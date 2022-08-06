@@ -329,7 +329,7 @@ namespace Display.Views
                         var textFileExists = "数据文件已存在，未复制原数据文件";
                         if (!File.Exists(dstDBFilepath))
                         {
-                            File.Copy(DataAccess.dbpath, dstDBFilepath, false);
+                            File.Copy(DataAccess.NewDBPath(lastDBSavePath), dstDBFilepath, false);
                             textFileExists = "原数据文件已复制到指定目录";
                         }
 
