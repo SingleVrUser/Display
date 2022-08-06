@@ -1,0 +1,23 @@
+﻿<Window
+    x:Class="Display.VideoPlayWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Display"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <!--纯浏览器窗口，播放视频方便全屏-->
+    <Grid>
+        <WebView2 x:Name="webview" Source="{x:Bind sourceUrl}" NavigationStarting="webview_NavigationStarting" NavigationCompleted="webview_NavigationCompleted"/>
+
+        
+        <!--无链接传入-->
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{x:Bind isSourceUrlNull()}">
+            <TextBlock Text="网页地址为空" FontSize="20"/>
+        </StackPanel>
+
+
+        <ProgressBar x:Name="NavigationProgressBar" IsIndeterminate="True" VerticalAlignment="Top"/>
+    </Grid>
+</Window>

@@ -1,0 +1,58 @@
+﻿<Page
+    x:Class="Display.Views.ActorsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Display.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    NavigationCacheMode="Enabled">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <RelativePanel Height="35" Margin="5">
+            <StackPanel Orientation="Horizontal" Spacing="2">
+                <StackPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="IsEnabled" Value="False"/>
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </StackPanel.Resources>
+                <Button Content="90后"/>
+                <Button Content="80后"/>
+                <Button Content="年轻"/>
+                <Button Content="苗条"/>
+                <ProgressRing x:Name="ProgressRing"/>
+            </StackPanel>
+            <TextBlock Text="{x:Bind actorinfo.Count,Mode=OneWay}"
+                       RelativePanel.AlignRightWithPanel="True"
+                       RelativePanel.AlignVerticalCenterWithPanel="True"
+                       Margin="0,0,10,0"/>
+        </RelativePanel>
+
+        <GridView Grid.Row="1"
+                x:Name="BasicGridView"
+                IsItemClickEnabled="True"
+                ItemClick="BasicGridView_ItemClick"
+                  Margin="10,0,0,0">
+            <GridView.ItemTemplate>
+                <DataTemplate x:DataType="local:ActorsInfo">
+                    <Grid Width="150"
+                            Height="120"
+                            Padding="10,5"
+                            BorderThickness="1"
+                            BorderBrush="{ThemeResource SystemControlTransientBorderBrush}"
+                            CornerRadius="5">
+                        <TextBlock Text="{x:Bind name}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                        <TextBlock Text="{x:Bind count}" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+                    </Grid>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+        </GridView>
+    </Grid>
+</Page>
