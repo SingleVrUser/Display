@@ -1,0 +1,33 @@
+﻿<Application
+    x:Class="Display.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Display">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                <!-- Other merged dictionaries here -->
+
+                <!--标题栏-->
+                <ResourceDictionary>
+                    <SolidColorBrush x:Key="WindowCaptionBackground">Transparent</SolidColorBrush>
+                    <SolidColorBrush x:Key="WindowCaptionBackgroundDisabled">Transparent</SolidColorBrush>
+                    <SolidColorBrush x:Key="WindowCaptionForeground">#1e90ff</SolidColorBrush>
+                    <SolidColorBrush x:Key="WindowCaptionForegroundDisabled">#abd5ff</SolidColorBrush>
+                </ResourceDictionary>
+                
+            </ResourceDictionary.MergedDictionaries>
+            <!-- Other app resources here -->
+
+            <x:Double x:Key="ContentDialogMaxWidth">900</x:Double>
+
+            
+            
+            <!--<AcrylicBrush x:Key="CustomAcrylicInAppLuminosity" TintOpacity="0.8" TintLuminosityOpacity="0.5" TintColor="SkyBlue" FallbackColor="SkyBlue" />-->
+
+
+            
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
