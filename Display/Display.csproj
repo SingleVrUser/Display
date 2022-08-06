@@ -1,0 +1,364 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>Display</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Platforms>x86;x64;arm64</Platforms>
+    <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
+    <PublishProfile>win10-$(Platform).pubxml</PublishProfile>
+    <UseWinUI>true</UseWinUI>
+    <EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+    <UserSecretsId>51af45ee-58f9-4ba6-b825-944994853423</UserSecretsId>
+    <DefaultLanguage>zh-cn</DefaultLanguage>
+    <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+    <GenerateTestArtifacts>True</GenerateTestArtifacts>
+    <AppxBundle>Never</AppxBundle>
+    <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+    <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
+    <PackageCertificateKeyFile>Display_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+    <AppxPackageDir>D:\库\Desktop\打包\</AppxPackageDir>
+    <PackageIcon>SmallTile.scale-125.png</PackageIcon>
+    <ApplicationIcon>Assets\pokeball.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Remove="Assets\BadgeLogo.scale-100.png" />
+    <Content Remove="Assets\BadgeLogo.scale-125.png" />
+    <Content Remove="Assets\BadgeLogo.scale-150.png" />
+    <Content Remove="Assets\BadgeLogo.scale-200.png" />
+    <Content Remove="Assets\BadgeLogo.scale-400.png" />
+    <Content Remove="Assets\icons8-text-96.png" />
+    <Content Remove="Assets\Svg\file_document_paper_page_icon.svg" />
+    <Content Remove="Assets\torrent-symbol-file-format - 复制.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="About\UpdatePlane.xaml" />
+    <None Remove="Assets\115favicon.ico" />
+    <None Remove="Assets\115\mountain.svg" />
+    <None Remove="Assets\115\pic_left_det.svg" />
+    <None Remove="Assets\115\QRCode.png" />
+    <None Remove="Assets\FileType\file.png" />
+    <None Remove="Assets\FileType\folder.png" />
+    <None Remove="Assets\icons8-archive-folder-96.png" />
+    <None Remove="Assets\icons8-circled-play-96.png" />
+    <None Remove="Assets\icons8-image-96.png" />
+    <None Remove="Assets\icons8-page-96.png" />
+    <None Remove="Assets\SmallTile.scale-100.png" />
+    <None Remove="Assets\Svg\accounting_banking_business_calculate_calculator_icon.svg" />
+    <None Remove="Assets\Svg\file_document_paper_page_icon.svg" />
+    <None Remove="ContentsPage\BrowserImportDataAccess.xaml" />
+    <None Remove="ContentsPage\CalculateLocalFileSha1.xaml" />
+    <None Remove="ContentsPage\CheckCookie.xaml" />
+    <None Remove="ContentsPage\CheckMatchMethod.xaml" />
+    <None Remove="ContentsPage\DownDialogContent.xaml" />
+    <None Remove="ContentsPage\Import115DataToLocalDataAccess.xaml" />
+    <None Remove="ContentsPage\LoginPage.xaml" />
+    <None Remove="ContentsPage\ProgressOfImportDataAccess.xaml" />
+    <None Remove="ContentsPage\SelectSingleVideoToPlay.xaml" />
+    <None Remove="ContentsPage\spiderVideoInfo.xaml" />
+    <None Remove="ContentsPage\SpiderVideoInfo_ConditionalCheck.xaml" />
+    <None Remove="ContentsPage\UpdateImagePath.xaml" />
+    <None Remove="ContentsPage\VideoPlay - 复制.xaml" />
+    <None Remove="ContentsPage\VideoPlay.xaml" />
+    <None Remove="Control\Browser.xaml" />
+    <None Remove="Control\CustomAutoSuggestBox.xaml" />
+    <None Remove="Control\Explorer.xaml" />
+    <None Remove="Control\MultipleCoverShow.xaml" />
+    <None Remove="Control\StatusShow.xaml" />
+    <None Remove="Control\TextBlockWithLongText.xaml" />
+    <None Remove="Control\UserInfo.xaml" />
+    <None Remove="Control\VideoCoverDisplay.xaml" />
+    <None Remove="Control\VideoDetails.xaml" />
+    <None Remove="Control\VideoPlay.xaml" />
+    <None Remove="Settings\GetVideoInfo.xaml" />
+    <None Remove="VideoPlayWindow.xaml" />
+    <None Remove="Views\BrowserPage.xaml" />
+    <None Remove="Views\BrowserWithTabPage.xaml" />
+    <None Remove="Views\MorePage.xaml" />
+    <None Remove="WindowView\CommonWindow.xaml" />
+    <None Remove="WindowView\LoginWindow.xaml" />
+    <None Remove="WindowView\SingleFrameWindow.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\SplashScreen.scale-200.png" />
+    <Content Include="Assets\LockScreenLogo.scale-200.png" />
+    <Content Include="Assets\Square150x150Logo.scale-200.png" />
+    <Content Include="Assets\Square44x44Logo.scale-200.png" />
+    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <Content Include="Views\AboutPage.xaml" />
+    <Content Include="Views\AboutPage.xaml.cs" />
+    <Content Include="Views\ActorInfoPage.xaml" />
+    <Content Include="Views\ActorInfoPage.xaml.cs" />
+    <Content Include="Views\ActorsPage.xaml" />
+    <Content Include="Views\ActorsPage.xaml.cs" />
+    <Content Include="Views\DetailInfoPage.xaml" />
+    <Content Include="Views\DetailInfoPage.xaml.cs" />
+    <Content Include="Views\FileListPage.xaml" />
+    <Content Include="Views\FileListPage.xaml.cs" />
+    <Content Include="Views\HomePage.xaml" />
+    <Content Include="Views\HomePage.xaml.cs" />
+    <Content Include="Views\ImportPage.xaml" />
+    <Content Include="Views\ImportPage.xaml.cs" />
+    <Content Include="Views\LoginPage.xaml" />
+    <Content Include="Views\LoginPage.xaml.cs" />
+    <Content Include="Views\SettingsPage.xaml" />
+    <Content Include="Views\SettingsPage.xaml.cs" />
+    <Content Include="Views\VideoViewPage.xaml" />
+    <Content Include="Views\VideoViewPage.xaml.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ByteSize" Version="2.1.1" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.43" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.WinUI" Version="2.0.0-beta.330" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.2" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.3" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="QRCoder" Version="1.4.3" />
+    <PackageReference Include="SQLitePCLRaw.bundle_winsqlite3" Version="2.1.0" />
+    <PackageReference Include="WinUIEx" Version="1.8.0" />
+    <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <!-- Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
+       Tools extension to be activated for this project even if the Windows App SDK Nuget
+       package has not yet been restored -->
+  <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnablePreviewMsixTooling)'=='true'">
+    <ProjectCapability Include="Msix" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Data\Data.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="ContentsPage\VideoPlay - 复制.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
+    <Page Update="Control\Explorer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="WindowView\CommonWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="ContentsPage\SpiderVideoInfo.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="ContentsPage\LoginPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="ContensPage\CheckCookie.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="WindowView\LoginWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Control\UserInfo.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="WindowView\VideoPlayWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Control\TextBlockWithLongText.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Control\CustomAutoSuggestBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="ContensPage\VideoPlay.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Control\MultipleCoverShow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="ContensPage\SelectSingleVideoToPlay.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Control\Browser.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\BrowserWithTabPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\MorePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\BrowserPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Control\VideoDetails.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\AboutPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\ActorInfoPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\ActorsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\DetailInfoPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\FileListPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\HomePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\ImportPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\LoginPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\SettingsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\VideoViewPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Control\VideoCoverDisplay.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="ContensPage\DownDialogContent.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Window\VideoPlay.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="About\UpdatePlane.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Settings\GetVideoInfo.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assets\115\file_type\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Assets\SmallTile.scale-125.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <Page Update="ContentsPage\UpdateImagePath.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="ContentsPage\CheckMatchMethod.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="WindowView\SingleFrameWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="ContentsPage\ProgressOfImportDataAccess.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="ContentsPage\Import115DataToLocalDataAccess.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Control\VideoPlay.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="ContentsPage\BrowserImportDataAccess.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Control\StatusShow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="ContentsPage\SpiderVideoInfo_ConditionalCheck.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomAdditionalCompileInputs Remove="ContentsPage\CalculateLocalFileSha1.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Remove="ContentsPage\CalculateLocalFileSha1.xaml" />
+  </ItemGroup>
+</Project>
