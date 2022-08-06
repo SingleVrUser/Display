@@ -1,0 +1,22 @@
+﻿<Page
+    x:Class="Display.About.UpdatePlane"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Display.About"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <StackPanel>
+        <TextBlock>
+            1.新增登录方式。打开Webview窗口，在里面登录115后获取Cookie
+            <LineBreak/>
+            2.优化页面过渡效果
+            <LineBreak/>
+            3.统一控件、字体样式，适配浅色/深色主题
+            <LineBreak/>
+            4.……
+        </TextBlock>
+    </StackPanel>
+</Page>
