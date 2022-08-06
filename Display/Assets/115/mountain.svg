@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="890px" height="278px" viewBox="0 0 890 278" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.2 (67145) - http://www.bohemiancoding.com/sketch -->
+    <title>Mountain</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="6.51169356%" y1="21.5224791%" x2="72.8535794%" y2="84.4640699%" id="linearGradient-1">
+            <stop stop-color="#EDF5FF" offset="0%"></stop>
+            <stop stop-color="#A6D1FC" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Screen" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="VD-0_1-115登录页面" transform="translate(0.000000, -242.000000)" fill="url(#linearGradient-1)" fill-rule="nonzero">
+            <g id="Illustration" transform="translate(0.000000, 178.000000)">
+                <g id="Mountain" transform="translate(0.000000, 64.000000)">
+                    <path d="M0,0 C26.3112852,39.7559505 72.7138867,59.6339257 139.207804,59.6339257 C230.138623,51.2113086 296.093648,77.6666667 337.072879,139 C376.577459,190.333333 435.770096,202 514.650793,174 C584.067764,142.666667 639.359395,155 680.525687,211 C701.36982,235 736.531072,238 786.009443,220 C819.892435,210.993562 854.555954,229.408886 890,275.245973 L0,278 L0,0 Z" id="Path-7"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
