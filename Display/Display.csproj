@@ -55,7 +55,6 @@
     <None Remove="ContentsPage\CheckCookie.xaml" />
     <None Remove="ContentsPage\CheckMatchMethod.xaml" />
     <None Remove="ContentsPage\DownDialogContent.xaml" />
-    <None Remove="ContentsPage\Import115DataToLocalDataAccess.xaml" />
     <None Remove="ContentsPage\LoginPage.xaml" />
     <None Remove="ContentsPage\ProgressOfImportDataAccess.xaml" />
     <None Remove="ContentsPage\SelectSingleVideoToPlay.xaml" />
@@ -327,11 +326,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="ContentsPage\ProgressOfImportDataAccess.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="ContentsPage\Import115DataToLocalDataAccess.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
