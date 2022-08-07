@@ -103,11 +103,18 @@ namespace Display.ContentsPage
 
             ShowFilesPieCharts(datumList);
 
-            TopProgressBar.Visibility = Visibility.Collapsed;
 
+            ////进度条
+            //var progress = new Progress<GetFileProgessIProgress>(progressPercent =>
+            //{
+
+            //});
 
             //挑选符合条件的视频文件
             List<MatchVideoResult> matchVideoResults = await Task.Run(() => FileMatch.GetVideoAndMatchFile(datumList));
+
+            TopProgressBar.Visibility = Visibility.Collapsed;
+
 
             //0:检查规则,1:直接开始
             switch (SelectedMethod_Combox.SelectedIndex)
@@ -143,7 +150,6 @@ namespace Display.ContentsPage
 
                         //未空，退出
                         if (matchVideoResults.Count == 0) return;
-
 
                         ContentDialog dialog = new ContentDialog();
                         dialog.Title = "检索";
@@ -189,28 +195,46 @@ namespace Display.ContentsPage
             TopProgressBar.Visibility = Visibility.Visible;
             StartMatchName_Button.IsEnabled = false;
             FailVideoNameList = new();
+
+            var startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+
             var progress = new Progress<SpliderInfoProgress>(progressPercent =>
             {
-                tryUpdateVideoInfo(progressPercent.videoInfo);
 
+                tryUpdateVideoInfo(progressPercent.videoInfo);
+                ProgressMore_TextBlock.Text = $"失败数：0";
                 var macthResult = progressPercent.macthResult;
 
                 //匹配失败/检索失败
                 if (!macthResult.status)
                 {
                     FailVideoNameList.Add(macthResult.OriginalName);
-                    SearchProgress_TextBlock.Text = $"失败：{macthResult.OriginalName} {macthResult.message}";
+                    ProgressMore_TextBlock.Text = $"失败数：{FailVideoNameList.Count}";
+                    SearchProgress_TextBlock.Text = $"❌失败：{macthResult.OriginalName} {macthResult.message}";
                 }
                 //匹配成功/跳过非视频文件/跳过重复番号
                 else
                 {
                     if(macthResult.MatchName != null)
                     {
-                        SearchProgress_TextBlock.Text = $"{macthResult.OriginalName} => {macthResult.MatchName}";
+                        //匹配成功
+                        if(macthResult.OriginalName!= null)
+                        {
+                            SearchProgress_TextBlock.Text = $"{macthResult.OriginalName} => {macthResult.MatchName}";
+                            SearchMessage_TextBlock.Text = $"✔{macthResult.message}";
+                        }
+                        //匹配中
+                        else
+                        {
+                            SearchProgress_TextBlock.Text = $"{macthResult.MatchName}";
+                            SearchMessage_TextBlock.Text = $"🐬{macthResult.message}";
+                        }
                     }
+                    // 其他
                     else
                     {
-                        SearchProgress_TextBlock.Text = $"{macthResult.OriginalName}：{macthResult.message}";
+                        SearchProgress_TextBlock.Text = $"{macthResult.OriginalName}";
+                        SearchMessage_TextBlock.Text = $"✨{macthResult.message}";
                     }
                 }
 
@@ -232,6 +256,9 @@ namespace Display.ContentsPage
 
                     StartMatchName_Button.IsEnabled = true;
                     TopProgressBar.Visibility = Visibility.Collapsed;
+
+                    //显示总耗时
+                    SearchProgress_TextBlock.Text = $"⏱总耗时：{FileMatch.ConvertInt32ToDateStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime)}";
                 }
             });
 
@@ -268,7 +295,7 @@ namespace Display.ContentsPage
                 //存在匹配文件
                 if (matchResult.MatchName != null)
                 {
-                    spliderInfoProgress.videoInfo = await SearchInfoByWeb(matchResult.MatchName);
+                    spliderInfoProgress.videoInfo = await SearchInfoByWeb(matchResult.MatchName, progress);
 
                     //检索失败
                     if (spliderInfoProgress.videoInfo == null)
@@ -276,6 +303,13 @@ namespace Display.ContentsPage
                         spliderInfoProgress.macthResult.status = false;
                         spliderInfoProgress.macthResult.statusCode = -2;
                         spliderInfoProgress.macthResult.message = "检索失败";
+                    }
+                    //成功
+                    else
+                    {
+                        spliderInfoProgress.macthResult.status = false;
+                        spliderInfoProgress.macthResult.statusCode = 1;
+                        spliderInfoProgress.macthResult.message = "检索成功";
                     }
                 }
 
@@ -289,7 +323,7 @@ namespace Display.ContentsPage
         /// </summary>
         /// <param name="VideoName"></param>
         /// <returns></returns>
-        private async Task<VideoInfo> SearchInfoByWeb(string VideoName)
+        private async Task<VideoInfo> SearchInfoByWeb(string VideoName, IProgress<SpliderInfoProgress> progress)
         {
             VideoInfo resultInfo;
 
@@ -300,18 +334,24 @@ namespace Display.ContentsPage
             {
                 //使用第一个符合条件的Name
                 resultInfo = DataAccess.LoadOneVideoInfoByCID(result[0]);
+
+                progress.Report(new SpliderInfoProgress() { macthResult= new MatchVideoResult() { MatchName = VideoName, status = true, message = "数据库已存在" } });
             }
             // 从相关网站中搜索
             else
             {
+                progress.Report(new SpliderInfoProgress() { macthResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~3秒" } });
                 await GetInfoFromNetwork.RandomTimeDelay(1, 3);
+                progress.Report(new SpliderInfoProgress() { macthResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavBus中搜索" } });
                 //先从javbus中搜索
                 resultInfo = await network.SearchInfoFromJavBus(VideoName);
 
                 //搜索无果，使用javdb搜索
                 if (resultInfo == null)
                 {
+                    progress.Report(new SpliderInfoProgress() { macthResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待3~6秒" } });
                     await GetInfoFromNetwork.RandomTimeDelay(3, 6);
+                    progress.Report(new SpliderInfoProgress() { macthResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavDB中搜索" } });
                     resultInfo = await network.SearchInfoFromJavDB(VideoName);
                 }
 
@@ -448,6 +488,11 @@ namespace Display.ContentsPage
 
             var result = await dialog.ShowAsync();
 
+        }
+
+        private void ProgressMore_Click(object sender, RoutedEventArgs e)
+        {
+            FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
         }
 
 

@@ -278,18 +278,27 @@
                         Header="搜刮信息">
                         <StackPanel Spacing="5">
                             <Pivot Margin="-15,-20,0,0">
+                                <Pivot.HeaderTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                        <TextBlock Text="{x:Bind}" FontSize="14"/>
+                                    </DataTemplate>
+                                </Pivot.HeaderTemplate>
                                 <PivotItem Header="JavBus">
-                                    <StackPanel Padding="50,10">
+                                    <StackPanel Padding="50,10" Spacing="10">
                                         <RelativePanel>
                                             <TextBlock x:Name="JavbusUrl_TextBlox" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0">地址</TextBlock>
                                             <TextBox x:Name="JavbusUrl_TextBox" Width="600" RelativePanel.RightOf="JavbusUrl_TextBlox" Text="{x:Bind data:AppSettings.JavBus_BaseUrl}"/>
                                             <Button x:Name="JavbusUrlChange_Button" Click="JavbusUrlChange_Button_Click" Content="修改" RelativePanel.AlignRightWithPanel="True"/>
                                         </RelativePanel>
+                                        
+                                        <RelativePanel>
+                                            <TextBlock Text="单次请求后等待" />
+                                            <TextBlock Text="1~3 s" RelativePanel.AlignRightWithPanel="True"/>
+                                        </RelativePanel>
                                     </StackPanel>
                                 </PivotItem>
 
                                 <PivotItem Header="JavDB">
-
                                     <StackPanel Spacing="5" Padding="50,10">
                                         <RelativePanel>
                                             <TextBlock x:Name="JavDBUrl_TextBlox" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0" Width="50">地址</TextBlock>
@@ -308,7 +317,32 @@
                                             </TextBox>
                                             <Button x:Name="JavDBCookieChange_Button" Click="JavDBCookieChange_Button_Click" Content="修改" RelativePanel.AlignRightWithPanel="True"/>
                                         </RelativePanel>
+
+                                        <RelativePanel Margin="0,5,0,0">
+                                            <TextBlock Text="单次请求后等待" />
+                                            <TextBlock Text="3~6 s" RelativePanel.AlignRightWithPanel="True"/>
+                                        </RelativePanel>
                                     </StackPanel>
+                                </PivotItem>
+
+                                <PivotItem Header="搜刮方式">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!--<TextBlock Text="javbus"/>-->
+                                        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+                                            <TextBlock Text="当前设置" VerticalAlignment="Center"/>
+                                            <ComboBox SelectedIndex="0" Width="90">
+                                                <x:String>JavBus</x:String>
+                                                <x:String>JavDB</x:String>
+                                            </ComboBox>
+                                        </StackPanel>
+                                        <GridView x:Name="MatchRulesList_GridView" Grid.Row="1">
+                                        </GridView>
+                                    </Grid>
                                 </PivotItem>
                             </Pivot>
 

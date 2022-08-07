@@ -35,7 +35,10 @@ namespace Display.ContentsPage
         {
             this.InitializeComponent();
 
+            reMatchProgressRing.IsActive = true;
             videoMatchInfo = new(matchResultList);
+
+            reMatchProgressRing.IsActive = false;
         }
 
         private void MatchKeywordModify_KeyDown(object sender, KeyRoutedEventArgs e)
@@ -64,14 +67,15 @@ namespace Display.ContentsPage
         /// <param name="e"></param>
         private async void ReMatchButton_Click(object sender, RoutedEventArgs e)
         {
+            reMatchProgressRing.IsActive = true;
             List<KeywordMatchName> allNameList = new();
 
-            foreach(var item in videoMatchInfo.SuccessNameCollection)
+            foreach(var item in videoMatchInfo.SuccessNameCollection.allMatchNameList)
             {
                 allNameList.Add(item);
             }
 
-            foreach(var item in videoMatchInfo.FailNameCollection)
+            foreach(var item in videoMatchInfo.FailNameCollection.allMatchNameList)
             {
                 allNameList.Add(item);
             }
@@ -110,16 +114,22 @@ namespace Display.ContentsPage
 
 
             videoMatchInfo.SuccessNameCollection.Clear();
+            videoMatchInfo.SuccessNameCollection.allMatchNameList = new();
             foreach (var item in NameList[0])
             {
                 videoMatchInfo.SuccessNameCollection.AddActualList(item);
             }
             
             videoMatchInfo.FailNameCollection.Clear();
+            videoMatchInfo.FailNameCollection.allMatchNameList=new();
+
             foreach (var item in NameList[1])
             {
                 videoMatchInfo.FailNameCollection.AddActualList(item);
             }
+
+
+            reMatchProgressRing.IsActive = false;
         }
         private void MatchSuccess_Expander_Expanding(Expander sender, ExpanderExpandingEventArgs args)
         {
@@ -140,6 +150,34 @@ namespace Display.ContentsPage
             //CloseMatchSuccessResult_Storyboard.Begin();
             CloseMatchSuccessResult_Storyboard.Begin();
             var i = MatchResult_Grid;
+        }
+
+        private async void AddRulesButton_Click(object sender, RoutedEventArgs e)
+        {
+            ContentDialog dialog = new ContentDialog();
+
+            // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
+            dialog.XamlRoot = this.XamlRoot;
+            dialog.Title = "自动添加";
+            dialog.PrimaryButtonText = "添加";
+            dialog.CloseButtonText = "返回";
+            dialog.DefaultButton = ContentDialogButton.Primary;
+
+            var AddMatchRulesAutomaticallyPage = new AddMatchRulesAutomatically(videoMatchInfo.FailNameCollection.allMatchNameList);
+            dialog.Content = AddMatchRulesAutomaticallyPage;
+
+            var result = await dialog.ShowAsync();
+
+            if(result == ContentDialogResult.Primary)
+            {
+
+                foreach(var newKeywordItem in AddMatchRulesAutomaticallyPage.AddMatchNameList)
+                {
+                    videoMatchInfo.tryAddKeyword(newKeywordItem.Keyword.ToLower());
+                }
+ 
+            }
+
         }
     }
 
@@ -212,7 +250,10 @@ namespace Display.ContentsPage
         public bool tryAddKeyword(string newKeyword)
         {
             bool result = false;
-            if(!KeywordString.Contains(newKeyword))
+
+            var keywordsList = KeywordString.Split(",");
+
+            if (!keywordsList.Contains(newKeyword))
             {
                 KeywordString += $",{newKeyword}";
                 KeywordCollection.Add(newKeyword);
@@ -318,17 +359,30 @@ namespace Display.ContentsPage
     public class KeywordMatchName
     {
         public string OriginalName;
+        private string _keyword = string.Empty;
         public string Keyword
         { 
             get
             {
                 string keyword = string.Empty;
-                Match match_keyword = Regex.Match(MatchName, @"(\w+)[-_]?\d", RegexOptions.IgnoreCase);
-                if (match_keyword.Success)
+                if (string.IsNullOrEmpty(_keyword))
                 {
-                    keyword = match_keyword.Groups[1].Value;
+                    Match match_keyword = Regex.Match(MatchName, @"(\w+)[-_]?\d", RegexOptions.IgnoreCase);
+                    if (match_keyword.Success)
+                    {
+                        keyword = match_keyword.Groups[1].Value;
+                    }
                 }
+                else
+                {
+                    keyword = _keyword;
+                }
+
                 return keyword;
+            }
+            set
+            {
+                _keyword = value;
             }
         }
         public string MatchName;

@@ -51,6 +51,7 @@
     <None Remove="Assets\Svg\accounting_banking_business_calculate_calculator_icon.svg" />
     <None Remove="Assets\Svg\file_document_paper_page_icon.svg" />
     <None Remove="Assets\Tip\FindFolderCid.png" />
+    <None Remove="ContentsPage\AddMatchRulesAutomatically.xaml" />
     <None Remove="ContentsPage\CalculateLocalFileSha1.xaml" />
     <None Remove="ContentsPage\CheckCookie.xaml" />
     <None Remove="ContentsPage\CheckMatchMethod.xaml" />
@@ -70,6 +71,7 @@
     <None Remove="Control\MultipleCoverShow.xaml" />
     <None Remove="Control\StatusShow.xaml" />
     <None Remove="Control\TextBlockWithLongText.xaml" />
+    <None Remove="Control\TextBlockWithStressText.xaml" />
     <None Remove="Control\UserInfo.xaml" />
     <None Remove="Control\VideoCoverDisplay.xaml" />
     <None Remove="Control\VideoDetails.xaml" />
@@ -311,6 +313,12 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="Control\TextBlockWithStressText.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="ContentsPage\AddMatchRulesAutomatically.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="ContentsPage\Import115DataToLocalDataAccess\InputCidManually.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
