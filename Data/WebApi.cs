@@ -72,7 +72,7 @@ namespace Data
             }
             catch (HttpRequestException e)
             {
-                tryToast("网络异常", "检查115登录状态时出现异常：", e.Message);
+                FileMatch.tryToast("网络异常", "检查115登录状态时出现异常：", e.Message);
 
                 return result;
             }
@@ -120,7 +120,7 @@ namespace Data
             }
             catch (AggregateException e)
             {
-                tryToast("网络异常","检查115隐藏状态时出现异常：",e.Message);
+                FileMatch.tryToast("网络异常","检查115隐藏状态时出现异常：",e.Message);
 
                 return result;
             }
@@ -155,20 +155,7 @@ namespace Data
             return result;
         }
 
-        private void tryToast(string Title, string content1, string content2 = "")
-        {
-            new ToastContentBuilder()
-                    .AddArgument("action", "viewConversation")
-                    .AddArgument("conversationId", 384928)
 
-                    .AddText(Title)
-
-                    .AddText(content1)
-
-                    .AddText(content2)
-
-                    .Show();
-        }
 
         /// <summary>
         /// 导入CidList获取到的所有信息到数据库
@@ -338,7 +325,7 @@ namespace Data
             }
             catch (AggregateException e)
             {
-                tryToast("网络异常", "获取文件信息时出现异常：", e.Message);
+                FileMatch.tryToast("网络异常", "获取文件信息时出现异常：", e.Message);
                 return WebFileInfoResult;
             }
 
@@ -407,11 +394,11 @@ namespace Data
             }
             catch(AggregateException e)
             {
-                tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
+                FileMatch.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
                 return WebFileInfoResult;
             }catch(HttpRequestException e)
             {
-                tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
+                FileMatch.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
                 return WebFileInfoResult;
             }
 

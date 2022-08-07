@@ -39,12 +39,12 @@
                             <x:String>直接开始</x:String>
                         </ComboBox>
                     </RelativePanel>
-                    <StackPanel x:Name="FileInfoPieChart" Visibility="Collapsed" BorderThickness="0,1,0,0" BorderBrush="Gray" Padding="0,5,0,0">
+                    <StackPanel x:Name="FileInfoPieChart" Visibility="Collapsed" BorderThickness="0,1,0,0" BorderBrush="{ThemeResource ListBoxBorderThemeBrush}" Padding="0,5,0,0">
                         <TextBlock Text="文件数量占比"/>
                         <lvc:PieChart x:Name="CountPercentPieChart" LegendPosition="Right" LegendBackground="{ThemeResource ApplicationPageBackgroundThemeBrush}"/>
                     </StackPanel>
 
-                    <Grid x:Name="ProgressRing_Grid" BorderThickness="0,1,0,0" BorderBrush="Gray" Visibility="Collapsed">
+                    <Grid x:Name="ProgressRing_Grid" BorderThickness="0,1,0,0" BorderBrush="{ThemeResource MediaButtonPressedBorderThemeBrush}" Visibility="Collapsed">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="20"/>
                             <ColumnDefinition Width="*"/>
@@ -63,6 +63,7 @@
                             </Grid>
 
                             <TextBlock x:Name="SearchProgress_TextBlock" HorizontalAlignment="Center" TextWrapping="Wrap" HorizontalTextAlignment="Center" IsTextSelectionEnabled="True"/>
+                            <TextBlock x:Name="SearchMessage_TextBlock" HorizontalAlignment="Center" TextWrapping="Wrap" HorizontalTextAlignment="Center" IsTextSelectionEnabled="True"/>
                         </StackPanel>
 
                         <StackPanel x:Name="SearchResult_StackPanel" Grid.Column="2" VerticalAlignment="Center" Margin="10,0" Spacing="5" Visibility="Collapsed">
@@ -79,11 +80,20 @@
                                 <Run x:Name="FailCount_Run">0</Run>
                             </TextBlock>
                         </StackPanel>
+                        
+                        <!--更多-->
+                        <HyperlinkButton Grid.ColumnSpan="4" Content="……" HorizontalAlignment="Right" VerticalAlignment="Top" Click="ProgressMore_Click">
+                            <FlyoutBase.AttachedFlyout>
+                                <Flyout>
+                                    <TextBlock x:Name="ProgressMore_TextBlock"/>
+                                </Flyout>
+                            </FlyoutBase.AttachedFlyout>
+                        </HyperlinkButton>
                     </Grid>
                     
 
                     <!--获取信息-->
-                    <Grid x:Name="VideoInfo_Grid" RowSpacing="5" Margin="0,10,0,0" Padding="5" BorderThickness="0,1,0,0" BorderBrush="Gray" Visibility="Collapsed">
+                    <Grid x:Name="VideoInfo_Grid" RowSpacing="5" Margin="0,10,0,0" Padding="5" BorderThickness="0,1,0,0" BorderBrush="{ThemeResource MediaButtonPressedBorderThemeBrush}" Visibility="Collapsed">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>

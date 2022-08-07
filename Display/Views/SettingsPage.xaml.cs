@@ -56,6 +56,7 @@ namespace Display.Views
 
             DataAccessSavePath_TextBox.Text = AppSettings.DataAccess_SavePath;
 
+            MatchRulesList_GridView.ItemsSource = AppSettings.MatchVideoKeywordsString.Split(',');
         }
 
         ///// <summary>
