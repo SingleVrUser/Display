@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.Toolkit.Uwp.Notifications;
+using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,6 +15,24 @@ namespace Data
     public static class FileMatch
     {
         /// <summary>
+        /// //正则删除某些关键词
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static string DeleteSomeKeywords(string name)
+        {
+            
+            List<string> reg_replace_list = new List<string> { "uur76", "4K60fps", @"part\d", "@18P2P", "1080P", "720P", @"\[?[0-9a-z]+?\.(com|cn|xyz|la|me|net|app|cc)\]?@?", @"SE\d{2}", @"S0\dE\d{1,2}", @"\D[hx]265", @"\D[hx]264", "[-_][468]k",@"h_[0-9]{3,4}" };
+            for (int i = 0; i < reg_replace_list.Count; i++)
+            {
+                Regex rgx = new Regex(reg_replace_list[i], RegexOptions.IgnoreCase);
+                name = rgx.Replace(name, "");
+            }
+
+            return name;
+        }
+
+        /// <summary>
         /// 从文件名中匹配CID名字
         /// </summary>
         /// <param name="src_text"></param>
@@ -23,23 +42,17 @@ namespace Data
             string combination = null;
 
             //提取文件名
-            string fileName = Regex.Match(src_text, @"(.*).\w{3}$").Groups[1].Value;
+            string fileName = Regex.Match(src_text.ToLower(), @"(.*)(\.\w{3,5})?$").Groups[1].Value;
 
-            //正则删除关键词
-            List<string> reg_replace_list = new List<string> { "uur76", "4K60fps", @"part\d","@18P2P", "1080P", "720P", @"\[?\w+\.(com|cn|xyz|la|me|net|app|cc)\]?@?", @"S0\dE\d{1,2}", @"\D[hx]265", @"\D[hx]264", "[-_][468]k" };
-            for (int i = 0; i < reg_replace_list.Count; i++)
-            {
-                Regex rgx = new Regex(reg_replace_list[i], RegexOptions.IgnoreCase);
-                fileName = rgx.Replace(fileName, "");
-            }
+            fileName = DeleteSomeKeywords(fileName);
 
             //替换一些容易混淆的关键词
             fileName = fileName.Replace("gachippv", "gachi");
             fileName = fileName.Replace("caribbe", "carib");
             fileName = fileName.Replace("caribpr", "carib");
 
-            Regex fc_rgx = new Regex("fc(2[-_ ])?[-_ ]?", RegexOptions.IgnoreCase);
-            fileName = fc_rgx.Replace(fileName, "fc-");
+            Regex fc_rgx = new Regex(@"fc2?[-_ ]?(\d)", RegexOptions.IgnoreCase);
+            fileName = fc_rgx.Replace(fileName, "fc-$1");
 
             if (fileName == "")
             {
@@ -56,7 +69,8 @@ namespace Data
                 {"fc", new Regex(@"\d{6,7}", RegexOptions.IgnoreCase) },
                 {"heyzo", new Regex(@"\d{4}", RegexOptions.IgnoreCase) },
                 {"1pon", new Regex(@"\d{6}[-_]\d{3}", RegexOptions.IgnoreCase) },
-                {"heydouga", new Regex(@"\d{4}-\d{3}", RegexOptions.IgnoreCase) }
+                {"heydouga", new Regex(@"\d{4}-\d{3}", RegexOptions.IgnoreCase) },
+                {"mkbd", new Regex(@"s\d{3}", RegexOptions.IgnoreCase) }
                 };
 
 
@@ -67,7 +81,8 @@ namespace Data
                         break;
                     }
 
-                    if (fileName.Contains(entry.Key))
+                    Match keywords_match = Regex.Match(fileName, @"[^a-z]" + entry.Key + "[^a-z]", RegexOptions.IgnoreCase);
+                    if (keywords_match.Success)
                     {
                         Match match_num = entry.Value.Match(fileName);
                         if (match_num.Success)
@@ -83,6 +98,10 @@ namespace Data
                                 combination = $"{entry.Key}-{number}";
                             }
                             else if (entry.Key == "heydouga")
+                            {
+                                combination = $"{entry.Key}-{number}";
+                            }
+                            else if (entry.Key == "mkbd")
                             {
                                 combination = $"{entry.Key}-{number}";
                             }
@@ -108,7 +127,7 @@ namespace Data
 
                         var key = general_keywords_list[i];
 
-                        Match match_cid = Regex.Match(fileName, @"(?: h_)?[^a-zA-Z]*(" + key + @")[-_ ]?0*(\d+)", RegexOptions.IgnoreCase);
+                        Match match_cid = Regex.Match(fileName, @"(?: h_)?[^a-zA-Z]*(" + key + @")[-_ ]{0,3}0*(\d+)", RegexOptions.IgnoreCase);
                         if (match_cid.Success)
                         {
                             string keywords = match_cid.Groups[1].Value;
@@ -345,7 +364,6 @@ namespace Data
                         break;
                 }
             }
-
             return cookieList;
         }
 
@@ -353,6 +371,22 @@ namespace Data
         {
             StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(path);
             await Launcher.LaunchFolderAsync(folder);
+        }
+
+
+        public static void tryToast(string Title, string content1, string content2 = "")
+        {
+            new ToastContentBuilder()
+                    .AddArgument("action", "viewConversation")
+                    .AddArgument("conversationId", 384928)
+
+                    .AddText(Title)
+
+                    .AddText(content1)
+
+                    .AddText(content2)
+
+                    .Show();
         }
     }
 }

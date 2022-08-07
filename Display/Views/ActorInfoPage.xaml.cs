@@ -111,6 +111,57 @@ namespace Display.Views
             Frame.Navigate(typeof(DetailInfoPage), item, new SuppressNavigationTransitionInfo());
         }
 
+
+        /// <summary>
+        /// 视频播放页面跳转
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void VideoPlay_Click(object sender, RoutedEventArgs e)
+        {
+            var VideoPlayButton = (Button)sender;
+            var videoInfo = VideoPlayButton.DataContext as VideoCoverDisplayClass;
+            List<Datum> videoInfoList = DataAccess.loadVideoInfoByTruename(videoInfo.truename);
+
+            //没有
+            if (videoInfoList.Count == 0)
+            {
+                VideoPlayButton.Flyout = new Flyout()
+                {
+                    Content = new TextBlock() { Text = "经查询，本地数据库无该文件，请导入后继续" }
+                };
+            }
+            else if (videoInfoList.Count == 1)
+            {
+                VideoPlayWindow.createNewWindow(FileMatch.getVideoPlayUrl(videoInfoList[0].pc));
+                //Frame.Navigate(typeof(ContentsPage.VideoPlay), videoInfoList[0].pc);
+            }
+
+            //有多集
+            else
+            {
+                List<Datum> multisetList = new();
+                foreach (var videoinfo in videoInfoList)
+                {
+                    multisetList.Add(videoinfo);
+                }
+
+                ContentsPage.SelectSingleVideoToPlay newPage = new ContentsPage.SelectSingleVideoToPlay(multisetList);
+                newPage.ContentListView.ItemClick += ContentListView_ItemClick; ;
+
+                VideoPlayButton.Flyout = new Flyout()
+                {
+                    Content = newPage
+                };
+            }
+        }
+
+        private void ContentListView_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var SingleVideoInfo = e.ClickedItem as Data.Datum;
+            VideoPlayWindow.createNewWindow(FileMatch.getVideoPlayUrl(SingleVideoInfo.pc));
+            //Frame.Navigate(typeof(ContentsPage.VideoPlay), SingleVideoInfo.pc);
+        }
     }
 
 }
