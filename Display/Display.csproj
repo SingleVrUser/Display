@@ -55,7 +55,10 @@
     <None Remove="ContentsPage\CheckCookie.xaml" />
     <None Remove="ContentsPage\CheckMatchMethod.xaml" />
     <None Remove="ContentsPage\DownDialogContent.xaml" />
+<<<<<<< HEAD
+=======
     <None Remove="ContentsPage\Import115DataToLocalDataAccess\InputCidManually.xaml" />
+>>>>>>> b9dd85235a6062d10d4d2636bb2ec537f5a83b1f
     <None Remove="ContentsPage\LoginPage.xaml" />
     <None Remove="ContentsPage\ProgressOfImportDataAccess.xaml" />
     <None Remove="ContentsPage\SelectSingleVideoToPlay.xaml" />
@@ -334,11 +337,14 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD
+=======
     <Page Update="ContentsPage\Import115DataToLoaclDataAccess\MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
+>>>>>>> b9dd85235a6062d10d4d2636bb2ec537f5a83b1f
     <Page Update="Control\VideoPlay.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
