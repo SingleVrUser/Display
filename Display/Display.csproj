@@ -55,7 +55,6 @@
     <None Remove="ContentsPage\CheckCookie.xaml" />
     <None Remove="ContentsPage\CheckMatchMethod.xaml" />
     <None Remove="ContentsPage\DownDialogContent.xaml" />
-    <None Remove="ContentsPage\Import115DataToLocalDataAccess.xaml" />
     <None Remove="ContentsPage\Import115DataToLocalDataAccess\InputCidManually.xaml" />
     <None Remove="ContentsPage\LoginPage.xaml" />
     <None Remove="ContentsPage\ProgressOfImportDataAccess.xaml" />
