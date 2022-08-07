@@ -50,11 +50,12 @@
     <None Remove="Assets\SmallTile.scale-100.png" />
     <None Remove="Assets\Svg\accounting_banking_business_calculate_calculator_icon.svg" />
     <None Remove="Assets\Svg\file_document_paper_page_icon.svg" />
-    <None Remove="ContentsPage\BrowserImportDataAccess.xaml" />
+    <None Remove="Assets\Tip\FindFolderCid.png" />
     <None Remove="ContentsPage\CalculateLocalFileSha1.xaml" />
     <None Remove="ContentsPage\CheckCookie.xaml" />
     <None Remove="ContentsPage\CheckMatchMethod.xaml" />
     <None Remove="ContentsPage\DownDialogContent.xaml" />
+    <None Remove="ContentsPage\Import115DataToLocalDataAccess\InputCidManually.xaml" />
     <None Remove="ContentsPage\LoginPage.xaml" />
     <None Remove="ContentsPage\ProgressOfImportDataAccess.xaml" />
     <None Remove="ContentsPage\SelectSingleVideoToPlay.xaml" />
@@ -310,6 +311,9 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="ContentsPage\Import115DataToLocalDataAccess\InputCidManually.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="ContentsPage\UpdateImagePath.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -325,17 +329,17 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="ContentsPage\ProgressOfImportDataAccess.xaml">
+    <Page Update="ContentsPage\Import115DataToLoaclDataAccess\Progress.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="ContentsPage\Import115DataToLoaclDataAccess\MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Control\VideoPlay.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="ContentsPage\BrowserImportDataAccess.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

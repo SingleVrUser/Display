@@ -107,7 +107,6 @@ namespace Display.Control
                     Type = FilesInfo.FileType.Folder,
                     Cid = item.cid,
                     HasUnrealizedChildren = hasUnrealizedChildren,
-                    //Children = children
                 };
 
                 list.Add(Folders);
