@@ -531,7 +531,6 @@ namespace Display.Control
         private void nowPageTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
         {
             //如果不是回车
-            
             if (e.Key != Windows.System.VirtualKey.Enter)
             {
                 return;

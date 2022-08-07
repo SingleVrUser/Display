@@ -106,7 +106,7 @@ namespace Display
                     case 3:
                         NavView.SelectedItem = NavView.MenuItems[4];
                         break;
-                    case 5:
+                    case 4:
                         NavView.SelectedItem = NavView.SettingsItem;
                         break;
                 }

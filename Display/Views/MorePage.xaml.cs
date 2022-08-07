@@ -79,7 +79,7 @@ namespace Display.Views
             {
                 case "导入115数据":
                     SingleFrameWindow window1 = new SingleFrameWindow();
-                    window1.NavigationToPageWithWebView(typeof(ContentsPage.Import115DataToLocalDataAccess), window1);
+                    window1.NavigationToPageWithWebView(typeof(ContentsPage.Import115DataToLocalDataAccess.MainPage), window1);
                     window1.Activate();
                     break;
                 case "搜刮信息":

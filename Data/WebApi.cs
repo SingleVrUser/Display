@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace Data
 {
@@ -64,7 +65,17 @@ namespace Data
         {
             bool result = false;
             //Uri uri = new Uri("https://webapi.115.com/files?aid=1&cid=2223208807868137192&o=user_ptime&asc=0&offset=0&show_dir=1&limit=56&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json");
-            var response = await Client.GetAsync($"https://my.115.com/?ct=ajax&ac=nav&callback=jQuery172046995607070659906_1647774910536&_={DateTimeOffset.Now.ToUnixTimeSeconds()}");
+            HttpResponseMessage response;
+            try
+            {
+                response = await Client.GetAsync($"https://my.115.com/?ct=ajax&ac=nav&callback=jQuery172046995607070659906_1647774910536&_={DateTimeOffset.Now.ToUnixTimeSeconds()}");
+            }
+            catch (HttpRequestException e)
+            {
+                tryToast("网络异常", "检查115登录状态时出现异常：", e.Message);
+
+                return result;
+            }
 
             if (!response.IsSuccessStatusCode)
             {
@@ -101,7 +112,18 @@ namespace Data
                     {"last_file_id"," 1865386445801900763" }
                 };
             var content = new FormUrlEncodedContent(values);
-            var response = Client.PostAsync("https://115.com/?ac=setting&even=saveedit&is_wl_tpl=1", content).Result;
+
+            HttpResponseMessage response;
+            try
+            {
+                response = Client.PostAsync("https://115.com/?ac=setting&even=saveedit&is_wl_tpl=1", content).Result;
+            }
+            catch (AggregateException e)
+            {
+                tryToast("网络异常","检查115隐藏状态时出现异常：",e.Message);
+
+                return result;
+            }
 
             if (!response.IsSuccessStatusCode)
             {
@@ -133,6 +155,28 @@ namespace Data
             return result;
         }
 
+        private void tryToast(string Title, string content1, string content2 = "")
+        {
+            new ToastContentBuilder()
+                    .AddArgument("action", "viewConversation")
+                    .AddArgument("conversationId", 384928)
+
+                    .AddText(Title)
+
+                    .AddText(content1)
+
+                    .AddText(content2)
+
+                    .Show();
+        }
+
+        /// <summary>
+        /// 导入CidList获取到的所有信息到数据库
+        /// </summary>
+        /// <param name="cidList"></param>
+        /// <param name="getFilesProgressInfo"></param>
+        /// <param name="progress"></param>
+        /// <returns></returns>
         public async Task GetAllFileInfoToDataAccess(List<string> cidList, GetFilesProgressInfo getFilesProgressInfo, IProgress<GetFileProgessIProgress> progress = null)
         {
             foreach (var cid in cidList)
@@ -152,14 +196,11 @@ namespace Data
                 //正常不为空，为空说明有异常
                 if (cidCategory == null)
                 {
-                    //fileProgressInfo.status = ProgressStatus.error;
-
                     progress.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, status = ProgressStatus.error, sendCountPerMinutes = 1 });
 
                     // 退出
                     return;
                 }
-
 
                 // 该文件已存在数据库里
                 if (DataAccess.IsLastestFileDataExists(cidCategory.pick_code, cidCategory.utime))
@@ -177,11 +218,14 @@ namespace Data
                 //之前未添加
                 else
                 {
-
-                    //获取当前文件夹下所有文件
+                    //获取当前文件夹下所有文件信息，并添加到数据库中
                     getFilesProgressInfo = await TraverseAllFileInfo(cid, getFilesProgressInfo, progress);
 
-                    DataAccess.AddFilesInfo(FolderCategory.ConvertFolderToDatum(cidCategory, cid));
+                    //不添加有错误的目录进数据库（添加数据库时会跳过已经添加过的目录，对于出现错误的目录不添加方便后续重新添加）
+                    if(getFilesProgressInfo.FailCid.Count == 0)
+                    {
+                        DataAccess.AddFilesInfo(FolderCategory.ConvertFolderToDatum(cidCategory, cid));
+                    }
                 }
             }
 
@@ -239,7 +283,6 @@ namespace Data
 
                             DataAccess.AddFilesInfo(item);
 
-                            //webFileInfoList = await TraverseAllFileInfo(item.cid, fileProgressInfo, progress);
                             getFilesProgressInfo = await TraverseAllFileInfo(item.cid, getFilesProgressInfo, progress);
                         }
                     }
@@ -254,13 +297,18 @@ namespace Data
                         DataAccess.AddFilesInfo(item);
 
                         //webFileInfoList.Add(item);
-
                     }
                 }
+            }
+            else
+            {
+                getFilesProgressInfo.FailCid.Add(cid);
             }
 
             return getFilesProgressInfo;
         }
+
+        //public async Task<>
 
         /// <summary>
         /// 获取文件信息
@@ -283,7 +331,16 @@ namespace Data
                 url = $"https://aps.115.com/natsort/files.php?aid=1&cid={cid}&o=file_name&asc=1&offset=0&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json&fc_mix=0&type=&star=&is_share=&suffix=&custom_order=";
             }
 
-            var response = Client.GetAsync(url).Result;
+            HttpResponseMessage response;
+            try
+            {
+                response = Client.GetAsync(url).Result;
+            }
+            catch (AggregateException e)
+            {
+                tryToast("网络异常", "获取文件信息时出现异常：", e.Message);
+                return WebFileInfoResult;
+            }
 
             if (!response.IsSuccessStatusCode)
             {
@@ -340,15 +397,28 @@ namespace Data
         /// <returns></returns>
         public async Task<FolderCategory> GetFolderCategory(string cid)
         {
-            FolderCategory WebFileInfoResult = new();
+            FolderCategory WebFileInfoResult=null;
 
             string url = $"https://webapi.115.com/category/get?cid={cid}";
-
-            HttpResponseMessage response = await Client.GetAsync(url);
+            HttpResponseMessage response;
+            try
+            {
+                response = await Client.GetAsync(url);
+            }
+            catch(AggregateException e)
+            {
+                tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
+                return WebFileInfoResult;
+            }catch(HttpRequestException e)
+            {
+                tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
+                return WebFileInfoResult;
+            }
 
             if (response.IsSuccessStatusCode)
             {
                 var strResult = await response.Content.ReadAsStringAsync();
+
                 WebFileInfoResult = JsonConvert.DeserializeObject<FolderCategory>(strResult);
             }
 

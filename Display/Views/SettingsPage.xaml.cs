@@ -40,10 +40,13 @@ namespace Display.Views
         {
             if (!string.IsNullOrEmpty(AppSettings._115_Cookie) &&WebApi.UserInfo == null)
             {
-                await webapi.UpdateLoginInfo();
+                var isLogin = await webapi.UpdateLoginInfo();
 
-                //检查一下是否为隐藏模式
-                await webapi.IsHiddenModel();
+                if (isLogin)
+                {
+                    //检查一下是否为隐藏模式
+                    await webapi.IsHiddenModel();
+                }
             }
 
             updateUserInfo();
@@ -51,15 +54,7 @@ namespace Display.Views
 
             infobar.IsOpen = WebApi.isEnterHiddenMode == true ? WebApi.isEnterHiddenMode : false;
 
-            //ImageSavePath_TextBox.Text = (string)localSettings.Values["ImageSave_Path"];
             DataAccessSavePath_TextBox.Text = AppSettings.DataAccess_SavePath;
-
-            ////是否存在cookie
-            //var cookieText = (string)localSettings.Values["Cookie"];
-            //if (cookieText != null)
-            //{
-            //    Cookie_TextBox.Text = cookieText;
-            //}
 
         }
 

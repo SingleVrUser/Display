@@ -1171,6 +1171,7 @@ namespace Data
                 AllCount = value;
             }
         }
+        public List<string> FailCid { get; set; } = new();
     }
     //报告进度和状态
     public class GetFileProgessIProgress
