@@ -105,7 +105,8 @@
 
         <RelativePanel Margin="10,5">
             <TextBlock Text="可通过添加规则列表，提高匹配成功率 （无需排序，相同规则只需添加一次）" RelativePanel.AlignVerticalCenterWithPanel="True"/>
-            <Button Content="重新匹配" RelativePanel.AlignRightWithPanel="True" Click="ReMatchButton_Click"/>
+            <ProgressRing x:Name="reMatchProgressRing" RelativePanel.LeftOf="reMatchButton" Margin="0,0,10,0" IsActive="False"/>
+            <Button x:Name="reMatchButton" Content="重新匹配" RelativePanel.AlignRightWithPanel="True" Click="ReMatchButton_Click"/>
         </RelativePanel>
         
         <!--规则列表-->
@@ -152,20 +153,7 @@
             
         
         </Expander>
-        <!--<Grid>
-            <Grid.Resources>
-
-            </Grid.Resources>
-
-
-        <Grid.ColumnDefinitions>
-
-            <ColumnDefinition x:Name="LeftColumn" />
-
-            <ColumnDefinition />
-
-        </Grid.ColumnDefinitions>
-        </Grid>-->
+        
         <!--匹配结果-->
         <Grid Grid.Row="2" x:Name="MatchResult_Grid">
             <Grid.RowDefinitions>
@@ -214,11 +202,12 @@
                     VerticalAlignment="Top">
                     <Expander.Header>
                         <RelativePanel>
-                            <TextBlock>
+                            <TextBlock RelativePanel.AlignVerticalCenterWithPanel="True">
                                 <Run>匹配失败</Run>
                                 <Run Foreground="{ThemeResource BackButtonDisabledForegroundThemeBrush}">（修改即添加新规则）</Run>
                             </TextBlock>
-                            <TextBlock  Text="{x:Bind videoMatchInfo.FailNameCollection.actualCount,Mode=OneWay}" RelativePanel.AlignRightWithPanel="True"/>
+                            <Button Click="AddRulesButton_Click" Content="自动添加" Margin="0,0,50,0" RelativePanel.AlignRightWithPanel="True"/>
+                            <TextBlock Text="{x:Bind videoMatchInfo.FailNameCollection.actualCount,Mode=OneWay}" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True"/>
                         </RelativePanel>
                     </Expander.Header>
 

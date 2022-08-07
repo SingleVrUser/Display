@@ -334,7 +334,6 @@ namespace Data
                 }
             }
 
-
             //标题
             var TitleNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='video-detail']//h2//strong");
             var title = TitleNode.InnerText;
