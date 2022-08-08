@@ -198,11 +198,11 @@ namespace Display.ContentsPage
 
             var startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
 
+            ProgressMore_TextBlock.Text = $"失败数：0";
             var progress = new Progress<SpliderInfoProgress>(progressPercent =>
             {
 
                 tryUpdateVideoInfo(progressPercent.videoInfo);
-                ProgressMore_TextBlock.Text = $"失败数：0";
                 var macthResult = progressPercent.macthResult;
 
                 //匹配失败/检索失败
