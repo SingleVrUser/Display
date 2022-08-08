@@ -46,7 +46,7 @@ namespace Data
                 {
                     localJavBusBaseUrl = _javBus_BaseUrl;
                 }
-                return _javBus_BaseUrl;
+                return localJavBusBaseUrl;
             }
             set
             {

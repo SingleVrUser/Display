@@ -260,7 +260,6 @@ namespace Display.Views
 
         private void JavDBUrlChange_Button_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-
             AppSettings.JavDB_BaseUrl = JavDBUrl_TextBox.Text;
         }
 
