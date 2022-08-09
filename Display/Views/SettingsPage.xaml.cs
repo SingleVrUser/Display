@@ -256,16 +256,25 @@ namespace Display.Views
         private void JavbusUrlChange_Button_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             AppSettings.JavBus_BaseUrl = JavbusUrl_TextBox.Text;
+
+            LightDismissTeachingTip.Content = "修改完成";
+            LightDismissTeachingTip.IsOpen = true;
         }
 
         private void JavDBUrlChange_Button_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             AppSettings.JavDB_BaseUrl = JavDBUrl_TextBox.Text;
+
+            LightDismissTeachingTip.Content = "修改完成";
+            LightDismissTeachingTip.IsOpen = true;
         }
 
         private void JavDBCookieChange_Button_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             AppSettings.javdb_Cookie = JavDBCookie_TextBox.Text;
+
+            LightDismissTeachingTip.Content = "修改完成";
+            LightDismissTeachingTip.IsOpen = true;
         }
 
         private async void DataAccessSavePath_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
@@ -380,6 +389,34 @@ namespace Display.Views
             {
                 LightDismissTeachingTip.Content = "已添加到剪贴板";
                 LightDismissTeachingTip.IsOpen = true;
+            }
+
+        }
+
+        private void ToggleButton_Unchecked(object sender, RoutedEventArgs e)
+        {
+            var toggleButton = sender as Microsoft.UI.Xaml.Controls.Primitives.ToggleButton;
+
+            //至少选择一个搜刮源
+            bool otherOriginUse = true;
+            switch (toggleButton.Content)
+            {
+                case "JavBus":
+                    otherOriginUse = AppSettings.isUseJavDB;
+                    break;
+                case "JavDB":
+                    otherOriginUse = AppSettings.isUseJavBus;
+                    break;
+            }
+
+            if(toggleButton.IsChecked is bool value)
+            {
+                if (!(value || otherOriginUse))
+                {
+                    LightDismissTeachingTip.Content = "请至少选择一个搜刮源，否则无法正常搜刮";
+                    LightDismissTeachingTip.Target = toggleButton;
+                    LightDismissTeachingTip.IsOpen = true;
+                }
             }
 
         }

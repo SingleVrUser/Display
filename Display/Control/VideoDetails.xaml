@@ -147,9 +147,9 @@
                             Orientation="Horizontal">
                                 <TextBlock Text="{x:Bind resultinfo.truename}"/>
                                 <HyperlinkButton
-                        NavigateUri="{x:Bind resultinfo.busurl}">
+                                    NavigateUri="{x:Bind resultinfo.busurl}">
                                     <Image Source="D:\Work\WinUi\Display_Test\Display_Test\Assets\JavBusLogo.png"
-                               Height="15"/>
+                                        Height="15"/>
                                 </HyperlinkButton>
                             </StackPanel>
 
@@ -178,10 +178,11 @@
                             Grid.Column="1"
                             Text="{x:Bind resultinfo.series, Mode=OneWay}"/>
 
-                            <StackPanel Grid.Row="7"
-                            Grid.Column="1"
-                            x:Name="CategorySatckPanel"
-                            Orientation="Horizontal"/>
+                            <StackPanel 
+                                Grid.Row="7"
+                                Grid.Column="1"
+                                x:Name="CategorySatckPanel"
+                                Orientation="Horizontal"/>
 
                             <StackPanel Grid.Row="8"
                             Grid.Column="1"

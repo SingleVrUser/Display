@@ -149,7 +149,6 @@ namespace Data
             }
         }
 
-
         /// <summary>
         /// 图片保存地址
         /// </summary>
@@ -178,5 +177,48 @@ namespace Data
             }
         }
 
+
+        /// <summary>
+        /// 是否使用JavDB
+        /// </summary>
+        public static bool isUseJavDB
+        {
+            get
+            {
+                bool useJavDB = true;
+
+                if(localSettings.Values["isUseJavDB"] is bool value)
+                {
+                    useJavDB = value;
+                }
+
+                return useJavDB;
+            }
+            set
+            {
+                localSettings.Values["isUseJavDB"] = value;
+            }
+        }
+
+        /// <summary>
+        /// 是否使用JavBus
+        /// </summary>
+        public static bool isUseJavBus
+        {
+            get
+            {
+                bool useJavBus = true;
+
+                if (localSettings.Values["isUseJavBus"] is bool value)
+                {
+                    useJavBus = value;
+                }
+                return useJavBus;
+            }
+            set
+            {
+                localSettings.Values["isUseJavBus"] = value;
+            }
+        }
     }
 }

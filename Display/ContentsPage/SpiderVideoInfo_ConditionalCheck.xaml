@@ -59,6 +59,8 @@
 
         <Button HorizontalAlignment="Center" Click="ClickOne_Click">重新检查</Button>
 
+        <TextBlock x:Name="spiderOrigin_TextBlock" Visibility="Collapsed" Text="请至少选择一个搜刮源，在设置中添加" HorizontalAlignment="Center"/>
+
         <StackPanel x:Name="Error_TextBlock" Visibility="Collapsed" HorizontalAlignment="Center" Spacing="2">
             <TextBlock>访问失败：请检查网络连接，代理设置</TextBlock>
             <TextBlock>如需要切换代理，需手动重启</TextBlock>

@@ -210,7 +210,9 @@ namespace Display.ContentsPage
                 {
                     FailVideoNameList.Add(macthResult.OriginalName);
                     ProgressMore_TextBlock.Text = $"失败数：{FailVideoNameList.Count}";
-                    SearchProgress_TextBlock.Text = $"❌失败：{macthResult.OriginalName} {macthResult.message}";
+                    SearchProgress_TextBlock.Text = $"{macthResult.OriginalName}";
+                    SearchMessage_TextBlock.Text = $"❌{macthResult.message}";
+
                 }
                 //匹配成功/跳过非视频文件/跳过重复番号
                 else
@@ -258,7 +260,7 @@ namespace Display.ContentsPage
                     TopProgressBar.Visibility = Visibility.Collapsed;
 
                     //显示总耗时
-                    SearchProgress_TextBlock.Text = $"⏱总耗时：{FileMatch.ConvertInt32ToDateStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime)}";
+                    SearchMessage_TextBlock.Text = $"⏱总耗时：{FileMatch.ConvertInt32ToDateStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime)}";
                 }
             });
 
@@ -307,7 +309,7 @@ namespace Display.ContentsPage
                     //成功
                     else
                     {
-                        spliderInfoProgress.macthResult.status = false;
+                        spliderInfoProgress.macthResult.status = true;
                         spliderInfoProgress.macthResult.statusCode = 1;
                         spliderInfoProgress.macthResult.message = "检索成功";
                     }
@@ -325,7 +327,7 @@ namespace Display.ContentsPage
         /// <returns></returns>
         private async Task<VideoInfo> SearchInfoByWeb(string VideoName, IProgress<SpliderInfoProgress> progress)
         {
-            VideoInfo resultInfo;
+            VideoInfo resultInfo = null;
 
             //如果数据库已存在该数据
             var result = DataAccess.SelectTrueName(VideoName.ToUpper());
@@ -340,14 +342,17 @@ namespace Display.ContentsPage
             // 从相关网站中搜索
             else
             {
-                progress.Report(new SpliderInfoProgress() { macthResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~3秒" } });
-                await GetInfoFromNetwork.RandomTimeDelay(1, 3);
-                progress.Report(new SpliderInfoProgress() { macthResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavBus中搜索" } });
-                //先从javbus中搜索
-                resultInfo = await network.SearchInfoFromJavBus(VideoName);
+                if (AppSettings.isUseJavBus)
+                {
+                    progress.Report(new SpliderInfoProgress() { macthResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~3秒" } });
+                    await GetInfoFromNetwork.RandomTimeDelay(1, 3);
+                    progress.Report(new SpliderInfoProgress() { macthResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavBus中搜索" } });
+                    //先从javbus中搜索
+                    resultInfo = await network.SearchInfoFromJavBus(VideoName);
+                }
 
                 //搜索无果，使用javdb搜索
-                if (resultInfo == null)
+                if (resultInfo == null && AppSettings.isUseJavDB)
                 {
                     progress.Report(new SpliderInfoProgress() { macthResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待3~6秒" } });
                     await GetInfoFromNetwork.RandomTimeDelay(3, 6);
