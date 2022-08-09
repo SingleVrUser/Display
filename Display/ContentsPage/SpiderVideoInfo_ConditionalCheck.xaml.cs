@@ -64,27 +64,44 @@ namespace Display.ContentsPage
             network = new();
 
             //显示UI
-            JavbusItem = new ConditionCheck()
-            {
-                Condition = "访问 JavBus",
-                CheckUrl = AppSettings.JavBus_BaseUrl,
-            };
 
-            JavdbItem = new ConditionCheck()
-            {
-                Condition = "访问 JavDB",
-                CheckUrl = AppSettings.JavDB_BaseUrl,
-            };
             ImageItem = new ConditionCheck()
             {
                 Condition = "图片存放地址",
                 CheckUrl = AppSettings.Image_SavePath,
                 CheckUrlRoutedEventHandler = ImageCheckButton_Click,
+
             };
 
             ConditionCheckItems.Add(ImageItem);
-            ConditionCheckItems.Add(JavbusItem);
-            ConditionCheckItems.Add(JavdbItem);
+
+            if (AppSettings.isUseJavBus)
+            {
+                JavbusItem = new ConditionCheck()
+                {
+                    Condition = "访问 JavBus",
+                    CheckUrl = AppSettings.JavBus_BaseUrl,
+                };
+
+                ConditionCheckItems.Add(JavbusItem);
+            }
+
+            if (AppSettings.isUseJavDB)
+            {
+                JavdbItem = new ConditionCheck()
+                {
+                    Condition = "访问 JavDB",
+                    CheckUrl = AppSettings.JavDB_BaseUrl,
+                };
+
+                ConditionCheckItems.Add(JavdbItem);
+            }
+
+            //至少选择一个搜刮源
+            if(!(AppSettings.isUseJavDB || AppSettings.isUseJavBus))
+            {
+                spiderOrigin_TextBlock.Visibility = Visibility.Visible;
+            }
 
             Check_Condition();
         }

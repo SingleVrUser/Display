@@ -283,6 +283,38 @@
                                         <TextBlock Text="{x:Bind}" FontSize="14"/>
                                     </DataTemplate>
                                 </Pivot.HeaderTemplate>
+
+
+                                <PivotItem Header="搜刮源">
+                                    <StackPanel Spacing="5" Margin="5">
+                                        <TextBlock Text="选择"/>
+                                        <StackPanel Orientation="Horizontal" Spacing="10">
+                                            <ToggleButton Content="JavBus" IsChecked="{x:Bind data:AppSettings.isUseJavBus,Mode=TwoWay}" Unchecked="ToggleButton_Unchecked"/>
+                                            <ToggleButton Content="JavDB" IsChecked="{x:Bind data:AppSettings.isUseJavDB,Mode=TwoWay}" Unchecked="ToggleButton_Unchecked"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </PivotItem>
+                                
+                                <PivotItem Header="搜刮方式">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!--<TextBlock Text="javbus"/>-->
+                                        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+                                            <TextBlock Text="当前设置" VerticalAlignment="Center"/>
+                                            <ComboBox SelectedIndex="0" Width="90">
+                                                <x:String>JavBus</x:String>
+                                                <x:String>JavDB</x:String>
+                                            </ComboBox>
+                                        </StackPanel>
+                                        <GridView x:Name="MatchRulesList_GridView" Grid.Row="1">
+                                        </GridView>
+                                    </Grid>
+                                </PivotItem>
+
                                 <PivotItem Header="JavBus">
                                     <StackPanel Padding="50,10" Spacing="10">
                                         <RelativePanel>
@@ -325,25 +357,7 @@
                                     </StackPanel>
                                 </PivotItem>
 
-                                <PivotItem Header="搜刮方式">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="auto"/>
-                                            <RowDefinition Height="*"/>
-                                        </Grid.RowDefinitions>
 
-                                        <!--<TextBlock Text="javbus"/>-->
-                                        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
-                                            <TextBlock Text="当前设置" VerticalAlignment="Center"/>
-                                            <ComboBox SelectedIndex="0" Width="90">
-                                                <x:String>JavBus</x:String>
-                                                <x:String>JavDB</x:String>
-                                            </ComboBox>
-                                        </StackPanel>
-                                        <GridView x:Name="MatchRulesList_GridView" Grid.Row="1">
-                                        </GridView>
-                                    </Grid>
-                                </PivotItem>
                             </Pivot>
 
                             
