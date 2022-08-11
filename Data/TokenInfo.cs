@@ -1190,4 +1190,30 @@ namespace Data
         public string OriginalName;
         public string MatchName;
     }
+
+    
+    public class m3u8Info
+    {
+        public m3u8Info(string name, string bandwidth, string resolution, string url)
+        {
+            Name = name;
+            Bandwidth = bandwidth;
+            Resolution = resolution;
+            Url = url;
+        }
+
+        public string Name { get; set; }
+        public string Bandwidth { get; set; }
+        public string Resolution { get; set; }
+        public string Url { get; set; }
+    }
+
+    //真实下载链接信息
+    public class DownUrlBase64EncryptInfo
+    {
+        public bool state { get; set; }
+        public string msg { get; set; }
+        public int errno { get; set; }
+        public string data { get; set; }
+    }
 }

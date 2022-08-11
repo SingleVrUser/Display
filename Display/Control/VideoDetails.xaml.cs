@@ -119,6 +119,8 @@ namespace Display.Control
             dialog.CloseButtonText = "返回";
             dialog.DefaultButton = ContentDialogButton.Primary;
 
+            videoinfoList = videoinfoList.OrderBy(item => item.n).ToList();
+
             var DownDialogContent = new ContentsPage.DownDialogContent(videoinfoList);
 
             dialog.Content = DownDialogContent;

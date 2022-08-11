@@ -11,6 +11,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Microsoft.Toolkit.Uwp.Notifications;
+using System.Text.RegularExpressions;
+using System.Diagnostics;
+using RestSharp;
 
 namespace Data
 {
@@ -24,9 +27,12 @@ namespace Data
         public static bool isEnterHiddenMode;
         public TokenInfo TokenInfo;
 
-        public WebApi()
+        public WebApi(bool useCookie=true)
         {
-            InitializeInternet();
+            if (useCookie)
+            {
+                InitializeInternet();
+            }
         }
 
         /// <summary>
@@ -38,7 +44,7 @@ namespace Data
             Client = new HttpClient(handler);
             Client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0");
 
-            var cookie = (string)localSettings.Values["cookie"];
+            var cookie = AppSettings._115_Cookie;
 
             //cookie不为空且可用
             if (!string.IsNullOrEmpty(cookie))
@@ -654,6 +660,167 @@ namespace Data
         public static void DeleteCookie()
         {
             ApplicationData.Current.LocalSettings.Values["cookie"] = null;
+        }
+
+        /// <summary>
+        /// 获取下载链接
+        /// </summary>
+        /// <param name="pickcode"></param>
+        /// <returns></returns>
+        public List<string> GetDownUrl(string pickcode)
+        {
+            List<string> downUrlList = new();
+            long tm = DateTimeOffset.Now.ToUnixTimeSeconds();
+            string src = $"{{\"pickcode\":\"{pickcode}\"}}";
+            var item = m115.encode(src, tm);
+            byte[] data = item.Item1;
+            byte[] keyBytes = item.Item2;
+
+            string dataString = Encoding.ASCII.GetString(data);
+            var dataUrlEncode = System.Web.HttpUtility.UrlEncode(dataString);
+
+            var client = new RestClient($"http://proapi.115.com/app/chrome/downurl?t={tm}");
+            var request = new RestRequest();
+            request.AddHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36 Edg/104.0.1293.47");
+            request.AddHeader("Cookie", AppSettings._115_Cookie);
+            request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
+            var body = $"data={dataUrlEncode}";
+            request.AddParameter("application/x-www-form-urlencoded", body, ParameterType.RequestBody);
+            var response = client.Post(request);
+
+            DownUrlBase64EncryptInfo downurl_base64EncryptInfo;
+            if (response.IsSuccessful && response.Content != null)
+            {
+                downurl_base64EncryptInfo = JsonConvert.DeserializeObject<DownUrlBase64EncryptInfo>(response.Content);
+
+                if (downurl_base64EncryptInfo != null)
+                {
+                    string base64Text = downurl_base64EncryptInfo.data;
+
+                    byte[] srcBase64 = Convert.FromBase64String(base64Text);
+
+                    var rep = m115.decode(srcBase64, keyBytes);
+
+                    //JObject json = JsonConvert.DeserializeObject<JObject>(rep);
+                    var json = JObject.Parse(rep);
+
+                    foreach (var children in json)
+                    {
+                        var videoInfo = children.Value;
+                        var downUrl = videoInfo["url"]["url"].ToString();
+                        downUrlList.Add(downUrl);
+                    }
+                }
+            }
+
+            return downUrlList;
+        }
+
+        /// <summary>
+        /// PotPlayer播放
+        /// </summary>
+        /// <param name="pickCode"></param>
+        public async void PlayeByPotPlayer(string pickCode)
+        {
+            HttpResponseMessage response;
+            string strResult;
+            try
+            {
+                response = await Client.GetAsync($"https://v.anxia.com/site/api/video/m3u8/{pickCode}.m3u8");
+                strResult = await response.Content.ReadAsStringAsync();
+            }
+            catch
+            {
+                return;
+                //Debug.WriteLine("获取m3u8链接失败");
+            }
+
+            List<m3u8Info> m3U8Infos = new List<m3u8Info>();
+            var lineList = strResult.Split(new char[] { '\n' });
+            for (int i = 0; i < lineList.Count(); i++)
+            {
+                var lineText = lineList[i].Trim('\r');
+
+                var re = Regex.Match(lineText, @"BANDWIDTH=(\d*),RESOLUTION=(\w*),NAME=""(\w*)""");
+                if (re.Success)
+                {
+                    m3U8Infos.Add(new m3u8Info(re.Groups[3].Value, re.Groups[1].Value, re.Groups[2].Value, lineList[i + 1]));
+                    //Debug.WriteLine(re.Groups[0].Value);
+                }
+            }
+
+            //排序
+            m3U8Infos = m3U8Infos.OrderByDescending(x => x.Bandwidth).ToList();
+            if (m3U8Infos.Count > 0)
+            {
+                //选择最高分辨率的播放
+                FileMatch.PlayByPotPlayer(m3U8Infos[0].Url);
+            }
+
+        }
+
+        /// <summary>
+        /// mpv播放
+        /// </summary>
+        /// <param name="playUrl"></param>
+        /// <param name="FileName"></param>
+        /// <param name="showWindow"></param>
+        /// <param name="referrerUrl"></param>
+        /// <param name="user_agnet"></param>
+        public void Play115SourceVideoWithMpv(string playUrl, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string user_agnet = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36 Edg/104.0.1293.47")
+        {
+            var process = new Process();
+
+            process.StartInfo.FileName = FileName;
+            process.StartInfo.Arguments = @$" ""{playUrl}"" --referrer=""{referrerUrl}"" --user-agent=""{user_agnet}""";
+            process.StartInfo.UseShellExecute = false;
+            if (!showWindow)
+            {
+                process.StartInfo.CreateNoWindow = true;
+            }
+
+            process.Start();
+        }
+
+        /// <summary>
+        /// vlc播放
+        /// </summary>
+        /// <param name="playUrl"></param>
+        /// <param name="FileName"></param>
+        /// <param name="showWindow"></param>
+        /// <param name="referrerUrl"></param>
+        /// <param name="user_agnet"></param>
+        public void Play115SourceVideoWithVlc(string playUrl, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string user_agnet = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36 Edg/104.0.1293.47")
+        {
+            var process = new Process();
+
+            process.StartInfo.FileName = FileName;
+            process.StartInfo.Arguments = @$" ""{playUrl}"" :http-referrer=""{referrerUrl}"" :http-user-agent=""{user_agnet}""";
+            process.StartInfo.UseShellExecute = false;
+            if (!showWindow)
+            {
+                process.StartInfo.CreateNoWindow = true;
+            }
+
+            process.Start();
+        }
+    
+        public void PlayVideoWithOriginUrl(string pickcode)
+        {
+            var downUrlList = GetDownUrl(pickcode);
+            if (downUrlList.Count==0) return;
+
+            string downUrl = downUrlList[0];
+            switch (AppSettings.PlayerSelection)
+            {
+                case 2:
+                    Play115SourceVideoWithMpv(downUrl,AppSettings.MpvExePath);
+                    break;
+                case 3:
+                    Play115SourceVideoWithVlc(downUrl,AppSettings.VlcExePath);
+                    break;
+
+            }
         }
     }
 }

@@ -14,6 +14,7 @@ using System.IO;
 using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI;
+using System.Collections.ObjectModel;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -25,7 +26,7 @@ namespace Display.Views
     /// </summary>
     public sealed partial class SettingsPage : Page
     {
-        //ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+        ObservableCollection<string> resolutionSelectionCollection = new ObservableCollection<string>();
         private WebApi webapi = new();
 
         public SettingsPage()
@@ -419,6 +420,87 @@ namespace Display.Views
                 }
             }
 
+        }
+
+        private void PlayerSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count != 0)
+            {
+                switch (e.AddedItems[0].ToString())
+                {
+                    case "WebView":
+                        Resolution_RelativePanel.Visibility = Visibility.Collapsed;
+                        break;
+
+                    case "PotPlayer":
+                        resolutionSelectionCollection.Clear();
+                        resolutionSelectionCollection.Add("最高");
+                        resolutionSelection_ComboBox.SelectedIndex = 0;
+                        Resolution_RelativePanel.Visibility = Visibility.Visible;
+
+                        PlayerExePath_RelativePanel.Visibility = Visibility.Collapsed;
+                        break;
+                    case "mpv":
+                        resolutionSelectionCollection.Clear();
+                        resolutionSelectionCollection.Add("原画");
+                        resolutionSelection_ComboBox.SelectedIndex = 0;
+                        Resolution_RelativePanel.Visibility = Visibility.Visible;
+                        PlayerExePath_RelativePanel.Visibility = Visibility.Visible;
+
+                        PlayerExePath_TextBox.Text = AppSettings.MpvExePath;
+                        break;
+                    case "vlc":
+                        resolutionSelectionCollection.Clear();
+                        resolutionSelectionCollection.Add("原画");
+                        resolutionSelection_ComboBox.SelectedIndex = 0;
+                        Resolution_RelativePanel.Visibility = Visibility.Visible;
+                        PlayerExePath_RelativePanel.Visibility = Visibility.Visible;
+
+                        PlayerExePath_TextBox.Text = AppSettings.VlcExePath;
+                        break;
+
+
+                }
+            }
+        }
+
+
+        private void OpenPlayerExePathButton_Click(object sender, RoutedEventArgs e)
+        {
+            switch (PlayerSelection_ComboBox.SelectedIndex)
+            {
+                case 2:
+                    FileMatch.LaunchFolder(Path.GetDirectoryName(AppSettings.MpvExePath));
+                    break;
+                case 3:
+                    FileMatch.LaunchFolder(Path.GetDirectoryName(AppSettings.VlcExePath));
+                    break;
+            }
+        }
+
+        private async void ModifyPlayerExePathButton_Click(object sender, RoutedEventArgs e)
+        {
+            FileOpenPicker fileOpenPicker = new();
+            fileOpenPicker.FileTypeFilter.Add(".exe");
+            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.AppMainWindow);
+            fileOpenPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+
+            WinRT.Interop.InitializeWithWindow.Initialize(fileOpenPicker, hwnd);
+
+            var file = await fileOpenPicker.PickSingleFileAsync();
+            if (file != null)
+            {
+                switch (PlayerSelection_ComboBox.SelectedIndex)
+                {
+                    case 2:
+                        AppSettings.MpvExePath = file.Path;
+                        break;
+                    case 3:
+                        AppSettings.VlcExePath = file.Path;
+                        break;
+                }
+                PlayerExePath_TextBox.Text = file.Path;
+            }
         }
     }
 }
