@@ -136,8 +136,8 @@ namespace Display.Views
             //一集
             else if (videoInfoList.Count == 1)
             {
-                VideoPlayWindow.createNewWindow(FileMatch.getVideoPlayUrl(videoInfoList[0].pc));
-                //Frame.Navigate(typeof(ContentsPage.VideoPlay), videoInfoList[0].pc);
+                PlayeVideo(videoInfoList[0].pc);
+                //VideoPlayWindow.createNewWindow();
             }
 
             //有多集
@@ -148,6 +148,8 @@ namespace Display.Views
                 {
                     multisetList.Add(videoinfo);
                 }
+
+                multisetList = multisetList.OrderBy(item => item.n).ToList();
 
                 ContentsPage.SelectSingleVideoToPlay newPage = new ContentsPage.SelectSingleVideoToPlay(multisetList);
                 newPage.ContentListView.ItemClick += ContentListView_ItemClick;
@@ -162,9 +164,31 @@ namespace Display.Views
         private void ContentListView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var SingleVideoInfo = e.ClickedItem as Data.Datum;
-            VideoPlayWindow.createNewWindow(FileMatch.getVideoPlayUrl(SingleVideoInfo.pc));
+            PlayeVideo(SingleVideoInfo.pc);
+            //VideoPlayWindow.createNewWindow();
 
-            //Frame.Navigate(typeof(ContentsPage.VideoPlay), SingleVideoInfo.pc);
+        }
+
+        public static void PlayeVideo(string pickCode)
+        {
+            switch (AppSettings.PlayerSelection)
+            {
+                //浏览器播放
+                case 0:
+                    VideoPlayWindow.createNewWindow(FileMatch.getVideoPlayUrl(pickCode));
+                    break;
+                //PotPlayer播放
+                case 1:
+                    WebApi webapi = new();
+                    webapi.PlayeByPotPlayer(pickCode);
+                    break;
+                //mpv播放
+                case 2 or 3:
+                    webapi = new();
+                    webapi.PlayVideoWithOriginUrl(pickCode);
+                    break;
+
+            }
         }
 
     }

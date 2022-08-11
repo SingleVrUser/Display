@@ -220,5 +220,50 @@ namespace Data
                 localSettings.Values["isUseJavBus"] = value;
             }
         }
+
+        public static string VlcExePath
+        {
+            get
+            {
+                return localSettings.Values["VlcExePath"] as string;
+            }
+            set
+            {
+                localSettings.Values["VlcExePath"] = value;
+            }
+        }
+
+        public static string MpvExePath
+        {
+            get
+            {
+                return localSettings.Values["MpvExePath"] as string;
+            }
+            set
+            {
+                localSettings.Values["MpvExePath"] = value;
+            }
+        }
+
+        /// <summary>
+        /// 播放方式
+        /// </summary>
+        public static int PlayerSelection
+        {
+            get
+            {
+                int playerSelection = 0;
+
+                if (localSettings.Values["PlayerSelection"] is int value)
+                {
+                    playerSelection = value;
+                }
+                return playerSelection;
+            }
+            set
+            {
+                localSettings.Values["PlayerSelection"] = value;
+            }
+        }
     }
 }

@@ -388,5 +388,19 @@ namespace Data
 
                     .Show();
         }
+
+        public async static void PlayByPotPlayer(string playUrl)
+        {
+
+            string url = $"PotPlayer://{playUrl}";
+            var uriDown = new Uri(url);
+
+            // Set the option to show a warning
+            var options = new Windows.System.LauncherOptions();
+            options.DesiredRemainingView = Windows.UI.ViewManagement.ViewSizePreference.UseLess;
+
+            // Launch the URI
+            var success = await Windows.System.Launcher.LaunchUriAsync(uriDown, options);
+        }
     }
 }
