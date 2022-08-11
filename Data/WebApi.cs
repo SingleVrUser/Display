@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Microsoft.Toolkit.Uwp.Notifications;
+using System.Text.RegularExpressions;
 
 namespace Data
 {
@@ -24,9 +25,12 @@ namespace Data
         public static bool isEnterHiddenMode;
         public TokenInfo TokenInfo;
 
-        public WebApi()
+        public WebApi(bool useCookie=true)
         {
-            InitializeInternet();
+            if (useCookie)
+            {
+                InitializeInternet();
+            }
         }
 
         /// <summary>
@@ -654,6 +658,45 @@ namespace Data
         public static void DeleteCookie()
         {
             ApplicationData.Current.LocalSettings.Values["cookie"] = null;
+        }
+
+        public async void PlayeByPotPlayer(string pickCode)
+        {
+            HttpResponseMessage response;
+            string strResult;
+            try
+            {
+                response = await Client.GetAsync($"https://v.anxia.com/site/api/video/m3u8/{pickCode}.m3u8");
+                strResult = await response.Content.ReadAsStringAsync();
+            }
+            catch
+            {
+                return;
+                //Debug.WriteLine("获取m3u8链接失败");
+            }
+
+            List<m3u8Info> m3U8Infos = new List<m3u8Info>();
+            var lineList = strResult.Split(new char[] { '\n' });
+            for (int i = 0; i < lineList.Count(); i++)
+            {
+                var lineText = lineList[i].Trim('\r');
+
+                var re = Regex.Match(lineText, @"BANDWIDTH=(\d*),RESOLUTION=(\w*),NAME=""(\w*)""");
+                if (re.Success)
+                {
+                    m3U8Infos.Add(new m3u8Info(re.Groups[3].Value, re.Groups[1].Value, re.Groups[2].Value, lineList[i + 1]));
+                    //Debug.WriteLine(re.Groups[0].Value);
+                }
+            }
+
+            //排序
+            m3U8Infos = m3U8Infos.OrderByDescending(x => x.Bandwidth).ToList();
+            if (m3U8Infos.Count > 0)
+            {
+                //选择最高分辨率的播放
+                FileMatch.PlayByPotPlayer(m3U8Infos[0].Url);
+            }
+
         }
     }
 }

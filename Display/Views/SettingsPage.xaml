@@ -38,208 +38,41 @@
             <InfoBar x:Name="infobar" Severity="Informational" Message="隐藏模式已启动，请注意：在隐藏模式下获取不到隐藏的文件信息"></InfoBar>
         </StackPanel>
         
-        <!--设置选项--><!--
-        <Grid Visibility="Collapsed" Grid.Row="1">
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock
-            Grid.Row="1"
-            Style="{StaticResource Title_TextBlock}"
-            Text="外观"/>
-            <StackPanel
-            Grid.Row="1"
-            Grid.Column="1"
-            Orientation="Horizontal"
-            Style="{StaticResource Options_StackPanel}">
-                <CheckBox Content="浅色"
-                          CornerRadius="10"/>
-                <CheckBox Content="深色"
-                          CornerRadius="10"/>
-                <CheckBox Content="跟随系统"
-                          CornerRadius="10"/>
-            </StackPanel>
-
-            <TextBlock
-            Grid.Row="2"
-            Style="{StaticResource Title_TextBlock}"
-            Text="自动启动"/>
-            <StackPanel
-            Grid.Row="2"
-            Grid.Column="1"
-            Orientation="Horizontal"
-            Style="{StaticResource Options_StackPanel}">
-                <CheckBox Content="开机时自动启动" CornerRadius="10"/>
-            </StackPanel>
-
-            <TextBlock
-            Grid.Row="3"
-            Style="{StaticResource Title_TextBlock}"
-            Text="传输设置"/>
-            <StackPanel
-            Grid.Row="3"
-            Grid.Column="1"
-            Orientation="Horizontal"
-            Style="{StaticResource Options_StackPanel}">
-                <CheckBox Content="有传输任务时电脑不休眠"
-                      CornerRadius="10"/>
-                <CheckBox Margin="20,0,0,0"
-                      Content="深色"
-                      CornerRadius="10"/>
-            </StackPanel>
-
-            <TextBlock
-            Grid.Row="4"
-            Style="{StaticResource Title_TextBlock}"
-            Text="通知"/>
-            <StackPanel
-            Grid.Row="4"
-            Grid.Column="1"
-            Orientation="Horizontal"
-            Style="{StaticResource Options_StackPanel}">
-                <CheckBox Content="传输状态"
-                      CornerRadius="10"/>
-                <CheckBox Content="系统信息"
-                      CornerRadius="10"/>
-                <CheckBox Content="传输完成消息提示音"
-                      CornerRadius="10"/>
-            </StackPanel>
-
-            <TextBlock
-            Grid.Row="5"
-            Style="{StaticResource Title_TextBlock}"
-            Text="登录设备管理"/>
-            <StackPanel
-            Grid.Row="5"
-            Grid.Column="1"
-            Orientation="Horizontal"
-            Style="{StaticResource Options_StackPanel}">
-                <TextBlock Text="查看" VerticalAlignment="Center"/>
-            </StackPanel>
-
-            <TextBlock
-            Grid.Row="6"
-            Style="{StaticResource Title_TextBlock}"
-            Text="自动更新"/>
-            <StackPanel
-            Grid.Row="6"
-            Grid.Column="1"
-            Orientation="Horizontal"
-            Style="{StaticResource Options_StackPanel}">
-                <CheckBox Content="自动更新至最新版本"
-                      CornerRadius="10"/>
-            </StackPanel>
-
-            <TextBlock
-            Grid.Row="7"
-            Style="{StaticResource Title_TextBlock}"
-            Text="Cookie"/>
-            <StackPanel
-                Grid.Row="7"
-                Grid.Column="1"
-                Orientation="Horizontal"
-                Style="{StaticResource Options_StackPanel}">
-                    <TextBox MinWidth="100" MaxWidth="600"/>
-                    <FontIcon x:Name="CheckMarkIcon"
-                          HorizontalAlignment="Left"
-                          Foreground="Green"
-                          FontFamily="Segoe Fluent Icons"
-                          Glyph="&#xF386;"
-                          Visibility="Collapsed"/>
-                    <FontIcon x:Name="ErrorIcon"
-                          Foreground="Red"
-                          FontFamily="Segoe Fluent Icons"
-                          Glyph="&#xED2E;"
-                          Visibility="Collapsed"/>
-                    <ProgressRing x:Name="Cookie_StateProgressRing" IsActive="False"/>
-            </StackPanel>
-            <TextBlock
-            Grid.Row="8"
-            Style="{StaticResource Title_TextBlock}"
-            Text="存储路径"/>
-            --><!--<StackPanel
-            Grid.Row="8"
-            Grid.Column="1"
-            Orientation="Horizontal"
-            Style="{StaticResource Options_StackPanel}">
-                <TextBox x:Name="SavePath_TextBox" MinWidth="100"/>
-                <Button Click="SelectPath_Click"
-                    Content="路径"/>
-            </StackPanel>--><!--
-        </Grid>-->
-
         <Grid Grid.Row="1" Margin="10,0" Padding="5" RowSpacing="5" BorderThickness="0,1,0,0" BorderBrush="{ThemeResource CircleElevationBorderBrush}">
             <Grid.Resources>
                 <Style TargetType="TextBlock">
                     <Setter Property="FontSize" Value="15"/>
                 </Style>
             </Grid.Resources>
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <TextBlock Text="下载"/>
-            <ScrollViewer Grid.Row="1">
+            <ScrollViewer>
                 <StackPanel Spacing="5">
-                    <Expander
-                         HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Stretch"
-                         IsExpanded="False"
-                         ExpandDirection="Down"
-                         VerticalAlignment="Top"
-                         Header="启动">
-                        <StackPanel Spacing="5" Padding="50,0">
-                            
-                            <RelativePanel>
-                                <TextBlock RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0">启动时显示</TextBlock>
-                                <ComboBox RelativePanel.AlignRightWithPanel="True" SelectedIndex="{x:Bind data:AppSettings.StartPageIndex, Mode=TwoWay}">
-                                    <x:String>主页</x:String>
-                                    <x:String>展示</x:String>
-                                    <x:String>演员一览</x:String>
-                                    <x:String>其他</x:String>
-                                    <x:String>设置</x:String>
-                                </ComboBox>
-                            </RelativePanel>
-                        </StackPanel>
-                    </Expander>
-                    <Expander
-                     HorizontalAlignment="Stretch"
-                    HorizontalContentAlignment="Stretch"
-                     IsExpanded="False"
-                     ExpandDirection="Down"
-                     VerticalAlignment="Top"
-                     Header="保存路径">
-                        <StackPanel Spacing="5">
-                            <RelativePanel Padding="50,0">
-                                <TextBlock x:Name="Image_TextBlox" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0">图片</TextBlock>
-                                <TextBox x:Name="ImageSavePath_TextBox" Width="600" RelativePanel.RightOf="Image_TextBlox" Text="{x:Bind data:AppSettings.Image_SavePath}"/>
-                                <Button Click="ImageSavePath_Click" Content="修改" RelativePanel.LeftOf="ImageOpenPath"/>
-                                <Button x:Name="ImageOpenPath" Click="ImageOpenPath_Click" Content="打开路径" RelativePanel.AlignRightWithPanel="True" Margin="3,0,0,0"/>
-                            </RelativePanel>
-                            
-                            <RelativePanel Padding="50,0">
-                                <TextBlock x:Name="DataAccess_TextBlox" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0">数据</TextBlock>
-                                <TextBox x:Name="DataAccessSavePath_TextBox" Width="600" RelativePanel.RightOf="DataAccess_TextBlox"/>
-                                <Button Click="DataAccessSavePath_Click" Content="修改" RelativePanel.LeftOf="DataAccessOpenPath_Button"/>
-                                <Button x:Name="DataAccessOpenPath_Button" Click="DataAccessOpenPath_Click" Content="打开路径" RelativePanel.AlignRightWithPanel="True" Margin="3,0,0,0"/>
-                            </RelativePanel>
-                        </StackPanel>
-                    </Expander>
-                    <Expander
+                    <StackPanel Spacing="5">
+                        <TextBlock Text="通用"/>
+                        
+                        <!--启动-->
+                        <Expander
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Stretch"
+                            IsExpanded="False"
+                            ExpandDirection="Down"
+                            VerticalAlignment="Top"
+                            Header="启动">
+                            <StackPanel Spacing="5" Padding="50,0">
+
+                                <RelativePanel>
+                                    <TextBlock RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0">启动时显示</TextBlock>
+                                    <ComboBox RelativePanel.AlignRightWithPanel="True" SelectedIndex="{x:Bind data:AppSettings.StartPageIndex, Mode=TwoWay}">
+                                        <x:String>主页</x:String>
+                                        <x:String>展示</x:String>
+                                        <x:String>演员一览</x:String>
+                                        <x:String>其他</x:String>
+                                        <x:String>设置</x:String>
+                                    </ComboBox>
+                                </RelativePanel>
+                            </StackPanel>
+                        </Expander>
+                        <!--115-->
+                        <Expander
                         HorizontalAlignment="Stretch"
                         IsExpanded="False"
                         ExpandDirection="Down"
@@ -247,123 +80,186 @@
                         Header="115"
                         HorizontalContentAlignment="Stretch">
 
-                        <StackPanel Padding="50,0" Spacing="10">
-                            <RelativePanel>
-                                <TextBox x:Name="Cookie_TextBox" MinWidth="100" MaxWidth="600" Text="{x:Bind data:AppSettings._115_Cookie}"/>
-                                <StackPanel Orientation="Horizontal" RelativePanel.AlignRightWithPanel="True" Spacing="5">
-                                    <Button Content="删除" Click="DeleteCookieButton"/>
-                                    <Button Content="导出" Click="ExportCookieButton">
-                                        <ToolTipService.ToolTip>
-                                            <TextBlock>
+                            <StackPanel Padding="50,0" Spacing="10">
+                                <RelativePanel>
+                                    <TextBox x:Name="Cookie_TextBox" MinWidth="100" MaxWidth="600" Text="{x:Bind data:AppSettings._115_Cookie}"/>
+                                    <StackPanel Orientation="Horizontal" RelativePanel.AlignRightWithPanel="True" Spacing="5">
+                                        <Button Content="删除" Click="DeleteCookieButton"/>
+                                        <Button Content="导出" Click="ExportCookieButton">
+                                            <ToolTipService.ToolTip>
+                                                <TextBlock>
                                                 配合浏览器插件(Cookie Edit)使用
-                                            </TextBlock>
-                                        </ToolTipService.ToolTip>
-                                    </Button>
-                                </StackPanel>
-                            </RelativePanel>
-                            
-                            <RelativePanel>
-                                <TextBlock Text="单次请求后等待" />
-                                <TextBlock Text="1s" RelativePanel.AlignRightWithPanel="True"/>
-                            </RelativePanel>
-                            
-                        </StackPanel>
-                    </Expander>
-                    <Expander
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Stretch"
-                        IsExpanded="False"
-                        ExpandDirection="Down"
-                        VerticalAlignment="Top"
-                        Header="搜刮信息">
-                        <StackPanel Spacing="5">
-                            <Pivot Margin="-15,-20,0,0">
-                                <Pivot.HeaderTemplate>
-                                    <DataTemplate x:DataType="x:String">
-                                        <TextBlock Text="{x:Bind}" FontSize="14"/>
-                                    </DataTemplate>
-                                </Pivot.HeaderTemplate>
-
-
-                                <PivotItem Header="搜刮源">
-                                    <StackPanel Spacing="5" Margin="5">
-                                        <TextBlock Text="选择"/>
-                                        <StackPanel Orientation="Horizontal" Spacing="10">
-                                            <ToggleButton Content="JavBus" IsChecked="{x:Bind data:AppSettings.isUseJavBus,Mode=TwoWay}" Unchecked="ToggleButton_Unchecked"/>
-                                            <ToggleButton Content="JavDB" IsChecked="{x:Bind data:AppSettings.isUseJavDB,Mode=TwoWay}" Unchecked="ToggleButton_Unchecked"/>
-                                        </StackPanel>
+                                                </TextBlock>
+                                            </ToolTipService.ToolTip>
+                                        </Button>
                                     </StackPanel>
-                                </PivotItem>
-                                
-                                <PivotItem Header="搜刮方式">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="auto"/>
-                                            <RowDefinition Height="*"/>
-                                        </Grid.RowDefinitions>
+                                </RelativePanel>
 
-                                        <!--<TextBlock Text="javbus"/>-->
-                                        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
-                                            <TextBlock Text="当前设置" VerticalAlignment="Center"/>
-                                            <ComboBox SelectedIndex="0" Width="90">
-                                                <x:String>JavBus</x:String>
-                                                <x:String>JavDB</x:String>
-                                            </ComboBox>
+                                <RelativePanel>
+                                    <TextBlock Text="单次请求后等待" />
+                                    <TextBlock Text="1s" RelativePanel.AlignRightWithPanel="True"/>
+                                </RelativePanel>
+
+                            </StackPanel>
+                        </Expander>
+
+
+                        <!--播放-->
+                        <Expander
+                            HorizontalAlignment="Stretch"
+                            IsExpanded="False"
+                            ExpandDirection="Down"
+                            VerticalAlignment="Top"
+                            Header="播放"
+                            HorizontalContentAlignment="Stretch">
+
+                            <StackPanel Padding="50,0" Spacing="5">
+                                <RelativePanel>
+                                    <TextBlock Text="播放器" RelativePanel.AlignVerticalCenterWithPanel="True"/>
+                                    <ComboBox RelativePanel.AlignRightWithPanel="True" SelectedIndex="{x:Bind data:AppSettings.PlayerSelection,Mode=TwoWay}" SelectionChanged="PlayerSelectionChanged">
+                                        <x:String>浏览器</x:String>
+                                        <x:String>PotPlayer</x:String>
+                                    </ComboBox>
+                                </RelativePanel>
+
+                                <RelativePanel x:Name="PotPlayerResolution_RelativePanel" Visibility="Collapsed">
+                                    <TextBlock Text="清晰度" RelativePanel.AlignVerticalCenterWithPanel="True"/>
+                                    <ComboBox RelativePanel.AlignRightWithPanel="True" SelectedIndex="0" IsEnabled="False">
+                                        <x:String>最高</x:String>
+                                    </ComboBox>
+                                </RelativePanel>
+
+                            </StackPanel>
+                        </Expander>
+                    </StackPanel>
+
+
+                    <StackPanel Spacing="5">
+                        <TextBlock Text="下载"/>
+
+                        <!--搜刮信息-->
+                        <Expander
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Stretch"
+                            IsExpanded="False"
+                            ExpandDirection="Down"
+                            VerticalAlignment="Top"
+                            Header="搜刮信息">
+                            <StackPanel Spacing="5">
+                                <Pivot Margin="-15,-20,0,0">
+                                    <Pivot.HeaderTemplate>
+                                        <DataTemplate x:DataType="x:String">
+                                            <TextBlock Text="{x:Bind}" FontSize="14"/>
+                                        </DataTemplate>
+                                    </Pivot.HeaderTemplate>
+
+
+                                    <PivotItem Header="搜刮源">
+                                        <StackPanel Spacing="5" Margin="5" Padding="50,0">
+                                            <TextBlock Text="选择"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                                <ToggleButton Content="JavBus" IsChecked="{x:Bind data:AppSettings.isUseJavBus,Mode=TwoWay}" Unchecked="ToggleButton_Unchecked"/>
+                                                <ToggleButton Content="JavDB" IsChecked="{x:Bind data:AppSettings.isUseJavDB,Mode=TwoWay}" Unchecked="ToggleButton_Unchecked"/>
+                                            </StackPanel>
                                         </StackPanel>
-                                        <GridView x:Name="MatchRulesList_GridView" Grid.Row="1">
-                                        </GridView>
-                                    </Grid>
-                                </PivotItem>
+                                    </PivotItem>
 
-                                <PivotItem Header="JavBus">
-                                    <StackPanel Padding="50,10" Spacing="10">
-                                        <RelativePanel>
-                                            <TextBlock x:Name="JavbusUrl_TextBlox" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0">地址</TextBlock>
-                                            <TextBox x:Name="JavbusUrl_TextBox" Width="600" RelativePanel.RightOf="JavbusUrl_TextBlox" Text="{x:Bind data:AppSettings.JavBus_BaseUrl}"/>
-                                            <Button x:Name="JavbusUrlChange_Button" Click="JavbusUrlChange_Button_Click" Content="修改" RelativePanel.AlignRightWithPanel="True"/>
-                                        </RelativePanel>
-                                        
-                                        <RelativePanel>
-                                            <TextBlock Text="单次请求后等待" />
-                                            <TextBlock Text="1~3 s" RelativePanel.AlignRightWithPanel="True"/>
-                                        </RelativePanel>
-                                    </StackPanel>
-                                </PivotItem>
+                                    <PivotItem Header="搜刮方式">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="auto"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
 
-                                <PivotItem Header="JavDB">
-                                    <StackPanel Spacing="5" Padding="50,10">
-                                        <RelativePanel>
-                                            <TextBlock x:Name="JavDBUrl_TextBlox" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0" Width="50">地址</TextBlock>
-                                            <TextBox x:Name="JavDBUrl_TextBox" Width="600" RelativePanel.RightOf="JavDBUrl_TextBlox" Text="{x:Bind data:AppSettings.JavDB_BaseUrl}"/>
-                                            <Button x:Name="JavDBUrlChange_Button" Click="JavDBUrlChange_Button_Click" Content="修改" RelativePanel.AlignRightWithPanel="True"/>
-                                        </RelativePanel>
-                                        
-                                        <RelativePanel>
-                                            <TextBlock x:Name="JavDBCookie_TextBlox" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0" Width="50">Cookie</TextBlock>
-                                            <TextBox x:Name="JavDBCookie_TextBox" Width="600" RelativePanel.RightOf="JavDBCookie_TextBlox" Text="{x:Bind data:AppSettings.javdb_Cookie}">
-                                                <ToolTipService.ToolTip>
-                                                    <TextBlock>
+                                            <!--<TextBlock Text="javbus"/>-->
+                                            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+                                                <TextBlock Text="当前设置" VerticalAlignment="Center"/>
+                                                <ComboBox SelectedIndex="0" Width="90">
+                                                    <x:String>JavBus</x:String>
+                                                    <x:String>JavDB</x:String>
+                                                </ComboBox>
+                                            </StackPanel>
+                                            <GridView x:Name="MatchRulesList_GridView" Grid.Row="1">
+                                            </GridView>
+                                        </Grid>
+                                    </PivotItem>
+
+                                    <PivotItem Header="JavBus">
+                                        <StackPanel Padding="50,10" Spacing="10">
+                                            <RelativePanel>
+                                                <TextBlock x:Name="JavbusUrl_TextBlox" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0">地址</TextBlock>
+                                                <TextBox x:Name="JavbusUrl_TextBox" Width="600" RelativePanel.RightOf="JavbusUrl_TextBlox" Text="{x:Bind data:AppSettings.JavBus_BaseUrl}"/>
+                                                <Button x:Name="JavbusUrlChange_Button" Click="JavbusUrlChange_Button_Click" Content="修改" RelativePanel.AlignRightWithPanel="True"/>
+                                            </RelativePanel>
+
+                                            <RelativePanel>
+                                                <TextBlock Text="单次请求后等待" />
+                                                <TextBlock Text="1~3 s" RelativePanel.AlignRightWithPanel="True"/>
+                                            </RelativePanel>
+                                        </StackPanel>
+                                    </PivotItem>
+
+                                    <PivotItem Header="JavDB">
+                                        <StackPanel Spacing="5" Padding="50,10">
+                                            <RelativePanel>
+                                                <TextBlock x:Name="JavDBUrl_TextBlox" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0" Width="50">地址</TextBlock>
+                                                <TextBox x:Name="JavDBUrl_TextBox" Width="600" RelativePanel.RightOf="JavDBUrl_TextBlox" Text="{x:Bind data:AppSettings.JavDB_BaseUrl}"/>
+                                                <Button x:Name="JavDBUrlChange_Button" Click="JavDBUrlChange_Button_Click" Content="修改" RelativePanel.AlignRightWithPanel="True"/>
+                                            </RelativePanel>
+
+                                            <RelativePanel>
+                                                <TextBlock x:Name="JavDBCookie_TextBlox" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0" Width="50">Cookie</TextBlock>
+                                                <TextBox x:Name="JavDBCookie_TextBox" Width="600" RelativePanel.RightOf="JavDBCookie_TextBlox" Text="{x:Bind data:AppSettings.javdb_Cookie}">
+                                                    <ToolTipService.ToolTip>
+                                                        <TextBlock>
                                                         访问FC内容需要登陆后的Cookie
-                                                    </TextBlock>
-                                                </ToolTipService.ToolTip>
-                                            </TextBox>
-                                            <Button x:Name="JavDBCookieChange_Button" Click="JavDBCookieChange_Button_Click" Content="修改" RelativePanel.AlignRightWithPanel="True"/>
-                                        </RelativePanel>
+                                                        </TextBlock>
+                                                    </ToolTipService.ToolTip>
+                                                </TextBox>
+                                                <Button x:Name="JavDBCookieChange_Button" Click="JavDBCookieChange_Button_Click" Content="修改" RelativePanel.AlignRightWithPanel="True"/>
+                                            </RelativePanel>
 
-                                        <RelativePanel Margin="0,5,0,0">
-                                            <TextBlock Text="单次请求后等待" />
-                                            <TextBlock Text="3~6 s" RelativePanel.AlignRightWithPanel="True"/>
-                                        </RelativePanel>
-                                    </StackPanel>
-                                </PivotItem>
+                                            <RelativePanel Margin="0,5,0,0">
+                                                <TextBlock Text="单次请求后等待" />
+                                                <TextBlock Text="3~6 s" RelativePanel.AlignRightWithPanel="True"/>
+                                            </RelativePanel>
+                                        </StackPanel>
+                                    </PivotItem>
 
 
-                            </Pivot>
+                                </Pivot>
 
-                            
-                        </StackPanel>
-                    </Expander>
+
+                            </StackPanel>
+                        </Expander>
+                        <!--保存路径-->
+                        <Expander
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Stretch"
+                            IsExpanded="False"
+                            ExpandDirection="Down"
+                            VerticalAlignment="Top"
+                            Header="保存路径">
+                            <StackPanel Spacing="5">
+                                <RelativePanel Padding="50,0">
+                                    <TextBlock x:Name="Image_TextBlox" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0">图片</TextBlock>
+                                    <TextBox x:Name="ImageSavePath_TextBox" Width="600" RelativePanel.RightOf="Image_TextBlox" Text="{x:Bind data:AppSettings.Image_SavePath}"/>
+                                    <Button Click="ImageSavePath_Click" Content="修改" RelativePanel.LeftOf="ImageOpenPath"/>
+                                    <Button x:Name="ImageOpenPath" Click="ImageOpenPath_Click" Content="打开路径" RelativePanel.AlignRightWithPanel="True" Margin="3,0,0,0"/>
+                                </RelativePanel>
+
+                                <RelativePanel Padding="50,0">
+                                    <TextBlock x:Name="DataAccess_TextBlox" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0">数据</TextBlock>
+                                    <TextBox x:Name="DataAccessSavePath_TextBox" Width="600" RelativePanel.RightOf="DataAccess_TextBlox"/>
+                                    <Button Click="DataAccessSavePath_Click" Content="修改" RelativePanel.LeftOf="DataAccessOpenPath_Button"/>
+                                    <Button x:Name="DataAccessOpenPath_Button" Click="DataAccessOpenPath_Click" Content="打开路径" RelativePanel.AlignRightWithPanel="True" Margin="3,0,0,0"/>
+                                </RelativePanel>
+                            </StackPanel>
+                        </Expander>
+                    </StackPanel>
                 </StackPanel>
+                
+                
             </ScrollViewer>
         </Grid>
 

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -86,8 +87,8 @@ namespace Display.Views
             }
             else if (videoInfoList.Count == 1)
             {
-                VideoPlayWindow.createNewWindow(FileMatch.getVideoPlayUrl(videoInfoList[0].pc));
-                //Frame.Navigate(typeof(ContentsPage.VideoPlay), videoInfoList[0].pc);
+                Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc);
+                //VideoPlayWindow.createNewWindow(FileMatch.getVideoPlayUrl(videoInfoList[0].pc));
             }
 
             //有多集
@@ -99,6 +100,8 @@ namespace Display.Views
                     multisetList.Add(videoinfo);
                 }
 
+                multisetList = multisetList.OrderBy(item => item.n).ToList();
+
                 ContentsPage.SelectSingleVideoToPlay newPage = new ContentsPage.SelectSingleVideoToPlay(multisetList);
                 newPage.ContentListView.ItemClick += ContentListView_ItemClick; ;
 
@@ -109,13 +112,14 @@ namespace Display.Views
             }
         }
 
-
-
         private void ContentListView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var SingleVideoInfo = e.ClickedItem as Data.Datum;
-            VideoPlayWindow.createNewWindow(FileMatch.getVideoPlayUrl(SingleVideoInfo.pc));
-            //Frame.Navigate(typeof(ContentsPage.VideoPlay), SingleVideoInfo.pc);
+
+
+            Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc);
+
+            //VideoPlayWindow.createNewWindow(FileMatch.getVideoPlayUrl(SingleVideoInfo.pc));
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)

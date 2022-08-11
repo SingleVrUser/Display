@@ -420,5 +420,18 @@ namespace Display.Views
             }
 
         }
+
+        private void PlayerSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count != 0 && e.AddedItems[0].ToString() == "PotPlayer")
+            {
+                PotPlayerResolution_RelativePanel.Visibility = Visibility.Visible;
+            }
+            else if(e.RemovedItems.Count !=0 && e.RemovedItems[0].ToString() == "PotPlayer")
+            {
+
+                PotPlayerResolution_RelativePanel.Visibility = Visibility.Collapsed;
+            }
+        }
     }
 }
