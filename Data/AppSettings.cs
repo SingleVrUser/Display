@@ -220,5 +220,27 @@ namespace Data
                 localSettings.Values["isUseJavBus"] = value;
             }
         }
+
+
+        /// <summary>
+        /// 播放方式
+        /// </summary>
+        public static int PlayerSelection
+        {
+            get
+            {
+                int playerSelection = 0;
+
+                if (localSettings.Values["PlayerSelection"] is int value)
+                {
+                    playerSelection = value;
+                }
+                return playerSelection;
+            }
+            set
+            {
+                localSettings.Values["PlayerSelection"] = value;
+            }
+        }
     }
 }
