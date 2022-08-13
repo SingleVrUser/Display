@@ -128,7 +128,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <RelativePanel>
-                    <TextBox x:Name="ChangeKeywordString_TextBox" MinWidth="200" Text="{x:Bind videoMatchInfo.KeywordString,Mode=OneWay}" Margin="0,0,60,0"/>
+                    <TextBox x:Name="ChangeKeywordString_TextBox" MinWidth="200" IsSpellCheckEnabled="False" Text="{x:Bind videoMatchInfo.KeywordString,Mode=OneWay}" Margin="0,0,60,0"/>
                     <Button Content="修改" RelativePanel.AlignRightWithPanel="True" Click="ChangeKeywordString_Click"/>
                 </RelativePanel>
 

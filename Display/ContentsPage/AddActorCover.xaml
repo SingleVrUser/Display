@@ -1,0 +1,96 @@
+﻿<Page
+    x:Class="Display.ContentsPage.AddActorCover"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Display.ContentsPage"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:data="using:Data"
+    xmlns:controls="using:Display.Control"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.Resources>
+        <DataTemplate x:DataType="data:ActorsInfo" x:Key="GirdViewTemplate">
+            <Grid Width="140"
+                    Height="140"
+                    BorderThickness="1"
+                    BorderBrush="{ThemeResource SystemControlTransientBorderBrush}"
+                    CornerRadius="5">
+                <Grid Visibility="{x:Bind data:FileMatch.showIfImageNull(prifilePhotoPath),Mode=OneWay}">
+                    <Image Source="{x:Bind prifilePhotoPath,Mode=OneWay}" Width="140"/>
+
+                    <TextBlock Text="{x:Bind name}" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" TextWrapping="Wrap" Margin="5"/>
+                    <TextBlock Text="{x:Bind count}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6"/>
+
+                    <controls:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
+                    <!--<ProgressRing IsActive="{x:Bind isProgressRingActive, Mode=OneWay}"/>-->
+                </Grid>
+
+                <Grid Visibility="{x:Bind data:FileMatch.showIfImageENotNull(prifilePhotoPath),Mode=OneWay}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Image Source="{x:Bind prifilePhotoPath,Mode=OneWay}" Width="150"/>
+
+                    <StackPanel Grid.Row="1">
+                        <RelativePanel Margin="5,0">
+                            <TextBlock Text="{x:Bind name}" RelativePanel.AlignVerticalCenterWithPanel="True" TextWrapping="Wrap"/>
+                            <TextBlock Text="{x:Bind count}" RelativePanel.AlignHorizontalCenterWithPanel="True" RelativePanel.AlignRightWithPanel="True" VerticalAlignment="Bottom"/>
+                        </RelativePanel>
+                        <TextBlock Text="{x:Bind genderInfo,Mode=OneWay}"/>
+                        <TextBlock Text="{x:Bind ageInfo,Mode=OneWay}"/>
+                    </StackPanel>
+                    
+
+                    <controls:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
+                    <!--<ProgressRing IsActive="{x:Bind isProgressRingActive, Mode=OneWay}"/>-->
+                </Grid>
+
+            </Grid>
+
+        </DataTemplate>
+
+        <!--<DataTemplate x:DataType="data:ActorsInfo" x:Key="GirdViewTemplateWithFaceImage" >
+            <Grid Width="150"
+                        Height="120"
+                        Padding="10,5"
+                        BorderThickness="1"
+                        BorderBrush="{ThemeResource SystemControlTransientBorderBrush}"
+                        CornerRadius="5">
+                <Image Source="{x:Bind prifilePhotoPath,Mode=OneWay}" Width="150"/>
+
+                <TextBlock Text="{x:Bind name}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                <TextBlock Text="{x:Bind count}" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+
+                <controls:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
+                --><!--<ProgressRing IsActive="{x:Bind isProgressRingActive, Mode=OneWay}"/>--><!--
+            </Grid>
+        </DataTemplate>-->
+
+        <!--<local:CoverItemTemplateSelector x:Key="CoverItemTemplateSelector"
+                                         HaveFaceImageTemplate="{StaticResource GirdViewTemplateWithFaceImage}"
+                                         WithoutFaceImageTemplate="{StaticResource GirdViewTemplateWithoutFaceImage}"/>-->
+    </Page.Resources>
+    <Grid Loaded="Grid_Loaded">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <RelativePanel Margin="10,2,10,10">
+            <CheckBox x:Name="selectedCheckBox" Content="共选 0 项" CornerRadius="10" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
+            <TextBlock x:Name="progress_TextBlock" RelativePanel.AlignVerticalCenterWithPanel="True"/>
+            <Button Content="开始" RelativePanel.AlignRightWithPanel="True" Click="SatarButton_Click"/>
+        </RelativePanel>
+        <GridView Grid.Row="1"
+                x:Name="BasicGridView"
+                IsItemClickEnabled="True"
+                ItemClick="BasicGridView_ItemClick"
+                Margin="10,0,0,0"
+                SelectionMode="Multiple"
+                SelectionChanged="BasicGridView_SelectionChanged"
+                ItemsSource="{x:Bind actorinfo}"
+                ItemTemplate="{StaticResource GirdViewTemplate}">
+        </GridView>
+    </Grid>
+</Page>

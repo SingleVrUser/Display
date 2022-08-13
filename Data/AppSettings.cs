@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -100,7 +101,8 @@ namespace Data
                 string savePath = localSettings.Values["ImageSave_Path"] as string;
                 if (string.IsNullOrEmpty(savePath))
                 {
-                    savePath = ApplicationData.Current.LocalFolder.Path;
+                    savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path,"Image");
+                    FileMatch.CreateDirectoryIfNotExists(savePath);
                 }
                 return savePath;
             }
@@ -109,6 +111,28 @@ namespace Data
                 localSettings.Values["ImageSave_Path"] = value;
             }
         }
+
+        /// <summary>
+        /// 图片保存地址
+        /// </summary>
+        public static string ActorInfo_SavePath
+        {
+            get
+            {
+                string savePath = localSettings.Values["ActorInfo_SavePath"] as string;
+                if (string.IsNullOrEmpty(savePath))
+                {
+                    savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "Actor");
+                    FileMatch.CreateDirectoryIfNotExists(savePath);
+                }
+                return savePath;
+            }
+            set
+            {
+                localSettings.Values["ActorInfo_SavePath"] = value;
+            }
+        }
+
 
         /// <summary>
         /// 数据文件存储地址

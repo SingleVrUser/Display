@@ -563,7 +563,7 @@ namespace Data
         /// <returns></returns>
         public static List<VideoInfo> loadVideoInfoByName(string name)
         {
-            string[] splitList = name.Split('-');
+            string[] splitList = name.Split(new char[] { '-', '_' });
             string leftName = splitList[0];
 
             string rightNumber = "";
@@ -644,9 +644,14 @@ namespace Data
         /// <returns></returns>
         public static List<Datum> loadVideoInfoByTruename(string truename)
         {
-            string[] splitList = truename.Split('-');
+            string[] splitList = truename.Split(new char[] {'-','_'});
             string leftName = splitList[0];
-            string rightNumber = splitList[1];
+
+            string rightNumber = "";
+            if (splitList.Length != 1)
+            {
+                rightNumber = splitList[1];
+            }
 
             List<Datum> data = new List<Datum>();
 
@@ -658,8 +663,9 @@ namespace Data
 
                 SqliteCommand selectCommand = new SqliteCommand();
 
-                selectCommand = new SqliteCommand
-                    ($"SELECT * from FilesInfo WHERE uid != 0 AND vdi != 0 AND n LIKE '%{leftName}%{rightNumber}%'", db);
+                //vdi = 0，即视频转码未成功，无法在线观看
+                //selectCommand = new SqliteCommand ($"SELECT * from FilesInfo WHERE uid != 0 AND vdi != 0 AND n LIKE '%{leftName}%{rightNumber}%'", db);
+                selectCommand = new SqliteCommand ($"SELECT * from FilesInfo WHERE uid != 0 AND n LIKE '%{leftName}%{rightNumber}%'", db);
 
 
                 SqliteDataReader query = selectCommand.ExecuteReader();

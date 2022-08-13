@@ -1154,7 +1154,7 @@ namespace Data
     }
 
     //115导入数据库的进度信息
-    public enum ProgressStatus { normal, error ,done}
+    public enum ProgressStatus { normal, error ,done, cancel}
     //报告文件数量
     public class GetFilesProgressInfo
     {
@@ -1215,5 +1215,75 @@ namespace Data
         public string msg { get; set; }
         public int errno { get; set; }
         public string data { get; set; }
+    }
+
+    //演员信息
+    public class ActorsInfo : INotifyPropertyChanged
+    {
+        public string name;
+        public int count;
+
+        private string _prifilePhotoPath = "/Assets/NoPicture.jpg";
+        //private string _prifilePhotoPath;
+        public string prifilePhotoPath
+        {
+            get
+            {
+                return _prifilePhotoPath;
+            }
+            set
+            {
+                _prifilePhotoPath = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Status _status = Status.beforeStart;
+        public Status Status
+        {
+            get
+            {
+                return _status;
+            }
+            set
+            {
+                _status = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _genderInfo;
+        public string genderInfo
+        {
+            get
+            {
+                return _genderInfo;
+            }
+            set
+            {
+                _genderInfo = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _ageInfo;
+        public string ageInfo
+        {
+            get
+            {
+                return _ageInfo;
+            }
+            set
+            {
+                _ageInfo = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

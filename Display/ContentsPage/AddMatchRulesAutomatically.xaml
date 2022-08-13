@@ -16,7 +16,7 @@
 
         <TextBlock Text="{x:Bind AddMatchNameList.Count,Mode=OneWay}" HorizontalAlignment="Right"/>
 
-        <GridView ItemsSource="{x:Bind AddMatchNameList}" Grid.Row="1">
+        <GridView ItemsSource="{x:Bind AddMatchNameList}" Grid.Row="1" SelectionMode="None">
             <GridView.ItemContainerStyle>
                 <Style TargetType="GridViewItem">
                     <Setter Property="Margin" Value="5"/>

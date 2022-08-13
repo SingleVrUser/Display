@@ -149,7 +149,7 @@ namespace Display.ContentsPage
             //VisualStateManager.GoToState(this, "CloseMatchResults", true);
             //CloseMatchSuccessResult_Storyboard.Begin();
             CloseMatchSuccessResult_Storyboard.Begin();
-            var i = MatchResult_Grid;
+            //var i = MatchResult_Grid;
         }
 
         private async void AddRulesButton_Click(object sender, RoutedEventArgs e)

@@ -14,6 +14,7 @@ using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -40,9 +41,13 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
         List<string> cidList;
         public Status _status;
 
+        CancellationTokenSource s_cts = new();
+        Window currentWindow;
+
         public Progress()
         {
             this.InitializeComponent();
+
         }
 
         /// <summary>
@@ -53,17 +58,53 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
         {
             base.OnNavigatedTo(e);
 
-            // Store the item to be used in binding to UI
-            cidList = e.Parameter as List<string>;
+            var content = e.Parameter as ContentPassBetweenPage;
 
-            if(cidList != null)
+            cidList = content.cidList;
+
+            currentWindow = content.window;
+
+            if (cidList != null)
             {
                 loadData();
             }
+
         }
+
+        private async void CurrentWindow_Closed(object sender, WindowEventArgs args)
+        {
+            args.Handled = true;
+            var window = (sender as Window);
+
+            ContentDialog dialog = new ContentDialog();
+
+            // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
+            dialog.XamlRoot = this.XamlRoot;
+            dialog.Title = "确认";
+            dialog.PrimaryButtonText = "关闭";
+            dialog.CloseButtonText = "返回";
+            dialog.DefaultButton = ContentDialogButton.Primary;
+            dialog.Content = "关闭窗口后将取消当前任务，是否继续关闭";
+
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                s_cts.Cancel();
+
+                window.Closed -= CurrentWindow_Closed;
+                window.Close();
+            }
+        }
+
+        //protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        //{
+        //    base.OnNavigatingFrom(e);
+        //}
 
         private async void loadData()
         {
+            currentWindow.Closed += CurrentWindow_Closed;
+
             GetFolderCategory_Expander.Visibility = Visibility.Visible;
             GetFolderCategory_Progress.status = Status.doing;
 
@@ -104,8 +145,6 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                 FolderCategory.Add(item);
             }
 
-
-
             if (overallCount == 0)
             {
                 GetFolderCategory_Progress.status = Status.error;
@@ -137,7 +176,6 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                     cps_TextBlock.Text = $"{progressPercent.sendCountPerMinutes} 次/分钟";
                     leftTime_Run.Text = FileMatch.ConvertInt32ToDateStr(1.5* (folderCount- progressPercent.getFilesProgressInfo.FolderCount));
                     //updateSendSpeed(progressPercent.sendCountPerSecond);
-
 
                 }
                 else if(progressPercent.status == ProgressStatus.done)
@@ -173,6 +211,10 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                     GetFolderCategory_Expander.IsExpanded = true;
                     GetInfos_Progress.Visibility = Visibility.Collapsed;
                 }
+                else if(progressPercent.status == ProgressStatus.cancel)
+                {
+                    Debug.WriteLine("退出进程");
+                }
                 //出错
                 else
                 {
@@ -185,15 +227,16 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             });
 
             // 2.获取数据，获取所有文件的全部信息（大小和数量）
-            await webapi.GetAllFileInfoToDataAccess(cidWithoutRootList, new GetFilesProgressInfo(), progress);
+            await webapi.GetAllFileInfoToDataAccess(cidWithoutRootList, new GetFilesProgressInfo(), s_cts.Token, progress);
 
+
+            currentWindow.Closed -= CurrentWindow_Closed;
         }
 
         //文件总数（包括文件夹）
         int successCount = 0;
         int overallCount = 0;
         int folderCount = 0;
-
 
         private void tryToast(string title, string content)
         {
@@ -218,7 +261,6 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             countProgress_TextBlock.Text = $"{successCount}/{overallCount}";
             overallProgress.Value = successCount;
         }
-
 
         private async void OpenSavePathButton_Click(object sender, RoutedEventArgs e)
         {
@@ -259,6 +301,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             if (Frame.CanGoBack)
             {
                 Frame.GoBack();
+                s_cts.Cancel();
             }
         }
     }

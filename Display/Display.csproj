@@ -47,10 +47,13 @@
     <None Remove="Assets\icons8-circled-play-96.png" />
     <None Remove="Assets\icons8-image-96.png" />
     <None Remove="Assets\icons8-page-96.png" />
+    <None Remove="Assets\NoPicture.jpg" />
     <None Remove="Assets\SmallTile.scale-100.png" />
     <None Remove="Assets\Svg\accounting_banking_business_calculate_calculator_icon.svg" />
+    <None Remove="Assets\Svg\face_male_man_portrait_icon.svg" />
     <None Remove="Assets\Svg\file_document_paper_page_icon.svg" />
     <None Remove="Assets\Tip\FindFolderCid.png" />
+    <None Remove="ContentsPage\AddActorCover.xaml" />
     <None Remove="ContentsPage\AddMatchRulesAutomatically.xaml" />
     <None Remove="ContentsPage\CalculateLocalFileSha1.xaml" />
     <None Remove="ContentsPage\CheckCookie.xaml" />
@@ -58,7 +61,6 @@
     <None Remove="ContentsPage\DownDialogContent.xaml" />
     <None Remove="ContentsPage\Import115DataToLocalDataAccess\InputCidManually.xaml" />
     <None Remove="ContentsPage\LoginPage.xaml" />
-    <None Remove="ContentsPage\ProgressOfImportDataAccess.xaml" />
     <None Remove="ContentsPage\SelectSingleVideoToPlay.xaml" />
     <None Remove="ContentsPage\spiderVideoInfo.xaml" />
     <None Remove="ContentsPage\SpiderVideoInfo_ConditionalCheck.xaml" />
@@ -307,12 +309,16 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Assets\115\file_type\" />
+    <Folder Include="Assets\Models\caffe\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Assets\SmallTile.scale-125.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="ContentsPage\AddActorCover.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Control\TextBlockWithStressText.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

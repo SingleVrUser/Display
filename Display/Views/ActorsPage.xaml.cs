@@ -40,7 +40,7 @@ namespace Display.Views
         private async void Page_Loaded()
         {
             ProgressRing.IsActive = true;
-            List<Data.VideoInfo> VideoInfoList = await Task.Run(() => DataAccess.LoadAllVideoInfo(-1));
+            List<VideoInfo> VideoInfoList = await Task.Run(() => DataAccess.LoadAllVideoInfo(-1));
 
             foreach (var VideoInfo in VideoInfoList)
             {
@@ -57,7 +57,6 @@ namespace Display.Views
                     ActorsInfoDict[actor].Add(VideoInfo.truename);
                 }
 
-
             }
 
             foreach (var item in ActorsInfoDict)
@@ -68,6 +67,7 @@ namespace Display.Views
                     count = item.Value.Count,
                 });
             }
+
             ProgressRing.IsActive = false;
         }
 
@@ -87,10 +87,5 @@ namespace Display.Views
         }
     }
 
-    public class ActorsInfo
-    {
-        public string name;
-        public int count;
-        public string prifilePhotoPath;
-    }
+
 }

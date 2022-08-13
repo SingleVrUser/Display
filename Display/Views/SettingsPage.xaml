@@ -26,13 +26,13 @@
         
 
         <!--用户信息-->
-        <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Horizontal" Padding="10,0">
             <control:UserInfo x:Name="userInfoControl"
-            UpdateClick="UpdateButton_Click"
-            Loginlick="LoginButton_Click"
-            LogoutClick="LogoutButton_Click"
-            HorizontalAlignment="Left"
-            Margin="5"/>
+                UpdateClick="UpdateButton_Click"
+                Loginlick="LoginButton_Click"
+                LogoutClick="LogoutButton_Click"
+                HorizontalAlignment="Left"
+                Margin="5"/>
 
             <!--提示-->
             <InfoBar x:Name="infobar" Severity="Informational" Message="隐藏模式已启动，请注意：在隐藏模式下获取不到隐藏的文件信息"></InfoBar>
@@ -172,21 +172,72 @@
                                     </PivotItem>
 
                                     <PivotItem Header="搜刮方式">
-                                        <Grid>
+                                        <Grid RowSpacing="10">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="auto"/>
                                                 <RowDefinition Height="*"/>
                                             </Grid.RowDefinitions>
 
                                             <!--<TextBlock Text="javbus"/>-->
-                                            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
-                                                <TextBlock Text="当前设置" VerticalAlignment="Center"/>
-                                                <ComboBox SelectedIndex="0" Width="90">
+                                            <RelativePanel>
+                                                <StackPanel Orientation="Horizontal" Spacing="15" >
+                                                    <TextBlock Text="当前设置" VerticalAlignment="Center"/>
+                                                    <CheckBox Content="通用" CornerRadius="10" Margin="0,0,-50,0" Checked="SpiderMothod_Checked" Unchecked="SpiderMothod_Unchecked"/>
+                                                    <TextBlock x:Name="SpiderMothodListCount_TextBlock" Text="{x:Bind SpiderMothodList.Count,Mode=OneWay}" VerticalAlignment="Center" Visibility="Collapsed"/>
+                                                    <!--<ComboBox SelectedIndex="0" Width="90">
                                                     <x:String>JavBus</x:String>
                                                     <x:String>JavDB</x:String>
-                                                </ComboBox>
-                                            </StackPanel>
-                                            <GridView x:Name="MatchRulesList_GridView" Grid.Row="1">
+                                                </ComboBox>-->
+                                                </StackPanel>
+
+                                                <StackPanel x:Name="AddSpiderMethod_StackPanel" RelativePanel.AlignRightWithPanel="True" Orientation="Horizontal" Spacing="5" Visibility="Collapsed">
+                                                    <TextBox x:Name="AddSpiderMethod_TextBox" PlaceholderText="输入要添加的规则" KeyDown="AddSpiderMethodTextBox_KeyDown"/>
+                                                    <Button Content="添加" Click="AddSpiderMethodButton_Click"/>
+                                                </StackPanel>
+                                            </RelativePanel>
+
+                                            <GridView x:Name="MatchRulesList_GridView" Grid.Row="1" ItemsSource="{x:Bind SpiderMothodList}" SelectionMode="None" MaxHeight="200">
+                                                <GridView.ItemContainerStyle>
+                                                    <Style TargetType="GridViewItem">
+                                                        <Setter Property="Margin" Value="2"/>
+                                                    </Style>
+                                                </GridView.ItemContainerStyle>
+                                                
+                                                <GridView.ItemTemplate>
+                                                    <DataTemplate x:DataType="x:String">
+                                                        <UserControl PointerEntered="SpiderMethodGridView_PointerEntered" PointerExited="SpiderMethodGridView_PointerExited">
+                                                            <Grid
+                                                                Width="120"
+                                                                Height="40"
+                                                                BorderBrush ="{ThemeResource BackButtonPointerOverBackgroundThemeBrush}"
+                                                                BorderThickness="1"
+                                                                CornerRadius="5">
+                                                                <VisualStateManager.VisualStateGroups>
+                                                                    <VisualStateGroup x:Name="HoveringStates">
+
+                                                                        <VisualState x:Name="HoverButtonsHidden" />
+
+                                                                        <VisualState x:Name="HoverButtonsShown">
+                                                                            <VisualState.Setters>
+                                                                                <Setter Target="SpiderMethodDeleteButton.Visibility" Value="Visible" />
+                                                                            </VisualState.Setters>
+                                                                        </VisualState>
+                                                                    </VisualStateGroup>
+                                                                </VisualStateManager.VisualStateGroups>
+
+                                                                <TextBlock Text="{x:Bind}" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
+
+                                                                <HyperlinkButton
+                                                                    x:Name="SpiderMethodDeleteButton"
+                                                                    Content="删除"
+                                                                    HorizontalAlignment="Right"
+                                                                    VerticalAlignment="Bottom"
+                                                                    Click="SpiderMethodDeleteButton_Click"
+                                                                    Visibility="Collapsed"/>
+                                                            </Grid>
+                                                        </UserControl>
+                                                    </DataTemplate>
+                                                </GridView.ItemTemplate>
                                             </GridView>
                                         </Grid>
                                     </PivotItem>
@@ -260,6 +311,16 @@
                                     <TextBox x:Name="DataAccessSavePath_TextBox" Width="600" RelativePanel.RightOf="DataAccess_TextBlox"/>
                                     <Button Click="DataAccessSavePath_Click" Content="修改" RelativePanel.LeftOf="DataAccessOpenPath_Button"/>
                                     <Button x:Name="DataAccessOpenPath_Button" Click="DataAccessOpenPath_Click" Content="打开路径" RelativePanel.AlignRightWithPanel="True" Margin="3,0,0,0"/>
+                                </RelativePanel>
+
+                                <RelativePanel Padding="50,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock x:Name="ActorInfo_TextBlox" VerticalAlignment="Center" Margin="0,0,10,0">演员信息</TextBlock>
+                                        <TextBox x:Name="ActorSavePath_TextBox" Width="570" Text="{x:Bind data:AppSettings.ActorInfo_SavePath}" />
+                                    </StackPanel>
+
+                                    <Button Click="ActorInfoSavePath_Click" Content="修改" RelativePanel.LeftOf="ActorInfoOpenPath"/>
+                                    <Button x:Name="ActorInfoOpenPath" Click="ActorInfoOpenPath_Click" Content="打开路径" RelativePanel.AlignRightWithPanel="True" Margin="3,0,0,0"/>
                                 </RelativePanel>
                             </StackPanel>
                         </Expander>

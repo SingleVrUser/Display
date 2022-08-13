@@ -170,10 +170,15 @@ namespace Data
         /// <param name="getFilesProgressInfo"></param>
         /// <param name="progress"></param>
         /// <returns></returns>
-        public async Task GetAllFileInfoToDataAccess(List<string> cidList, GetFilesProgressInfo getFilesProgressInfo, IProgress<GetFileProgessIProgress> progress = null)
+        public async Task GetAllFileInfoToDataAccess(List<string> cidList, GetFilesProgressInfo getFilesProgressInfo, CancellationToken token, IProgress<GetFileProgessIProgress> progress = null)
         {
             foreach (var cid in cidList)
             {
+                if (token.IsCancellationRequested)
+                {
+                    Debug.WriteLine("退出3");
+                    return;
+                }
                 //fileProgressInfo.datumList = new List<Datum>();
 
                 //统计发送请求的频率
@@ -196,7 +201,7 @@ namespace Data
                 }
 
                 // 该文件已存在数据库里
-                if (DataAccess.IsLastestFileDataExists(cidCategory.pick_code, cidCategory.utime))
+                if (DataAccess.IsLastestFileDataExists(cidCategory.pick_code, cidCategory.utime) && Data.StaticData.isJumpExistsFolder)
                 {
                     //统计上下级文件夹所含文件的数量
                     //文件数量
@@ -212,7 +217,9 @@ namespace Data
                 else
                 {
                     //获取当前文件夹下所有文件信息，并添加到数据库中
-                    getFilesProgressInfo = await TraverseAllFileInfo(cid, getFilesProgressInfo, progress);
+                    getFilesProgressInfo = await TraverseAllFileInfo(cid, getFilesProgressInfo, token, progress);
+
+                    if (getFilesProgressInfo == null) continue;
 
                     //不添加有错误的目录进数据库（添加数据库时会跳过已经添加过的目录，对于出现错误的目录不添加方便后续重新添加）
                     if(getFilesProgressInfo.FailCid.Count == 0)
@@ -222,8 +229,15 @@ namespace Data
                 }
             }
 
-            // 完成
-            progress.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, status = ProgressStatus.done, sendCountPerMinutes = 1 });
+            if (token.IsCancellationRequested)
+            {
+                progress.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, status = ProgressStatus.cancel, sendCountPerMinutes = 1 });
+            }
+            else
+            {
+                // 完成
+                progress.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, status = ProgressStatus.done, sendCountPerMinutes = 1 });
+            }
 
         }
 
@@ -233,9 +247,15 @@ namespace Data
         /// <param name="cid"></param>
         /// <param name="webFileInfoList"></param>
         /// <returns></returns>
-        public async Task<GetFilesProgressInfo> TraverseAllFileInfo(string cid, GetFilesProgressInfo getFilesProgressInfo, IProgress<GetFileProgessIProgress> progress = null)
+        public async Task<GetFilesProgressInfo> TraverseAllFileInfo(string cid, GetFilesProgressInfo getFilesProgressInfo, CancellationToken token, IProgress<GetFileProgessIProgress> progress = null)
         {
             //var webFileInfoList = fileProgressInfo.datumList;
+            if (token.IsCancellationRequested)
+            {
+                return null;
+                Debug.WriteLine("退出1");
+            }
+
 
             //统计请求速度
             int sendCount = 0;
@@ -252,13 +272,19 @@ namespace Data
             {
                 foreach (var item in WebFileInfo.data)
                 {
+                    if (token.IsCancellationRequested)
+                    {
+                        return null;
+                        Debug.WriteLine("退出2");
+                    }
+
                     //文件夹
-                    if(item.fid == null)
+                    if (item.fid == null)
                     {
                         getFilesProgressInfo.FolderCount++;
 
                         //查询数据库是否存在
-                       if (DataAccess.IsLastestFileDataExists(item.pc, item.te))
+                       if (DataAccess.IsLastestFileDataExists(item.pc, item.te) && Data.StaticData.isJumpExistsFolder)
                         {
                             //统计下级文件夹所含文件的数量
                             //通过数据库获取
@@ -272,11 +298,12 @@ namespace Data
                         }
                         else
                         {
+                            //先添加文件后添加文件夹
+                            getFilesProgressInfo = await TraverseAllFileInfo(item.cid, getFilesProgressInfo, token, progress);
 
+                            if (getFilesProgressInfo == null) continue;
 
                             DataAccess.AddFilesInfo(item);
-
-                            getFilesProgressInfo = await TraverseAllFileInfo(item.cid, getFilesProgressInfo, progress);
                         }
                     }
                     //文件
@@ -595,8 +622,8 @@ namespace Data
         public async Task<bool> tryRefreshCookie(string cookie)
         {
             bool result = false;
-            //先保存之前的Cookie，若Cookie无效则回复原有Cookie
-            string currentCookie="";
+            //先保存之前的Cookie，若Cookie无效则恢复原有Cookie
+            string currentCookie;
 
             IEnumerable<string> value;
             bool haveCookie = Client.DefaultRequestHeaders.TryGetValues("Cookie",out value);
@@ -722,6 +749,18 @@ namespace Data
         /// <param name="pickCode"></param>
         public async void PlayeByPotPlayer(string pickCode)
         {
+            var m3U8Infos = await Getm3u8InfoByPickCode(pickCode);
+            if (m3U8Infos.Count > 0)
+            {
+                //选择最高分辨率的播放
+                FileMatch.PlayByPotPlayer(m3U8Infos[0].Url);
+            }
+        }
+
+        public async Task<List<m3u8Info>> Getm3u8InfoByPickCode(string pickCode)
+        {
+            List<m3u8Info> m3U8Infos = new List<m3u8Info>();
+
             HttpResponseMessage response;
             string strResult;
             try
@@ -731,11 +770,10 @@ namespace Data
             }
             catch
             {
-                return;
+                return m3U8Infos;
                 //Debug.WriteLine("获取m3u8链接失败");
             }
 
-            List<m3u8Info> m3U8Infos = new List<m3u8Info>();
             var lineList = strResult.Split(new char[] { '\n' });
             for (int i = 0; i < lineList.Count(); i++)
             {
@@ -751,12 +789,8 @@ namespace Data
 
             //排序
             m3U8Infos = m3U8Infos.OrderByDescending(x => x.Bandwidth).ToList();
-            if (m3U8Infos.Count > 0)
-            {
-                //选择最高分辨率的播放
-                FileMatch.PlayByPotPlayer(m3U8Infos[0].Url);
-            }
 
+            return m3U8Infos;
         }
 
         /// <summary>
