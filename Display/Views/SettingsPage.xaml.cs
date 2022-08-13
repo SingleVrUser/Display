@@ -464,7 +464,6 @@ namespace Display.Views
             }
         }
 
-
         private void OpenPlayerExePathButton_Click(object sender, RoutedEventArgs e)
         {
             switch (PlayerSelection_ComboBox.SelectedIndex)
