@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -28,7 +29,11 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
     public sealed partial class MainPage : Page
     {
         private WebView2 webview;
+        private Window currentWindow;
         //private string _stroeUrl;
+
+
+        CancellationTokenSource s_cts;
 
         public MainPage()
         {
@@ -55,8 +60,8 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
         {
             base.OnNavigatedTo(e);
 
-            Window window = e.Parameter as Window;
-            window.Closed += (sender, args) =>
+            currentWindow = e.Parameter as Window;
+            currentWindow.Closed += (sender, args) =>
             {
                 if(webview.CoreWebView2 != null)
                 {
@@ -75,7 +80,6 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
             //跳转前先关闭WebView，不然会出错
             webview.Close();
-
         }
 
         /// <summary>
@@ -133,7 +137,6 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             return selectedItemList;
         }
 
-
         /// <summary>
         /// 点击了开始按钮
         /// </summary>
@@ -183,13 +186,19 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             //确认对话框
             var receiveResult = await ShowContentDialog(nameList);
 
-
             if (receiveResult == ContentDialogResult.Primary)
             {
-                Frame.Navigate(typeof(Import115DataToLocalDataAccess.Progress),cidList);
+                ContentPassBetweenPage content = new()
+                {
+                    cidList = cidList,
+                    window = currentWindow
+                };
+                Frame.Navigate(typeof(Import115DataToLocalDataAccess.Progress), content);
 
             }
         }
+
+
 
         /// <summary>
         /// 显示确认提示框
@@ -247,5 +256,12 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             Tip_TextBlock.Text = "添加完需要导入的cid后，点击“开始”继续";
             InputCidManually_HyperlinkButton.Visibility = Visibility.Collapsed;
         }
+
+    }
+
+    class ContentPassBetweenPage
+    {
+        public List<string> cidList { get; set; }
+        public Window window { get;set; }
     }
 }

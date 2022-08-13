@@ -12,6 +12,7 @@ namespace Data
         public static string ImportDataAccess_NavigationUrl;
 
         //public static List
-
+        //导入115数据时是否跳过已导入文件夹（修改时间一致）
+        public static bool isJumpExistsFolder = true;
     }
 }

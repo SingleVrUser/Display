@@ -122,7 +122,7 @@ namespace Display.ContentsPage
                 }
             }
 
-            //成功登录后，检查网络状态（内涵存储Cookie），关闭窗口
+            //成功登录后，检查网络状态（内含存储Cookie），关闭窗口
             if (isLogined)
             {
                 await webapi.NetworkVerifyTokenAsync();

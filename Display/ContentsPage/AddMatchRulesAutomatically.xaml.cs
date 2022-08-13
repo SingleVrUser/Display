@@ -66,6 +66,8 @@ namespace Display.ContentsPage
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             var deleteItem = (sender as Button).DataContext as KeywordMatchName;
+
+            //部分设备使用会报错，添加SelectionMode = "None"可用
             AddMatchNameList.Remove(deleteItem);
         }
     }

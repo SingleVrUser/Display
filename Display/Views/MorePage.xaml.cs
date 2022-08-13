@@ -51,6 +51,12 @@ namespace Display.Views
             });
             DataSource.Add(new FunctionModule()
             {
+                Name = "演员头像",
+                IconPath = "/Assets/Svg/face_male_man_portrait_icon.svg",
+                Description = "从视频中截取演员头像"
+            });
+            DataSource.Add(new FunctionModule()
+            {
                 Name = "文件列表",
                 IconPath = "/Assets/Svg/file_alt_icon.svg",
                 Description = "115中的文件列表",
@@ -83,24 +89,31 @@ namespace Display.Views
                     window1.Activate();
                     break;
                 case "搜刮信息":
-                    WindowView.CommonWindow window2 = new WindowView.CommonWindow();
-                    window2.Content = new ContentsPage.SpiderVideoInfo();
+                    CommonWindow window2 = new CommonWindow();
+                    var page = new ContentsPage.SpiderVideoInfo();
+                    page.currentWindow = window2;
+                    window2.Content = page;
                     window2.Activate();
                     break;
                 case "计算Sha1":
-                    WindowView.CommonWindow window3 = new WindowView.CommonWindow();
+                    CommonWindow window3 = new CommonWindow();
                     window3.Content = new ContentsPage.CalculateLocalFileSha1();
                     window3.Activate();
                     break;
                 case "浏览器":
-                    WindowView.CommonWindow window4 = new WindowView.CommonWindow();
+                    CommonWindow window4 = new CommonWindow();
                     window4.Content = new BrowserPage(window4);
                     window4.Activate();
                     break;
                 case "文件列表":
-                    WindowView.CommonWindow window5 = new WindowView.CommonWindow();
+                    CommonWindow window5 = new CommonWindow();
                     window5.Content = new FileListPage();
                     window5.Activate();
+                    break;
+                case "演员头像":
+                    CommonWindow window6 = new CommonWindow();
+                    window6.Content = new ContentsPage.AddActorCover();
+                    window6.Activate();
                     break;
 
             }

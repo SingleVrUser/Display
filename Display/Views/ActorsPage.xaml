@@ -5,6 +5,7 @@
     xmlns:local="using:Display.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:data="using:Data"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     NavigationCacheMode="Enabled">
@@ -39,9 +40,9 @@
                 x:Name="BasicGridView"
                 IsItemClickEnabled="True"
                 ItemClick="BasicGridView_ItemClick"
-                  Margin="10,0,0,0">
+                Margin="10,0,0,0">
             <GridView.ItemTemplate>
-                <DataTemplate x:DataType="local:ActorsInfo">
+                <DataTemplate x:DataType="data:ActorsInfo">
                     <Grid Width="150"
                             Height="120"
                             Padding="10,5"

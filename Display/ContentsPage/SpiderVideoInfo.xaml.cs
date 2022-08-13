@@ -17,6 +17,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -36,11 +37,12 @@ namespace Display.ContentsPage
         VideoInfo videoInfo = new VideoInfo();
         List<string> FailVideoNameList;
 
+        CancellationTokenSource s_cts = new();
+        public Window currentWindow;
+
         public SpiderVideoInfo()
         {
             this.InitializeComponent();
-
-
         }
 
         private void Expander_Expanding(Expander sender, ExpanderExpandingEventArgs args)
@@ -52,7 +54,7 @@ namespace Display.ContentsPage
         }
 
         //匹配名称
-        private void StartMatchName_ButtonClick(object sender, RoutedEventArgs e)
+        private async void StartMatchName_ButtonClick(object sender, RoutedEventArgs e)
         {
             //检查是否有选中文件
             if (Explorer.FolderTreeView.SelectedNodes.Count == 0)
@@ -61,12 +63,38 @@ namespace Display.ContentsPage
                 return;
             }
 
+            currentWindow.Closed += CurrentWindow_Closed;
+            await ShowMatchResult();
 
-            ShowMatchResult();
-
+            currentWindow.Closed -= CurrentWindow_Closed;
         }
 
-        private async void ShowMatchResult()
+        private async void CurrentWindow_Closed(object sender, WindowEventArgs args)
+        {
+            args.Handled = true;
+            var window = (sender as Window);
+
+            ContentDialog dialog = new ContentDialog();
+
+            // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
+            dialog.XamlRoot = this.XamlRoot;
+            dialog.Title = "确认";
+            dialog.PrimaryButtonText = "关闭";
+            dialog.CloseButtonText = "返回";
+            dialog.DefaultButton = ContentDialogButton.Primary;
+            dialog.Content = "关闭窗口后将取消当前任务，是否继续关闭";
+
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                s_cts.Cancel();
+
+                window.Closed -= CurrentWindow_Closed;
+                window.Close();
+            }
+        }
+
+        private async Task ShowMatchResult()
         {
             TopProgressBar.Visibility = Visibility.Visible;
             var treeView = Explorer.FolderTreeView;
@@ -74,6 +102,8 @@ namespace Display.ContentsPage
             List<Datum> datumList = new();
             foreach (var node in treeView.SelectedNodes)
             {
+
+
                 var explorer = node.Content as ExplorerItem;
 
                 if (explorer == null) continue;
@@ -110,11 +140,21 @@ namespace Display.ContentsPage
 
             //});
 
+            if (s_cts.IsCancellationRequested)
+            {
+                return;
+            }
+
             //挑选符合条件的视频文件
             List<MatchVideoResult> matchVideoResults = await Task.Run(() => FileMatch.GetVideoAndMatchFile(datumList));
 
-            TopProgressBar.Visibility = Visibility.Collapsed;
 
+            if (s_cts.IsCancellationRequested)
+            {
+                return;
+            }
+
+            TopProgressBar.Visibility = Visibility.Collapsed;
 
             //0:检查规则,1:直接开始
             switch (SelectedMethod_Combox.SelectedIndex)
@@ -159,18 +199,19 @@ namespace Display.ContentsPage
                         dialog.DefaultButton = ContentDialogButton.Primary;
                         dialog.Content = "即将搜刮视频信息，点击确认后开始";
 
+                        if (!dialog.IsLoaded) return;
                         var result = await dialog.ShowAsync();
 
                         if (result == ContentDialogResult.Primary)
                         {
-                            SpliderVideoInfo(matchVideoResults);
+                            await SpliderVideoInfo(matchVideoResults);
                         }
 
                     };
 
                     break;
                 case 1:
-                    SpliderVideoInfo(matchVideoResults);
+                    await SpliderVideoInfo(matchVideoResults);
                     break;
             }
         }
@@ -188,7 +229,7 @@ namespace Display.ContentsPage
         /// <summary>
         /// 开始从网络中检索视频信息
         /// </summary>
-        private void SpliderVideoInfo(List<MatchVideoResult> matchVideoResults)
+        private async Task SpliderVideoInfo(List<MatchVideoResult> matchVideoResults)
         {
             network = new();
             VideoInfo_Grid.Visibility = Visibility.Visible;
@@ -264,13 +305,13 @@ namespace Display.ContentsPage
                 }
             });
 
-            Task.Run( () =>
-            {
-                SearchAllInfo(matchVideoResults, progress);
+            //await Task.Run( () =>
+            //{
+            //    SearchAllInfo(matchVideoResults, progress);
 
-            });
+            //});
+            await SearchAllInfo(matchVideoResults, progress);
         }
-
 
         private void tryUpdateVideoInfo(VideoInfo newInfo)
         {
@@ -286,11 +327,15 @@ namespace Display.ContentsPage
             }
         }
 
-        private async void SearchAllInfo(List<MatchVideoResult> matchVideoResults, IProgress<SpliderInfoProgress> progress)
+        private async Task SearchAllInfo(List<MatchVideoResult> matchVideoResults, IProgress<SpliderInfoProgress> progress)
         {
-
             foreach (var matchResult in matchVideoResults)
             {
+                if (s_cts.IsCancellationRequested)
+                {
+                    return;
+                }
+
                 SpliderInfoProgress spliderInfoProgress = new();
                 spliderInfoProgress.macthResult = matchResult;
 

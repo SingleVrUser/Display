@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -401,6 +402,40 @@ namespace Data
 
             // Launch the URI
             var success = await Windows.System.Launcher.LaunchUriAsync(uriDown, options);
+        }
+
+        public static void CreateDirectoryIfNotExists(string savePath)
+        {
+            if (!Directory.Exists(savePath))
+            {
+                Directory.CreateDirectory(savePath);
+            }
+        }
+
+        //临时方法
+        public static Visibility showIfImageENotNull(string imagepath)
+        {
+            if (imagepath == "/Assets/NoPicture.jpg")
+            {
+                return Visibility.Collapsed;
+            }
+            else
+            {
+                return Visibility.Visible;
+            }
+        }
+
+        //临时方法
+        public static Visibility showIfImageNull(string imagepath)
+        {
+            if (imagepath == "/Assets/NoPicture.jpg")
+            {
+                return Visibility.Visible;
+            }
+            else
+            {
+                return Visibility.Collapsed;
+            }
         }
     }
 }

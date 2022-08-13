@@ -27,7 +27,10 @@ namespace Display.Views
     public sealed partial class SettingsPage : Page
     {
         ObservableCollection<string> resolutionSelectionCollection = new ObservableCollection<string>();
-        private WebApi webapi = new();
+
+        ObservableCollection<string> SpiderMothodList = new();
+
+        private WebApi webapi;
 
         public SettingsPage()
         {
@@ -39,7 +42,8 @@ namespace Display.Views
 
         private async void InitializationView()
         {
-            if (!string.IsNullOrEmpty(AppSettings._115_Cookie) &&WebApi.UserInfo == null)
+            webapi = new();
+            if (!string.IsNullOrEmpty(AppSettings._115_Cookie) && WebApi.UserInfo == null)
             {
                 var isLogin = await webapi.UpdateLoginInfo();
 
@@ -56,8 +60,6 @@ namespace Display.Views
             infobar.IsOpen = WebApi.isEnterHiddenMode == true ? WebApi.isEnterHiddenMode : false;
 
             DataAccessSavePath_TextBox.Text = AppSettings.DataAccess_SavePath;
-
-            MatchRulesList_GridView.ItemsSource = AppSettings.MatchVideoKeywordsString.Split(',');
         }
 
         ///// <summary>
@@ -121,12 +123,13 @@ namespace Display.Views
             InitializationView();
         }
 
-        private async void LogoutButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        private void LogoutButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             webapi.LogoutAccount();
-            await Task.Delay(2000);
-
-            InitializationView();
+            //await Task.Delay(2000);
+            userInfoControl.status = "NoLogin";
+            infobar.Visibility = Visibility.Collapsed;
+            //InitializationView();
         }
 
         private async void DeleteCookieButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
@@ -146,7 +149,6 @@ namespace Display.Views
                 WebApi.DeleteCookie();
                 Cookie_TextBox.Text = null;
             }
-
 
         }
 
@@ -189,7 +191,6 @@ namespace Display.Views
                     ImageSavePath_TextBox.Text = folder.Path;
                     tryUpdateImagePath(folder.Path);
                 }
-
             }
         }
         /// <summary>
@@ -201,6 +202,7 @@ namespace Display.Views
             string srcPath = AppSettings.Image_SavePath;
             string dstPath = folderPath;
             string imagePath = DataAccess.GetOneImagePath();
+            if (string.IsNullOrEmpty(imagePath)) return;
 
             AppSettings.Image_SavePath = folderPath;
 
@@ -231,6 +233,42 @@ namespace Display.Views
                 LightDismissTeachingTip.IsOpen = true;
             }
 
+        }
+
+
+
+        private async void ActorInfoSavePath_Click(object sender, RoutedEventArgs e)
+        {
+            FolderPicker folderPicker = new();
+            folderPicker.FileTypeFilter.Add("*");
+            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.AppMainWindow);
+            folderPicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+
+            WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hwnd);
+
+            var folder = await folderPicker.PickSingleFolderAsync();
+
+            if (folder != null)
+            {
+                if (folder.Path == AppSettings.Image_SavePath)
+                {
+                    LightDismissTeachingTip.Content = "选择目录与原目录相同，未修改";
+                    LightDismissTeachingTip.IsOpen = true;
+                }
+                else
+                {
+                    //修改地址
+                    ActorSavePath_TextBox.Text = folder.Path;
+                    AppSettings.ActorInfo_SavePath = folder.Path;
+
+                }
+            }
+        }
+
+        private void ActorInfoOpenPath_Click(object sender, RoutedEventArgs e)
+        {
+            string ActorInfoPath = AppSettings.ActorInfo_SavePath;
+            FileMatch.LaunchFolder(ActorInfoPath);
         }
 
         /// <summary>
@@ -419,7 +457,6 @@ namespace Display.Views
                     LightDismissTeachingTip.IsOpen = true;
                 }
             }
-
         }
 
         private void PlayerSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -458,8 +495,6 @@ namespace Display.Views
 
                         PlayerExePath_TextBox.Text = AppSettings.VlcExePath;
                         break;
-
-
                 }
             }
         }
@@ -493,13 +528,81 @@ namespace Display.Views
                 {
                     case 2:
                         AppSettings.MpvExePath = file.Path;
-                        break;
+                        break;  
                     case 3:
                         AppSettings.VlcExePath = file.Path;
                         break;
                 }
                 PlayerExePath_TextBox.Text = file.Path;
             }
+        }
+
+        private void SpiderMothod_Checked(object sender, RoutedEventArgs e)
+        {
+            UpdateSpiderMothodList();
+            AddSpiderMethod_StackPanel.Visibility = Visibility;
+            SpiderMothodListCount_TextBlock.Visibility = Visibility;
+        }
+
+        private void SpiderMothod_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (SpiderMothodList.Count > 0)
+            {
+                SpiderMothodList.Clear();
+            }
+
+            AddSpiderMethod_StackPanel.Visibility = Visibility.Collapsed;
+            SpiderMothodListCount_TextBlock.Visibility = Visibility.Collapsed;
+        }
+
+        private void UpdateSpiderMothodList()
+        {
+            if(SpiderMothodList.Count > 0)
+            {
+                SpiderMothodList.Clear();
+            }
+            foreach (var text in AppSettings.MatchVideoKeywordsString.Split(','))
+            {
+                SpiderMothodList.Add(text);
+            }
+        }
+
+
+        private void SpiderMethodDeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            var text = (sender as HyperlinkButton).DataContext as string;
+            SpiderMothodList.Remove(text);
+            AppSettings.MatchVideoKeywordsString = string.Join(",", SpiderMothodList);
+        }
+
+        private void SpiderMethodGridView_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+        {
+            VisualStateManager.GoToState(sender as Microsoft.UI.Xaml.Controls.Control, "HoverButtonsShown", true);
+        }
+
+        private void SpiderMethodGridView_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+        {
+            VisualStateManager.GoToState(sender as Microsoft.UI.Xaml.Controls.Control, "HoverButtonsHidden", true);
+        }
+
+        private void AddSpiderMethodButton_Click(object sender, RoutedEventArgs e)
+        {
+            AddSpiderMethod(AddSpiderMethod_TextBox.Text);
+        }
+
+        private void AddSpiderMethod(string newText)
+        {
+            AppSettings.MatchVideoKeywordsString += $",{newText}";
+            SpiderMothodList.Add(newText);
+        }
+
+        private void AddSpiderMethodTextBox_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+        {
+            if (e.Key == Windows.System.VirtualKey.Enter)
+            {
+                AddSpiderMethod((sender as TextBox).Text);
+            }
+
         }
     }
 }
