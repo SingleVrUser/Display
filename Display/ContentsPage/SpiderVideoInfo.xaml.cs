@@ -102,8 +102,6 @@ namespace Display.ContentsPage
             List<Datum> datumList = new();
             foreach (var node in treeView.SelectedNodes)
             {
-
-
                 var explorer = node.Content as ExplorerItem;
 
                 if (explorer == null) continue;
@@ -244,45 +242,49 @@ namespace Display.ContentsPage
             {
 
                 tryUpdateVideoInfo(progressPercent.videoInfo);
-                var macthResult = progressPercent.macthResult;
+                var matchResult = progressPercent.matchResult;
 
                 //匹配失败/检索失败
-                if (!macthResult.status)
+                if (!matchResult.status)
                 {
-                    FailVideoNameList.Add(macthResult.OriginalName);
+                    FailVideoNameList.Add(matchResult.OriginalName);
                     ProgressMore_TextBlock.Text = $"失败数：{FailVideoNameList.Count}";
-                    SearchProgress_TextBlock.Text = $"{macthResult.OriginalName}";
-                    SearchMessage_TextBlock.Text = $"❌{macthResult.message}";
+                    SearchProgress_TextBlock.Text = $"{matchResult.OriginalName}";
+                    SearchMessage_TextBlock.Text = $"❌{matchResult.message}";
 
                 }
                 //匹配成功/跳过非视频文件/跳过重复番号
                 else
                 {
-                    if(macthResult.MatchName != null)
+                    if(matchResult.MatchName != null)
                     {
                         //匹配成功
-                        if(macthResult.OriginalName!= null)
+                        if(matchResult.OriginalName!= null)
                         {
-                            SearchProgress_TextBlock.Text = $"{macthResult.OriginalName} => {macthResult.MatchName}";
-                            SearchMessage_TextBlock.Text = $"✔{macthResult.message}";
+                            SearchProgress_TextBlock.Text = $"{matchResult.OriginalName} => {matchResult.MatchName}";
+                            SearchMessage_TextBlock.Text = $"✔{matchResult.message}";
                         }
                         //匹配中
                         else
                         {
-                            SearchProgress_TextBlock.Text = $"{macthResult.MatchName}";
-                            SearchMessage_TextBlock.Text = $"🐬{macthResult.message}";
+                            SearchProgress_TextBlock.Text = $"{matchResult.MatchName}";
+                            SearchMessage_TextBlock.Text = $"🐬{matchResult.message}";
                         }
                     }
                     // 其他
                     else
                     {
-                        SearchProgress_TextBlock.Text = $"{macthResult.OriginalName}";
-                        SearchMessage_TextBlock.Text = $"✨{macthResult.message}";
+                        SearchProgress_TextBlock.Text = $"{matchResult.OriginalName}";
+                        SearchMessage_TextBlock.Text = $"✨{matchResult.message}";
                     }
                 }
 
                 //更新进度信息
-                overallProgress.Value ++;
+                if (progressPercent.isEnd)
+                {
+                    overallProgress.Value++;
+                }
+
                 percentProgress_TextBlock.Text = $"{(int)overallProgress.Value * 100 / matchVideoResults.Count}%";
                 countProgress_TextBlock.Text = $"{overallProgress.Value}/{matchVideoResults.Count}";
 
@@ -337,7 +339,7 @@ namespace Display.ContentsPage
                 }
 
                 SpliderInfoProgress spliderInfoProgress = new();
-                spliderInfoProgress.macthResult = matchResult;
+                spliderInfoProgress.matchResult = matchResult;
 
                 //存在匹配文件
                 if (matchResult.MatchName != null)
@@ -347,18 +349,20 @@ namespace Display.ContentsPage
                     //检索失败
                     if (spliderInfoProgress.videoInfo == null)
                     {
-                        spliderInfoProgress.macthResult.status = false;
-                        spliderInfoProgress.macthResult.statusCode = -2;
-                        spliderInfoProgress.macthResult.message = "检索失败";
+                        spliderInfoProgress.matchResult.status = false;
+                        spliderInfoProgress.matchResult.statusCode = -2;
+                        spliderInfoProgress.matchResult.message = "检索失败";
                     }
                     //成功
                     else
                     {
-                        spliderInfoProgress.macthResult.status = true;
-                        spliderInfoProgress.macthResult.statusCode = 1;
-                        spliderInfoProgress.macthResult.message = "检索成功";
+                        spliderInfoProgress.matchResult.status = true;
+                        spliderInfoProgress.matchResult.statusCode = 1;
+                        spliderInfoProgress.matchResult.message = "检索成功";
                     }
                 }
+
+                spliderInfoProgress.isEnd = true;
 
                 //获取到该信息，在UI上显示
                 progress.Report(spliderInfoProgress);
@@ -382,16 +386,19 @@ namespace Display.ContentsPage
                 //使用第一个符合条件的Name
                 resultInfo = DataAccess.LoadOneVideoInfoByCID(result[0]);
 
-                progress.Report(new SpliderInfoProgress() { macthResult= new MatchVideoResult() { MatchName = VideoName, status = true, message = "数据库已存在" } });
+                progress.Report(new SpliderInfoProgress() { matchResult= new MatchVideoResult() { MatchName = VideoName, status = true, message = "数据库已存在" } });
             }
             // 从相关网站中搜索
             else
             {
+                //Fc2视频且没有JavDb的Cookie
+                if (VideoName.Contains("fc2-") && string.IsNullOrEmpty(AppSettings.javdb_Cookie)) return null;
+
                 if (AppSettings.isUseJavBus)
                 {
-                    progress.Report(new SpliderInfoProgress() { macthResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~3秒" } });
+                    progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~3秒" } });
                     await GetInfoFromNetwork.RandomTimeDelay(1, 3);
-                    progress.Report(new SpliderInfoProgress() { macthResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavBus中搜索" } });
+                    progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavBus中搜索" } });
                     //先从javbus中搜索
                     resultInfo = await network.SearchInfoFromJavBus(VideoName);
                 }
@@ -399,9 +406,9 @@ namespace Display.ContentsPage
                 //搜索无果，使用javdb搜索
                 if (resultInfo == null && AppSettings.isUseJavDB)
                 {
-                    progress.Report(new SpliderInfoProgress() { macthResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待3~6秒" } });
+                    progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待3~6秒" } });
                     await GetInfoFromNetwork.RandomTimeDelay(3, 6);
-                    progress.Report(new SpliderInfoProgress() { macthResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavDB中搜索" } });
+                    progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavDB中搜索" } });
                     resultInfo = await network.SearchInfoFromJavDB(VideoName);
                 }
 
@@ -562,7 +569,9 @@ namespace Display.ContentsPage
     public class SpliderInfoProgress
     {
         public VideoInfo videoInfo { get; set; }
-        public MatchVideoResult macthResult { get; set; }
+        public MatchVideoResult matchResult { get; set; }
+
+        public bool isEnd { get; set; } = false;
     }
 
     public enum FileFormat { Video, Subtitles, Torrent, Image, Audio,Archive }

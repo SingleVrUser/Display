@@ -43,14 +43,27 @@
                 Margin="10,0,0,0">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="data:ActorsInfo">
-                    <Grid Width="150"
-                            Height="120"
-                            Padding="10,5"
-                            BorderThickness="1"
-                            BorderBrush="{ThemeResource SystemControlTransientBorderBrush}"
-                            CornerRadius="5">
-                        <TextBlock Text="{x:Bind name}" HorizontalAlignment="Center" TextWrapping="Wrap"/>
-                        <TextBlock Text="{x:Bind count}" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+                    <Grid
+                        Width="140"
+                        Height="140"
+                        Padding="10,5"
+                        BorderThickness="1"
+                        BorderBrush="{ThemeResource SystemControlTransientBorderBrush}"
+                        CornerRadius="5"
+                        PointerEntered="Grid_PointerEntered"
+                        PointerExited="Grid_PointerExited">
+                        
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <Image Source="{x:Bind prifilePhotoPath}" Width="150"/>
+
+                        <RelativePanel Margin="5,0" Grid.Row="1">
+                            <TextBlock Text="{x:Bind name}" RelativePanel.AlignVerticalCenterWithPanel="True" IsTextSelectionEnabled="True" TextWrapping="Wrap"/>
+                            <TextBlock Text="{x:Bind count}" RelativePanel.AlignHorizontalCenterWithPanel="True" RelativePanel.AlignRightWithPanel="True" VerticalAlignment="Bottom"/>
+                        </RelativePanel>
                     </Grid>
                 </DataTemplate>
             </GridView.ItemTemplate>
