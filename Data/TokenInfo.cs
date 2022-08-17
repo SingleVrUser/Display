@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Microsoft.UI.Xaml;
 using System;
+using System.IO;
 
 namespace Data
 {
@@ -1223,12 +1224,25 @@ namespace Data
         public string name;
         public int count;
 
-        private string _prifilePhotoPath = "ms-appx:///Assets/NoPicture.jpg";
+        private string _prifilePhotoPath;
         //private string _prifilePhotoPath;
         public string prifilePhotoPath
         {
             get
             {
+                if (string.IsNullOrEmpty(_prifilePhotoPath))
+                {
+                    //初始化
+                    _prifilePhotoPath = $"ms-appx:///Assets/NoPicture.jpg";
+
+                    //检查演员图片是否存在
+                    string imagePath = Path.Combine(AppSettings.ActorInfo_SavePath, name, "face.jpg");
+                    if (File.Exists(imagePath))
+                    {
+                        _prifilePhotoPath = imagePath;
+                    }
+                }
+
                 return _prifilePhotoPath;
             }
             set
@@ -1286,4 +1300,78 @@ namespace Data
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
+
+
+    //缩略图信息
+    public class ThumbnailInfo : INotifyPropertyChanged
+    {
+        public string name;
+        public int count;
+
+        private string _PhotoPath = "ms-appx:///Assets/Svg/picture-o.svg";
+        //private string _prifilePhotoPath;
+        public string PhotoPath
+        {
+            get
+            {
+                return _PhotoPath;
+            }
+            set
+            {
+                _PhotoPath = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public List<string> thumbnailDownUrlList;
+
+        private Status _status = Status.beforeStart;
+        public Status Status
+        {
+            get
+            {
+                return _status;
+            }
+            set
+            {
+                _status = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _genderInfo;
+        public string genderInfo
+        {
+            get
+            {
+                return _genderInfo;
+            }
+            set
+            {
+                _genderInfo = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _ageInfo;
+        public string ageInfo
+        {
+            get
+            {
+                return _ageInfo;
+            }
+            set
+            {
+                _ageInfo = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
 }

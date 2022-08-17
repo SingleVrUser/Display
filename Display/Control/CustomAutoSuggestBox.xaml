@@ -116,7 +116,7 @@
             <AutoSuggestBox x:Name="NavViewSearchBox"
                             Width="300"
                             QueryIcon="Find"
-                            PlaceholderText="搜索框"
+                            PlaceholderText="搜索"
                             IsEnabled="True" 
                             TextChanged="AutoSuggestBox_TextChanged"
                             QuerySubmitted="AutoSuggestBox_QuerySubmitted"
@@ -124,7 +124,6 @@
                             GotFocus="NavViewSearchBox_GotFocus"
                             LostFocus="NavViewSearchBox_LostFocus"/>
 
-            <!---->
             <ListView x:Name="collection">
 
             </ListView>

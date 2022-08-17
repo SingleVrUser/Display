@@ -1,5 +1,6 @@
 ﻿using Data;
 using Display.Views;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -15,8 +16,10 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Foundation.Metadata;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -39,6 +42,8 @@ namespace Display.Control
             this.InitializeComponent();
 
         }
+
+        ObservableCollection<string> ShowImageList = new();
 
         private void loadData()
         {
@@ -74,6 +79,42 @@ namespace Display.Control
                 // stackpanel内添加button
                 CategorySatckPanel.Children.Insert(i, hyperButton);
             }
+
+            //缩略图
+            //检查缩略图是否存在
+            List<string> ThumbnailList = new();
+
+            //来源为本地
+            if(AppSettings.ThumbnailOrigin == (int)AppSettings.Origin.Local)
+            {
+                string folderFullName = Path.Combine(AppSettings.Image_SavePath, resultinfo.truename);
+                DirectoryInfo TheFolder = new DirectoryInfo(folderFullName);
+
+                //文件
+                foreach (FileInfo NextFile in TheFolder.GetFiles())
+                {
+                    if (NextFile.Name.Contains("Thumbnail_"))
+                    {
+                        ThumbnailList.Add(NextFile.FullName);
+                    }
+                }
+            }
+            //来源为网络
+            else if (AppSettings.ThumbnailOrigin == (int)AppSettings.Origin.Web)
+            {
+                VideoInfo VideoInfo = DataAccess.LoadOneVideoInfoByCID(resultinfo.truename);
+
+                ThumbnailList = VideoInfo.sampleImageList.Split(",").ToList();
+
+            }
+
+            if(ThumbnailList.Count > 0)
+            {
+                ThumbnailList = ThumbnailList.OrderByNatural(emp => emp.ToString()).ToList();
+                ThumbnailGridView.ItemsSource = ThumbnailList;
+                ThumbnailGridView.Visibility = Visibility;
+            }
+
         }
 
         private void GridlLoaded(object sender, RoutedEventArgs e)
@@ -185,18 +226,127 @@ namespace Display.Control
             DataAccess.UpdateSingleDataFromVideoInfo(resultinfo.truename, "is_like", is_like.ToString());
         }
 
-        private void ActorScrollViewer_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
+        private void Animation_Completed(ConnectedAnimation sender, object args)
         {
-            var scv = (ScrollViewer)sender;
-            scv.ScrollToHorizontalOffset(scv.HorizontalOffset);
-            e.Handled = true;
+            SmokeGrid.Visibility = Visibility.Collapsed;
+            SmokeGrid.Children.Add(destinationElement);
+
+            SmokeCancelGrid.Tapped -= SmokeCancelGrid_Tapped;
         }
 
-        private void CategoryScrollViewer_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
+        private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            var scv = (ScrollViewer)sender;
-            scv.ScrollToHorizontalOffset(scv.HorizontalOffset);
-            e.Handled = true;
+            SmokeGridCancel();
+        }
+
+        private async void SmokeGridCancel()
+        {
+            if (!destinationElement.IsLoaded) return;
+            ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("backwardsAnimation", destinationElement);
+            SmokeGrid.Children.Remove(destinationElement);
+
+            // Collapse the smoke when the animation completes.
+            animation.Completed += Animation_Completed;
+
+            // If the connected item appears outside the viewport, scroll it into view.
+            ThumbnailGridView.ScrollIntoView(_storedItem, ScrollIntoViewAlignment.Default);
+            ThumbnailGridView.UpdateLayout();
+
+            // Use the Direct configuration to go back (if the API is available). 
+            if (ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 7))
+            {
+                animation.Configuration = new DirectConnectedAnimationConfiguration();
+            }
+
+            // Play the second connected animation. 
+            await ThumbnailGridView.TryStartConnectedAnimationAsync(animation, _storedItem, "Thumbnail_Image");
+        }
+
+        private string _storedItem;
+        private void ThumbnailGridView_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            ConnectedAnimation animation = null;
+
+            // Get the collection item corresponding to the clicked item.
+            if (ThumbnailGridView.ContainerFromItem(e.ClickedItem) is GridViewItem container)
+            {
+                // Stash the clicked item for use later. We'll need it when we connect back from the detailpage.
+                _storedItem = container.Content as string;
+
+                // Prepare the connected animation.
+                // Notice that the stored item is passed in, as well as the name of the connected element. 
+                // The animation will actually start on the Detailed info page.
+                animation = ThumbnailGridView.PrepareConnectedAnimation("forwardAnimation", _storedItem, "Thumbnail_Image");
+
+            }
+
+            string iamgePath = e.ClickedItem as string;
+
+            //之前未赋值
+            if (ShowImageList.Count == 0)
+            {
+                var ThumbnailList = ThumbnailGridView.ItemsSource as List<string>;
+                for (int i = 0; i < ThumbnailList.Count; i++)
+                {
+                    var image = ThumbnailList[i];
+
+                    ShowImageList.Add(image);
+                    if(image == iamgePath)
+                    {
+                        ShowImageFlipView.SelectedIndex = i;
+                    }
+
+                }
+            }
+            //之前已赋值
+            else
+            {
+                var index = ShowImageList.IndexOf(iamgePath);
+                ShowImageFlipView.SelectedIndex = index;
+            }
+            
+            //ShowImage.Source = new BitmapImage(new Uri(iamgePath));
+            
+
+            //ShoeImageName.Text = Path.GetFileName(iamgePath);
+            SmokeGrid.Visibility = Visibility.Visible;
+
+            animation.TryStart(destinationElement);
+
+            SmokeCancelGrid.Tapped += SmokeCancelGrid_Tapped;
+        }
+
+        private void SmokeCancelGrid_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            SmokeGridCancel();
+        }
+
+        private void Thumbnail_Image_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
+        }
+
+        private void Thumbnail_Image_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
+        }
+
+        //private void ActorScrollViewer_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
+        //{
+        //    var scv = (ScrollViewer)sender;
+        //    scv.ScrollToHorizontalOffset(scv.HorizontalOffset);
+        //    e.Handled = true;
+        //}
+
+        //private void CategoryScrollViewer_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
+        //{
+        //    var scv = (ScrollViewer)sender;
+        //    scv.ScrollToHorizontalOffset(scv.HorizontalOffset);
+        //    e.Handled = true;
+        //}
+        private string GetFileNameFromFullPath(object fullpath)
+        {
+            return Path.GetFileName(fullpath as string);
         }
     }
 }

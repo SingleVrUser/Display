@@ -306,5 +306,24 @@ namespace Data
                 localSettings.Values["PlayerSelection"] = value;
             }
         }
+
+        public enum Origin { Local = 0 , Web = 1 }
+
+        /// <summary>
+        /// 缩略图的显示来源
+        /// </summary>
+        private static Origin _thumbnialOrigin = Origin.Local;
+        public static int ThumbnailOrigin
+        {
+            get
+            {
+                return (int)_thumbnialOrigin;
+            }
+            set
+            {
+                _thumbnialOrigin = (Origin)value;
+            }
+        }
+
     }
 }
