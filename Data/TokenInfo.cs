@@ -1223,7 +1223,7 @@ namespace Data
         public string name;
         public int count;
 
-        private string _prifilePhotoPath = "/Assets/NoPicture.jpg";
+        private string _prifilePhotoPath = "ms-appx:///Assets/NoPicture.jpg";
         //private string _prifilePhotoPath;
         public string prifilePhotoPath
         {

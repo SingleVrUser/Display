@@ -67,6 +67,7 @@
     <None Remove="ContentsPage\UpdateImagePath.xaml" />
     <None Remove="ContentsPage\VideoPlay - 复制.xaml" />
     <None Remove="ContentsPage\VideoPlay.xaml" />
+    <None Remove="Control\ActorImage.xaml" />
     <None Remove="Control\Browser.xaml" />
     <None Remove="Control\CustomAutoSuggestBox.xaml" />
     <None Remove="Control\Explorer.xaml" />
@@ -316,6 +317,9 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="Control\ActorImage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="ContentsPage\AddActorCover.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
