@@ -6,16 +6,23 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Foundation.Metadata;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -30,12 +37,17 @@ namespace Display.ContentsPage
         ObservableCollection<ActorsInfo> actorinfo = new();
         Dictionary<string, List<string>> ActorsInfoDict = new();
 
+        ObservableCollection<string> failList = new();
+
+        CancellationTokenSource s_cts = new();
+
         ////绘制头像框
         //CanvasControl canv = new CanvasControl();
 
         public AddActorCover()
         {
             this.InitializeComponent();
+
         }
 
         private async void Grid_Loaded(object sender, RoutedEventArgs e)
@@ -71,9 +83,31 @@ namespace Display.ContentsPage
             }
         }
 
+
+        ActorsInfo _storedItem;
         private void BasicGridView_ItemClick(object sender, ItemClickEventArgs e)
         {
+            ConnectedAnimation animation = null;
 
+            // Get the collection item corresponding to the clicked item.
+            if (BasicGridView.ContainerFromItem(e.ClickedItem) is GridViewItem container)
+            {
+                // Stash the clicked item for use later. We'll need it when we connect back from the detailpage.
+                _storedItem = container.Content as ActorsInfo;
+
+                // Prepare the connected animation.
+                // Notice that the stored item is passed in, as well as the name of the connected element. 
+                // The animation will actually start on the Detailed info page.
+                animation = BasicGridView.PrepareConnectedAnimation("forwardAnimation", _storedItem, "connectedElement");
+
+            }
+            
+            string iamgePath = (e.ClickedItem as ActorsInfo).prifilePhotoPath;
+            ShowImage.Source = new BitmapImage(new Uri(iamgePath));
+            ShoeActorName.Text = (e.ClickedItem as ActorsInfo).name;
+            SmokeGrid.Visibility = Visibility.Visible;
+
+            animation.TryStart(destinationElement);
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
@@ -103,13 +137,263 @@ namespace Display.ContentsPage
             //}
         }
 
-        private void SatarButton_Click(object sender, RoutedEventArgs e)
+        private void StartButton_Click(object sender, RoutedEventArgs e)
         {
             if (BasicGridView.SelectedItems.Count == 0) return;
 
             updateGridViewShow();
 
-            getActorCover();
+
+            //进度
+            var progress = new Progress<progressClass>(info =>
+            {
+                if (!progress_TextBlock.IsLoaded)
+                {
+                    s_cts.Cancel();
+                    return;
+                }
+
+                progress_TextBlock.Text = info.text;
+
+                if(info.index == -1)
+                {
+                    return;
+                }
+
+                var item = actorinfo[info.index];
+
+                item.Status = info.status;
+
+                if(item.Status == Status.error)
+                {
+                    failList.Add(item.name);
+                }
+
+                if (!string.IsNullOrEmpty(info.imagePath))
+                {
+                    item.prifilePhotoPath = info.imagePath;
+                }
+            });
+
+            Task.Run(() => getActorCoverByGit(actorinfo.ToList(), progress, s_cts));
+
+
+            BasicGridView.ItemClick += BasicGridView_ItemClick;
+
+            StartButton.Visibility = Visibility.Collapsed;
+
+            //getActorCoverByWebVideo();
+        }
+
+        private async void getActorCoverByGit(List<ActorsInfo> actorinfos,IProgress<progressClass> progress, CancellationTokenSource s_cts)
+        {
+            string filePath = AppSettings.ActorFileTree_SavePath;
+
+            progress.Report(new progressClass() { text = "正在获取GFriend仓库信息……"});
+
+            if (!await tryUpdateFileTree(filePath)) return;
+
+            IEnumerable<string> line = File.ReadLines(filePath);
+
+            var textContent = string.Join(Environment.NewLine, line);
+
+            for(int i = 0;i< actorinfos.Count;i++)
+            //foreach (var item in actorinfo)
+            {
+                if (s_cts.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                progressClass progressinfo = new();
+                progressinfo.index = i;
+                progressinfo.status = Status.doing;
+
+                var item = actorinfos[i];
+                //item.Status = Status.doing;
+
+                //演员名
+                var actorName = item.name;
+
+                string indexText = $"【{i + 1}/{actorinfo.Count}】 ";
+
+                progressinfo.text = $"{indexText}{actorName}";
+
+                progress.Report(progressinfo);
+
+                var iamgeSavePath = Path.Combine(AppSettings.ActorInfo_SavePath, actorName, "face.jpg");
+
+                if (!File.Exists(iamgeSavePath))
+                {
+                    var ImageUrl = getImageUrlFormFileTreeContent(textContent, actorName);
+
+                    if (string.IsNullOrEmpty(ImageUrl))
+                    {
+                        progressinfo.status = Status.error;
+                        progress.Report(progressinfo);
+                        continue;
+                    }
+
+                    var downResult = await DownFile(ImageUrl, iamgeSavePath);
+
+                    if (!downResult)
+                    {
+                        progressinfo.status = Status.error;
+                        progress.Report(progressinfo);
+                        continue;
+                    }
+                }
+
+                progressinfo.imagePath = iamgeSavePath;
+                progressinfo.status = Status.beforeStart;
+
+                progress.Report(progressinfo);
+            }
+
+
+        }
+
+        private string getImageUrlFormFileTreeContent(string textContent, string name)
+        {
+            string imageUrl = string.Empty;
+
+            JObject json = JsonConvert.DeserializeObject<JObject>(textContent);
+
+            bool findName = false;
+            foreach (var item in json)
+            {
+                if (findName) break;
+
+                var Path1 = item.Key;
+
+                if (!item.Value.HasValues) continue;
+
+                var value = (JObject)item.Value;
+
+                foreach (var item2 in value)
+                {
+                    if (findName) break;
+
+                    var Path2 = item2.Key;
+
+                    if (!item2.Value.HasValues) continue;
+
+                    var value2 = (JObject)item2.Value;
+
+                    foreach (var item3 in value2)
+                    {
+                        var Path3 = item3.Key;
+
+                        if (item3.Value.HasValues) continue;
+
+                        var value3 = item3.Value.ToString();
+
+                        if (Path3.Contains(name))
+                        {
+                            string imagePath = Path.Combine(Path1, Path2, value3);
+                            imageUrl = GetInfoFromNetwork.UrlCombine("https://raw.githubusercontent.com/gfriends/gfriends/master", imagePath);
+                            findName = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return imageUrl;
+        }
+
+        private async Task<bool> tryUpdateFileTree(string filePath)
+        {
+            bool result = true;
+            bool isNeedDownFile = false;
+
+            if (!File.Exists(filePath))
+            {
+                isNeedDownFile = true;
+            }
+            else
+            {
+                var fileWriteTime = File.GetLastWriteTime(filePath);
+                //本地文件信息
+
+                //仓库信息
+                var dateStr = await GetGitUpdateDateStr();
+                var gitUpdateDate = Convert.ToDateTime(dateStr);
+
+                if (gitUpdateDate > fileWriteTime)
+                {
+                    isNeedDownFile = true;
+                }
+            }
+            if (isNeedDownFile)
+            {
+                progress_TextBlock.Text = "正在下载FileTree……";
+                string FiletreeDownUrl = @"https://raw.githubusercontent.com/gfriends/gfriends/master/Filetree.json";
+                result = await DownFile(FiletreeDownUrl, filePath);
+            }
+
+            return result;
+        }
+
+        private async Task<string> GetGitUpdateDateStr()
+        {
+            HttpClient Client = new HttpClient();
+            var handler = new HttpClientHandler { UseCookies = false };
+            Client = new HttpClient(handler);
+            Client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0");
+
+            string UpdateDateStr = string.Empty;
+
+            string gitInfoUrl = @"https://api.github.com/repos/gfriends/gfriends";
+
+            HttpResponseMessage resp;
+            string strResult;
+            try
+            {
+                resp = await Client.GetAsync(gitInfoUrl);
+                strResult = await resp.Content.ReadAsStringAsync();
+            }
+            catch (HttpRequestException)
+            {
+                return UpdateDateStr;
+            }
+
+            if (resp.IsSuccessStatusCode)
+            {
+                JObject json = JsonConvert.DeserializeObject<JObject>(strResult);
+                UpdateDateStr = json["updated_at"].ToString();
+            }
+
+            return UpdateDateStr;
+        }
+
+        private async Task<bool> DownFile(string downurl,string filePath)
+        {
+            HttpClient Client = new HttpClient();
+            var handler = new HttpClientHandler { UseCookies = false };
+            Client = new HttpClient(handler);
+            Client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0");
+
+            var directoryNaem = Path.GetDirectoryName(filePath);
+            if (!File.Exists(directoryNaem))
+            {
+                Directory.CreateDirectory(directoryNaem);
+            }
+
+            if (!File.Exists(filePath))
+            {
+                try
+                {
+                    byte[] imageBytes = await Client.GetByteArrayAsync(downurl);
+
+                    File.WriteAllBytes(filePath, imageBytes);
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>
@@ -138,9 +422,9 @@ namespace Display.ContentsPage
         }
 
         /// <summary>
-        /// 获取演员头像
+        /// 获取演员头像（通过视频）
         /// </summary>
-        private async void getActorCover()
+        private async void getActorCoverByWebVideo()
         {
             WebApi webApi = new();
             var startTime = DateTimeOffset.Now;
@@ -366,6 +650,58 @@ namespace Display.ContentsPage
             return progressInfo;
         }
 
+        private async void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("backwardsAnimation", destinationElement);
+            SmokeGrid.Children.Remove(destinationElement);
+
+            // Collapse the smoke when the animation completes.
+            animation.Completed += Animation_Completed;
+
+            // If the connected item appears outside the viewport, scroll it into view.
+            BasicGridView.ScrollIntoView(_storedItem, ScrollIntoViewAlignment.Default);
+            BasicGridView.UpdateLayout();
+
+            // Use the Direct configuration to go back (if the API is available). 
+            if (ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 7))
+            {
+                animation.Configuration = new DirectConnectedAnimationConfiguration();
+            }
+
+            // Play the second connected animation. 
+            await BasicGridView.TryStartConnectedAnimationAsync(animation, _storedItem, "connectedElement");
+        }
+
+        private void Animation_Completed(ConnectedAnimation sender, object args)
+        {
+            SmokeGrid.Visibility = Visibility.Collapsed;
+            SmokeGrid.Children.Add(destinationElement);
+        }
+
+        private Visibility isShowFailList(ObservableCollection<string> List)
+        {
+            if (List.Count > 0)
+            {
+                return Visibility.Visible;
+            }
+            else
+            {
+                return Visibility.Collapsed;
+            }
+        }
+
+        private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
+        {
+            FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
+        }
+    }
+
+    class progressClass
+    {
+        public int index { get; set; } = -1;
+        public string imagePath { get; set; }
+        public string text { get; set; }
+        public Status status { get; set; }
     }
 
 

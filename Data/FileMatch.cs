@@ -415,7 +415,7 @@ namespace Data
         //临时方法
         public static Visibility showIfImageENotNull(string imagepath)
         {
-            if (imagepath == "/Assets/NoPicture.jpg")
+            if (imagepath == "ms-appx:///Assets/NoPicture.jpg")
             {
                 return Visibility.Collapsed;
             }
@@ -428,7 +428,7 @@ namespace Data
         //临时方法
         public static Visibility showIfImageNull(string imagepath)
         {
-            if (imagepath == "/Assets/NoPicture.jpg")
+            if (imagepath == "ms-appx:///Assets/NoPicture.jpg")
             {
                 return Visibility.Visible;
             }

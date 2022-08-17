@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
@@ -47,13 +48,18 @@ namespace Display.Control
             var actorList = resultinfo.actor.Split(',');
             for (var i = 0; i < actorList.Length; i++)
             {
-                // 定义button
-                var hyperButton = new HyperlinkButton();
-                hyperButton.Content = actorList[i];
-                hyperButton.Click += ActorButtonOnClick;
+                //// 定义button
+                //var hyperButton = new HyperlinkButton();
+                //hyperButton.Content = actorList[i];
+                //hyperButton.Click += ActorButtonOnClick;
 
-                // stackpanel内添加button
-                ActorSatckPanel.Children.Insert(i, hyperButton);
+                //// stackpanel内添加button
+                //ActorSatckPanel.Children.Insert(i, hyperButton);
+
+                var actorImageControl = new Control.ActorImage(actorList[i]);
+                actorImageControl.Click += ActorButtonOnClick;
+
+                ActorSatckPanel.Children.Insert(i, actorImageControl);
             }
 
             //标签
@@ -179,5 +185,18 @@ namespace Display.Control
             DataAccess.UpdateSingleDataFromVideoInfo(resultinfo.truename, "is_like", is_like.ToString());
         }
 
+        private void ActorScrollViewer_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
+        {
+            var scv = (ScrollViewer)sender;
+            scv.ScrollToHorizontalOffset(scv.HorizontalOffset);
+            e.Handled = true;
+        }
+
+        private void CategoryScrollViewer_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
+        {
+            var scv = (ScrollViewer)sender;
+            scv.ScrollToHorizontalOffset(scv.HorizontalOffset);
+            e.Handled = true;
+        }
     }
 }

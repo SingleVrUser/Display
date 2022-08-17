@@ -15,80 +15,13 @@ namespace Data
         static byte[] g_key_s = { 0x29, 0x23, 0x21, 0x5E };
         static byte[] g_key_l = { 0x42, 0xDA, 0x13, 0xBA, 0x78, 0x76, 0x8D, 0x37, 0xE8, 0xEE, 0x04, 0x91 };
 
-        static string privateKey = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAIyBQkvBZvSRh1bp97Iu+qA0ebCB5hiWhyy3xRyRDX7BpM4ocUJNXJFJvV4IollZoZrTyYHmUS79qyu42j8eMVwpS9EXqfudjOjmM7SWLgh8Yp3GyjoUkhS0CR7ysDY8s65sfucCN38FXtPNk/bDQiVqdlVLvqfyA0N7vmXy2idBAgMBAAECgYA3BNqwDYDCXkZP+3haFtlfaI0KWCOBF1jBYwjVodtV+oANlnqbSu3nmqeDrf/c2yNUHIC41DaQHxcrHMyhkLIk2+d3vxi5bdmjCqzoeANQeTpPkKZFp3R+9pViLq2+I6TG2I8i6HhCtDs1SGwtG1sfp32zUosJEMqE7bekav2+0QJBAOmMpiywX6Sr2LID1a9dGNtj35xrbth9qsP1ZXNZLasWDwywJu8Kj15tdyaO7jhCEKCFAUhVe55tDtCnJ2+oXSUCQQCaAueJvVeidg7GNUkzaOrLnMQZ7q/ODxpLAoJh5zXiKIkqYRhw/jMNJGazjeGdCynwzbKeOexgKPKJ6CD4BnztAkA27DCYCdI0M4V+N5Ck8MvLrC0F5+3lU4g5FRiKi8pFlaZsYXCGfoFAv5Vpp+s1p7OpTB4FGLU9iIAXaXfItltRAkB/+c3gfP+nNibMuVaca6A/lYK2ccqQlagpkGo7ZF84EKr6FjizG+fcEdVteoZxcudk++hi5oru1NfFlKhgsTN5AkEAvwy3cCQXUZyLkc66DqNPizhn6oMOtRej0GVPBJY/3S/CUcX6aRMmkp3lZpx5/S9X7G6ao2iu8ukhdYrDE1qgcw==";
-        static string _xmlPrivateKey;
-        static string xmlPrivateKey
-        {
-            get
-            {
-                string result;
-                if (_xmlPrivateKey != null) result = _xmlPrivateKey;
-                else
-                {
-                    result = RSAPrivateKeyJava2DotNet(privateKey);
-                    _xmlPrivateKey = result;
-                }
-                return result;
-            }
-        }
-
-        static string publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDR3rWmeYnRClwLBB0Rq0dlm8MrPmWpL5I23SzCFAoNpJX6Dn74dfb6y02YH15eO6XmeBHdc7ekEFJUIi+swganTokRIVRRr/z16/3oh7ya22dcAqg191y+d6YDr4IGg/Q5587UKJMj35yQVXaeFXmLlFPokFiz4uPxhrB7BGqZbQIDAQAB";
-        static string _xmlPublicKey;
-        static string xmlPublicKey
-        {
-            get
-            {
-                string result;
-                if (_xmlPublicKey != null) result = _xmlPublicKey;
-                else
-                {
-                    result = RSAPublicKeyJava2DotNet(publicKey);
-                    _xmlPublicKey = result;
-                }
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// RSA私钥格式转换，java->.net
-        /// </summary>
-        /// <param name="privateKey">java生成的RSA私钥</param>
-        /// <returns></returns>
-        static string RSAPrivateKeyJava2DotNet(string privateKey)
-        {
-            var privateKeyBase64 = Convert.FromBase64String(privateKey);
-            RsaPrivateCrtKeyParameters privateKeyParam = (RsaPrivateCrtKeyParameters)PrivateKeyFactory.CreateKey(privateKeyBase64);
-            //RsaPrivateCrtKeyParameters privateKeyParam =
-            //            PrivateKeyFactory.CreateKey(privateKeyBase64) as RsaPrivateCrtKeyParameters;
-
-            return string.Format("<RSAKeyValue><Modulus>{0}</Modulus><Exponent>{1}</Exponent><P>{2}</P><Q>{3}</Q><DP>{4}</DP><DQ>{5}</DQ><InverseQ>{6}</InverseQ><D>{7}</D></RSAKeyValue>",
-                Convert.ToBase64String(privateKeyParam.Modulus.ToByteArrayUnsigned()),
-                Convert.ToBase64String(privateKeyParam.PublicExponent.ToByteArrayUnsigned()),
-                Convert.ToBase64String(privateKeyParam.P.ToByteArrayUnsigned()),
-                Convert.ToBase64String(privateKeyParam.Q.ToByteArrayUnsigned()),
-                Convert.ToBase64String(privateKeyParam.DP.ToByteArrayUnsigned()),
-                Convert.ToBase64String(privateKeyParam.DQ.ToByteArrayUnsigned()),
-                Convert.ToBase64String(privateKeyParam.QInv.ToByteArrayUnsigned()),
-                Convert.ToBase64String(privateKeyParam.Exponent.ToByteArrayUnsigned()));
-
-        }
-
-        /// <summary>
-        /// RSA公钥格式转换，java->.net
-        /// </summary>
-        /// <param name="publicKey">java生成的公钥</param>
-        /// <returns></returns>
-        static string RSAPublicKeyJava2DotNet(string publicKey)
-        {
-            RsaKeyParameters publicKeyParam = (RsaKeyParameters)PublicKeyFactory.CreateKey(Convert.FromBase64String(publicKey));
-            return string.Format("<RSAKeyValue><Modulus>{0}</Modulus><Exponent>{1}</Exponent></RSAKeyValue>",
-                Convert.ToBase64String(publicKeyParam.Modulus.ToByteArrayUnsigned()),
-                Convert.ToBase64String(publicKeyParam.Exponent.ToByteArrayUnsigned()));
-        }
+        static string xmlPrivateKey = "<RSAKeyValue><Modulus>jIFCS8Fm9JGHVun3si76oDR5sIHmGJaHLLfFHJENfsGkzihxQk1ckUm9XgiiWVmhmtPJgeZRLv2rK7jaPx4xXClL0Rep+52M6OYztJYuCHxincbKOhSSFLQJHvKwNjyzrmx+5wI3fwVe082T9sNCJWp2VUu+p/IDQ3u+ZfLaJ0E=</Modulus><Exponent>AQAB</Exponent><P>6YymLLBfpKvYsgPVr10Y22PfnGtu2H2qw/Vlc1ktqxYPDLAm7wqPXm13Jo7uOEIQoIUBSFV7nm0O0Kcnb6hdJQ==</P><Q>mgLnib1XonYOxjVJM2jqy5zEGe6vzg8aSwKCYec14iiJKmEYcP4zDSRms43hnQsp8M2ynjnsYCjyiegg+AZ87Q==</Q><DP>NuwwmAnSNDOFfjeQpPDLy6wtBeft5VOIORUYiovKRZWmbGFwhn6BQL+VaafrNaezqUweBRi1PYiAF2l3yLZbUQ==</DP><DQ>f/nN4Hz/pzYmzLlWnGugP5WCtnHKkJWoKZBqO2RfOBCq+hY4sxvn3BHVbXqGcXLnZPvoYuaK7tTXxZSoYLEzeQ==</DQ><InverseQ>vwy3cCQXUZyLkc66DqNPizhn6oMOtRej0GVPBJY/3S/CUcX6aRMmkp3lZpx5/S9X7G6ao2iu8ukhdYrDE1qgcw==</InverseQ><D>NwTasA2Awl5GT/t4WhbZX2iNClgjgRdYwWMI1aHbVfqADZZ6m0rt55qng63/3NsjVByAuNQ2kB8XKxzMoZCyJNvnd78YuW3Zowqs6HgDUHk6T5CmRad0fvaVYi6tviOkxtiPIuh4QrQ7NUhsLRtbH6d9s1KLCRDKhO23pGr9vtE=</D></RSAKeyValue>";
+        
+        static string xmlPublicKey = "<RSAKeyValue><Modulus>0d61pnmJ0QpcCwQdEatHZZvDKz5lqS+SNt0swhQKDaSV+g5++HX2+stNmB9eXjul5ngR3XO3pBBSVCIvrMIGp06JESFUUa/89ev96Ie8mttnXAKoNfdcvnemA6+CBoP0OefO1CiTI9+ckFV2nhV5i5RT6JBYs+Lj8YawewRqmW0=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
 
         public static string decode(byte[] srcBase64, byte[] keyBytes)
         {
-            string rep = string.Empty;
+            string rep;
 
             var tmp = asym_decode(srcBase64, srcBase64.Length);
 

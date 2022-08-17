@@ -87,8 +87,11 @@ namespace Display.Views
         /// <param name="e"></param>
         private void Actor_Click(object sender, RoutedEventArgs e)
         {
-            var clickButton = sender as HyperlinkButton;
-            string actorName = clickButton.Content as string;
+            //var clickButton = sender as HyperlinkButton;
+            //string actorName = clickButton.Content as string;
+
+            var clickButton = (sender as Grid);
+            string actorName = clickButton.DataContext as string;
             string[] TypeAndName = { "actor", actorName };
 
             //准备动画

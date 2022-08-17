@@ -23,9 +23,9 @@ namespace Data
             Client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0");
         }
 
-        private string UrlCombine(string uri1, string uri2)
+        public static string UrlCombine(string uri1, string uri2)
         {
-            Uri baseUri = new Uri(uri1);
+            Uri baseUri = new Uri(uri1+"/");
             Uri myUri = new Uri(baseUri, uri2);
             return myUri.ToString();
         }

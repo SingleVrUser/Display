@@ -9,12 +9,12 @@
     mc:Ignorable="d">
 
     <Grid BorderThickness="1"
-                BorderBrush="LightSlateGray"
-                Loaded="GridlLoaded"
-                Margin="2,5,5,5"
-                Padding="10"
-                RowSpacing="10"
-                CornerRadius="10">
+        BorderBrush="LightSlateGray"
+        Loaded="GridlLoaded"
+        Margin="2,5,5,5"
+        Padding="10"
+        RowSpacing="10"
+        CornerRadius="10">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState>
@@ -37,14 +37,43 @@
         </Grid.RowDefinitions>
         <!--<TextBlock x:Name="Result_TextBlock"/>-->
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,0">
-            <!--<TextBlock x:Name="DoingInfo_TextBlock"
+        <CommandBar HorizontalAlignment="Right" IsOpen="False" DefaultLabelPosition="Collapsed" Margin="-5">
+            <CommandBar.PrimaryCommands>
+                <AppBarButton Icon="Play"
+                                x:Uid="playButton"
+                                Margin="10,0"
+                                Click="VideoPlay_Click">
+                    <ToolTipService.ToolTip>
+                        <ToolTip x:Uid="playToolTip"/>
+                    </ToolTipService.ToolTip>
+
+                </AppBarButton>
+                <AppBarButton Icon="Download" Click="DownButton_Click">
+                    <ToolTipService.ToolTip>
+                        <ToolTip x:Uid="downToolTip"/>
+                    </ToolTipService.ToolTip>
+                </AppBarButton>
+                <AppBarSeparator/>
+
+                <!--喜欢-->
+                <AppBarToggleButton IsChecked="{x:Bind data:FileMatch.isLike(resultinfo.is_like), BindBack = updateLike, Mode=TwoWay}">
+                    <FontIcon Glyph="&#xE006;"/>
+                </AppBarToggleButton>
+                
+                <!--稍后再看-->
+                <AppBarToggleButton IsChecked="{x:Bind data:FileMatch.isLookLater(resultinfo.look_later), BindBack = updateLookLater, Mode=TwoWay}">
+                    <FontIcon Glyph="&#xE13B;"/>
+                </AppBarToggleButton>
+            </CommandBar.PrimaryCommands>
+        </CommandBar>
+
+        <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,0">
+            --><!--<TextBlock x:Name="DoingInfo_TextBlock"
                 VerticalAlignment="Center"
                 Text="文件信息"/>-->
 
-            <!--播放按钮-->
+            <!--播放按钮--><!--
             <Button
-                x:Name="playButton"
                 x:Uid="playButton"
                 Margin="10,0"
                 Click="VideoPlay_Click">
@@ -54,7 +83,7 @@
                 <SymbolIcon Symbol="Play"/>
             </Button>
 
-            <!--下载按钮-->
+            --><!--下载按钮--><!--
             <Button Click="DownButton_Click">
                 <ToolTipService.ToolTip>
                     <ToolTip x:Uid="downToolTip"/>
@@ -62,9 +91,13 @@
                 <SymbolIcon Symbol="Download" />
 
             </Button>
-        </StackPanel>
-        
 
+            <StackPanel Orientation="Horizontal" Margin="20,5" Spacing="5">
+                <ToggleButton Content="喜欢" IsChecked="{x:Bind data:FileMatch.isLike(resultinfo.is_like), BindBack = updateLike, Mode=TwoWay}"/>
+                <ToggleButton Content="稍后观看" IsChecked="{x:Bind data:FileMatch.isLookLater(resultinfo.look_later), BindBack = updateLookLater, Mode=TwoWay}"/>
+            </StackPanel>
+        </StackPanel>-->
+        
         <!--<HyperlinkButton x:Name="HyperLink"></HyperlinkButton>-->
         <!--<ProgressBar x:Name="Doing_ProgressBar"
                          HorizontalAlignment="Stretch"/>-->
@@ -81,125 +114,138 @@
                         MaxHeight="500"
                         HorizontalAlignment="Left"
                            VerticalAlignment="Top"/>
-                    <StackPanel>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto"/>
-                                <RowDefinition Height="auto"/>
-                                <RowDefinition Height="auto"/>
-                                <RowDefinition Height="auto"/>
-                                <RowDefinition Height="auto"/>
-                                <RowDefinition Height="auto"/>
-                                <RowDefinition Height="auto"/>
-                                <RowDefinition Height="auto"/>
-                                <RowDefinition Height="auto"/>
-                            </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
 
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition MinWidth="30"
-                                      MaxWidth="80"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.Resources>
-                                <Style TargetType="TextBlock" x:Key="leftTitle">
-                                    <Setter Property="Height" Value="{StaticResource AppBarExpandButtonThemeHeight}"/>
-                                    <Setter Property="TextAlignment" Value="Right"/>
-                                    <Setter Property="Margin" Value="0,0,10,0"/>
-                                </Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Height" Value="{StaticResource AppBarExpandButtonThemeHeight}"/>
-                                    <Setter Property="TextAlignment" Value="Left"/>
-                                    <Setter Property="Margin" Value="10,0,0,0"/>
-                                </Style>
-                            </Grid.Resources>
-                            <!--标题-->
-                            <TextBlock Grid.Row="0"
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition
+                                    MinWidth="30"
+                                    MaxWidth="80"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.Resources>
+                            <Style TargetType="TextBlock" x:Key="leftTitle">
+                                <Setter Property="Height" Value="{StaticResource AppBarExpandButtonThemeHeight}"/>
+                                <Setter Property="TextAlignment" Value="Right"/>
+                                <Setter Property="Margin" Value="0,0,10,0"/>
+                            </Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Height" Value="{StaticResource AppBarExpandButtonThemeHeight}"/>
+                                <Setter Property="TextAlignment" Value="Left"/>
+                                <Setter Property="Margin" Value="10,0,0,0"/>
+                            </Style>
+                        </Grid.Resources>
+                        <!--标题-->
+                        <TextBlock Grid.Row="0"
                            Text="影片信息"
                            Style="{StaticResource leftTitle}"/>
-                            <TextBlock Grid.Row="1"
+                        <TextBlock Grid.Row="1"
                            Text="发行日期"
                            Style="{StaticResource leftTitle}"/>
-                            <TextBlock Grid.Row="2"
+                        <TextBlock Grid.Row="2"
                            Text="影片时长"
                            Style="{StaticResource leftTitle}"/>
-                            <TextBlock Grid.Row="3"
+                        <TextBlock Grid.Row="3"
                            Text="导演"
                            Style="{StaticResource leftTitle}"/>
-                            <TextBlock Grid.Row="4"
+                        <TextBlock Grid.Row="4"
                            Text="制作商"
                            Style="{StaticResource leftTitle}"/>
-                            <TextBlock Grid.Row="5"
+                        <TextBlock Grid.Row="5"
                            Text="发行商"
                            Style="{StaticResource leftTitle}"/>
-                            <TextBlock Grid.Row="6"
+                        <TextBlock Grid.Row="6"
                            Text="系列"
                            Style="{StaticResource leftTitle}"/>
-                            <TextBlock Grid.Row="7"
+                        <TextBlock Grid.Row="7"
                            Text="类别"
                            Style="{StaticResource leftTitle}"/>
-                            <TextBlock Grid.Row="8"
+                        <TextBlock Grid.Row="8"
                            Text="演员"
                            Style="{StaticResource leftTitle}"/>
 
-                            <!--内容-->
-                            <StackPanel Grid.Row="0"
+                        <!--内容-->
+                        <StackPanel Grid.Row="0"
                             Grid.Column="1"
                             Orientation="Horizontal">
-                                <TextBlock Text="{x:Bind resultinfo.truename}"/>
-                                <HyperlinkButton
+                            <TextBlock Text="{x:Bind resultinfo.truename}"/>
+                            <HyperlinkButton
                                     NavigateUri="{x:Bind resultinfo.busurl}">
-                                    <Image Source="D:\Work\WinUi\Display_Test\Display_Test\Assets\JavBusLogo.png"
+                                <Image Source="D:\Work\WinUi\Display_Test\Display_Test\Assets\JavBusLogo.png"
                                         Height="15"/>
-                                </HyperlinkButton>
-                            </StackPanel>
+                            </HyperlinkButton>
+                        </StackPanel>
 
-                            <TextBlock
+                        <TextBlock
                             Grid.Row="1"
                             Grid.Column="1"
                             Text="{x:Bind resultinfo.releasetime, Mode=OneWay}"/>
-                            <TextBlock
+                        <TextBlock
                             Grid.Row="2"
                             Grid.Column="1"
                             Text="{x:Bind resultinfo.lengthtime, Mode=OneWay}"/>
-                            <TextBlock
+                        <TextBlock
                             Grid.Row="3"
                             Grid.Column="1"
                             Text="{x:Bind resultinfo.director, Mode=OneWay}"/>
-                            <TextBlock
+                        <TextBlock
                             Grid.Row="4"
                             Grid.Column="1"
                             Text="{x:Bind resultinfo.producer, Mode=OneWay}"/>
-                            <TextBlock
+                        <TextBlock
                             Grid.Row="5"
                             Grid.Column="1"
                             Text="{x:Bind resultinfo.publisher, Mode=OneWay}"/>
-                            <TextBlock
+                        <TextBlock
                             Grid.Row="6"
                             Grid.Column="1"
                             Text="{x:Bind resultinfo.series, Mode=OneWay}"/>
 
-                            <StackPanel 
-                                Grid.Row="7"
-                                Grid.Column="1"
-                                x:Name="CategorySatckPanel"
-                                Orientation="Horizontal"/>
-
-                            <StackPanel Grid.Row="8"
+                        <ScrollViewer
+                            Grid.Row="7"
                             Grid.Column="1"
-                            x:Name="ActorSatckPanel"
-                            Orientation="Horizontal">
-                            </StackPanel>
-                        </Grid>
+                            HorizontalScrollBarVisibility="Visible"
+                            HorizontalScrollMode="Auto"
+                            VerticalScrollBarVisibility="Hidden"
+                            VerticalScrollMode="Disabled"
+                            PointerWheelChanged="CategoryScrollViewer_PointerWheelChanged"
+                            HorizontalAlignment="Left"
+                            Padding="5">
 
-                        <StackPanel Orientation="Horizontal" Margin="20,5" Spacing="5">
-                            <ToggleButton Content="喜欢" IsChecked="{x:Bind data:FileMatch.isLike(resultinfo.is_like), BindBack = updateLike, Mode=TwoWay}"/>
-                            <ToggleButton Content="稍后观看" IsChecked="{x:Bind data:FileMatch.isLookLater(resultinfo.look_later), BindBack = updateLookLater, Mode=TwoWay}"/>
-                        </StackPanel>
-                    </StackPanel>
+                            <StackPanel 
+                                    x:Name="CategorySatckPanel"
+                                    Orientation="Horizontal"/>
+                        </ScrollViewer>
+
+                        <ScrollViewer
+                            Grid.Column="1"
+                            Grid.Row="8"
+                            HorizontalScrollBarVisibility="Visible"
+                            HorizontalScrollMode="Auto"
+                            VerticalScrollBarVisibility="Hidden"
+                            VerticalScrollMode="Disabled"
+                            MaxWidth="420"
+                            PointerWheelChanged="ActorScrollViewer_PointerWheelChanged"
+                            HorizontalAlignment="Left">
+                            <StackPanel
+                                    x:Name="ActorSatckPanel"
+                                    Orientation="Horizontal">
+                            </StackPanel>
+                        </ScrollViewer>
+
+                    </Grid>
                 </StackPanel>
             </ScrollViewer>
-            
-
         </Grid>
 
 

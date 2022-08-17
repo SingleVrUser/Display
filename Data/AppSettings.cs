@@ -133,6 +133,23 @@ namespace Data
             }
         }
 
+        /// <summary>
+        /// 演员头像仓库文件保存地址
+        /// </summary>
+        public static string ActorFileTree_SavePath
+        {
+            get
+            {
+                string savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "Data");
+                if (!Directory.Exists(savePath))
+                {
+                    FileMatch.CreateDirectoryIfNotExists(savePath);
+                }
+                string filePath = Path.Combine(savePath, "Filetree.json");
+
+                return filePath;
+            }
+        }
 
         /// <summary>
         /// 数据文件存储地址
