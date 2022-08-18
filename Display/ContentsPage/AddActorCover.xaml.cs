@@ -37,9 +37,13 @@ namespace Display.ContentsPage
         ObservableCollection<ActorsInfo> actorinfo = new();
         Dictionary<string, List<string>> ActorsInfoDict = new();
 
+        ObservableCollection<string> ShowImageList = new();
+
         ObservableCollection<string> failList = new();
 
         CancellationTokenSource s_cts = new();
+
+        string textContent;
 
         ////绘制头像框
         //CanvasControl canv = new CanvasControl();
@@ -47,6 +51,7 @@ namespace Display.ContentsPage
         public AddActorCover()
         {
             this.InitializeComponent();
+
 
         }
 
@@ -83,7 +88,6 @@ namespace Display.ContentsPage
             }
         }
 
-
         ActorsInfo _storedItem;
         private void BasicGridView_ItemClick(object sender, ItemClickEventArgs e)
         {
@@ -101,13 +105,37 @@ namespace Display.ContentsPage
                 animation = BasicGridView.PrepareConnectedAnimation("forwardAnimation", _storedItem, "connectedElement");
 
             }
-            
-            string iamgePath = (e.ClickedItem as ActorsInfo).prifilePhotoPath;
-            ShowImage.Source = new BitmapImage(new Uri(iamgePath));
+
+            var actorInfo = e.ClickedItem as ActorsInfo;
+
+            var ImageUrlList = GetImageUrlListFromFileTree( actorInfo.name);
+
+            //string imagePath = actorInfo.prifilePhotoPath;
+            ShowImageList.Clear();
+
+            foreach (var imagePath in ImageUrlList)
+            {
+                //Image showimage = new Image() { Source = new BitmapImage(new Uri(imagePath)) };
+
+                ShowImageList.Add(imagePath);
+            }
+
+
             ShoeActorName.Text = (e.ClickedItem as ActorsInfo).name;
             SmokeGrid.Visibility = Visibility.Visible;
 
             animation.TryStart(destinationElement);
+        }
+
+        private List<string> GetImageUrlListFromFileTree(string actorName,int count = -1)
+        {
+            if (string.IsNullOrEmpty(textContent))
+            {
+                string filePath = AppSettings.ActorFileTree_SavePath;
+                textContent = string.Join(Environment.NewLine, File.ReadLines(filePath));
+            }
+
+            return getImageUrlFormFileTreeContent(textContent, actorName, count);
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
@@ -143,6 +171,7 @@ namespace Display.ContentsPage
 
             updateGridViewShow();
 
+            var startTime = DateTimeOffset.Now;
 
             //进度
             var progress = new Progress<progressClass>(info =>
@@ -173,14 +202,17 @@ namespace Display.ContentsPage
                 {
                     item.prifilePhotoPath = info.imagePath;
                 }
+
+                //完成
+                if(item.Status!= Status.doing && actorinfo.Count == info.index + 1)
+                {
+                    progress_TextBlock.Text = $"任务已完成，耗时{FileMatch.ConvertInt32ToDateStr((DateTimeOffset.Now-startTime).TotalSeconds)}";
+                }
             });
 
             Task.Run(() => getActorCoverByGit(actorinfo.ToList(), progress, s_cts));
 
-
             BasicGridView.ItemClick += BasicGridView_ItemClick;
-
-            StartButton.Visibility = Visibility.Collapsed;
 
             //getActorCoverByWebVideo();
         }
@@ -193,9 +225,9 @@ namespace Display.ContentsPage
 
             if (!await tryUpdateFileTree(filePath)) return;
 
-            IEnumerable<string> line = File.ReadLines(filePath);
+            //IEnumerable<string> line = File.ReadLines(filePath);
 
-            var textContent = string.Join(Environment.NewLine, line);
+            //var textContent = string.Join(Environment.NewLine, line);
 
             for(int i = 0;i< actorinfos.Count;i++)
             //foreach (var item in actorinfo)
@@ -225,7 +257,9 @@ namespace Display.ContentsPage
 
                 if (!File.Exists(iamgeSavePath))
                 {
-                    var ImageUrl = getImageUrlFormFileTreeContent(textContent, actorName);
+                    string ImageUrl = string.Empty;
+                    var ImageUrlList = GetImageUrlListFromFileTree(actorName, 1);
+                    if (ImageUrlList.Count>0) ImageUrl = ImageUrlList[0];
 
                     if (string.IsNullOrEmpty(ImageUrl))
                     {
@@ -253,16 +287,17 @@ namespace Display.ContentsPage
 
         }
 
-        private string getImageUrlFormFileTreeContent(string textContent, string name)
+        private List<string> getImageUrlFormFileTreeContent(string textContent, string name, int count)
         {
-            string imageUrl = string.Empty;
+            List<string> imageUrlList = new();
 
             JObject json = JsonConvert.DeserializeObject<JObject>(textContent);
 
-            bool findName = false;
+            //bool findName = false;
+            int getNum = 0;
             foreach (var item in json)
             {
-                if (findName) break;
+                if (getNum == count) break;
 
                 var Path1 = item.Key;
 
@@ -272,7 +307,7 @@ namespace Display.ContentsPage
 
                 foreach (var item2 in value)
                 {
-                    if (findName) break;
+                    if (getNum == count) break;
 
                     var Path2 = item2.Key;
 
@@ -291,15 +326,15 @@ namespace Display.ContentsPage
                         if (Path3.Contains(name))
                         {
                             string imagePath = Path.Combine(Path1, Path2, value3);
-                            imageUrl = GetInfoFromNetwork.UrlCombine("https://raw.githubusercontent.com/gfriends/gfriends/master", imagePath);
-                            findName = true;
-                            break;
+                            string imageUrl = GetInfoFromNetwork.UrlCombine("https://raw.githubusercontent.com/gfriends/gfriends/master", imagePath);
+                            imageUrlList.Add(imageUrl);
+                            getNum++;
                         }
                     }
                 }
             }
 
-            return imageUrl;
+            return imageUrlList;
         }
 
         private async Task<bool> tryUpdateFileTree(string filePath)
@@ -327,7 +362,6 @@ namespace Display.ContentsPage
             }
             if (isNeedDownFile)
             {
-                progress_TextBlock.Text = "正在下载FileTree……";
                 string FiletreeDownUrl = @"https://raw.githubusercontent.com/gfriends/gfriends/master/Filetree.json";
                 result = await DownFile(FiletreeDownUrl, filePath);
             }
@@ -419,6 +453,10 @@ namespace Display.ContentsPage
             BasicGridView.SelectionMode = ListViewSelectionMode.None;
 
             selectedCheckBox.Visibility = Visibility.Collapsed;
+
+            StartButton.Visibility = Visibility.Collapsed;
+
+            modifyToggleSwitch.IsEnabled = false;
         }
 
         /// <summary>
@@ -650,8 +688,10 @@ namespace Display.ContentsPage
             return progressInfo;
         }
 
-        private async void BackButton_Click(object sender, RoutedEventArgs e)
+        private async void CancelSmokeGrid()
         {
+            if (!destinationElement.IsLoaded) return;
+
             ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("backwardsAnimation", destinationElement);
             SmokeGrid.Children.Remove(destinationElement);
 
@@ -670,6 +710,11 @@ namespace Display.ContentsPage
 
             // Play the second connected animation. 
             await BasicGridView.TryStartConnectedAnimationAsync(animation, _storedItem, "connectedElement");
+        }
+
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            CancelSmokeGrid();
         }
 
         private void Animation_Completed(ConnectedAnimation sender, object args)
@@ -694,15 +739,60 @@ namespace Display.ContentsPage
         {
             FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
         }
+
+        private class progressClass
+        {
+            public int index { get; set; } = -1;
+            public string imagePath { get; set; }
+            public string text { get; set; }
+            public Status status { get; set; }
+        }
+
+        private void modifyToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+            var toggleswitch = sender as ToggleSwitch;
+            //添加模式
+            if (toggleswitch.IsOn)
+            {
+                StartButton.IsEnabled = true;
+                selectedCheckBox.Visibility = Visibility.Visible;
+                BasicGridView.SelectionMode = ListViewSelectionMode.Multiple;
+                BasicGridView.ItemClick -= BasicGridView_ItemClick;
+            }
+            //修改模式
+            else
+            {
+                StartButton.IsEnabled = false;
+                selectedCheckBox.Visibility = Visibility.Collapsed;
+                BasicGridView.SelectionMode = ListViewSelectionMode.None;
+                BasicGridView.ItemClick += BasicGridView_ItemClick;
+            }
+        }
+
+        private void SmokeCancelGrid_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            CancelSmokeGrid();
+        }
+
+        private async void ModifyActorImage_Click(object sender, RoutedEventArgs e)
+        {
+            var imageUrl = (sender as HyperlinkButton).DataContext as string;
+            string actorName = ShoeActorName.Text;
+            string savePath = Path.Combine(AppSettings.ActorInfo_SavePath, actorName);
+
+            string imageFullPath =  await GetInfoFromNetwork.downloadImage(imageUrl, savePath, "face",true);
+
+            foreach(var item in actorinfo)
+            {
+                if(item.name == actorName)
+                {
+                    item.prifilePhotoPath = imageUrl;
+                    break;
+                }
+            }
+        }
     }
 
-    class progressClass
-    {
-        public int index { get; set; } = -1;
-        public string imagePath { get; set; }
-        public string text { get; set; }
-        public Status status { get; set; }
-    }
 
 
     ///// <summary>

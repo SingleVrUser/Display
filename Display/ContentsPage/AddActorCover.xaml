@@ -79,11 +79,78 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        
+        <GridView Grid.Row="1"
+                x:Name="BasicGridView"
+                IsItemClickEnabled="True"
+                Margin="10,0,0,0"
+                SelectionMode="Multiple"
+                SelectionChanged="BasicGridView_SelectionChanged"
+                ItemsSource="{x:Bind actorinfo}"
+                ItemTemplate="{StaticResource GirdViewTemplate}">
+        </GridView>
+
+        <Grid x:Name="SmokeGrid" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Collapsed" >
+
+            <Grid Tapped="SmokeCancelGrid_Tapped">
+                <Grid.Background>
+                    <SolidColorBrush Color="{ThemeResource SystemChromeAltHighColor}" Opacity="0.8" />
+                </Grid.Background>
+            </Grid>
+            
+            <Grid x:Name="destinationElement" HorizontalAlignment="Center" VerticalAlignment="Center" Width="350" Height="400">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{ThemeResource AccentAAFillColorDisabledBrush}" Padding="10">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <FlipView x:Name="ShowImageFlipView" ItemsSource="{x:Bind ShowImageList}">
+                            <FlipView.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Image Source="{x:Bind}" />
+                                        <HyperlinkButton Content="设置当前图片为头像" Grid.Row="1" HorizontalAlignment="Center" Click="ModifyActorImage_Click"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </FlipView.ItemTemplate>
+                            <!--<Image x:Name="ShowImage"/>-->
+                        </FlipView>
+                        <PipsPager Margin="0" Grid.Row="1" HorizontalAlignment="Center" NumberOfPages="{x:Bind ShowImageList.Count,Mode=OneWay}" SelectedPageIndex="{x:Bind ShowImageFlipView.SelectedIndex,Mode=TwoWay}"/>
+                    </Grid>
+                    
+                    <Button Click="BackButton_Click" HorizontalAlignment="Right" VerticalAlignment="Top" Height="40" Width="40" Margin="5">
+                        <Button.Content>
+                            <SymbolIcon Symbol="Clear" />
+                        </Button.Content>
+                    </Button>
+                </Grid>
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" Grid.Row="1">
+                    <TextBlock x:Name="ShoeActorName" Text="演员名" Style="{ThemeResource BaseTextBlockStyle}" HorizontalAlignment="Center" Margin="12" IsTextSelectionEnabled="True"/>
+                </Grid>
+            </Grid>
+        </Grid>
+
         <RelativePanel Margin="10,2,10,10">
-            <CheckBox x:Name="selectedCheckBox" Content="共选 0 项" CornerRadius="10" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
+            <CheckBox x:Name="selectedCheckBox" RelativePanel.AlignVerticalCenterWithPanel="True" Content="共选 0 项" CornerRadius="10" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
             <TextBlock x:Name="progress_TextBlock" RelativePanel.AlignVerticalCenterWithPanel="True"/>
-            <Button x:Name="StartButton" Content="开始" RelativePanel.AlignRightWithPanel="True" Click="StartButton_Click"/>
-            <StackPanel Visibility="{x:Bind isShowFailList(failList),Mode=OneWay}" Orientation="Horizontal" RelativePanel.AlignRightWithPanel="True">
+
+
+            <Button x:Name="StartButton" Content="开始" RelativePanel.LeftOf="modifyToggleSwitch" Click="StartButton_Click" RelativePanel.AlignVerticalCenterWithPanel="True"/>
+
+
+            <ToggleSwitch x:Name="modifyToggleSwitch" Toggled="modifyToggleSwitch_Toggled" OnContent="添加" OffContent="修改" RelativePanel.AlignRightWithPanel="True" MinWidth="0" Margin="10,0,0,0" IsOn="True"/>
+
+            <StackPanel Visibility="{x:Bind isShowFailList(failList),Mode=OneWay}" Orientation="Horizontal" RelativePanel.LeftOf="modifyToggleSwitch" RelativePanel.AlignVerticalCenterWithPanel="True">
                 <HyperlinkButton Content="失败列表" Click="HyperlinkButton_Click">
                     <FlyoutBase.AttachedFlyout>
                         <Flyout>
@@ -106,41 +173,7 @@
 
                 <TextBlock Text="{x:Bind failList.Count,Mode=OneWay}" VerticalAlignment="Bottom" Foreground="{ThemeResource PivotHeaderForegroundUnselectedBrush}"/>
             </StackPanel>
-            
 
         </RelativePanel>
-        
-        <GridView Grid.Row="1"
-                x:Name="BasicGridView"
-                IsItemClickEnabled="True"
-                Margin="10,0,0,0"
-                SelectionMode="Multiple"
-                SelectionChanged="BasicGridView_SelectionChanged"
-                ItemsSource="{x:Bind actorinfo}"
-                ItemTemplate="{StaticResource GirdViewTemplate}">
-        </GridView>
-
-        <Grid x:Name="SmokeGrid" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Collapsed" >
-            <Grid.Background>
-                <SolidColorBrush Color="{ThemeResource SystemChromeAltHighColor}" Opacity="0.8" />
-            </Grid.Background>
-            <Grid x:Name="destinationElement" HorizontalAlignment="Center" VerticalAlignment="Center" Width="320" Height="400" BorderThickness="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="auto" />
-                </Grid.RowDefinitions>
-                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{ThemeResource AccentAAFillColorDisabledBrush}">
-                    <Image x:Name="ShowImage"/>
-                    <Button Click="BackButton_Click" HorizontalAlignment="Right" VerticalAlignment="Top" Height="40" Width="40" Margin="5">
-                        <Button.Content>
-                            <SymbolIcon Symbol="Clear" />
-                        </Button.Content>
-                    </Button>
-                </Grid>
-                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" Grid.Row="1">
-                    <TextBlock x:Name="ShoeActorName" Text="演员名" Style="{ThemeResource BaseTextBlockStyle}" HorizontalAlignment="Center" Margin="12" IsTextSelectionEnabled="True"/>
-                </Grid>
-            </Grid>
-        </Grid>
     </Grid>
 </Page>
