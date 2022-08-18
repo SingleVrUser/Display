@@ -41,6 +41,19 @@ namespace Display.ContentsPage
             reMatchProgressRing.IsActive = false;
         }
 
+        public IAsyncOperation<ContentDialogResult> ShowContentDialog()
+        {
+            ContentDialog dialog = new ContentDialog();
+            dialog.Title = "检索";
+            dialog.XamlRoot = this.XamlRoot;
+            dialog.PrimaryButtonText = "确认";
+            dialog.CloseButtonText = "取消";
+            dialog.DefaultButton = ContentDialogButton.Primary;
+            dialog.Content = "即将搜刮视频信息，点击确认后开始";
+
+            return dialog.ShowAsync();
+        }
+
         private void MatchKeywordModify_KeyDown(object sender, KeyRoutedEventArgs e)
         {
             //如果不是回车
