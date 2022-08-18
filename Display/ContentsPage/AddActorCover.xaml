@@ -17,7 +17,9 @@
                 Height="140"
                 BorderThickness="1"
                 BorderBrush="{ThemeResource SystemControlTransientBorderBrush}"
-                CornerRadius="5">
+                CornerRadius="5"
+                PointerEntered="connectedElement_PointerEntered"
+                PointerExited="connectedElement_PointerExited">
                 <Grid Visibility="{x:Bind data:FileMatch.showIfImageNull(prifilePhotoPath),Mode=OneWay}">
                     <Image Source="{x:Bind prifilePhotoPath,Mode=OneWay}" Width="140"/>
 
@@ -44,7 +46,6 @@
                         <TextBlock Text="{x:Bind ageInfo,Mode=OneWay}" Visibility="Collapsed"/>
                     </StackPanel>
                     
-
                     <controls:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
                     <!--<ProgressRing IsActive="{x:Bind isProgressRingActive, Mode=OneWay}"/>-->
                 </Grid>
