@@ -542,6 +542,8 @@ namespace Display.Views
             UpdateSpiderMothodList();
             AddSpiderMethod_StackPanel.Visibility = Visibility;
             SpiderMothodListCount_TextBlock.Visibility = Visibility;
+
+            SpiderMethodGridView.Visibility = Visibility;
         }
 
         private void SpiderMothod_Unchecked(object sender, RoutedEventArgs e)
@@ -553,6 +555,8 @@ namespace Display.Views
 
             AddSpiderMethod_StackPanel.Visibility = Visibility.Collapsed;
             SpiderMothodListCount_TextBlock.Visibility = Visibility.Collapsed;
+
+            SpiderMethodGridView.Visibility = Visibility.Collapsed;
         }
 
         private void UpdateSpiderMothodList()

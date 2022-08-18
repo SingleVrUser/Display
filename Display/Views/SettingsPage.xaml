@@ -148,7 +148,7 @@
                             Header="显示"
                             HorizontalContentAlignment="Stretch">
                             
-                            <RelativePanel>
+                            <RelativePanel Margin="50,0">
                                 <TextBlock RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0">缩略图来源</TextBlock>
                                 <ComboBox RelativePanel.AlignRightWithPanel="True" SelectedIndex="{x:Bind data:AppSettings.ThumbnailOrigin, Mode=TwoWay}">
                                     <x:String>本地</x:String>
@@ -190,7 +190,7 @@
                                     </PivotItem>
 
                                     <PivotItem Header="搜刮方式">
-                                        <Grid RowSpacing="10">
+                                        <Grid RowSpacing="10" MaxHeight="300">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="auto"/>
                                                 <RowDefinition Height="*"/>
@@ -214,7 +214,7 @@
                                                 </StackPanel>
                                             </RelativePanel>
 
-                                            <GridView x:Name="MatchRulesList_GridView" Grid.Row="1" ItemsSource="{x:Bind SpiderMothodList}" SelectionMode="None" MaxHeight="200">
+                                            <GridView x:Name="SpiderMethodGridView" Grid.Row="1" ItemsSource="{x:Bind SpiderMothodList}" SelectionMode="None" Visibility="Collapsed">
                                                 <GridView.ItemContainerStyle>
                                                     <Style TargetType="GridViewItem">
                                                         <Setter Property="Margin" Value="2"/>
