@@ -165,7 +165,7 @@ namespace Display.ContentsPage
 
                     break;
                 case 1:
-                    await SpliderVideoInfo(matchVideoResults);
+                    SpliderVideoInfo(matchVideoResults);
                     break;
             }
         }
@@ -221,6 +221,8 @@ namespace Display.ContentsPage
         /// </summary>
         private async void SpliderVideoInfo(List<MatchVideoResult> matchVideoResults)
         {
+            currentWindow.Closed += CurrentWindow_Closed;
+
             network = new();
             VideoInfo_Grid.Visibility = Visibility.Visible;
             TopProgressBar.Visibility = Visibility.Visible;
@@ -232,7 +234,7 @@ namespace Display.ContentsPage
             ProgressMore_TextBlock.Text = $"失败数：0";
             var progress = new Progress<SpliderInfoProgress>(progressPercent =>
             {
-
+                if (!this.IsLoaded) return;
                 tryUpdateVideoInfo(progressPercent.videoInfo);
                 var matchResult = progressPercent.matchResult;
 
@@ -240,6 +242,9 @@ namespace Display.ContentsPage
                 if (!matchResult.status)
                 {
                     FailVideoNameList.Add(matchResult.OriginalName);
+
+                    if (!ProgressMore_TextBlock.IsLoaded) return;
+
                     ProgressMore_TextBlock.Text = $"失败数：{FailVideoNameList.Count}";
                     SearchProgress_TextBlock.Text = $"{matchResult.OriginalName}";
                     SearchMessage_TextBlock.Text = $"❌{matchResult.message}";
@@ -300,6 +305,8 @@ namespace Display.ContentsPage
             });
 
             await SearchAllInfo(matchVideoResults, progress);
+
+            currentWindow.Closed -= CurrentWindow_Closed;
         }
 
         private void tryUpdateVideoInfo(VideoInfo newInfo)

@@ -1,5 +1,6 @@
 ﻿using Data;
 using Microsoft.Graphics.Canvas.UI.Xaml;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -790,6 +791,16 @@ namespace Display.ContentsPage
                     break;
                 }
             }
+        }
+
+        private void connectedElement_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
+        }
+
+        private void connectedElement_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
     }
 
