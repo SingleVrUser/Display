@@ -171,7 +171,7 @@ namespace Data
             }
         }
 
-        private static string _matchVideoKeywordsString = "aarm,abp,abs,abw,adn,ajvr,aoz,ap,urvrsp,apaa,apak,apkh,apns,ara,atfb,atid,avop,avsa,bahp,baze,bf,bgn,bijn,bnst,booty,bta,btha,cafr,cami,cand,capi,cawd,cbx,cemd,cesd,chn,cjod,cmd,crvr,csdx,cspl,cute,cwpbd,czbd,dandy,dasd,ddff,ddhh,ddk,ddkh,ddob,dgcemd,dgcesd,dioguitar,dldss,dmdg,docp,doks,dpmx,dsambd,dsvr,dt,dtw,dv,dvaj,ebod,ebvr,endx,esk,eyan,ezd,fanh,fdd,fffs,fneo,fsdss,fset,fwdv,G,gachi,gachig,gachip,gachippv,gana,gaor,garea,gdhh,gent,gnab,gns,gopj,gvg,gzap,hbad,hey,hhh,hmn,hnd,hnvr,hodv,hoi,hoiz,homa,hunta,huntb,hxad,hxae,hzgd,ibw,idbd,iesp,ing,instv,inu,ion,ipit,ipvr,ipx,ipz,jac,japornxxx,josi,jpsvr,jufe,jukf,jul,juvr,jux,juy,jvr,k,kane,kavr,kawd,kimu,kird,krnd,ktb,ktds,kuse,kvr,lafbd,lcbd,lcdv,llr,lol,love,lpbr,lulu,luxu,lzdm,maan,madm,man,mao,mas,maxvrh,mcb,mcbd,mcdv,mct,mdb,mdbk,mdtm,mdvr,meyd,mfcs,miaa,miad,miae,mide,midv,mifd,migd,milk,mimk,mird,mism,mist,mium,mkmp,mmks,mmnt,mmus,mogi,mopg,msd,msfh,mstd,mtall,mvsd,mxbd,mxgs,myhd,mywife,n,nacr,naka,nhdta,nhdtb,nitr,nmc,nps,nsfs,nsps,ntk,ntr,nttr,oae,ofje,oigs,okad,onez,ongbak,oni,orec,oretd,pb,pbd,pgd,pgm,pkpd,pppd,pppe,ppt,ppvr,pred,prtd,prvr,psz,pt,pxh,raw,rbd,real,rebd,rebdb,rhts,roe,room,royd,rpin,rtp,s2mbd,saba,sama,savr,scp,sdde,sdjs,sdmf,sdmm,sdnm,sdsi,sero,sgk,sgla,shkd,shn,shpv,shs,sim,simm,siro,sis,sivr,skmj,skyhd,smbd,smd,snis,soe,spc,spro,sps,sqte,srs,srtd,ssis,ssni,sspd,star,stars,stsk,supa,supd,svdvd,sw,sweet,sxar,t,tar,tek,tikp,tkwa,tmavr,tmvi,top,tppn,trg,tsf,tus,ud,ueh,ure,urvk,usba,ve,vec,vema,venu,venx,vgd,vip,vrkm,vrtm,wa,waaa,wanz,wat,wbdv,wdi,wps,xrw,xss,xvsr,ymdd,ymds,yrh,yrll,yrz,zmen";
+        private static string _matchVideoKeywordsString = "aarm,abp,abs,abw,acme,adn,adz,ajvr,aka,ama,anzd,aoz,apaa,apak,apar,apkh,apns,ara,area,atfb,atid,averv,avkh,avop,avsa,bagr,bahp,baze,bazx,bbi,bcv,bda,beb,bgn,bijn,bikmvr,blor,bmvr,bnst,booty,bst,bstc,bta,btha,buena,caca,cafr,cami,cand,capi,cawd,cbx,cead,cemd,cesd,cetd,chn,chsd,cjod,club,cmd,crnx,crs,crvr,csdx,cspl,cute,cwm,cwpbd,czbd,damz,dandy,dasd,dcv,ddff,ddhh,ddk,ddkh,ddob,ddt,dfe,dgcemd,dgcesd,dgl,diam,dic,dioguitar,dkn,dldss,dmdg,dnin,dnw,docp,doks,dpmi,dpmx,dpsdl,drc,dsambd,dss,dsvr,dtt,dtvr,dtw,dvaj,dvdes,dvsr,ebod,ebvr,ecb,ecr,edd,eiki,ekdv,ekdv,emoi,endx,erofv,erov,esk,etn,etqr,eva,evo,eyan,ezd,fai,fanh,fch,fcp,fdd,fffs,finh,flns,fneo,fsdss,fset,fwdv,gachi,gachig,gachip,gachippv,gana,gaor,garea,gav,gcf,gdhh,geki,genm,gent,gnab,gnax,gns,good,gopj,gs,gvg,gvh,gwaz,gzap,haru,hbad,hey,hgot,hhh,hiz,hmgl,hmn,hnd,hnky,hnvr,hodv,hoi,hoiz,homa,homev,honb,hrv,hunt,hunta,huntb,hunvr,hxad,hxae,hxak,hypn,hzgd,ibw,idbd,ienf,iesp,ing,instv,inu,ion,ipit,iptd,ipvr,ipx,ipz,jac,jag,jan,japornxxx,jbs,jfyg,job,johs,josi,jpsvr,jrai,juc,jufd,jufe,jukf,jul,jusd,juvr,jux,juy,jvr,kamef,kane,kavr,kawd,kbi,kimu,kiray,kird,kire,kiwvr,kmhr,kmhrs,kmvr,knam,knb,kncs,kray,krnd,ksbe,ktb,ktds,ktkp,ktkz,kuro,kuse,kvr,kwp,kyun,lafbd,las,lcbd,lcdv,llr,lol,loli,love,lpbr,lulu,luxu,lxvs,lzdm,maan,madm,man,mao,maraa,mas,maxvr,maxvrh,mcb,mcbd,mcdv,mct,mdb,mdbk,mdm,mdtm,mdvr,meyd,mfc,mfcs,mgt,miaa,miad,miae,midd,mide,midv,mifd,migd,mild,milk,mimk,mint,mird,mism,mist,mium,mix,mizd,mkck,mkmp,mkon,mmb,mmgh,mmks,mmnt,mmus,mogi,mopg,mrmm,msd,msfh,mstd,mste,mstt,mtall,mtm,mudr,mukc,mum,mvsd,mxbd,mxgs,myhd,mywife,nacr,nade,naka,nama,natr,nfdm,ngod,nhdta,nhdtb,nhvr,nitr,nmc,nnpj,nps,nsfs,nsps,nsstl,ntk,ntr,ntrd,nttr,nzk,oae,odfm,ofje,oigs,okad,okb,okp,onez,ongbak,oni,onsd,ore,orebms,orec,oretd,orex,oyc,pb,pbd,per,pgd,pgm,pgod,pipivr,piyo,pkpd,ppft,pppd,pppe,ppt,ppvr,pred,prtd,prvr,psd,psz,pxh,pxvr,qqcm,qrvr,raw,rbd,real,rebd,rebdb,red,rhts,rki,rmd,rmds,roe,room,royd,rpin,rtp,s2mbd,saba,sad,sama,same,savr,sbmx,scp,sdab,sdam,sdde,sdjs,sdmf,sdmm,sdms,sdmt,sdmu,sdnm,sdnt,sdsi,senn,sero,sflb,sga,sgk,sgla,shkd,shl,shn,shpv,shs,shyn,silk,sim,simm,siro,siro,sis,siv,sivr,skmj,sky,skyhd,smbd,smd,snis,soe,spc,spivr,spro,sps,sqte,sqtevr,srho,srs,srtd,ssis,ssni,sspd,star,stars,std,stko,stsk,suke,supa,supd,svdvd,sw,sweet,sxar,tar,tbl,tek,ten,tgav,tigr,tikp,tki,tkwa,tmavr,tmvi,tnb,top,tppn,tpvr,tre,trg,tsf,tus,tyod,ueh,ult,upsm,ure,urvk,urvrsp,usba,val,vdd,vec,vema,venu,venx,vgd,voss,vov,vovs,vrkm,vrtb,vrtm,vrvr,vspds,wa,waaa,wanz,wat,wavr,wbdv,wdi,wf,wnz,wps,wpvr,xrw,xss,xvsr,yab,ymdd,ymds,yrh,yrll,yrz,zmen,zsd,zuko";
         public static string MatchVideoKeywordsString
         {
             get
@@ -205,7 +205,9 @@ namespace Data
             }
         }
 
-        //应用的启动页面
+        /// <summary>
+        /// 应用的启动页面
+        /// </summary>
         public static int StartPageIndex
         {
             get
@@ -217,7 +219,6 @@ namespace Data
                 localSettings.Values["StartPageIndex"] = value;
             }
         }
-
 
         /// <summary>
         /// 是否使用JavDB

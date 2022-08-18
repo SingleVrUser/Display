@@ -31,19 +31,73 @@
     </Page.Resources>
 
     <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="SelectedStates">
+
+                <VisualState x:Name="SelectedUrl" />
+
+                <VisualState x:Name="SelectedWebVideo">
+                    <VisualState.Setters>
+                        <Setter Target="ScreenshotsNumber_NumberBox.Visibility" Value="Visible" />
+                        <Setter Target="IsJumpVrVideo_ToggleSwitch.Visibility" Value="Visible" />
+                        <Setter Target="IsSelectedFaceImage_ToggleSwitch.Visibility" Value="Visible" />
+                        <Setter Target="IsShowWindows_ToggleSwitch.Visibility" Value="Visible" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <RelativePanel Margin="10,2,10,10">
-            <CheckBox x:Name="selectedCheckBox" Content="共选 0 项" CornerRadius="10" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
+
+
+        <RelativePanel Margin="5,5,5,0">
+            <Button x:Name="StartButton" Content="开始" Click="StartButton_Click"/>
+            
             <TextBlock x:Name="progress_TextBlock" RelativePanel.AlignVerticalCenterWithPanel="True"/>
-            <Button x:Name="StartButton" Content="开始" RelativePanel.AlignRightWithPanel="True" Click="StartButton_Click"/>
+
+            <StackPanel RelativePanel.AlignRightWithPanel="True">
+                <Button Style="{StaticResource DateTimePickerFlyoutLoopingSelectorNavigationButtonStyle}" Content="更多">
+                    <Button.Flyout>
+                        <Flyout>
+                            <StackPanel Spacing="5">
+
+                                <CheckBox x:Name="ShowVideoPart_CheckBox" Content="只显示缺少缩略图地址的视频" CornerRadius="10" Checked="ShowVideoPart_CheckBox_Checked" Unchecked="ShowVideoPart_CheckBox_Unchecked"/>
+
+                                <ComboBox x:Name="OriginMethodSelected_ComboBox" Header="获取来源" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="OriginMethodSelected_ComboBox_SelectionChanged">
+                                    <x:String>搜刮源网站</x:String>
+                                    <x:String>在线视频</x:String>
+                                </ComboBox>
+
+                                <NumberBox x:Name="ScreenshotsNumber_NumberBox" Header="获取数量" Value="10" SmallChange="1" LargeChange="50" SpinButtonPlacementMode="Inline" Visibility="Collapsed"/>
+
+                                <ToggleSwitch x:Name="IsJumpVrVideo_ToggleSwitch" Header="跳过VR" OnContent="跳过" OffContent="不跳过" IsOn="True" Visibility="Collapsed"/>
+
+                                <ToggleSwitch x:Name="IsSelectedFaceImage_ToggleSwitch" Header="挑选有人脸的图片" OnContent="挑选" OffContent="不挑选" IsOn="False" Visibility="Collapsed"/>
+
+                                <ToggleSwitch x:Name="IsShowWindows_ToggleSwitch" Header="显示预览窗口" OnContent="显示" OffContent="不显示" IsOn="True" Visibility="Collapsed"/>
+
+                            </StackPanel>
+
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+            </StackPanel>
+        </RelativePanel>
+        
+        
+        <RelativePanel Margin="10,2,10,10" Grid.Row="1">
+            <CheckBox x:Name="selectedCheckBox" Content="共选 0 项" CornerRadius="10" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
+
+
         </RelativePanel>
 
         <GridView
             Loaded="BasicGridView_Loaded"
-            Grid.Row="1"
+            Grid.Row="2"
             x:Name="BasicGridView"
             IsItemClickEnabled="True"
             Margin="10,0,0,0"

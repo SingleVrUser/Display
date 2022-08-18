@@ -63,6 +63,7 @@
                         </MenuFlyoutItem>
                     </MenuFlyout>
                 </Grid.ContextFlyout>
+                
                 <StackPanel CornerRadius="5" Padding="10,10,10,0">
                     <!--背景-->
                     <StackPanel.Background>
@@ -181,6 +182,13 @@
                             </CommandBar>
                         </Grid>
 
+                        <Grid Visibility="{x:Bind isDeleted,Mode=OneWay}">
+                            <Grid.Background>
+                                <SolidColorBrush Color="{ThemeResource SystemChromeAltHighColor}" Opacity="0.8" />
+                            </Grid.Background>
+                            
+                            <TextBlock Text="已删除" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
                     </Grid>
                     <StackPanel HorizontalAlignment="Center" Margin="0,5,0,0">
                         <StackPanel Orientation="Horizontal">
@@ -353,13 +361,13 @@
                                     </StackPanel>
 
                                     <StackPanel>
-                                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xEC92;"/>
+                                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE13D;"/>
                                         <TextBlock Text="演员"/>
                                         <FontIcon Style="{StaticResource UpOrDownSortStyle}" FontFamily="Segoe Fluent Icons" Glyph="&#xE015;"/>
                                     </StackPanel>
 
                                     <StackPanel>
-                                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xEB05;"/>
+                                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xEC92;"/>
                                         <TextBlock Text="年份"/>
                                         <FontIcon Style="{StaticResource UpOrDownSortStyle}" FontFamily="Segoe Fluent Icons" Glyph="&#xE015;"/>
                                     </StackPanel>

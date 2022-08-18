@@ -176,7 +176,6 @@ namespace Data
             {
                 if (token.IsCancellationRequested)
                 {
-                    Debug.WriteLine("退出3");
                     return;
                 }
                 //fileProgressInfo.datumList = new List<Datum>();
@@ -253,7 +252,6 @@ namespace Data
             if (token.IsCancellationRequested)
             {
                 return null;
-                Debug.WriteLine("退出1");
             }
 
 
@@ -275,7 +273,6 @@ namespace Data
                     if (token.IsCancellationRequested)
                     {
                         return null;
-                        Debug.WriteLine("退出2");
                     }
 
                     //文件夹
@@ -756,6 +753,40 @@ namespace Data
                 FileMatch.PlayByPotPlayer(m3U8Infos[0].Url);
             }
         }
+
+        public async Task<m3u8Info> Getm3u8Content(m3u8Info m3u8_info)
+        {
+            HttpResponseMessage response;
+            string strReuslt = string.Empty;
+
+            try
+            {
+                response = await Client.GetAsync(m3u8_info.Url);
+                strReuslt = await response.Content.ReadAsStringAsync();
+            }
+            catch
+            {
+                Debug.WriteLine("获取m3u8链接失败");
+            }
+
+            var lineList = strReuslt.Split(new char[] { '\n' });
+
+            for (int i = 0; i < lineList.Count(); i++)
+            {
+                var lineText = lineList[i].Trim('\r');
+
+                var re = Regex.Match(lineText, @"^#EXTINF:(\d*\.\d*),$");
+                if (re.Success)
+                {
+                    var strUrl = lineList[i + 1];
+                    var doubleSecond = Convert.ToDouble(re.Groups[1].Value);
+                    m3u8_info.ts_info_list.Add(new tsInfo() { Second = doubleSecond, Url = strUrl });
+                }
+            }
+
+            return m3u8_info;
+        }
+
 
         public async Task<List<m3u8Info>> Getm3u8InfoByPickCode(string pickCode)
         {

@@ -148,7 +148,7 @@ namespace Display.ContentsPage
         {
             //VisualStateManager.GoToState(this, "OpenMatchSuccessResult", true);
             OpenMatchSuccessRusult_Storyboard.Begin();
-            var i = MatchResult_Grid;
+            //var i = MatchResult_Grid;
         }
 
         private void MatchFail_Expander_Expanding(Expander sender, ExpanderExpandingEventArgs args)

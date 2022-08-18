@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using Microsoft.UI.Xaml;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace Data
 {
@@ -642,17 +643,22 @@ namespace Data
         //public bool isLookLater { get; set; }
 
         //public double score { get; set; }
-        //private double _score;
-        //public double score
-        //{
-        //    get => _score;
-        //    set
-        //    {
-        //        _score = value;
-        //        OnPropertyChanged();
-        //    }
-        //}
+        private Visibility _isDeleted = Visibility.Collapsed;
+        public Visibility isDeleted
+        {
+            get => _isDeleted;
+            set
+            {
+                _isDeleted = value;
+                OnPropertyChanged();
+            }
+        }
 
+        ////是否显示已删除
+        //public Visibility isShowDeletedGrid(bool isDeleted)
+        //{
+        //    return isDeleted ? Visibility.Visible : Visibility.Collapsed;
+        //}
         //private bool _islike;
         //public bool isLike
         //{
@@ -817,25 +823,6 @@ namespace Data
             Cid = data.cid;
             Fid = data.fid;
 
-
-            //Dictionary<string, string> testDict = new Dictionary<string, string>
-            //{
-            //    ["application"] = "fightsyj",
-            //    ["id"] = "123123",
-            //    ["score"] = "100"
-            //};
-
-            //Dictionary<string, string> testDict1 = new Dictionary<string, string>
-            //{
-            //    {"name", "fightsyj"},
-            //    {"name", "fightsyj"}
-            //};
-
-
-
-
-            //fileType.Add("application",);
-
             IconPath = "ms-appx:///Assets/115/file_type/other/unknown.svg";
             //文件夹
             if (string.IsNullOrEmpty(data.fid))
@@ -851,34 +838,6 @@ namespace Data
                 if (data.iv == 1)
                 {
                     string video_quality = GetVideoQualityFromVdi(data.vdi);
-
-                    //switch (data.vdi)
-                    //{
-                    //    case 1:
-                    //        video_quality = "sd";
-                    //        //IconPath = "ms-appx:///Assets/115/file_type/video_quality/sd.svg";
-                    //        break;
-                    //    case 2:
-                    //        video_quality = "hd";
-                    //        //IconPath = "ms-appx:///Assets/115/file_type/video_quality/hd.svg";
-                    //        break;
-                    //    case 3:
-                    //        video_quality = "fhd";
-                    //        //IconPath = "ms-appx:///Assets/115/file_type/video_quality/fhd.svg";
-                    //        break;
-                    //    case 4:
-                    //        video_quality = "1080p";
-                    //        //IconPath = "ms-appx:///Assets/115/file_type/video_quality/1080p.svg";
-                    //        break;
-                    //    case 5:
-                    //        video_quality = "4k";
-                    //        //IconPath = "ms-appx:///Assets/115/file_type/video_quality/4k.svg";
-                    //        break;
-                    //    case 100:
-                    //        video_quality = "origin";
-                    //        //IconPath = "ms-appx:///Assets/115/file_type/video_quality/origin.svg";
-                    //        break;
-                    //}
 
                     if (video_quality != null)
                     {
@@ -1196,7 +1155,14 @@ namespace Data
         public string MatchName;
     }
 
-    
+    public class tsInfo
+    {
+        public double Second;
+
+        public string Url;
+
+    }
+
     public class m3u8Info
     {
         public m3u8Info(string name, string bandwidth, string resolution, string url)
@@ -1211,6 +1177,27 @@ namespace Data
         public string Bandwidth { get; set; }
         public string Resolution { get; set; }
         public string Url { get; set; }
+
+        public double TotalSecond
+        {
+            get
+            {
+                return ts_info_list.Sum(x => x.Second);
+            }
+        }
+
+        public string BaseUrl
+        {
+            get
+            {
+                var urlInfo = new Uri(Url);
+
+                return $"{urlInfo.Scheme}://{urlInfo.Host}";
+            }
+        }
+
+        public List<tsInfo> ts_info_list = new();
+
     }
 
     //真实下载链接信息
@@ -1305,10 +1292,27 @@ namespace Data
         }
     }
 
-
     //缩略图信息
     public class ThumbnailInfo : INotifyPropertyChanged
     {
+        public ThumbnailInfo(VideoInfo videoinfo)
+        {
+            name = videoinfo.truename;
+
+            var tmpList = videoinfo.sampleImageList.Split(',').ToList();
+            if(tmpList.Count > 1)
+            {
+                thumbnailDownUrlList = tmpList;
+            }
+
+            if(videoinfo.category.Contains("VR") || videoinfo.series.Contains("VR"))
+            {
+                isVr = true;
+            }
+        }
+
+        public bool isVr = false;
+
         public string name;
         public int count;
 
@@ -1327,7 +1331,7 @@ namespace Data
             }
         }
 
-        public List<string> thumbnailDownUrlList;
+        public List<string> thumbnailDownUrlList = new();
 
         private Status _status = Status.beforeStart;
         public Status Status
@@ -1378,4 +1382,19 @@ namespace Data
         }
     }
 
+    //使用OpenCv获取115在线视频缩略图
+    public class VideoToThumbnail
+    {
+        public string name;
+
+        //总时长
+        public float play_long { get; set; } = 0;
+
+        //总帧数
+        public double frame_count { get; set; } = 0;
+
+        //pickCode
+        public List<string> pickCodeList { get; set; } = new();
+
+    }
 }

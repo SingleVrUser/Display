@@ -445,7 +445,7 @@ namespace Display.Control
         private Dictionary<Datum, bool> getNewNode(List<Datum> itemsList, IProgress<int> progress)
         {
             var Node_HasUnrealizedChildren_Dict = new Dictionary<Datum, bool>();
-            var NodeList = new List<TreeViewNode>();
+            //var NodeList = new List<TreeViewNode>();
             int i = 0;
             foreach (var folderInfo in itemsList)
             {
@@ -550,6 +550,48 @@ namespace Display.Control
 
             tryUpdataFolderInfo(itemInfo.Cid);
         }
+
+        //删除文件夹
+        private async void DeletedCid_Click(object sender, RoutedEventArgs e)
+        {
+            var item = ((sender as MenuFlyoutItem).DataContext as TreeViewNode).Content as ExplorerItem;
+
+            ContentDialog dialog = new ContentDialog()
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "确认",
+                PrimaryButtonText = "删除",
+                CloseButtonText = "返回",
+                DefaultButton = ContentDialogButton.Close,
+                Content = $"即将从本地数据库中删除 “{item.Name}”，确认删除？"
+            };
+
+            var result = await dialog.ShowAsync();
+            if(result == ContentDialogResult.Primary)
+            {
+                deletedNodeAndDataAccessByCid(FolderTreeView.RootNodes, item.Cid);
+
+            }
+        }
+
+        private void deletedNodeAndDataAccessByCid(IList<TreeViewNode> Nodechildrens, string cid)
+        {
+            foreach (TreeViewNode node in Nodechildrens)
+            {
+                if (((ExplorerItem)node.Content).Cid == cid)
+                {
+                    Nodechildrens.Remove(node);
+                    DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(cid);
+                    return;
+                }
+                var nodeChildrens = node.Children;
+                if (nodeChildrens.Count != 0)
+                {
+                    deletedNodeAndDataAccessByCid(nodeChildrens, cid);
+                }
+            }
+        }
+
     }
 
     public class lastUnAllShowFolderItem

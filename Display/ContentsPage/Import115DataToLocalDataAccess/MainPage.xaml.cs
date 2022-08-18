@@ -35,7 +35,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
         //private string _stroeUrl;
 
 
-        CancellationTokenSource s_cts;
+        //CancellationTokenSource s_cts;
 
         public MainPage()
         {

@@ -56,11 +56,11 @@
     </Page.Resources>
     <Grid>
         
-        <VisualStateManager.VisualStateGroups>
+        <!--<VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState x:Name="OpenMatchSuccessResult">
                     <VisualState.StateTriggers>
-                        <!--<StateTrigger IsActive="{x:Bind MatchSuccess_Expander.IsExpanded, Mode=OneWay}" />-->
+                        --><!--<StateTrigger IsActive="{x:Bind MatchSuccess_Expander.IsExpanded, Mode=OneWay}" />--><!--
                     </VisualState.StateTriggers>
                     
                     <VisualState.Setters>
@@ -72,7 +72,7 @@
 
                 <VisualState x:Name="OpenMatchFailResult">
                     <VisualState.StateTriggers>
-                        <!--<StateTrigger IsActive="{x:Bind MatchSuccess_Expander.IsExpanded, Mode=OneWay}" />-->
+                        --><!--<StateTrigger IsActive="{x:Bind MatchSuccess_Expander.IsExpanded, Mode=OneWay}" />--><!--
                     </VisualState.StateTriggers>
 
                     <VisualState.Setters>
@@ -84,18 +84,18 @@
 
                 <VisualState x:Name="CloseMatchResults">
                     <VisualState.StateTriggers>
-                        <!--<StateTrigger IsActive="{x:Bind MatchSuccess_Expander.IsExpanded, Mode=OneWay}" />-->
+                        --><!--<StateTrigger IsActive="{x:Bind MatchSuccess_Expander.IsExpanded, Mode=OneWay}" />--><!--
                     </VisualState.StateTriggers>
 
                     <VisualState.Setters>
                         <Setter Target="MatchResult_Grid.RowDefinitions[0].Height" Value="auto"/>
                         <Setter Target="MatchResult_Grid.RowDefinitions[1].Height" Value="auto"/>
-                        <!--<Setter Target="MatchSuccess_Expander.IsExpanded" Value="false"/>-->
+                        --><!--<Setter Target="MatchSuccess_Expander.IsExpanded" Value="false"/>--><!--
                     </VisualState.Setters>
                 </VisualState>
 
             </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
+        </VisualStateManager.VisualStateGroups>-->
         
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -106,7 +106,7 @@
         <RelativePanel Margin="10,5">
             <TextBlock Text="可通过添加规则列表，提高匹配成功率 （无需排序，相同规则只需添加一次）" RelativePanel.AlignVerticalCenterWithPanel="True"/>
             <ProgressRing x:Name="reMatchProgressRing" RelativePanel.LeftOf="reMatchButton" Margin="0,0,10,0" IsActive="False"/>
-            <Button x:Name="reMatchButton" Content="重新检查" RelativePanel.AlignRightWithPanel="True" Click="ReMatchButton_Click"/>
+            <Button x:Name="reMatchButton" Content="重新匹配" RelativePanel.AlignRightWithPanel="True" Click="ReMatchButton_Click"/>
         </RelativePanel>
         
         <!--规则列表-->

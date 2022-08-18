@@ -41,13 +41,12 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             string addCid = InputCid_TextBox.Text;
 
             tryAddCid(addCid);
-
         }
 
         private void tryAddCid(string addCid)
         {
-            long n;
-            bool is_num = Int64.TryParse(addCid, out n);
+            //long n;
+            bool is_num = long.TryParse(addCid, out _);
 
             if (!is_num)
             {
@@ -75,7 +74,6 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             {
                 return;
             }
-
             tryAddCid((sender as TextBox).Text);
         }
     }

@@ -10,7 +10,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <DataTemplate x:Key="FoundedSuggestionBox" x:DataType="data:VideoInfo">
-                <StackPanel Orientation="Horizontal" Margin="5">
+                <StackPanel Orientation="Horizontal" Margin="5" Spacing="5">
                     <Image Source="{x:Bind imagepath}" Width="100" x:Name="Cover_image"/>
                     <StackPanel>
                         <TextBlock Text="{x:Bind truename}"/>

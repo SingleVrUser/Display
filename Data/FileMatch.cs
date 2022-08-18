@@ -128,7 +128,7 @@ namespace Data
 
                         var key = general_keywords_list[i];
 
-                        Match match_cid = Regex.Match(fileName, @"(?: h_)?[^a-zA-Z]*(" + key + @")[-_ ]{0,3}0*(\d+)", RegexOptions.IgnoreCase);
+                        Match match_cid = Regex.Match(fileName, @"(?: h_)?[^a-z]+(" + key + @")[-_ ]{0,3}0*(\d+)", RegexOptions.IgnoreCase);
                         if (match_cid.Success)
                         {
                             string keywords = match_cid.Groups[1].Value;
@@ -309,6 +309,11 @@ namespace Data
                 {
                     //根据视频名称匹配番号
                     var VideoName = FileMatch.MatchName(FileName);
+
+                    if(VideoName != null && VideoName.Contains("gs") && VideoName.Contains("13"))
+                    {
+                        var ite = FileName;
+                    }
 
                     //未匹配
                     if (VideoName == null)
