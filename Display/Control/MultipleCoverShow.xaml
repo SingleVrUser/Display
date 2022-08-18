@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
+    
     <UserControl.Resources>
         <Style TargetType="Image" x:Key="newAddCoverResources">
             <Setter Property="MaxHeight" Value="210"/>
@@ -19,7 +20,7 @@
         <TextBlock Text="{x:Bind ShowName}"/>
         <Grid>
             <StackPanel x:Name="NewAddStackPanel" BorderBrush="SkyBlue" BorderThickness="1" CornerRadius="5" Margin="5" SizeChanged="NewAddStackPanel_SizeChanged">
-                <FlipView Height="250" ItemsSource="{x:Bind NewAddFlipItems, Mode=OneWay}">
+                <FlipView Height="250" ItemsSource="{x:Bind NewAddFlipItems, Mode=OneWay}"  Background="{ThemeResource BreadcrumbBarBackgroundBrush}">
                     <FlipView.ItemTemplate>
                         <DataTemplate x:DataType="data:CoverFlipItems">
                             <GridView ItemsSource="{x:Bind CoverItems,Mode=OneWay}"
@@ -39,7 +40,7 @@
                                             <Image.ContextFlyout>
                                                 <!--右键操作-->
                                                 <MenuFlyout>
-                                                    <MenuFlyoutItem Text="移出">
+                                                    <MenuFlyoutItem Text="移出" IsEnabled="False">
                                                         <MenuFlyoutItem.Icon>
                                                             <FontIcon Glyph="&#xEE4A;"/>
                                                         </MenuFlyoutItem.Icon>

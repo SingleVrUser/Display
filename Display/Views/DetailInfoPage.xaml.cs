@@ -193,6 +193,48 @@ namespace Display.Views
 
             }
         }
+        /// <summary>
+        /// 点击了删除键
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void Delete_Click(object sender, RoutedEventArgs e)
+        {
+            ContentDialog dialog = new ContentDialog()
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "确认",
+                PrimaryButtonText = "删除",
+                CloseButtonText = "返回",
+                DefaultButton = ContentDialogButton.Close,
+                Content = "该操作只删除本地数据库数据，不对115服务器进行操作，确认删除？"
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                if (sender is AppBarButton appBarButton)
+                {
+                    //从数据库中删除
+                    DataAccess.DeleteDataInVideoInfoTable(DetailInfo.truename);
+
+                    //删除存储的文件夹
+                    string savePath = Path.Combine(AppSettings.Image_SavePath, DetailInfo.truename);
+                    if (Directory.Exists(savePath))
+                    {
+                        Directory.Delete(savePath, true);
+                    }
+
+                    DetailInfo.isDeleted = Visibility.Visible;
+
+                    if (Frame.CanGoBack)
+                    {
+                        Frame.GoBack();
+                    }
+                }
+            }
+        }
 
     }
 }

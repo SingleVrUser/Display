@@ -16,7 +16,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel HorizontalAlignment="Center" Margin="10">
-            <TextBlock x:Name="showNameTextBlock" Text="{x:Bind ShowName,Mode=OneWay}" FontSize="25"/>
+            <TextBlock x:Name="showNameTextBlock" Text="{x:Bind ShowName,Mode=OneWay}" FontSize="25" IsTextSelectionEnabled="True"/>
         </StackPanel>
 
         <control:VideoCoverDisplay

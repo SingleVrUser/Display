@@ -655,23 +655,45 @@ namespace Display.Control
             {
                 XamlRoot = this.XamlRoot,
                 Title = "确认",
-                IsPrimaryButtonEnabled = false,
                 PrimaryButtonText = "删除",
                 CloseButtonText = "返回",
                 DefaultButton = ContentDialogButton.Close,
                 Content = "该操作只删除本地数据库数据，不对115服务器进行操作，确认删除？"
             };
 
-            //TODO
             var result = await dialog.ShowAsync();
 
+            if(result == ContentDialogResult.Primary)
+            {
+                if(sender is AppBarButton appBarButton)
+                {
+                    var item = appBarButton.DataContext as VideoCoverDisplayClass;
+                    //从数据库中删除
+                    DataAccess.DeleteDataInVideoInfoTable(item.truename);
+
+                    //删除存储的文件夹
+                    string savePath = Path.Combine(AppSettings.Image_SavePath, item.truename);
+                    if (Directory.Exists(savePath))
+                    {
+                        Directory.Delete(savePath,true);
+                    }
+
+                    FileGrid.Remove(item);
+                    FileGrid_part.Remove(item);
+
+                }
+            }
         }
 
         //开始动画
         public async void StartAnimation(ConnectedAnimation animation,VideoCoverDisplayClass item)
         {
-            //开始动画
-            await BasicGridView.TryStartConnectedAnimationAsync(animation, item, "showImage");
+            if(BasicGridView.Items.Contains(item))
+            {
+                //开始动画
+                await BasicGridView.TryStartConnectedAnimationAsync(animation, item, "showImage");
+            }
+
 
         }
 
@@ -679,7 +701,6 @@ namespace Display.Control
         {
             BasicGridView.PrepareConnectedAnimation("ForwardConnectedAnimation", item, "showImage");
         }
-
 
     }
 }

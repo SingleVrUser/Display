@@ -93,14 +93,18 @@ namespace Display.Control
                 string folderFullName = Path.Combine(AppSettings.Image_SavePath, resultinfo.truename);
                 DirectoryInfo TheFolder = new DirectoryInfo(folderFullName);
 
-                //文件
-                foreach (FileInfo NextFile in TheFolder.GetFiles())
+                if (TheFolder.Exists)
                 {
-                    if (NextFile.Name.Contains("Thumbnail_"))
+                    //文件
+                    foreach (FileInfo NextFile in TheFolder.GetFiles())
                     {
-                        ThumbnailList.Add(NextFile.FullName);
+                        if (NextFile.Name.Contains("Thumbnail_"))
+                        {
+                            ThumbnailList.Add(NextFile.FullName);
+                        }
                     }
                 }
+
             }
             //来源为网络
             else if (AppSettings.ThumbnailOrigin == (int)AppSettings.Origin.Web)
@@ -307,9 +311,9 @@ namespace Display.Control
                 var index = ShowImageList.IndexOf(iamgePath);
                 ShowImageFlipView.SelectedIndex = index;
             }
-            
+
             //ShowImage.Source = new BitmapImage(new Uri(iamgePath));
-            
+
             //ShoeImageName.Text = Path.GetFileName(iamgePath);
             SmokeGrid.Visibility = Visibility.Visible;
             animation.Completed += Animation_Completed1;
@@ -351,9 +355,24 @@ namespace Display.Control
         //    scv.ScrollToHorizontalOffset(scv.HorizontalOffset);
         //    e.Handled = true;
         //}
+
         private string GetFileNameFromFullPath(object fullpath)
         {
             return Path.GetFileName(fullpath as string);
+        }
+
+        public event RoutedEventHandler DeleteClick;
+        private void DeletedAppBarButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            DeleteClick?.Invoke(sender, e);
+            
+        }
+
+        private void OpenDirectory_Click(object sender, RoutedEventArgs e)
+        {
+            string ImagePath = Path.GetDirectoryName(resultinfo.imagepath);
+            FileMatch.LaunchFolder(ImagePath);
         }
     }
 }

@@ -3,6 +3,8 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
 
@@ -170,6 +172,68 @@ namespace Data
 
                 db.Close();
             }
+        }
+
+        /// <summary>
+        /// 删除VideoInfo表中的一条记录
+        /// </summary>
+        public static void DeleteDataInVideoInfoTable(string truename)
+        {
+            using (SqliteConnection db =
+              new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand insertCommand = new SqliteCommand();
+                insertCommand.Connection = db;
+
+                // Use parameterized query to prevent SQL injection attacks
+                insertCommand.CommandText = $"DELETE FROM VideoInfo WHERE truename == '{truename}'";
+
+                insertCommand.ExecuteReader();
+
+                db.Close();
+            }
+        }
+
+        /// <summary>
+        /// 删除FilesInfo表里文件夹下的所有文件和文件夹（最多两级）
+        /// </summary>
+        public static void DeleteDirectoryAndFiles_InFilesInfoTable(string cid)
+        {
+            using (SqliteConnection db =
+              new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand insertCommand = new SqliteCommand();
+                insertCommand.Connection = db;
+
+                // Use parameterized query to prevent SQL injection attacks
+                insertCommand.CommandText = $"DELETE FROM FilesInfo WHERE cid == '{cid}' or pid = '{cid}'";
+
+                insertCommand.ExecuteReader();
+
+                db.Close();
+            }
+        }
+
+        public static void DeleteAllDirectroyAndFiles_InfilesInfoTabel(string cid)
+        {
+            var Files = GetAllFilesTraverse(cid);
+            List<string> cidList = new();
+            foreach(var file in Files)
+            {
+                if (!cidList.Contains(file.cid))
+                {
+                    cidList.Add(file.cid);
+                }
+            }
+            foreach(var cidFolder in cidList)
+            {
+                DeleteDirectoryAndFiles_InFilesInfoTable(cidFolder);
+            }
+
         }
 
         /// <summary>
@@ -404,6 +468,10 @@ namespace Data
             //return data;
         }
 
+        /// <summary>
+        /// 获取一个图片地址
+        /// </summary>
+        /// <returns></returns>
         public static string GetOneImagePath()
         {
             string imagePath = "";
@@ -425,7 +493,6 @@ namespace Data
 
             return imagePath;
         }
-
 
         /// <summary>
         /// 加载已存在的videoInfo数据
@@ -699,6 +766,9 @@ namespace Data
 
                 db.Close();
             }
+
+            //进一步筛选
+            data = data.Where(x => Regex.Match(x.n, @$"[^a-z]{leftName}[^a-z]|^{leftName}[^a-z]", RegexOptions.IgnoreCase).Success).ToList();
 
             return data;
         }

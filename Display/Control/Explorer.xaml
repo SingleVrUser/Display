@@ -60,6 +60,16 @@
         <DataTemplate x:Key="FolderTemplate" x:DataType="TreeViewNode">
             <TreeViewItem>
                 <StackPanel Orientation="Horizontal" Spacing="5">
+                    <StackPanel.ContextFlyout>
+                        <!--右键操作-->
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="删除" Click="DeletedCid_Click">
+                                <MenuFlyoutItem.Icon>
+                                    <SymbolIcon Symbol="Delete"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                        </MenuFlyout>
+                    </StackPanel.ContextFlyout>
                     <ToolTipService.ToolTip>
                         <TextBlock  Text="{x:Bind ((data:ExplorerItem)Content).Name}"/>
                     </ToolTipService.ToolTip>

@@ -14,6 +14,7 @@ using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -143,7 +144,6 @@ namespace Display.ContentsPage
             //挑选符合条件的视频文件
             matchVideoResults = await Task.Run(() => FileMatch.GetVideoAndMatchFile(datumList));
 
-
             if (s_cts.IsCancellationRequested)
             {
                 return;
@@ -193,13 +193,17 @@ namespace Display.ContentsPage
 
 
             //未空，退出
-            if (matchVideoResults.Count == 0) return;
-
-            var result = await matchVideoResultsPage.ShowContentDialog();
-
-            if (result == ContentDialogResult.Primary)
+            if (matchVideoResults.Count == 0)
             {
-                SpliderVideoInfo(matchVideoResults);
+            }
+            else
+            {
+                var result = await matchVideoResultsPage.ShowContentDialog();
+
+                if (result == ContentDialogResult.Primary)
+                {
+                    SpliderVideoInfo(matchVideoResults);
+                }
             }
 
             window2.Closed -= Window2_Closed;
@@ -234,7 +238,15 @@ namespace Display.ContentsPage
             ProgressMore_TextBlock.Text = $"失败数：0";
             var progress = new Progress<SpliderInfoProgress>(progressPercent =>
             {
-                if (!this.IsLoaded) return;
+                //Debug.WriteLine($"进度:{progressPercent.index}");
+
+                //更新进度信息
+                if (progressPercent.index != 0)
+                {
+                    //Debug.WriteLine($"》》{progressPercent.index}");
+                    overallProgress.Value = progressPercent.index;
+                }
+
                 tryUpdateVideoInfo(progressPercent.videoInfo);
                 var matchResult = progressPercent.matchResult;
 
@@ -242,8 +254,6 @@ namespace Display.ContentsPage
                 if (!matchResult.status)
                 {
                     FailVideoNameList.Add(matchResult.OriginalName);
-
-                    if (!ProgressMore_TextBlock.IsLoaded) return;
 
                     ProgressMore_TextBlock.Text = $"失败数：{FailVideoNameList.Count}";
                     SearchProgress_TextBlock.Text = $"{matchResult.OriginalName}";
@@ -276,18 +286,18 @@ namespace Display.ContentsPage
                     }
                 }
 
-                //更新进度信息
-                if (progressPercent.isEnd)
-                {
-                    overallProgress.Value++;
-                }
 
                 percentProgress_TextBlock.Text = $"{(int)overallProgress.Value * 100 / matchVideoResults.Count}%";
                 countProgress_TextBlock.Text = $"{overallProgress.Value}/{matchVideoResults.Count}";
 
+
+                //Debug.WriteLine($"{overallProgress.Value} == {overallProgress.Maximum}");
+
                 //100%
                 if (overallProgress.Value == overallProgress.Maximum)
                 {
+                    //Debug.WriteLine($"完成……");
+
                     ProgressRing_StackPanel.SetValue(Grid.ColumnSpanProperty, 1);
                     SearchResult_StackPanel.Visibility = Visibility.Visible;
                     SearchProgress_TextBlock.Visibility = Visibility.Collapsed;
@@ -325,12 +335,17 @@ namespace Display.ContentsPage
 
         private async Task SearchAllInfo(List<MatchVideoResult> matchVideoResults, IProgress<SpliderInfoProgress> progress)
         {
-            foreach (var matchResult in matchVideoResults)
+            //int i = 0;
+            //foreach (var matchResult in matchVideoResults)
+            for(int i = 0;i<matchVideoResults.Count;i++)
             {
                 if (s_cts.IsCancellationRequested)
                 {
                     return;
                 }
+
+                var matchResult = matchVideoResults[i];
+
 
                 SpliderInfoProgress spliderInfoProgress = new();
                 spliderInfoProgress.matchResult = matchResult;
@@ -356,10 +371,11 @@ namespace Display.ContentsPage
                     }
                 }
 
-                spliderInfoProgress.isEnd = true;
+                spliderInfoProgress.index = i+1;
 
                 //获取到该信息，在UI上显示
                 progress.Report(spliderInfoProgress);
+
             }
         }
 
@@ -380,7 +396,7 @@ namespace Display.ContentsPage
                 //使用第一个符合条件的Name
                 resultInfo = DataAccess.LoadOneVideoInfoByCID(result[0]);
 
-                progress.Report(new SpliderInfoProgress() { matchResult= new MatchVideoResult() { MatchName = VideoName, status = true, message = "数据库已存在" } });
+                progress.Report(new SpliderInfoProgress() {matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "数据库已存在" } });
             }
             // 从相关网站中搜索
             else
@@ -388,7 +404,7 @@ namespace Display.ContentsPage
                 //Fc2视频且没有JavDb的Cookie
                 if (VideoName.Contains("fc2-") && string.IsNullOrEmpty(AppSettings.javdb_Cookie)) return null;
 
-                if (AppSettings.isUseJavBus)
+                if (AppSettings.isUseJavBus && !VideoName.Contains("fc2-"))
                 {
                     progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~3秒" } });
                     await GetInfoFromNetwork.RandomTimeDelay(1, 3);
@@ -565,7 +581,7 @@ namespace Display.ContentsPage
         public VideoInfo videoInfo { get; set; }
         public MatchVideoResult matchResult { get; set; }
 
-        public bool isEnd { get; set; } = false;
+        public int index { get; set; } = 0;
     }
 
     public enum FileFormat { Video, Subtitles, Torrent, Image, Audio,Archive }

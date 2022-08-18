@@ -43,7 +43,7 @@
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
             <TextBlock x:Name="Title_TextBlock" TextTrimming="CharacterEllipsis" VerticalAlignment="Bottom" Style="{ThemeResource FlyoutPickerTitleTextBlockStyle}"/>
-            <CommandBar Grid.Column="1" HorizontalAlignment="Right" IsOpen="False" DefaultLabelPosition="Collapsed" Margin="-10" VerticalAlignment="Bottom">
+            <CommandBar Grid.Column="1" HorizontalAlignment="Right" IsOpen="False" DefaultLabelPosition="Right" Margin="-10" VerticalAlignment="Bottom">
                 <CommandBar.PrimaryCommands>
                     <AppBarButton Icon="Play"
                                 x:Uid="playButton"
@@ -71,6 +71,15 @@
                         <FontIcon Glyph="&#xE13B;"/>
                     </AppBarToggleButton>
                 </CommandBar.PrimaryCommands>
+
+                <CommandBar.SecondaryCommands>
+                    <AppBarButton Icon="Delete" Label="删除" Click="DeletedAppBarButton_Click">
+                        <AppBarButton.KeyboardAccelerators>
+                            <KeyboardAccelerator Modifiers="Control" Key="D" />
+                        </AppBarButton.KeyboardAccelerators>
+                    </AppBarButton>
+                </CommandBar.SecondaryCommands>
+
             </CommandBar>
 
         </Grid>
@@ -128,8 +137,19 @@
                         MaxWidth="600"
                         MaxHeight="500"
                         HorizontalAlignment="Left"
-                        VerticalAlignment="Top"/>
-                    <Grid Grid.Column="1">
+                        VerticalAlignment="Top">
+                        <Image.ContextFlyout>
+                            <!--右键操作-->
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="打开所在目录" Click="OpenDirectory_Click">
+                                    <MenuFlyoutItem.Icon>
+                                        <SymbolIcon Symbol="Folder"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                            </MenuFlyout>
+                        </Image.ContextFlyout>
+                    </Image>
+                    <Grid Grid.Column="1" VerticalAlignment="Center">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>
                             <RowDefinition Height="auto"/>
@@ -192,12 +212,13 @@
                         <!--内容-->
                         <StackPanel Grid.Row="0"
                             Grid.Column="1"
-                            Orientation="Horizontal">
-                            <TextBlock Text="{x:Bind resultinfo.truename}"/>
-                            <HyperlinkButton
-                                    NavigateUri="{x:Bind resultinfo.busurl}">
-                                <Image Source="D:\Work\WinUi\Display_Test\Display_Test\Assets\JavBusLogo.png"
-                                        Height="15"/>
+                            Orientation="Horizontal"
+                            Spacing="10">
+                            <TextBlock Text="{x:Bind resultinfo.truename}" IsTextSelectionEnabled="True"/>
+                            <HyperlinkButton NavigateUri="{x:Bind resultinfo.busurl}" Opacity="0.5">
+                                <!--<Image Source="/Assets/JavBusLogo.png"
+                                        Height="15"/>-->
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xF6FA;" />
                             </HyperlinkButton>
                         </StackPanel>
 
@@ -296,7 +317,7 @@
                                 </FlipView.ItemTemplate>
                             </FlipView>
 
-                            <PipsPager Grid.Row="1" HorizontalAlignment="Center" NumberOfPages="{x:Bind ShowImageList.Count}" SelectedPageIndex="{x:Bind ShowImageFlipView.SelectedIndex,Mode=TwoWay}"/>
+                            <PipsPager Grid.Row="1" HorizontalAlignment="Center" NumberOfPages="{x:Bind ShowImageList.Count,Mode=OneWay}" SelectedPageIndex="{x:Bind ShowImageFlipView.SelectedIndex,Mode=TwoWay}"/>
                         </Grid>
                         
                         <!--<Image x:Name="ShowImage"/>-->

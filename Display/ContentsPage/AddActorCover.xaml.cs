@@ -775,13 +775,13 @@ namespace Display.ContentsPage
             CancelSmokeGrid();
         }
 
-        private async void ModifyActorImage_Click(object sender, RoutedEventArgs e)
+        private void ModifyActorImage_Click(object sender, RoutedEventArgs e)
         {
             var imageUrl = (sender as HyperlinkButton).DataContext as string;
             string actorName = ShoeActorName.Text;
             string savePath = Path.Combine(AppSettings.ActorInfo_SavePath, actorName);
 
-            string imageFullPath =  await GetInfoFromNetwork.downloadImage(imageUrl, savePath, "face",true);
+            //string imageFullPath =  await GetInfoFromNetwork.downloadImage(imageUrl, savePath, "face",true);
 
             foreach(var item in actorinfo)
             {

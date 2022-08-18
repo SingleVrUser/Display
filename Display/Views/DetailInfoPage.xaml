@@ -20,6 +20,7 @@
             ActorClick="{x:Bind Actor_Click}"
             LabelClick="{x:Bind Label_Click}"
             VideoPlayClick="{x:Bind VideoPlay_Click}"
+            DeleteClick="{x:Bind Delete_Click}"
             resultinfo="{x:Bind DetailInfo, Mode=TwoWay}"/>
     </Grid>
 

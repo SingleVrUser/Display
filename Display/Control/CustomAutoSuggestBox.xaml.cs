@@ -70,9 +70,11 @@ namespace Display.Control
         private void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
             //var nowItem = args.ChosenSuggestion as VideoInfo;
-
-            sender.DataContext = selectFoundMethodButton.Content;
-            QuerySubmitted?.Invoke(sender, args);
+            if ( args.QueryText != "Data.VideoInfo")
+            {
+                sender.DataContext = selectFoundMethodButton.Content;
+                QuerySubmitted?.Invoke(sender, args);
+            }
 
             //初始化搜索框
             NavViewSearchBox.Text = "";

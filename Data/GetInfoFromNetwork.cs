@@ -164,7 +164,12 @@ namespace Data
             {
                 foreach (var node in sampleBox_Nodes)
                 {
-                    sampleUrlList.Add(node.Attributes["href"].Value);
+                    string sampleImageUrl = node.Attributes["href"].Value;
+                    if (!sampleImageUrl.Contains("http"))
+                    {
+                        sampleImageUrl = UrlCombine(JavBusUrl, sampleImageUrl);
+                    }
+                    sampleUrlList.Add(sampleImageUrl);
                 }
                 videoInfo.sampleImageList = string.Join(",", sampleUrlList);
             }
@@ -263,13 +268,11 @@ namespace Data
 
             videoInfo.busurl = detail_url;
 
-
             var ImageUrl = video_meta_panelNode.SelectSingleNode(".//img[@class='video-cover']").Attributes["src"].Value;
             if (!ImageUrl.Contains("http"))
             {
                 ImageUrl = UrlCombine(JavDBUrl,ImageUrl);
             }
-
 
             ////下载封面
             string filePath = Path.Combine(SavePath, CID);
@@ -339,7 +342,6 @@ namespace Data
             var title = TitleNode.InnerText;
             videoInfo.title = title.Replace(videoInfo.truename, "").Trim();
 
-
             //样品图片
             var preview_imagesSingesNode = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class,'preview-images')]");
             if(preview_imagesSingesNode != null)
@@ -350,13 +352,17 @@ namespace Data
                 {
                     foreach (var node in preview_imagesNodes)
                     {
-                        sampleUrlList.Add(node.Attributes["href"].Value);
+                        var sampleImageUrl = node.Attributes["href"].Value;
+                        if (!sampleImageUrl.Contains("http"))
+                        {
+                            sampleImageUrl = UrlCombine(JavDBUrl, sampleImageUrl);
+                        }
+                        sampleUrlList.Add(sampleImageUrl);
                     }
                     videoInfo.sampleImageList = string.Join(",", sampleUrlList);
                 }
             }
             
-
             return videoInfo;
         }
 
