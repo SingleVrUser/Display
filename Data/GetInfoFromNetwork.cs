@@ -476,22 +476,30 @@ namespace Data
         /// <param name="filePath"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public async Task<string> downloadImage(string url, string filePath, string fileName)
+        public static async Task<string> downloadImage(string url, string imagePath, string imageName, bool isReplaceExistsImage = false)
         {
-            string localFilename = $"{fileName}{Path.GetExtension(url)}";
-            string localPath = Path.Combine(filePath, localFilename);
+            HttpClient Client = new HttpClient();
 
-            if (!File.Exists(filePath))
+            string localFilename = $"{imageName}{Path.GetExtension(url)}";
+            string localPath = Path.Combine(imagePath, localFilename);
+
+            if (!File.Exists(imagePath))
             {
-                Directory.CreateDirectory(filePath);
+                Directory.CreateDirectory(imagePath);
             }
 
-
-            if (!File.Exists(localPath))
+            if (isReplaceExistsImage || !File.Exists(localPath))
             {
-                byte[] imageBytes = await Client.GetByteArrayAsync(url);
+                try
+                {
+                    byte[] imageBytes = await Client.GetByteArrayAsync(url);
 
-                File.WriteAllBytes(localPath, imageBytes);
+                    File.WriteAllBytes(localPath, imageBytes);
+                }
+                catch
+                {
+                    return localPath;
+                }
             }
 
             return localPath;

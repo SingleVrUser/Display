@@ -19,11 +19,13 @@
             <VisualStateGroup>
                 <VisualState>
                     <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="1000"/>
+                        <AdaptiveTrigger MinWindowWidth="1260"/>
+                        <AdaptiveTrigger MinWindowHeight="840"/>
                     </VisualState.StateTriggers>
 
                     <VisualState.Setters>
-                        <Setter Target="Show_StackPanel.Orientation" Value="Horizontal"/>
+                        <Setter Target="ThumbnailGrid.MaxWidth" Value="900"/>
+                        <Setter Target="ThumbnailGrid.MaxHeight" Value="600"/>
                     </VisualState.Setters>
                 </VisualState>
 
@@ -35,38 +37,44 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <!--<TextBlock x:Name="Result_TextBlock"/>-->
-
-        <CommandBar HorizontalAlignment="Right" IsOpen="False" DefaultLabelPosition="Collapsed" Margin="-5">
-            <CommandBar.PrimaryCommands>
-                <AppBarButton Icon="Play"
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="Title_TextBlock" TextTrimming="CharacterEllipsis" VerticalAlignment="Bottom" Style="{ThemeResource FlyoutPickerTitleTextBlockStyle}"/>
+            <CommandBar Grid.Column="1" HorizontalAlignment="Right" IsOpen="False" DefaultLabelPosition="Collapsed" Margin="-10" VerticalAlignment="Bottom">
+                <CommandBar.PrimaryCommands>
+                    <AppBarButton Icon="Play"
                                 x:Uid="playButton"
                                 Margin="10,0"
                                 Click="VideoPlay_Click">
-                    <ToolTipService.ToolTip>
-                        <ToolTip x:Uid="playToolTip"/>
-                    </ToolTipService.ToolTip>
+                        <ToolTipService.ToolTip>
+                            <ToolTip x:Uid="playToolTip"/>
+                        </ToolTipService.ToolTip>
 
-                </AppBarButton>
-                <AppBarButton Icon="Download" Click="DownButton_Click">
-                    <ToolTipService.ToolTip>
-                        <ToolTip x:Uid="downToolTip"/>
-                    </ToolTipService.ToolTip>
-                </AppBarButton>
-                <AppBarSeparator/>
+                    </AppBarButton>
+                    <AppBarButton Icon="Download" Click="DownButton_Click">
+                        <ToolTipService.ToolTip>
+                            <ToolTip x:Uid="downToolTip"/>
+                        </ToolTipService.ToolTip>
+                    </AppBarButton>
+                    <AppBarSeparator/>
 
-                <!--喜欢-->
-                <AppBarToggleButton IsChecked="{x:Bind data:FileMatch.isLike(resultinfo.is_like), BindBack = updateLike, Mode=TwoWay}">
-                    <FontIcon Glyph="&#xE006;"/>
-                </AppBarToggleButton>
-                
-                <!--稍后再看-->
-                <AppBarToggleButton IsChecked="{x:Bind data:FileMatch.isLookLater(resultinfo.look_later), BindBack = updateLookLater, Mode=TwoWay}">
-                    <FontIcon Glyph="&#xE13B;"/>
-                </AppBarToggleButton>
-            </CommandBar.PrimaryCommands>
-        </CommandBar>
+                    <!--喜欢-->
+                    <AppBarToggleButton IsChecked="{x:Bind data:FileMatch.isLike(resultinfo.is_like), BindBack = updateLike, Mode=TwoWay}">
+                        <FontIcon Glyph="&#xE006;"/>
+                    </AppBarToggleButton>
 
+                    <!--稍后再看-->
+                    <AppBarToggleButton IsChecked="{x:Bind data:FileMatch.isLookLater(resultinfo.look_later), BindBack = updateLookLater, Mode=TwoWay}">
+                        <FontIcon Glyph="&#xE13B;"/>
+                    </AppBarToggleButton>
+                </CommandBar.PrimaryCommands>
+            </CommandBar>
+
+        </Grid>
+       
         <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,0">
             --><!--<TextBlock x:Name="DoingInfo_TextBlock"
                 VerticalAlignment="Center"
@@ -102,19 +110,26 @@
         <!--<ProgressBar x:Name="Doing_ProgressBar"
                          HorizontalAlignment="Stretch"/>-->
 
-        <Grid Grid.Row="1" Margin="5,0" BorderBrush="#bdc3c7" BorderThickness="0,1,0,0" Padding="10">
+        <Grid Grid.Row="1" Margin="5,0" BorderBrush="#bdc3c7" BorderThickness="0,1,0,0">
             <ScrollViewer>
-                <StackPanel x:Name="Show_StackPanel"
-                    Orientation="Vertical"
-                    Spacing="10">
+                <!--<StackPanel x:Name="Show_StackPanel" Orientation="Vertical" Spacing="10"-->
+                <Grid RowSpacing="20"  Padding="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
                     <Image x:FieldModifier="public"
                         x:Name="Cover_Image"
                         Source="{x:Bind resultinfo.imagepath}"
                         MaxWidth="600"
                         MaxHeight="500"
                         HorizontalAlignment="Left"
-                           VerticalAlignment="Top"/>
-                    <Grid>
+                        VerticalAlignment="Top"/>
+                    <Grid Grid.Column="1">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>
                             <RowDefinition Height="auto"/>
@@ -218,7 +233,6 @@
                             HorizontalScrollMode="Auto"
                             VerticalScrollBarVisibility="Hidden"
                             VerticalScrollMode="Disabled"
-                            PointerWheelChanged="CategoryScrollViewer_PointerWheelChanged"
                             HorizontalAlignment="Left"
                             Padding="5">
 
@@ -234,8 +248,6 @@
                             HorizontalScrollMode="Auto"
                             VerticalScrollBarVisibility="Hidden"
                             VerticalScrollMode="Disabled"
-                            MaxWidth="420"
-                            PointerWheelChanged="ActorScrollViewer_PointerWheelChanged"
                             HorizontalAlignment="Left">
                             <StackPanel
                                     x:Name="ActorSatckPanel"
@@ -244,8 +256,62 @@
                         </ScrollViewer>
 
                     </Grid>
-                </StackPanel>
+
+                    <GridView x:Name="ThumbnailGridView" Grid.Row="1" Grid.ColumnSpan="2" Header="缩略图" IsItemClickEnabled="True" ItemClick="ThumbnailGridView_ItemClick" Visibility="Collapsed">
+                        <GridView.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Image x:Name="Thumbnail_Image" Source="{x:Bind}" Height="120" Width="180" Stretch="UniformToFill"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" PointerEntered="Thumbnail_Image_PointerEntered" PointerExited="Thumbnail_Image_PointerExited"/>
+                            </DataTemplate>
+                        </GridView.ItemTemplate>
+                    </GridView>
+                </Grid>
+                <!--</StackPanel>-->
             </ScrollViewer>
+
+            <Grid x:Name="SmokeGrid" Grid.RowSpan="2" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Collapsed">
+                <Grid x:Name="SmokeCancelGrid">
+                    <Grid.Background>
+                        <SolidColorBrush Color="{ThemeResource SystemChromeAltHighColor}" Opacity="0.8" />
+                    </Grid.Background>
+                </Grid>
+                
+                <Grid x:Name="destinationElement" HorizontalAlignment="Center" VerticalAlignment="Center" BorderThickness="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{ThemeResource AccentAAFillColorDisabledBrush}">
+                        <Grid x:Name="ThumbnailGrid" MaxWidth="630" MaxHeight="420">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <FlipView x:Name="ShowImageFlipView" ItemsSource="{x:Bind ShowImageList}" Background="{ThemeResource AccentAAFillColorDisabledBrush}">
+                                <FlipView.ItemTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                        <Image Source="{x:Bind}" />
+                                    </DataTemplate>
+                                </FlipView.ItemTemplate>
+                            </FlipView>
+
+                            <PipsPager Grid.Row="1" HorizontalAlignment="Center" NumberOfPages="{x:Bind ShowImageList.Count}" SelectedPageIndex="{x:Bind ShowImageFlipView.SelectedIndex,Mode=TwoWay}"/>
+                        </Grid>
+                        
+                        <!--<Image x:Name="ShowImage"/>-->
+                        <Button Click="BackButton_Click" HorizontalAlignment="Right" VerticalAlignment="Top" Height="40" Width="40" Margin="5">
+                            <Button.Content>
+                                <SymbolIcon Symbol="Clear" />
+                            </Button.Content>
+                        </Button>
+                    </Grid>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" Grid.Row="1">
+                        <TextBlock x:Name="ShoeImageName" Text="{x:Bind GetFileNameFromFullPath(ShowImageFlipView.SelectedItem),Mode=OneWay}" Style="{ThemeResource BaseTextBlockStyle}" HorizontalAlignment="Center" Margin="12" IsTextSelectionEnabled="True"/>
+                    </Grid>
+                </Grid>
+
+            </Grid>
         </Grid>
 
 

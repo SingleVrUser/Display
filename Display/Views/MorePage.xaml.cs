@@ -53,7 +53,13 @@ namespace Display.Views
             {
                 Name = "演员头像",
                 IconPath = "/Assets/Svg/face_male_man_portrait_icon.svg",
-                Description = "从视频中截取演员头像"
+                Description = "从gfriends仓库中获取演员头像"
+            });
+            DataSource.Add(new FunctionModule()
+            {
+                Name = "缩略图",
+                IconPath = "/Assets/Svg/image_icon.svg",
+                Description = "获取视频缩略图"
             });
             DataSource.Add(new FunctionModule()
             {
@@ -114,6 +120,11 @@ namespace Display.Views
                     CommonWindow window6 = new CommonWindow();
                     window6.Content = new ContentsPage.AddActorCover();
                     window6.Activate();
+                    break;
+                case "缩略图":
+                    CommonWindow window7 = new CommonWindow();
+                    window7.Content = new ContentsPage.GetThumbnail();
+                    window7.Activate();
                     break;
 
             }
