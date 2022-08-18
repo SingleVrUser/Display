@@ -151,6 +151,28 @@ namespace Data
         }
 
         /// <summary>
+        /// 删除FilesInfo表中的所有数据
+        /// </summary>
+        public static void DeleteFilesInfoTable()
+        {
+            using (SqliteConnection db =
+              new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand insertCommand = new SqliteCommand();
+                insertCommand.Connection = db;
+
+                // Use parameterized query to prevent SQL injection attacks
+                insertCommand.CommandText = $"delete from FilesInfo";
+
+                insertCommand.ExecuteReader();
+
+                db.Close();
+            }
+        }
+
+        /// <summary>
         /// 添加115文件信息
         /// </summary>
         /// <param name="data"></param>

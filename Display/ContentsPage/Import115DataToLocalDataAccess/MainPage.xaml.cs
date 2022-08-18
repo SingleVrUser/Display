@@ -1,9 +1,11 @@
 ﻿using Data;
 using Microsoft.UI;
+using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
@@ -257,6 +259,38 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             InputCidManually_HyperlinkButton.Visibility = Visibility.Collapsed;
         }
 
+        private async void deleData_Click(object sender, RoutedEventArgs e)
+        {
+            ContentDialog dialog = new ContentDialog();
+
+            // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
+            dialog.XamlRoot = this.XamlRoot;
+            //dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
+            dialog.Title = "确认后继续";
+            dialog.PrimaryButtonText = "继续";
+            dialog.CloseButtonText = "取消";
+            dialog.DefaultButton = ContentDialogButton.Close;
+
+            RichTextBlock TextHighlightingRichTextBlock = new();
+
+            Paragraph paragraph = new();
+            paragraph.Inlines.Add(new Run() { Text = "该操作将" });
+            paragraph.Inlines.Add(new Run() { Text = "删除", Foreground = new SolidColorBrush(Colors.OrangeRed), FontWeight = FontWeights.Bold, FontSize = 15 });
+            paragraph.Inlines.Add(new Run() { Text = "之前导入的" });
+            paragraph.Inlines.Add(new Run() { Text = "所有", Foreground = new SolidColorBrush(Colors.OrangeRed) });
+            paragraph.Inlines.Add(new Run() { Text = "115数据" });
+
+            TextHighlightingRichTextBlock.Blocks.Add(paragraph);
+
+            dialog.Content = TextHighlightingRichTextBlock;
+
+            var result = await dialog.ShowAsync();
+
+            if(result == ContentDialogResult.Primary)
+            {
+                DataAccess.DeleteFilesInfoTable();
+            }
+        }
     }
 
     class ContentPassBetweenPage
