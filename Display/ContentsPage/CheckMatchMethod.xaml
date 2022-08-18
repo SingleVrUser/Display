@@ -106,7 +106,7 @@
         <RelativePanel Margin="10,5">
             <TextBlock Text="可通过添加规则列表，提高匹配成功率 （无需排序，相同规则只需添加一次）" RelativePanel.AlignVerticalCenterWithPanel="True"/>
             <ProgressRing x:Name="reMatchProgressRing" RelativePanel.LeftOf="reMatchButton" Margin="0,0,10,0" IsActive="False"/>
-            <Button x:Name="reMatchButton" Content="重新匹配" RelativePanel.AlignRightWithPanel="True" Click="ReMatchButton_Click"/>
+            <Button x:Name="reMatchButton" Content="重新检查" RelativePanel.AlignRightWithPanel="True" Click="ReMatchButton_Click"/>
         </RelativePanel>
         
         <!--规则列表-->

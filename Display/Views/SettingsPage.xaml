@@ -138,6 +138,24 @@
 
                             </StackPanel>
                         </Expander>
+
+                        <!--显示-->
+                        <Expander
+                            HorizontalAlignment="Stretch"
+                            IsExpanded="False"
+                            ExpandDirection="Down"
+                            VerticalAlignment="Top"
+                            Header="显示"
+                            HorizontalContentAlignment="Stretch">
+                            
+                            <RelativePanel>
+                                <TextBlock RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0">缩略图来源</TextBlock>
+                                <ComboBox RelativePanel.AlignRightWithPanel="True" SelectedIndex="{x:Bind data:AppSettings.ThumbnailOrigin, Mode=TwoWay}">
+                                    <x:String>本地</x:String>
+                                    <x:String>网络</x:String>
+                                </ComboBox>
+                            </RelativePanel>
+                        </Expander>
                     </StackPanel>
 
 

@@ -59,6 +59,7 @@
     <None Remove="ContentsPage\CheckCookie.xaml" />
     <None Remove="ContentsPage\CheckMatchMethod.xaml" />
     <None Remove="ContentsPage\DownDialogContent.xaml" />
+    <None Remove="ContentsPage\GetThumbnail.xaml" />
     <None Remove="ContentsPage\Import115DataToLocalDataAccess\InputCidManually.xaml" />
     <None Remove="ContentsPage\LoginPage.xaml" />
     <None Remove="ContentsPage\SelectSingleVideoToPlay.xaml" />
@@ -317,6 +318,9 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="ContentsPage\GetThumbnail.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Control\ActorImage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

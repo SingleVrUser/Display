@@ -279,7 +279,6 @@ namespace Display
                 var newItem = new VideoCoverDisplayClass(nowItem);
                 ContentFrame.Navigate(typeof(DetailInfoPage), newItem, new SuppressNavigationTransitionInfo());
             }
-
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using Data;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -84,6 +85,16 @@ namespace Display.Views
                 string[] TypeAndName = { "actor", actorinfo.name };
                 Frame.Navigate(typeof(ActorInfoPage), TypeAndName);
             }
+        }
+
+        private void Grid_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
+        }
+
+        private void Grid_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
     }
 
