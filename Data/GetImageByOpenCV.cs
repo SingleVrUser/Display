@@ -26,7 +26,6 @@ namespace Data
         Net genderNet = CvDnn.ReadNetFromCaffe(genderProto, genderModel);
         Net ageNet = CvDnn.ReadNetFromCaffe(AgeconfigFile, AgefaceModel);
 
-
         void InitializeNet(bool isUseGPU)
         {
             if (isUseGPU)

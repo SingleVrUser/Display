@@ -1016,6 +1016,8 @@ namespace Data
             dataInfo.series = query["series"] as string;
             dataInfo.category = query["category"] as string;
             dataInfo.actor = query["actor"] as string;
+            dataInfo.imageurl = query["imageurl"] as string;
+            dataInfo.sampleImageList = query["sampleImageList"] as string;
             dataInfo.imagepath = query["imagepath"] as string;
             dataInfo.busurl = query["busurl"] as string;
             dataInfo.look_later = Convert.ToInt32(query["look_later"]);
