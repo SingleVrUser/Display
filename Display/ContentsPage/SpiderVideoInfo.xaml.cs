@@ -40,6 +40,10 @@ namespace Display.ContentsPage
         CancellationTokenSource s_cts = new();
         public Window currentWindow;
 
+        ContentsPage.CheckMatchMethod matchVideoResultsPage;
+        List<MatchVideoResult> matchVideoResults;
+        WindowView.CommonWindow window2;
+
         public SpiderVideoInfo()
         {
             this.InitializeComponent();
@@ -131,20 +135,13 @@ namespace Display.ContentsPage
 
             ShowFilesPieCharts(datumList);
 
-
-            ////进度条
-            //var progress = new Progress<GetFileProgessIProgress>(progressPercent =>
-            //{
-
-            //});
-
             if (s_cts.IsCancellationRequested)
             {
                 return;
             }
 
             //挑选符合条件的视频文件
-            List<MatchVideoResult> matchVideoResults = await Task.Run(() => FileMatch.GetVideoAndMatchFile(datumList));
+            matchVideoResults = await Task.Run(() => FileMatch.GetVideoAndMatchFile(datumList));
 
 
             if (s_cts.IsCancellationRequested)
@@ -159,59 +156,54 @@ namespace Display.ContentsPage
             {
                 //检查规则
                 case 0:
-                    WindowView.CommonWindow window2 = new WindowView.CommonWindow();
-                    var matchVideoResultsPage = new ContentsPage.CheckMatchMethod(matchVideoResults);
+                    window2 = new WindowView.CommonWindow();
+                    matchVideoResultsPage = new ContentsPage.CheckMatchMethod(matchVideoResults);
                     window2.Content = matchVideoResultsPage;
                     window2.Activate();
 
-                    window2.Closed += async (sender, args) =>
-                    {
-                        var newMatchVideoResults = new List<MatchVideoResult>();
-                        foreach (var info in matchVideoResultsPage.videoMatchInfo.SuccessNameCollection.allMatchNameList)
-                        {
-                            newMatchVideoResults.Add(new MatchVideoResult()
-                            {
-                                status = true,
-                                statusCode = 1,
-                                OriginalName = info.OriginalName,
-                                MatchName = info.MatchName,
-                                message = "匹配成功"
-                            });
-                        }
-
-
-                        matchVideoResults = newMatchVideoResults;
-
-                        //更新UI
-                        ResetMatchCountInfo(matchVideoResults);
-
-
-                        //未空，退出
-                        if (matchVideoResults.Count == 0) return;
-
-                        ContentDialog dialog = new ContentDialog();
-                        dialog.Title = "检索";
-                        dialog.XamlRoot = this.XamlRoot;
-                        dialog.PrimaryButtonText = "确认";
-                        dialog.CloseButtonText = "取消";
-                        dialog.DefaultButton = ContentDialogButton.Primary;
-                        dialog.Content = "即将搜刮视频信息，点击确认后开始";
-
-                        if (!dialog.IsLoaded) return;
-                        var result = await dialog.ShowAsync();
-
-                        if (result == ContentDialogResult.Primary)
-                        {
-                            await SpliderVideoInfo(matchVideoResults);
-                        }
-
-                    };
+                    window2.Closed += Window2_Closed;
 
                     break;
                 case 1:
                     await SpliderVideoInfo(matchVideoResults);
                     break;
             }
+        }
+
+        private async void Window2_Closed(object sender, WindowEventArgs args)
+        {
+            args.Handled = true;
+            var newMatchVideoResults = new List<MatchVideoResult>();
+            foreach (var info in matchVideoResultsPage.videoMatchInfo.SuccessNameCollection.allMatchNameList)
+            {
+                newMatchVideoResults.Add(new MatchVideoResult()
+                {
+                    status = true,
+                    statusCode = 1,
+                    OriginalName = info.OriginalName,
+                    MatchName = info.MatchName,
+                    message = "匹配成功"
+                });
+            }
+
+            matchVideoResults = newMatchVideoResults;
+
+            //更新UI
+            ResetMatchCountInfo(matchVideoResults);
+
+
+            //未空，退出
+            if (matchVideoResults.Count == 0) return;
+
+            var result = await matchVideoResultsPage.ShowContentDialog();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                SpliderVideoInfo(matchVideoResults);
+            }
+
+            window2.Closed -= Window2_Closed;
+            window2.Close();
         }
 
         private void ResetMatchCountInfo(List<MatchVideoResult> matchVideoResults)
@@ -227,7 +219,7 @@ namespace Display.ContentsPage
         /// <summary>
         /// 开始从网络中检索视频信息
         /// </summary>
-        private async Task SpliderVideoInfo(List<MatchVideoResult> matchVideoResults)
+        private async void SpliderVideoInfo(List<MatchVideoResult> matchVideoResults)
         {
             network = new();
             VideoInfo_Grid.Visibility = Visibility.Visible;
@@ -307,11 +299,6 @@ namespace Display.ContentsPage
                 }
             });
 
-            //await Task.Run( () =>
-            //{
-            //    SearchAllInfo(matchVideoResults, progress);
-
-            //});
             await SearchAllInfo(matchVideoResults, progress);
         }
 

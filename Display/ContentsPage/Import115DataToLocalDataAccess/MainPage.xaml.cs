@@ -195,7 +195,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                     cidList = cidList,
                     window = currentWindow
                 };
-                Frame.Navigate(typeof(Import115DataToLocalDataAccess.Progress), content);
+                Frame.Navigate(typeof(Progress), content);
 
             }
         }
