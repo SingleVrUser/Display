@@ -84,7 +84,6 @@ namespace Display.ContentsPage
                     AddCookie(key, value);
                 }
             }
-
         }
 
         private void CoreWebView2_ContainsFullScreenElementChanged(Microsoft.Web.WebView2.Core.CoreWebView2 sender, object args)
@@ -113,9 +112,18 @@ namespace Display.ContentsPage
             NavigationProgressBar.Visibility = Visibility.Visible;
         }
 
+
+        private async void HiddenWaterMark()
+        {
+            await webview.ExecuteScriptAsync(
+                @"var tag = document.getElementsByTagName('div');for(var i=0;i<tag.length;i++){if(tag[i].className.indexOf('fp-') != -1){tag[i].remove();console.log(""删除水印"")}};");
+        }
+
         private void webview_NavigationCompleted(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs args)
         {
             NavigationProgressBar.Visibility = Visibility.Collapsed;
+
+            HiddenWaterMark();
         }
     }
 

@@ -57,7 +57,7 @@
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
                         
-                        <Image Source="{x:Bind prifilePhotoPath}" Width="150"/>
+                        <Image Source="{x:Bind prifilePhotoPath,Mode=OneWay}" Width="150"/>
 
                         <RelativePanel Margin="5,0" Grid.Row="1">
                             <TextBlock Text="{x:Bind name}" RelativePanel.AlignVerticalCenterWithPanel="True" IsTextSelectionEnabled="True" TextWrapping="Wrap"/>
