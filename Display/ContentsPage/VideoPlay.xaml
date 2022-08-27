@@ -9,14 +9,6 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <!--<Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <StackPanel Orientation="Vertical">
-            <Button x:Name="Start_Button" Click="Button_Click" Content="点击检查"/>
-            <TeachingTip x:Name="SelectedNull_TeachingTip" Target="{x:Bind Start_Button}" IsLightDismissEnabled="True" Foreground="{ThemeResource TextBoxButtonForegroundThemeBrush}" Subtitle="当前未选中文件夹，请选中后继续"/>
-        </StackPanel>-->
         <WebView2 x:FieldModifier="public" Grid.Row="1" x:Name="webview" NavigationStarting="webview_NavigationStarting" NavigationCompleted="webview_NavigationCompleted"/>
         <ProgressBar x:Name="NavigationProgressBar" IsIndeterminate="True" VerticalAlignment="Top"/>
     </Grid>

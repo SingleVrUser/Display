@@ -109,8 +109,6 @@
     <Content Include="Views\FileListPage.xaml.cs" />
     <Content Include="Views\HomePage.xaml" />
     <Content Include="Views\HomePage.xaml.cs" />
-    <Content Include="Views\ImportPage.xaml" />
-    <Content Include="Views\ImportPage.xaml.cs" />
     <Content Include="Views\LoginPage.xaml" />
     <Content Include="Views\LoginPage.xaml.cs" />
     <Content Include="Views\SettingsPage.xaml" />
@@ -269,9 +267,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Views\HomePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\ImportPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Views\LoginPage.xaml">

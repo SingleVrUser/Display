@@ -14,6 +14,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
+using Windows.UI.WebUI;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -75,11 +76,22 @@ namespace Display.Views
         private void WebViewControl_NavigationCompleted(WebView2 sender, CoreWebView2NavigationCompletedEventArgs args)
         {
             NavigationProgressBar.Visibility = Visibility.Collapsed;
+
+            HiddenWaterMark();
         }
 
         private void WebViewControl_NavigationStarting(WebView2 sender, CoreWebView2NavigationStartingEventArgs args)
         {
             NavigationProgressBar.Visibility = Visibility.Visible;
+
+
+        }
+
+
+        private async void HiddenWaterMark()
+        {
+            await WebViewControl.ExecuteScriptAsync(
+                @"var tag = document.getElementsByTagName('div');for(var i=0;i<tag.length;i++){if(tag[i].className.indexOf('fp-') != -1){tag[i].remove();console.log(""删除水印"")}};");
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
