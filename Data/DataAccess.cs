@@ -741,6 +741,16 @@ namespace Data
             {
                 rightNumber = splitList[1];
             }
+            else
+            {
+                //SE221
+                var result = Regex.Match(leftName, "^([a-z]+)([0-9]+)$", RegexOptions.IgnoreCase);
+                if (result.Success)
+                {
+                    leftName = result.Groups[1].Value;
+                    rightNumber = result.Groups[2].Value;
+                }
+            }
 
             List<Datum> data = new List<Datum>();
 

@@ -6,7 +6,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-
+    <UserControl.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="霞鹜文楷"/>
+            <Setter Property="FontWeight" Value="Light"/>
+        </Style>
+    </UserControl.Resources>
     <TextBlock x:Name="LongTextBlock" Text="{x:Bind StringValue,Mode=OneWay}" TextTrimming="WordEllipsis" MaxWidth="150" IsTextSelectionEnabled="{x:Bind IsFirstTextSelectionEnabled}">
         <TextBlock.ContextFlyout>
             <Flyout>

@@ -15,7 +15,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel HorizontalAlignment="Center" Margin="10">
-            <TextBlock x:Name="showNameTextBlock" Text="{x:Bind ShowName,Mode=OneWay}" FontSize="25" IsTextSelectionEnabled="True"/>
+            <TextBlock x:Name="showNameTextBlock" Text="{x:Bind ShowName,Mode=OneWay}" FontSize="25" IsTextSelectionEnabled="True" Style="{ThemeResource FlyoutPickerTitleTextBlockStyle}" FontFamily="霞鹜文楷" FontWeight="Bold"/>
         </StackPanel>
 
         <control:VideoCoverDisplay

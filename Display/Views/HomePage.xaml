@@ -77,7 +77,7 @@
                                 <StackPanel Orientation="Horizontal" Margin="2">
                                     <Image Source="{x:Bind imagepath}" Width="120"/>
                                     <StackPanel VerticalAlignment="Center" Margin="5">
-                                        <TextBlock Text="{x:Bind truename}"/>
+                                        <TextBlock Text="{x:Bind truename}" FontFamily="JetBrains Mono"/>
                                         <control:TextBlockWithLongText StringValue="{x:Bind actor}" IsFirstTextSelectionEnabled="False"/>
                                         <control:TextBlockWithLongText StringValue="{x:Bind category}" IsFirstTextSelectionEnabled="False"/>
                                     </StackPanel>
