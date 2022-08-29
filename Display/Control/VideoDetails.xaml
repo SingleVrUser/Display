@@ -42,7 +42,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock x:Name="Title_TextBlock" TextTrimming="CharacterEllipsis" VerticalAlignment="Bottom" Style="{ThemeResource FlyoutPickerTitleTextBlockStyle}"/>
+            <TextBlock x:Name="Title_TextBlock" TextTrimming="CharacterEllipsis" VerticalAlignment="Bottom" Style="{ThemeResource FlyoutPickerTitleTextBlockStyle}" FontFamily="霞鹜文楷" FontWeight="Bold"/>
             <CommandBar Grid.Column="1" HorizontalAlignment="Right" IsOpen="False" DefaultLabelPosition="Right" Margin="-10" VerticalAlignment="Bottom">
                 <CommandBar.PrimaryCommands>
                     <AppBarButton Icon="Play"
@@ -83,43 +83,10 @@
             </CommandBar>
 
         </Grid>
-       
-        <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,0">
-            --><!--<TextBlock x:Name="DoingInfo_TextBlock"
-                VerticalAlignment="Center"
-                Text="文件信息"/>-->
-
-            <!--播放按钮--><!--
-            <Button
-                x:Uid="playButton"
-                Margin="10,0"
-                Click="VideoPlay_Click">
-                <ToolTipService.ToolTip>
-                    <ToolTip x:Uid="playToolTip"/>
-                </ToolTipService.ToolTip>
-                <SymbolIcon Symbol="Play"/>
-            </Button>
-
-            --><!--下载按钮--><!--
-            <Button Click="DownButton_Click">
-                <ToolTipService.ToolTip>
-                    <ToolTip x:Uid="downToolTip"/>
-                </ToolTipService.ToolTip>
-                <SymbolIcon Symbol="Download" />
-
-            </Button>
-
-            <StackPanel Orientation="Horizontal" Margin="20,5" Spacing="5">
-                <ToggleButton Content="喜欢" IsChecked="{x:Bind data:FileMatch.isLike(resultinfo.is_like), BindBack = updateLike, Mode=TwoWay}"/>
-                <ToggleButton Content="稍后观看" IsChecked="{x:Bind data:FileMatch.isLookLater(resultinfo.look_later), BindBack = updateLookLater, Mode=TwoWay}"/>
-            </StackPanel>
-        </StackPanel>-->
-        
-        <!--<HyperlinkButton x:Name="HyperLink"></HyperlinkButton>-->
-        <!--<ProgressBar x:Name="Doing_ProgressBar"
-                         HorizontalAlignment="Stretch"/>-->
 
         <Grid Grid.Row="1" Margin="5,0" BorderBrush="#bdc3c7" BorderThickness="0,1,0,0">
+
+
             <ScrollViewer>
                 <!--<StackPanel x:Name="Show_StackPanel" Orientation="Vertical" Spacing="10"-->
                 <Grid RowSpacing="20"  Padding="10">
@@ -150,6 +117,7 @@
                         </Image.ContextFlyout>
                     </Image>
                     <Grid Grid.Column="1" VerticalAlignment="Center">
+
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>
                             <RowDefinition Height="auto"/>
@@ -173,11 +141,15 @@
                                 <Setter Property="Height" Value="{StaticResource AppBarExpandButtonThemeHeight}"/>
                                 <Setter Property="TextAlignment" Value="Right"/>
                                 <Setter Property="Margin" Value="0,0,10,0"/>
+                                <Setter Property="FontFamily" Value="霞鹜文楷 GB 屏幕阅读版"/>
+                                
                             </Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Height" Value="{StaticResource AppBarExpandButtonThemeHeight}"/>
                                 <Setter Property="TextAlignment" Value="Left"/>
                                 <Setter Property="Margin" Value="10,0,0,0"/>
+                                <Setter Property="FontFamily" Value="霞鹜文楷"/>
+                                <Setter Property="FontWeight" Value="Light"/>
                             </Style>
                         </Grid.Resources>
                         <!--标题-->
@@ -214,7 +186,7 @@
                             Grid.Column="1"
                             Orientation="Horizontal"
                             Spacing="10">
-                            <TextBlock Text="{x:Bind resultinfo.truename}" IsTextSelectionEnabled="True"/>
+                            <TextBlock Text="{x:Bind resultinfo.truename}" IsTextSelectionEnabled="True" FontFamily="JetBrains Mono"/>
                             <HyperlinkButton NavigateUri="{x:Bind resultinfo.busurl}" Opacity="0.5">
                                 <!--<Image Source="/Assets/JavBusLogo.png"
                                         Height="15"/>-->

@@ -1,6 +1,7 @@
 ﻿using Data;
 using Display.Views;
 using Microsoft.UI.Input;
+using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -20,6 +21,7 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Foundation.Metadata;
+using Windows.UI.Text;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -75,7 +77,7 @@ namespace Display.Control
             for (var i = 0; i < categoryList.Length; i++)
             {
                 // 定义button
-                var hyperButton = new HyperlinkButton();
+                var hyperButton = new HyperlinkButton() { FontFamily= new FontFamily("霞鹜文楷"),FontWeight = FontWeights.Light };
                 hyperButton.Content = categoryList[i];
                 hyperButton.Click += LabelButtonOnClick;
 
