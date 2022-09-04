@@ -95,10 +95,6 @@ namespace Data
 
             var AttributeNodes = htmlDoc.DocumentNode.SelectNodes("//div[@class='col-md-3 info']//p");
 
-            ////下载封面
-            string filePath = Path.Combine(SavePath, CID);
-            videoInfo.imageurl = ImageUrl;
-            videoInfo.imagepath = await downloadImage(ImageUrl, filePath, CID);
             
             //信息
             for (var i = 0; i < AttributeNodes.Count; i++)
@@ -110,6 +106,7 @@ namespace Data
                 if (header == "識別碼:")
                 {
                     videoInfo.truename = AttributeNode.SelectNodes(".//span")[1].InnerText.Trim();
+                    CID = videoInfo.truename;
                 }
                 else if (header == "發行日期:")
                 {
@@ -157,6 +154,12 @@ namespace Data
                     videoInfo.actor = string.Join(",", actorList);
                 }
             }
+
+
+            ////下载封面
+            string filePath = Path.Combine(SavePath, CID);
+            videoInfo.imageurl = ImageUrl;
+            videoInfo.imagepath = await downloadImage(ImageUrl, filePath, CID);
 
             var sampleBox_Nodes = htmlDoc.DocumentNode.SelectNodes("//a[@class='sample-box']");
             List<string> sampleUrlList = new();
@@ -274,11 +277,6 @@ namespace Data
                 ImageUrl = UrlCombine(JavDBUrl,ImageUrl);
             }
 
-            ////下载封面
-            string filePath = Path.Combine(SavePath, CID);
-
-            videoInfo.imageurl = ImageUrl;
-            videoInfo.imagepath = await downloadImage(ImageUrl, filePath, CID);
 
             var AttributeNodes = video_meta_panelNode.SelectNodes(".//div[contains(@class,'panel-block')]");
             //信息
@@ -290,9 +288,11 @@ namespace Data
 
                 var valueNode = AttributeNodes[i].SelectSingleNode("span");
 
+                //以网页的CID为准
                 if (key.Contains("番號"))
                 {
                     videoInfo.truename = valueNode.InnerText;
+                    CID = videoInfo.truename;
                 }
                 else if (key.Contains("日期"))
                 {
@@ -341,6 +341,13 @@ namespace Data
             var TitleNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='video-detail']//h2//strong");
             var title = TitleNode.InnerText;
             videoInfo.title = title.Replace(videoInfo.truename, "").Trim();
+
+
+            ////下载封面
+            string filePath = Path.Combine(SavePath, CID);
+
+            videoInfo.imageurl = ImageUrl;
+            videoInfo.imagepath = await downloadImage(ImageUrl, filePath, CID);
 
             //样品图片
             var preview_imagesSingesNode = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class,'preview-images')]");

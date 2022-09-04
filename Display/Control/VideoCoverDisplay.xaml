@@ -22,7 +22,6 @@
         <!--提示-->
         <TeachingTip x:Name="HintTeachingTip"/>
 
-
         <TeachingTip x:Name="LightDismissTeachingTip" IsLightDismissEnabled="True"/>
 
         <!--取消ListView悬停效果-->
@@ -63,15 +62,15 @@
                         </MenuFlyoutItem>
                     </MenuFlyout>
                 </Grid.ContextFlyout>
-                
+
                 <StackPanel CornerRadius="5" Padding="10,10,10,0">
-                    <!--背景-->
+                    <!--背景--><!--
                     <StackPanel.Background>
-                        <SolidColorBrush Color="{ThemeResource SystemChromeDisabledLowColor}" Opacity="0.2" />
-                    </StackPanel.Background>
+                        <SolidColorBrush Color="{ThemeResource SystemChromeDisabledLowColor}" Opacity="1" />
+                    </StackPanel.Background>-->
 
                     <Grid PointerEntered="Grid_PointerEntered" PointerExited="Grid_PointerExited">
-                        <Grid x:Name="showImage">
+                        <Grid x:Name="showImage" CornerRadius="5">
                             <Image Stretch="UniformToFill" Source="{x:Bind imagepath}" Width="{x:Bind imagewidth,Mode=OneWay}" Height="{x:Bind imageheight,Mode=OneWay}"/>
                             <RelativePanel >
                                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE00B;" Foreground="OrangeRed" Opacity="1" Margin="8" FontSize="30" Visibility="{x:Bind data:FileMatch.isShowLikeIcon(is_like),Mode=OneWay}"/>
@@ -206,15 +205,7 @@
                             <TextBlock Text="|" Foreground="Gray" Opacity="0.5"/>
                             <AppBarSeparator/>
                             <local:TextBlockWithLongText StringValue="{x:Bind actor}"/>
-                            <!--<TextBlock Text="{x:Bind actor}" TextTrimming="WordEllipsis" MaxWidth="150" IsTextSelectionEnabled="True">
-                                <TextBlock.ContextFlyout>
-                                    <Flyout>
-                                        <StackPanel>
-                                            <TextBlock Text="{x:Bind actor}" IsTextSelectionEnabled="True"/>
-                                        </StackPanel>
-                                    </Flyout>
-                                </TextBlock.ContextFlyout>
-                            </TextBlock>-->
+ 
                         </StackPanel>
                         <RatingControl IsClearEnabled="False" IsReadOnly="True" PlaceholderValue="{x:Bind score,Mode=OneWay}">
                             <RatingControl.Resources>
@@ -276,12 +267,12 @@
 
         <!--提示信息-->
         <InfoBar
-                RelativePanel.AlignLeftWithPanel="True"
-                IsOpen="True"
-                Severity="Informational"
-                Title="Title"
-                x:Name="InfoBar"
-                Message="Essential app message for your users to be informed of, acknowledge, or take action on." />
+            RelativePanel.AlignLeftWithPanel="True"
+            IsOpen="True"
+            Severity="Informational"
+            Title="Title"
+            x:Name="InfoBar"
+            Message="Essential app message for your users to be informed of, acknowledge, or take action on." />
 
         <!--视频预览-->
         <ScrollViewer
@@ -319,9 +310,7 @@
             </GridView>
         </ScrollViewer>
 
-
-
-        <!--页面跳转-->
+        <!--页面跳转栏-->
         <RelativePanel Grid.Row="2"
                        Margin="0,0,10,0">
 
@@ -390,28 +379,6 @@
                             </ListView>
                         </Flyout>
 
-                        <!--<MenuFlyout Placement="Bottom">
-                            <MenuFlyoutItem Text="名称" Click="orderByName_Click">
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE185;" />
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                            <MenuFlyoutItem Text="时间">
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xEC92;"/>
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                            <MenuFlyoutItem Text="文件大小">
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xEB05;" />
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                            <MenuFlyoutItem Text="随机">
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xF463;" />
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                        </MenuFlyout>-->
                     </AppBarButton.Flyout>
                 </AppBarButton>
             </StackPanel>
