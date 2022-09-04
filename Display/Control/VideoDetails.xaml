@@ -8,13 +8,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid BorderThickness="1"
-        BorderBrush="LightSlateGray"
+    <Grid BorderThickness="0,1,0,0"
+        BorderBrush="{ThemeResource ControlElevationBorderBrush}"
         Loaded="GridlLoaded"
-        Margin="2,5,5,5"
         Padding="10"
-        RowSpacing="10"
-        CornerRadius="10">
+        RowSpacing="10">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
                 <VisualState>

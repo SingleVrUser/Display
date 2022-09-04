@@ -19,7 +19,7 @@
     <StackPanel Padding="5">
         <TextBlock Text="{x:Bind ShowName}"/>
         <Grid>
-            <StackPanel x:Name="NewAddStackPanel" BorderBrush="SkyBlue" BorderThickness="1" CornerRadius="5" Margin="5" SizeChanged="NewAddStackPanel_SizeChanged">
+            <StackPanel x:Name="NewAddStackPanel" BorderBrush="{ThemeResource AppBarBorderThemeBrush}" BorderThickness="1" CornerRadius="5" Margin="5" SizeChanged="NewAddStackPanel_SizeChanged">
                 <FlipView Height="250" ItemsSource="{x:Bind NewAddFlipItems, Mode=OneWay}"  Background="{ThemeResource BreadcrumbBarBackgroundBrush}">
                     <FlipView.ItemTemplate>
                         <DataTemplate x:DataType="data:CoverFlipItems">
