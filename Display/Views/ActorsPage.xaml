@@ -63,7 +63,7 @@
 
                         <RelativePanel Margin="5,0" Grid.Row="1">
                             <TextBlock Text="{x:Bind name}" RelativePanel.AlignVerticalCenterWithPanel="True" IsTextSelectionEnabled="True" TextWrapping="Wrap" FontFamily="霞鹜文楷"/>
-                            <TextBlock Text="{x:Bind count}" RelativePanel.AlignHorizontalCenterWithPanel="True" RelativePanel.AlignRightWithPanel="True" VerticalAlignment="Bottom" FontFamily="JetBrains Mono"/>
+                            <TextBlock Text="{x:Bind count}" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignBottomWithPanel="True" FontFamily="JetBrains Mono" FontSize="10" Opacity="0.4"/>
                         </RelativePanel>
                     </Grid>
                 </DataTemplate>

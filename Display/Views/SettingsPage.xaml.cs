@@ -501,15 +501,23 @@ namespace Display.Views
 
         private void OpenPlayerExePathButton_Click(object sender, RoutedEventArgs e)
         {
+            string openPath = string.Empty;
+
             switch (PlayerSelection_ComboBox.SelectedIndex)
             {
                 case 2:
-                    FileMatch.LaunchFolder(Path.GetDirectoryName(AppSettings.MpvExePath));
+                    openPath = Path.GetDirectoryName(AppSettings.MpvExePath);
                     break;
                 case 3:
-                    FileMatch.LaunchFolder(Path.GetDirectoryName(AppSettings.VlcExePath));
+                    openPath = Path.GetDirectoryName(AppSettings.VlcExePath);
                     break;
             }
+
+            if(! string.IsNullOrEmpty(openPath))
+            {
+                FileMatch.LaunchFolder(openPath);
+            }
+
         }
 
         private async void ModifyPlayerExePathButton_Click(object sender, RoutedEventArgs e)

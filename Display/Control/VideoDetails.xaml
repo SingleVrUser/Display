@@ -26,8 +26,6 @@
                         <Setter Target="ThumbnailGrid.MaxHeight" Value="600"/>
                     </VisualState.Setters>
                 </VisualState>
-
-
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         
@@ -41,32 +39,45 @@
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
             <TextBlock x:Name="Title_TextBlock" TextTrimming="CharacterEllipsis" VerticalAlignment="Bottom" Style="{ThemeResource FlyoutPickerTitleTextBlockStyle}" FontFamily="霞鹜文楷" FontWeight="Bold"/>
-            <CommandBar Grid.Column="1" HorizontalAlignment="Right" IsOpen="False" DefaultLabelPosition="Right" Margin="-10" VerticalAlignment="Bottom">
+            <CommandBar Grid.Column="1" HorizontalAlignment="Right" IsOpen="False" Margin="-10">
                 <CommandBar.PrimaryCommands>
+                    <!--播放-->
                     <AppBarButton Icon="Play"
                                 x:Uid="playButton"
-                                Margin="10,0"
-                                Click="VideoPlay_Click">
+                                Click="VideoPlay_Click"
+                                  Label="播放">
                         <ToolTipService.ToolTip>
                             <ToolTip x:Uid="playToolTip"/>
                         </ToolTipService.ToolTip>
 
                     </AppBarButton>
-                    <AppBarButton Icon="Download" Click="DownButton_Click">
+                    
+                    <!--下载-->
+                    <AppBarButton Icon="Download"
+                                  Click="DownButton_Click"
+                                  Label="下载">
                         <ToolTipService.ToolTip>
                             <ToolTip x:Uid="downToolTip"/>
                         </ToolTipService.ToolTip>
                     </AppBarButton>
+                    
+                    <!--分割-->
                     <AppBarSeparator/>
 
                     <!--喜欢-->
-                    <AppBarToggleButton IsChecked="{x:Bind data:FileMatch.isLike(resultinfo.is_like), BindBack = updateLike, Mode=TwoWay}">
-                        <FontIcon Glyph="&#xE006;"/>
+                    <AppBarToggleButton IsChecked="{x:Bind data:FileMatch.isLike(resultinfo.is_like), BindBack = updateLike, Mode=TwoWay}"
+                                  Label="喜欢">
+                        <AppBarToggleButton.Icon>
+                            <FontIcon Glyph="&#xE006;"/>
+                        </AppBarToggleButton.Icon>
                     </AppBarToggleButton>
 
                     <!--稍后再看-->
-                    <AppBarToggleButton IsChecked="{x:Bind data:FileMatch.isLookLater(resultinfo.look_later), BindBack = updateLookLater, Mode=TwoWay}">
-                        <FontIcon Glyph="&#xE13B;"/>
+                    <AppBarToggleButton IsChecked="{x:Bind data:FileMatch.isLookLater(resultinfo.look_later), BindBack = updateLookLater, Mode=TwoWay}"
+                                  Label="稍后再看">
+                        <AppBarToggleButton.Icon>
+                            <FontIcon Glyph="&#xE13B;"/>
+                        </AppBarToggleButton.Icon>
                     </AppBarToggleButton>
                 </CommandBar.PrimaryCommands>
 
@@ -86,34 +97,48 @@
 
 
             <ScrollViewer>
-                <!--<StackPanel x:Name="Show_StackPanel" Orientation="Vertical" Spacing="10"-->
+                <!--<VisualStateManager.VisualStateGroups>
+                    <VisualStateGroup>
+                        <VisualState>
+                            <VisualState.StateTriggers>
+                                <AdaptiveTrigger MinWindowWidth="1260"/>
+                                <AdaptiveTrigger MinWindowHeight="840"/>
+                            </VisualState.StateTriggers>
+
+                            <VisualState.Setters>
+                                <Setter Target="Cover_Image.MaxHeight" Value="500"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateManager.VisualStateGroups>-->
                 <Grid RowSpacing="20"  Padding="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Image x:FieldModifier="public"
+                    <Grid CornerRadius="4">
+                        <Image x:FieldModifier="public"
                         x:Name="Cover_Image"
                         Source="{x:Bind resultinfo.imagepath}"
-                        MaxWidth="600"
-                        MaxHeight="500"
                         HorizontalAlignment="Left"
-                        VerticalAlignment="Top">
-                        <Image.ContextFlyout>
-                            <!--右键操作-->
-                            <MenuFlyout>
-                                <MenuFlyoutItem Text="打开所在目录" Click="OpenDirectory_Click">
-                                    <MenuFlyoutItem.Icon>
-                                        <SymbolIcon Symbol="Folder"/>
-                                    </MenuFlyoutItem.Icon>
-                                </MenuFlyoutItem>
-                            </MenuFlyout>
-                        </Image.ContextFlyout>
-                    </Image>
+                        VerticalAlignment="Center">
+                            <Image.ContextFlyout>
+                                <!--右键操作-->
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="打开所在目录" Click="OpenDirectory_Click">
+                                        <MenuFlyoutItem.Icon>
+                                            <SymbolIcon Symbol="Folder"/>
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                </MenuFlyout>
+                            </Image.ContextFlyout>
+                        </Image>
+                    </Grid>
+                    
                     <Grid Grid.Column="1" VerticalAlignment="Center">
 
                         <Grid.RowDefinitions>
