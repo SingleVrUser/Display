@@ -7,8 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:control="using:Display.Control"
     xmlns:data="using:Data"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    mc:Ignorable="d">
 
     <Page.Resources>
         <Style TargetType="TextBlock" x:Key="Title_TextBlock">
