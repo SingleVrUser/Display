@@ -218,6 +218,11 @@ namespace Data
             }
         }
 
+
+        /// <summary>
+        /// 删除FilesInfo表里文件夹下的所有文件和文件夹（遍历所有）
+        /// </summary>
+        /// <param name="cid"></param>
         public static void DeleteAllDirectroyAndFiles_InfilesInfoTabel(string cid)
         {
             var Files = GetAllFilesTraverse(cid);
@@ -530,7 +535,7 @@ namespace Data
         /// </summary>
         /// <param name="limit"></param>
         /// <returns></returns>
-        public static bool IsLastestFileDataExists(string pickCode,int timeEdit)
+        public static bool IsLastestFileDataExists(string pickCode,int timeEdit = 0)
         {
             bool isExists = false;
 
@@ -540,8 +545,15 @@ namespace Data
             {
                 db.Open();
 
+
                 SqliteCommand selectCommand = new SqliteCommand
                     ($"SELECT pc FROM FilesInfo WHERE pc == '{pickCode}' and te == '{timeEdit}'", db);
+
+                if (timeEdit == 0)
+                {
+                    selectCommand = new SqliteCommand
+                        ($"SELECT pc FROM FilesInfo WHERE pc == '{pickCode}'", db);
+                }
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
 
@@ -764,7 +776,7 @@ namespace Data
 
                 //vdi = 0，即视频转码未成功，无法在线观看
                 //selectCommand = new SqliteCommand ($"SELECT * from FilesInfo WHERE uid != 0 AND vdi != 0 AND n LIKE '%{leftName}%{rightNumber}%'", db);
-                selectCommand = new SqliteCommand ($"SELECT * from FilesInfo WHERE uid != 0 AND n LIKE '%{leftName}%{rightNumber}%'", db);
+                selectCommand = new SqliteCommand ($"SELECT * from FilesInfo WHERE uid != 0 AND iv = 1 AND n LIKE '%{leftName}%{rightNumber}%'", db);
 
 
                 SqliteDataReader query = selectCommand.ExecuteReader();

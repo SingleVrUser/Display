@@ -199,7 +199,7 @@ namespace Data
                     return;
                 }
 
-                // 该文件已存在数据库里
+                // 该文件已存在数据库里，且修改时间不变
                 if (DataAccess.IsLastestFileDataExists(cidCategory.pick_code, cidCategory.utime) && Data.StaticData.isJumpExistsFolder)
                 {
                     //统计上下级文件夹所含文件的数量
@@ -212,7 +212,7 @@ namespace Data
                     progress.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
 
                 }
-                //之前未添加
+                //之前未添加或修改时间已改变
                 else
                 {
                     //获取当前文件夹下所有文件信息，并添加到数据库中
@@ -220,8 +220,41 @@ namespace Data
 
                     if (getFilesProgressInfo == null) continue;
 
+                    var addToDataAccessList = getFilesProgressInfo.addToDataAccessList;
+
+                    if (addToDataAccessList.Count == 0)
+                    {
+                        DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(cid);
+                    }
+                    else
+                    {
+                        //选中的文件夹只有一层
+                        bool isOneLayout = false;
+                        var otherList = addToDataAccessList.Where(x => !(x.pid == cid || x.cid == cid));
+
+                        if (otherList.Count() == 0)
+                        {
+                            DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(cid);
+                            isOneLayout = true;
+                        }
+
+
+                        //需要添加进数据库的Datatum
+                        foreach (var item in addToDataAccessList)
+                        {
+                            //如果文件夹已存在，则删除文件夹下所有的文件
+                            //当文件夹只有一层时，且进入到这里（修改时间已改变），则跳过因为前一个步骤已删除数据
+                            if (!isOneLayout && item.fid == null && DataAccess.IsLastestFileDataExists(item.pc))
+                            {
+                                DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(item.cid);
+                            }
+
+                            DataAccess.AddFilesInfo(item);
+                        }
+                    }
+
                     //不添加有错误的目录进数据库（添加数据库时会跳过已经添加过的目录，对于出现错误的目录不添加方便后续重新添加）
-                    if(getFilesProgressInfo.FailCid.Count == 0)
+                    if (getFilesProgressInfo.FailCid.Count == 0)
                     {
                         DataAccess.AddFilesInfo(FolderCategory.ConvertFolderToDatum(cidCategory, cid));
                     }
@@ -295,12 +328,16 @@ namespace Data
                         }
                         else
                         {
-                            //先添加文件后添加文件夹
+                            //先添加文件夹后添加文件，方便删除已有文件夹中的文件
+                            getFilesProgressInfo.addToDataAccessList.Add(item);
+
                             getFilesProgressInfo = await TraverseAllFileInfo(item.cid, getFilesProgressInfo, token, progress);
 
                             if (getFilesProgressInfo == null) continue;
 
-                            DataAccess.AddFilesInfo(item);
+                            ////先添加文件后添加文件夹
+                            //getFilesProgressInfo.addToDataAccessList.Add(item);
+                            //DataAccess.AddFilesInfo(item);
                         }
                     }
                     //文件
@@ -311,7 +348,8 @@ namespace Data
                         var cpm = sendCount * 60 / (DateTimeOffset.Now.ToUnixTimeSeconds() - nowDate);
                         progress.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
 
-                        DataAccess.AddFilesInfo(item);
+                        getFilesProgressInfo.addToDataAccessList.Add(item);
+                        //DataAccess.AddFilesInfo(item);
 
                         //webFileInfoList.Add(item);
                     }
@@ -711,12 +749,18 @@ namespace Data
             var body = $"data={dataUrlEncode}";
             request.AddParameter("application/x-www-form-urlencoded", body, ParameterType.RequestBody);
             var response = client.Post(request);
-
             DownUrlBase64EncryptInfo downurl_base64EncryptInfo;
             if (response.IsSuccessful && response.Content != null)
             {
-                downurl_base64EncryptInfo = JsonConvert.DeserializeObject<DownUrlBase64EncryptInfo>(response.Content);
-
+                try
+                {
+                    downurl_base64EncryptInfo = JsonConvert.DeserializeObject<DownUrlBase64EncryptInfo>(response.Content);
+                }
+                catch
+                {
+                    downurl_base64EncryptInfo = null;
+                }
+                
                 if (downurl_base64EncryptInfo != null)
                 {
                     string base64Text = downurl_base64EncryptInfo.data;

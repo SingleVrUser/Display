@@ -1136,6 +1136,8 @@ namespace Data
             }
         }
         public List<string> FailCid { get; set; } = new();
+
+        public List<Datum> addToDataAccessList = new();
     }
     //报告进度和状态
     public class GetFileProgessIProgress
