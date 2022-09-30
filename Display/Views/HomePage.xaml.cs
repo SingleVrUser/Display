@@ -9,6 +9,8 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
+using System.Linq;
+using OpenCvSharp.Flann;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -51,23 +53,23 @@ namespace Display.Views
                 Items.Add(new VideoCoverDisplayClass(item));
             }
 
-            //稍后观看
-            foreach (var item in DataAccess.getNameAndImageFromLookLater())
-            {
-                lookLaterList.Add(new VideoCoverDisplayClass(item));
-            }
+            ////稍后观看
+            //foreach (var item in DataAccess.getNameAndImageFromLookLater())
+            //{
+            //    lookLaterList.Add(new VideoCoverDisplayClass(item));
+            //}
 
-            //最近视频
-            foreach (var item in DataAccess.getNameAndIamgeRecent())
-            {
-                recentCoverList.Add(new VideoCoverDisplayClass(item));
-            }
+            ////最近视频
+            //foreach (var item in DataAccess.getNameAndIamgeRecent())
+            //{
+            //    recentCoverList.Add(new VideoCoverDisplayClass(item));
+            //}
 
-            //喜欢视频
-            foreach (var item in DataAccess.getNameAndImageFromLike())
-            {
-                LoveCoverList.Add(new VideoCoverDisplayClass(item));
-            }
+            ////喜欢视频
+            //foreach (var item in DataAccess.getNameAndImageFromLike())
+            //{
+            //    LoveCoverList.Add(new VideoCoverDisplayClass(item));
+            //}
 
         }
 
@@ -84,8 +86,6 @@ namespace Display.Views
 
             Frame.Navigate(typeof(DetailInfoPage), coverInfo, new SuppressNavigationTransitionInfo());
         }
-
-
 
         private void Image_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
@@ -158,52 +158,112 @@ namespace Display.Views
                         await _stroedgridview.TryStartConnectedAnimationAsync(animation, _storeditem, "showImage");
                     }
                 }
-
-                //对上一级页面的更改做出响应，删除或添加喜欢
-                tryUpdateCoverShow();
             }
+            //对上一级页面的更改做出响应，删除或添加喜欢
+            tryUpdateCoverShow();
 
         }
 
         private void tryUpdateCoverShow()
         {
-            VideoCoverDisplayClass item=new();
+            //VideoCoverDisplayClass item;
 
-            if(_navigationType == navigationAnimationType.image && _storedimage!= null)
+            //if(_navigationType == navigationAnimationType.image && _storedimage!= null)
+            //{
+            //    item = _storedimage.DataContext as VideoCoverDisplayClass;
+            //}
+            //else if(_navigationType == navigationAnimationType.gridView && _storeditem != null)
+            //{
+            //    item = _storeditem;
+            //}
+            //else
+            //{
+            //    return;
+            //}
+
+            ////删除了喜欢
+            //if (item.is_like == 0 && (LoveCoverList.Contains(item)))
+            //{
+            //    LoveCoverList.Remove(item);
+            //}
+            ////添加了喜欢
+            //else if (item.is_like == 1 && !LoveCoverList.Contains(item))
+            //{
+            //    LoveCoverList.Add(item);
+            //}
+
+            ////删除了稍后再看
+            //if (item.look_later == 0 && (lookLaterList.Contains(item)))
+            //{
+            //    lookLaterList.Remove(item);
+            //}
+            ////添加了稍后再看
+            //else if (item.look_later != 0 && !lookLaterList.Contains(item))
+            //{
+            //    lookLaterList.Add(item);
+            //}
+
+            //稍后观看
+            tryUpdateVideoCoverDisplayClass(DataAccess.getNameAndImageFromLookLater(),lookLaterList);
+
+            //最近视频
+            tryUpdateVideoCoverDisplayClass(DataAccess.getNameAndIamgeRecent(), recentCoverList);
+
+
+            //喜欢视频
+            tryUpdateVideoCoverDisplayClass(DataAccess.getNameAndImageFromLike(), LoveCoverList);
+
+        }
+
+        private void tryUpdateVideoCoverDisplayClass(List<VideoInfo> videoInfos, ObservableCollection<VideoCoverDisplayClass> videoList)
+        {
+            //添加
+            var addList = new List<VideoInfo>();
+            foreach (var item in videoInfos)
             {
-                item = _storedimage.DataContext as VideoCoverDisplayClass;
-            }
-            else if(_navigationType == navigationAnimationType.gridView && _storeditem != null)
-            {
-                item = _storeditem;
-            }
-            else
-            {
-                return;
+                bool isAdd = true;
+                foreach (var showItem in videoList)
+                {
+                    if (showItem.truename == item.truename)
+                    {
+                        isAdd = false;
+                    }
+                }
+
+                if (isAdd)
+                {
+                    addList.Add(item);
+                }
             }
 
-            //删除了喜欢
-            if (item.is_like == 0 && (LoveCoverList.Contains(item)))
+            //删除
+            var delList = new List<string>();
+            foreach (var showItem in videoList)
             {
-                LoveCoverList.Remove(item);
-            }
-            //添加了喜欢
-            else if (item.is_like == 1 && !LoveCoverList.Contains(item))
-            {
-                LoveCoverList.Add(item);
+                bool isDel = true;
+                foreach (var item in videoInfos)
+                {
+                    if (showItem.truename == item.truename)
+                    {
+                        isDel = false;
+                    }
+                }
+
+                if (isDel)
+                {
+                    delList.Add(showItem.truename);
+                }
             }
 
-            //删除了稍后再看
-            if (item.look_later == 0 && (lookLaterList.Contains(item)))
+            foreach (var trueName in delList)
             {
-                lookLaterList.Remove(item);
+                var delItem = videoList.FirstOrDefault(x=>x.truename == trueName);
+                videoList.Remove(delItem);
             }
-            //添加了稍后再看
-            else if (item.look_later != 0 && !lookLaterList.Contains(item))
+            foreach (var item in addList)
             {
-                lookLaterList.Add(item);
+                videoList.Add(new VideoCoverDisplayClass(item));
             }
-
         }
     }
 

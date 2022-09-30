@@ -761,7 +761,7 @@ namespace Data
                     downurl_base64EncryptInfo = null;
                 }
                 
-                if (downurl_base64EncryptInfo != null)
+                if (downurl_base64EncryptInfo != null && downurl_base64EncryptInfo.state)
                 {
                     string base64Text = downurl_base64EncryptInfo.data;
 
