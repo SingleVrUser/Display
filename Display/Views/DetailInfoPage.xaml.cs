@@ -186,9 +186,14 @@ namespace Display.Views
                     webapi.PlayeByPotPlayer(pickCode);
                     break;
                 //mpv播放
-                case 2 or 3:
+                case 2:
                     webapi = new();
                     webapi.PlayVideoWithOriginUrl(pickCode);
+                    break;
+                //vlc播放
+                case 3:
+                    webapi = new();
+                    webapi.PlayByVlc(pickCode);
                     break;
 
             }
