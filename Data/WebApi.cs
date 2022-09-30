@@ -27,6 +27,8 @@ namespace Data
         public static bool isEnterHiddenMode;
         public TokenInfo TokenInfo;
 
+        string api_version = "2.0.1.7";
+
         public WebApi(bool useCookie=true)
         {
             if (useCookie)
@@ -743,7 +745,7 @@ namespace Data
 
             var client = new RestClient($"http://proapi.115.com/app/chrome/downurl?t={tm}");
             var request = new RestRequest();
-            request.AddHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36 Edg/104.0.1293.47");
+            request.AddHeader("User-Agent", "Mozilla/5.0; 115Desktop/2.0.1.7");
             request.AddHeader("Cookie", AppSettings._115_Cookie);
             request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
             var body = $"data={dataUrlEncode}";
@@ -857,7 +859,7 @@ namespace Data
                 var re = Regex.Match(lineText, @"BANDWIDTH=(\d*),RESOLUTION=(\w*),NAME=""(\w*)""");
                 if (re.Success)
                 {
-                    m3U8Infos.Add(new m3u8Info(re.Groups[3].Value, re.Groups[1].Value, re.Groups[2].Value, lineList[i + 1]));
+                    m3U8Infos.Add(new m3u8Info(re.Groups[3].Value, re.Groups[1].Value, re.Groups[2].Value, lineList[i + 1].Trim('\r')));
                     //Debug.WriteLine(re.Groups[0].Value);
                 }
             }
@@ -876,7 +878,7 @@ namespace Data
         /// <param name="showWindow"></param>
         /// <param name="referrerUrl"></param>
         /// <param name="user_agnet"></param>
-        public void Play115SourceVideoWithMpv(string playUrl, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string user_agnet = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36 Edg/104.0.1293.47")
+        public void Play115SourceVideoWithMpv(string playUrl, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string user_agnet = "Mozilla/5.0; 115Desktop/2.0.1.7")
         {
             var process = new Process();
 
@@ -899,19 +901,14 @@ namespace Data
         /// <param name="showWindow"></param>
         /// <param name="referrerUrl"></param>
         /// <param name="user_agnet"></param>
-        public void Play115SourceVideoWithVlc(string playUrl, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string user_agnet = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36 Edg/104.0.1293.47")
+        public async void PlayByVlc(string pickCode)
         {
-            var process = new Process();
-
-            process.StartInfo.FileName = FileName;
-            process.StartInfo.Arguments = @$" ""{playUrl}"" :http-referrer=""{referrerUrl}"" :http-user-agent=""{user_agnet}""";
-            process.StartInfo.UseShellExecute = false;
-            if (!showWindow)
+            var m3U8Infos = await Getm3u8InfoByPickCode(pickCode);
+            if (m3U8Infos.Count > 0)
             {
-                process.StartInfo.CreateNoWindow = true;
+                //选择最高分辨率的播放
+                FileMatch.PlayByVlc(m3U8Infos[0].Url, AppSettings.VlcExePath);
             }
-
-            process.Start();
         }
     
         public void PlayVideoWithOriginUrl(string pickcode)
@@ -923,12 +920,8 @@ namespace Data
             switch (AppSettings.PlayerSelection)
             {
                 case 2:
-                    Play115SourceVideoWithMpv(downUrl,AppSettings.MpvExePath);
+                    Play115SourceVideoWithMpv(downUrl,AppSettings.MpvExePath,false);
                     break;
-                case 3:
-                    Play115SourceVideoWithVlc(downUrl,AppSettings.VlcExePath);
-                    break;
-
             }
         }
     }

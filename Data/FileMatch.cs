@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -397,7 +398,6 @@ namespace Data
 
         public async static void PlayByPotPlayer(string playUrl)
         {
-
             string url = $"PotPlayer://{playUrl}";
             var uriDown = new Uri(url);
 
@@ -407,6 +407,22 @@ namespace Data
 
             // Launch the URI
             var success = await Windows.System.Launcher.LaunchUriAsync(uriDown, options);
+        }
+
+        public static void PlayByVlc(string playUrl, string FileName, bool showWindow = true)
+        {
+            var process = new Process();
+
+            process.StartInfo.FileName = FileName;
+            //process.StartInfo.Arguments = @$" ""{playUrl}"" :http-referrer=""{referrerUrl}"" :http-user-agent=""{user_agnet}""";
+            process.StartInfo.Arguments = @$" ""{playUrl}""";
+            process.StartInfo.UseShellExecute = false;
+            if (!showWindow)
+            {
+                process.StartInfo.CreateNoWindow = true;
+            }
+
+            process.Start();
         }
 
         public static void CreateDirectoryIfNotExists(string savePath)

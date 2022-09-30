@@ -484,16 +484,16 @@ namespace Display.Views
                         Resolution_RelativePanel.Visibility = Visibility.Visible;
                         PlayerExePath_RelativePanel.Visibility = Visibility.Visible;
 
-                        PlayerExePath_TextBox.Text = AppSettings.MpvExePath;
+                        //PlayerExePath_TextBox.Text = AppSettings.MpvExePath;
                         break;
                     case "vlc":
                         resolutionSelectionCollection.Clear();
-                        resolutionSelectionCollection.Add("原画");
+                        resolutionSelectionCollection.Add("最高");
                         resolutionSelection_ComboBox.SelectedIndex = 0;
                         Resolution_RelativePanel.Visibility = Visibility.Visible;
                         PlayerExePath_RelativePanel.Visibility = Visibility.Visible;
 
-                        PlayerExePath_TextBox.Text = AppSettings.VlcExePath;
+                        //PlayerExePath_TextBox.Text = AppSettings.VlcExePath;
                         break;
                 }
             }
@@ -524,6 +524,7 @@ namespace Display.Views
         {
             FileOpenPicker fileOpenPicker = new();
             fileOpenPicker.FileTypeFilter.Add(".exe");
+            fileOpenPicker.FileTypeFilter.Add(".com");
             IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.AppMainWindow);
             fileOpenPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
 
@@ -541,7 +542,7 @@ namespace Display.Views
                         AppSettings.VlcExePath = file.Path;
                         break;
                 }
-                PlayerExePath_TextBox.Text = file.Path;
+                //PlayerExePath_TextBox.Text = file.Path;
             }
         }
 

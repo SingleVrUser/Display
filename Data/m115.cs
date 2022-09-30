@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Data.Helper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -9,13 +10,13 @@ namespace Data
 {
     internal class m115
     {
-        static byte[] g_kts = { 0xF0, 0xE5, 0x69, 0xAE, 0xBF, 0xDC, 0xBF, 0x5A, 0x1A, 0x45, 0xE8, 0xBE, 0x7D, 0xA6, 0x73, 0x88, 0xDE, 0x8F, 0xE7, 0xC4, 0x45, 0xDA, 0x86, 0x94, 0x9B, 0x69, 0x92, 0x0B, 0x6A, 0xB8, 0xF1, 0x7A, 0x38, 0x06, 0x3C, 0x95, 0x26, 0x6D, 0x2C, 0x56, 0x00, 0x70, 0x56, 0x9C, 0x36, 0x38, 0x62, 0x76, 0x2F, 0x9B, 0x5F, 0x0F, 0xF2, 0xFE, 0xFD, 0x2D, 0x70, 0x9C, 0x86, 0x44, 0x8F, 0x3D, 0x14, 0x27, 0x71, 0x93, 0x8A, 0xE4, 0x0E, 0xC1, 0x48, 0xAE, 0xDC, 0x34, 0x7F, 0xCF, 0xFE, 0xB2, 0x7F, 0xF6, 0x55, 0x9A, 0x46, 0xC8, 0xEB, 0x37, 0x77, 0xA4, 0xE0, 0x6B, 0x72, 0x93, 0x7E, 0x51, 0xCB, 0xF1, 0x37, 0xEF, 0xAD, 0x2A, 0xDE, 0xEE, 0xF9, 0xC9, 0x39, 0x6B, 0x32, 0xA1, 0xBA, 0x35, 0xB1, 0xB8, 0xBE, 0xDA, 0x78, 0x73, 0xF8, 0x20, 0xD5, 0x27, 0x04, 0x5A, 0x6F, 0xFD, 0x5E, 0x72, 0x39, 0xCF, 0x3B, 0x9C, 0x2B, 0x57, 0x5C, 0xF9, 0x7C, 0x4B, 0x7B, 0xD2, 0x12, 0x66, 0xCC, 0x77, 0x09, 0xA6 };
+        static byte[] g_kts = { 0xf0, 0xe5, 0x69, 0xae, 0xbf, 0xdc, 0xbf, 0x8a, 0x1a, 0x45, 0xe8, 0xbe, 0x7d, 0xa6, 0x73, 0xb8, 0xde, 0x8f, 0xe7, 0xc4, 0x45, 0xda, 0x86, 0xc4, 0x9b, 0x64, 0x8b, 0x14, 0x6a, 0xb4, 0xf1, 0xaa, 0x38, 0x01, 0x35, 0x9e, 0x26, 0x69, 0x2c, 0x86, 0x00, 0x6b, 0x4f, 0xa5, 0x36, 0x34, 0x62, 0xa6, 0x2a, 0x96, 0x68, 0x18, 0xf2, 0x4a, 0xfd, 0xbd, 0x6b, 0x97, 0x8f, 0x4d, 0x8f, 0x89, 0x13, 0xb7, 0x6c, 0x8e, 0x93, 0xed, 0x0e, 0x0d, 0x48, 0x3e, 0xd7, 0x2f, 0x88, 0xd8, 0xfe, 0xfe, 0x7e, 0x86, 0x50, 0x95, 0x4f, 0xd1, 0xeb, 0x83, 0x26, 0x34, 0xdb, 0x66, 0x7b, 0x9c, 0x7e, 0x9d, 0x7a, 0x81, 0x32, 0xea, 0xb6, 0x33, 0xde, 0x3a, 0xa9, 0x59, 0x34, 0x66, 0x3b, 0xaa, 0xba, 0x81, 0x60, 0x48, 0xb9, 0xd5, 0x81, 0x9c, 0xf8, 0x6c, 0x84, 0x77, 0xff, 0x54, 0x78, 0x26, 0x5f, 0xbe, 0xe8, 0x1e, 0x36, 0x9f, 0x34, 0x80, 0x5c, 0x45, 0x2c, 0x9b, 0x76, 0xd5, 0x1b, 0x8f, 0xcc, 0xc3, 0xb8, 0xf5 };
         static byte[] g_key_s = { 0x29, 0x23, 0x21, 0x5E };
-        static byte[] g_key_l = { 0x42, 0xDA, 0x13, 0xBA, 0x78, 0x76, 0x8D, 0x37, 0xE8, 0xEE, 0x04, 0x91 };
+        static byte[] g_key_l = { 0x78, 0x06, 0xad, 0x4c, 0x33, 0x86, 0x5d, 0x18, 0x4c, 0x01, 0x3f, 0x46 };
 
-        static string xmlPrivateKey = "<RSAKeyValue><Modulus>jIFCS8Fm9JGHVun3si76oDR5sIHmGJaHLLfFHJENfsGkzihxQk1ckUm9XgiiWVmhmtPJgeZRLv2rK7jaPx4xXClL0Rep+52M6OYztJYuCHxincbKOhSSFLQJHvKwNjyzrmx+5wI3fwVe082T9sNCJWp2VUu+p/IDQ3u+ZfLaJ0E=</Modulus><Exponent>AQAB</Exponent><P>6YymLLBfpKvYsgPVr10Y22PfnGtu2H2qw/Vlc1ktqxYPDLAm7wqPXm13Jo7uOEIQoIUBSFV7nm0O0Kcnb6hdJQ==</P><Q>mgLnib1XonYOxjVJM2jqy5zEGe6vzg8aSwKCYec14iiJKmEYcP4zDSRms43hnQsp8M2ynjnsYCjyiegg+AZ87Q==</Q><DP>NuwwmAnSNDOFfjeQpPDLy6wtBeft5VOIORUYiovKRZWmbGFwhn6BQL+VaafrNaezqUweBRi1PYiAF2l3yLZbUQ==</DP><DQ>f/nN4Hz/pzYmzLlWnGugP5WCtnHKkJWoKZBqO2RfOBCq+hY4sxvn3BHVbXqGcXLnZPvoYuaK7tTXxZSoYLEzeQ==</DQ><InverseQ>vwy3cCQXUZyLkc66DqNPizhn6oMOtRej0GVPBJY/3S/CUcX6aRMmkp3lZpx5/S9X7G6ao2iu8ukhdYrDE1qgcw==</InverseQ><D>NwTasA2Awl5GT/t4WhbZX2iNClgjgRdYwWMI1aHbVfqADZZ6m0rt55qng63/3NsjVByAuNQ2kB8XKxzMoZCyJNvnd78YuW3Zowqs6HgDUHk6T5CmRad0fvaVYi6tviOkxtiPIuh4QrQ7NUhsLRtbH6d9s1KLCRDKhO23pGr9vtE=</D></RSAKeyValue>";
-        
-        static string xmlPublicKey = "<RSAKeyValue><Modulus>0d61pnmJ0QpcCwQdEatHZZvDKz5lqS+SNt0swhQKDaSV+g5++HX2+stNmB9eXjul5ngR3XO3pBBSVCIvrMIGp06JESFUUa/89ev96Ie8mttnXAKoNfdcvnemA6+CBoP0OefO1CiTI9+ckFV2nhV5i5RT6JBYs+Lj8YawewRqmW0=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
+        //static string privateKey = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAIyBQkvBZvSRh1bp\r\n97Iu+qA0ebCB5hiWhyy3xRyRDX7BpM4ocUJNXJFJvV4IollZoZrTyYHmUS79qyu4\r\n2j8eMVwpS9EXqfudjOjmM7SWLgh8Yp3GyjoUkhS0CR7ysDY8s65sfucCN38FXtPN\r\nk/bDQiVqdlVLvqfyA0N7vmXy2idBAgMBAAECgYA3BNqwDYDCXkZP+3haFtlfaI0K\r\nWCOBF1jBYwjVodtV+oANlnqbSu3nmqeDrf/c2yNUHIC41DaQHxcrHMyhkLIk2+d3\r\nvxi5bdmjCqzoeANQeTpPkKZFp3R+9pViLq2+I6TG2I8i6HhCtDs1SGwtG1sfp32z\r\nUosJEMqE7bekav2+0QJBAOmMpiywX6Sr2LID1a9dGNtj35xrbth9qsP1ZXNZLasW\r\nDwywJu8Kj15tdyaO7jhCEKCFAUhVe55tDtCnJ2+oXSUCQQCaAueJvVeidg7GNUkz\r\naOrLnMQZ7q/ODxpLAoJh5zXiKIkqYRhw/jMNJGazjeGdCynwzbKeOexgKPKJ6CD4\r\nBnztAkA27DCYCdI0M4V+N5Ck8MvLrC0F5+3lU4g5FRiKi8pFlaZsYXCGfoFAv5Vp\r\np+s1p7OpTB4FGLU9iIAXaXfItltRAkB/+c3gfP+nNibMuVaca6A/lYK2ccqQlagp\r\nkGo7ZF84EKr6FjizG+fcEdVteoZxcudk++hi5oru1NfFlKhgsTN5AkEAvwy3cCQX\r\nUZyLkc66DqNPizhn6oMOtRej0GVPBJY/3S/CUcX6aRMmkp3lZpx5/S9X7G6ao2iu\r\n8ukhdYrDE1qgcw==";
+
+        static string publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCGhpgMD1okxLnUMCDNLCJwP/P0\r\nUHVlKQWLHPiPCbhgITZHcZim4mgxSWWb0SLDNZL9ta1HlErR6k02xrFyqtYzjDu2\r\nrGInUC0BCZOsln0a7wDwyOA43i5NO8LsNory6fEKbx7aT3Ji8TZCDAfDMbhxvxOf\r\ndPMBDjxP5X3zr7cWgwIDAQAB";
 
         public static string decode(byte[] srcBase64, byte[] keyBytes)
         {
@@ -60,12 +61,7 @@ namespace Data
                 int maxIndex = Math.Min((i + 1) * m, srclen);
                 var message_slice = src.Skip(startIndex).Take(maxIndex - startIndex).ToArray();
 
-                byte[] decryptedData;
-                using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
-                {
-                    rsa.FromXmlString(xmlPrivateKey);
-                    decryptedData = rsa.Decrypt(message_slice, false);
-                }
+                byte[] decryptedData = RSAPcks12Helper.DecryptWithPublicKey(Convert.FromBase64String(publicKey), message_slice);
 
                 ret.AddRange(decryptedData.ToList());
             }
@@ -89,13 +85,7 @@ namespace Data
                 int maxIndex = Math.Min((i + 1) * m, srclen);
                 var message = src.Skip(startIndex).Take(maxIndex - startIndex).ToArray();
 
-                string encryptedContent = string.Empty;
-                using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider())
-                {
-                    rsa.FromXmlString(xmlPublicKey);
-                    byte[] encryptedData = rsa.Encrypt(message, false);
-                    encryptedContent = Convert.ToBase64String(encryptedData);
-                }
+                string encryptedContent = RSAPcks12Helper.EncryptWithPublicKey(publicKey, message);
 
                 var item = Encoding.ASCII.GetBytes(encryptedContent);
                 ret.AddRange(item.ToList());

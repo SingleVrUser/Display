@@ -131,10 +131,10 @@
                                 </RelativePanel>
 
                                 <RelativePanel x:Name="PlayerExePath_RelativePanel" Visibility="Collapsed">
-                                    <TextBlock x:Name="PlayerExePath_Title" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0">程序位置</TextBlock>
+                                    <!--<TextBlock x:Name="PlayerExePath_Title" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0">程序位置</TextBlock>
                                     <TextBox x:Name="PlayerExePath_TextBox" Width="600" RelativePanel.RightOf="PlayerExePath_Title"/>
                                     <Button Content="修改" RelativePanel.LeftOf="OpenPlayerExePath_Button" Click="ModifyPlayerExePathButton_Click"/>
-                                    <Button x:Name="OpenPlayerExePath_Button" Click="OpenPlayerExePathButton_Click" Content="打开路径" RelativePanel.AlignRightWithPanel="True" Margin="3,0,0,0"/>
+                                    <Button x:Name="OpenPlayerExePath_Button" Click="OpenPlayerExePathButton_Click" Content="打开路径" RelativePanel.AlignRightWithPanel="True" Margin="3,0,0,0"/>-->
                                 </RelativePanel>
 
                             </StackPanel>

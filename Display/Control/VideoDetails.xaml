@@ -274,7 +274,7 @@
                         <GridView x:Name="ThumbnailGridView" IsItemClickEnabled="True" ItemClick="ThumbnailGridView_ItemClick">
                             <GridView.ItemTemplate>
                                 <DataTemplate x:DataType="x:String">
-                                    <Image x:Name="Thumbnail_Image" Source="{x:Bind}" Height="120" Width="180" Stretch="UniformToFill"
+                                    <Image x:Name="Thumbnail_Image" Source="{x:Bind Mode=OneWay}" Height="120" Width="180" Stretch="UniformToFill"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center" PointerEntered="Thumbnail_Image_PointerEntered" PointerExited="Thumbnail_Image_PointerExited"/>
                                 </DataTemplate>
