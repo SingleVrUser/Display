@@ -38,7 +38,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock x:Name="Title_TextBlock" TextTrimming="CharacterEllipsis" VerticalAlignment="Bottom" Style="{ThemeResource FlyoutPickerTitleTextBlockStyle}" FontFamily="霞鹜文楷" FontWeight="Bold"/>
+            <TextBlock x:Name="Title_TextBlock" TextTrimming="CharacterEllipsis" VerticalAlignment="Bottom" Style="{ThemeResource FlyoutPickerTitleTextBlockStyle}" IsTextSelectionEnabled="True" FontFamily="霞鹜文楷" FontWeight="Bold"/>
             <CommandBar Grid.Column="1" HorizontalAlignment="Right" IsOpen="False" Margin="-10">
                 <CommandBar.PrimaryCommands>
                     <!--播放-->
@@ -94,23 +94,246 @@
         </Grid>
 
         <Grid Grid.Row="1" Margin="5,0" BorderBrush="#bdc3c7" BorderThickness="0,1,0,0">
-
-
             <ScrollViewer>
-                <!--<VisualStateManager.VisualStateGroups>
-                    <VisualStateGroup>
-                        <VisualState>
-                            <VisualState.StateTriggers>
-                                <AdaptiveTrigger MinWindowWidth="1260"/>
-                                <AdaptiveTrigger MinWindowHeight="840"/>
-                            </VisualState.StateTriggers>
+                <Grid RowSpacing="20"  Padding="10">
+                    <!--样式-->
+                    <Grid.Resources>
+                        <Style TargetType="TextBlock" x:Key="leftTitle">
+                            <Setter Property="Height" Value="{StaticResource AppBarExpandButtonThemeHeight}"/>
+                            <Setter Property="TextAlignment" Value="Left"/>
+                            <Setter Property="Margin" Value="10,0,0,0"/>
+                            <Setter Property="FontFamily" Value="霞鹜文楷"/>
+                            <Setter Property="FontWeight" Value="Light"/>
 
-                            <VisualState.Setters>
-                                <Setter Target="Cover_Image.MaxHeight" Value="500"/>
-                            </VisualState.Setters>
-                        </VisualState>
-                    </VisualStateGroup>
-                </VisualStateManager.VisualStateGroups>-->
+                        </Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextAlignment" Value="Left"/>
+                            <Setter Property="Margin" Value="10,0,0,0"/>
+                            <Setter Property="FontFamily" Value="霞鹜文楷 GB 屏幕阅读版"/>
+                            <Setter Property="FontWeight" Value="Normal"/>
+                        </Style>
+
+                        <!--<Style TargetType="TextBlock" x:Key="rightValue">
+                            <Setter Property="TextAlignment" Value="Left"/>
+                            <Setter Property="Margin" Value="10,0,0,0"/>
+                            <Setter Property="FontFamily" Value="霞鹜文楷 GB 屏幕阅读版"/>
+                            <Setter Property="FontWeight" Value="Normal"/>
+                        </Style>-->
+                    </Grid.Resources>
+                    
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!--封面图-->
+                    <Grid CornerRadius="4">
+                        <Image x:FieldModifier="public"
+                            x:Name="Cover_Image"
+                            Source="{x:Bind resultinfo.imagepath}"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            MaxHeight="780">
+                            <Image.ContextFlyout>
+                                <!--右键操作-->
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="打开所在目录" Click="OpenDirectory_Click">
+                                        <MenuFlyoutItem.Icon>
+                                            <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE8B7;" />
+                                        </MenuFlyoutItem.Icon>
+                                    </MenuFlyoutItem>
+                                </MenuFlyout>
+                            </Image.ContextFlyout>
+                        </Image>
+                    </Grid>
+                    
+                    <!--右侧信息-->
+                    <Grid Grid.Column="1" RowSpacing="3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!--名称-->
+                        <StackPanel Grid.Row="1"
+                            Orientation="Horizontal"
+                            Spacing="10">
+                            <TextBlock Text="{x:Bind resultinfo.truename}" IsTextSelectionEnabled="True" FontFamily="JetBrains Mono" FontSize="24" FontWeight="Bold"/>
+                            <HyperlinkButton NavigateUri="{x:Bind resultinfo.busurl}" Opacity="0.2">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xF6FA;" />
+                            </HyperlinkButton>
+                        </StackPanel>
+                        
+                        <!--发行时间，视频时长-->
+                        <StackPanel Grid.Row="2" Orientation="Horizontal">
+                            <TextBlock Text="{x:Bind resultinfo.releasetime}" IsTextSelectionEnabled="True" FontFamily="霞鹜文楷" FontWeight="Bold"/>
+                            <TextBlock Text="{x:Bind resultinfo.lengthtime}" IsTextSelectionEnabled="True"/>
+                        </StackPanel>
+
+                        <!--评分-->
+                        <RatingControl Grid.Row="3" Value="{x:Bind resultinfo.score,Mode=TwoWay}" ValueChanged="RatingControl_ValueChanged" HorizontalAlignment="Left" Margin="10,0,0,0">
+                            <RatingControl.Resources>
+                                <SolidColorBrush x:Key="RatingControlSelectedForeground" Color="#f7ba36" />
+                                <SolidColorBrush x:Key="RatingControlUnselectedForeground" Color="#ecf0f1" />
+                            </RatingControl.Resources>
+                        </RatingControl>
+
+                        <!--其他信息-->
+                        <Grid Grid.Row="4" ColumnSpacing="50">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition MaxWidth="200"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel>
+                                <Grid>
+                                    <TextBlock Text="导演" Style="{StaticResource leftTitle}"/>
+
+                                    <TextBlock Text="{x:Bind resultinfo.director}" Padding="50,0,0,0"/>
+                                </Grid>
+
+                                <Grid MaxWidth="300">
+                                    <TextBlock Text="系列" Style="{StaticResource leftTitle}"/>
+
+                                    <TextBlock Text="{x:Bind resultinfo.series}" Padding="50,0,0,0"/>
+                                </Grid>
+                                
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1">
+                                <Grid>
+                                    <TextBlock Text="制作商" Style="{StaticResource leftTitle}"/>
+
+                                    <TextBlock Text="{x:Bind resultinfo.producer}" Padding="60,0,0,0"/>
+                                </Grid>
+                                
+                                <Grid>
+                                    <TextBlock Text="发行商" Style="{StaticResource leftTitle}"/>
+
+                                    <TextBlock Text="{x:Bind resultinfo.publisher}" Padding="60,0,0,0"/>
+                                </Grid>
+                                
+                            </StackPanel>
+
+                            <Grid Grid.Row="1" Grid.ColumnSpan="2">
+                                <TextBlock Text="类别" Style="{StaticResource leftTitle}"/>
+                                <ScrollViewer
+                                    HorizontalScrollBarVisibility="Visible"
+                                    HorizontalScrollMode="Auto"
+                                    VerticalScrollBarVisibility="Hidden"
+                                    VerticalScrollMode="Disabled"
+                                    HorizontalAlignment="Left"
+                                    Padding="0,5"
+                                    Margin="50,0,0,0">
+
+                                    <StackPanel x:Name="CategorySatckPanel" Orientation="Horizontal"/>
+
+                                </ScrollViewer>
+                                <!--<TextBlock Text="{x:Bind resultinfo.publisher}" Padding="80,0,0,0"/>-->
+                            </Grid>
+
+                        </Grid>
+                    </Grid>
+
+                    <!--演员表-->
+                    <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
+                        <TextBlock Text="演员表" Style="{StaticResource leftTitle}"/>
+                        
+                        <ScrollViewer
+                            Grid.Column="1"
+                            Grid.Row="8"
+                            HorizontalScrollBarVisibility="Visible"
+                            HorizontalScrollMode="Auto"
+                            VerticalScrollBarVisibility="Hidden"
+                            VerticalScrollMode="Disabled"
+                            HorizontalAlignment="Left">
+                            <StackPanel
+                                x:Name="ActorSatckPanel"
+                                Orientation="Horizontal">
+                            </StackPanel>
+                        </ScrollViewer>
+                    </StackPanel>
+
+                    <!--缩略图-->
+                    <StackPanel x:Name="ThumbnailStackPanel" Grid.Row="2" Grid.ColumnSpan="2" Visibility="Collapsed">
+                        <TextBlock Text="缩略图" Style="{StaticResource leftTitle}"/>
+                        <GridView x:Name="ThumbnailGridView" IsItemClickEnabled="True" ItemClick="ThumbnailGridView_ItemClick">
+                            <GridView.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <Image x:Name="Thumbnail_Image" Source="{x:Bind}" Height="120" Width="180" Stretch="UniformToFill"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" PointerEntered="Thumbnail_Image_PointerEntered" PointerExited="Thumbnail_Image_PointerExited"/>
+                                </DataTemplate>
+                            </GridView.ItemTemplate>
+                        </GridView>
+                    </StackPanel>
+
+                </Grid>
+            </ScrollViewer>
+
+            <Grid x:Name="SmokeGrid" Grid.RowSpan="2" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Collapsed">
+                <Grid x:Name="SmokeCancelGrid">
+                    <Grid.Background>
+                        <SolidColorBrush Color="{ThemeResource SystemChromeAltHighColor}" Opacity="0.8" />
+                    </Grid.Background>
+                </Grid>
+
+                <Grid x:Name="destinationElement" HorizontalAlignment="Center" VerticalAlignment="Center" BorderThickness="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{ThemeResource AccentAAFillColorDisabledBrush}">
+                        <Grid x:Name="ThumbnailGrid" MaxWidth="630" MaxHeight="420">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <FlipView x:Name="ShowImageFlipView" ItemsSource="{x:Bind ShowImageList}" SelectionChanged="ShowImageFlipView_SelectionChanged" Background="{ThemeResource AccentAAFillColorDisabledBrush}">
+                                <FlipView.ItemTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                        <Image Source="{x:Bind}" />
+                                    </DataTemplate>
+                                </FlipView.ItemTemplate>
+                            </FlipView>
+
+                            <PipsPager Grid.Row="1" HorizontalAlignment="Center" NumberOfPages="{x:Bind ShowImageList.Count,Mode=OneWay}" SelectedPageIndex="{x:Bind ShowImageFlipView.SelectedIndex,Mode=TwoWay}"/>
+                        </Grid>
+
+                        <!--<Image x:Name="ShowImage"/>-->
+                        <Button Click="BackButton_Click" HorizontalAlignment="Right" VerticalAlignment="Top" Height="40" Width="40" Margin="5">
+                            <Button.Content>
+                                <SymbolIcon Symbol="Clear" />
+                            </Button.Content>
+                        </Button>
+                    </Grid>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" Grid.Row="1">
+                        <!--<TextBlock x:Name="ShoeImageName" Text="{x:Bind GetFileNameFromFullPath(ShowImageFlipView.SelectedItem),Mode=OneWay}" Style="{ThemeResource BaseTextBlockStyle}" HorizontalAlignment="Center" Margin="12" IsTextSelectionEnabled="True"/>-->
+                        <TextBlock x:Name="ShoeImageName" Style="{ThemeResource BaseTextBlockStyle}" HorizontalAlignment="Center" Margin="12" IsTextSelectionEnabled="True"/>
+
+                    </Grid>
+                </Grid>
+
+            </Grid>
+
+        </Grid>
+
+        <!--<Grid Grid.Row="2" Margin="5,0" BorderBrush="#bdc3c7" BorderThickness="0,1,0,0">
+            <ScrollViewer>
                 <Grid RowSpacing="20"  Padding="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
@@ -120,25 +343,8 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Grid CornerRadius="4">
-                        <Image x:FieldModifier="public"
-                        x:Name="Cover_Image"
-                        Source="{x:Bind resultinfo.imagepath}"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center">
-                            <Image.ContextFlyout>
-                                <!--右键操作-->
-                                <MenuFlyout>
-                                    <MenuFlyoutItem Text="打开所在目录" Click="OpenDirectory_Click">
-                                        <MenuFlyoutItem.Icon>
-                                            <SymbolIcon Symbol="Folder"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
-                                </MenuFlyout>
-                            </Image.ContextFlyout>
-                        </Image>
-                    </Grid>
-                    
+
+
                     <Grid Grid.Column="1" VerticalAlignment="Center">
 
                         <Grid.RowDefinitions>
@@ -165,7 +371,7 @@
                                 <Setter Property="TextAlignment" Value="Right"/>
                                 <Setter Property="Margin" Value="0,0,10,0"/>
                                 <Setter Property="FontFamily" Value="霞鹜文楷 GB 屏幕阅读版"/>
-                                
+
                             </Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Height" Value="{StaticResource AppBarExpandButtonThemeHeight}"/>
@@ -175,7 +381,7 @@
                                 <Setter Property="FontWeight" Value="Light"/>
                             </Style>
                         </Grid.Resources>
-                        <!--标题-->
+                        --><!--标题--><!--
                         <TextBlock Grid.Row="0"
                            Text="影片信息"
                            Style="{StaticResource leftTitle}"/>
@@ -204,15 +410,13 @@
                            Text="演员"
                            Style="{StaticResource leftTitle}"/>
 
-                        <!--内容-->
+                        --><!--内容--><!--
                         <StackPanel Grid.Row="0"
                             Grid.Column="1"
                             Orientation="Horizontal"
                             Spacing="10">
                             <TextBlock Text="{x:Bind resultinfo.truename}" IsTextSelectionEnabled="True" FontFamily="JetBrains Mono"/>
                             <HyperlinkButton NavigateUri="{x:Bind resultinfo.busurl}" Opacity="0.5">
-                                <!--<Image Source="/Assets/JavBusLogo.png"
-                                        Height="15"/>-->
                                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xF6FA;" />
                             </HyperlinkButton>
                         </StackPanel>
@@ -242,7 +446,8 @@
                             Grid.Column="1"
                             Text="{x:Bind resultinfo.series, Mode=OneWay}"/>
 
-                        <ScrollViewer
+
+                        --><!--<ScrollViewer
                             Grid.Row="7"
                             Grid.Column="1"
                             HorizontalScrollBarVisibility="Visible"
@@ -252,12 +457,11 @@
                             HorizontalAlignment="Left"
                             Padding="5">
 
-                            <StackPanel 
-                                    x:Name="CategorySatckPanel"
-                                    Orientation="Horizontal"/>
-                        </ScrollViewer>
+                            <StackPanel x:Name="CategorySatckPanel" Orientation="Horizontal"/>
 
-                        <ScrollViewer
+                        </ScrollViewer>-->
+
+                        <!--<ScrollViewer
                             Grid.Column="1"
                             Grid.Row="8"
                             HorizontalScrollBarVisibility="Visible"
@@ -266,24 +470,16 @@
                             VerticalScrollMode="Disabled"
                             HorizontalAlignment="Left">
                             <StackPanel
-                                    x:Name="ActorSatckPanel"
-                                    Orientation="Horizontal">
+                                x:Name="ActorSatckPanel"
+                                Orientation="Horizontal">
                             </StackPanel>
-                        </ScrollViewer>
+                        </ScrollViewer>--><!--
 
                     </Grid>
 
-                    <GridView x:Name="ThumbnailGridView" Grid.Row="1" Grid.ColumnSpan="2" Header="缩略图" IsItemClickEnabled="True" ItemClick="ThumbnailGridView_ItemClick" Visibility="Collapsed">
-                        <GridView.ItemTemplate>
-                            <DataTemplate x:DataType="x:String">
-                                <Image x:Name="Thumbnail_Image" Source="{x:Bind}" Height="120" Width="180" Stretch="UniformToFill"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center" PointerEntered="Thumbnail_Image_PointerEntered" PointerExited="Thumbnail_Image_PointerExited"/>
-                            </DataTemplate>
-                        </GridView.ItemTemplate>
-                    </GridView>
+                    
                 </Grid>
-                <!--</StackPanel>-->
+                --><!--</StackPanel>--><!--
             </ScrollViewer>
 
             <Grid x:Name="SmokeGrid" Grid.RowSpan="2" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Collapsed">
@@ -292,7 +488,7 @@
                         <SolidColorBrush Color="{ThemeResource SystemChromeAltHighColor}" Opacity="0.8" />
                     </Grid.Background>
                 </Grid>
-                
+
                 <Grid x:Name="destinationElement" HorizontalAlignment="Center" VerticalAlignment="Center" BorderThickness="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
@@ -304,7 +500,7 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="auto"/>
                             </Grid.RowDefinitions>
-                            <FlipView x:Name="ShowImageFlipView" ItemsSource="{x:Bind ShowImageList}" Background="{ThemeResource AccentAAFillColorDisabledBrush}">
+                            <FlipView x:Name="ShowImageFlipView" ItemsSource="{x:Bind ShowImageList}" SelectionChanged="ShowImageFlipView_SelectionChanged" Background="{ThemeResource AccentAAFillColorDisabledBrush}">
                                 <FlipView.ItemTemplate>
                                     <DataTemplate x:DataType="x:String">
                                         <Image Source="{x:Bind}" />
@@ -314,8 +510,8 @@
 
                             <PipsPager Grid.Row="1" HorizontalAlignment="Center" NumberOfPages="{x:Bind ShowImageList.Count,Mode=OneWay}" SelectedPageIndex="{x:Bind ShowImageFlipView.SelectedIndex,Mode=TwoWay}"/>
                         </Grid>
-                        
-                        <!--<Image x:Name="ShowImage"/>-->
+
+                        --><!--<Image x:Name="ShowImage"/>--><!--
                         <Button Click="BackButton_Click" HorizontalAlignment="Right" VerticalAlignment="Top" Height="40" Width="40" Margin="5">
                             <Button.Content>
                                 <SymbolIcon Symbol="Clear" />
@@ -323,15 +519,14 @@
                         </Button>
                     </Grid>
                     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" Grid.Row="1">
-                        <TextBlock x:Name="ShoeImageName" Text="{x:Bind GetFileNameFromFullPath(ShowImageFlipView.SelectedItem),Mode=OneWay}" Style="{ThemeResource BaseTextBlockStyle}" HorizontalAlignment="Center" Margin="12" IsTextSelectionEnabled="True"/>
+                        --><!--<TextBlock x:Name="ShoeImageName" Text="{x:Bind GetFileNameFromFullPath(ShowImageFlipView.SelectedItem),Mode=OneWay}" Style="{ThemeResource BaseTextBlockStyle}" HorizontalAlignment="Center" Margin="12" IsTextSelectionEnabled="True"/>--><!--
+                        <TextBlock x:Name="ShoeImageName" Style="{ThemeResource BaseTextBlockStyle}" HorizontalAlignment="Center" Margin="12" IsTextSelectionEnabled="True"/>
+
                     </Grid>
                 </Grid>
 
             </Grid>
-        </Grid>
-
-
-
+        </Grid>-->
 
     </Grid>
 </UserControl>

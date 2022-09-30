@@ -146,7 +146,11 @@
                                     <AppBarButton ToolTipService.ToolTip="评分" IsCompact="True">
                                         <AppBarButton.Flyout>
                                             <Flyout>
-                                                <RatingControl Caption="评分" Value="{x:Bind score, Mode=TwoWay}" ValueChanged="RatingControl_ValueChanged"/>
+                                                <RatingControl Caption="评分" Value="{x:Bind score, Mode=TwoWay}" ValueChanged="RatingControl_ValueChanged">
+                                                    <RatingControl.Resources>
+                                                        <SolidColorBrush x:Key="RatingControlSelectedForeground" Color="#f7ba36" />
+                                                    </RatingControl.Resources>
+                                                </RatingControl>
                                             </Flyout>
                                         </AppBarButton.Flyout>
                                         <FontIcon Glyph="&#xE1CE;"/>
@@ -190,26 +194,41 @@
                         </Grid>
                     </Grid>
                     <StackPanel HorizontalAlignment="Center" Margin="0,5,0,0">
-                        <StackPanel Orientation="Horizontal">
-                            <StackPanel.Resources>
+                        <Grid MaxWidth="{x:Bind imagewidth,Mode=OneWay}">
+                            <Grid.Resources>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="FontFamily" Value="JetBrains Mono"/>
                                 </Style>
-                            </StackPanel.Resources>
+                            </Grid.Resources>
+                            
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            
                             <TextBlock Text="{x:Bind truename}" IsTextSelectionEnabled="True"/>
-                            <AppBarSeparator/>
-                            <TextBlock Text="|" Foreground="Gray" Opacity="0.5"/>
-                            <AppBarSeparator/>
-                            <TextBlock Text="{x:Bind realeaseYear}" IsTextSelectionEnabled="True"/>
-                            <AppBarSeparator/>
-                            <TextBlock Text="|" Foreground="Gray" Opacity="0.5"/>
-                            <AppBarSeparator/>
-                            <local:TextBlockWithLongText StringValue="{x:Bind actor}"/>
+                            <AppBarSeparator Grid.Column="1"/>
+                            <TextBlock Grid.Column="2" Text="|" Foreground="Gray" Opacity="0.5"/>
+                            <AppBarSeparator Grid.Column="3"/>
+                            <TextBlock Grid.Column="4" Text="{x:Bind realeaseYear}" IsTextSelectionEnabled="True"/>
+                            <AppBarSeparator Grid.Column="5"/>
+                            <TextBlock Grid.Column="6" Text="|" Foreground="Gray" Opacity="0.5"/>
+                            <AppBarSeparator Grid.Column="7"/>
+                            <local:TextBlockWithLongText Grid.Column="8" StringValue="{x:Bind actor}"/>
  
-                        </StackPanel>
-                        <RatingControl IsClearEnabled="False" IsReadOnly="True" PlaceholderValue="{x:Bind score,Mode=OneWay}">
+                        </Grid>
+                        
+                        <RatingControl IsClearEnabled="False" IsReadOnly="True" Value="{x:Bind score,Mode=OneWay}">
                             <RatingControl.Resources>
-                                <SolidColorBrush x:Key="RatingControlPlaceholderForeground" Color="#fff799" />
+                                <SolidColorBrush x:Key="RatingControlSelectedForeground" Color="#f7ba36" />
                                 <SolidColorBrush x:Key="RatingControlUnselectedForeground" Color="#ecf0f1" />
                             </RatingControl.Resources>
                         </RatingControl>

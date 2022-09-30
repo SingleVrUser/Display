@@ -405,7 +405,7 @@ namespace Display.Control
         {
             if (startValue - showCountInPage < 0)
             {
-                LightDismissTeachingTip.Content = "最小了，不能再减了";
+                LightDismissTeachingTip.Subtitle = "最小了，不能再减了";
                 LightDismissTeachingTip.Target = sender as Button;
                 LightDismissTeachingTip.IsOpen = true;
                 return;
@@ -423,7 +423,7 @@ namespace Display.Control
         {
             if(startValue + showCountInPage >= totalPageCount * showCountInPage)
             {
-                LightDismissTeachingTip.Content = "最大了，不能再加了";
+                LightDismissTeachingTip.Subtitle = "最大了，不能再加了";
                 LightDismissTeachingTip.Target = sender as Button;
                 LightDismissTeachingTip.IsOpen = true;
                 return;

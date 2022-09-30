@@ -113,7 +113,11 @@ namespace Display.Control
             {
                 VideoInfo VideoInfo = DataAccess.LoadOneVideoInfoByCID(resultinfo.truename);
 
-                ThumbnailList = VideoInfo.sampleImageList.Split(",").ToList();
+                var sampleImageListStr = VideoInfo.sampleImageList;
+                if(!string.IsNullOrEmpty(sampleImageListStr))
+                {
+                    ThumbnailList = sampleImageListStr.Split(",").ToList();
+                }
 
             }
 
@@ -121,7 +125,7 @@ namespace Display.Control
             {
                 ThumbnailList = ThumbnailList.OrderByNatural(emp => emp.ToString()).ToList();
                 ThumbnailGridView.ItemsSource = ThumbnailList;
-                ThumbnailGridView.Visibility = Visibility;
+                ThumbnailStackPanel.Visibility = Visibility;
             }
 
         }
@@ -314,6 +318,7 @@ namespace Display.Control
                 ShowImageFlipView.SelectedIndex = index;
             }
 
+            ShoeImageName.Text = GetFileIndex();
             //ShowImage.Source = new BitmapImage(new Uri(iamgePath));
 
             //ShoeImageName.Text = Path.GetFileName(iamgePath);
@@ -358,6 +363,11 @@ namespace Display.Control
         //    e.Handled = true;
         //}
 
+        private string GetFileIndex()
+        {
+            return $"{ShowImageFlipView.SelectedIndex+1}/{ShowImageList.Count}";
+        }
+
         private string GetFileNameFromFullPath(object fullpath)
         {
             return Path.GetFileName(fullpath as string);
@@ -375,6 +385,18 @@ namespace Display.Control
         {
             string ImagePath = Path.GetDirectoryName(resultinfo.imagepath);
             FileMatch.LaunchFolder(ImagePath);
+        }
+
+        private void ShowImageFlipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ShoeImageName.Text = GetFileIndex();
+        }
+
+        private void RatingControl_ValueChanged(RatingControl sender, object args)
+        {
+            string score_str = sender.Value == 0 ? "-1" : sender.Value.ToString();
+
+            DataAccess.UpdateSingleDataFromVideoInfo(resultinfo.truename, "score", score_str);
         }
     }
 }
