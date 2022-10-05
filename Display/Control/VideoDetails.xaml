@@ -43,9 +43,9 @@
                 <CommandBar.PrimaryCommands>
                     <!--播放-->
                     <AppBarButton Icon="Play"
-                                x:Uid="playButton"
-                                Click="VideoPlay_Click"
-                                  Label="播放">
+                        x:Uid="playButton"
+                        Click="VideoPlay_Click"
+                        Label="播放">
                         <ToolTipService.ToolTip>
                             <ToolTip x:Uid="playToolTip"/>
                         </ToolTipService.ToolTip>
