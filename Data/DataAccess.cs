@@ -745,6 +745,7 @@ namespace Data
         /// <returns></returns>
         public static List<Datum> loadVideoInfoByTruename(string truename)
         {
+            truename = truename.ToUpper();
             string[] splitList = truename.Split(new char[] {'-','_'});
             string leftName = splitList[0];
 
@@ -752,6 +753,7 @@ namespace Data
             if (splitList.Length != 1)
             {
                 rightNumber = splitList[1];
+                
             }
             else
             {
@@ -763,6 +765,8 @@ namespace Data
                     rightNumber = result.Groups[2].Value;
                 }
             }
+
+            leftName = leftName.Replace("FC2", "FC");
 
             List<Datum> data = new List<Datum>();
 
