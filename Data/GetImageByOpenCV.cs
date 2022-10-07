@@ -185,8 +185,8 @@ namespace Data
             //失败尝试次数
             int tryAgainCount = 3;
 
-            //人脸信息尝试获取次数
-            int GetFaceCount = 30;
+            ////人脸信息尝试获取次数
+            //int GetFaceCount = 30;
 
             for (int idx = 0, tryCount = 0; idx < length && tryCount < tryAgainCount; idx++)
             {

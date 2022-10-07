@@ -147,7 +147,6 @@ namespace Display.ContentsPage
 
             using (var stream = File.Open(filePath, FileMode.Open))
             {
-
                 //前一部分Sha1
                 int bufferSize = 128 * 1024; //每次读取的字节数
                 byte[] buffer = new byte[bufferSize];

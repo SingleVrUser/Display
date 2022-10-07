@@ -110,8 +110,6 @@ namespace Display
             // TODO
             // 数据文件格式有误
 
-
-
             return isNormal;
         }
 

@@ -18,6 +18,28 @@
         <Style TargetType="StackPanel" x:Key="Options_StackPanel">
             <Setter Property="Margin" Value="20,20,0,0"/>
         </Style>
+        <Style TargetType="Expander">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="IsExpanded" Value="False"/>
+            <Setter Property="ExpandDirection" Value="Down"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="IsExpanded" Value="False"/>
+        </Style>
+        <Style TargetType="Pivot">
+            <Setter Property="Margin" Value="-15,-20,0,0"/>
+            <Setter Property="HeaderTemplate">
+                <Setter.Value>
+                    <DataTemplate x:DataType="x:String">
+                        <TextBlock Text="{x:Bind}" FontSize="14"/>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+
+        </Style>
+        <DataTemplate x:Key="PivotHeaderTemplate">
+            
+        </DataTemplate>
     </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -47,17 +69,12 @@
             </Grid.Resources>
             <ScrollViewer>
                 <StackPanel Spacing="5">
+                    <!--通用-->
                     <StackPanel Spacing="5">
-                        <TextBlock Text="通用"/>
+                        <TextBlock Text="通用" Margin="5"/>
                         
                         <!--启动-->
-                        <Expander
-                            HorizontalAlignment="Stretch"
-                            HorizontalContentAlignment="Stretch"
-                            IsExpanded="False"
-                            ExpandDirection="Down"
-                            VerticalAlignment="Top"
-                            Header="启动">
+                        <Expander Header="启动">
                             <StackPanel Spacing="5" Padding="50,0">
 
                                 <RelativePanel>
@@ -73,12 +90,7 @@
                             </StackPanel>
                         </Expander>
                         <!--115-->
-                        <Expander
-                        HorizontalAlignment="Stretch"
-                        IsExpanded="False"
-                        ExpandDirection="Down"
-                        VerticalAlignment="Top"
-                        Header="115"
+                        <Expander Header="115"
                         HorizontalContentAlignment="Stretch">
 
                             <StackPanel Padding="50,0" Spacing="10">
@@ -106,13 +118,7 @@
 
 
                         <!--播放-->
-                        <Expander
-                            HorizontalAlignment="Stretch"
-                            IsExpanded="False"
-                            ExpandDirection="Down"
-                            VerticalAlignment="Top"
-                            Header="播放"
-                            HorizontalContentAlignment="Stretch">
+                        <Expander Header="播放">
 
                             <StackPanel Padding="50,0" Spacing="5">
                                 <RelativePanel>
@@ -141,13 +147,7 @@
                         </Expander>
 
                         <!--显示-->
-                        <Expander
-                            HorizontalAlignment="Stretch"
-                            IsExpanded="False"
-                            ExpandDirection="Down"
-                            VerticalAlignment="Top"
-                            Header="显示"
-                            HorizontalContentAlignment="Stretch">
+                        <Expander Header="显示">
                             
                             <RelativePanel Margin="50,0">
                                 <TextBlock RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0">缩略图来源</TextBlock>
@@ -159,27 +159,14 @@
                         </Expander>
                     </StackPanel>
 
-
+                    <!--下载-->
                     <StackPanel Spacing="5">
-                        <TextBlock Text="下载"/>
+                        <TextBlock Text="下载" Margin="5"/>
 
                         <!--搜刮信息-->
-                        <Expander
-                            HorizontalAlignment="Stretch"
-                            HorizontalContentAlignment="Stretch"
-                            IsExpanded="False"
-                            ExpandDirection="Down"
-                            VerticalAlignment="Top"
-                            Header="搜刮信息">
+                        <Expander Header="搜刮信息">
                             <StackPanel Spacing="5">
-                                <Pivot Margin="-15,-20,0,0">
-                                    <Pivot.HeaderTemplate>
-                                        <DataTemplate x:DataType="x:String">
-                                            <TextBlock Text="{x:Bind}" FontSize="14"/>
-                                        </DataTemplate>
-                                    </Pivot.HeaderTemplate>
-
-
+                                <Pivot>
                                     <PivotItem Header="搜刮源">
                                         <StackPanel Spacing="5" Margin="5" Padding="50,0">
                                             <TextBlock Text="选择"/>
@@ -310,13 +297,7 @@
                             </StackPanel>
                         </Expander>
                         <!--保存路径-->
-                        <Expander
-                            HorizontalAlignment="Stretch"
-                            HorizontalContentAlignment="Stretch"
-                            IsExpanded="False"
-                            ExpandDirection="Down"
-                            VerticalAlignment="Top"
-                            Header="保存路径">
+                        <Expander Header="保存路径">
                             <StackPanel Spacing="5">
                                 <RelativePanel Padding="50,0">
                                     <TextBlock x:Name="Image_TextBlox" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,10,0">图片</TextBlock>
@@ -342,6 +323,92 @@
                                     <Button x:Name="ActorInfoOpenPath" Click="ActorInfoOpenPath_Click" Content="打开路径" RelativePanel.AlignRightWithPanel="True" Margin="3,0,0,0"/>
                                 </RelativePanel>
                             </StackPanel>
+                        </Expander>
+                        
+                        <!--下载方式-->
+                        <Expander Header="下载方式">
+                            <Pivot>
+                                <PivotItem Header="115">
+                                    <StackPanel Spacing="5" Margin="5" Padding="50,0">
+                                        <TextBlock Text="调用115浏览器下载"/>
+                                    </StackPanel>
+                                </PivotItem>
+                                <PivotItem Header="BitComet">
+                                    <StackPanel Spacing="5" Margin="5" Padding="50,0">
+                                        <TextBlock Text="调用比特彗星的“网页版远程下载”，请在软件中启动该选项" Opacity="0.7"/>
+                                        <RelativePanel Padding="50,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">远程下载接口</TextBlock>
+                                                <TextBox PlaceholderText="http://用户名:密码@IP地址:监听端口，例:http://admin:123@127.0.0.1:1235"
+                                                         Text="{x:Bind data:AppSettings.BitCometSettings.ApiUrl}"
+                                                         x:Name="BitCometDownApi_TextBox"
+                                                         Width="540"/>
+                                                <control:StatusShow HorizontalAlignment="Right" x:Name="BitCometCheckStatus" Margin="5,0"/>
+                                            </StackPanel>
+
+                                            <Button x:Name="BitCometCheckButton" Click="BitCometSettingsCheck_Click" Content="检查" RelativePanel.LeftOf="BitCometSaveButton"/>
+                                            <Button x:Name="BitCometSaveButton" Click="BitCometSettingsSave_Click" Content="保存" HorizontalAlignment="Center" RelativePanel.AlignRightWithPanel="True"/>
+                                        </RelativePanel>
+
+                                        <RelativePanel Padding="50,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock x:Name="BitCometSavePath_TextBlox" VerticalAlignment="Center" Margin="0,0,10,0">保存路径</TextBlock>
+                                                <TextBox x:Name="BitCometSavePath_TextBox" Width="570" Text="{x:Bind data:AppSettings.BitCometSavePath}" />
+                                            </StackPanel>
+
+                                            <StackPanel RelativePanel.AlignRightWithPanel="True" Orientation="Horizontal">
+
+                                                <Button Click="BitCometSavePathChange_Click"
+                                                    Content="修改"/>
+                                                <Button Click="BitCometSavePathClear_Click"
+                                                    Content="删除"/>
+                                                <Button Click="BitCometSavePathOpen_Click"
+                                                    Content="打开路径"
+                                                    x:Name="BitCometSavePath_Button"
+                                                    Margin="3,0,0,0"/>
+                                            </StackPanel>
+                                        </RelativePanel>
+                                        
+                                    </StackPanel>
+                                </PivotItem>
+                                <PivotItem Header="Aria2">
+                                    <StackPanel Spacing="5" Margin="5" Padding="50,0">
+                                        <TextBlock Text="调用 Aria2 的网页版远程下载" Opacity="0.7"/>
+                                        <RelativePanel Padding="50,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">远程下载接口</TextBlock>
+                                                <TextBox PlaceholderText="http://token:{secret}@{IP地址}:{监听端口}/jsonrpc，例:http://token:secret142@127.0.0.1:6800/jsonrpc"
+                                                         Text="{x:Bind data:AppSettings.Aria2Settings.ApiUrl}"
+                                                         x:Name="Aria2DownApi_TextBox"
+                                                         Width="650"/>
+                                                <control:StatusShow HorizontalAlignment="Right" x:Name="Aria2CheckStatus" Margin="5,0"/>
+                                            </StackPanel>
+
+                                            <Button x:Name="Aria2CheckButton" Click="Aria2SettingsCheck_Click" Content="检查" RelativePanel.LeftOf="Aria2SaveButton"/>
+                                            <Button x:Name="Aria2SaveButton" Click="Aria2tSettingsSave_Click" Content="保存" HorizontalAlignment="Center" RelativePanel.AlignRightWithPanel="True"/>
+                                        </RelativePanel>
+
+                                        <RelativePanel Padding="50,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock VerticalAlignment="Center" Margin="0,0,10,0">保存路径</TextBlock>
+                                                <TextBox x:Name="Aria2SavePath_TextBox" Width="680" Text="{x:Bind data:AppSettings.Aria2SavePath}" />
+                                            </StackPanel>
+
+                                            <StackPanel RelativePanel.AlignRightWithPanel="True" Orientation="Horizontal">
+                                                <Button Click="Aria2SavePathChange_Click"
+                                                    Content="修改"/>
+                                                <Button Click="Aria2SavePathClear_Click"
+                                                    Content="删除"/>
+                                                <Button Click="Aria2SavePathOpen_Click"
+                                                    Content="打开路径"
+                                                    x:Name="Aria2SavePath_Button"
+                                                    Margin="3,0,0,0"/>
+                                            </StackPanel>
+                                        </RelativePanel>
+
+                                    </StackPanel>
+                                </PivotItem>
+                            </Pivot>
                         </Expander>
                     </StackPanel>
                 </StackPanel>

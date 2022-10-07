@@ -15,6 +15,13 @@ using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI;
 using System.Collections.ObjectModel;
+using System.Net.Http;
+using Windows.Media.Protection.PlayReady;
+using RestSharp;
+using System.Net;
+using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+using System.Text;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -183,8 +190,7 @@ namespace Display.Views
             {
                 if (folder.Path == AppSettings.Image_SavePath)
                 {
-                    LightDismissTeachingTip.Content = "选择目录与原目录相同，未修改";
-                    LightDismissTeachingTip.IsOpen = true;
+                    ShowTeachingTip("选择目录与原目录相同，未修改");
                 }
                 else
                 {
@@ -229,8 +235,7 @@ namespace Display.Views
             {
                 //修改数据库图片地址
                 DataAccess.UpdateAllImagePath(updateImagePathPage.srcPath, updateImagePathPage.dstPath);
-                LightDismissTeachingTip.Content = "修改成功，重启后生效";
-                LightDismissTeachingTip.IsOpen = true;
+                ShowTeachingTip("修改成功，重启后生效");
             }
 
         }
@@ -252,8 +257,7 @@ namespace Display.Views
             {
                 if (folder.Path == AppSettings.Image_SavePath)
                 {
-                    LightDismissTeachingTip.Content = "选择目录与原目录相同，未修改";
-                    LightDismissTeachingTip.IsOpen = true;
+                    ShowTeachingTip("选择目录与原目录相同，未修改");
                 }
                 else
                 {
@@ -296,24 +300,21 @@ namespace Display.Views
         {
             AppSettings.JavBus_BaseUrl = JavbusUrl_TextBox.Text;
 
-            LightDismissTeachingTip.Content = "修改完成";
-            LightDismissTeachingTip.IsOpen = true;
+            ShowTeachingTip("修改完成");
         }
 
         private void JavDBUrlChange_Button_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             AppSettings.JavDB_BaseUrl = JavDBUrl_TextBox.Text;
 
-            LightDismissTeachingTip.Content = "修改完成";
-            LightDismissTeachingTip.IsOpen = true;
+            ShowTeachingTip("修改完成");
         }
 
         private void JavDBCookieChange_Button_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             AppSettings.javdb_Cookie = JavDBCookie_TextBox.Text;
 
-            LightDismissTeachingTip.Content = "修改完成";
-            LightDismissTeachingTip.IsOpen = true;
+            ShowTeachingTip("修改完成");
         }
 
         private async void DataAccessSavePath_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
@@ -332,7 +333,7 @@ namespace Display.Views
                 var lastDBSavePath = AppSettings.DataAccess_SavePath;
                 if (folder.Path == lastDBSavePath)
                 {
-                    LightDismissTeachingTip.Content = "选择目录与原目录相同，未修改";
+                    LightDismissTeachingTip.Subtitle = "选择目录与原目录相同，未修改";
                     LightDismissTeachingTip.IsOpen = true;
                 }
                 else
@@ -405,8 +406,7 @@ namespace Display.Views
             var coookieText = Cookie_TextBox.Text;
             if (string.IsNullOrEmpty(coookieText))
             {
-                LightDismissTeachingTip.Content = "输入为空";
-                LightDismissTeachingTip.IsOpen = true;
+                ShowTeachingTip("输入为空");
                 return;
             }
 
@@ -415,7 +415,7 @@ namespace Display.Views
             //创建一个数据包
             DataPackage dataPackage = new DataPackage();
             //设置创建包里的文本内容
-            string ClipboardText = JsonSerializer.Serialize(exportCookieList);
+            string ClipboardText = System.Text.Json.JsonSerializer.Serialize(exportCookieList);
             dataPackage.SetText(ClipboardText);
             
             //把数据包放到剪贴板里
@@ -426,7 +426,7 @@ namespace Display.Views
             string text = await dataPackageView.GetTextAsync();
             if (text == ClipboardText)
             {
-                LightDismissTeachingTip.Content = "已添加到剪贴板";
+                LightDismissTeachingTip.Subtitle = "已添加到剪贴板";
                 LightDismissTeachingTip.IsOpen = true;
             }
 
@@ -452,7 +452,7 @@ namespace Display.Views
             {
                 if (!(value || otherOriginUse))
                 {
-                    LightDismissTeachingTip.Content = "请至少选择一个搜刮源，否则无法正常搜刮";
+                    LightDismissTeachingTip.Subtitle = "请至少选择一个搜刮源，否则无法正常搜刮";
                     LightDismissTeachingTip.Target = toggleButton;
                     LightDismissTeachingTip.IsOpen = true;
                 }
@@ -488,7 +488,7 @@ namespace Display.Views
                         break;
                     case "vlc":
                         resolutionSelectionCollection.Clear();
-                        resolutionSelectionCollection.Add("最高");
+                        resolutionSelectionCollection.Add("原画");
                         resolutionSelection_ComboBox.SelectedIndex = 0;
                         Resolution_RelativePanel.Visibility = Visibility.Visible;
                         PlayerExePath_RelativePanel.Visibility = Visibility.Visible;
@@ -616,6 +616,307 @@ namespace Display.Views
                 AddSpiderMethod((sender as TextBox).Text);
             }
 
+        }
+
+        private void BitCometSettingsSave_Click(object sender, RoutedEventArgs e)
+        {
+            DownApiSettings bitCometSettings = checkBitCometSettingsFormat(BitCometDownApi_TextBox.Text);
+
+            if (bitCometSettings == null)
+                return;
+
+            AppSettings.BitCometSettings = bitCometSettings;
+        }
+
+        private async void BitCometSettingsCheck_Click(object sender, RoutedEventArgs e)
+        {
+            DownApiSettings bitCometSettings = checkBitCometSettingsFormat(BitCometDownApi_TextBox.Text);
+
+            if (bitCometSettings == null)
+                return;
+
+            BitCometCheckStatus.status = Status.doing;
+
+            bool isOK = await IsBitCometSettingOK(bitCometSettings.UserName, bitCometSettings.Password, bitCometSettings.ApiUrl);
+
+            if(isOK)
+                BitCometCheckStatus.status = Status.success;
+            else
+                BitCometCheckStatus.status = Status.error;
+
+        }
+
+        private DownApiSettings checkBitCometSettingsFormat(string fullApiUrl)
+        {
+            DownApiSettings bitCometSettings = new();
+
+            if (string.IsNullOrWhiteSpace(fullApiUrl))
+            {
+                ShowTeachingTip("输入不能为空");
+
+                return null;
+            }
+
+            var isMatch = Regex.Match(fullApiUrl, "^(https?://)(\\w+):(\\w+)@([\\w.]+:(\\d+))/?$");
+
+            if (!isMatch.Success)
+            {
+                ShowTeachingTip("请检查格式是否正确");
+                return null;
+            }
+
+            bitCometSettings.ApiUrl = $"{isMatch.Groups[1].Value}{isMatch.Groups[4].Value}";
+            bitCometSettings.UserName = isMatch.Groups[2].Value;
+            bitCometSettings.Password = isMatch.Groups[3].Value;
+
+            return bitCometSettings;
+        }
+
+        private async Task<bool> IsBitCometSettingOK(string user,string pwd,string url)
+        {
+            bool isOK = false;
+
+            var handler = new HttpClientHandler()
+            {
+                UseDefaultCredentials = true,
+                Credentials = new NetworkCredential(user, pwd)
+            };
+
+            HttpClient httpClient = new(handler);
+
+            try
+            {
+                HttpResponseMessage rep = await httpClient.GetAsync(url + "/panel/task_add_httpftp");
+
+                if (rep.IsSuccessStatusCode)
+                {
+                    string content = await rep.Content.ReadAsStringAsync();
+
+                    if (!string.IsNullOrWhiteSpace(content))
+                        isOK = true;
+                }
+                else
+                {
+                    if(rep.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        ShowTeachingTip("认证失败","请检查用户名和密码");
+                    }
+                }
+            }
+            catch (UriFormatException ex)
+            {
+                //出错
+                ShowTeachingTip("网页访问失败", $"{ex.Message}，请检查地址和端口");
+            }
+
+
+            return isOK;
+        }
+
+        private void ShowTeachingTip(string subtitle,string content=null)
+        {
+            LightDismissTeachingTip.Subtitle = subtitle;
+            if(content != null)
+                LightDismissTeachingTip.Content = content;
+
+            LightDismissTeachingTip.IsOpen = true;
+        }
+
+        private void BitCometSavePathOpen_Click(object sender, RoutedEventArgs e)
+        {
+            var BitCometSavePath = AppSettings.BitCometSavePath;
+
+            if (BitCometSavePath == null)
+                return;
+            FileMatch.LaunchFolder(BitCometSavePath);
+        }
+
+        private async void BitCometSavePathChange_Click(object sender, RoutedEventArgs e)
+        {
+            FolderPicker folderPicker = new();
+            folderPicker.FileTypeFilter.Add("*");
+            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.AppMainWindow);
+            folderPicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+
+            WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hwnd);
+
+            var folder = await folderPicker.PickSingleFolderAsync();
+
+            if (folder != null)
+            {
+                if (folder.Path == AppSettings.BitCometSavePath)
+                {
+                    ShowTeachingTip("选择目录与原目录相同，未修改");
+                }
+                else
+                {
+                    BitCometSavePath_TextBox.Text = folder.Path;
+
+                    AppSettings.BitCometSavePath = folder.Path;
+                }
+            }
+        }
+
+        private async void Aria2SettingsCheck_Click(object sender, RoutedEventArgs e)
+        {
+            DownApiSettings aria2Settings = checkAria2SettingsFormat(Aria2DownApi_TextBox.Text);
+
+            if (aria2Settings == null)
+                return;
+
+            Aria2CheckStatus.status = Status.doing;
+
+            bool isOK = await IsAriannaSettingOK(aria2Settings.Password, aria2Settings.ApiUrl);
+
+            if (isOK)
+                Aria2CheckStatus.status = Status.success;
+            else
+                Aria2CheckStatus.status = Status.error;
+        }
+
+        private void Aria2tSettingsSave_Click(object sender, RoutedEventArgs e)
+        {
+            DownApiSettings aria2Settings = checkAria2SettingsFormat(Aria2DownApi_TextBox.Text);
+
+            if (aria2Settings == null)
+                return;
+
+            AppSettings.Aria2Settings = aria2Settings;
+        }
+
+        private DownApiSettings checkAria2SettingsFormat(string fullApiUrl)
+        {
+            DownApiSettings aria2Settings = new();
+
+            if (string.IsNullOrWhiteSpace(fullApiUrl))
+            {
+                ShowTeachingTip("输入不能为空");
+
+                return null;
+            }
+
+            var isMatch = Regex.Match(fullApiUrl, "^https?://(\\w+:\\w+)@[\\w.]+(:\\d+)?/jsonrpc$");
+
+            if (!isMatch.Success)
+            {
+                ShowTeachingTip("请检查格式是否正确");
+                return null;
+            }
+
+            aria2Settings.ApiUrl = isMatch.Value;
+            //aria2Settings.UserName = isMatch.Groups[2].Value;
+            aria2Settings.Password = isMatch.Groups[1].Value;
+
+            return aria2Settings;
+        }
+
+        private async Task<bool> IsAriannaSettingOK(string pwd, string url)
+        {
+            bool isOK = false;
+
+            Aria2Request requclass = new() { jsonrpc = "2.0",
+                method = "aria2.getVersion",
+                id = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString(),
+                _params = new string[] { pwd } };
+
+            var myContent = JsonConvert.SerializeObject(requclass);
+
+            myContent = myContent.Replace("_params", "params");
+
+            HttpClient httpClient = new HttpClient()
+            {
+                Timeout = TimeSpan.FromSeconds(5)
+            };
+            var Content = new StringContent(myContent, Encoding.UTF8, "application/json");
+
+            try
+            {
+                HttpResponseMessage rep = await httpClient.PostAsync(url, Content);
+
+                if (rep.IsSuccessStatusCode)
+                {
+                    string content = await rep.Content.ReadAsStringAsync();
+
+                    if (!string.IsNullOrWhiteSpace(content))
+                        isOK = true;
+                }
+                else
+                {
+                    if (rep.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                    {
+                        ShowTeachingTip("请求失败", "请检查Secret");
+                    }
+                    else if (rep.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    {
+                        ShowTeachingTip("请求地址有误", "请检查 地址是否以 \"/jsonrpc\" 结尾");
+                    }
+                    else if (rep.StatusCode == System.Net.HttpStatusCode.BadGateway)
+                    {
+                        ShowTeachingTip("端口有误", "请检查端口");
+                    }
+
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                //出错
+                ShowTeachingTip("请求失败", $"{ex.Message}，请检查地址和端口");
+            }
+            catch (TaskCanceledException ex)
+            {
+                //出错
+                ShowTeachingTip("请求超时", $"{ex.Message}，请检查地址");
+            }
+
+
+            return isOK;
+        }
+
+        private async void Aria2SavePathChange_Click(object sender, RoutedEventArgs e)
+        {
+            FolderPicker folderPicker = new();
+            folderPicker.FileTypeFilter.Add("*");
+            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.AppMainWindow);
+            folderPicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+
+            WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hwnd);
+
+            var folder = await folderPicker.PickSingleFolderAsync();
+
+            if (folder != null)
+            {
+                if (folder.Path == AppSettings.Aria2SavePath)
+                {
+                    ShowTeachingTip("选择目录与原目录相同，未修改");
+                }
+                else
+                {
+                    Aria2SavePath_TextBox.Text = folder.Path;
+
+                    AppSettings.Aria2SavePath = folder.Path;
+                }
+            }
+        }
+
+        private void Aria2SavePathOpen_Click(object sender, RoutedEventArgs e)
+        {
+            var Aria2SavePath = AppSettings.Aria2SavePath;
+
+            if (Aria2SavePath == null)
+                return;
+            FileMatch.LaunchFolder(Aria2SavePath);
+        }
+
+        private void Aria2SavePathClear_Click(object sender, RoutedEventArgs e)
+        {
+            AppSettings.Aria2SavePath = String.Empty;
+            Aria2SavePath_TextBox.Text = null;
+        }
+
+        private void BitCometSavePathClear_Click(object sender, RoutedEventArgs e)
+        {
+            AppSettings.BitCometSavePath = String.Empty;
+            BitCometSavePath_TextBox.Text = null;
         }
     }
 }
