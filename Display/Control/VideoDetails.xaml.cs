@@ -14,6 +14,7 @@ using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -190,10 +191,41 @@ namespace Display.Control
 
             WebApi webapi = new();
 
+            //下载方式
+            WebApi.downType downType;
+            switch (DownDialogContent.DownMethod)
+            {
+                case "比特彗星":
+                    downType = WebApi.downType.bc;
+                    if (AppSettings.BitCometSettings == null)
+                        ShowTeachingTip("还没有完成比特彗星的设置，请移步到“设置->下载方式->BitComet”完成相关配置");
+                    break;
+                case "aria2":
+                    downType = WebApi.downType.aria2;
+                    if (AppSettings.Aria2Settings == null)
+                        ShowTeachingTip("还没有完成Aria2的设置，请移步到“设置->下载方式->Aria2”完成相关配置");
+                    break;
+                default:
+                    downType = WebApi.downType._115;
+                    break;
+            }
+            
+            string savePath = AppSettings.BitCometSavePath;
+
+
             //下载全部
             if (result == ContentDialogResult.Primary)
             {
-                webapi.RequestDown(videoinfoList);
+                //下载数量大于1则下载在新文件夹下
+                string topFolderName = null;
+                if (videoinfoList.Count > 1)
+                    topFolderName = name;
+                bool isOk = await webapi.RequestDown(videoinfoList, downType, savePath, topFolderName);
+
+                if (isOk)
+                    ShowTeachingTip("发送下载请求成功");
+                else
+                    ShowTeachingTip("发送下载请求失败");
             }
 
             //下载选中
@@ -215,7 +247,18 @@ namespace Display.Control
                         }
                     }
                 }
-                webapi.RequestDown(downVideoInfoList);
+
+                //下载数量大于1则下载在新文件夹下
+                string topFolderName = null;
+                if (downVideoInfoList.Count > 1)
+                    topFolderName = name;
+
+                bool isOk = await webapi.RequestDown(downVideoInfoList, downType, savePath, topFolderName);
+
+                if (isOk)
+                    ShowTeachingTip("发送下载请求成功");
+                else
+                    ShowTeachingTip("发送下载请求失败");
             }
             else
             {
@@ -397,6 +440,15 @@ namespace Display.Control
             string score_str = sender.Value == 0 ? "-1" : sender.Value.ToString();
 
             DataAccess.UpdateSingleDataFromVideoInfo(resultinfo.truename, "score", score_str);
+        }
+
+        private void ShowTeachingTip(string subtitle, string content = null)
+        {
+            LightDismissTeachingTip.Subtitle = subtitle;
+            if (content != null)
+                LightDismissTeachingTip.Content = content;
+
+            LightDismissTeachingTip.IsOpen = true;
         }
     }
 }

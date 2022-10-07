@@ -14,6 +14,13 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using RestSharp;
+using Windows.UI.Notifications;
+using HtmlAgilityPack;
+using Windows.Media.Ocr;
+using Windows.Media.Protection.PlayReady;
+using System.IO;
+using System.Web;
+using OpenCvSharp;
 
 namespace Data
 {
@@ -27,7 +34,7 @@ namespace Data
         public static bool isEnterHiddenMode;
         public TokenInfo TokenInfo;
 
-        string api_version = "2.0.1.7";
+        //string api_version = "2.0.1.7";
 
         public WebApi(bool useCookie=true)
         {
@@ -594,12 +601,37 @@ namespace Data
             return QRCodeInfo;
         }
 
+        public enum downType {_115 ,bc, aria2};
+        public async Task<bool> RequestDown(List<Datum> videoInfoList, downType downType=downType._115, string savePath = null,string topFolderName=null)
+        {
+            bool success = false;
+
+            //115只支持文件
+            if (downType == downType._115)
+                success = await RequestDownBy115Browser(videoInfoList);
+            //BitComet支持文件和文件夹
+            else if (downType == downType.bc)
+            {
+                success = await RequestDownByBitComet(videoInfoList, save_path: savePath, topFolderName: topFolderName);
+            }
+            //Arai2也支持文件和文件夹
+            else if (downType == downType.aria2)
+            {
+                success = await RequestDownByAria2(videoInfoList, save_path: savePath, topFolderName: topFolderName);
+            }
+
+            return success;
+        }
+
         /// <summary>
         /// 请求115浏览器下载
         /// </summary>
         /// <param name="videoInfoList"></param>
-        public async void RequestDown(List<Datum> videoInfoList)
+        async Task<bool> RequestDownBy115Browser(List<Datum> videoInfoList)
         {
+
+            bool isSuccess = false;
+
             var downRequest = new Browser_115_Request();
             //UID
             downRequest.uid = videoInfoList[0].uid;
@@ -644,12 +676,362 @@ namespace Data
 
             if (success)
             {
+                isSuccess = true;
                 // URI launched
             }
             else
             {
                 // URI launch failed
             }
+
+            return isSuccess;
+        }
+
+        /// <summary>
+        /// 请求比特彗星下载
+        /// </summary>
+        /// <param name="videoInfoList"></param>
+        /// <returns></returns>
+        async Task<bool> RequestDownByBitComet(List<Datum> videoInfoList, string save_path, string ua= "Mozilla/5.0; 115Desktop/2.0.1.7", string topFolderName = null)
+        {
+            bool success=true;
+
+            var BitCometSettings = AppSettings.BitCometSettings;
+
+            if (BitCometSettings == null)
+                return false;
+
+
+            string baseUrl = BitCometSettings.ApiUrl;
+
+            var handler = new HttpClientHandler()
+            {
+                UseDefaultCredentials = true,
+                Credentials = new NetworkCredential(BitCometSettings.UserName, BitCometSettings.Password),
+            };
+
+            var client = new HttpClient(handler);
+
+            //存储路径
+            if (save_path == null)
+                save_path = AppSettings.BitCometSavePath;
+
+            //应用设置中没有，则从比特彗星的设置中读取
+            if (string.IsNullOrEmpty(save_path))
+                save_path = await getBitCometDefaultSavePath(client,baseUrl);
+
+            if (topFolderName != null)
+                save_path = Path.Combine(save_path, topFolderName);
+
+            foreach (Datum datum in videoInfoList)
+            {
+                string pc = datum.pc;
+
+                //文件夹
+                if (string.IsNullOrEmpty(datum.fid)||(!string.IsNullOrEmpty(datum.fid) && datum.fid == "0"))
+                {
+                    string newSavePath = Path.Combine(save_path, datum.n);
+                    //遍历文件夹并下载
+                    GetAllFilesTraverseAndDownByBitComet(client, baseUrl, datum, ua, newSavePath);
+                }
+                //文件
+                else
+                {
+                    bool isOk = await pushOneFileDownRequestToBitComet(client, baseUrl, datum, ua, save_path);
+
+                    if (!isOk)
+                        success = false;
+                }
+            }
+
+            return success;
+        }
+
+        /// <summary>
+        /// 请求Aria2下载
+        /// </summary>
+        /// <param name="videoInfoList"></param>
+        /// <returns></returns>
+        async Task<bool> RequestDownByAria2(List<Datum> videoInfoList, string save_path, string ua = "Mozilla/5.0; 115Desktop/2.0.1.7", string topFolderName = null)
+        {
+            var Aria2Settings = AppSettings.Aria2Settings;
+
+            if (Aria2Settings == null)
+                return false;
+
+            //存储路径
+            if (string.IsNullOrEmpty(save_path))
+            {
+                save_path = AppSettings.BitCometSavePath;
+            }
+
+            //应用设置中没有，则从Aria2的设置中读取
+            if (string.IsNullOrEmpty(save_path))
+                save_path = await getAria2DefaultSavePath(Aria2Settings.ApiUrl, Aria2Settings.Password, ua);
+
+            if (topFolderName != null)
+                save_path = Path.Combine(save_path, topFolderName);
+
+            bool success =  await GetAllFilesTraverseAndDownByAria2(videoInfoList, Aria2Settings.ApiUrl, Aria2Settings.Password, save_path,ua);
+
+            return success;
+        }
+
+        public async Task<bool> GetAllFilesTraverseAndDownByAria2(List<Datum> videoInfoList,string apiUrl,string password,string save_path,string ua)
+        {
+            bool success = true;
+
+            Dictionary<string,string> fileList = new();
+
+            foreach (Datum datum in videoInfoList)
+            {
+                //文件夹
+                if (string.IsNullOrEmpty(datum.fid) || (!string.IsNullOrEmpty(datum.fid) && datum.fid == "0"))
+                {
+                    //获取该文件夹下的文件和文件夹
+                    WebFileInfo webFileInfo = GetFile(datum.cid);
+                    if (webFileInfo.count == 0)
+                    {
+                        success = false;
+                        continue;
+                    }
+
+                    string newSavePath = Path.Combine(save_path, datum.n);
+                    bool isOK = await GetAllFilesTraverseAndDownByAria2(webFileInfo.data.ToList(),apiUrl, password, newSavePath, ua);
+
+                    if(!isOK)
+                        success = false;
+                }
+
+                //文件
+                else
+                {
+                    //一般只有一个
+                    var downUrlList = GetDownUrl(datum.pc, ua);
+                    if(downUrlList.Count == 0)
+                    {
+                        success = false;
+                        continue;
+                    }
+
+                    fileList.Add(datum.sha, downUrlList.First().Value);
+                }
+            }
+
+            //文件
+            if (fileList.Count > 0)
+            {
+                foreach(var file in fileList)
+                {
+
+                    bool isOK = await pushDownRequestToAria2(apiUrl, password, new List<string>() { file.Value }, ua, save_path, file.Key);
+
+                    if (!isOK)
+                        success = false;
+                }
+            }
+
+            return success;
+        }
+
+        /// <summary>
+        /// 链接只能一个一个添加，添加多个视为为同一文件的不同源
+        /// </summary>
+        /// <param name="apiUrl"></param>
+        /// <param name="password"></param>
+        /// <param name="urls"></param>
+        /// <param name="ua"></param>
+        /// <param name="save_path"></param>
+        /// <returns></returns>
+        async Task<bool> pushDownRequestToAria2(string apiUrl,string password,List<string> urls, string ua, string save_path,string sha1=null)
+        {
+            bool success = false;
+
+            save_path=save_path.Replace("\\", "/");
+
+            string gid = sha1 != null ? sha1 : DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
+
+            string myContent = "{\"jsonrpc\":\"2.0\","+
+                "\"method\": \"aria2.addUri\","+
+                "\"id\": \""+ gid + "\"," +
+                "\"params\": [ \""+ password + "\","+
+                            "[\"" + string.Join("\",\"", urls) + "\"]," +
+                            "{\"referer\": \"https://115.com/?cid=0&offset=0&tab=&mode=wangpan\","+
+                            "\"header\": [\"User-Agent: " + ua +"\"],"+
+                            "\"dir\": \"" + save_path + "\"}]}";
+
+            HttpClient client = new HttpClient()
+            {
+                Timeout = TimeSpan.FromSeconds(5)
+            };
+            var Content = new StringContent(myContent, Encoding.UTF8, "application/json");
+
+            try
+            {
+                HttpResponseMessage rep = await client.PostAsync(apiUrl, Content);
+
+                if (rep.IsSuccessStatusCode)
+                {
+                    string strResult = await rep.Content.ReadAsStringAsync();
+                    Console.WriteLine(strResult);
+
+                    if (!string.IsNullOrWhiteSpace(strResult))
+                        success = true;
+                }
+            }
+            catch
+            {
+                success = false;
+            }
+
+            return success;
+        }
+
+        async Task<bool> pushOneFileDownRequestToBitComet(HttpClient client, string baseUrl, Datum datum,string ua,string save_path)
+        {
+            bool success = false;
+
+            var urlList = GetDownUrl(datum.pc, ua);
+
+            if (urlList.Count == 0)
+                return false;
+
+            bool isOk = await pushDownRequestToBitComet(client,
+                baseUrl,
+                urlList.First().Value,
+                save_path,
+                datum.n,
+                $"https://115.com/?cid={datum.cid}=0&tab=download&mode=wangpan",
+                ua);
+
+            if (isOk)
+                success = true;
+
+            return success;
+        }
+
+        public async void GetAllFilesTraverseAndDownByBitComet(HttpClient client, string baseUrl, Datum datum, string ua, string save_path)
+        {
+            //获取该文件夹下的文件和文件夹
+            WebFileInfo webFileInfo = GetFile(datum.cid);
+
+            foreach(var data in webFileInfo.data)
+            {
+                //文件夹
+                if (string.IsNullOrEmpty(data.fid) || (!string.IsNullOrEmpty(data.fid) && data.fid == "0"))
+                {
+                    string newSavePath = Path.Combine(save_path, data.n);
+                    GetAllFilesTraverseAndDownByBitComet(client, baseUrl, data, ua, newSavePath);
+
+                    //延迟1s;
+                    await Task.Delay(1000);
+                }
+                //文件
+                else
+                {
+                    await pushOneFileDownRequestToBitComet(client, baseUrl, data, ua, save_path);
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// 向比特彗星发送下载请求
+        /// </summary>
+        /// <param name="client">带user和passwd的HttpClient</param>
+        /// <param name="baseUrl">比特彗星接口地址</param>
+        /// <param name="downUrl">文件下载地址</param>
+        /// <param name="save_path">文件保存路径</param>
+        /// <param name="filename">文件名臣</param>
+        /// <param name="referrer">下载需要的referrer</param>
+        /// <param name="user_agent">下载需要的user_agent</param>
+        /// <param name="cookie">个别需要的Cookie</param>
+        /// <returns></returns>
+        async Task<bool> pushDownRequestToBitComet(HttpClient client,string baseUrl, string downUrl, string save_path, string filename="",string referrer="",string user_agent="",string cookie="")
+        {
+            bool isOk = false;
+
+
+            var values = new Dictionary<string, string>
+            {
+                { "url", downUrl},
+                {"save_path",save_path },
+                {"connection","200" },
+                {"file_name",filename },
+                {"referrer",referrer },
+                {"user_agent",user_agent },
+                {"cookie",cookie },
+                {"mirror_url_list",""}
+            };
+            var content = new FormUrlEncodedContent(values);
+
+            var response = await client.PostAsync(baseUrl +"/panel/task_add_httpftp_result", content);
+
+            if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
+                isOk = true;
+
+            return isOk;
+        }
+
+        /// <summary>
+        /// 获取网页中比特彗星的默认存储地址
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="baseUrl"></param>
+        /// <returns></returns>
+        async Task<string> getBitCometDefaultSavePath(HttpClient client,string baseUrl)
+        {
+            string savePath = null;
+
+            var response = await client.GetAsync(baseUrl + "/panel/task_add_httpftp");
+
+            if(response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
+            {
+                HtmlDocument htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(await response.Content.ReadAsStringAsync());
+
+                var savePathNode = htmlDoc.DocumentNode.SelectSingleNode("//input[@id='save_path']");
+
+                if (savePathNode != null)
+                    savePath = savePathNode.GetAttributeValue("value", null);
+            }
+
+            return savePath;
+        }
+
+        async Task<string> getAria2DefaultSavePath(string apiUrl, string password, string ua)
+        {
+            string save_path = string.Empty;
+
+            string myContent = "{\"jsonrpc\":\"2.0\"," +
+                "\"method\": \"aria2.getGlobalOption\"," +
+                "\"id\": " + DateTimeOffset.Now.ToUnixTimeMilliseconds() + "," +
+                "\"params\": [ \"" + password + "\"] }";
+
+            HttpClient client = new HttpClient()
+            {
+                Timeout = TimeSpan.FromSeconds(5)
+            };
+            var Content = new StringContent(myContent, Encoding.UTF8, "application/json");
+
+            try
+            {
+                HttpResponseMessage rep = await client.PostAsync(apiUrl, Content);
+
+                if (rep.IsSuccessStatusCode)
+                {
+                    string strResult = await rep.Content.ReadAsStringAsync();
+
+                    Aria2GlobalOptionRequest aria2GlobalOptionRequest = JsonConvert.DeserializeObject<Aria2GlobalOptionRequest>(strResult);
+
+                    save_path = aria2GlobalOptionRequest?.result?.dir;
+                }
+            }
+            catch
+            {
+            }
+
+            return save_path;
         }
 
         /// <summary>
@@ -731,9 +1113,9 @@ namespace Data
         /// </summary>
         /// <param name="pickcode"></param>
         /// <returns></returns>
-        public List<string> GetDownUrl(string pickcode)
+        public Dictionary<string,string> GetDownUrl(string pickcode,string ua= "Mozilla/5.0; 115Desktop/2.0.1.7")
         {
-            List<string> downUrlList = new();
+            Dictionary<string, string> downUrlList = new();
             long tm = DateTimeOffset.Now.ToUnixTimeSeconds();
             string src = $"{{\"pickcode\":\"{pickcode}\"}}";
             var item = m115.encode(src, tm);
@@ -745,13 +1127,24 @@ namespace Data
 
             var client = new RestClient($"http://proapi.115.com/app/chrome/downurl?t={tm}");
             var request = new RestRequest();
-            request.AddHeader("User-Agent", "Mozilla/5.0; 115Desktop/2.0.1.7");
+            request.AddHeader("User-Agent", ua);
             request.AddHeader("Cookie", AppSettings._115_Cookie);
             request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
             var body = $"data={dataUrlEncode}";
             request.AddParameter("application/x-www-form-urlencoded", body, ParameterType.RequestBody);
-            var response = client.Post(request);
+
+            RestResponse response;
+            try
+            {
+                response = client.Post(request);
+            }
+            catch
+            {
+                return downUrlList;
+            }
+
             DownUrlBase64EncryptInfo downurl_base64EncryptInfo;
+
             if (response.IsSuccessful && response.Content != null)
             {
                 try
@@ -774,11 +1167,17 @@ namespace Data
                     //JObject json = JsonConvert.DeserializeObject<JObject>(rep);
                     var json = JObject.Parse(rep);
 
+                    //如使用的pc是属于文件夹，url为false
                     foreach (var children in json)
                     {
                         var videoInfo = children.Value;
-                        var downUrl = videoInfo["url"]["url"].ToString();
-                        downUrlList.Add(downUrl);
+
+                        if (videoInfo["url"].HasValues)
+                        {
+                            var downUrl = videoInfo["url"]?["url"].ToString();
+                            downUrlList.Add(videoInfo["file_name"].ToString(), downUrl);
+                        }
+
                     }
                 }
             }
@@ -800,6 +1199,11 @@ namespace Data
             }
         }
 
+        /// <summary>
+        /// 解析m3u8内容
+        /// </summary>
+        /// <param name="m3u8_info"></param>
+        /// <returns></returns>
         public async Task<m3u8Info> Getm3u8Content(m3u8Info m3u8_info)
         {
             HttpResponseMessage response;
@@ -832,7 +1236,6 @@ namespace Data
 
             return m3u8_info;
         }
-
 
         public async Task<List<m3u8Info>> Getm3u8InfoByPickCode(string pickCode)
         {
@@ -878,12 +1281,27 @@ namespace Data
         /// <param name="showWindow"></param>
         /// <param name="referrerUrl"></param>
         /// <param name="user_agnet"></param>
-        public void Play115SourceVideoWithMpv(string playUrl, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string user_agnet = "Mozilla/5.0; 115Desktop/2.0.1.7")
+        public void Play115SourceVideoWithMpv(string playUrl, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string user_agnet = "Mozilla/5.0; 115Desktop/2.0.1.7",string title=null)
         {
             var process = new Process();
+            
+            string addTitle = string.Empty;
+
+            if (title == null)
+            {
+                var matchTitle = Regex.Match(HttpUtility.UrlDecode(playUrl), @"/([-@.\w]+?\.\w+)\?t=");
+                if (matchTitle.Success)
+                    addTitle = @$"  --title=""{matchTitle.Groups[1].Value}""";
+            }
+            else
+            {
+                addTitle = @$"  --title=""{title}""";
+            }
 
             process.StartInfo.FileName = FileName;
-            process.StartInfo.Arguments = @$" ""{playUrl}"" --referrer=""{referrerUrl}"" --user-agent=""{user_agnet}""";
+
+            process.StartInfo.FileName = FileName;
+            process.StartInfo.Arguments = @$" ""{playUrl}"" --referrer=""{referrerUrl}"" --user-agent=""{user_agnet}""{addTitle}";
             process.StartInfo.UseShellExecute = false;
             if (!showWindow)
             {
@@ -894,7 +1312,44 @@ namespace Data
         }
 
         /// <summary>
-        /// vlc播放
+        /// vlc播放（原画）
+        /// </summary>
+        /// <param name="playUrl"></param>
+        /// <param name="FileName"></param>
+        /// <param name="showWindow"></param>
+        /// <param name="referrerUrl"></param>
+        /// <param name="user_agnet"></param>
+        public static void Play115SourceVideoWithVlc(string playUrl, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string user_agnet = "Mozilla/5.0; 115Desktop/2.0.1.7",string title=null)
+        {
+            var process = new Process();
+
+            string addTitle = string.Empty;
+            if(title == null)
+            {
+                var matchTitle = Regex.Match(HttpUtility.UrlDecode(playUrl), @"/([-@.\w]+?\.\w+)\?t=");
+                if (matchTitle.Success)
+                    addTitle = $" :meta-title={matchTitle.Groups[1].Value}";
+            }
+            else
+            {
+                addTitle = $" :meta-title={title}";
+            }
+
+
+            process.StartInfo.FileName = FileName;
+            process.StartInfo.Arguments = @$" ""{playUrl}"" :http-referrer=""{referrerUrl}"" :http-user-agent=""{user_agnet}""{addTitle}";
+            //process.StartInfo.Arguments = @$" ""{playUrl}""";
+            process.StartInfo.UseShellExecute = false;
+            if (!showWindow)
+            {
+                process.StartInfo.CreateNoWindow = true;
+            }
+
+            process.Start();
+        }
+
+        /// <summary>
+        /// vlc播放(m3u8)
         /// </summary>
         /// <param name="playUrl"></param>
         /// <param name="FileName"></param>
@@ -911,16 +1366,32 @@ namespace Data
             }
         }
     
-        public void PlayVideoWithOriginUrl(string pickcode)
+        public enum playMethod { mpv,vlc}
+        /// <summary>
+        /// 原画播放
+        /// </summary>
+        /// <param name="pickcode"></param>
+        public void PlayVideoWithOriginUrl(string pickcode ,playMethod playMethod)
         {
-            var downUrlList = GetDownUrl(pickcode);
-            if (downUrlList.Count==0) return;
-
-            string downUrl = downUrlList[0];
-            switch (AppSettings.PlayerSelection)
+            switch (playMethod)
             {
-                case 2:
-                    Play115SourceVideoWithMpv(downUrl,AppSettings.MpvExePath,false);
+                case playMethod.mpv:
+                    string ua = "Mozilla/5.0; Windows NT/10.0.19044; 115Desktop/2.0.1.7";
+                    var downUrlList = GetDownUrl(pickcode,ua);
+                    if (downUrlList.Count == 0) return;
+
+                    string downUrl = downUrlList.First().Value;
+                    Play115SourceVideoWithMpv(downUrl,AppSettings.MpvExePath,false,user_agnet:ua, title: downUrlList.First().Key);
+                    break;
+                case playMethod.vlc:
+                    //vlc不支持带“; ”的user-agent
+                    ua = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36 115Browser/8.3.0";
+                    downUrlList = GetDownUrl(pickcode,ua);
+                    if (downUrlList.Count == 0) return;
+
+                    downUrl = downUrlList.First().Value;
+
+                    Play115SourceVideoWithVlc(downUrl, AppSettings.VlcExePath, false, user_agnet: ua,title:downUrlList.First().Key);
                     break;
             }
         }

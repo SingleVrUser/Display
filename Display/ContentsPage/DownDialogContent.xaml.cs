@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Data;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
@@ -7,8 +8,10 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -21,7 +24,7 @@ namespace Display.ContentsPage
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class DownDialogContent : Page
+    public sealed partial class DownDialogContent : Page, INotifyPropertyChanged
     {
         //public List<Data.Datum> videoInfoList = new();
 
@@ -53,20 +56,50 @@ namespace Display.ContentsPage
         private string downUrl_115 = "https://pc.115.com/browser.html";
         private string prompt_aria2 = "调用 Aria2 下载，请确保已安装此应用并完成相关设置";
         private string downUrl_aria2 = "https://aria2.github.io/";
+        private string prompt_bitcomet = "调用 比特彗星 下载，请确保已安装此应用并完成相关设置";
+        private string downUrl_bitcomet = "https://www.bitcomet.com/en/downloads";
+
+        string downMethod = AppSettings.DefaultDownMethod;
+        public string DownMethod
+        {
+            get => downMethod;
+            set
+            {
+                downMethod = value;
+                AppSettings.DefaultDownMethod = downMethod;
+                OnPropertyChanged();
+
+
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         private void Select_115(object sender, RoutedEventArgs e)
         {
-            DownMethodSelect_DropDownButton.Content = "115";
+            DownMethod = "115";
             ContentTextBlock.Text = prompt_115;
             DownHyperLinkButton.NavigateUri = new Uri(downUrl_115);
         }
 
+        private void Select_bitcomet(object sender, RoutedEventArgs e)
+        {
+            DownMethod = "比特彗星";
+            ContentTextBlock.Text = prompt_bitcomet;
+            DownHyperLinkButton.NavigateUri = new Uri(downUrl_bitcomet);
+        }
+
         private void Select_aria2(object sender, RoutedEventArgs e)
         {
-            DownMethodSelect_DropDownButton.Content = "aria2";
+            DownMethod = "aria2";
             ContentTextBlock.Text = prompt_aria2;
             DownHyperLinkButton.NavigateUri = new Uri(downUrl_aria2);
         }
+
 
         private void ContentStackPanel_Loaded(object sender, RoutedEventArgs e)
         {
@@ -78,5 +111,6 @@ namespace Display.ContentsPage
         {
             string colorName = e.AddedItems[0].ToString();
         }
+
     }
 }

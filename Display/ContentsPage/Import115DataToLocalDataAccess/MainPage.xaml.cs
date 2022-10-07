@@ -11,6 +11,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,6 +20,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Gaming.Preview.GamesEnumeration;
+using static Data.WebApi;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -56,6 +59,14 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                 url = "https://115.com/?cid=0&offset=0&mode=wangpan";
             }
             webview.Source = new Uri(url);
+
+            webview.NavigationCompleted += Webview_NavigationCompleted;
+        }
+
+        private void Webview_NavigationCompleted(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs args)
+        {
+            //加载完成显示下载按钮
+            DownButton.Visibility = Visibility.Visible;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -115,11 +126,12 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
             List<SelectedItem> selectedItemList = new();
 
+            //选择文件夹和文件
             string inputElementsIdAndValueAsJsonString = await webview.ExecuteScriptAsync(
                 "Array.from(" +
                         "document.getElementById('js_center_main_box').getElementsByTagName('iframe')[0].contentDocument.getElementsByClassName('list-contents')[0].getElementsByTagName('li')" +
                     ").filter(" +
-                        "li => li.getAttribute('class') == 'selected' & li.getAttribute('file_type') == 0" +
+                        "li => li.getAttribute('class') == 'selected'" +
                     ").map(" +
                         "li_selected => {  " +
                             "return {'id': li_selected.getAttribute('cate_id'), " +
@@ -127,7 +139,24 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                                 "'file_count': li_selected.getAttribute('category_file_count'), " +
                                 "'folder_count': li_selected.getAttribute('cate_folder_count')," +
                                 "'hasHiddenFile': li_selected.getAttribute('hdf')," +
-                                " 'size': li_selected.getAttribute('cate_size')}  });");
+                                " 'size': li_selected.getAttribute('cate_size')," +
+                                " 'file_type': li_selected.getAttribute('file_type')," +
+                                " 'file_id': li_selected.getAttribute('file_id')," +
+                                " 'pick_code': li_selected.getAttribute('pick_code')}  });");
+            //string inputElementsIdAndValueAsJsonString = await webview.ExecuteScriptAsync(
+            //    "Array.from(" +
+            //            "document.getElementById('js_center_main_box').getElementsByTagName('iframe')[0].contentDocument.getElementsByClassName('list-contents')[0].getElementsByTagName('li')" +
+            //        ").filter(" +
+            //            "li => li.getAttribute('class') == 'selected' & li.getAttribute('file_type') == 0" +
+            //        ").map(" +
+            //            "li_selected => {  " +
+            //                "return {'id': li_selected.getAttribute('cate_id'), " +
+            //                    "'name': li_selected.getAttribute('title') || li_selected.getAttribute('cate_id'), " +
+            //                    "'file_count': li_selected.getAttribute('category_file_count'), " +
+            //                    "'folder_count': li_selected.getAttribute('cate_folder_count')," +
+            //                    "'hasHiddenFile': li_selected.getAttribute('hdf')," +
+            //                    " 'size': li_selected.getAttribute('cate_size')," +
+            //                    " 'pick_code': li_selected.getAttribute('pick_code')}  });");
 
             inputElementsIdAndValueAsJsonString = inputElementsIdAndValueAsJsonString.Replace("null", "0");
 
@@ -138,7 +167,6 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
             return selectedItemList;
         }
-
 
         /// <summary>
         /// 点击了开始按钮
@@ -160,6 +188,8 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             {
                 var selectedItemList = await GetSelectedItems();
 
+                //挑选文件夹
+                selectedItemList = selectedItemList.Where(x => x.file_type == 0).ToList();
 
                 if (selectedItemList.Count == 0)
                 {
@@ -200,7 +230,6 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
             }
         }
-
 
 
         /// <summary>
@@ -291,6 +320,74 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             {
                 DataAccess.DeleteFilesInfoTable();
             }
+        }
+
+        private void DownButton_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            (sender as HyperlinkButton).Opacity = 1;
+        }
+
+        private void DownButton_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            (sender as HyperlinkButton).Opacity = 0.2;
+        }
+
+
+        WebApi webApi;
+        private async void DownButton_Click(object sender, RoutedEventArgs e)
+        {
+            await DownFiles(Data.WebApi.downType.bc);
+
+        }
+
+        private async Task DownFiles(Data.WebApi.downType downtype)
+        {
+            var selectedItemList = await GetSelectedItems();
+
+            if (selectedItemList.Count == 0)
+            {
+                //SelectedNull_TeachingTip.IsOpen = true;
+                ShowTeachingTip("当前未选中要下载的文件或文件夹");
+                return;
+            }
+            else
+            {
+                if (webApi == null)
+                    webApi = new();
+
+                List<Datum> videoinfos = new();
+
+                foreach (var item in selectedItemList)
+                {
+                    Datum datum = new();
+                    datum.cid = item.id;
+                    datum.n = item.name;
+                    datum.pc = item.pick_code;
+                    datum.fid = item.file_id;
+                    videoinfos.Add(datum);
+                }
+
+                //BitComet只需要cid,n,pc三个值
+                bool isSuccess = await webApi.RequestDown(videoinfos, downtype);
+
+                if (!isSuccess)
+                    ShowTeachingTip("请求下载失败");
+            }
+        }
+
+        private void ShowTeachingTip(string subtitle, string content = null)
+        {
+            LightDismissTeachingTip.Subtitle = subtitle;
+            if (content != null)
+                LightDismissTeachingTip.Content = content;
+
+            LightDismissTeachingTip.IsOpen = true;
+        }
+
+        private async void Aria2Down_Click(object sender, RoutedEventArgs e)
+        {
+
+            await DownFiles(Data.WebApi.downType.aria2);
         }
     }
 

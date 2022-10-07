@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml;
 using System;
 using System.IO;
 using System.Linq;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 
 namespace Data
 {
@@ -210,7 +211,7 @@ namespace Data
         public int forever { get; set; }
         public bool is_privilege { get; set; }
         public Privilege privilege { get; set; }
-        
+
         /// <summary>
         /// 用户名
         /// </summary>
@@ -851,7 +852,7 @@ namespace Data
                 else if (!string.IsNullOrEmpty(data.ico))
                 {
                     var tmpIcoPath = getPathFromFileType(data.ico);
-                    if(tmpIcoPath != null)
+                    if (tmpIcoPath != null)
                     {
                         IconPath = tmpIcoPath;
                     }
@@ -894,7 +895,7 @@ namespace Data
 
         //public event PropertyChangedEventHandler PropertyChanged;
 
-        public enum FileType { Folder, File};
+        public enum FileType { Folder, File };
         public string Name { get; set; }
         public string Cid { get; set; }
         public string Fid { get; set; }
@@ -989,20 +990,20 @@ namespace Data
                 } },
             };
 
-            
-            foreach(var kvp in fileType)
+
+            foreach (var kvp in fileType)
             {
                 string key = kvp.Key;
                 var values = kvp.Value;
 
-                foreach(var kvp2 in values)
+                foreach (var kvp2 in values)
                 {
                     string key2 = kvp2.Key;
                     List<string> values2 = kvp2.Value;
 
-                    foreach(string key3 in values2)
+                    foreach (string key3 in values2)
                     {
-                        if(key3 == ico)
+                        if (key3 == ico)
                         {
                             IconPath = $"ms-appx:///Assets/115/file_type/{key}/{key2}.svg";
                         }
@@ -1012,7 +1013,7 @@ namespace Data
 
             return IconPath;
         }
-        
+
 
         public static string getFileIcon(FileType fileType)
         {
@@ -1029,7 +1030,7 @@ namespace Data
 
             }
 
-                    return IconUrl;
+            return IconUrl;
         }
 
     }
@@ -1037,7 +1038,7 @@ namespace Data
     /// <summary>
     /// 状态
     /// </summary>
-    public enum Status { doing, success, error ,pause, beforeStart };
+    public enum Status { doing, success, error, pause, beforeStart };
 
     /// <summary>
     /// 浏览器选择项
@@ -1049,6 +1050,9 @@ namespace Data
         public int file_count { get; set; }
         public int folder_count { get; set; }
         public string size { get; set; }
+        public string pick_code { get; set; }
+        public int file_type { get; set; }
+        public string file_id { get; set; }
 
         /// <summary>
         /// 是否有隐藏文件，有为1，无为0
@@ -1081,7 +1085,7 @@ namespace Data
         public ParentPath[] paths { get; set; }
 
         public int allCount
-        { 
+        {
             get
             {
                 return count + folder_count;
@@ -1093,12 +1097,13 @@ namespace Data
         }
 
 
-        public static Datum ConvertFolderToDatum(FolderCategory folderCategory,string cid)
+        public static Datum ConvertFolderToDatum(FolderCategory folderCategory, string cid)
         {
-            Datum datum = new() {
+            Datum datum = new()
+            {
                 uid = 0,
                 aid = 1,
-                cid =cid,
+                cid = cid,
                 n = folderCategory.file_name,
                 pid = folderCategory.paths[folderCategory.paths.Length - 1].file_id,
                 pc = folderCategory.pick_code,
@@ -1118,19 +1123,19 @@ namespace Data
     }
 
     //115导入数据库的进度信息
-    public enum ProgressStatus { normal, error ,done, cancel}
+    public enum ProgressStatus { normal, error, done, cancel }
     //报告文件数量
     public class GetFilesProgressInfo
     {
-        public int FolderCount { get; set; }=0;
-        public int FilesCount { get; set; } =0;
+        public int FolderCount { get; set; } = 0;
+        public int FilesCount { get; set; } = 0;
         public int AllCount
-        { 
+        {
             get
             {
                 return FolderCount + FilesCount;
             }
-            set 
+            set
             {
                 AllCount = value;
             }
@@ -1302,12 +1307,12 @@ namespace Data
             name = videoinfo.truename;
 
             var tmpList = videoinfo.sampleImageList.Split(',').ToList();
-            if(tmpList.Count > 1)
+            if (tmpList.Count > 1)
             {
                 thumbnailDownUrlList = tmpList;
             }
 
-            if(videoinfo.category.Contains("VR") || videoinfo.series.Contains("VR"))
+            if (videoinfo.category.Contains("VR") || videoinfo.series.Contains("VR"))
             {
                 isVr = true;
             }
@@ -1399,4 +1404,154 @@ namespace Data
         public List<string> pickCodeList { get; set; } = new();
 
     }
+
+    public class Aria2Request
+    {
+        public string jsonrpc { get; set; }
+        public string method { get; set; }
+        public string id { get; set; }
+        public string[] _params { get; set; }
+    }
+
+
+    public class Aria2GlobalOptionRequest
+    {
+        public string id { get; set; }
+        public string jsonrpc { get; set; }
+        public Aria2GlobalOptionRequestResult result { get; set; }
+    }
+
+    public class Aria2GlobalOptionRequestResult
+    {
+        public string allowoverwrite { get; set; }
+        public string allowpiecelengthchange { get; set; }
+        public string alwaysresume { get; set; }
+        public string asyncdns { get; set; }
+        public string autofilerenaming { get; set; }
+        public string autosaveinterval { get; set; }
+        public string btdetachseedonly { get; set; }
+        public string btenablehookafterhashcheck { get; set; }
+        public string btenablelpd { get; set; }
+        public string btforceencryption { get; set; }
+        public string bthashcheckseed { get; set; }
+        public string btloadsavedmetadata { get; set; }
+        public string btmaxopenfiles { get; set; }
+        public string btmaxpeers { get; set; }
+        public string btmetadataonly { get; set; }
+        public string btmincryptolevel { get; set; }
+        public string btremoveunselectedfile { get; set; }
+        public string btrequestpeerspeedlimit { get; set; }
+        public string btrequirecrypto { get; set; }
+        public string btsavemetadata { get; set; }
+        public string btseedunverified { get; set; }
+        public string btstoptimeout { get; set; }
+        public string bttrackerconnecttimeout { get; set; }
+        public string bttrackerinterval { get; set; }
+        public string bttrackertimeout { get; set; }
+        public string cacertificate { get; set; }
+        public string checkcertificate { get; set; }
+        public string checkintegrity { get; set; }
+        public string conditionalget { get; set; }
+        public string confpath { get; set; }
+        public string connecttimeout { get; set; }
+        public string consoleloglevel { get; set; }
+        public string contentdispositiondefaultutf8 { get; set; }
+        public string _continue { get; set; }
+        public string daemon { get; set; }
+        public string deferredinput { get; set; }
+        public string dhtfilepath { get; set; }
+        public string dhtfilepath6 { get; set; }
+        public string dhtlistenport { get; set; }
+        public string dhtmessagetimeout { get; set; }
+        public string dir { get; set; }
+        public string disableipv6 { get; set; }
+        public string diskcache { get; set; }
+        public string downloadresult { get; set; }
+        public string dryrun { get; set; }
+        public string dscp { get; set; }
+        public string enablecolor { get; set; }
+        public string enabledht { get; set; }
+        public string enabledht6 { get; set; }
+        public string enablehttpkeepalive { get; set; }
+        public string enablehttppipelining { get; set; }
+        public string enablemmap { get; set; }
+        public string enablepeerexchange { get; set; }
+        public string enablerpc { get; set; }
+        public string eventpoll { get; set; }
+        public string fileallocation { get; set; }
+        public string followmetalink { get; set; }
+        public string followtorrent { get; set; }
+        public string forcesave { get; set; }
+        public string ftppasv { get; set; }
+        public string ftpreuseconnection { get; set; }
+        public string ftptype { get; set; }
+        public string hashcheckonly { get; set; }
+        public string help { get; set; }
+        public string httpacceptgzip { get; set; }
+        public string httpauthchallenge { get; set; }
+        public string httpnocache { get; set; }
+        public string humanreadable { get; set; }
+        public string keepunfinisheddownloadresult { get; set; }
+        public string listenport { get; set; }
+        public string loglevel { get; set; }
+        public string lowestspeedlimit { get; set; }
+        public string maxconcurrentdownloads { get; set; }
+        public string maxconnectionperserver { get; set; }
+        public string maxdownloadlimit { get; set; }
+        public string maxdownloadresult { get; set; }
+        public string maxfilenotfound { get; set; }
+        public string maxmmaplimit { get; set; }
+        public string maxoveralldownloadlimit { get; set; }
+        public string maxoveralluploadlimit { get; set; }
+        public string maxresumefailuretries { get; set; }
+        public string maxtries { get; set; }
+        public string maxuploadlimit { get; set; }
+        public string metalinkenableuniqueprotocol { get; set; }
+        public string metalinkpreferredprotocol { get; set; }
+        public string minsplitsize { get; set; }
+        public string mintlsversion { get; set; }
+        public string netrcpath { get; set; }
+        public string noconf { get; set; }
+        public string nofileallocationlimit { get; set; }
+        public string nonetrc { get; set; }
+        public string optimizeconcurrentdownloads { get; set; }
+        public string parameterizeduri { get; set; }
+        public string pausemetadata { get; set; }
+        public string peeragent { get; set; }
+        public string peeridprefix { get; set; }
+        public string piecelength { get; set; }
+        public string proxymethod { get; set; }
+        public string quiet { get; set; }
+        public string realtimechunkchecksum { get; set; }
+        public string remotetime { get; set; }
+        public string removecontrolfile { get; set; }
+        public string retrywait { get; set; }
+        public string reuseuri { get; set; }
+        public string rlimitnofile { get; set; }
+        public string rpcalloworiginall { get; set; }
+        public string rpclistenall { get; set; }
+        public string rpclistenport { get; set; }
+        public string rpcmaxrequestsize { get; set; }
+        public string rpcsaveuploadmetadata { get; set; }
+        public string rpcsecure { get; set; }
+        public string savenotfound { get; set; }
+        public string savesession { get; set; }
+        public string savesessioninterval { get; set; }
+        public string seedratio { get; set; }
+        public string serverstattimeout { get; set; }
+        public string showconsolereadout { get; set; }
+        public string showfiles { get; set; }
+        public string socketrecvbuffersize { get; set; }
+        public string split { get; set; }
+        public string stderr { get; set; }
+        public string stop { get; set; }
+        public string streampieceselector { get; set; }
+        public string summaryinterval { get; set; }
+        public string timeout { get; set; }
+        public string truncateconsolereadout { get; set; }
+        public string uriselector { get; set; }
+        public string usehead { get; set; }
+        public string useragent { get; set; }
+    }
+
 }

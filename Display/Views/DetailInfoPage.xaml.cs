@@ -16,6 +16,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using static Data.WebApi;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -188,12 +189,12 @@ namespace Display.Views
                 //mpv播放
                 case 2:
                     webapi = new();
-                    webapi.PlayVideoWithOriginUrl(pickCode);
+                    webapi.PlayVideoWithOriginUrl(pickCode,playMethod.mpv);
                     break;
                 //vlc播放
                 case 3:
                     webapi = new();
-                    webapi.PlayByVlc(pickCode);
+                    webapi.PlayVideoWithOriginUrl(pickCode, playMethod.vlc);
                     break;
 
             }
