@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Windowing;
+﻿using Microsoft.UI;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -38,11 +39,20 @@ namespace Display
         {
             this.InitializeComponent();
 
-            this.Title = "视频播放";
+            //this.Title = "播放";
 
-            appwindow = App.getAppWindow(this);
-            appwindow.SetIcon(Path.Combine(Package.Current.InstalledLocation.Path, "Assets/pokeball.ico"));
+            //appwindow = App.getAppWindow(this);
+
+            //appwindow.TitleBar.ButtonPressedForegroundColor = Colors.White;
+
+            //appwindow.SetIcon(Path.Combine(Package.Current.InstalledLocation.Path, "Assets/pokeball.ico"));
+
+            ExtendsContentIntoTitleBar = true;
+
+            this.SetTitleBar(AppTitleBar);
+
             webview.CoreWebView2Initialized += Webview_CoreWebView2Initialized;
+
 
         }
 

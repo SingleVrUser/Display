@@ -57,18 +57,22 @@ namespace Display.Views
                     }
                     ActorsInfoDict[actor].Add(VideoInfo.truename);
                 }
-
             }
 
+            List<ActorsInfo> tmpInfos = new();
             foreach (var item in ActorsInfoDict)
             {
-                actorinfo.Add(new ActorsInfo
+                tmpInfos.Add(new ActorsInfo
                 {
                     name = item.Key,
                     count = item.Value.Count,
                 });
             }
 
+            tmpInfos = tmpInfos.OrderByDescending(x => x.name == "").ThenBy(x => x.prifilePhotoPath).ToList();
+
+            tmpInfos.ForEach(x => actorinfo.Add(x));
+            
             ProgressRing.IsActive = false;
         }
 

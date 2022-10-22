@@ -35,7 +35,6 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
     {
         private WebView2 webview;
         private Window currentWindow;
-        //private string _stroeUrl;
 
 
         //CancellationTokenSource s_cts;
@@ -60,13 +59,6 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             }
             webview.Source = new Uri(url);
 
-            webview.NavigationCompleted += Webview_NavigationCompleted;
-        }
-
-        private void Webview_NavigationCompleted(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs args)
-        {
-            //加载完成显示下载按钮
-            DownButton.Visibility = Visibility.Visible;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -113,60 +105,60 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             return isHiddenModel;
         }
 
-        /// <summary>
-        /// file_count,folder_count,hasHiddenFile,size可能获取不到（选中数超过两个），所以只使用name和id
-        /// </summary>
-        /// <returns></returns>
-        private async Task<List<SelectedItem>> GetSelectedItems()
-        {
-            if(webview == null)
-            {
-                return null;
-            }
+        ///// <summary>
+        ///// file_count,folder_count,hasHiddenFile,size可能获取不到（选中数超过两个），所以只使用name和id
+        ///// </summary>
+        ///// <returns></returns>
+        //private async Task<List<SelectedItem>> GetSelectedItems()
+        //{
+        //    if(webview == null)
+        //    {
+        //        return null;
+        //    }
 
-            List<SelectedItem> selectedItemList = new();
+        //    List<SelectedItem> selectedItemList = new();
 
-            //选择文件夹和文件
-            string inputElementsIdAndValueAsJsonString = await webview.ExecuteScriptAsync(
-                "Array.from(" +
-                        "document.getElementById('js_center_main_box').getElementsByTagName('iframe')[0].contentDocument.getElementsByClassName('list-contents')[0].getElementsByTagName('li')" +
-                    ").filter(" +
-                        "li => li.getAttribute('class') == 'selected'" +
-                    ").map(" +
-                        "li_selected => {  " +
-                            "return {'id': li_selected.getAttribute('cate_id'), " +
-                                "'name': li_selected.getAttribute('title') || li_selected.getAttribute('cate_id'), " +
-                                "'file_count': li_selected.getAttribute('category_file_count'), " +
-                                "'folder_count': li_selected.getAttribute('cate_folder_count')," +
-                                "'hasHiddenFile': li_selected.getAttribute('hdf')," +
-                                " 'size': li_selected.getAttribute('cate_size')," +
-                                " 'file_type': li_selected.getAttribute('file_type')," +
-                                " 'file_id': li_selected.getAttribute('file_id')," +
-                                " 'pick_code': li_selected.getAttribute('pick_code')}  });");
-            //string inputElementsIdAndValueAsJsonString = await webview.ExecuteScriptAsync(
-            //    "Array.from(" +
-            //            "document.getElementById('js_center_main_box').getElementsByTagName('iframe')[0].contentDocument.getElementsByClassName('list-contents')[0].getElementsByTagName('li')" +
-            //        ").filter(" +
-            //            "li => li.getAttribute('class') == 'selected' & li.getAttribute('file_type') == 0" +
-            //        ").map(" +
-            //            "li_selected => {  " +
-            //                "return {'id': li_selected.getAttribute('cate_id'), " +
-            //                    "'name': li_selected.getAttribute('title') || li_selected.getAttribute('cate_id'), " +
-            //                    "'file_count': li_selected.getAttribute('category_file_count'), " +
-            //                    "'folder_count': li_selected.getAttribute('cate_folder_count')," +
-            //                    "'hasHiddenFile': li_selected.getAttribute('hdf')," +
-            //                    " 'size': li_selected.getAttribute('cate_size')," +
-            //                    " 'pick_code': li_selected.getAttribute('pick_code')}  });");
+        //    //选择文件夹和文件
+        //    string inputElementsIdAndValueAsJsonString = await webview.ExecuteScriptAsync(
+        //        "Array.from(" +
+        //                "document.getElementById('js_center_main_box').getElementsByTagName('iframe')[0].contentDocument.getElementsByClassName('list-contents')[0].getElementsByTagName('li')" +
+        //            ").filter(" +
+        //                "li => li.getAttribute('class') == 'selected'" +
+        //            ").map(" +
+        //                "li_selected => {  " +
+        //                    "return {'id': li_selected.getAttribute('cate_id'), " +
+        //                        "'name': li_selected.getAttribute('title') || li_selected.getAttribute('cate_id'), " +
+        //                        "'file_count': li_selected.getAttribute('category_file_count'), " +
+        //                        "'folder_count': li_selected.getAttribute('cate_folder_count')," +
+        //                        "'hasHiddenFile': li_selected.getAttribute('hdf')," +
+        //                        " 'size': li_selected.getAttribute('cate_size')," +
+        //                        " 'file_type': li_selected.getAttribute('file_type')," +
+        //                        " 'file_id': li_selected.getAttribute('file_id')," +
+        //                        " 'pick_code': li_selected.getAttribute('pick_code')}  });");
+        //    //string inputElementsIdAndValueAsJsonString = await webview.ExecuteScriptAsync(
+        //    //    "Array.from(" +
+        //    //            "document.getElementById('js_center_main_box').getElementsByTagName('iframe')[0].contentDocument.getElementsByClassName('list-contents')[0].getElementsByTagName('li')" +
+        //    //        ").filter(" +
+        //    //            "li => li.getAttribute('class') == 'selected' & li.getAttribute('file_type') == 0" +
+        //    //        ").map(" +
+        //    //            "li_selected => {  " +
+        //    //                "return {'id': li_selected.getAttribute('cate_id'), " +
+        //    //                    "'name': li_selected.getAttribute('title') || li_selected.getAttribute('cate_id'), " +
+        //    //                    "'file_count': li_selected.getAttribute('category_file_count'), " +
+        //    //                    "'folder_count': li_selected.getAttribute('cate_folder_count')," +
+        //    //                    "'hasHiddenFile': li_selected.getAttribute('hdf')," +
+        //    //                    " 'size': li_selected.getAttribute('cate_size')," +
+        //    //                    " 'pick_code': li_selected.getAttribute('pick_code')}  });");
 
-            inputElementsIdAndValueAsJsonString = inputElementsIdAndValueAsJsonString.Replace("null", "0");
+        //    inputElementsIdAndValueAsJsonString = inputElementsIdAndValueAsJsonString.Replace("null", "0");
 
-            if (inputElementsIdAndValueAsJsonString != "[]" && inputElementsIdAndValueAsJsonString != "0")
-            {
-                selectedItemList = JsonConvert.DeserializeObject<List<SelectedItem>>(inputElementsIdAndValueAsJsonString);
-            }
+        //    if (inputElementsIdAndValueAsJsonString != "[]" && inputElementsIdAndValueAsJsonString != "0")
+        //    {
+        //        selectedItemList = JsonConvert.DeserializeObject<List<SelectedItem>>(inputElementsIdAndValueAsJsonString);
+        //    }
 
-            return selectedItemList;
-        }
+        //    return selectedItemList;
+        //}
 
         /// <summary>
         /// 点击了开始按钮
@@ -186,7 +178,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             }
             else
             {
-                var selectedItemList = await GetSelectedItems();
+                var selectedItemList = await Browser.GetSelectedItems();
 
                 //挑选文件夹
                 selectedItemList = selectedItemList.Where(x => x.file_type == 0).ToList();
@@ -322,59 +314,6 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             }
         }
 
-        private void DownButton_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            (sender as HyperlinkButton).Opacity = 1;
-        }
-
-        private void DownButton_PointerExited(object sender, PointerRoutedEventArgs e)
-        {
-            (sender as HyperlinkButton).Opacity = 0.2;
-        }
-
-
-        WebApi webApi;
-        private async void DownButton_Click(object sender, RoutedEventArgs e)
-        {
-            await DownFiles(Data.WebApi.downType.bc);
-
-        }
-
-        private async Task DownFiles(Data.WebApi.downType downtype)
-        {
-            var selectedItemList = await GetSelectedItems();
-
-            if (selectedItemList.Count == 0)
-            {
-                //SelectedNull_TeachingTip.IsOpen = true;
-                ShowTeachingTip("当前未选中要下载的文件或文件夹");
-                return;
-            }
-            else
-            {
-                if (webApi == null)
-                    webApi = new();
-
-                List<Datum> videoinfos = new();
-
-                foreach (var item in selectedItemList)
-                {
-                    Datum datum = new();
-                    datum.cid = item.id;
-                    datum.n = item.name;
-                    datum.pc = item.pick_code;
-                    datum.fid = item.file_id;
-                    videoinfos.Add(datum);
-                }
-
-                //BitComet只需要cid,n,pc三个值
-                bool isSuccess = await webApi.RequestDown(videoinfos, downtype);
-
-                if (!isSuccess)
-                    ShowTeachingTip("请求下载失败");
-            }
-        }
-
         private void ShowTeachingTip(string subtitle, string content = null)
         {
             LightDismissTeachingTip.Subtitle = subtitle;
@@ -384,16 +323,16 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             LightDismissTeachingTip.IsOpen = true;
         }
 
-        private async void Aria2Down_Click(object sender, RoutedEventArgs e)
-        {
+        //private async void Aria2Down_Click(object sender, RoutedEventArgs e)
+        //{
 
-            await DownFiles(Data.WebApi.downType.aria2);
-        }
+        //    await DownFiles(Data.WebApi.downType.aria2);
+        //}
     }
 
     class ContentPassBetweenPage
     {
         public List<string> cidList { get; set; }
-        public Window window { get;set; }
+        public Window window { get; set; }
     }
 }

@@ -15,15 +15,16 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Numerics;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Foundation.Metadata;
+using System.Web;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -43,8 +44,6 @@ namespace Display.ContentsPage
         ObservableCollection<string> failList = new();
 
         CancellationTokenSource s_cts = new();
-
-        string textContent;
 
         ////绘制头像框
         //CanvasControl canv = new CanvasControl();
@@ -79,14 +78,21 @@ namespace Display.ContentsPage
                 }
 
             }
+
+            //先排序
+            List< ActorsInfo> tmpInfos = new();
             foreach (var item in ActorsInfoDict)
             {
-                actorinfo.Add(new ActorsInfo
+                tmpInfos.Add(new ActorsInfo
                 {
                     name = item.Key,
                     count = item.Value.Count,
                 });
             }
+            tmpInfos = tmpInfos.OrderByDescending(x => x.prifilePhotoPath).ToList();
+
+            tmpInfos.ForEach(x => actorinfo.Add(x));
+
         }
 
         ActorsInfo _storedItem;
@@ -127,15 +133,24 @@ namespace Display.ContentsPage
             SmokeCancelGrid.Tapped += SmokeCancelGrid_Tapped;
         }
 
+
+        //JObject json;
         private List<string> GetImageUrlListFromFileTree(string actorName,int count = -1)
         {
-            if (string.IsNullOrEmpty(textContent))
-            {
-                string filePath = AppSettings.ActorFileTree_SavePath;
-                textContent = string.Join(Environment.NewLine, File.ReadLines(filePath));
-            }
+            //if (json == null)
+            //{
+            //    string filePath = AppSettings.ActorFileTree_SavePath;
 
-            return getImageUrlFormFileTreeContent(textContent, actorName, count);
+            //    var lines = await File.ReadAllLinesAsync(filePath);
+            //    string textContent = string.Join(Environment.NewLine, lines);
+            //    json = JsonConvert.DeserializeObject<JObject>(textContent);
+            //}
+            //List<string> result = getImageUrlFormFileTreeContent(json, actorName, count);
+
+            List<string> result = getImageUrlFormFileTree(AppSettings.ActorFileTree_SavePath, actorName, count);
+
+
+            return result;
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
@@ -223,13 +238,19 @@ namespace Display.ContentsPage
 
             progress.Report(new progressClass() { text = "正在获取GFriend仓库信息……"});
 
-            if (!await tryUpdateFileTree(filePath)) return;
+            if (!await tryUpdateFileTree(filePath))
+            {
+                progress.Report(new progressClass() { text = "获取GFriend仓库信息失败!" });
+                return;
+            }
+            //else
+            //    progress.Report(new progressClass() { text = "开始下载头像" });
 
             //IEnumerable<string> line = File.ReadLines(filePath);
 
             //var textContent = string.Join(Environment.NewLine, line);
 
-            for(int i = 0;i< actorinfos.Count;i++)
+            for (int i = 0;i< actorinfos.Count;i++)
             //foreach (var item in actorinfo)
             {
                 if (s_cts.IsCancellationRequested)
@@ -253,7 +274,7 @@ namespace Display.ContentsPage
 
                 progress.Report(progressinfo);
 
-                var iamgeSavePath = Path.Combine(AppSettings.ActorInfo_SavePath, actorName, "face.jpg");
+                var iamgeSavePath = System.IO.Path.Combine(AppSettings.ActorInfo_SavePath, actorName, "face.jpg");
 
                 if (!File.Exists(iamgeSavePath))
                 {
@@ -287,13 +308,89 @@ namespace Display.ContentsPage
 
         }
 
-        private List<string> getImageUrlFormFileTreeContent(string textContent, string name, int count)
+        private List<string> getImageUrlFormFileTree(string filePath,string actorName, int count)
+        {
+            List<string> urlList = new();
+
+            string key = String.Empty;
+            string path = String.Empty;
+            //string name = String.Empty;
+
+            foreach (var line in File.ReadLines(filePath))
+            {
+                var content = line.Trim();
+
+                if (string.IsNullOrEmpty(key))
+                {
+                    var matchKey = Regex.Match(content, "\"(.*)\":");
+
+                    if (matchKey.Success)
+                    {
+                        key = matchKey.Groups[1].Value;
+                    }
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(path))
+                    {
+                        var matchPath = Regex.Match(content, "\"(.*)\":");
+
+                        if (matchPath.Success)
+                        {
+                            path = matchPath.Groups[1].Value;
+                        }
+                        else
+                        {
+                            if (content.Contains('}'))
+                            {
+                                key = string.Empty;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var matchName = Regex.Match(content, "\"(.*)\":\"(.*)\"");
+
+                        if (matchName.Success)
+                        {
+                            string name = matchName.Groups[1].Value;
+                            var url = matchName.Groups[2].Value;
+
+                            if (url.Contains(actorName))
+                            {
+                                urlList.Add($"https://raw.githubusercontent.com/gfriends/gfriends/master/{key}/{path}/{url}");
+
+                                if(urlList.Count == count)
+                                {
+                                    break;
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            if (content.Contains('}'))
+                            {
+                                path = string.Empty;
+                            }
+                        }
+                    }
+                }
+            }
+            return urlList;
+        }
+
+        /// <summary>
+        /// 从文件中获取演员地址，占用内存过大，弃用
+        /// </summary>
+        /// <param name="json"></param>
+        /// <param name="name"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        private List<string> getImageUrlFormFileTreeContent(JObject json, string name, int count)
         {
             List<string> imageUrlList = new();
 
-            JObject json = JsonConvert.DeserializeObject<JObject>(textContent);
-
-            //bool findName = false;
             int getNum = 0;
             foreach (var item in json)
             {
@@ -326,7 +423,7 @@ namespace Display.ContentsPage
                         if (Path3.Contains(name))
                         {
                             string imagePath = Path.Combine(Path1, Path2, value3);
-                            string imageUrl = GetInfoFromNetwork.UrlCombine("https://raw.githubusercontent.com/gfriends/gfriends/master", imagePath);
+                            string imageUrl = $"https://raw.githubusercontent.com/gfriends/gfriends/master/{imagePath}";
                             imageUrlList.Add(imageUrl);
                             getNum++;
                         }
@@ -353,6 +450,9 @@ namespace Display.ContentsPage
 
                 //仓库信息
                 var dateStr = await GetGitUpdateDateStr();
+                if (string.IsNullOrEmpty(dateStr))
+                    return false;
+
                 var gitUpdateDate = Convert.ToDateTime(dateStr);
 
                 if (gitUpdateDate > fileWriteTime)
@@ -360,10 +460,11 @@ namespace Display.ContentsPage
                     isNeedDownFile = true;
                 }
             }
+
             if (isNeedDownFile)
             {
                 string FiletreeDownUrl = @"https://raw.githubusercontent.com/gfriends/gfriends/master/Filetree.json";
-                result = await DownFile(FiletreeDownUrl, filePath);
+                result = await DownFile(FiletreeDownUrl, filePath,true);
             }
 
             return result;
@@ -371,7 +472,6 @@ namespace Display.ContentsPage
 
         private async Task<string> GetGitUpdateDateStr()
         {
-            HttpClient Client = new HttpClient();
             var handler = new HttpClientHandler { UseCookies = false };
             Client = new HttpClient(handler);
             Client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0");
@@ -401,12 +501,14 @@ namespace Display.ContentsPage
             return UpdateDateStr;
         }
 
-        private async Task<bool> DownFile(string downurl,string filePath)
+        HttpClient Client;
+        private async Task<bool> DownFile(string downurl,string filePath,bool isNeedReplace = false)
         {
-            HttpClient Client = new HttpClient();
-            var handler = new HttpClientHandler { UseCookies = false };
-            Client = new HttpClient(handler);
-            Client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0");
+            if(Client == null)
+                Client = new HttpClient();
+            //var handler = new HttpClientHandler { UseCookies = false };
+            //Client = new HttpClient(handler);
+            //Client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0");
 
             var directoryNaem = Path.GetDirectoryName(filePath);
             if (!File.Exists(directoryNaem))
@@ -414,13 +516,21 @@ namespace Display.ContentsPage
                 Directory.CreateDirectory(directoryNaem);
             }
 
-            if (!File.Exists(filePath))
+            if (!File.Exists(filePath) || isNeedReplace)
             {
                 try
                 {
-                    byte[] imageBytes = await Client.GetByteArrayAsync(downurl);
+                    var rep = await Client.GetAsync(HttpUtility.UrlPathEncode(downurl));
+                    if (rep.IsSuccessStatusCode)
+                    {
+                        byte[] imageBytes = await rep.Content.ReadAsByteArrayAsync();
+                        File.WriteAllBytes(filePath, imageBytes);
+                    }
+                    else
+                    {
+                        return false;
+                    }
 
-                    File.WriteAllBytes(filePath, imageBytes);
                 }
                 catch
                 {
@@ -703,7 +813,7 @@ namespace Display.ContentsPage
             BasicGridView.UpdateLayout();
 
             // Use the Direct configuration to go back (if the API is available). 
-            if (ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 7))
+            if (Windows.Foundation.Metadata.ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 7))
             {
                 animation.Configuration = new DirectConnectedAnimationConfiguration();
             }

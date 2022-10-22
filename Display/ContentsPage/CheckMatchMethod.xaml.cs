@@ -126,15 +126,15 @@ namespace Display.ContentsPage
             });
 
 
-            videoMatchInfo.SuccessNameCollection.Clear();
-            videoMatchInfo.SuccessNameCollection.allMatchNameList = new();
+            //videoMatchInfo.SuccessNameCollection.Clear();
+            videoMatchInfo.SuccessNameCollection.allMatchNameList.Clear();
             foreach (var item in NameList[0])
             {
                 videoMatchInfo.SuccessNameCollection.AddActualList(item);
             }
             
-            videoMatchInfo.FailNameCollection.Clear();
-            videoMatchInfo.FailNameCollection.allMatchNameList=new();
+            //videoMatchInfo.FailNameCollection.Clear();
+            videoMatchInfo.FailNameCollection.allMatchNameList.Clear();
 
             foreach (var item in NameList[1])
             {
@@ -154,15 +154,11 @@ namespace Display.ContentsPage
         private void MatchFail_Expander_Expanding(Expander sender, ExpanderExpandingEventArgs args)
         {
             OpenMatchFailRusult_Storyboard.Begin();
-            //VisualStateManager.GoToState(this, "OpenMatchFailResult", true);
         }
 
         private void MatchSuccessExpander_Collapsed(Expander sender, ExpanderCollapsedEventArgs args)
         {
-            //VisualStateManager.GoToState(this, "CloseMatchResults", true);
-            //CloseMatchSuccessResult_Storyboard.Begin();
             CloseMatchSuccessResult_Storyboard.Begin();
-            //var i = MatchResult_Grid;
         }
 
         private async void AddRulesButton_Click(object sender, RoutedEventArgs e)

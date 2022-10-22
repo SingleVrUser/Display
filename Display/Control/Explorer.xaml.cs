@@ -64,6 +64,10 @@ namespace Display.Control
             if (item == null)
             {
                 items = DataAccess.GetListByCid(folderCid);
+
+                //排序
+                items = items.OrderByDescending(x => x.te).ToList();
+
                 StoreDataList.Add(new StoreDatum()
                 {
                     Cid = folderCid,
