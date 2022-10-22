@@ -1185,8 +1185,33 @@ namespace Data
             return downUrlList;
         }
 
+
         /// <summary>
-        /// PotPlayer播放
+        /// PotPlayer播放（原画）
+        /// </summary>
+        /// <param name="playUrl"></param>
+        /// <param name="FileName"></param>
+        /// <param name="showWindow"></param>
+        /// <param name="referrerUrl"></param>
+        /// <param name="user_agnet"></param>
+        public static void Play115SourceVideoWithPotPlayer(string playUrl, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string user_agnet = "Mozilla/5.0; 115Desktop/2.0.1.7")
+        {
+            var process = new Process();
+
+            process.StartInfo.FileName = FileName;
+            process.StartInfo.Arguments = @$" ""{playUrl}"" /user_agent=""{user_agnet}"" /referer=""{referrerUrl}""";
+            process.StartInfo.UseShellExecute = false;
+            if (!showWindow)
+            {
+                process.StartInfo.CreateNoWindow = true;
+            }
+
+            process.Start();
+        }
+
+
+        /// <summary>
+        /// PotPlayer播放(m3u8)
         /// </summary>
         /// <param name="pickCode"></param>
         public async void PlayeByPotPlayer(string pickCode)
@@ -1366,32 +1391,63 @@ namespace Data
             }
         }
     
-        public enum playMethod { mpv,vlc}
+        public enum playMethod { pot,mpv,vlc}
         /// <summary>
         /// 原画播放
         /// </summary>
         /// <param name="pickcode"></param>
         public void PlayVideoWithOriginUrl(string pickcode ,playMethod playMethod)
         {
+            //播放路径检查选择
+            string savePath = string.Empty;
+            string ua = string.Empty;
+
             switch (playMethod)
             {
+                case playMethod.pot:
+                    savePath = AppSettings.PotPlayerExePath;
+                    ua = "Mozilla/5.0; Windows NT/10.0.19044; 115Desktop/2.0.1.7";
+                    break;
                 case playMethod.mpv:
-                    string ua = "Mozilla/5.0; Windows NT/10.0.19044; 115Desktop/2.0.1.7";
-                    var downUrlList = GetDownUrl(pickcode,ua);
+                    savePath = AppSettings.MpvExePath;
+                    ua = "Mozilla/5.0; Windows NT/10.0.19044; 115Desktop/2.0.1.7";
+                    break;
+                case playMethod.vlc:
+                    savePath = AppSettings.VlcExePath;
+                    ua = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36 115Browser/8.3.0";
+                    break;
+            }
+
+            if (string.IsNullOrEmpty(savePath))
+                return;
+
+
+                    switch (playMethod)
+            {
+                case playMethod.pot:
+                    //vlc不支持带“; ”的user-agent
+                    var downUrlList = GetDownUrl(pickcode, ua);
                     if (downUrlList.Count == 0) return;
 
-                    string downUrl = downUrlList.First().Value;
-                    Play115SourceVideoWithMpv(downUrl,AppSettings.MpvExePath,false,user_agnet:ua, title: downUrlList.First().Key);
+                    var downUrl = downUrlList.First().Value;
+
+                    Play115SourceVideoWithPotPlayer(downUrl, savePath, false, user_agnet: ua);
+                    break;
+                case playMethod.mpv:
+                    downUrlList = GetDownUrl(pickcode,ua);
+                    if (downUrlList.Count == 0) return;
+
+                    downUrl = downUrlList.First().Value;
+                    Play115SourceVideoWithMpv(downUrl, savePath, false,user_agnet:ua, title: downUrlList.First().Key);
                     break;
                 case playMethod.vlc:
                     //vlc不支持带“; ”的user-agent
-                    ua = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36 115Browser/8.3.0";
                     downUrlList = GetDownUrl(pickcode,ua);
                     if (downUrlList.Count == 0) return;
 
                     downUrl = downUrlList.First().Value;
 
-                    Play115SourceVideoWithVlc(downUrl, AppSettings.VlcExePath, false, user_agnet: ua,title:downUrlList.First().Key);
+                    Play115SourceVideoWithVlc(downUrl, savePath, false, user_agnet: ua,title:downUrlList.First().Key);
                     break;
             }
         }

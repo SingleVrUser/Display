@@ -184,7 +184,7 @@ namespace Display.Views
                 //PotPlayer播放
                 case 1:
                     WebApi webapi = new();
-                    webapi.PlayeByPotPlayer(pickCode);
+                    webapi.PlayVideoWithOriginUrl(pickCode, playMethod.pot);
                     break;
                 //mpv播放
                 case 2:

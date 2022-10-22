@@ -471,18 +471,22 @@ namespace Display.Views
 
                     case "PotPlayer":
                         resolutionSelectionCollection.Clear();
-                        resolutionSelectionCollection.Add("最高");
+                        resolutionSelectionCollection.Add("原画");
                         resolutionSelection_ComboBox.SelectedIndex = 0;
                         Resolution_RelativePanel.Visibility = Visibility.Visible;
 
-                        PlayerExePath_RelativePanel.Visibility = Visibility.Collapsed;
+                        PlayerExePath_RelativePanel.Visibility = Visibility.Visible;
+
+                        PlayerExePath_TextBox.Text = AppSettings.PotPlayerExePath;
                         break;
                     case "mpv":
                         resolutionSelectionCollection.Clear();
                         resolutionSelectionCollection.Add("原画");
                         resolutionSelection_ComboBox.SelectedIndex = 0;
                         Resolution_RelativePanel.Visibility = Visibility.Visible;
-                        PlayerExePath_RelativePanel.Visibility = Visibility.Visible;
+
+
+                        PlayerExePath_RelativePanel.Visibility = Visibility.Collapsed;
 
                         //PlayerExePath_TextBox.Text = AppSettings.MpvExePath;
                         break;
@@ -491,7 +495,8 @@ namespace Display.Views
                         resolutionSelectionCollection.Add("原画");
                         resolutionSelection_ComboBox.SelectedIndex = 0;
                         Resolution_RelativePanel.Visibility = Visibility.Visible;
-                        PlayerExePath_RelativePanel.Visibility = Visibility.Visible;
+
+                        PlayerExePath_RelativePanel.Visibility = Visibility.Collapsed;
 
                         //PlayerExePath_TextBox.Text = AppSettings.VlcExePath;
                         break;
@@ -505,12 +510,15 @@ namespace Display.Views
 
             switch (PlayerSelection_ComboBox.SelectedIndex)
             {
-                case 2:
-                    openPath = Path.GetDirectoryName(AppSettings.MpvExePath);
+                case 1:
+                    openPath = Path.GetDirectoryName(AppSettings.PotPlayerExePath);
                     break;
-                case 3:
-                    openPath = Path.GetDirectoryName(AppSettings.VlcExePath);
-                    break;
+                //case 2:
+                //    openPath = Path.GetDirectoryName(AppSettings.MpvExePath);
+                //    break;
+                //case 3:
+                //    openPath = Path.GetDirectoryName(AppSettings.VlcExePath);
+                //    break;
             }
 
             if(! string.IsNullOrEmpty(openPath))
@@ -535,14 +543,17 @@ namespace Display.Views
             {
                 switch (PlayerSelection_ComboBox.SelectedIndex)
                 {
-                    case 2:
-                        AppSettings.MpvExePath = file.Path;
-                        break;  
-                    case 3:
-                        AppSettings.VlcExePath = file.Path;
+                    case 1:
+                        AppSettings.PotPlayerExePath = file.Path;
                         break;
+                    //case 2:
+                    //    AppSettings.MpvExePath = file.Path;
+                    //    break;  
+                    //case 3:
+                    //    AppSettings.VlcExePath = file.Path;
+                    //    break;
                 }
-                //PlayerExePath_TextBox.Text = file.Path;
+                PlayerExePath_TextBox.Text = file.Path;
             }
         }
 
