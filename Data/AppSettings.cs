@@ -268,7 +268,13 @@ public class AppSettings
     {
         get
         {
-            return localSettings.Values["VlcExePath"] as string;
+            var savePath = localSettings.Values["VlcExePath"];
+            if (savePath == null)
+            {
+                savePath = "vlc";
+                localSettings.Values["VlcExePath"] = savePath;
+            }
+            return savePath.ToString();
         }
         set
         {
@@ -280,11 +286,29 @@ public class AppSettings
     {
         get
         {
-            return localSettings.Values["MpvExePath"] as string;
+            var savePath = localSettings.Values["MpvExePath"];
+            if (savePath == null)
+            {
+                savePath = "mpv";
+                localSettings.Values["MpvExePath"] = savePath;
+            }
+            return savePath.ToString();
         }
         set
         {
             localSettings.Values["MpvExePath"] = value;
+        }
+    }
+
+    public static string PotPlayerExePath
+    {
+        get
+        {
+            return localSettings.Values["PotPlayerExePath"] as string;
+        }
+        set
+        {
+            localSettings.Values["PotPlayerExePath"] = value;
         }
     }
 
