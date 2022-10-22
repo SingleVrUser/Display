@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Org.BouncyCastle.Bcpg.OpenPgp;
+using Windows.ApplicationModel;
 
 namespace Data
 {
@@ -990,14 +991,20 @@ namespace Data
                 } },
             };
 
-
+            bool isMatch = false;
             foreach (var kvp in fileType)
             {
+                if (isMatch)
+                    break;
+
                 string key = kvp.Key;
                 var values = kvp.Value;
 
                 foreach (var kvp2 in values)
                 {
+                    if (isMatch)
+                        break;
+
                     string key2 = kvp2.Key;
                     List<string> values2 = kvp2.Value;
 
@@ -1005,7 +1012,16 @@ namespace Data
                     {
                         if (key3 == ico)
                         {
-                            IconPath = $"ms-appx:///Assets/115/file_type/{key}/{key2}.svg";
+                            string tmpPath = $"Assets/115/file_type/{key}/{key2}.svg";
+                            
+                            if (!File.Exists(Path.Combine(Package.Current.InstalledLocation.Path, tmpPath)))
+                                IconPath = $"ms-appx:///Assets/115/file_type/{key}/{key}.svg";
+                            else
+                                IconPath = $"ms-appx:///{tmpPath}";
+
+
+                            isMatch = true;
+                            break;
                         }
                     }
                 }

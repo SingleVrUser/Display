@@ -61,7 +61,9 @@
                             x:Name="RefreshHyperlinkButton"
                             RelativePanel.AlignRightWithPanel="True"
                             RelativePanel.AlignVerticalCenterWithPanel="True"
-                            Click="UpdateRandomCover_Click">
+                            Opacity="0.5"
+                            Click="UpdateRandomCover_Click"
+                            CornerRadius="20">
                             <SymbolIcon Symbol="Refresh" />
                         </HyperlinkButton>
                     </RelativePanel>

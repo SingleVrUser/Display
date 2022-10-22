@@ -8,10 +8,7 @@
     mc:Ignorable="d">
 
     <Grid>
-        <StackPanel>
-            <TextBlock Text="Content"/>
-            <WebView2 x:Name="WebViewControl"
-                      Source="https://115.com"/>
-        </StackPanel>
+        <WebView2 x:FieldModifier="public" Grid.Row="1" x:Name="webview" NavigationStarting="webview_NavigationStarting" NavigationCompleted="webview_NavigationCompleted"/>
+        <ProgressBar x:Name="NavigationProgressBar" IsIndeterminate="True" VerticalAlignment="Top"/>
     </Grid>
 </UserControl>

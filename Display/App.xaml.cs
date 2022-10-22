@@ -68,7 +68,6 @@ namespace Display
             //初始化数据库
             await DataAccess.InitializeDatabase();
 
-
             AppMainWindow = new MainWindow();
             AppMainWindow.Activate();
 

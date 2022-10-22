@@ -79,7 +79,6 @@
     <None Remove="Control\UserInfo.xaml" />
     <None Remove="Control\VideoCoverDisplay.xaml" />
     <None Remove="Control\VideoDetails.xaml" />
-    <None Remove="Control\VideoPlay.xaml" />
     <None Remove="Settings\GetVideoInfo.xaml" />
     <None Remove="VideoPlayWindow.xaml" />
     <None Remove="Views\BrowserPage.xaml" />
@@ -226,11 +225,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Control\Browser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
     <Page Update="Views\BrowserWithTabPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -356,7 +350,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Control\VideoPlay.xaml">
+    <Page Update="Control\Browser.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

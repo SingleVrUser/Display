@@ -25,6 +25,7 @@ namespace Data
 
         public static string UrlCombine(string uri1, string uri2)
         {
+
             Uri baseUri = new Uri(uri1);
             Uri myUri = new Uri(baseUri, uri2);
             return myUri.ToString();
