@@ -11,11 +11,11 @@
         <ResourceDictionary>
             <DataTemplate x:Key="FoundedSuggestionBox" x:DataType="data:VideoInfo">
                 <StackPanel Orientation="Horizontal" Margin="5" Spacing="5">
-                    <Image Source="{x:Bind imagepath}" Width="100" x:Name="Cover_image"/>
+                    <Image Source="{x:Bind imagepath}" Width="150" x:Name="Cover_image"/>
                     <StackPanel>
                         <TextBlock Text="{x:Bind truename}"/>
-                        <TextBlock Text="{x:Bind actor}" TextTrimming="WordEllipsis" MaxWidth="200" FontWeight="Normal"/>
-                        <TextBlock Text="{x:Bind category}" TextTrimming="WordEllipsis" MaxWidth="200" FontWeight="Normal"/>
+                        <TextBlock Text="{x:Bind actor}" TextTrimming="WordEllipsis" MaxWidth="300" FontWeight="Normal"/>
+                        <TextBlock Text="{x:Bind category}" TextTrimming="WordEllipsis" MaxWidth="300" FontWeight="Normal"/>
                     </StackPanel>
                 </StackPanel>
             </DataTemplate>
@@ -98,8 +98,9 @@
                 </ObjectAnimationUsingKeyFrames>
             </Storyboard>
         </Grid.Resources>
+        
         <StackPanel Orientation="Horizontal" x:Name="EntranceStackPanel">
-
+            
             <DropDownButton Content="番号" x:Name="selectFoundMethodButton" Visibility="Collapsed">
                 <DropDownButton.Flyout>
                     <MenuFlyout Placement="Bottom">
@@ -114,19 +115,17 @@
             </DropDownButton>
 
             <AutoSuggestBox x:Name="NavViewSearchBox"
-                            Width="300"
-                            QueryIcon="Find"
-                            PlaceholderText="搜索"
-                            IsEnabled="True" 
-                            TextChanged="AutoSuggestBox_TextChanged"
-                            QuerySubmitted="AutoSuggestBox_QuerySubmitted"
-                            SuggestionChosen="AutoSuggestBox_SuggestionChosen"
-                            GotFocus="NavViewSearchBox_GotFocus"
-                            LostFocus="NavViewSearchBox_LostFocus"/>
+                Width="300"
+                QueryIcon="Find"
+                PlaceholderText="搜索"
+                IsEnabled="True" 
+                TextChanged="AutoSuggestBox_TextChanged"
+                QuerySubmitted="AutoSuggestBox_QuerySubmitted"
+                SuggestionChosen="AutoSuggestBox_SuggestionChosen"
+                GotFocus="NavViewSearchBox_GotFocus"
+                LostFocus="NavViewSearchBox_LostFocus"/>
 
-            <ListView x:Name="collection">
-
-            </ListView>
+            <!--<ListView x:Name="collection"/>-->
         </StackPanel>
 
 

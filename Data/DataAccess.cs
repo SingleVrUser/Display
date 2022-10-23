@@ -531,13 +531,15 @@ namespace Data
         }
 
         /// <summary>
-        /// 通过PickCode以及TimeEdit判断数据是否存在且未更新
+        /// 通过PickCode以及TimeEdit判断文件夹是否存在且未更新。
+        /// 针对的是文件夹
+        /// 如果条件为真，则返回pid（如果是文件夹，则为上一级目录的cid；如果是文件则为空）
         /// </summary>
         /// <param name="limit"></param>
         /// <returns></returns>
-        public static bool IsLastestFileDataExists(string pickCode,int timeEdit = 0)
+        public static string GetLastestFolderPid(string pickCode,int timeEdit = 0)
         {
-            bool isExists = false;
+            string pid = String.Empty;
 
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
@@ -547,22 +549,21 @@ namespace Data
 
 
                 SqliteCommand selectCommand = new SqliteCommand
-                    ($"SELECT pc FROM FilesInfo WHERE pc == '{pickCode}' and te == '{timeEdit}'", db);
+                    ($"SELECT pid FROM FilesInfo WHERE pc == '{pickCode}' and te == '{timeEdit}'", db);
 
                 if (timeEdit == 0)
                 {
                     selectCommand = new SqliteCommand
-                        ($"SELECT pc FROM FilesInfo WHERE pc == '{pickCode}'", db);
+                        ($"SELECT pid FROM FilesInfo WHERE pc == '{pickCode}'", db);
                 }
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
 
                 while (query.Read())
                 {
-                    var i = query;
                     if(query.FieldCount != 0)
                     {
-                        isExists = true;
+                        pid = query["pid"] as string;
                         break;
                     }
                 }
@@ -570,7 +571,7 @@ namespace Data
                 db.Close();
             }
 
-            return isExists;
+            return pid;
         }
 
         /// <summary>

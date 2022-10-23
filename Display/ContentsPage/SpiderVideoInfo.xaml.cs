@@ -432,7 +432,6 @@ namespace Display.ContentsPage
             return resultInfo;
         }
 
-
         /// <summary>
         /// 显示饼形图
         /// </summary>
@@ -562,19 +561,6 @@ namespace Display.ContentsPage
             FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
         }
 
-
-        //private void AddVideoInfoButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    videoInfo = new VideoInfo() { truename = "nihao", actor = "nihao",category="标签" };
-
-
-        //}
-
-        //private void UpdateInfoButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    videoInfo.lengthtime = "nihao";
-        //    videoInfo.actor = "修改后";
-        //}
     }
     public class SpliderInfoProgress
     {

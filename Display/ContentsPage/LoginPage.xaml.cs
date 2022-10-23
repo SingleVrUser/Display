@@ -50,7 +50,6 @@ namespace Display.ContentsPage
             webapi = new();
         }
 
-
         private void Grid_Loaded(object sender, RoutedEventArgs e)
         {
             tryLogin();
@@ -186,7 +185,6 @@ namespace Display.ContentsPage
             _qrTimer?.Start();
         }
 
-
         /// <summary>
         /// 监听二维码请求结果
         /// </summary>
@@ -249,10 +247,8 @@ namespace Display.ContentsPage
             }
         }
 
-
         private void CheckCookieButton_Click(object sender, RoutedEventArgs e)
         {
-
             //termsOfUseContentDialog.Content = new ContentsPage.CheckCookie(CookieInputTextBox.Text);
             //await termsOfUseContentDialog.ShowAsync();
             checkCookieTip.Content = new ContentsPage.CheckCookie(CookieInputTextBox.Text);
