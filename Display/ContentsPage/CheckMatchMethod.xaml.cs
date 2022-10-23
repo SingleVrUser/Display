@@ -126,14 +126,14 @@ namespace Display.ContentsPage
             });
 
 
-            //videoMatchInfo.SuccessNameCollection.Clear();
+            videoMatchInfo.SuccessNameCollection.Clear();
             videoMatchInfo.SuccessNameCollection.allMatchNameList.Clear();
             foreach (var item in NameList[0])
             {
                 videoMatchInfo.SuccessNameCollection.AddActualList(item);
             }
-            
-            //videoMatchInfo.FailNameCollection.Clear();
+
+            videoMatchInfo.FailNameCollection.Clear();
             videoMatchInfo.FailNameCollection.allMatchNameList.Clear();
 
             foreach (var item in NameList[1])

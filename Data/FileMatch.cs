@@ -263,7 +263,6 @@ namespace Data
             return true;
         }
 
-
         public static string ConvertInt32ToDateStr(double Second)
         {
             string formatStr;

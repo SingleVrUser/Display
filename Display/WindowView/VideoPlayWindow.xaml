@@ -7,8 +7,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     
-    
-
     <!--纯浏览器窗口，播放视频方便全屏-->
     <Grid >
         <Grid.RowDefinitions>

@@ -208,9 +208,18 @@ namespace Data
                     return;
                 }
 
+                // 获取上一次已添加文件夹的pid（如果存在，且修改时间不变；不存在的默认值为string.empty）
+                var pid = DataAccess.GetLastestFolderPid(cidCategory.pick_code, cidCategory.utime);
+
                 // 该文件已存在数据库里，且修改时间不变
-                if (DataAccess.IsLastestFileDataExists(cidCategory.pick_code, cidCategory.utime) && Data.StaticData.isJumpExistsFolder)
+                if (!string.IsNullOrEmpty(pid) && Data.StaticData.isJumpExistsFolder)
                 {
+                    //如果修改时间未变，但移动了位置
+                    if(pid == cidCategory.paths.Last().file_id)
+                    {
+                        DataAccess.AddFilesInfo(FolderCategory.ConvertFolderToDatum(cidCategory, cid));
+                    }
+
                     //统计上下级文件夹所含文件的数量
                     //文件数量
                     getFilesProgressInfo.FilesCount += cidCategory.count;
@@ -218,45 +227,51 @@ namespace Data
                     getFilesProgressInfo.FolderCount += cidCategory.folder_count;
 
                     var cpm = sendCount * 60 / (DateTimeOffset.Now.ToUnixTimeSeconds() - nowDate);
+
                     progress.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
 
                 }
                 //之前未添加或修改时间已改变
                 else
                 {
-                    //获取当前文件夹下所有文件信息，并添加到数据库中
+                    //获取当前文件夹下所有文件信息和文件夹信息（从数据库或者网络）
                     getFilesProgressInfo = await TraverseAllFileInfo(cid, getFilesProgressInfo, token, progress);
 
                     if (getFilesProgressInfo == null) continue;
 
                     var addToDataAccessList = getFilesProgressInfo.addToDataAccessList;
 
-                    if (addToDataAccessList.Count == 0)
+
+                    //删除后重新添加
+                    DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(cid);
+
+                    //if (addToDataAccessList.Count == 0)
+                    //{
+                    //    DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(cid);
+                    //}
+                    if(addToDataAccessList.Count > 0)
                     {
-                        DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(cid);
-                    }
-                    else
-                    {
-                        //选中的文件夹只有一层
-                        bool isOneLayout = false;
-                        var otherList = addToDataAccessList.Where(x => !(x.pid == cid || x.cid == cid));
+                        ////选中的文件夹只有一层
+                        //bool isOneLayout = false;
+                        //var otherList = addToDataAccessList.Where(x => !(x.pid == cid || x.cid == cid));
 
-                        if (otherList.Count() == 0)
-                        {
-                            DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(cid);
-                            isOneLayout = true;
-                        }
+                        //if (otherList.Count() == 0)
+                        //{
+                        //    DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(cid);
+                        //    isOneLayout = true;
+                        //}
 
 
-                        //需要添加进数据库的Datatum
+                        //需要添加进数据库的Datum
                         foreach (var item in addToDataAccessList)
                         {
-                            //如果文件夹已存在，则删除文件夹下所有的文件
-                            //当文件夹只有一层时，且进入到这里（修改时间已改变），则跳过因为前一个步骤已删除数据
-                            if (!isOneLayout && item.fid == null && DataAccess.IsLastestFileDataExists(item.pc))
-                            {
-                                DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(item.cid);
-                            }
+                            ////如果文件夹已存在，则删除文件夹下所有的文件，针对单层文件
+                            ////当文件夹只有一层时，且进入到这里（说明修改时间已改变），则删除上一次添加的已过时的数据
+                            //if (!isOneLayout && item.fid == null)
+                            //{
+                            //    if(!string.IsNullOrEmpty(DataAccess.GetLastestFolderPid(item.pc)))
+                            //        DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(item.cid);
+                            //}
 
                             DataAccess.AddFilesInfo(item);
                         }
@@ -322,12 +337,17 @@ namespace Data
                     {
                         getFilesProgressInfo.FolderCount++;
 
+                        //先添加文件夹后添加文件，方便删除已有文件夹中的文件
+                        getFilesProgressInfo.addToDataAccessList.Add(item);
+
                         //查询数据库是否存在
-                       if (DataAccess.IsLastestFileDataExists(item.pc, item.te) && Data.StaticData.isJumpExistsFolder)
+                        if (!string.IsNullOrEmpty(DataAccess.GetLastestFolderPid(item.pc, item.te)) && Data.StaticData.isJumpExistsFolder)
                         {
                             //统计下级文件夹所含文件的数量
                             //通过数据库获取
                             var datumList = DataAccess.GetAllFilesTraverse(item.cid);
+
+                            getFilesProgressInfo.addToDataAccessList.AddRange(datumList);
 
                             //文件数量
                             getFilesProgressInfo.FilesCount += datumList.Count;
@@ -337,9 +357,6 @@ namespace Data
                         }
                         else
                         {
-                            //先添加文件夹后添加文件，方便删除已有文件夹中的文件
-                            getFilesProgressInfo.addToDataAccessList.Add(item);
-
                             getFilesProgressInfo = await TraverseAllFileInfo(item.cid, getFilesProgressInfo, token, progress);
 
                             if (getFilesProgressInfo == null) continue;
@@ -434,7 +451,6 @@ namespace Data
                         int dateInt = FileMatch.ConvertDateTimeToInt32(item.t);
                         item.te = item.tp = dateInt;
                     }
-
 
                 }
             }
@@ -785,6 +801,8 @@ namespace Data
 
             foreach (Datum datum in videoInfoList)
             {
+
+
                 //文件夹
                 if (string.IsNullOrEmpty(datum.fid) || (!string.IsNullOrEmpty(datum.fid) && datum.fid == "0"))
                 {
@@ -814,7 +832,10 @@ namespace Data
                         continue;
                     }
 
-                    fileList.Add(datum.sha, downUrlList.First().Value);
+                    ////用来标记aria2的任务id，如果没有就用时间戳代替
+                    //string aria2TaskId = datum.pc != null? datum.pc : DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
+
+                    fileList.Add(datum.pc, downUrlList.FirstOrDefault().Value);
                 }
             }
 
@@ -1185,7 +1206,6 @@ namespace Data
             return downUrlList;
         }
 
-
         /// <summary>
         /// PotPlayer播放（原画）
         /// </summary>
@@ -1208,7 +1228,6 @@ namespace Data
 
             process.Start();
         }
-
 
         /// <summary>
         /// PotPlayer播放(m3u8)
@@ -1415,17 +1434,19 @@ namespace Data
                 case playMethod.vlc:
                     savePath = AppSettings.VlcExePath;
                     ua = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36 115Browser/8.3.0";
+                    //ua = "Mozilla/5.0; Windows NT/10.0.19044; 115Desktop/2.0.1.7";
+                    //ua = "VLC/3.0.12.1 LibVLC/3.0.12.1";
+                    //ua = "nPlayer/3.0";
+                    //ua = "Lavf/58.76.100";
                     break;
             }
 
             if (string.IsNullOrEmpty(savePath))
                 return;
 
-
-                    switch (playMethod)
+            switch (playMethod)
             {
                 case playMethod.pot:
-                    //vlc不支持带“; ”的user-agent
                     var downUrlList = GetDownUrl(pickcode, ua);
                     if (downUrlList.Count == 0) return;
 
@@ -1451,5 +1472,6 @@ namespace Data
                     break;
             }
         }
+
     }
 }

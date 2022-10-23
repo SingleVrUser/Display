@@ -7,8 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:data="using:Data"
     mc:Ignorable="d">
-
-
+    
     <control:VideoCoverDisplay
         x:Name="videoControl"
         Click="{x:Bind OnClicked}"
