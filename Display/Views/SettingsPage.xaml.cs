@@ -22,6 +22,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using System.Text;
+using System.Diagnostics;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -718,6 +719,9 @@ namespace Display.Views
             {
                 //出错
                 ShowTeachingTip("网页访问失败", $"{ex.Message}，请检查地址和端口");
+            }catch(Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
             }
 
 
