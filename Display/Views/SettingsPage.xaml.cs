@@ -65,7 +65,7 @@ namespace Display.Views
             updateUserInfo();
             updateLoginStatus();
 
-            infobar.IsOpen = WebApi.isEnterHiddenMode == true ? WebApi.isEnterHiddenMode : false;
+            infobar.IsOpen = WebApi.isEnterHiddenMode == true ? false : true;
 
             DataAccessSavePath_TextBox.Text = AppSettings.DataAccess_SavePath;
         }
@@ -443,6 +443,9 @@ namespace Display.Views
             {
                 case "JavBus":
                     otherOriginUse = AppSettings.isUseJavDB;
+                    break;
+                case "fc2hub":
+                    otherOriginUse = AppSettings.isUseFc2Hub;
                     break;
                 case "JavDB":
                     otherOriginUse = AppSettings.isUseJavBus;

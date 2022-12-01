@@ -32,10 +32,6 @@ namespace Display.ContentsPage
             this.InitializeComponent();
 
             MatchKeywordFromOriginalName(keywordMatchNames);
-            //foreach (var keywordMatchName in keywordMatchNames)
-            //{
-            //    AddMatchNameList.Add(keywordMatchName.OriginalName);
-            //}
         }
 
         private void MatchKeywordFromOriginalName(List<KeywordMatchName> keywordMatchNames)

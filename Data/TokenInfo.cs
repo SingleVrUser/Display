@@ -204,7 +204,7 @@ namespace Data
         /// <summary>
         /// 会员到期时间
         /// </summary>
-        public int expire { get; set; }
+        public long expire { get; set; }
         public int global { get; set; }
         public int forever { get; set; }
         public bool is_privilege { get; set; }
@@ -265,7 +265,7 @@ namespace Data
     public class Privilege
     {
         public int start { get; set; }
-        public int expire { get; set; }
+        public long expire { get; set; }
         public bool state { get; set; }
         public int mark { get; set; }
     }
@@ -1567,4 +1567,31 @@ namespace Data
         public string useragent { get; set; }
     }
 
+
+    //FC2的格式
+    public class FcJson
+    {
+        public string context { get; set; }
+        public string type { get; set; }
+        public string name { get; set; }
+        public string description { get; set; }
+        public string image { get; set; }
+        public string[] identifier { get; set; }
+        public string datePublished { get; set; }
+        public string duration { get; set; }
+        public object[] actor { get; set; }
+        public string[] genre { get; set; }
+        public string[] sameAs { get; set; }
+        public string director { get; set; }
+        public Aggregaterating aggregateRating { get; set; }
+    }
+
+    public class Aggregaterating
+    {
+        public string type { get; set; }
+        public int bestRating { get; set; }
+        public int worstRating { get; set; }
+        public int ratingCount { get; set; }
+        public int ratingValue { get; set; }
+    }
 }

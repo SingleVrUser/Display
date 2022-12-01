@@ -26,7 +26,7 @@
                             Width="50"
                             HorizontalAlignment="Right"
                             Visibility="{x:Bind isShowVip(status),Mode=OneWay}">
-                    <TextBlock FontSize="10" FontFamily="Segoe UI" Foreground="White" HorizontalAlignment="Center" Text="{x:Bind data:UserData.getVipName(userinfo.mark),Mode=OneWay}"/>
+                    <TextBlock FontSize="10" FontFamily="Segoe UI" Foreground="White" HorizontalAlignment="Center" Text="{x:Bind data:UserData.getVipName(userinfo.mark1),Mode=OneWay}"/>
                 </StackPanel>
                 <TextBlock x:Name="UserName_TextBlock" FontWeight="Bold" FontSize="20" HorizontalAlignment="Center" Text="{x:Bind userinfo.user_name,Mode=OneWay}"/>
                 <!--<TextBlock FontWeight="Bold" FontSize="20" HorizontalAlignment="Center""/>-->

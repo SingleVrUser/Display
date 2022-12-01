@@ -77,6 +77,28 @@ public class AppSettings
         }
     }
 
+
+    /// <summary>
+    /// JavDB网址
+    /// </summary>
+    private static string _fc2Hub_BaseUrl = "https://fc2hub.com/";
+    public static string Fc2Hub_BaseUrl
+    {
+        get
+        {
+            var url = localSettings.Values["Fc2Hub_BaseUrl"] as string;
+            if (string.IsNullOrEmpty(url))
+            {
+                url = _fc2Hub_BaseUrl;
+            }
+            return url;
+        }
+        set
+        {
+            localSettings.Values["Fc2Hub_BaseUrl"] = value;
+        }
+    }
+
     /// <summary>
     /// JavDB的Cookie，查询FC信息需要
     /// </summary>
@@ -228,7 +250,7 @@ public class AppSettings
     {
         get
         {
-            bool useJavDB = true;
+            bool useJavDB = false;
 
             if (localSettings.Values["isUseJavDB"] is bool value)
             {
@@ -261,6 +283,28 @@ public class AppSettings
         set
         {
             localSettings.Values["isUseJavBus"] = value;
+        }
+    }
+
+
+    /// <summary>
+    /// 是否使用Fc2Hub
+    /// </summary>
+    public static bool isUseFc2Hub
+    {
+        get
+        {
+            bool isUse = true;
+
+            if (localSettings.Values["isUseFc2Hub"] is bool value)
+            {
+                isUse = value;
+            }
+            return isUse;
+        }
+        set
+        {
+            localSettings.Values["isUseFc2Hub"] = value;
         }
     }
 

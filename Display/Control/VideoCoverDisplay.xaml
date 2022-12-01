@@ -43,21 +43,10 @@
                 <Grid.ContextFlyout>
                     <!--右键操作-->
                     <MenuFlyout>
-                        <MenuFlyoutItem Text="播放" IsEnabled="False">
+                        <MenuFlyoutItem Text="删除"
+                                        Click="deleteAppBarButton_Click">
                             <MenuFlyoutItem.Icon>
-                                <FontIcon Glyph="&#xEE4A;"/>
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-
-                        <MenuFlyoutItem Text="收藏" IsEnabled="False">
-                            <MenuFlyoutItem.Icon>
-                                <FontIcon Glyph="&#xE1CE;"/>
-                            </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
-
-                        <MenuFlyoutItem Text="稍后观看" IsEnabled="False">
-                            <MenuFlyoutItem.Icon>
-                                <FontIcon Glyph="&#xE13B;"/>
+                                <FontIcon Glyph="&#xE107;"/>
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
                     </MenuFlyout>
@@ -165,14 +154,15 @@
 
                                     <AppBarSeparator />
 
-
-                                    <!--删除-->
-                                    <AppBarButton ToolTipService.ToolTip="删除" IsCompact="True" Click="deleteAppBarButton_Click">
+                                    <!--删除--><!--
+                                    <AppBarButton ToolTipService.ToolTip="删除"
+                                                  IsCompact="True"
+                                                  Click="deleteAppBarButton_Click">
                                         <AppBarButton.Resources>
                                             <SolidColorBrush x:Key="AppBarButtonBackgroundPointerOver" Color="#e74c3c" Opacity="0.8"/>
                                         </AppBarButton.Resources>
                                         <FontIcon Glyph="&#xE107;"/>
-                                    </AppBarButton>
+                                    </AppBarButton>-->
                                 </CommandBar.PrimaryCommands>
 
                                 <CommandBar.CommandBarOverflowPresenterStyle>
@@ -287,7 +277,7 @@
         <!--提示信息-->
         <InfoBar
             RelativePanel.AlignLeftWithPanel="True"
-            IsOpen="True"
+            IsOpen="False"
             Severity="Informational"
             Title="Title"
             x:Name="InfoBar"
