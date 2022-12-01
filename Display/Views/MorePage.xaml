@@ -11,7 +11,8 @@
                   Margin="10"
                   IsItemClickEnabled="True"
                   SelectionMode="None"
-                  ItemClick="GridView_ItemClick">
+                  ItemClick="GridView_ItemClick"
+                  HorizontalAlignment="Center">
 
             <GridView.ItemContainerStyle>
                 <Style TargetType="GridViewItem">

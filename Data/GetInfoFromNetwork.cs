@@ -1,19 +1,25 @@
-﻿using HtmlAgilityPack;
+﻿using Data.Helper;
+using HtmlAgilityPack;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Media.Protection.PlayReady;
 
 namespace Data
 {
     public class GetInfoFromNetwork
     {
         private HttpClient Client;
+        private HttpClient ClientWithJavDBCookie;
 
         public GetInfoFromNetwork()
         {
@@ -31,6 +37,11 @@ namespace Data
             return myUri.ToString();
         }
 
+        /// <summary>
+        /// 检查是否能访问该网页
+        /// </summary>
+        /// <param name="checkUrl"></param>
+        /// <returns></returns>
         public async Task<bool> CheckUrlUseful(string checkUrl)
         {
             bool isUseful = true;
@@ -47,6 +58,24 @@ namespace Data
             return isUseful;
         }
 
+        /// <summary>
+        /// 等待startSecond到endSecond秒后继续，文本控件showText提示正在倒计时
+        /// </summary>
+        /// <param name="startSecond"></param>
+        /// <param name="endSecond"></param>
+        /// <param name="showText"></param>
+        public static async Task RandomTimeDelay(int startSecond, int endSecond)
+        {
+            //随机等待1-10s
+            int randomSecond = new Random().Next(startSecond, endSecond);
+
+            //倒计时
+            for (int i = 0; i < randomSecond; i++)
+            {
+                await Task.Delay(1000);
+            }
+
+        }
 
         /// <summary>
         /// 从javbus中搜索影片信息
@@ -59,25 +88,14 @@ namespace Data
             string JavBusUrl = AppSettings.JavBus_BaseUrl;
             string SavePath = AppSettings.Image_SavePath;
 
-            HttpClient Client = new HttpClient();
-            string busurl = UrlCombine(JavBusUrl,CID);
+            if(Client == null)
+                Client = new HttpClient();
+            string busurl = UrlCombine(JavBusUrl, CID);
 
-
-            Uri uri = new Uri(busurl);
             videoInfo.busurl = busurl;
 
-            // 访问
-            HttpResponseMessage response;
-            string strResult;
-            try
-            {
-                response = await Client.GetAsync(uri);
-                strResult = await response.Content.ReadAsStringAsync();
-            }
-            catch
-            {
-                return null;
-            }
+            string strResult = await RequestHelper.RequestHtml(Client, busurl);
+
             HtmlDocument htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(strResult);
 
@@ -96,7 +114,7 @@ namespace Data
 
             var AttributeNodes = htmlDoc.DocumentNode.SelectNodes("//div[@class='col-md-3 info']//p");
 
-            
+
             //信息
             for (var i = 0; i < AttributeNodes.Count; i++)
             {
@@ -156,7 +174,6 @@ namespace Data
                 }
             }
 
-
             ////下载封面
             string filePath = Path.Combine(SavePath, CID);
             videoInfo.imageurl = ImageUrl;
@@ -181,23 +198,77 @@ namespace Data
             return videoInfo;
         }
 
+
         /// <summary>
-        /// 等待startSecond到endSecond秒后继续，文本控件showText提示正在倒计时
+        /// 从Fc2Hub中搜索影片信息
         /// </summary>
-        /// <param name="startSecond"></param>
-        /// <param name="endSecond"></param>
-        /// <param name="showText"></param>
-        public static async Task RandomTimeDelay(int startSecond, int endSecond)
+        /// <param name="CID"></param>
+        /// <returns></returns>
+        public async Task<VideoInfo> SearchInfoFromFc2Hub(string CID)
         {
-            //随机等待1-10s
-            int randomSecond = new Random().Next(startSecond, endSecond);
+            VideoInfo videoInfo = new VideoInfo();
 
-            //倒计时
-            for (int i = 0; i < randomSecond; i++)
-            {
-                await Task.Delay(1000);
-            }
+            string BaseUrl = AppSettings.Fc2Hub_BaseUrl;
+            string SavePath = AppSettings.Image_SavePath;
 
+            HttpClient Client = new HttpClient();
+            string url = $"{BaseUrl}search?kw={CID.ToLower().Replace("fc2-","")}";
+
+            videoInfo.busurl = url;
+
+            string strResult = await RequestHelper.RequestHtml(Client, url);
+
+            HtmlDocument htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(strResult);
+
+            var jsons = htmlDoc.DocumentNode.SelectNodes("//script[@type='application/ld+json']");
+
+            if (jsons == null || jsons.Count == 0) return null;
+
+
+            var jsonString = jsons.Last().InnerText;
+
+            var json = JsonConvert.DeserializeObject<FcJson>(jsonString);
+
+            Debug.WriteLine(json);
+
+            if(json.name == null) return null;
+
+            videoInfo.title = json.name;
+            videoInfo.truename = CID;
+            videoInfo.releasetime = json.datePublished;
+            videoInfo.lengthtime = json.duration;
+            videoInfo.director = json.director;
+            videoInfo.producer = "fc2";
+
+            if (json.genre != null)
+                videoInfo.category = string.Join(",", json.genre);
+
+            if(json.actor!= null)
+                videoInfo.actor = string.Join(",", json.actor);
+
+
+            string ImageUrl = json.image;
+            ////下载封面
+            string filePath = Path.Combine(SavePath, CID);
+            videoInfo.imageurl = ImageUrl;
+            videoInfo.imagepath = await downloadImage(ImageUrl, filePath, CID);
+
+            ////预览图不要了
+            //var sampleBox_Nodes = htmlDoc.DocumentNode.SelectNodes("//a[@class='sample-box']");
+            //List<string> sampleUrlList = new();
+            //if (sampleBox_Nodes != null)
+            //{
+            //    foreach (var node in sampleBox_Nodes)
+            //    {
+            //        string sampleImageUrl = node.Attributes["href"].Value;
+
+            //        sampleUrlList.Add(sampleImageUrl);
+            //    }
+            //    videoInfo.sampleImageList = string.Join(",", sampleUrlList);
+            //}
+
+            return videoInfo;
         }
 
 
@@ -222,46 +293,36 @@ namespace Data
             //两次访问间隔不能太短
             await RandomTimeDelay(3, 6);
 
-            HttpClient Client;
-            var handler = new HttpClientHandler { UseCookies = false };
-            Client = new HttpClient(handler);
-            Client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0");
-
+            string strResult;
             //访问fc内容需要cookie
             if (CID.Contains("FC"))
             {
-                //未设置Cookie，直接退出
-                if(AppSettings.javdb_Cookie == null)
+                if(ClientWithJavDBCookie == null)
                 {
-                    return null;
+                    var handler = new HttpClientHandler { UseCookies = false };
+                    ClientWithJavDBCookie = new HttpClient(handler);
+
+                    //未设置Cookie，直接退出
+                    if (AppSettings.javdb_Cookie == null)
+                    {
+                        ClientWithJavDBCookie = null;
+                        return null;
+                    }
+                    else
+                    {
+                        ClientWithJavDBCookie.DefaultRequestHeaders.Add("cookie", AppSettings.javdb_Cookie);
+                    }
+
+                    ClientWithJavDBCookie.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0");
+                
                 }
-                else
-                {
-                    Client.DefaultRequestHeaders.Add("cookie", AppSettings.javdb_Cookie);
-                }
 
+                strResult = await RequestHelper.RequestHtml(ClientWithJavDBCookie, detail_url);
             }
-
-            Uri uri = new Uri(detail_url);
-
-            // 访问
-            HttpResponseMessage response ;
-            string strResult;
-            try
+            else
             {
-                response = await Client.GetAsync(uri);
-                strResult = await response.Content.ReadAsStringAsync();
+                strResult = await RequestHelper.RequestHtml(Client, detail_url);
             }
-            catch
-            {
-                return null;
-            }
-
-            ////查看是否触发反爬虫机制
-            //if (strResult.Count() < 200)
-            //{
-            //    return null;
-            //}
 
             HtmlDocument htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(strResult);
@@ -370,33 +431,21 @@ namespace Data
                     videoInfo.sampleImageList = string.Join(",", sampleUrlList);
                 }
             }
-            
             return videoInfo;
         }
-
 
         private async Task<string> GetDetailUrlFromJavDBSearchResult(string CID)
         {
             string JavDBUrl = AppSettings.JavDB_BaseUrl;
             string result;
 
-            //反爬严重，尝试添加user-agent
+            if (Client == null)
+                Client = new HttpClient();
 
-            string busurl = $"{JavDBUrl}/search?q={CID}&f=all";
-            Uri uri = new Uri(busurl);
+            string url = $"{JavDBUrl}/search?q={CID}&f=all";
 
             // 访问
-            HttpResponseMessage response;
-            string strResult;
-            try
-            {
-                response = await Client.GetAsync(uri);
-                strResult = await response.Content.ReadAsStringAsync();
-            }
-            catch
-            {
-                return null;
-            }
+            string strResult = await RequestHelper.RequestHtml(Client,url);
 
             HtmlDocument htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(strResult);
@@ -410,9 +459,8 @@ namespace Data
             return result;
         }
 
-
         /// <summary>
-        /// 从众多搜索结果中搜索出符合条件的
+        /// 从JavDB众多搜索结果中搜索出符合条件的
         /// </summary>
         /// <returns></returns>
         private string GetDetailUrlFromSearchResult(HtmlDocument htmlDoc, string CID)
@@ -420,7 +468,6 @@ namespace Data
             string result = null;
 
             var SearchResultNodes = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class,'movie-list')]");
-
 
             //搜索无果，退出
             if (SearchResultNodes == null) return null;
@@ -504,16 +551,24 @@ namespace Data
 
             if (isReplaceExistsImage || !File.Exists(localPath))
             {
-                try
-                {
-                    byte[] imageBytes = await Client.GetByteArrayAsync(url);
+                int maxTryCount = 3;
 
-                    File.WriteAllBytes(localPath, imageBytes);
-                }
-                catch
+                for(int i = 0; i < maxTryCount; i++)
                 {
-                    return localPath;
+                    try
+                    {
+                        byte[] imageBytes = await Client.GetByteArrayAsync(url);
+
+                        File.WriteAllBytes(localPath, imageBytes);
+
+                        break;
+                    }
+                    catch(Exception ex)
+                    {
+                        Debug.WriteLine($"下载图片时发生错误：{ex.Message}");
+                    }
                 }
+
             }
 
             return localPath;

@@ -1,4 +1,5 @@
 ﻿using Data;
+using Display.ContentsPage;
 using Display.Views;
 using Microsoft.UI.Input;
 using Microsoft.UI.Text;
@@ -23,6 +24,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Foundation.Metadata;
 using Windows.UI.Text;
+using static QRCoder.PayloadGenerator;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -285,7 +287,8 @@ namespace Display.Control
         private void Animation_Completed(ConnectedAnimation sender, object args)
         {
             SmokeGrid.Visibility = Visibility.Collapsed;
-            SmokeGrid.Children.Add(destinationElement);
+            SmokeGrid.Children.Add(destinationImageElement);
+            destinationImageElement.Visibility = Visibility.Collapsed;
 
             SmokeCancelGrid.Tapped -= SmokeCancelGrid_Tapped;
         }
@@ -295,11 +298,35 @@ namespace Display.Control
             SmokeGridCancel();
         }
 
+        ContentsPage.FindInfoAgainSmoke FindInfoAgainSmoke;
+        private void FindAppBarButton_Click(object sender, RoutedEventArgs e)
+        {
+            SmokeGrid.Visibility = Visibility.Visible;
+
+            FindInfoAgainSmoke = new(resultinfo.truename);
+            SmokeGrid.Children.Add(FindInfoAgainSmoke);
+
+            SmokeCancelGrid.Tapped += SmokeCancelGrid_Tapped1;
+        }
+
+        private void SmokeCancelGrid_Tapped1(object sender, TappedRoutedEventArgs e)
+        {
+            SmokeGrid.Visibility = Visibility.Collapsed;
+
+            if (SmokeGrid.Children.Contains(FindInfoAgainSmoke))
+            {
+                SmokeGrid.Children.Remove(FindInfoAgainSmoke);
+            }
+
+            SmokeCancelGrid.Tapped -= SmokeCancelGrid_Tapped1;
+        }
+
         private async void SmokeGridCancel()
         {
-            if (!destinationElement.IsLoaded) return;
-            ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("backwardsAnimation", destinationElement);
-            SmokeGrid.Children.Remove(destinationElement);
+            if (!destinationImageElement.IsLoaded) return;
+
+            ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("backwardsAnimation", destinationImageElement);
+            SmokeGrid.Children.Remove(destinationImageElement);
 
             // Collapse the smoke when the animation completes.
             animation.Completed += Animation_Completed;
@@ -316,6 +343,7 @@ namespace Display.Control
 
             // Play the second connected animation. 
             await ThumbnailGridView.TryStartConnectedAnimationAsync(animation, _storedItem, "Thumbnail_Image");
+
         }
 
         private string _storedItem;
@@ -362,13 +390,13 @@ namespace Display.Control
             }
 
             ShoeImageName.Text = GetFileIndex();
-            //ShowImage.Source = new BitmapImage(new Uri(iamgePath));
 
-            //ShoeImageName.Text = Path.GetFileName(iamgePath);
             SmokeGrid.Visibility = Visibility.Visible;
+            destinationImageElement.Visibility = Visibility.Visible;
+
             animation.Completed += Animation_Completed1;
 
-            animation.TryStart(destinationElement);
+            animation.TryStart(destinationImageElement);
 
         }
 
@@ -391,20 +419,6 @@ namespace Display.Control
         {
             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
-
-        //private void ActorScrollViewer_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
-        //{
-        //    var scv = (ScrollViewer)sender;
-        //    scv.ScrollToHorizontalOffset(scv.HorizontalOffset);
-        //    e.Handled = true;
-        //}
-
-        //private void CategoryScrollViewer_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
-        //{
-        //    var scv = (ScrollViewer)sender;
-        //    scv.ScrollToHorizontalOffset(scv.HorizontalOffset);
-        //    e.Handled = true;
-        //}
 
         private string GetFileIndex()
         {
@@ -450,5 +464,6 @@ namespace Display.Control
 
             LightDismissTeachingTip.IsOpen = true;
         }
+
     }
 }

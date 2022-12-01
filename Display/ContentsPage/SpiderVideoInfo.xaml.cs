@@ -401,25 +401,38 @@ namespace Display.ContentsPage
             // 从相关网站中搜索
             else
             {
-                //Fc2视频且没有JavDb的Cookie
-                if (VideoName.Contains("fc2-") && string.IsNullOrEmpty(AppSettings.javdb_Cookie)) return null;
-
-                if (AppSettings.isUseJavBus && !VideoName.Contains("fc2-"))
+                //Fc2类型
+                if (VideoName.Contains("fc2-"))
                 {
-                    progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~3秒" } });
-                    await GetInfoFromNetwork.RandomTimeDelay(1, 3);
-                    progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavBus中搜索" } });
-                    //先从javbus中搜索
-                    resultInfo = await network.SearchInfoFromJavBus(VideoName);
+                    if (AppSettings.isUseFc2Hub)
+                    {
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~2秒" } });
+                        await GetInfoFromNetwork.RandomTimeDelay(1, 2);
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从fc2hub中搜索" } });
+                        //先从fc2hub中搜索
+                        resultInfo = await network.SearchInfoFromFc2Hub(VideoName);
+                    }
+
                 }
-
-                //搜索无果，使用javdb搜索
-                if (resultInfo == null && AppSettings.isUseJavDB)
+                else
                 {
-                    progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待3~6秒" } });
-                    await GetInfoFromNetwork.RandomTimeDelay(3, 6);
-                    progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavDB中搜索" } });
-                    resultInfo = await network.SearchInfoFromJavDB(VideoName);
+                    if (AppSettings.isUseJavBus)
+                    {
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~3秒" } });
+                        await GetInfoFromNetwork.RandomTimeDelay(1, 3);
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavBus中搜索" } });
+                        //先从javbus中搜索
+                        resultInfo = await network.SearchInfoFromJavBus(VideoName);
+                    }
+
+                    //搜索无果，使用javdb搜索
+                    if (resultInfo == null && AppSettings.isUseJavDB)
+                    {
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待3~6秒" } });
+                        await GetInfoFromNetwork.RandomTimeDelay(3, 6);
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavDB中搜索" } });
+                        resultInfo = await network.SearchInfoFromJavDB(VideoName);
+                    }
                 }
 
                 //多次搜索无果，退出
@@ -561,6 +574,27 @@ namespace Display.ContentsPage
             FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
         }
 
+        private void RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var i = e;
+            if (e.AddedItems.Count == 0) return;
+
+            if (e.AddedItems[0] is RadioButton radioButton)
+            {
+                switch (radioButton.Content)
+                {
+                    case "本地数据库":
+                        Explorer.Visibility = Visibility.Visible;
+                        FailListView.Visibility = Visibility.Collapsed;
+                        break;
+                    case "匹配失败":
+                        FailListView.Visibility = Visibility.Visible;
+                        Explorer.Visibility = Visibility.Collapsed;
+                        break;
+                }
+            }
+
+        }
     }
     public class SpliderInfoProgress
     {
