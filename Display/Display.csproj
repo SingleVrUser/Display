@@ -54,11 +54,8 @@
     <None Remove="Assets\Svg\file_document_paper_page_icon.svg" />
     <None Remove="Assets\Tip\FindFolderCid.png" />
     <None Remove="ContentsPage\AddActorCover.xaml" />
-    <None Remove="ContentsPage\AddMatchRulesAutomatically.xaml" />
     <None Remove="ContentsPage\CalculateLocalFileSha1.xaml" />
     <None Remove="ContentsPage\CheckCookie.xaml" />
-    <None Remove="ContentsPage\CheckMatchMethod.xaml" />
-    <None Remove="ContentsPage\DownDialogContent.xaml" />
     <None Remove="ContentsPage\FindInfoAgainSmoke.xaml" />
     <None Remove="ContentsPage\GetThumbnail.xaml" />
     <None Remove="ContentsPage\Import115DataToLocalDataAccess\InputCidManually.xaml" />
@@ -323,18 +320,10 @@
     <Page Update="Control\TextBlockWithStressText.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="ContentsPage\AddMatchRulesAutomatically.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Update="ContentsPage\Import115DataToLocalDataAccess\InputCidManually.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="ContentsPage\UpdateImagePath.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="ContentsPage\CheckMatchMethod.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

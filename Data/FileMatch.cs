@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Windows.Storage;
 using Windows.System;
 
@@ -23,8 +24,11 @@ namespace Data
         /// <returns></returns>
         public static string DeleteSomeKeywords(string name)
         {
-            
-            List<string> reg_replace_list = new List<string> { "uur76", "4K60fps", @"part\d", "@18P2P", "1080P", "720P", @"\[?[0-9a-z]+?\.(com|cn|xyz|la|me|net|app|cc)\]?@?", @"SE\d{2}", @"S0\dE\d{1,2}", @"\D[hx]265", @"\D[hx]264", "[-_][468]k",@"h_[0-9]{3,4}" };
+
+            List<string> reg_replace_list =
+                new List<string> { "uur76", @"{\d}K\d{2,3}fps", @"part\d", "@18P2P", @"[^\d]\d{3,6}P", @"\[?[0-9a-z]+?\.(com|cn|xyz|la|me|net|app|cc)\]?@?",
+                                @"SE\d{2}",@"EP\d{2}", @"S\d{1,2}E\d{1,2}", @"\D[hx]26[54]", "[-_][468]k", @"h_[0-9]{3,4}",@"[a-z0-9]{15,}",
+                                @"\d+bit",@"\d{3,6}x\d{3,6}"};
             for (int i = 0; i < reg_replace_list.Count; i++)
             {
                 Regex rgx = new Regex(reg_replace_list[i], RegexOptions.IgnoreCase);
@@ -41,120 +45,106 @@ namespace Data
         /// <returns></returns>
         public static string MatchName(string src_text)
         {
-            string combination = null;
-
             //提取文件名
-            string fileName = Regex.Match(src_text.ToLower(), @"(.*)(\.\w{3,5})?$").Groups[1].Value;
+            string name = Regex.Match(src_text.ToLower(), @"(.*)(\.\w{3,5})?$").Groups[1].Value;
 
-            fileName = DeleteSomeKeywords(fileName);
+            //转小写
+            string name_lc = name.ToLower();
 
-            //替换一些容易混淆的关键词
-            fileName = fileName.Replace("gachippv", "gachi");
-            fileName = fileName.Replace("caribbe", "carib");
-            fileName = fileName.Replace("caribpr", "carib");
-
-            Regex fc_rgx = new Regex(@"fc2?[-_ ]?(\d)", RegexOptions.IgnoreCase);
-            fileName = fc_rgx.Replace(fileName, "fc-$1");
-
-            if (fileName == "")
+            Match match;
+            string no_domain = name;
+            if (name_lc.Contains("fc"))
             {
+                //根据FC2 Club的影片数据，FC2编号为5-7个数字
+                match = Regex.Match(name, @"fc2?[^a-z\d]{0,5}(ppv[^a-z、d]{0,5})?(\d{5,7})", RegexOptions.IgnoreCase);
 
-                //Console.WriteLine(fileName);
-            }
-            else if (fileName[0] != ' ')
-            {
-                fileName = ' ' + fileName;
-
-                Dictionary<string, Regex> special_keywords_dict = new Dictionary<string, Regex>()
+                if (match.Success)
                 {
-                {"carbi",  new Regex(@"\d{6}[-_]\d{3}", RegexOptions.IgnoreCase)},
-                {"fc", new Regex(@"\d{6,7}", RegexOptions.IgnoreCase) },
-                {"heyzo", new Regex(@"\d{4}", RegexOptions.IgnoreCase) },
-                {"1pon", new Regex(@"\d{6}[-_]\d{3}", RegexOptions.IgnoreCase) },
-                {"heydouga", new Regex(@"\d{4}-\d{3}", RegexOptions.IgnoreCase) },
-                {"mkbd", new Regex(@"s\d{3}", RegexOptions.IgnoreCase) }
-                };
-
-
-                foreach (var entry in special_keywords_dict)
-                {
-                    if (combination != null)
-                    {
-                        break;
-                    }
-
-                    Match keywords_match = Regex.Match(fileName, @"[^a-z]" + entry.Key + "[^a-z]", RegexOptions.IgnoreCase);
-                    if (keywords_match.Success)
-                    {
-                        Match match_num = entry.Value.Match(fileName);
-                        if (match_num.Success)
-                        {
-                            string number = match_num.Value;
-
-                            if (entry.Key == "fc")
-                            {
-                                combination = $"{entry.Key}2-{number}";
-                            }
-                            else if (entry.Key == "heyzo")
-                            {
-                                combination = $"{entry.Key}-{number}";
-                            }
-                            else if (entry.Key == "heydouga")
-                            {
-                                combination = $"{entry.Key}-{number}";
-                            }
-                            else if (entry.Key == "mkbd")
-                            {
-                                combination = $"{entry.Key}-{number}";
-                            }
-                            //Console.WriteLine(combination);
-
-                        }
-                    }
+                    return $"FC2-{match.Groups[2].Value}";
                 }
+            }
+            else if (name_lc.Contains("heydouga"))
+            {
+                match = Regex.Match(name, @"(heydouga)[-_]*(\d{4})[-_]0?(\d{3,5})", RegexOptions.IgnoreCase);
 
-                if (combination == null)
+                if (match.Success)
                 {
-                    string general_keywords_string = AppSettings.MatchVideoKeywordsString;
+                    return string.Join("-", match.Groups.Values.Skip(1));
+                }
+            }
+            else
+            {
+                //先尝试移除可疑关键词进行匹配，如果匹配不到再使用去掉关键词的名称进行匹配
+                no_domain = DeleteSomeKeywords(name);
 
-                    var general_keywords_str = general_keywords_string.Split(',');
-                    var general_keywords_list = general_keywords_str.OrderByDescending(x => x.Length).ToList();
-
-                    for (int i = 0; i < general_keywords_list.Count; i++)
-                    {
-                        if (combination != null)
-                        {
-                            break;
-                        }
-
-                        var key = general_keywords_list[i];
-
-                        Match match_cid = Regex.Match(fileName, @"(?: h_)?[^a-z]+(" + key + @")[-_ ]{0,3}0*(\d+)", RegexOptions.IgnoreCase);
-                        if (match_cid.Success)
-                        {
-                            string keywords = match_cid.Groups[1].Value;
-                            string number = match_cid.Groups[2].Value;
-                            //不满三位数，填充0
-                            number = number.PadLeft(3, '0');
-                            combination = $"{keywords}-{number}";
-                        }
-                        else
-                        {
-                            //纯数字系列，如加勒比111815-02
-                            Match keywords_match = Regex.Match(fileName, @"\d{6}[-_]\d{2,3}", RegexOptions.IgnoreCase);
-                            if (keywords_match.Success)
-                            {
-                                string number = keywords_match.Value;
-                                combination = number;
-                                Console.WriteLine($"\t{combination}");
-                            }
-                        }
-                    }
+                if (!string.IsNullOrEmpty(no_domain) && no_domain != name)
+                {
+                    return MatchName(no_domain);
                 }
 
             }
 
-            return combination;
+            //匹配缩写成hey的heydouga影片。由于番号分三部分，要先于后面分两部分的进行匹配
+            match = Regex.Match(no_domain, @"(?:hey)[-_]*(\d{4})[-_]0?(\d{3,5})", RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                return $"heydouga-" + string.Join("-", match.Groups.Values.Skip(1));
+            }
+            //普通番号，优先尝试匹配带分隔符的（如ABC - 123）
+            match = Regex.Match(no_domain, @"([a-z]{2,10})[-_]0*(\d{2,5})", RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                string number = match.Groups[2].Value;
+                //不满三位数，填充0
+                number = number.PadLeft(3, '0');
+
+                return $"{match.Groups[1].Value}-{number}";
+            }
+            //普通番号，运行到这里时表明无法匹配到带分隔符的番号
+            //先尝试匹配东热的red, sky, ex三个不带 - 分隔符的系列
+            //（这三个系列已停止更新，因此根据其作品编号将数字范围限制得小一些以降低误匹配概率）
+            match = Regex.Match(no_domain, @"(red[01]\d\d|sky[0-3]\d\d|ex00[01]\d)", RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                return match.Groups[1].Value;
+            }
+            //然后再将影片视作缺失了 - 分隔符来匹配
+            match = Regex.Match(no_domain, @"([a-z]{2,})(\d{2,5})", RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                return $"{match.Groups[1].Value}-{match.Groups[2].Value}";
+            }
+
+            //尝试匹配TMA制作的影片（如'T28-557'，他家的番号很乱）
+            match = Regex.Match(no_domain, @"(T28[-_]\d{3})", RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                return match.Groups[1].Value;
+            }
+            //尝试匹配东热n, k系列
+            match = Regex.Match(no_domain, @"(n\d{4}|k\d{4})", RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                return match.Groups[1].Value;
+            }
+            //尝试匹配纯数字番号（无码影片）
+            match = Regex.Match(no_domain, @"(\d{6}[-_]\d{2,3})", RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                return match.Groups[1].Value;
+            }
+            //如果还是匹配不了，尝试将')('替换为'-'后再试，少部分影片的番号是由')('分隔的
+            if (no_domain.Contains(")("))
+            {
+                string avid = MatchName(no_domain.Replace(")(", "-"));
+                if (!string.IsNullOrEmpty(avid))
+                    return avid;
+            }
+
+            //如果最后仍然匹配不了番号，则尝试使用文件所在文件夹的名字去匹配
+            // ……
+            return null;
+
         }
 
 

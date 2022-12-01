@@ -41,9 +41,7 @@ namespace Display.ContentsPage
         CancellationTokenSource s_cts = new();
         public Window currentWindow;
 
-        ContentsPage.CheckMatchMethod matchVideoResultsPage;
         List<MatchVideoResult> matchVideoResults;
-        WindowView.CommonWindow window2;
 
         public SpiderVideoInfo()
         {
@@ -70,7 +68,6 @@ namespace Display.ContentsPage
 
             currentWindow.Closed += CurrentWindow_Closed;
             await ShowMatchResult();
-
             currentWindow.Closed -= CurrentWindow_Closed;
         }
 
@@ -151,63 +148,8 @@ namespace Display.ContentsPage
 
             TopProgressBar.Visibility = Visibility.Collapsed;
 
-            //0:检查规则,1:直接开始
-            switch (SelectedMethod_Combox.SelectedIndex)
-            {
-                //检查规则
-                case 0:
-                    window2 = new WindowView.CommonWindow();
-                    matchVideoResultsPage = new ContentsPage.CheckMatchMethod(matchVideoResults);
-                    window2.Content = matchVideoResultsPage;
-                    window2.Activate();
+            SpliderVideoInfo(matchVideoResults);
 
-                    window2.Closed += Window2_Closed;
-
-                    break;
-                case 1:
-                    SpliderVideoInfo(matchVideoResults);
-                    break;
-            }
-        }
-
-        private async void Window2_Closed(object sender, WindowEventArgs args)
-        {
-            args.Handled = true;
-            var newMatchVideoResults = new List<MatchVideoResult>();
-            foreach (var info in matchVideoResultsPage.videoMatchInfo.SuccessNameCollection.allMatchNameList)
-            {
-                newMatchVideoResults.Add(new MatchVideoResult()
-                {
-                    status = true,
-                    statusCode = 1,
-                    OriginalName = info.OriginalName,
-                    MatchName = info.MatchName,
-                    message = "匹配成功"
-                });
-            }
-
-            matchVideoResults = newMatchVideoResults;
-
-            //更新UI
-            ResetMatchCountInfo(matchVideoResults);
-
-
-            //未空，退出
-            if (matchVideoResults.Count == 0)
-            {
-            }
-            else
-            {
-                var result = await matchVideoResultsPage.ShowContentDialog();
-
-                if (result == ContentDialogResult.Primary)
-                {
-                    SpliderVideoInfo(matchVideoResults);
-                }
-            }
-
-            window2.Closed -= Window2_Closed;
-            window2.Close();
         }
 
         private void ResetMatchCountInfo(List<MatchVideoResult> matchVideoResults)
@@ -243,7 +185,6 @@ namespace Display.ContentsPage
                 //更新进度信息
                 if (progressPercent.index != 0)
                 {
-                    //Debug.WriteLine($"》》{progressPercent.index}");
                     overallProgress.Value = progressPercent.index;
                 }
 
@@ -289,9 +230,6 @@ namespace Display.ContentsPage
 
                 percentProgress_TextBlock.Text = $"{(int)overallProgress.Value * 100 / matchVideoResults.Count}%";
                 countProgress_TextBlock.Text = $"{overallProgress.Value}/{matchVideoResults.Count}";
-
-
-                //Debug.WriteLine($"{overallProgress.Value} == {overallProgress.Maximum}");
 
                 //100%
                 if (overallProgress.Value == overallProgress.Maximum)
@@ -396,13 +334,14 @@ namespace Display.ContentsPage
                 //使用第一个符合条件的Name
                 resultInfo = DataAccess.LoadOneVideoInfoByCID(result[0]);
 
-                progress.Report(new SpliderInfoProgress() {matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "数据库已存在" } });
+                progress.Report(new SpliderInfoProgress() {
+                    matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "数据库已存在" } });
             }
             // 从相关网站中搜索
             else
             {
                 //Fc2类型
-                if (VideoName.Contains("fc2-"))
+                if (VideoName.ToLower().Contains("fc2-"))
                 {
                     if (AppSettings.isUseFc2Hub)
                     {

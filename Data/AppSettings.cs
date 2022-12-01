@@ -194,40 +194,6 @@ public class AppSettings
         }
     }
 
-    private static string _matchVideoKeywordsString = "aarm,abp,abs,abw,acme,adn,adz,ajvr,aka,ama,anzd,aoz,apaa,apak,apar,apkh,apns,ara,area,atfb,atid,averv,avkh,avop,avsa,bagr,bahp,baze,bazx,bbi,bcv,bda,beb,bgn,bijn,bikmvr,blor,bmvr,bnst,booty,bst,bstc,bta,btha,buena,caca,cafr,cami,cand,capi,cawd,cbx,cead,cemd,cesd,cetd,chn,chsd,cjod,club,cmd,crnx,crs,crvr,csdx,cspl,cute,cwm,cwpbd,czbd,damz,dandy,dasd,dcv,ddff,ddhh,ddk,ddkh,ddob,ddt,dfe,dgcemd,dgcesd,dgl,diam,dic,dioguitar,dkn,dldss,dmdg,dnin,dnw,docp,doks,dpmi,dpmx,dpsdl,drc,dsambd,dss,dsvr,dtt,dtvr,dtw,dvaj,dvdes,dvsr,ebod,ebvr,ecb,ecr,edd,eiki,ekdv,ekdv,emoi,endx,erofv,erov,esk,etn,etqr,eva,evo,eyan,ezd,fai,fanh,fch,fcp,fdd,fffs,finh,flns,fneo,fsdss,fset,fwdv,gachi,gachig,gachip,gachippv,gana,gaor,garea,gav,gcf,gdhh,geki,genm,gent,gnab,gnax,gns,good,gopj,gs,gvg,gvh,gwaz,gzap,haru,hbad,hey,hgot,hhh,hiz,hmgl,hmn,hnd,hnky,hnvr,hodv,hoi,hoiz,homa,homev,honb,hrv,hunt,hunta,huntb,hunvr,hxad,hxae,hxak,hypn,hzgd,ibw,idbd,ienf,iesp,ing,instv,inu,ion,ipit,iptd,ipvr,ipx,ipz,jac,jag,jan,japornxxx,jbs,jfyg,job,johs,josi,jpsvr,jrai,juc,jufd,jufe,jukf,jul,jusd,juvr,jux,juy,jvr,kamef,kane,kavr,kawd,kbi,kimu,kiray,kird,kire,kiwvr,kmhr,kmhrs,kmvr,knam,knb,kncs,kray,krnd,ksbe,ktb,ktds,ktkp,ktkz,kuro,kuse,kvr,kwp,kyun,lafbd,las,lcbd,lcdv,llr,lol,loli,love,lpbr,lulu,luxu,lxvs,lzdm,maan,madm,man,mao,maraa,mas,maxvr,maxvrh,mcb,mcbd,mcdv,mct,mdb,mdbk,mdm,mdtm,mdvr,meyd,mfc,mfcs,mgt,miaa,miad,miae,midd,mide,midv,mifd,migd,mild,milk,mimk,mint,mird,mism,mist,mium,mix,mizd,mkck,mkmp,mkon,mmb,mmgh,mmks,mmnt,mmus,mogi,mopg,mrmm,msd,msfh,mstd,mste,mstt,mtall,mtm,mudr,mukc,mum,mvsd,mxbd,mxgs,myhd,mywife,nacr,nade,naka,nama,natr,nfdm,ngod,nhdta,nhdtb,nhvr,nitr,nmc,nnpj,nps,nsfs,nsps,nsstl,ntk,ntr,ntrd,nttr,nzk,oae,odfm,ofje,oigs,okad,okb,okp,onez,ongbak,oni,onsd,ore,orebms,orec,oretd,orex,oyc,pb,pbd,per,pgd,pgm,pgod,pipivr,piyo,pkpd,ppft,pppd,pppe,ppt,ppvr,pred,prtd,prvr,psd,psz,pxh,pxvr,qqcm,qrvr,raw,rbd,real,rebd,rebdb,red,rhts,rki,rmd,rmds,roe,room,royd,rpin,rtp,s2mbd,saba,sad,sama,same,savr,sbmx,scp,sdab,sdam,sdde,sdjs,sdmf,sdmm,sdms,sdmt,sdmu,sdnm,sdnt,sdsi,senn,sero,sflb,sga,sgk,sgla,shkd,shl,shn,shpv,shs,shyn,silk,sim,simm,siro,siro,sis,siv,sivr,skmj,sky,skyhd,smbd,smd,snis,soe,spc,spivr,spro,sps,sqte,sqtevr,srho,srs,srtd,ssis,ssni,sspd,star,stars,std,stko,stsk,suke,supa,supd,svdvd,sw,sweet,sxar,tar,tbl,tek,ten,tgav,tigr,tikp,tki,tkwa,tmavr,tmvi,tnb,top,tppn,tpvr,tre,trg,tsf,tus,tyod,ueh,ult,upsm,ure,urvk,urvrsp,usba,val,vdd,vec,vema,venu,venx,vgd,voss,vov,vovs,vrkm,vrtb,vrtm,vrvr,vspds,wa,waaa,wanz,wat,wavr,wbdv,wdi,wf,wnz,wps,wpvr,xrw,xss,xvsr,yab,ymdd,ymds,yrh,yrll,yrz,zmen,zsd,zuko";
-    public static string MatchVideoKeywordsString
-    {
-        get
-        {
-            string localStr = localSettings.Values["MatchVideoKeywordsString"] as string;
-            if (localStr == null)
-            {
-                localStr = _matchVideoKeywordsString;
-            }
-
-            return localStr;
-        }
-        set
-        {
-            localSettings.Values["MatchVideoKeywordsString"] = value;
-        }
-    }
-
-    /// <summary>
-    /// 图片保存地址
-    /// </summary>
-    public static int isStartAfterMatchName
-    {
-        get
-        {
-            return Convert.ToInt32(localSettings.Values["isStartAfterMatchName"]);
-        }
-        set
-        {
-            localSettings.Values["isStartAfterMatchName"] = value;
-        }
-    }
-
     /// <summary>
     /// 应用的启动页面
     /// </summary>
