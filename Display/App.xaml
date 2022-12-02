@@ -20,8 +20,6 @@
                 </ResourceDictionary>
 
                 <ResourceDictionary>
-                    <SolidColorBrush x:Key="DefaultBorderBrush">#bdc3c7</SolidColorBrush>
-                    
                     <Style TargetType="TextBlock">
                         <Setter Property="FontFamily"
                                 Value="霞鹜文楷" />

@@ -37,6 +37,7 @@ namespace Display.ContentsPage
         GetInfoFromNetwork network;
         VideoInfo videoInfo = new VideoInfo();
         List<string> FailVideoNameList;
+        ObservableCollection<Datum> FailList = new();
 
         CancellationTokenSource s_cts = new();
         public Window currentWindow;
@@ -180,8 +181,6 @@ namespace Display.ContentsPage
             ProgressMore_TextBlock.Text = $"失败数：0";
             var progress = new Progress<SpliderInfoProgress>(progressPercent =>
             {
-                //Debug.WriteLine($"进度:{progressPercent.index}");
-
                 //更新进度信息
                 if (progressPercent.index != 0)
                 {
@@ -303,10 +302,13 @@ namespace Display.ContentsPage
                     //成功
                     else
                     {
+                        
+
                         spliderInfoProgress.matchResult.status = true;
                         spliderInfoProgress.matchResult.statusCode = 1;
                         spliderInfoProgress.matchResult.message = "检索成功";
                     }
+
                 }
 
                 spliderInfoProgress.index = i+1;
@@ -326,9 +328,9 @@ namespace Display.ContentsPage
         {
             VideoInfo resultInfo = null;
 
-            //如果数据库已存在该数据
             var result = DataAccess.SelectTrueName(VideoName.ToUpper());
 
+            //如果数据库已存在该数据
             if (result.Count != 0)
             {
                 //使用第一个符合条件的Name
@@ -336,7 +338,11 @@ namespace Display.ContentsPage
 
                 progress.Report(new SpliderInfoProgress() {
                     matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "数据库已存在" } });
+
+                DataAccess.UpdataFileToInfo(VideoName, true);
+
             }
+            // 数据库中不存在该数据
             // 从相关网站中搜索
             else
             {
@@ -375,10 +381,17 @@ namespace Display.ContentsPage
                 }
 
                 //多次搜索无果，退出
-                if (resultInfo == null) return null;
+                if (resultInfo == null)
+                {
+                    DataAccess.UpdataFileToInfo(VideoName, false);
+                    return null;
+                }
 
                 // 添加进数据库
                 DataAccess.AddVideoInfo(resultInfo);
+
+                //更新FileToInfo表
+                DataAccess.UpdataFileToInfo(VideoName,true);
             }
 
             return resultInfo;
@@ -515,7 +528,6 @@ namespace Display.ContentsPage
 
         private void RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var i = e;
             if (e.AddedItems.Count == 0) return;
 
             if (e.AddedItems[0] is RadioButton radioButton)
@@ -524,15 +536,26 @@ namespace Display.ContentsPage
                 {
                     case "本地数据库":
                         Explorer.Visibility = Visibility.Visible;
-                        FailListView.Visibility = Visibility.Collapsed;
+                        FailListGrid.Visibility = Visibility.Collapsed;
                         break;
                     case "匹配失败":
-                        FailListView.Visibility = Visibility.Visible;
+                        FailListGrid.Visibility = Visibility.Visible;
                         Explorer.Visibility = Visibility.Collapsed;
+                        tryShowFailList();
                         break;
                 }
             }
 
+        }
+
+        private void tryShowFailList()
+        {
+            if (FailList.Count == 0)
+            {
+                var list = DataAccess.LoadFailFileInfo();
+
+                list.ForEach(item => FailList.Add(item));
+            }
         }
     }
     public class SpliderInfoProgress

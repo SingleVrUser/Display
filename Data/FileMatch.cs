@@ -56,7 +56,7 @@ namespace Data
             if (name_lc.Contains("fc"))
             {
                 //根据FC2 Club的影片数据，FC2编号为5-7个数字
-                match = Regex.Match(name, @"fc2?[^a-z\d]{0,5}(ppv[^a-z、d]{0,5})?(\d{5,7})", RegexOptions.IgnoreCase);
+                match = Regex.Match(name, @"fc2?[^a-z\d]{0,5}(ppv[^a-z\d]{0,5})?(\d{5,7})", RegexOptions.IgnoreCase);
 
                 if (match.Success)
                 {
@@ -300,10 +300,7 @@ namespace Data
                     //根据视频名称匹配番号
                     var VideoName = FileMatch.MatchName(FileName);
 
-                    if(VideoName != null && VideoName.Contains("gs") && VideoName.Contains("13"))
-                    {
-                        var ite = FileName;
-                    }
+                    DataAccess.AddFileToInfo(file_info.pc, VideoName);
 
                     //未匹配
                     if (VideoName == null)
@@ -323,6 +320,8 @@ namespace Data
                     {
                         resultList.Add(new MatchVideoResult() { status = true, OriginalName = file_info.n, statusCode = 2, message = "已添加" });
                     }
+
+
                 }
                 else
                 {

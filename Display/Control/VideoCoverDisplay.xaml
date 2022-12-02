@@ -1,44 +1,55 @@
-﻿<UserControl
-    x:Class="Display.Control.VideoCoverDisplay"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Display.Control"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:data="using:Data"
-    mc:Ignorable="d"
-    CacheMode="BitmapCache">
+﻿<UserControl x:Class="Display.Control.VideoCoverDisplay"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:Display.Control"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:data="using:Data"
+             mc:Ignorable="d"
+             CacheMode="BitmapCache">
 
 
     <Control.Resources>
         <!--AppBarToggleButton选中后的效果-->
-        <SolidColorBrush x:Key="AppBarToggleButtonBackgroundPointerOver" Color="#70a1ff" Opacity="0.8"/>
-        <SolidColorBrush x:Key="AppBarToggleButtonBackgroundChecked" Color="#70a1ff" Opacity="0.8"/>
-        <SolidColorBrush x:Key="AppBarToggleButtonBackgroundCheckedPointerOver" Color="#70a1ff" Opacity="0.8"/>
+        <SolidColorBrush x:Key="AppBarToggleButtonBackgroundPointerOver"
+                         Color="#70a1ff"
+                         Opacity="0.8" />
+        <SolidColorBrush x:Key="AppBarToggleButtonBackgroundChecked"
+                         Color="#70a1ff"
+                         Opacity="0.8" />
+        <SolidColorBrush x:Key="AppBarToggleButtonBackgroundCheckedPointerOver"
+                         Color="#70a1ff"
+                         Opacity="0.8" />
 
         <!--AppBarButton按钮悬停效果-->
-        <SolidColorBrush x:Key="AppBarButtonBackgroundPointerOver" Color="#70a1ff" Opacity="0.8"/>
+        <SolidColorBrush x:Key="AppBarButtonBackgroundPointerOver"
+                         Color="#70a1ff"
+                         Opacity="0.8" />
 
         <!--提示-->
-        <TeachingTip x:Name="HintTeachingTip"/>
+        <TeachingTip x:Name="HintTeachingTip" />
 
-        <TeachingTip x:Name="LightDismissTeachingTip" IsLightDismissEnabled="True"/>
+        <TeachingTip x:Name="LightDismissTeachingTip"
+                     IsLightDismissEnabled="True"/>
 
         <!--取消ListView悬停效果-->
-        <Style x:Name="ListViewItemNoneStyle" TargetType="ListViewItem">
+        <Style x:Name="ListViewItemNoneStyle"
+               TargetType="ListViewItem">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ListViewItem">
                         <Grid Background="{TemplateBinding Background}">
-                            <ContentPresenter Content="{TemplateBinding Content}" Margin="{TemplateBinding Padding}" />
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                              Margin="{TemplateBinding Padding}" />
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
 
-        <!--视频预览展示样式-->
-        <DataTemplate x:Key="ImageTemplate" x:DataType="data:VideoCoverDisplayClass">
+        <!--预览展示样式-->
+        <DataTemplate x:Key="ImageTemplate"
+                      x:DataType="data:VideoCoverDisplayClass">
             <Grid>
                 <Grid.ContextFlyout>
                     <!--右键操作-->
@@ -46,52 +57,87 @@
                         <MenuFlyoutItem Text="删除"
                                         Click="deleteAppBarButton_Click">
                             <MenuFlyoutItem.Icon>
-                                <FontIcon Glyph="&#xE107;"/>
+                                <FontIcon Glyph="&#xE107;" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
                     </MenuFlyout>
                 </Grid.ContextFlyout>
 
-                <StackPanel CornerRadius="5" Padding="10,10,10,0">
-                    <!--背景--><!--
+                <StackPanel CornerRadius="5"
+                            Padding="10,10,10,0">
+                    <!--背景-->
+                    <!--
                     <StackPanel.Background>
                         <SolidColorBrush Color="{ThemeResource SystemChromeDisabledLowColor}" Opacity="1" />
                     </StackPanel.Background>-->
 
-                    <Grid PointerEntered="Grid_PointerEntered" PointerExited="Grid_PointerExited">
-                        <Grid x:Name="showImage" CornerRadius="5">
-                            <Image Stretch="UniformToFill" Source="{x:Bind imagepath}" Width="{x:Bind imagewidth,Mode=OneWay}" Height="{x:Bind imageheight,Mode=OneWay}"/>
-                            <RelativePanel >
-                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE00B;" Foreground="OrangeRed" Opacity="1" Margin="8" FontSize="30" Visibility="{x:Bind data:FileMatch.isShowLikeIcon(is_like),Mode=OneWay}"/>
-                                <StackPanel Margin="5" Padding="5,2" Background="CornflowerBlue" RelativePanel.AlignRightWithPanel="True" VerticalAlignment="Top" CornerRadius="5" Opacity="0.9" Visibility="{x:Bind isShowLabel}">
-                                    <TextBlock Text="{x:Bind ShowLabel}" Foreground="AntiqueWhite" FontFamily="Times New Roman" FontSize="20"/>
+                    <Grid PointerEntered="Grid_PointerEntered"
+                          PointerExited="Grid_PointerExited">
+                        <Grid x:Name="showImage"
+                              CornerRadius="5">
+                            <Image Stretch="UniformToFill"
+                                   Source="{x:Bind imagepath}"
+                                   Width="{x:Bind imagewidth,Mode=OneWay}"
+                                   Height="{x:Bind imageheight,Mode=OneWay}" />
+                            
+                            <RelativePanel>
+                                <FontIcon FontFamily="Segoe Fluent Icons"
+                                          Glyph="&#xE00B;"
+                                          Foreground="OrangeRed"
+                                          Opacity="1"
+                                          Margin="8"
+                                          FontSize="30"
+                                          Visibility="{x:Bind data:FileMatch.isShowLikeIcon(is_like),Mode=OneWay}" />
+                                <StackPanel Margin="5"
+                                            Padding="5,2"
+                                            Background="CornflowerBlue"
+                                            RelativePanel.AlignRightWithPanel="True"
+                                            VerticalAlignment="Top"
+                                            CornerRadius="5"
+                                            Opacity="0.9"
+                                            Visibility="{x:Bind isShowLabel}">
+                                    <TextBlock Text="{x:Bind ShowLabel}"
+                                               Foreground="AntiqueWhite"
+                                               FontFamily="Times New Roman"
+                                               FontSize="20" />
                                 </StackPanel>
                             </RelativePanel>
                         </Grid>
 
                         <Grid Visibility="Collapsed">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="auto"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <Grid.Background>
                                 <!--<AcrylicBrush TintOpacity="0.03600000170990825" TintColor="#FF000000" FallbackColor="#FF008000" />-->
-                                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1" Opacity="0.7">
-                                    <GradientStop Color="#70a1ff" Offset="0"/>
-                                    <GradientStop Color="#00000050" Offset="0.3"/>
-                                    <GradientStop Color="#00000050" Offset="0.7"/>
-                                    <GradientStop Color="#70a1ff" Offset="1"/>
+                                <LinearGradientBrush StartPoint="0.5,0"
+                                                     EndPoint="0.5,1"
+                                                     Opacity="0.7">
+                                    <GradientStop Color="#70a1ff"
+                                                  Offset="0" />
+                                    <GradientStop Color="#00000050"
+                                                  Offset="0.3" />
+                                    <GradientStop Color="#00000050"
+                                                  Offset="0.7" />
+                                    <GradientStop Color="#70a1ff"
+                                                  Offset="1" />
                                 </LinearGradientBrush>
                             </Grid.Background>
 
                             <RelativePanel>
-                                <AppBarToggleButton IsCompact="True" ToolTipService.ToolTip="稍后观看" RelativePanel.AlignRightWithPanel="True" IsChecked="{x:Bind data:FileMatch.isLookLater(look_later), Mode=OneWay}" Click="LookLaterToggleButton_Click">
+                                <AppBarToggleButton IsCompact="True"
+                                                    ToolTipService.ToolTip="稍后观看"
+                                                    RelativePanel.AlignRightWithPanel="True"
+                                                    IsChecked="{x:Bind data:FileMatch.isLookLater(look_later), Mode=OneWay}"
+                                                    Click="LookLaterToggleButton_Click">
                                     <AppBarToggleButton.Resources>
 
                                     </AppBarToggleButton.Resources>
                                     <AppBarToggleButton.Icon>
-                                        <FontIcon Glyph="&#xE13B;" Foreground="White"/>
+                                        <FontIcon Glyph="&#xE13B;"
+                                                  Foreground="White" />
                                     </AppBarToggleButton.Icon>
                                 </AppBarToggleButton>
                             </RelativePanel>
@@ -111,50 +157,68 @@
                                     <!--<SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#ecf0f1" Opacity="0"/>
                                     <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#ecf0f1" Opacity="0"/>-->
                                 </Button.Resources>
-                                <TextBlock Foreground="White"/>
+                                <TextBlock Foreground="White" />
                             </Button>
 
-                            <CommandBar Grid.Row="2" IsOpen="False" DefaultLabelPosition="Collapsed" OverflowButtonVisibility="Collapsed">
+                            <CommandBar Grid.Row="2"
+                                        IsOpen="False"
+                                        DefaultLabelPosition="Collapsed"
+                                        OverflowButtonVisibility="Collapsed">
                                 <CommandBar.Resources>
                                     <Style TargetType="FontIcon">
-                                        <Setter Property="Foreground" Value="White"/>
+                                        <Setter Property="Foreground"
+                                                Value="White" />
                                     </Style>
-                                    <SolidColorBrush x:Key="CommandBarBackgroundOpen" Color="#bdc3c7"  Opacity="0.5"/>
-                                    <SolidColorBrush x:Key="CommandBarBorderBrushOpen" Color="#ecf0f1" Opacity="0.5"/>
+                                    <SolidColorBrush x:Key="CommandBarBackgroundOpen"
+                                                     Color="#bdc3c7"
+                                                     Opacity="0.5" />
+                                    <SolidColorBrush x:Key="CommandBarBorderBrushOpen"
+                                                     Color="#ecf0f1"
+                                                     Opacity="0.5" />
                                 </CommandBar.Resources>
 
                                 <CommandBar.PrimaryCommands>
                                     <!--播放-->
-                                    <AppBarButton ToolTipService.ToolTip="播放" IsCompact="True" Click="PlayButton_Click">
-                                        <FontIcon Glyph="&#xEE4A;"/>
+                                    <AppBarButton ToolTipService.ToolTip="播放"
+                                                  IsCompact="True"
+                                                  Click="PlayButton_Click">
+                                        <FontIcon Glyph="&#xEE4A;" />
                                     </AppBarButton>
 
                                     <AppBarSeparator />
 
                                     <!--修改评分-->
-                                    <AppBarButton ToolTipService.ToolTip="评分" IsCompact="True">
+                                    <AppBarButton ToolTipService.ToolTip="评分"
+                                                  IsCompact="True">
                                         <AppBarButton.Flyout>
                                             <Flyout>
-                                                <RatingControl Caption="评分" Value="{x:Bind score, Mode=TwoWay}" ValueChanged="RatingControl_ValueChanged">
+                                                <RatingControl Caption="评分"
+                                                               Value="{x:Bind score, Mode=TwoWay}"
+                                                               ValueChanged="RatingControl_ValueChanged">
                                                     <RatingControl.Resources>
-                                                        <SolidColorBrush x:Key="RatingControlSelectedForeground" Color="#f7ba36" />
+                                                        <SolidColorBrush x:Key="RatingControlSelectedForeground"
+                                                                         Color="#f7ba36" />
                                                     </RatingControl.Resources>
                                                 </RatingControl>
                                             </Flyout>
                                         </AppBarButton.Flyout>
-                                        <FontIcon Glyph="&#xE1CE;"/>
+                                        <FontIcon Glyph="&#xE1CE;" />
                                     </AppBarButton>
 
                                     <AppBarSeparator />
 
                                     <!--标记为喜欢-->
-                                    <AppBarToggleButton ToolTipService.ToolTip="喜欢" IsCompact="True" IsChecked="{x:Bind data:FileMatch.isLike(is_like),Mode=OneWay}" Click="LikeToggleButton_Click">
-                                        <FontIcon Glyph="&#xE006;"/>
+                                    <AppBarToggleButton ToolTipService.ToolTip="喜欢"
+                                                        IsCompact="True"
+                                                        IsChecked="{x:Bind data:FileMatch.isLike(is_like),Mode=OneWay}"
+                                                        Click="LikeToggleButton_Click">
+                                        <FontIcon Glyph="&#xE006;" />
                                     </AppBarToggleButton>
 
                                     <AppBarSeparator />
 
-                                    <!--删除--><!--
+                                    <!--删除-->
+                                    <!--
                                     <AppBarButton ToolTipService.ToolTip="删除"
                                                   IsCompact="True"
                                                   Click="deleteAppBarButton_Click">
@@ -177,62 +241,94 @@
 
                         <Grid Visibility="{x:Bind isDeleted,Mode=OneWay}">
                             <Grid.Background>
-                                <SolidColorBrush Color="{ThemeResource SystemChromeAltHighColor}" Opacity="0.8" />
+                                <SolidColorBrush Color="{ThemeResource SystemChromeAltHighColor}"
+                                                 Opacity="0.8" />
                             </Grid.Background>
-                            
-                            <TextBlock Text="已删除" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                            <TextBlock Text="已删除"
+                                       FontSize="30"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
                         </Grid>
                     </Grid>
-                    <StackPanel HorizontalAlignment="Center" Margin="0,5,0,0">
+                    <StackPanel HorizontalAlignment="Center"
+                                Margin="0,5,0,0">
                         <Grid MaxWidth="{x:Bind imagewidth,Mode=OneWay}">
                             <Grid.Resources>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="FontFamily" Value="JetBrains Mono"/>
+                                    <Setter Property="FontFamily"
+                                            Value="JetBrains Mono" />
                                 </Style>
                             </Grid.Resources>
-                            
+
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            
-                            
-                            <TextBlock Text="{x:Bind truename}" IsTextSelectionEnabled="True"/>
-                            <AppBarSeparator Grid.Column="1"/>
-                            <TextBlock Grid.Column="2" Text="|" Foreground="Gray" Opacity="0.5"/>
-                            <AppBarSeparator Grid.Column="3"/>
-                            <TextBlock Grid.Column="4" Text="{x:Bind realeaseYear}" IsTextSelectionEnabled="True"/>
-                            <AppBarSeparator Grid.Column="5"/>
-                            <TextBlock Grid.Column="6" Text="|" Foreground="Gray" Opacity="0.5"/>
-                            <AppBarSeparator Grid.Column="7"/>
-                            <local:TextBlockWithLongText Grid.Column="8" StringValue="{x:Bind actor}"/>
- 
+
+
+                            <TextBlock Text="{x:Bind truename}"
+                                       IsTextSelectionEnabled="True" />
+                            <AppBarSeparator Grid.Column="1" />
+                            <TextBlock Grid.Column="2"
+                                       Text="|"
+                                       Foreground="Gray"
+                                       Opacity="0.5" />
+                            <AppBarSeparator Grid.Column="3" />
+                            <TextBlock Grid.Column="4"
+                                       Text="{x:Bind realeaseYear}"
+                                       IsTextSelectionEnabled="True" />
+                            <AppBarSeparator Grid.Column="5" />
+                            <TextBlock Grid.Column="6"
+                                       Text="|"
+                                       Foreground="Gray"
+                                       Opacity="0.5" />
+                            <AppBarSeparator Grid.Column="7" />
+                            <local:TextBlockWithLongText Grid.Column="8"
+                                                         StringValue="{x:Bind actor}" />
+
                         </Grid>
-                        
-                        <RatingControl IsClearEnabled="False" IsReadOnly="True" Value="{x:Bind score,Mode=OneWay}">
+
+                        <RatingControl IsClearEnabled="False"
+                                       IsReadOnly="True"
+                                       Value="{x:Bind score,Mode=OneWay}">
                             <RatingControl.Resources>
-                                <SolidColorBrush x:Key="RatingControlSelectedForeground" Color="#f7ba36" />
-                                <SolidColorBrush x:Key="RatingControlUnselectedForeground" Color="#ecf0f1" />
+                                <SolidColorBrush x:Key="RatingControlSelectedForeground"
+                                                 Color="#f7ba36" />
+                                <SolidColorBrush x:Key="RatingControlUnselectedForeground"
+                                                 Color="#ecf0f1" />
                             </RatingControl.Resources>
                         </RatingControl>
                     </StackPanel>
                 </StackPanel>
             </Grid>
         </DataTemplate>
+        
+        <!--匹配失败的展示样式-->
+        <DataTemplate x:Key="ListTemplate"
+                      x:DataType="data:Datum">
+            <TextBlock Text="{x:Bind n}" />
+        </DataTemplate>
+
+        <local:CoverItemTemplateSelector x:Key="CoverItemTemplateSelector"
+                                         ImageTemplate="{StaticResource ImageTemplate}"
+                                         WithoutImageTemplate="{StaticResource ListTemplate}"/>
 
         <!--每页显示数量-->
         <Flyout x:Name="PageFlyout">
             <Flyout.FlyoutPresenterStyle>
                 <Style TargetType="FlyoutPresenter">
-                    <Setter Property="Padding" Value="0"/>
-                    <Setter Property="CornerRadius" Value="5"/>
+                    <Setter Property="Padding"
+                            Value="0" />
+                    <Setter Property="CornerRadius"
+                            Value="5" />
                 </Style>
             </Flyout.FlyoutPresenterStyle>
             <StackPanel>
@@ -241,27 +337,30 @@
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="data:AccountContentInPage">
                             <RelativePanel>
-                                <TextBlock Text="{x:Bind ContentAcount}" RelativePanel.AlignLeftWithPanel="True"/>
-                                <Button
-                                    Click="DeleteButton_Click"
-                                    RelativePanel.AlignRightWithPanel="True"
-                                    Style="{StaticResource ButtonRevealStyle}">
+                                <TextBlock Text="{x:Bind ContentAcount}"
+                                           RelativePanel.AlignLeftWithPanel="True" />
+                                <Button Click="DeleteButton_Click"
+                                        RelativePanel.AlignRightWithPanel="True"
+                                        Style="{StaticResource ButtonRevealStyle}">
                                     <Button.Background>
-                                        <SolidColorBrush Opacity="0"/>
+                                        <SolidColorBrush Opacity="0" />
                                     </Button.Background>
-                                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE106;" FontSize="10" Margin="0"/>
+                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                              Glyph="&#xE106;"
+                                              FontSize="10"
+                                              Margin="0" />
                                 </Button>
                             </RelativePanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
                 <NumberBox x:Name="AddAccountPage_NumberBox"
-                    PlaceholderText="500"
-                    ValueChanged="AddAccountPage_NumberBox_ValueChanged"
-                    ValidationMode="InvalidInputOverwritten"
-                    SpinButtonPlacementMode="Compact"
-                    LargeChange="50"
-                    SmallChange="50"/>
+                           PlaceholderText="500"
+                           ValueChanged="AddAccountPage_NumberBox_ValueChanged"
+                           ValidationMode="InvalidInputOverwritten"
+                           SpinButtonPlacementMode="Compact"
+                           LargeChange="50"
+                           SmallChange="50" />
             </StackPanel>
         </Flyout>
 
@@ -269,46 +368,45 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <!--提示信息-->
-        <InfoBar
-            RelativePanel.AlignLeftWithPanel="True"
-            IsOpen="False"
-            Severity="Informational"
-            Title="Title"
-            x:Name="InfoBar"
-            Message="Essential app message for your users to be informed of, acknowledge, or take action on." />
+        <InfoBar RelativePanel.AlignLeftWithPanel="True"
+                 IsOpen="False"
+                 Severity="Informational"
+                 Title="Title"
+                 x:Name="InfoBar"
+                 Message="Essential app message for your users to be informed of, acknowledge, or take action on." />
 
         <!--视频预览-->
-        <ScrollViewer
-            Grid.Row="1"
-            VerticalScrollBarVisibility="Auto">
-            <GridView
-                Margin="5,0,5,0"
-                x:Name="BasicGridView"
-                ItemTemplate="{StaticResource ImageTemplate}"
-                IsItemClickEnabled="True"
-                ItemClick="BasicGridView_ItemClick"
-                SelectionMode="None"
-                CanBeScrollAnchor="False"
-                HorizontalAlignment="Center"
-                ScrollViewer.VerticalScrollMode="Disabled"
-                ScrollViewer.VerticalScrollBarVisibility="Disabled">
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto">
+            <GridView Margin="5,0,5,0"
+                      x:Name="BasicGridView"
+                      ItemTemplateSelector="{StaticResource CoverItemTemplateSelector}"
+                      IsItemClickEnabled="True"
+                      ItemClick="BasicGridView_ItemClick"
+                      SelectionMode="None"
+                      CanBeScrollAnchor="False"
+                      HorizontalAlignment="Center"
+                      ScrollViewer.VerticalScrollMode="Disabled"
+                      ScrollViewer.VerticalScrollBarVisibility="Disabled">
 
                 <GridView.ItemContainerStyle>
                     <Style TargetType="GridViewItem">
-                        <Setter Property="Margin" Value="2"/>
+                        <Setter Property="Margin"
+                                Value="2" />
 
                         <!--取消GridView悬停效果-->
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="GridViewItem">
                                     <Grid Background="{TemplateBinding Background}">
-                                        <ContentPresenter Content="{TemplateBinding Content}" Margin="{TemplateBinding Padding}" />
+                                        <ContentPresenter Content="{TemplateBinding Content}"
+                                                          Margin="{TemplateBinding Padding}" />
                                     </Grid>
                                 </ControlTemplate>
                             </Setter.Value>
@@ -323,73 +421,102 @@
         <RelativePanel Grid.Row="2"
                        Margin="0,0,10,0">
 
-            <StackPanel Height="45">
+            <StackPanel Margin="0,0,0,-20"
+                        Orientation="Horizontal">
 
-                <AppBarButton
-                    x:Name="orderButton"
-                    IsCompact="True"
-                    RelativePanel.AlignLeftWithPanel="True">
+                <AppBarButton x:Name="orderButton"
+                              IsCompact="True">
 
                     <ToolTipService.ToolTip>
-                        <ToolTip x:Uid="sortToolTip"/>
+                        <ToolTip x:Uid="sortToolTip" />
                     </ToolTipService.ToolTip>
                     <AppBarButton.Content>
-                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE174;" />
-                        <!--<SymbolIcon Symbol="Sort"/>-->
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                  Glyph="&#xE174;" />
                     </AppBarButton.Content>
                     <AppBarButton.Flyout>
                         <Flyout Placement="Bottom">
                             <Flyout.FlyoutPresenterStyle>
                                 <Style TargetType="FlyoutPresenter">
-                                    <Setter Property="Padding" Value="2"/>
-                                    <Setter Property="CornerRadius" Value="5"/>
+                                    <Setter Property="Padding"
+                                            Value="2" />
+                                    <Setter Property="CornerRadius"
+                                            Value="5" />
                                 </Style>
                             </Flyout.FlyoutPresenterStyle>
-                            <ListView IsItemClickEnabled="True" ItemClick="orderListView_ItemClick">
+                            <ListView IsItemClickEnabled="True"
+                                      ItemClick="orderListView_ItemClick">
                                 <ListView.Resources>
                                     <Style TargetType="StackPanel">
-                                        <Setter Property="Orientation" Value="Horizontal"/>
-                                        <Setter Property="Spacing" Value="5"/>
+                                        <Setter Property="Orientation"
+                                                Value="Horizontal" />
+                                        <Setter Property="Spacing"
+                                                Value="5" />
                                     </Style>
-                                    <Style x:Key="UpOrDownSortStyle" TargetType="FontIcon">
-                                        <Setter Property="Foreground" Value="Gray"/>
-                                        <Setter Property="FontWeight" Value="ExtraLight"/>
-                                        <Setter Property="Opacity" Value="0.5"/>
-                                        <!--<Setter Property="Orientation" Value="Horizontal"/>
-                                        <Setter Property="Spacing" Value="5"/>-->
+                                    <Style x:Key="UpOrDownSortStyle"
+                                           TargetType="FontIcon">
+                                        <Setter Property="Foreground"
+                                                Value="Gray" />
+                                        <Setter Property="FontWeight"
+                                                Value="ExtraLight" />
+                                        <Setter Property="Opacity"
+                                                Value="0.5" />
                                     </Style>
                                 </ListView.Resources>
                                 <ListView.Items>
                                     <StackPanel>
-                                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE185;"/>
-                                        <TextBlock Text="名称"/>
-                                        <FontIcon Style="{StaticResource UpOrDownSortStyle}" FontFamily="Segoe Fluent Icons" Glyph="&#xE015;"/>
+                                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xE185;" />
+                                        <TextBlock Text="名称" />
+                                        <FontIcon Style="{StaticResource UpOrDownSortStyle}"
+                                                  FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xE015;" />
                                     </StackPanel>
 
                                     <StackPanel>
-                                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE13D;"/>
-                                        <TextBlock Text="演员"/>
-                                        <FontIcon Style="{StaticResource UpOrDownSortStyle}" FontFamily="Segoe Fluent Icons" Glyph="&#xE015;"/>
+                                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xE13D;" />
+                                        <TextBlock Text="演员" />
+                                        <FontIcon Style="{StaticResource UpOrDownSortStyle}"
+                                                  FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xE015;" />
                                     </StackPanel>
 
                                     <StackPanel>
-                                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xEC92;"/>
-                                        <TextBlock Text="年份"/>
-                                        <FontIcon Style="{StaticResource UpOrDownSortStyle}" FontFamily="Segoe Fluent Icons" Glyph="&#xE015;"/>
+                                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xEC92;" />
+                                        <TextBlock Text="年份" />
+                                        <FontIcon Style="{StaticResource UpOrDownSortStyle}"
+                                                  FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xE015;" />
                                     </StackPanel>
 
                                     <StackPanel>
-                                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xF463;"/>
-                                        <TextBlock Text="随机"/>
-                                        <FontIcon Style="{StaticResource UpOrDownSortStyle}" FontFamily="Segoe Fluent Icons" Glyph="&#xF143;"/>
+                                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xF463;" />
+                                        <TextBlock Text="随机" />
+                                        <FontIcon Style="{StaticResource UpOrDownSortStyle}"
+                                                  FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xF143;" />
                                     </StackPanel>
 
                                 </ListView.Items>
                             </ListView>
                         </Flyout>
-
                     </AppBarButton.Flyout>
                 </AppBarButton>
+
+                <ToggleSwitch x:Name="ShowType_ToggleSwitch"
+                              VerticalAlignment="Center"
+                              Margin="0,0,0,15"
+                              OnContent="匹配失败"
+                              OffContent="匹配成功"
+                              Opacity="0.3"
+                              PointerEntered="ShowType_ToggleSwitch_PointerEntered"
+                              PointerExited="ShowType_ToggleSwitch_PointerExited">
+                </ToggleSwitch>
+
+
             </StackPanel>
 
             <StackPanel RelativePanel.AlignRightWithPanel="True"
@@ -397,34 +524,37 @@
                         RelativePanel.AlignVerticalCenterWithPanel="True"
                         ContextFlyout="{StaticResource PageFlyout}">
 
-                <StackPanel Orientation="Horizontal" Margin="20,0">
-                    <TextBlock x:Name="result_textblock"/>
-                    <Slider
-                        x:Name="ImageSizeChangeSlider"
-                        Grid.Row="0"
-                        Minimum="300"
-                        Maximum="900"
-                        ValueChanged="Slider_valueChanged"
-                        AutomationProperties.Name="simple slider"
-                        Width="200"/>
+                <StackPanel Orientation="Horizontal"
+                            Margin="20,0">
+                    <TextBlock x:Name="result_textblock" />
+                    <Slider x:Name="ImageSizeChangeSlider"
+                            Grid.Row="0"
+                            Minimum="300"
+                            Maximum="900"
+                            ValueChanged="Slider_valueChanged"
+                            AutomationProperties.Name="simple slider"
+                            Width="200" />
                 </StackPanel>
 
                 <!--TODO:记载全部-->
-                <Button Content="加载全部" Visibility="Collapsed"/>
+                <Button Content="加载全部"
+                        Visibility="Collapsed" />
 
                 <!--上一页-->
                 <Button Click="PreviousPageButton">
-                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE760;" />
-                    <!--<SymbolIcon Symbol="Back" Width="20" Height="20"/>-->
-                    <!--<TextBlock Text="☚"/>-->
+                    <FontIcon FontFamily="Segoe Fluent Icons"
+                              Glyph="&#xE760;" />
                 </Button>
-                <TextBox x:FieldModifier="public" x:Name="nowPageTextBox" Text="1" KeyDown="nowPageTextBox_KeyDown" ContextFlyout="{StaticResource PageFlyout}"/>
+                <TextBox x:FieldModifier="public"
+                         x:Name="nowPageTextBox"
+                         Text="1"
+                         KeyDown="nowPageTextBox_KeyDown"
+                         ContextFlyout="{StaticResource PageFlyout}" />
 
                 <!--下一页-->
                 <Button Click="NextPageButton">
-                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE761;"/>
-                    <!--<TextBlock Text="☛"/>-->
-                    <!--<SymbolIcon Symbol="Forward" Width="20" Height="20"/>-->
+                    <FontIcon FontFamily="Segoe Fluent Icons"
+                              Glyph="&#xE761;" />
                 </Button>
 
             </StackPanel>

@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -109,6 +110,17 @@ namespace Data
 
                 createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteReader();
+
+                tableCommand = "CREATE TABLE IF NOT " +
+                    $"EXISTS FileToInfo ( " +
+                      "file_pickcode text," +
+                      "truename text," +
+                      "issuccess integer," +
+                      "PRIMARY KEY('file_pickcode')" +
+                      ") ";
+
+                createTable = new SqliteCommand(tableCommand, db);
+                createTable.ExecuteReader();
             }
 
         }
@@ -124,32 +136,6 @@ namespace Data
             StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(TargetPath);
             //获取数据库文件，没有则创建
             await folder.CreateFileAsync(DBNAME, CreationCollisionOption.OpenIfExists);
-        }
-
-        /// <summary>
-        /// 添加数据(测试)
-        /// </summary>
-        /// <param name="inputText"></param>
-        public static void AddData(string inputText)
-        {
-            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
-            using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
-            {
-                db.Open();
-
-                SqliteCommand insertCommand = new SqliteCommand();
-                insertCommand.Connection = db;
-
-                // Use parameterized query to prevent SQL injection attacks
-                insertCommand.CommandText = $"INSERT INTO {TABLENAME} VALUES (NULL, @Entry);";
-                insertCommand.Parameters.AddWithValue("@Entry", inputText);
-
-                insertCommand.ExecuteReader();
-
-                db.Close();
-            }
-
         }
 
         /// <summary>
@@ -247,7 +233,6 @@ namespace Data
         /// <param name="data"></param>
         public static void AddFilesInfo(Datum data)
         {
-            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
               new SqliteConnection($"Filename={dbpath}"))
             {
@@ -279,6 +264,78 @@ namespace Data
                 }
 
                 insertCommand.ExecuteReader();
+
+                db.Close();
+            }
+        }
+
+        /// <summary>
+        /// 添加FileToInfo表
+        /// </summary>
+        /// <param name="pickCode"></param>
+        /// <param name="truename"></param>
+        public static void AddFileToInfo(string pickCode,string truename,bool issuccess= false,bool isReplace = false)
+        {
+            using (SqliteConnection db =
+              new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand insertCommand = new SqliteCommand();
+                insertCommand.Connection = db;
+
+                //唯一值（pc）重复 则代替 （replace）
+                string replaceStr = isReplace ? " OR REPLACE":string.Empty;
+                insertCommand.CommandText = $"INSERT{replaceStr} INTO FileToInfo VALUES (@file_pickcode,@truename,@issuccess);";
+
+                insertCommand.Parameters.AddWithValue("@file_pickcode", pickCode);
+
+                if(truename == null)
+                {
+                    truename = string.Empty;
+                }
+                insertCommand.Parameters.AddWithValue("@truename", truename);
+                insertCommand.Parameters.AddWithValue("@issuccess", issuccess);
+
+                try
+                {
+                    insertCommand.ExecuteReader();
+                }
+                catch(Exception e)
+                {
+                    Debug.WriteLine(e.Message);
+                }
+
+                db.Close();
+            }
+        }
+
+        /// <summary>
+        /// 更新FileToInfo表
+        /// </summary>
+        /// <param name="truename"></param>
+        /// <param name="isSuccess"></param>
+        public static void UpdataFileToInfo(string truename,bool isSuccess)
+        {
+            using (SqliteConnection db =
+              new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand Command = new SqliteCommand();
+                Command.Connection = db;
+
+                //唯一值（pc）重复 则代替 （replace）
+                Command.CommandText = $"UPDATE FileToInfo set issuccess = {isSuccess} WHERE truename = '{truename}'";
+
+                try
+                {
+                    Command.ExecuteReader();
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e.Message);
+                }
 
                 db.Close();
             }
@@ -381,6 +438,35 @@ namespace Data
 
                 SqliteCommand selectCommand = new SqliteCommand
                     ($"SELECT * from {TABLENAME}", db);
+
+                SqliteDataReader query = selectCommand.ExecuteReader();
+
+                while (query.Read())
+                {
+                    data.Add(tryCovertQueryToDatum(query));
+                }
+                db.Close();
+            }
+
+            return data;
+        }
+
+        /// <summary>
+        /// 查询失败列表
+        /// </summary>
+        /// <returns></returns>
+        public static List<Datum> LoadFailFileInfo()
+        {
+            List<Datum> data = new List<Datum>();
+
+            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
+            using (SqliteConnection db =
+               new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"SELECT * FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode", db);
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
 
