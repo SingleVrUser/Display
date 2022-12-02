@@ -27,22 +27,34 @@
             <Grid Grid.Row="2">
                 <!--本地数据库-->
                 <control:Explorer x:Name="Explorer" />
-                
+
                 <!--失败列表-->
-                <ListView x:Name="FailListView">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="测试"/>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+                <Grid x:Name="FailListGrid">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <TextBlock Text="数量："/>
+                        <TextBlock Text="{x:Bind FailList.Count,Mode=OneWay}" />
+                    </StackPanel>
+
+                    <ListView ItemsSource="{x:Bind FailList}" Grid.Row="1">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="data:Datum">
+                                <TextBlock Text="{x:Bind n}" />
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
             </Grid>
 
             <!--操作按钮-->
             <Grid  Grid.Row="1"
                    Grid.ColumnSpan="2"
                    BorderThickness="0,0,0,1"
-                   BorderBrush="{StaticResource DefaultBorderBrush}"
+                   BorderBrush="{ThemeResource ControlElevationBorderBrush}"
                    Padding="10,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -52,16 +64,18 @@
                 <RadioButtons SelectedIndex="0"
                               MaxColumns="3"
                               SelectionChanged="RadioButtons_SelectionChanged">
-                    <RadioButton Content="本地数据库"/>
-                    <RadioButton Content="匹配失败"/>
+                    <RadioButton Content="本地数据库" />
+                    <RadioButton Content="匹配失败" />
                 </RadioButtons>
 
-                <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal"
+                            Grid.Column="1"
+                            VerticalAlignment="Center">
                     <TextBlock x:Name="StartMatchName_TextBlox"
                                Text="选中所需文件夹后"
                                Margin="0,0,5,0"
                                RelativePanel.AlignVerticalCenterWithPanel="True"
-                               VerticalAlignment="Center"/>
+                               VerticalAlignment="Center" />
                     <Button x:Name="StartMatchName_Button"
                             RelativePanel.AlignHorizontalCenterWithPanel="True"
                             RelativePanel.RightOf="StartMatchName_TextBlox"
@@ -70,12 +84,21 @@
 
                 </StackPanel>
             </Grid>
-            
+
             <!--文件信息查看-->
             <Grid Grid.Row="2"
-                  Grid.Column="1"
-                  Padding="10,5">
-                <StackPanel Spacing="2">
+                  Grid.Column="1">
+
+                <ProgressBar x:Name="TopProgressBar"
+                             Grid.Row="1"
+                             Grid.Column="1"
+                             IsIndeterminate="True"
+                             Visibility="Collapsed"
+                             VerticalAlignment="Top" />
+
+                <StackPanel Spacing="2"
+                            Padding="10,5">
+                    
                     <StackPanel x:Name="FileInfoPieChart"
                                 Visibility="Collapsed"
                                 Padding="0,5,0,0">
@@ -224,6 +247,7 @@
                             <control:TextBlockWithLongText StringValue="{x:Bind videoInfo.actor, Mode=OneWay}" />
                         </StackPanel>
 
+
                     </Grid>
 
                     <!--<Button Click="AddVideoInfoButton_Click" Content="点击添加"/>
@@ -232,12 +256,6 @@
 
             </Grid>
 
-            <ProgressBar x:Name="TopProgressBar"
-                         Grid.Row="1"
-                         Grid.Column="1"
-                         IsIndeterminate="True"
-                         Visibility="Collapsed"
-                         VerticalAlignment="Top" />
         </Grid>
 
         <Expander x:Name="Condiontion_CheckExpander"

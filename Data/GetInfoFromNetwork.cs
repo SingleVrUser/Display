@@ -224,14 +224,11 @@ namespace Data
 
             if (jsons == null || jsons.Count == 0) return null;
 
-
             var jsonString = jsons.Last().InnerText;
 
             var json = JsonConvert.DeserializeObject<FcJson>(jsonString);
 
-            Debug.WriteLine(json);
-
-            if(json.name == null) return null;
+            if(json.name == null || json.image == null) return null;
 
             videoInfo.title = json.name;
             videoInfo.truename = CID;
@@ -247,11 +244,29 @@ namespace Data
                 videoInfo.actor = string.Join(",", json.actor);
 
 
-            string ImageUrl = json.image;
-            ////下载封面
-            string filePath = Path.Combine(SavePath, CID);
-            videoInfo.imageurl = ImageUrl;
-            videoInfo.imagepath = await downloadImage(ImageUrl, filePath, CID);
+            string ImageUrl = string.Empty;
+            if(json.image != null)
+            {
+                ImageUrl = json.image;
+            }
+            else
+            {
+                var imageNode = htmlDoc.DocumentNode.SelectSingleNode("//meta[@property='og:image']");
+
+                if (imageNode != null)
+                {
+                    ImageUrl= imageNode.GetAttributeValue("content",string.Empty);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(ImageUrl))
+            {
+                ////下载封面
+                string filePath = Path.Combine(SavePath, CID);
+                videoInfo.imageurl = ImageUrl;
+                videoInfo.imagepath = await downloadImage(ImageUrl, filePath, CID);
+            }
+
 
             ////预览图不要了
             //var sampleBox_Nodes = htmlDoc.DocumentNode.SelectNodes("//a[@class='sample-box']");
@@ -269,7 +284,6 @@ namespace Data
 
             return videoInfo;
         }
-
 
         /// <summary>
         /// 从javdb中搜索影片信息
@@ -338,7 +352,6 @@ namespace Data
                 ImageUrl = UrlCombine(JavDBUrl,ImageUrl);
             }
 
-
             var AttributeNodes = video_meta_panelNode.SelectNodes(".//div[contains(@class,'panel-block')]");
             //信息
             for (var i = 0; i < AttributeNodes.Count; i++)
@@ -399,7 +412,7 @@ namespace Data
             }
 
             //标题
-            var TitleNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='video-detail']//h2//strong");
+            var TitleNode = htmlDoc.DocumentNode.SelectSingleNode(".//strong[@class='current-title']");
             var title = TitleNode.InnerText;
             videoInfo.title = title.Replace(videoInfo.truename, "").Trim();
 

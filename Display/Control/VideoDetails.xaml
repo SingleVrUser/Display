@@ -9,7 +9,6 @@
              mc:Ignorable="d">
 
     <Grid BorderThickness="0,1,0,0"
-          BorderBrush="{ThemeResource ControlElevationBorderBrush}"
           Loaded="GridlLoaded"
           Padding="10"
           RowSpacing="10">
@@ -121,7 +120,7 @@
 
         <Grid Grid.Row="1"
               Margin="5,0"
-              BorderBrush="{StaticResource DefaultBorderBrush}"
+              BorderBrush="{ThemeResource ControlElevationBorderBrush}"
               BorderThickness="0,1,0,0">
             <ScrollViewer>
                 <Grid RowSpacing="20"

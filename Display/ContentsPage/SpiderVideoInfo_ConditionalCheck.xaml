@@ -17,7 +17,9 @@
         <ListView ItemsSource="{x:Bind ConditionCheckItems}" SelectionMode="None">
             <ListView.Header>
                 <!--标题-->
-                <Grid ColumnSpacing="50" BorderThickness="0,0,0,1" BorderBrush="{ThemeResource AccentAcrylicInAppFillColorBaseBrush}">
+                <Grid ColumnSpacing="50"
+                      BorderThickness="0,0,0,1"
+                      BorderBrush="{ThemeResource ControlElevationBorderBrush}">
                     <Grid.Resources>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Center"/>
