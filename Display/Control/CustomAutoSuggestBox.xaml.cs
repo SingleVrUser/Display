@@ -87,7 +87,6 @@ namespace Display.Control
         {
             //准备动画
             ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", sender);
-            //animation.Configuration = new BasicConnectedAnimationConfiguration();
 
             SuggestionChosen?.Invoke(sender, args);
         }

@@ -20,7 +20,7 @@ namespace Display.ContentsPage
     /// </summary>
     public sealed partial class FindInfoAgainSmoke : Page
     {
-        public string cidName { get; private set; }
+        private string cidName { get; set; }
 
         private ObservableCollection<VideoInfo> VideoInfos = new();
 
@@ -31,6 +31,11 @@ namespace Display.ContentsPage
             this.cidName = cidName;
 
             this.Loaded += PageLoaded;
+        }
+
+        private void PageLoaded(object sender, RoutedEventArgs e)
+        {
+            FindInfos();
         }
 
         private GetInfoFromNetwork _searchNetwork;
@@ -46,14 +51,11 @@ namespace Display.ContentsPage
             set => _searchNetwork = value;
         }
 
-        private void PageLoaded(object sender, RoutedEventArgs e)
-        {
-            FindInfos();
-        }
-
         async void FindInfos()
         {
             List<VideoInfo> infos = new();
+
+            ReCheckProgressRing.Visibility = Visibility.Visible;
 
             if (!cidName.ToLower().Contains("fc") && JavBus_CheckBox.IsChecked == true)
             {
@@ -82,6 +84,7 @@ namespace Display.ContentsPage
                 infos.ForEach(info => VideoInfos.Add(info));
             }
 
+            ReCheckProgressRing.Visibility = Visibility.Collapsed;
 
         }
 

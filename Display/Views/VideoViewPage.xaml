@@ -11,6 +11,8 @@
     <control:VideoCoverDisplay
         x:Name="videoControl"
         Click="{x:Bind OnClicked}"
-        VideoPlayClick="{x:Bind VideoPlay_Click}"/>
+        VideoPlayClick="{x:Bind VideoPlay_Click}"
+        SingleVideoPlayClick="{x:Bind SingleVideoPlay_Click}"
+        IsShowFailListView="True"/>
 
 </Page>

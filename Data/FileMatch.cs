@@ -235,7 +235,6 @@ namespace Data
             return Convert.ToInt32((dt2 - dt1).TotalSeconds);
         }
 
-
         /// <summary>
         /// 字符串内容是否为数字
         /// </summary>
@@ -278,7 +277,6 @@ namespace Data
 
             return ts.ToString(formatStr);
         }
-
 
         /// <summary>
         /// 从文件中挑选出视频文件
@@ -367,7 +365,6 @@ namespace Data
             StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(path);
             await Launcher.LaunchFolderAsync(folder);
         }
-
 
         public static void tryToast(string Title, string content1, string content2 = "")
         {

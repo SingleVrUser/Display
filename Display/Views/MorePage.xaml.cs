@@ -61,13 +61,13 @@ namespace Display.Views
                 IconPath = "/Assets/Svg/image_icon.svg",
                 Description = "获取视频缩略图"
             });
-            DataSource.Add(new FunctionModule()
-            {
-                Name = "文件列表",
-                IconPath = "/Assets/Svg/file_alt_icon.svg",
-                Description = "115中的文件列表",
-                Label = "测试中"
-            });
+            //DataSource.Add(new FunctionModule()
+            //{
+            //    Name = "文件列表",
+            //    IconPath = "/Assets/Svg/file_alt_icon.svg",
+            //    Description = "115中的文件列表",
+            //    Label = "测试中"
+            //});
             DataSource.Add(new FunctionModule()
             {
                 Name = "浏览器",

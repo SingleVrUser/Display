@@ -1,30 +1,18 @@
 ﻿using Data;
 using Display.ContentsPage;
-using Display.Views;
 using Microsoft.UI.Input;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
-using Microsoft.UI.Xaml.Media.Imaging;
-using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Foundation.Metadata;
-using Windows.UI.Text;
-using static QRCoder.PayloadGenerator;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -61,13 +49,6 @@ namespace Display.Control
             var actorList = resultinfo.actor.Split(',');
             for (var i = 0; i < actorList.Length; i++)
             {
-                //// 定义button
-                //var hyperButton = new HyperlinkButton();
-                //hyperButton.Content = actorList[i];
-                //hyperButton.Click += ActorButtonOnClick;
-
-                //// stackpanel内添加button
-                //ActorSatckPanel.Children.Insert(i, hyperButton);
 
                 var actorImageControl = new Control.ActorImage(actorList[i]);
                 actorImageControl.Click += ActorButtonOnClick;
@@ -306,10 +287,10 @@ namespace Display.Control
             FindInfoAgainSmoke = new(resultinfo.truename);
             SmokeGrid.Children.Add(FindInfoAgainSmoke);
 
-            SmokeCancelGrid.Tapped += SmokeCancelGrid_Tapped1;
+            SmokeCancelGrid.Tapped += FindInfoAgainSmokeCancelGrid_Tapped;
         }
 
-        private void SmokeCancelGrid_Tapped1(object sender, TappedRoutedEventArgs e)
+        private void FindInfoAgainSmokeCancelGrid_Tapped(object sender, TappedRoutedEventArgs e)
         {
             SmokeGrid.Visibility = Visibility.Collapsed;
 
@@ -318,7 +299,7 @@ namespace Display.Control
                 SmokeGrid.Children.Remove(FindInfoAgainSmoke);
             }
 
-            SmokeCancelGrid.Tapped -= SmokeCancelGrid_Tapped1;
+            SmokeCancelGrid.Tapped -= FindInfoAgainSmokeCancelGrid_Tapped;
         }
 
         private async void SmokeGridCancel()
@@ -465,5 +446,28 @@ namespace Display.Control
             LightDismissTeachingTip.IsOpen = true;
         }
 
+        ContentsPage.FileInfoInCidSmoke FileInfoInCidSmokePage;
+        private void MoreInfoAppBarButton_Click(object sender, RoutedEventArgs e)
+        {
+            SmokeGrid.Visibility = Visibility.Visible;
+
+            FileInfoInCidSmokePage = new(resultinfo.truename);
+            SmokeGrid.Children.Add(FileInfoInCidSmokePage);
+
+            SmokeCancelGrid.Tapped += FileInfoInCidSmokeCancelGrid_Tapped;
+        }
+
+        private void FileInfoInCidSmokeCancelGrid_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            SmokeGrid.Visibility = Visibility.Collapsed;
+
+            if (SmokeGrid.Children.Contains(FileInfoInCidSmokePage))
+            {
+                SmokeGrid.Children.Remove(FileInfoInCidSmokePage);
+            }
+
+            SmokeCancelGrid.Tapped -= FileInfoInCidSmokeCancelGrid_Tapped; ;
+
+        }
     }
 }

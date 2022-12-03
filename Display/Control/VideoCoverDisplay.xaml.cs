@@ -7,16 +7,26 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Windows.Storage;
-
+using Windows.Web.Http;
 
 namespace Display.Control;
 
 public sealed partial class VideoCoverDisplay : UserControl
 {
+    public static readonly DependencyProperty IsShowFailListViewProperty =
+    DependencyProperty.Register("IsShowFailListView", typeof(bool), typeof(VideoCoverDisplay), null);
+
+    public bool IsShowFailListView
+    {
+        get { return (bool)GetValue(IsShowFailListViewProperty); }
+        set { SetValue(IsShowFailListViewProperty, value); }
+    }
+
     ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
     ObservableCollection<AccountContentInPage> AccountInPage = new ObservableCollection<AccountContentInPage>();
     ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)ApplicationData.Current.LocalSettings.Values["DisplaySettings"];
@@ -37,6 +47,9 @@ public sealed partial class VideoCoverDisplay : UserControl
     }
 
     public ObservableCollection<VideoCoverDisplayClass> FileGrid_part = new();
+
+    public Model.IncrementalLoadingdFileCollection FailFileGrid_part = new();
+
     //item开始Index
     private int startValue = 0;
     //item开始Index
@@ -92,13 +105,14 @@ public sealed partial class VideoCoverDisplay : UserControl
                 });
             }
         }
-
+        
         //显示UI
         ContentAcountListView.ItemsSource = AccountInPage;
         BasicGridView.ItemsSource = FileGrid_part;
 
         //加载控件默认设置，每页最大显示数量，图标显示大小s
         LoadDefaultSettings();
+
     }
 
     /// <summary>
@@ -111,7 +125,6 @@ public sealed partial class VideoCoverDisplay : UserControl
         //举例：
         //    FileGrid.Count = 50
         //    Value           0-49
-
         if (newEndIndex >= FileGrid.Count)
         {
             newEndIndex = FileGrid.Count - 1;
@@ -275,19 +288,11 @@ public sealed partial class VideoCoverDisplay : UserControl
 
     }
 
-    ////点击选项
-    //public event ItemClickEventHandler Click;
-    private void BasicGridView_ItemClick(object sender, ItemClickEventArgs e)
-    {
-        //Click?.Invoke(sender, e);
-    }
-
     public event RoutedEventHandler Click;
     private void MoreButton_Click(object sender, RoutedEventArgs e)
     {
         Click?.Invoke(sender, e);
     }
-
 
     /// <summary>
     /// 删除当前页的最大显示数量
@@ -416,7 +421,6 @@ public sealed partial class VideoCoverDisplay : UserControl
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
     }
 
-
     /// <summary>
     /// 点击了喜欢按钮
     /// </summary>
@@ -462,6 +466,12 @@ public sealed partial class VideoCoverDisplay : UserControl
 
         DataAccess.UpdateSingleDataFromVideoInfo(videoInfo.truename, "score", score_str);
 
+    }
+
+    public event RoutedEventHandler SingleVideoPlayClick;
+    private void SingleVideoButton_Click(object sender, RoutedEventArgs e)
+    {
+        SingleVideoPlayClick?.Invoke(sender, e);
     }
 
     /// <summary>
@@ -668,6 +678,73 @@ public sealed partial class VideoCoverDisplay : UserControl
 
         toggleSwitch.Opacity = 0.3;
     }
+
+    private async void ShowType_ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+    {
+        var toggleswitch = sender as ToggleSwitch;
+        //匹配失败
+        if (toggleswitch.IsOn)
+        {
+            BasicGridView.ItemsSource = FailFileGrid_part;
+
+            BasicGridView.SelectionMode = ListViewSelectionMode.Single;
+
+            MyFileAutoSuggestBox.Visibility = Visibility.Visible;
+
+            if (FailFileGrid_part.Count == 0)
+            {
+                var lists = await DataAccess.LoadFailFileInfo(0, 30);
+
+                lists.ForEach(datum => FailFileGrid_part.Add(datum));
+            }
+        }
+        //匹配成功
+        else
+        {
+            BasicGridView.ItemsSource = FileGrid_part;
+            BasicGridView.SelectionMode = ListViewSelectionMode.None;
+
+            MyFileAutoSuggestBox.Visibility = Visibility.Collapsed;
+        }
+    }
+
+    private void FailGrid_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        if (!(sender is Grid grid))
+        {
+            return;
+        }
+
+        grid.Scale = new System.Numerics.Vector3(1.01f);
+    }
+
+    private void FailGrid_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        if (!(sender is Grid grid))
+        {
+            return;
+        }
+
+        grid.Scale = new System.Numerics.Vector3(1.0f);
+    }
+
+    private async void FileAutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+    {
+        if (!(sender is AutoSuggestBox suggestBox))
+        {
+            return;
+        }
+
+        var checkTest = suggestBox.Text;
+
+        FailFileGrid_part.filterName= checkTest;
+        var lists = await DataAccess.LoadFailFileInfo(0,30,checkTest);
+
+        FailFileGrid_part.Clear();
+        lists.ForEach(datum => FailFileGrid_part.Add(datum));
+
+    }
+
 }
 
 

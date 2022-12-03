@@ -39,14 +39,6 @@ namespace Display
         {
             this.InitializeComponent();
 
-            //this.Title = "播放";
-
-            //appwindow = App.getAppWindow(this);
-
-            //appwindow.TitleBar.ButtonPressedForegroundColor = Colors.White;
-
-            //appwindow.SetIcon(Path.Combine(Package.Current.InstalledLocation.Path, "Assets/pokeball.ico"));
-
             ExtendsContentIntoTitleBar = true;
 
             this.SetTitleBar(AppTitleBar);

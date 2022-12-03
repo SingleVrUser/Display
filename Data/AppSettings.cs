@@ -77,7 +77,6 @@ public class AppSettings
         }
     }
 
-
     /// <summary>
     /// JavDB网址
     /// </summary>
@@ -231,6 +230,26 @@ public class AppSettings
         }
     }
 
+    /// <summary>
+    /// 是否使用JavBus
+    /// </summary>
+    public static bool isShowFailListInDisplay
+    {
+        get
+        {
+            bool isShow = false;
+
+            if (localSettings.Values["isShowFailListInDisplay"] is bool value)
+            {
+                isShow = value;
+            }
+            return isShow;
+        }
+        set
+        {
+            localSettings.Values["isShowFailListInDisplay"] = value;
+        }
+    }
     /// <summary>
     /// 是否使用JavBus
     /// </summary>
@@ -475,7 +494,6 @@ public class AppSettings
             localSettings.Values["Aria2Settings"] = JsonConvert.SerializeObject(value);
         }
     }
-
 
     public static string Aria2SavePath
     {

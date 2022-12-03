@@ -10,7 +10,6 @@
 
     <Grid BorderThickness="0,1,0,0"
           Loaded="GridlLoaded"
-          Padding="10"
           RowSpacing="10">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
@@ -34,7 +33,7 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid>
+        <Grid Padding="10,5,10,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="auto" />
@@ -94,6 +93,15 @@
                 </CommandBar.PrimaryCommands>
 
                 <CommandBar.SecondaryCommands>
+                    <AppBarButton Icon="Delete"
+                                  Label="删除"
+                                  Click="DeletedAppBarButton_Click">
+                        <AppBarButton.KeyboardAccelerators>
+                            <KeyboardAccelerator Modifiers="Control"
+                                                 Key="D" />
+                        </AppBarButton.KeyboardAccelerators>
+                    </AppBarButton>
+                    
                     <AppBarButton Icon="Find"
                                   Label="重新搜刮"
                                   Click="FindAppBarButton_Click">
@@ -103,12 +111,13 @@
                         </AppBarButton.KeyboardAccelerators>
                     </AppBarButton>
 
-                    <AppBarButton Icon="Delete"
-                                  Label="删除"
-                                  Click="DeletedAppBarButton_Click">
+                    
+                    <AppBarButton Icon="OpenFile"
+                                  Label="文件信息"
+                                  Click="MoreInfoAppBarButton_Click">
                         <AppBarButton.KeyboardAccelerators>
                             <KeyboardAccelerator Modifiers="Control"
-                                                 Key="D" />
+                                                 Key="I" />
                         </AppBarButton.KeyboardAccelerators>
                     </AppBarButton>
 
@@ -119,7 +128,6 @@
         </Grid>
 
         <Grid Grid.Row="1"
-              Margin="5,0"
               BorderBrush="{ThemeResource ControlElevationBorderBrush}"
               BorderThickness="0,1,0,0">
             <ScrollViewer>
@@ -152,12 +160,6 @@
                                     Value="Normal" />
                         </Style>
 
-                        <!--<Style TargetType="TextBlock" x:Key="rightValue">
-                            <Setter Property="TextAlignment" Value="Left"/>
-                            <Setter Property="Margin" Value="10,0,0,0"/>
-                            <Setter Property="FontFamily" Value="霞鹜文楷 GB 屏幕阅读版"/>
-                            <Setter Property="FontWeight" Value="Normal"/>
-                        </Style>-->
                     </Grid.Resources>
 
                     <Grid.RowDefinitions>
@@ -444,7 +446,11 @@
                     </Grid>
                 </Grid>
                 
+                
+                
             </Grid>
+            
+            
         </Grid>
 
         <TeachingTip x:Name="LightDismissTeachingTip"

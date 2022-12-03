@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:data="using:Data"
+             xmlns:converter="using:Display.Converter"
              mc:Ignorable="d"
              CacheMode="BitmapCache">
 
@@ -20,11 +21,12 @@
         <SolidColorBrush x:Key="AppBarToggleButtonBackgroundCheckedPointerOver"
                          Color="#70a1ff"
                          Opacity="0.8" />
-
         <!--AppBarButton按钮悬停效果-->
         <SolidColorBrush x:Key="AppBarButtonBackgroundPointerOver"
                          Color="#70a1ff"
                          Opacity="0.8" />
+
+        <converter:BytesToSizeStrConverter x:Key="BytesToSizeStrConverter" />
 
         <!--提示-->
         <TeachingTip x:Name="HintTeachingTip" />
@@ -314,7 +316,46 @@
         <!--匹配失败的展示样式-->
         <DataTemplate x:Key="ListTemplate"
                       x:DataType="data:Datum">
-            <TextBlock Text="{x:Bind n}" />
+            <Grid x:Name="FailGrid"
+                  Padding="2"
+                  PointerEntered="FailGrid_PointerEntered"
+                  PointerExited="FailGrid_PointerExited"
+                  Background="Transparent"
+                  Margin="5,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Button HorizontalAlignment="Stretch" Click="SingleVideoButton_Click">
+                    <Grid HorizontalAlignment="Stretch" Width="300">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Grid.Resources>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment"
+                                        Value="Left" />
+                            </Style>
+                        </Grid.Resources>
+                        <TextBlock Text="{x:Bind n}"
+                                   MaxWidth="300"
+                                   TextTrimming="CharacterEllipsis"/>
+
+                        <TextBlock Grid.Row="1"
+                                   Text="{x:Bind s,Converter={StaticResource BytesToSizeStrConverter}}"
+                                   HorizontalAlignment="Right"
+                                   Opacity="0.5"/>
+                        
+                        <TextBlock Grid.Row="1"
+                                   Text="{x:Bind t}"
+                                   TextTrimming="CharacterEllipsis"
+                                   Opacity="0.5"/>
+                    </Grid>
+                </Button>
+            </Grid>
         </DataTemplate>
 
         <local:CoverItemTemplateSelector x:Key="CoverItemTemplateSelector"
@@ -369,6 +410,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
@@ -381,44 +423,40 @@
                  x:Name="InfoBar"
                  Message="Essential app message for your users to be informed of, acknowledge, or take action on." />
 
-        <!--视频预览-->
-        <ScrollViewer Grid.Row="1"
-                      VerticalScrollBarVisibility="Auto">
-            <GridView Margin="5,0,5,0"
-                      x:Name="BasicGridView"
-                      ItemTemplateSelector="{StaticResource CoverItemTemplateSelector}"
-                      IsItemClickEnabled="True"
-                      ItemClick="BasicGridView_ItemClick"
-                      SelectionMode="None"
-                      CanBeScrollAnchor="False"
-                      HorizontalAlignment="Center"
-                      ScrollViewer.VerticalScrollMode="Disabled"
-                      ScrollViewer.VerticalScrollBarVisibility="Disabled">
+        <!--搜索框（匹配失败列表显示时显示）-->
+        <local:FileAutoSuggestBox x:Name="MyFileAutoSuggestBox" Grid.Row="1" Margin="10,2" TextChanged="FileAutoSuggestBox_TextChanged" Visibility="Collapsed"/>
 
-                <GridView.ItemContainerStyle>
-                    <Style TargetType="GridViewItem">
-                        <Setter Property="Margin"
-                                Value="2" />
+        <!--封面预览-->
+        <GridView Grid.Row="2"
+                    Margin="5,0,0,0"
+                    x:Name="BasicGridView"
+                    ItemTemplateSelector="{StaticResource CoverItemTemplateSelector}"
+                    CanBeScrollAnchor="False"
+                    HorizontalAlignment="Stretch">
 
-                        <!--取消GridView悬停效果-->
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="GridViewItem">
-                                    <Grid Background="{TemplateBinding Background}">
-                                        <ContentPresenter Content="{TemplateBinding Content}"
-                                                          Margin="{TemplateBinding Padding}" />
-                                    </Grid>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </GridView.ItemContainerStyle>
+            <GridView.ItemContainerStyle>
+                <Style TargetType="GridViewItem">
+                    <Setter Property="Margin"
+                            Value="2" />
 
-            </GridView>
-        </ScrollViewer>
+                    <!--取消GridView悬停效果-->
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="GridViewItem">
+                                <Grid Background="{TemplateBinding Background}">
+                                    <ContentPresenter Content="{TemplateBinding Content}"
+                                                        Margin="{TemplateBinding Padding}" />
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </GridView.ItemContainerStyle>
+
+        </GridView>
 
         <!--页面跳转栏-->
-        <RelativePanel Grid.Row="2"
+        <RelativePanel Grid.Row="3"
                        Margin="0,0,10,0">
 
             <StackPanel Margin="0,0,0,-20"
@@ -508,15 +546,17 @@
 
                 <ToggleSwitch x:Name="ShowType_ToggleSwitch"
                               VerticalAlignment="Center"
+                              Visibility="{x:Bind IsShowFailListView}"
                               Margin="0,0,0,15"
+                              Toggled="ShowType_ToggleSwitch_Toggled"
                               OnContent="匹配失败"
                               OffContent="匹配成功"
                               Opacity="0.3"
                               PointerEntered="ShowType_ToggleSwitch_PointerEntered"
-                              PointerExited="ShowType_ToggleSwitch_PointerExited">
+                              PointerExited="ShowType_ToggleSwitch_PointerExited"
+                              IsOn="{x:Bind data:AppSettings.isShowFailListInDisplay,Mode=TwoWay}">
                 </ToggleSwitch>
-
-
+                
             </StackPanel>
 
             <StackPanel RelativePanel.AlignRightWithPanel="True"

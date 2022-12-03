@@ -56,6 +56,7 @@
     <None Remove="ContentsPage\AddActorCover.xaml" />
     <None Remove="ContentsPage\CalculateLocalFileSha1.xaml" />
     <None Remove="ContentsPage\CheckCookie.xaml" />
+    <None Remove="ContentsPage\FileInfoInCidSmoke.xaml" />
     <None Remove="ContentsPage\FindInfoAgainSmoke.xaml" />
     <None Remove="ContentsPage\GetThumbnail.xaml" />
     <None Remove="ContentsPage\Import115DataToLocalDataAccess\InputCidManually.xaml" />
@@ -70,6 +71,7 @@
     <None Remove="Control\Browser.xaml" />
     <None Remove="Control\CustomAutoSuggestBox.xaml" />
     <None Remove="Control\Explorer.xaml" />
+    <None Remove="Control\FileAutoSuggestBox.xaml" />
     <None Remove="Control\MultipleCoverShow.xaml" />
     <None Remove="Control\StatusShow.xaml" />
     <None Remove="Control\TextBlockWithLongText.xaml" />
@@ -305,6 +307,12 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="ContentsPage\FileInfoInCidSmoke.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Control\FileAutoSuggestBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="ContentsPage\FindInfoAgainSmoke.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

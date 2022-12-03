@@ -10,7 +10,6 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       mc:Ignorable="d">
 
-
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
           Width="500"
           Height="500"
@@ -27,15 +26,17 @@
         <RelativePanel>
             <StackPanel Orientation="Horizontal">
                 <CheckBox x:Name="JavBus_CheckBox"
-                          Content="JavBus"/>
+                          Content="JavBus"
+                          IsChecked="{x:Bind data:AppSettings.isUseJavBus}"/>
                 <CheckBox x:Name="JavDB_CheckBox"
                           Content="JavDB"
-                          IsChecked="True" />
-                <CheckBox x:Name="JavLibDmm_CheckBox"
-                          Content="libredmm" />
+                          IsChecked="{x:Bind data:AppSettings.isUseJavBus}" />
                 <CheckBox x:Name="Fc2Hub_CheckBox"
                           Content="Fc2Hub"
-                          IsChecked="True" />
+                          IsChecked="{x:Bind data:AppSettings.isUseJavBus}" />
+                <CheckBox x:Name="JavLibDmm_CheckBox"
+                          Content="libredmm"
+                          IsEnabled="False" />
             </StackPanel>
 
             <!--刷新-->
@@ -122,6 +123,8 @@
 
         </ListView>
 
-        <Button Grid.Row="3" Content="确定" HorizontalAlignment="Center"/>
+        <ProgressRing Grid.Row="2" x:Name="ReCheckProgressRing" Visibility="Collapsed"/>
+
+        <Button Grid.Row="3" Content="确定" HorizontalAlignment="Center" IsEnabled="False"/>
     </Grid>
 </Page>

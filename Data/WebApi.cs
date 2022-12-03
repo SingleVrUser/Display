@@ -187,7 +187,6 @@ namespace Data
                 {
                     return;
                 }
-                //fileProgressInfo.datumList = new List<Datum>();
 
                 //统计发送请求的频率
                 int sendCount = 0;
@@ -241,38 +240,14 @@ namespace Data
 
                     var addToDataAccessList = getFilesProgressInfo.addToDataAccessList;
 
-
                     //删除后重新添加
                     DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(cid);
 
-                    //if (addToDataAccessList.Count == 0)
-                    //{
-                    //    DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(cid);
-                    //}
                     if(addToDataAccessList.Count > 0)
                     {
-                        ////选中的文件夹只有一层
-                        //bool isOneLayout = false;
-                        //var otherList = addToDataAccessList.Where(x => !(x.pid == cid || x.cid == cid));
-
-                        //if (otherList.Count() == 0)
-                        //{
-                        //    DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(cid);
-                        //    isOneLayout = true;
-                        //}
-
-
                         //需要添加进数据库的Datum
                         foreach (var item in addToDataAccessList)
                         {
-                            ////如果文件夹已存在，则删除文件夹下所有的文件，针对单层文件
-                            ////当文件夹只有一层时，且进入到这里（说明修改时间已改变），则删除上一次添加的已过时的数据
-                            //if (!isOneLayout && item.fid == null)
-                            //{
-                            //    if(!string.IsNullOrEmpty(DataAccess.GetLastestFolderPid(item.pc)))
-                            //        DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(item.cid);
-                            //}
-
                             DataAccess.AddFilesInfo(item);
                         }
                     }
@@ -360,10 +335,6 @@ namespace Data
                             getFilesProgressInfo = await TraverseAllFileInfo(item.cid, getFilesProgressInfo, token, progress);
 
                             if (getFilesProgressInfo == null) continue;
-
-                            ////先添加文件后添加文件夹
-                            //getFilesProgressInfo.addToDataAccessList.Add(item);
-                            //DataAccess.AddFilesInfo(item);
                         }
                     }
                     //文件
@@ -375,9 +346,6 @@ namespace Data
                         progress.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
 
                         getFilesProgressInfo.addToDataAccessList.Add(item);
-                        //DataAccess.AddFilesInfo(item);
-
-                        //webFileInfoList.Add(item);
                     }
                 }
             }
@@ -448,11 +416,37 @@ namespace Data
                     //"2022-07-28 17:03"
                     else
                     {
-                        int dateInt = FileMatch.ConvertDateTimeToInt32(item.t);
-                        item.te = item.tp = dateInt;
+                        
+                    }
+                }
+            }
+
+            if (WebFileInfoResult.data != null)
+            {
+                foreach (var item in WebFileInfoResult.data)
+                {
+                    int dateInt = 0;
+                    //item.t 可能是 "1658999027" 也可能是 "2022-07-28 17:03"
+
+                    //"1658999027"
+                    if (FileMatch.isNumberic1(item.t))
+                    {
+                        dateInt = Int32.Parse(item.t);
+                        item.t = FileMatch.ConvertInt32ToDateTime(dateInt);
+
+                    }
+                    //"2022-07-28 17:03"
+                    else
+                    {
+                        dateInt = FileMatch.ConvertDateTimeToInt32(item.t);
                     }
 
+                    if (userApi2)
+                    {
+                        item.te = item.tp = dateInt;
+                    }
                 }
+
             }
 
             //接口1出错，使用接口2

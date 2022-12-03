@@ -1,23 +1,10 @@
 ﻿using Data;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -119,8 +106,12 @@ namespace Display.Views
         /// <param name="e"></param>
         private void VideoPlay_Click(object sender, RoutedEventArgs e)
         {
+            var item = videoControl;
+
             var VideoPlayButton = (Button)sender;
             var videoInfo = VideoPlayButton.DataContext as VideoCoverDisplayClass;
+
+
             List<Datum> videoInfoList = DataAccess.loadVideoInfoByTruename(videoInfo.truename);
 
             //没有
@@ -134,8 +125,6 @@ namespace Display.Views
             else if (videoInfoList.Count == 1)
             {
                 Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc);
-                //VideoPlayWindow.createNewWindow(FileMatch.getVideoPlayUrl(videoInfoList[0].pc));
-                //Frame.Navigate(typeof(ContentsPage.VideoPlay), videoInfoList[0].pc);
             }
 
             //有多集
@@ -159,14 +148,15 @@ namespace Display.Views
             }
         }
 
+
+
         private void ContentListView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var SingleVideoInfo = e.ClickedItem as Data.Datum;
 
             Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc);
-            //VideoPlayWindow.createNewWindow(FileMatch.getVideoPlayUrl(SingleVideoInfo.pc));
-            //Frame.Navigate(typeof(ContentsPage.VideoPlay), SingleVideoInfo.pc);
         }
+
     }
 
 }
