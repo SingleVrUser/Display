@@ -53,6 +53,14 @@ namespace Display.Views
         }
 
 
+        private void SingleVideoPlay_Click(object sender, RoutedEventArgs e)
+        {
+            var VideoPlayButton = (Button)sender;
+            var datum = VideoPlayButton.DataContext as Datum;
+
+            Views.DetailInfoPage.PlayeVideo(datum.pc);
+        }
+
         /// <summary>
         /// 选项选中后跳转至详情页
         /// </summary>
@@ -88,7 +96,6 @@ namespace Display.Views
             else if (videoInfoList.Count == 1)
             {
                 Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc);
-                //VideoPlayWindow.createNewWindow(FileMatch.getVideoPlayUrl(videoInfoList[0].pc));
             }
 
             //有多集

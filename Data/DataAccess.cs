@@ -204,7 +204,6 @@ namespace Data
             }
         }
 
-
         /// <summary>
         /// 删除FilesInfo表里文件夹下的所有文件和文件夹（遍历所有）
         /// </summary>
@@ -455,7 +454,42 @@ namespace Data
         /// 查询失败列表
         /// </summary>
         /// <returns></returns>
-        public static List<Datum> LoadFailFileInfo()
+        public static async Task<List<Datum>> LoadFailFileInfo(int offset = 0,int limit = -1,string n = "")
+        {
+            List<Datum> data = new List<Datum>();
+
+            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
+            using (SqliteConnection db =
+               new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                if (n.Contains("'"))
+                {
+                    n = n.Replace("'","%");
+                }
+
+                string queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n}%'";
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"SELECT * FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{queryStr} LIMIT {limit} offset {offset}", db);
+
+                SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
+
+                while (query.Read())
+                {
+                    data.Add(tryCovertQueryToDatum(query));
+                }
+                db.Close();
+            }
+
+            return data;
+        }
+        /// <summary>
+        /// 通过truename查询文件列表
+        /// </summary>
+        /// <returns></returns>
+        public static async Task<List<Datum>> FindFileInfoByTrueName(string truename)
         {
             List<Datum> data = new List<Datum>();
 
@@ -466,9 +500,9 @@ namespace Data
                 db.Open();
 
                 SqliteCommand selectCommand = new SqliteCommand
-                    ($"SELECT * FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode", db);
+                    ($"SELECT * FROM FilesInfo,FileToInfo WHERE FilesInfo.pc == FileToInfo.file_pickcode AND FileToInfo.truename == '{truename}'", db);
 
-                SqliteDataReader query = selectCommand.ExecuteReader();
+                SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
 
                 while (query.Read())
                 {
@@ -1256,7 +1290,7 @@ namespace Data
             dataInfo.pc = query["pc"] as string;
             dataInfo.p = Convert.ToInt32(query["p"]);
             dataInfo.m = Convert.ToInt32(query["m"]);
-            dataInfo.t = query["n"] as string;
+            dataInfo.t = query["t"] as string;
             dataInfo.te = Convert.ToInt32(query["te"]);
             dataInfo.tp = Convert.ToInt32(query["tp"]);
             dataInfo.d = Convert.ToInt32(query["d"]);

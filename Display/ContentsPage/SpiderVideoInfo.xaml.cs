@@ -37,7 +37,7 @@ namespace Display.ContentsPage
         GetInfoFromNetwork network;
         VideoInfo videoInfo = new VideoInfo();
         List<string> FailVideoNameList;
-        ObservableCollection<Datum> FailList = new();
+        Model.IncrementalLoadingdFileCollection FailList = new();
 
         CancellationTokenSource s_cts = new();
         public Window currentWindow;
@@ -548,11 +548,11 @@ namespace Display.ContentsPage
 
         }
 
-        private void tryShowFailList()
+        private async void tryShowFailList()
         {
             if (FailList.Count == 0)
             {
-                var list = DataAccess.LoadFailFileInfo();
+                var list = await DataAccess.LoadFailFileInfo(0,30);
 
                 list.ForEach(item => FailList.Add(item));
             }

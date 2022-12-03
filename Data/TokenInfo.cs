@@ -48,8 +48,6 @@ namespace Data
     }
 
     //调用115下载请求
-
-
     public class Browser_115_Request
     {
         public long uid { get; set; }
@@ -1120,7 +1118,7 @@ namespace Data
                 n = folderCategory.file_name,
                 pid = folderCategory.paths[folderCategory.paths.Length - 1].file_id,
                 pc = folderCategory.pick_code,
-                t = $"{folderCategory.utime}",
+                t = FileMatch.ConvertInt32ToDateTime(folderCategory.utime),
                 tp = folderCategory.ptime,
                 te = folderCategory.utime,
             };

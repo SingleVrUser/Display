@@ -34,7 +34,8 @@
                        RelativePanel.AlignRightWithPanel="True"
                        RelativePanel.AlignVerticalCenterWithPanel="True"
                        Margin="0,0,10,0"
-                       FontFamily="JetBrains Mono"/>
+                       FontFamily="JetBrains Mono"
+                       Opacity="0.5"/>
         </RelativePanel>
 
         <GridView Grid.Row="1"
