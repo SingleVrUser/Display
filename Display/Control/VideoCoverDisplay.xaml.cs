@@ -1,4 +1,5 @@
 ﻿using Data;
+using Display.Model;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -9,14 +10,16 @@ using Microsoft.UI.Xaml.Media.Animation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Windows.Storage;
 using Windows.Web.Http;
 
 namespace Display.Control;
 
-public sealed partial class VideoCoverDisplay : UserControl
+public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChanged
 {
     public static readonly DependencyProperty IsShowFailListViewProperty =
     DependencyProperty.Register("IsShowFailListView", typeof(bool), typeof(VideoCoverDisplay), null);
@@ -31,8 +34,8 @@ public sealed partial class VideoCoverDisplay : UserControl
     ObservableCollection<AccountContentInPage> AccountInPage = new ObservableCollection<AccountContentInPage>();
     ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)ApplicationData.Current.LocalSettings.Values["DisplaySettings"];
 
-    private ObservableCollection<VideoCoverDisplayClass> _FileGrid;
-    public ObservableCollection<VideoCoverDisplayClass> FileGrid
+    private List<VideoCoverDisplayClass> _FileGrid;
+    public List<VideoCoverDisplayClass> FileGrid
     {
         get
         {
@@ -41,12 +44,32 @@ public sealed partial class VideoCoverDisplay : UserControl
         set
         {
             _FileGrid = value;
-            totalPageCount = (int)Math.Ceiling((double)FileGrid.Count / showCountInPage);
+
             tryDisplayInfo(0);
+
+            OnPropertyChanged();
         }
     }
 
-    public ObservableCollection<VideoCoverDisplayClass> FileGrid_part = new();
+    public ObservableCollection<VideoCoverDisplayClass> FileGrid_part;
+
+    private Model.IncrementalLoadingdVideoFileCollection _incrementalFileGrid;
+    public Model.IncrementalLoadingdVideoFileCollection IncrementalFileGrid
+    {
+        get => _incrementalFileGrid;
+        set
+        {
+            _incrementalFileGrid = value;
+
+            OnPropertyChanged();
+        }
+    }
+
+    public void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        // Raise the PropertyChanged event, passing the name of the property whose value has changed.
+        this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
     public Model.IncrementalLoadingdFileCollection FailFileGrid_part = new();
 
@@ -92,9 +115,33 @@ public sealed partial class VideoCoverDisplay : UserControl
         loadData();
     }
 
+
     private void loadData()
     {
+        //增量显示
+        if (LoadAll_ToggleButton.IsChecked == true)
+        {
+            ShowCount_Grid.Visibility= Visibility.Visible;
 
+        }
+        //每页显示指定数量
+        else
+        {
+            PageControl_StackPanel.Visibility = Visibility.Visible;
+            TryInitShowCountPerPage();
+            FileGrid_part = new();
+            BasicGridView.ItemsSource = FileGrid_part;
+        }
+
+        //加载控件默认设置，每页最大显示数量，图标显示大小
+        LoadDefaultSettings();
+    }
+
+    /// <summary>
+    /// 初始化每页显示数量选项
+    /// </summary>
+    private void TryInitShowCountPerPage()
+    {
         if (AccountInPage.Count == 0)
         {
             for (var i = 10; i < 100; i += 20)
@@ -105,13 +152,12 @@ public sealed partial class VideoCoverDisplay : UserControl
                 });
             }
         }
-        
-        //显示UI
-        ContentAcountListView.ItemsSource = AccountInPage;
-        BasicGridView.ItemsSource = FileGrid_part;
 
-        //加载控件默认设置，每页最大显示数量，图标显示大小s
-        LoadDefaultSettings();
+        if (ContentAcountListView.ItemsSource == null)
+        {
+            //显示UI
+            ContentAcountListView.ItemsSource = AccountInPage;
+        }
 
     }
 
@@ -119,6 +165,46 @@ public sealed partial class VideoCoverDisplay : UserControl
     /// 加载（更新）文件信息，根据startValue[0:FileGrid.Count]
     /// </summary>
     private void tryDisplayInfo(int newStartValue)
+    {
+        if(LoadAll_ToggleButton.IsChecked == true)
+        {
+            if (IncrementalFileGrid != null)
+            {
+                //IncrementalFileGrid.Clear();
+                //if(!IncrementalFileGrid.HasMoreItems)
+                //    IncrementalFileGrid.HasMoreItems = true;
+
+                //IncrementalFileGrid.AllItems = FileGrid;
+
+                IncrementalFileGrid = new(FileGrid);
+                BasicGridView.ItemsSource = IncrementalFileGrid;
+
+                foreach (var item in FileGrid.Skip(0).Take(30))
+                {
+                    IncrementalFileGrid.Add(item);
+                }
+
+            }
+            else if(FileGrid.Count!=0)
+            {
+                IncrementalFileGrid = new(FileGrid);
+
+                foreach (var item in FileGrid.Skip(0).Take(30))
+                {
+                    IncrementalFileGrid.Add(item);
+                }
+                BasicGridView.ItemsSource = IncrementalFileGrid;
+            }
+        }
+        else
+        {
+            totalPageCount = (int)Math.Ceiling((double)FileGrid.Count / showCountInPage);
+            DisplayInfoPerPage(newStartValue);
+        }
+
+    }
+
+    private void DisplayInfoPerPage(int newStartValue)
     {
         var newEndIndex = newStartValue + showCountInPage - 1;
 
@@ -163,6 +249,10 @@ public sealed partial class VideoCoverDisplay : UserControl
         if (FileGrid_part != null)
         {
             FileGrid_part.Clear();
+        }
+        else
+        {
+            FileGrid_part = new();
         }
 
         for (int i = newStartValue; i <= newEndIndex; i++)
@@ -276,7 +366,6 @@ public sealed partial class VideoCoverDisplay : UserControl
 
         for (int i = 0; i < FileGrid.Count; i++)
         {
-            //FileGrid.Add(FileGrid[i]);
             FileGrid[i].imagewidth = (int)e.NewValue;
             FileGrid[i].imageheight = (int)e.NewValue / 3 * 2;
         }
@@ -483,6 +572,8 @@ public sealed partial class VideoCoverDisplay : UserControl
     /// 点击播放键
     /// </summary>
     public event RoutedEventHandler VideoPlayClick;
+    public event PropertyChangedEventHandler PropertyChanged;
+
     private void PlayButton_Click(object sender, RoutedEventArgs e)
     {
         VideoPlayClick?.Invoke(sender, e);
@@ -575,24 +666,24 @@ public sealed partial class VideoCoverDisplay : UserControl
         {
             case "名称":
                 newGlyph = "\xE185";
-                FileGrid = isUpSort ? new ObservableCollection<VideoCoverDisplayClass>(FileGrid.OrderBy(item => item.truename)) : new ObservableCollection<VideoCoverDisplayClass>(FileGrid.OrderByDescending(item => item.truename));
-                tryDisplayInfo(0);
+                FileGrid = isUpSort ? new List<VideoCoverDisplayClass>(FileGrid.OrderBy(item => item.truename)) : new List<VideoCoverDisplayClass>(FileGrid.OrderByDescending(item => item.truename));
+                //tryDisplayInfo(0);
                 break;
             case "演员":
                 newGlyph = "\xE13D";
-                FileGrid = isUpSort ? new ObservableCollection<VideoCoverDisplayClass>(FileGrid.OrderBy(item => item.actor)) : new ObservableCollection<VideoCoverDisplayClass>(FileGrid.OrderByDescending(item => item.actor));
-                tryDisplayInfo(0);
+                FileGrid = isUpSort ? new List<VideoCoverDisplayClass>(FileGrid.OrderBy(item => item.actor)) : new List<VideoCoverDisplayClass>(FileGrid.OrderByDescending(item => item.actor));
+                //tryDisplayInfo(0);
                 break;
             case "年份":
                 newGlyph = "\xEC92";
-                FileGrid = isUpSort ? new ObservableCollection<VideoCoverDisplayClass>(FileGrid.OrderBy(item => item.realeaseYear)) : new ObservableCollection<VideoCoverDisplayClass>(FileGrid.OrderByDescending(item => item.realeaseYear));
-                tryDisplayInfo(0);
+                FileGrid = isUpSort ? new List<VideoCoverDisplayClass>(FileGrid.OrderBy(item => item.realeaseYear)) : new List<VideoCoverDisplayClass>(FileGrid.OrderByDescending(item => item.realeaseYear));
+                //tryDisplayInfo(0);
                 break;
             case "随机":
                 newGlyph = "\xF463";
                 Random rnd = new Random();
-                FileGrid = new ObservableCollection<VideoCoverDisplayClass>(FileGrid.OrderByDescending(item => rnd.Next()));
-                tryDisplayInfo(0);
+                FileGrid = new List<VideoCoverDisplayClass>(FileGrid.OrderByDescending(item => rnd.Next()));
+                //tryDisplayInfo(0);
                 break;
         }
 
@@ -612,7 +703,6 @@ public sealed partial class VideoCoverDisplay : UserControl
     /// <param name="e"></param>
     private async void deleteAppBarButton_Click(object sender, RoutedEventArgs e)
     {
-
         ContentDialog dialog = new ContentDialog()
         {
             XamlRoot = this.XamlRoot,
@@ -692,9 +782,8 @@ public sealed partial class VideoCoverDisplay : UserControl
         {
             BasicGridView.ItemsSource = FailFileGrid_part;
 
-            BasicGridView.SelectionMode = ListViewSelectionMode.Single;
-
             MyFileAutoSuggestBox.Visibility = Visibility.Visible;
+            ShowControl_StackPanel.Visibility= Visibility.Collapsed;
 
             if (FailFileGrid_part.Count == 0)
             {
@@ -706,10 +795,19 @@ public sealed partial class VideoCoverDisplay : UserControl
         //匹配成功
         else
         {
-            BasicGridView.ItemsSource = FileGrid_part;
-            BasicGridView.SelectionMode = ListViewSelectionMode.None;
+            //增量加载
+            if (LoadAll_ToggleButton.IsChecked == true)
+            {
+                BasicGridView.ItemsSource = IncrementalFileGrid;
+            }
+            //每页固定加载数
+            else
+            {
+                BasicGridView.ItemsSource = FileGrid_part;
+            }
 
             MyFileAutoSuggestBox.Visibility = Visibility.Collapsed;
+            ShowControl_StackPanel.Visibility = Visibility.Visible;
         }
     }
 
@@ -750,6 +848,43 @@ public sealed partial class VideoCoverDisplay : UserControl
 
     }
 
+    //加载全部
+    private void LoadAll_ToggleButton_Checked(object sender, RoutedEventArgs e)
+    {
+        if (ShowCount_Grid == null)
+            return;
+
+        ShowCount_Grid.Visibility = Visibility.Visible;
+        PageControl_StackPanel.Visibility = Visibility.Collapsed;
+
+
+        BasicGridView.ItemsSource = IncrementalFileGrid;
+        tryDisplayInfo(0);
+
+
+    }
+
+    //限制每页数量
+    private void LoadAll_ToggleButton_UnChecked(object sender, RoutedEventArgs e)
+    {
+        if (PageControl_StackPanel == null)
+            return;
+
+        PageControl_StackPanel.Visibility = Visibility.Visible;
+        ShowCount_Grid.Visibility = Visibility.Collapsed;
+
+        TryInitShowCountPerPage();
+        BasicGridView.ItemsSource = FileGrid_part;
+        tryDisplayInfo(0);
+    }
+
+    private void ToTopButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (!(BasicGridView.ItemsSource is IncrementalLoadingdVideoFileCollection collection))
+            return;
+
+        BasicGridView.ScrollIntoView(collection.First());
+    }
 }
 
 

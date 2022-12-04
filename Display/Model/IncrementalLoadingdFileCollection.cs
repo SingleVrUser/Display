@@ -14,6 +14,7 @@ public class IncrementalLoadingdFileCollection : ObservableCollection<Datum>, IS
 
     public bool HasMoreItems { get; set; } = true;
 
+
     public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
     {
         return InnerLoadMoreItemsAsync(count).AsAsyncOperation();

@@ -255,26 +255,6 @@ public class AppSettings
     /// <summary>
     /// 是否使用JavBus
     /// </summary>
-    public static bool isShowFailListInDisplay
-    {
-        get
-        {
-            bool isShow = false;
-
-            if (localSettings.Values["isShowFailListInDisplay"] is bool value)
-            {
-                isShow = value;
-            }
-            return isShow;
-        }
-        set
-        {
-            localSettings.Values["isShowFailListInDisplay"] = value;
-        }
-    }
-    /// <summary>
-    /// 是否使用JavBus
-    /// </summary>
     public static bool isUseJavBus
     {
         get
@@ -292,7 +272,6 @@ public class AppSettings
             localSettings.Values["isUseJavBus"] = value;
         }
     }
-
 
     /// <summary>
     /// 是否使用Fc2Hub
@@ -558,6 +537,52 @@ public class AppSettings
             localSettings.Values["Aria2SavePath"] = value;
         }
 
+    }
+
+
+    //展示页设置
+
+    /// <summary>
+    /// 展示匹配失败的列表?
+    /// </summary>
+    public static bool IsShowFailListInDisplay
+    {
+        get
+        {
+            bool isShow = false;
+
+            if (localSettings.Values["IsShowFailListInDisplay"] is bool value)
+            {
+                isShow = value;
+            }
+
+            return isShow;
+        }
+        set
+        {
+            localSettings.Values["IsShowFailListInDisplay"] = value;
+        }
+    }
+    /// <summary>
+    /// 增量加载展示页内容
+    /// </summary>
+    public static bool IsIncrementalShowInDisplay
+    {
+        get
+        {
+            bool isEnable = true;
+
+            if (localSettings.Values["IsIncrementalShowInDisplay"] is bool value)
+            {
+                isEnable = value;
+            }
+
+            return isEnable;
+        }
+        set
+        {
+            localSettings.Values["IsIncrementalShowInDisplay"] = value;
+        }
     }
 
 }

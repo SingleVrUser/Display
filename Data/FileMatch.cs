@@ -153,9 +153,9 @@ namespace Data
         /// </summary>
         /// <param name="VideoInfoList"></param>
         /// <returns></returns>
-        public static ObservableCollection<VideoCoverDisplayClass> getFileGrid(List<VideoInfo> VideoInfoList)
+        public static List<VideoCoverDisplayClass> getFileGrid(List<VideoInfo> VideoInfoList)
         {
-            ObservableCollection<VideoCoverDisplayClass> FileGrid = new();
+            List<VideoCoverDisplayClass> FileGrid = new();
 
             // VR 和 4K 类别在右上角显示标签
             for (var i = 0; i < VideoInfoList.Count; i++)

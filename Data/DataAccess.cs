@@ -625,7 +625,7 @@ namespace Data
         /// </summary>
         /// <param name="limit"></param>
         /// <returns></returns>
-        public static List<VideoInfo> LoadAllVideoInfo(int limit = 1)
+        public static List<VideoInfo> LoadAllVideoInfo(int limit = 1,int offset = 0)
         {
             List<VideoInfo> data = new List<VideoInfo>();
 
@@ -636,7 +636,7 @@ namespace Data
                 db.Open();
 
                 SqliteCommand selectCommand = new SqliteCommand
-                    ($"SELECT * from VideoInfo LIMIT {limit}", db);
+                    ($"SELECT * from VideoInfo LIMIT {limit} offset {offset}", db);
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
 
