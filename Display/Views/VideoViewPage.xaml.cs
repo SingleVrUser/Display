@@ -33,16 +33,15 @@ namespace Display.Views
             NavigationCacheMode = Microsoft.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
 
             //加载数据
-            loadSqlData();
+            LoadSqlData();
 
         }
 
         /// <summary>
         /// 从数据库中加载数据
         /// </summary>
-        private void loadSqlData()
+        private void LoadSqlData()
         {
-
             if (videoControl.FileGrid == null)
             {
                 videoControl.FileGrid = new();
