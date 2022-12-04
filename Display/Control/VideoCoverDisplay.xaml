@@ -578,7 +578,7 @@
 
                 <!--TODO:记载全部-->
                 <Button Content="加载全部"
-                        Visibility="Collapsed" />
+                        Visibility="Visible" />
 
                 <!--上一页-->
                 <Button Click="PreviousPageButton">

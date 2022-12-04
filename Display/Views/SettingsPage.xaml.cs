@@ -303,7 +303,18 @@ namespace Display.Views
 
             ShowTeachingTip("修改完成");
         }
+        private void LibreDmmUrlChange_Button_Click(object sender, RoutedEventArgs e)
+        {
+            AppSettings.LibreDmm_BaseUrl = LibreDmm_TextBox.Text;
 
+            ShowTeachingTip("修改完成");
+        }
+        private void Fc2hubUrlChange_Button_Click(object sender, RoutedEventArgs e)
+        {
+            AppSettings.Fc2hub_BaseUrl = Fc2hub_TextBox.Text;
+
+            ShowTeachingTip("修改完成");
+        }
         private void JavDBUrlChange_Button_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             AppSettings.JavDB_BaseUrl = JavDBUrl_TextBox.Text;
@@ -317,6 +328,8 @@ namespace Display.Views
 
             ShowTeachingTip("修改完成");
         }
+
+
 
         private async void DataAccessSavePath_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
@@ -442,13 +455,16 @@ namespace Display.Views
             switch (toggleButton.Content)
             {
                 case "JavBus":
-                    otherOriginUse = AppSettings.isUseJavDB;
+                    otherOriginUse = AppSettings.isUseLibreDmm || AppSettings.isUseFc2Hub || AppSettings.isUseJavDB;
                     break;
-                case "fc2hub":
-                    otherOriginUse = AppSettings.isUseFc2Hub;
+                case "LibreDmm":
+                    otherOriginUse = AppSettings.isUseJavBus || AppSettings.isUseFc2Hub || AppSettings.isUseJavDB;
+                    break;
+                case "Fc2hub":
+                    otherOriginUse = AppSettings.isUseJavBus || AppSettings.isUseLibreDmm || AppSettings.isUseJavDB;
                     break;
                 case "JavDB":
-                    otherOriginUse = AppSettings.isUseJavBus;
+                    otherOriginUse = AppSettings.isUseJavBus || AppSettings.isUseLibreDmm || AppSettings.isUseFc2Hub;
                     break;
             }
 
@@ -864,5 +880,6 @@ namespace Display.Views
             AppSettings.BitCometSavePath = String.Empty;
             BitCometSavePath_TextBox.Text = null;
         }
+
     }
 }

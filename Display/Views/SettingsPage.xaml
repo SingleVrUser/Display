@@ -237,6 +237,9 @@
                                                 <ToggleButton Content="JavBus"
                                                               IsChecked="{x:Bind data:AppSettings.isUseJavBus,Mode=TwoWay}"
                                                               Unchecked="ToggleButton_Unchecked" />
+                                                <ToggleButton Content="LibDmm"
+                                                              IsChecked="{x:Bind data:AppSettings.isUseLibreDmm,Mode=TwoWay}"
+                                                              Unchecked="ToggleButton_Unchecked" />
                                                 <ToggleButton Content="fc2hub"
                                                               IsChecked="{x:Bind data:AppSettings.isUseFc2Hub,Mode=TwoWay}"
                                                               Unchecked="ToggleButton_Unchecked" />
@@ -267,6 +270,57 @@
                                             <RelativePanel>
                                                 <TextBlock Text="单次请求后等待" />
                                                 <TextBlock Text="1~3 s"
+                                                           RelativePanel.AlignRightWithPanel="True" />
+                                            </RelativePanel>
+                                        </StackPanel>
+                                    </PivotItem>
+
+
+                                    <PivotItem Header="LibreDmm">
+                                        <StackPanel Padding="50,10"
+                                                    Spacing="10">
+                                            <RelativePanel>
+                                                <TextBlock x:Name="LibreDmm_TextBlox"
+                                                           RelativePanel.AlignVerticalCenterWithPanel="True"
+                                                           Margin="0,0,10,0">地址</TextBlock>
+                                                <TextBox x:Name="LibreDmm_TextBox"
+                                                         Width="600"
+                                                         RelativePanel.RightOf="LibreDmm_TextBlox"
+                                                         Text="{x:Bind data:AppSettings.LibreDmm_BaseUrl}" />
+                                                <Button x:Name="LibreDmmUrlChange_Button"
+                                                        Click="LibreDmmUrlChange_Button_Click"
+                                                        Content="修改"
+                                                        RelativePanel.AlignRightWithPanel="True" />
+                                            </RelativePanel>
+
+                                            <RelativePanel>
+                                                <TextBlock Text="单次请求后等待" />
+                                                <TextBlock Text="1~2 s"
+                                                           RelativePanel.AlignRightWithPanel="True" />
+                                            </RelativePanel>
+                                        </StackPanel>
+                                    </PivotItem>
+
+                                    <PivotItem Header="Fc2hub">
+                                        <StackPanel Padding="50,10"
+                                                    Spacing="10">
+                                            <RelativePanel>
+                                                <TextBlock x:Name="Fc2hub_TextBlox"
+                                                           RelativePanel.AlignVerticalCenterWithPanel="True"
+                                                           Margin="0,0,10,0">地址</TextBlock>
+                                                <TextBox x:Name="Fc2hub_TextBox"
+                                                         Width="600"
+                                                         RelativePanel.RightOf="Fc2hub_TextBlox"
+                                                         Text="{x:Bind data:AppSettings.Fc2hub_BaseUrl}" />
+                                                <Button x:Name="Fc2hubUrlChange_Button"
+                                                        Click="Fc2hubUrlChange_Button_Click"
+                                                        Content="修改"
+                                                        RelativePanel.AlignRightWithPanel="True" />
+                                            </RelativePanel>
+
+                                            <RelativePanel>
+                                                <TextBlock Text="单次请求后等待" />
+                                                <TextBlock Text="1~2 s"
                                                            RelativePanel.AlignRightWithPanel="True" />
                                             </RelativePanel>
                                         </StackPanel>

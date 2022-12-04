@@ -302,8 +302,6 @@ namespace Display.ContentsPage
                     //成功
                     else
                     {
-                        
-
                         spliderInfoProgress.matchResult.status = true;
                         spliderInfoProgress.matchResult.statusCode = 1;
                         spliderInfoProgress.matchResult.message = "检索成功";
@@ -357,6 +355,13 @@ namespace Display.ContentsPage
                         //先从fc2hub中搜索
                         resultInfo = await network.SearchInfoFromFc2Hub(VideoName);
                     }
+                    else if(AppSettings.isUseJavDB && !string.IsNullOrEmpty(AppSettings.javdb_Cookie))
+                    {
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待3~6秒" } });
+                        await GetInfoFromNetwork.RandomTimeDelay(3, 6);
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavDB中搜索" } });
+                        resultInfo = await network.SearchInfoFromJavDB(VideoName);
+                    }
 
                 }
                 else
@@ -368,6 +373,15 @@ namespace Display.ContentsPage
                         progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavBus中搜索" } });
                         //先从javbus中搜索
                         resultInfo = await network.SearchInfoFromJavBus(VideoName);
+                    }
+
+                    //搜索无果，使用libredmm搜索
+                    if (resultInfo == null && AppSettings.isUseLibreDmm)
+                    {
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~2秒" } });
+                        await GetInfoFromNetwork.RandomTimeDelay(1, 2);
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从LibreDmm中搜索" } });
+                        resultInfo = await network.SearchInfoFromLibreDmm(VideoName);
                     }
 
                     //搜索无果，使用javdb搜索

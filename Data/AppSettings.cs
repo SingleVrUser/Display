@@ -35,6 +35,28 @@ public class AppSettings
     }
 
     /// <summary>
+    /// LibreDmm网址
+    /// </summary>
+    /// 
+    private static string _libreDmm_BaseUrl = "https://www.libredmm.com/";
+    public static string LibreDmm_BaseUrl
+    {
+        get
+        {
+            var BaseUrl = localSettings.Values["LibreDmm_BaseUrl"] as string;
+            if (string.IsNullOrEmpty(BaseUrl))
+            {
+                BaseUrl = _libreDmm_BaseUrl;
+            }
+            return BaseUrl;
+        }
+        set
+        {
+            localSettings.Values["LibreDmm_BaseUrl"] = value;
+        }
+    }
+    
+    /// <summary>
     /// JavBus网址
     /// </summary>
     /// 
@@ -78,23 +100,23 @@ public class AppSettings
     }
 
     /// <summary>
-    /// JavDB网址
+    /// Fc2hub网址
     /// </summary>
-    private static string _fc2Hub_BaseUrl = "https://fc2hub.com/";
-    public static string Fc2Hub_BaseUrl
+    private static string _fc2hub_BaseUrl = "https://fc2hub.com/";
+    public static string Fc2hub_BaseUrl
     {
         get
         {
-            var url = localSettings.Values["Fc2Hub_BaseUrl"] as string;
+            var url = localSettings.Values["Fc2hub_BaseUrl"] as string;
             if (string.IsNullOrEmpty(url))
             {
-                url = _fc2Hub_BaseUrl;
+                url = _fc2hub_BaseUrl;
             }
             return url;
         }
         set
         {
-            localSettings.Values["Fc2Hub_BaseUrl"] = value;
+            localSettings.Values["Fc2hub_BaseUrl"] = value;
         }
     }
 
@@ -290,6 +312,27 @@ public class AppSettings
         set
         {
             localSettings.Values["isUseFc2Hub"] = value;
+        }
+    }
+
+    /// <summary>
+    /// 是否使用LibDmm
+    /// </summary>
+    public static bool isUseLibreDmm
+    {
+        get
+        {
+            bool isUse = true;
+
+            if (localSettings.Values["isUseLibreDmm"] is bool value)
+            {
+                isUse = value;
+            }
+            return isUse;
+        }
+        set
+        {
+            localSettings.Values["isUseLibreDmm"] = value;
         }
     }
 

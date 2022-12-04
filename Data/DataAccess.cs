@@ -499,8 +499,9 @@ namespace Data
             {
                 db.Open();
 
+                //COLLATE NOCASE 忽略大小写
                 SqliteCommand selectCommand = new SqliteCommand
-                    ($"SELECT * FROM FilesInfo,FileToInfo WHERE FilesInfo.pc == FileToInfo.file_pickcode AND FileToInfo.truename == '{truename}'", db);
+                    ($"SELECT * FROM FilesInfo,FileToInfo WHERE FilesInfo.pc == FileToInfo.file_pickcode AND FileToInfo.truename == '{truename}' COLLATE NOCASE", db);
 
                 SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
 

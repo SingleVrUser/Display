@@ -27,16 +27,16 @@
             <StackPanel Orientation="Horizontal">
                 <CheckBox x:Name="JavBus_CheckBox"
                           Content="JavBus"
-                          IsChecked="{x:Bind data:AppSettings.isUseJavBus}"/>
-                <CheckBox x:Name="JavDB_CheckBox"
-                          Content="JavDB"
-                          IsChecked="{x:Bind data:AppSettings.isUseJavBus}" />
-                <CheckBox x:Name="Fc2Hub_CheckBox"
-                          Content="Fc2Hub"
                           IsChecked="{x:Bind data:AppSettings.isUseJavBus}" />
                 <CheckBox x:Name="JavLibDmm_CheckBox"
                           Content="libredmm"
-                          IsEnabled="False" />
+                          IsChecked="{x:Bind data:AppSettings.isUseLibreDmm}" />
+                <CheckBox x:Name="Fc2Hub_CheckBox"
+                          Content="Fc2Hub"
+                          IsChecked="{x:Bind data:AppSettings.isUseFc2Hub}" />
+                <CheckBox x:Name="JavDB_CheckBox"
+                          Content="JavDB"
+                          IsChecked="{x:Bind data:AppSettings.isUseJavDB}" />
             </StackPanel>
 
             <!--刷新-->
@@ -67,7 +67,7 @@
                             </Style>
                         </Grid.Resources>
 
-                        <Image Source="{x:Bind imageurl}"
+                        <Image Source="{x:Bind imagepath}"
                                Margin="2" />
 
                         <Grid Grid.Column="1" Padding="2" VerticalAlignment="Center" ColumnSpacing="5">
