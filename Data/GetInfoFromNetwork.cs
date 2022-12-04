@@ -6,13 +6,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Text;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
-using Windows.Media.Protection.PlayReady;
 
 namespace Data
 {
@@ -20,6 +17,8 @@ namespace Data
     {
         private HttpClient Client;
         private HttpClient ClientWithJavDBCookie;
+
+        private string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0";
 
         public GetInfoFromNetwork()
         {
@@ -78,6 +77,92 @@ namespace Data
         }
 
         /// <summary>
+        /// 从LibreDmm中搜索影片信息
+        /// </summary>
+        /// <param name="CID"></param>
+        /// <returns></returns>
+        public async Task<VideoInfo> SearchInfoFromLibreDmm(string CID)
+        {
+            VideoInfo videoInfo = new VideoInfo();
+            string BusUrl = AppSettings.LibreDmm_BaseUrl;
+            string SavePath = AppSettings.Image_SavePath;
+
+            CID = CID.ToUpper();
+            string url = UrlCombine(BusUrl, $"movies/{CID}");
+
+            videoInfo.busurl = url;
+
+            if (Client == null)
+            {
+                Client = CreateClient(new Dictionary<string, string>() {
+                        {"user-agent" ,DefaultUserAgent}
+                    });
+            }
+            string strResult = await RequestHelper.RequestHtml(Client, url);
+
+            HtmlDocument htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(strResult);
+
+            var ImageUrlNode = htmlDoc.DocumentNode.SelectSingleNode("//img[@class='img-fluid']");
+            //搜索无果，退出
+            if (ImageUrlNode == null) return null;
+
+            var ImageUrl = ImageUrlNode.Attributes["src"].Value;
+
+            videoInfo.truename = CID;
+
+            var titleNode = htmlDoc.DocumentNode.SelectSingleNode("//h1");
+            if(titleNode!=null)
+                videoInfo.title = titleNode.InnerText.Trim();
+
+            var keyNodes = htmlDoc.DocumentNode.SelectNodes("//div[@class='col-md-4']/dl/dt");
+            var valueNodes = htmlDoc.DocumentNode.SelectNodes("//div[@class='col-md-4']/dl/dd");
+
+            //其他信息
+            for (var i = 0; i < keyNodes.Count; i++)
+            {
+                var key = keyNodes[i].InnerText;
+                switch (key)
+                {
+                    case "Release Date":
+                        videoInfo.releasetime = valueNodes[i].InnerText.Trim();
+                        break;
+                    case "Directors":
+                        videoInfo.director = valueNodes[i].InnerText.Trim();
+                        break;
+                    case "Genres":
+                        var generesNodes = valueNodes[i].SelectNodes("ul/li");
+                        videoInfo.category = string.Join(",", generesNodes.Select(x => x.InnerText.Trim()));
+                        break;
+                    case "Labels":
+                        videoInfo.series = valueNodes[i].InnerText.Trim();
+                        break;
+                    case "Makers":
+                        videoInfo.producer = valueNodes[i].InnerText.Trim();
+                        break;
+                    case "Volume":
+                        videoInfo.lengthtime = valueNodes[i].InnerText.Trim();
+                        break;
+                }
+            }
+
+            //演员
+            var actressesNodes = htmlDoc.DocumentNode.SelectNodes("//div[@class='card actress']");
+
+            if (actressesNodes != null)
+            {
+                videoInfo.actor = string.Join(",", actressesNodes.Select(x => x.InnerText.Trim()));
+            }
+
+            //下载封面
+            string filePath = Path.Combine(SavePath, CID);
+            videoInfo.imageurl = ImageUrl;
+            videoInfo.imagepath = await downloadImage(ImageUrl, filePath, CID);
+
+            return videoInfo;
+        }
+        
+        /// <summary>
         /// 从javbus中搜索影片信息
         /// </summary>
         /// <param name="CID"></param>
@@ -88,11 +173,16 @@ namespace Data
             string JavBusUrl = AppSettings.JavBus_BaseUrl;
             string SavePath = AppSettings.Image_SavePath;
 
-            if(Client == null)
-                Client = new HttpClient();
             string busurl = UrlCombine(JavBusUrl, CID);
 
             videoInfo.busurl = busurl;
+
+            if (Client == null)
+            {
+                Client = CreateClient(new Dictionary<string, string>() {
+                        {"user-agent" ,DefaultUserAgent}
+                    });
+            }
 
             string strResult = await RequestHelper.RequestHtml(Client, busurl);
 
@@ -207,13 +297,20 @@ namespace Data
         {
             VideoInfo videoInfo = new VideoInfo();
 
-            string BaseUrl = AppSettings.Fc2Hub_BaseUrl;
+            string BaseUrl = AppSettings.Fc2hub_BaseUrl;
             string SavePath = AppSettings.Image_SavePath;
 
-            HttpClient Client = new HttpClient();
+
             string url = $"{BaseUrl}search?kw={CID.ToLower().Replace("fc2-","")}";
 
             videoInfo.busurl = url;
+
+            if (Client == null)
+            {
+                Client = CreateClient(new Dictionary<string, string>() {
+                        {"user-agent" ,DefaultUserAgent}
+                    });
+            }
 
             string strResult = await RequestHelper.RequestHtml(Client, url);
 
@@ -267,7 +364,6 @@ namespace Data
                 videoInfo.imagepath = await downloadImage(ImageUrl, filePath, CID);
             }
 
-
             ////预览图不要了
             //var sampleBox_Nodes = htmlDoc.DocumentNode.SelectNodes("//a[@class='sample-box']");
             //List<string> sampleUrlList = new();
@@ -307,33 +403,35 @@ namespace Data
             await RandomTimeDelay(3, 6);
 
             string strResult;
+
             //访问fc内容需要cookie
             if (CID.Contains("FC"))
             {
-                if(ClientWithJavDBCookie == null)
+                //javdb没有登录无法访问fc内容
+                if (string.IsNullOrEmpty(AppSettings.javdb_Cookie))
                 {
-                    var handler = new HttpClientHandler { UseCookies = false };
-                    ClientWithJavDBCookie = new HttpClient(handler);
+                    return null;
+                }
 
-                    //未设置Cookie，直接退出
-                    if (AppSettings.javdb_Cookie == null)
-                    {
-                        ClientWithJavDBCookie = null;
-                        return null;
-                    }
-                    else
-                    {
-                        ClientWithJavDBCookie.DefaultRequestHeaders.Add("cookie", AppSettings.javdb_Cookie);
-                    }
-
-                    ClientWithJavDBCookie.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0");
-                
+                if (ClientWithJavDBCookie == null)
+                {
+                    ClientWithJavDBCookie = CreateClient(new Dictionary<string, string>() {
+                        {"cookie",AppSettings.javdb_Cookie },
+                        {"user-agent" ,DefaultUserAgent}
+                    });
                 }
 
                 strResult = await RequestHelper.RequestHtml(ClientWithJavDBCookie, detail_url);
             }
             else
             {
+                if (Client == null)
+                {
+                    Client = CreateClient(new Dictionary<string, string>() {
+                        {"user-agent" ,DefaultUserAgent}
+                    });
+                }
+
                 strResult = await RequestHelper.RequestHtml(Client, detail_url);
             }
 
@@ -415,7 +513,6 @@ namespace Data
             var TitleNode = htmlDoc.DocumentNode.SelectSingleNode(".//strong[@class='current-title']");
             var title = TitleNode.InnerText;
             videoInfo.title = title.Replace(videoInfo.truename, "").Trim();
-
 
             ////下载封面
             string filePath = Path.Combine(SavePath, CID);
@@ -585,6 +682,20 @@ namespace Data
 
             return localPath;
 
+        }
+
+        private HttpClient CreateClient(Dictionary<string,string> headers)
+        {
+            var handler = new HttpClientHandler { UseCookies = false };
+            var Client = new HttpClient(handler);
+
+            foreach(var header in headers)
+            {
+                //Client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0");
+                Client.DefaultRequestHeaders.Add(header.Key, header.Value);
+            }
+
+            return Client;
         }
     }
 }

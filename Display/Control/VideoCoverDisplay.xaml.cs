@@ -400,6 +400,11 @@ public sealed partial class VideoCoverDisplay : UserControl
         item.Children[1].Visibility = Visibility.Visible;
     }
 
+    /// <summary>
+    /// 鼠标移出在Grid，隐藏可操作按钮
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void Grid_PointerExited(object sender, PointerRoutedEventArgs e)
     {
         var item = sender as Grid;

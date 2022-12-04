@@ -99,7 +99,7 @@
             </Storyboard>
         </Grid.Resources>
         
-        <StackPanel Orientation="Horizontal" x:Name="EntranceStackPanel">
+        <StackPanel Orientation="Horizontal" x:Name="EntranceStackPanel" Margin="5,0">
             
             <DropDownButton Content="番号" x:Name="selectFoundMethodButton" Visibility="Collapsed">
                 <DropDownButton.Flyout>
@@ -127,8 +127,6 @@
 
             <!--<ListView x:Name="collection"/>-->
         </StackPanel>
-
-
 
     </Grid>
 

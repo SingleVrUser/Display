@@ -63,17 +63,23 @@ namespace Display.ContentsPage
                 if(info!=null)
                     infos.Add(info);
             }
-
-            if (JavDB_CheckBox.IsChecked == true)
+            if (!cidName.ToLower().Contains("fc") && JavLibDmm_CheckBox.IsChecked == true)
             {
-                var info = await SearchNetwork.SearchInfoFromJavDB(cidName);
-                if (info != null)
+                var info = await SearchNetwork.SearchInfoFromLibreDmm(cidName);
+                if(info!=null)
                     infos.Add(info);
             }
+
 
             if (cidName.ToLower().Contains("fc") && Fc2Hub_CheckBox.IsChecked == true)
             {
                 var info = await SearchNetwork.SearchInfoFromFc2Hub(cidName);
+                if (info != null)
+                    infos.Add(info);
+            }
+            if (JavDB_CheckBox.IsChecked == true)
+            {
+                var info = await SearchNetwork.SearchInfoFromJavDB(cidName);
                 if (info != null)
                     infos.Add(info);
             }
