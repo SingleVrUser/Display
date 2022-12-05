@@ -1,5 +1,6 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -46,7 +47,7 @@ namespace Data
         public static string MatchName(string src_text)
         {
             //提取文件名
-            string name = Regex.Match(src_text.ToLower(), @"(.*)(\.\w{3,5})?$").Groups[1].Value;
+            string name = Regex.Match(src_text, @"(.*)(\.\w{3,5})?$",RegexOptions.IgnoreCase).Groups[1].Value;
 
             //转小写
             string name_lc = name.ToLower();
@@ -109,10 +110,14 @@ namespace Data
                 return match.Groups[1].Value;
             }
             //然后再将影片视作缺失了 - 分隔符来匹配
-            match = Regex.Match(no_domain, @"([a-z]{2,})(\d{2,5})", RegexOptions.IgnoreCase);
+            match = Regex.Match(no_domain, @"([a-z]{2,})0*(\d{2,5})", RegexOptions.IgnoreCase);
             if (match.Success)
             {
-                return $"{match.Groups[1].Value}-{match.Groups[2].Value}";
+                string number = match.Groups[2].Value;
+                //不满三位数，填充0
+                number = number.PadLeft(3, '0');
+
+                return $"{match.Groups[1].Value}-{number}";
             }
 
             //尝试匹配TMA制作的影片（如'T28-557'，他家的番号很乱）
@@ -147,7 +152,6 @@ namespace Data
 
         }
 
-
         /// <summary>
         /// List<class>转换,VideoInfo ==> VideoCoverDisplayClass
         /// </summary>
@@ -178,6 +182,7 @@ namespace Data
             bool result = look_later == 0 ? false : true;
             return result;
         }
+
 
         //是否显示喜欢图标
         public static Visibility isShowLikeIcon(int is_like)
@@ -276,6 +281,30 @@ namespace Data
             TimeSpan ts = TimeSpan.FromSeconds(Second);
 
             return ts.ToString(formatStr);
+        }
+
+        public static string ConvertPtTimeToTotalMinute(string PtTimeStr)
+        {
+            int totalMinute = 0;
+
+            var match = Regex.Match(PtTimeStr, @"PT((\d+)H)?(\d+)M(\d+)S", RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                int result;
+                if (int.TryParse(match.Groups[2].Value, out result))
+                {
+                    totalMinute += result * 60;
+                }
+
+                if (int.TryParse(match.Groups[3].Value, out result))
+                {
+                    totalMinute += result;
+                }
+
+                return $"{totalMinute}分钟";
+            }
+
+            return PtTimeStr;
         }
 
         /// <summary>
@@ -453,6 +482,32 @@ namespace Data
                           .Max() ?? 0;
 
             return items.OrderBy(i => regex.Replace(selector(i), match => match.Value.PadLeft(maxDigits, '0')), stringComparer ?? StringComparer.CurrentCulture);
+        }
+
+
+        public static Tuple<string,string> SpliteLeftAndRightFromCid(string cid)
+        {
+            string[] splitList = cid.Split(new char[] { '-', '_' });
+            string leftName = splitList[0];
+
+            string rightNumber = "";
+            if (splitList.Length != 1)
+            {
+                rightNumber = splitList[1];
+
+            }
+            else
+            {
+                //SE221
+                var result = Regex.Match(leftName, "^([a-z]+)([0-9]+)$", RegexOptions.IgnoreCase);
+                if (result.Success)
+                {
+                    leftName = result.Groups[1].Value;
+                    rightNumber = result.Groups[2].Value;
+                }
+            }
+
+            return Tuple.Create(leftName, rightNumber);
         }
     }
 }

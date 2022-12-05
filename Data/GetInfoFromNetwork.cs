@@ -141,7 +141,7 @@ namespace Data
                         videoInfo.producer = valueNodes[i].InnerText.Trim();
                         break;
                     case "Volume":
-                        videoInfo.lengthtime = valueNodes[i].InnerText.Trim();
+                        videoInfo.lengthtime = valueNodes[i].InnerText.Trim().Replace(" minutes", "分钟");
                         break;
                 }
             }
@@ -172,6 +172,8 @@ namespace Data
             VideoInfo videoInfo = new VideoInfo();
             string JavBusUrl = AppSettings.JavBus_BaseUrl;
             string SavePath = AppSettings.Image_SavePath;
+
+            CID = CID.ToUpper();
 
             string busurl = UrlCombine(JavBusUrl, CID);
 
@@ -204,6 +206,7 @@ namespace Data
 
             var AttributeNodes = htmlDoc.DocumentNode.SelectNodes("//div[@class='col-md-3 info']//p");
 
+            videoInfo.truename = CID;
 
             //信息
             for (var i = 0; i < AttributeNodes.Count; i++)
@@ -212,18 +215,18 @@ namespace Data
 
                 var header = AttributeNode.FirstChild.InnerText.Trim();
 
-                if (header == "識別碼:")
-                {
-                    videoInfo.truename = AttributeNode.SelectNodes(".//span")[1].InnerText.Trim();
-                    CID = videoInfo.truename;
-                }
-                else if (header == "發行日期:")
+                //if (header == "識別碼:")
+                //{
+                //    videoInfo.truename = AttributeNode.SelectNodes(".//span")[1].InnerText.Trim();
+                //    CID = videoInfo.truename;
+                //}
+                if (header == "發行日期:")
                 {
                     videoInfo.releasetime = AttributeNode.LastChild.InnerText.Trim();
                 }
                 else if (header == "長度:")
                 {
-                    videoInfo.lengthtime = AttributeNode.LastChild.InnerText.Trim();
+                    videoInfo.lengthtime = AttributeNode.LastChild.InnerText.Trim().Replace("分鐘","分钟");
                 }
                 else if (header == "導演:")
                 {
@@ -300,8 +303,7 @@ namespace Data
             string BaseUrl = AppSettings.Fc2hub_BaseUrl;
             string SavePath = AppSettings.Image_SavePath;
 
-
-            string url = $"{BaseUrl}search?kw={CID.ToLower().Replace("fc2-","")}";
+            string url = $"{BaseUrl}search?kw={CID.Replace("FC2-","")}";
 
             videoInfo.busurl = url;
 
@@ -329,8 +331,9 @@ namespace Data
 
             videoInfo.title = json.name;
             videoInfo.truename = CID;
-            videoInfo.releasetime = json.datePublished;
-            videoInfo.lengthtime = json.duration;
+            videoInfo.releasetime = json.datePublished.Replace("/","-");
+            //PTxHxMxS转x分钟
+            videoInfo.lengthtime = Data.FileMatch.ConvertPtTimeToTotalMinute(json.duration);
             videoInfo.director = json.director;
             videoInfo.producer = "fc2";
 
@@ -451,6 +454,8 @@ namespace Data
             }
 
             var AttributeNodes = video_meta_panelNode.SelectNodes(".//div[contains(@class,'panel-block')]");
+
+            videoInfo.truename = CID;
             //信息
             for (var i = 0; i < AttributeNodes.Count; i++)
             {
@@ -460,19 +465,19 @@ namespace Data
 
                 var valueNode = AttributeNodes[i].SelectSingleNode("span");
 
-                //以网页的CID为准
-                if (key.Contains("番號"))
-                {
-                    videoInfo.truename = valueNode.InnerText;
-                    CID = videoInfo.truename;
-                }
-                else if (key.Contains("日期"))
+                ////以网页的CID为准
+                //if (key.Contains("番號"))
+                //{
+                //    videoInfo.truename = valueNode.InnerText;
+                //    CID = videoInfo.truename;
+                //}
+                if (key.Contains("日期"))
                 {
                     videoInfo.releasetime = valueNode.InnerText;
                 }
                 else if (key.Contains("時長"))
                 {
-                    videoInfo.lengthtime = valueNode.InnerText;
+                    videoInfo.lengthtime = valueNode.InnerText.Trim().Replace(" 分鍾", "分钟");
                 }
                 else if (key.Contains("片商") || key.Contains("賣家"))
                 {

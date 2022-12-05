@@ -105,7 +105,10 @@
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="data:VideoInfo">
                                     <StackPanel Orientation="Horizontal" Margin="2">
-                                        <Image Source="{x:Bind imagepath}" Width="120"/>
+                                        <Grid CornerRadius="2">
+                                            <Image Source="{x:Bind imagepath}"
+                                                   Width="120" />
+                                        </Grid>
                                         <StackPanel VerticalAlignment="Center" Margin="5">
                                             <TextBlock Text="{x:Bind truename}" FontFamily="JetBrains Mono"/>
                                             <control:TextBlockWithLongText StringValue="{x:Bind actor}" IsFirstTextSelectionEnabled="False"/>

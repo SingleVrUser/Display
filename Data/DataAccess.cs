@@ -892,28 +892,10 @@ namespace Data
         /// <returns></returns>
         public static List<Datum> loadVideoInfoByTruename(string truename)
         {
-            truename = truename.ToUpper();
-            string[] splitList = truename.Split(new char[] {'-','_'});
-            string leftName = splitList[0];
+            var tuple = FileMatch.SpliteLeftAndRightFromCid(truename);
 
-            string rightNumber = "";
-            if (splitList.Length != 1)
-            {
-                rightNumber = splitList[1];
-                
-            }
-            else
-            {
-                //SE221
-                var result = Regex.Match(leftName, "^([a-z]+)([0-9]+)$", RegexOptions.IgnoreCase);
-                if (result.Success)
-                {
-                    leftName = result.Groups[1].Value;
-                    rightNumber = result.Groups[2].Value;
-                }
-            }
-
-            leftName = leftName.Replace("FC2", "FC");
+            string leftName = tuple.Item1.Replace("FC2", "FC");
+            string rightNumber = tuple.Item2;
 
             List<Datum> data = new List<Datum>();
 

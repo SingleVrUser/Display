@@ -117,6 +117,7 @@ namespace Display.Control
         private void GridlLoaded(object sender, RoutedEventArgs e)
         {
             loadData();
+
         }
 
         // 点击了演员更多页
@@ -140,12 +141,12 @@ namespace Display.Control
             VideoPlayClick?.Invoke(sender, args);
         }
 
-        //点击了多集中的具体集数
-        public event ItemClickEventHandler MultisetListClick;
-        private void StationsList_OnItemClick(object sender, ItemClickEventArgs e)
-        {
-            MultisetListClick?.Invoke(sender, e);
-        }
+        ////点击了多集中的具体集数
+        //public event ItemClickEventHandler MultisetListClick;
+        //private void StationsList_OnItemClick(object sender, ItemClickEventArgs e)
+        //{
+        //    MultisetListClick?.Invoke(sender, e);
+        //}
 
         private async void DownButton_Click(object sender, RoutedEventArgs e)
         {
@@ -406,10 +407,10 @@ namespace Display.Control
             return $"{ShowImageFlipView.SelectedIndex+1}/{ShowImageList.Count}";
         }
 
-        private string GetFileNameFromFullPath(object fullpath)
-        {
-            return Path.GetFileName(fullpath as string);
-        }
+        //private string GetFileNameFromFullPath(object fullpath)
+        //{
+        //    return Path.GetFileName(fullpath as string);
+        //}
 
         public event RoutedEventHandler DeleteClick;
         private void DeletedAppBarButton_Click(object sender, RoutedEventArgs e)
@@ -467,6 +468,34 @@ namespace Display.Control
             }
 
             SmokeCancelGrid.Tapped -= FileInfoInCidSmokeCancelGrid_Tapped; ;
+
+        }
+
+        private void Cover_Image_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
+            VideoPlayIconInCover.Visibility = Visibility.Visible;
+        }
+
+        private void Cover_Image_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
+            VideoPlayIconInCover.Visibility = Visibility.Collapsed;
+        }
+
+        //点击封面
+        public event TappedEventHandler CoverTapped;
+        private void Cover_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            CoverTapped?.Invoke(sender, e);
+        }
+
+        //动画结束后开始监听CoverGrid的pointer
+        public void ForwardConnectedAnimationCompleted(ConnectedAnimation sender, object args)
+        {
+            Cover_Grid.PointerEntered += Cover_Image_PointerEntered;
+            Cover_Grid.PointerExited += Cover_Image_PointerExited;
+            Cover_Grid.Tapped += Cover_Tapped;
 
         }
     }

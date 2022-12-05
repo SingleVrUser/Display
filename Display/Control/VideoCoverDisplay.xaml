@@ -9,6 +9,7 @@
              mc:Ignorable="d"
              CacheMode="BitmapCache">
 
+    
 
     <Control.Resources>
         <!--AppBarToggleButton选中后的效果-->
@@ -28,6 +29,7 @@
 
         <converter:BytesToSizeStrConverter x:Key="BytesToSizeStrConverter" />
         <converter:BoolToVisiableConverter x:Key="BoolToVisiableConverter" />
+        <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter" />
 
         <!--提示-->
         <TeachingTip x:Name="HintTeachingTip" />
@@ -79,7 +81,7 @@
                         <Grid x:Name="showImage"
                               CornerRadius="5">
                             <Image Stretch="UniformToFill"
-                                   Source="{x:Bind imagepath}"
+                                   Source="{x:Bind imagepath,Converter={StaticResource NotExistsImagePathConverter}}"
                                    Width="{x:Bind imagewidth,Mode=OneWay}"
                                    Height="{x:Bind imageheight,Mode=OneWay}" />
 
@@ -114,7 +116,6 @@
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <Grid.Background>
-                                <!--<AcrylicBrush TintOpacity="0.03600000170990825" TintColor="#FF000000" FallbackColor="#FF008000" />-->
                                 <LinearGradientBrush StartPoint="0.5,0"
                                                      EndPoint="0.5,1"
                                                      Opacity="0.7">
@@ -559,7 +560,8 @@
                               Opacity="0.3"
                               PointerEntered="ShowType_ToggleSwitch_PointerEntered"
                               PointerExited="ShowType_ToggleSwitch_PointerExited"
-                              IsOn="{x:Bind data:AppSettings.IsShowFailListInDisplay,Mode=TwoWay}">
+                              IsOn="{x:Bind IsShowFailListView,Mode=TwoWay}"
+                              Visibility="{x:Bind IsShowFailListButton}">
                 </ToggleSwitch>
 
             </StackPanel>
@@ -623,55 +625,6 @@
                                             AllCount="{x:Bind  FileGrid.Count,Mode=OneWay}"
                                             Clicked="ToTopButton_Click"
                                             Visibility="Collapsed" />
-
-                    <!--<Grid x:Name="ShowCount_Grid"
-                          BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-                          BorderThickness="1"
-                          CornerRadius="5"
-                          VerticalAlignment="Center"
-                          HorizontalAlignment="Center"
-                          Visibility="Collapsed">
-
-                        <Grid.Resources>
-                            <Style TargetType="Button">
-                                <Setter Property="Padding"
-                                        Value="8" />
-                                <Setter Property="BorderThickness"
-                                        Value="0" />
-                                <Setter Property="Background"
-                                        Value="Transparent" />
-                            </Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="VerticalAlignment"
-                                        Value="Center" />
-                            </Style>
-                        </Grid.Resources>
-
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="auto" />
-                            <ColumnDefinition Width="auto" />
-                            <ColumnDefinition Width="auto" />
-                            <ColumnDefinition Width="auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Orientation="Horizontal"
-                                    Padding="10,0">
-                            <TextBlock Text="{x:Bind IncrementalFileGrid.Count,TargetNullValue='空',Mode=OneWay}" />
-                            <TextBlock Text="/"
-                                       Opacity="0.4"
-                                       Margin="4,0,0,0" />
-                            <TextBlock Text="{x:Bind FileGrid.Count,Mode=OneWay}"
-                                       Opacity="0.4" />
-                        </StackPanel>
-
-                        <AppBarSeparator Grid.Column="1" />
-
-                        <Button Grid.Column="2"
-                                FontFamily="Segoe Fluent Icons"
-                                Content="&#xE098;"
-                                Click="ToTopButton_Click"/>
-                    </Grid>-->
 
                 </Grid>
 

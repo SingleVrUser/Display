@@ -1,5 +1,6 @@
 ﻿using Data;
 using Display.Control;
+using LiveChartsCore.Drawing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -54,7 +55,9 @@ namespace Display.Views
             if (anim != null)
             {
                 anim.TryStart(VideoDetailsControl.Cover_Image);
+                anim.Completed += VideoDetailsControl.ForwardConnectedAnimationCompleted;
             }
+
 
         }
 
@@ -121,7 +124,8 @@ namespace Display.Views
         /// <param name="e"></param>
         private void VideoPlay_Click(object sender, RoutedEventArgs e)
         {
-            var VideoPlayButton = (Button)sender;
+            if (!(sender is Button VideoPlayButton))
+                return;
 
             string name = DetailInfo.truename;
             var videoInfoList = DataAccess.loadVideoInfoByTruename(name);
@@ -138,7 +142,6 @@ namespace Display.Views
             else if (videoInfoList.Count == 1)
             {
                 PlayeVideo(videoInfoList[0].pc);
-                //VideoPlayWindow.createNewWindow();
             }
 
             //有多集
@@ -239,5 +242,55 @@ namespace Display.Views
             }
         }
 
+        private async void CoverTapped(object sender, TappedRoutedEventArgs e)
+        {
+            if (!(sender is Grid grid))
+                return;
+
+            string name = DetailInfo.truename;
+            var videoInfoList = DataAccess.loadVideoInfoByTruename(name);
+
+            //没有该数据
+            if (videoInfoList.Count == 0)
+            {
+                ContentDialog dialog = new();
+                dialog.XamlRoot = this.XamlRoot;
+                dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
+                dialog.Title = "播放";
+                dialog.CloseButtonText = "返回";
+                dialog.Content = "经查询，本地数据库无该文件，请导入后继续";
+                dialog.DefaultButton = ContentDialogButton.Close;
+                await dialog.ShowAsync();
+            }
+            //一集
+            else if (videoInfoList.Count == 1)
+            {
+                PlayeVideo(videoInfoList[0].pc);
+            }
+
+            //有多集
+            else
+            {
+                List<Datum> multisetList = new();
+                foreach (var videoinfo in videoInfoList)
+                {
+                    multisetList.Add(videoinfo);
+                }
+
+                multisetList = multisetList.OrderBy(item => item.n).ToList();
+
+                ContentsPage.SelectSingleVideoToPlay newPage = new ContentsPage.SelectSingleVideoToPlay(multisetList);
+                newPage.ContentListView.ItemClick += ContentListView_ItemClick;
+
+                ContentDialog dialog = new();
+                dialog.XamlRoot = this.XamlRoot;
+                dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
+                dialog.Title = "播放";
+                dialog.CloseButtonText = "返回";
+                dialog.Content = newPage;
+                dialog.DefaultButton = ContentDialogButton.Close;
+                await dialog.ShowAsync();
+            }
+        }
     }
 }

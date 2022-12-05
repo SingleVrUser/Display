@@ -41,16 +41,16 @@
                         OpenPaneLength="150">
             <!--调整NavigationView样式-->
             <NavigationView.Resources>
-                <Thickness x:Key="NavigationViewMinimalHeaderMargin">-65,3,0,3</Thickness>
+                <Thickness x:Key="NavigationViewMinimalHeaderMargin">-65,43,0,3</Thickness>
                 <Thickness x:Key="NavigationViewHeaderMargin">15,3,0,3</Thickness>
-                <VisualStateGroup x:Name="PaneStateListSizeGroup">
+                <!--<VisualStateGroup x:Name="PaneStateListSizeGroup">
                     <VisualState x:Name="ListSizeFull"/>
                     <VisualState x:Name="ListSizeCompact">
                         <VisualState.Setters>
                             <Setter Target="NavView.PaneContentGrid.Width" Value="100"/>
                         </VisualState.Setters>
                     </VisualState>
-                </VisualStateGroup>
+                </VisualStateGroup>-->
             </NavigationView.Resources>
 
             <!--自定义Header-->
@@ -75,26 +75,12 @@
                 </DataTemplate>
             </NavigationView.HeaderTemplate>
 
-            <!--<NavigationView.AutoSuggestBox>
-                <AutoSuggestBox x:Name="NavViewSearchBox" QueryIcon="Find" PlaceholderText="搜索框"/>
-            </NavigationView.AutoSuggestBox>-->
-
             <!--菜单-->
             <NavigationView.MenuItems>
                 <NavigationViewItem Tag="home"
                                 Icon="Home"
                                 Content="主页"/>
                 <NavigationViewItemSeparator/>
-                <!--<NavigationViewItemHeader Content="115"/>-->
-               
-                <!--<NavigationViewItem Content="浏览器"
-                            Tag="browser">
-                    <NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="Globe" />
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>-->
-
-                <!--<NavigationViewItemHeader Content="视频"/>-->
                 
                 <NavigationViewItem Content="展示"
                                 Tag="videoView">

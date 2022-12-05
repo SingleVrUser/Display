@@ -125,7 +125,6 @@
                 GotFocus="NavViewSearchBox_GotFocus"
                 LostFocus="NavViewSearchBox_LostFocus"/>
 
-            <!--<ListView x:Name="collection"/>-->
         </StackPanel>
 
     </Grid>

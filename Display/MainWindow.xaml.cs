@@ -305,9 +305,6 @@ namespace Display
             }
         }
 
-        ////记录当前NavigationView 状态
-        //private NavigationViewPaneDisplayMode _displayMode;
-
         //进入全屏
         private void enterlFullScreen()
         {
@@ -315,7 +312,7 @@ namespace Display
             {
                 _markPresenterKindBeforeFullScreen = appwindow.Presenter.Kind;
                 appwindow.SetPresenter(AppWindowPresenterKind.FullScreen);
-                //_displayMode = NavView.PaneDisplayMode;
+
                 NavView.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftMinimal;
 
                 //监听ESC退出
