@@ -1,28 +1,18 @@
 ﻿using Data;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
-using LiveChartsCore.SkiaSharpView.Painting;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using SkiaSharp;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
+using System.ComponentModel;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Storage;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -32,17 +22,56 @@ namespace Display.ContentsPage
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class SpiderVideoInfo : Page
+    public sealed partial class SpiderVideoInfo : Page, INotifyPropertyChanged
     {
         GetInfoFromNetwork network;
         VideoInfo videoInfo = new VideoInfo();
         List<string> FailVideoNameList;
-        Model.IncrementalLoadingdFileCollection FailList = new();
+
+
+        private Model.IncrementalLoadingdFileCollection _failList;
+        Model.IncrementalLoadingdFileCollection FailList
+        {
+            get => _failList;
+            set
+            {
+                if (_failList == value)
+                    return;
+
+                _failList = value;
+
+                OnPropertyChanged();
+            }
+        }
 
         CancellationTokenSource s_cts = new();
         public Window currentWindow;
 
         List<MatchVideoResult> matchVideoResults;
+
+        private Datum _selectedDatum;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public Datum SelectedDatum
+        {
+            get => _selectedDatum;
+            set
+            {
+                if (_selectedDatum == value)
+                    return;
+                _selectedDatum = value;
+
+                OnPropertyChanged();
+            }
+        }
+
+
+        public void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            // Raise the PropertyChanged event, passing the name of the property whose value has changed.
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public SpiderVideoInfo()
         {
@@ -66,6 +95,14 @@ namespace Display.ContentsPage
                 SelectNull_TeachintTip.IsOpen = true;
                 return;
             }
+
+            //隐藏文件信息
+            CurrentFileInfo_Grid.Visibility = Visibility.Collapsed;
+            //显示进度
+            FindMoreVideoInfo_Grid.Visibility = Visibility.Visible;
+            //不在监听文件信息的显示
+            Explorer.ItemClick -= ExplorerItemClick;
+            Explorer.ItemInvoked -= TreeView_ItemInvoked;
 
             currentWindow.Closed += CurrentWindow_Closed;
             await ShowMatchResult();
@@ -553,6 +590,7 @@ namespace Display.ContentsPage
                         FailListGrid.Visibility = Visibility.Collapsed;
                         break;
                     case "匹配失败":
+
                         FailListGrid.Visibility = Visibility.Visible;
                         Explorer.Visibility = Visibility.Collapsed;
                         tryShowFailList();
@@ -564,6 +602,12 @@ namespace Display.ContentsPage
 
         private async void tryShowFailList()
         {
+            if (FailListView.ItemsSource == null)
+            {
+                FailList = new();
+                FailListView.ItemsSource = FailList;
+            }
+
             if (FailList.Count == 0)
             {
                 var list = await DataAccess.LoadFailFileInfo(0,30);
@@ -571,6 +615,38 @@ namespace Display.ContentsPage
                 list.ForEach(item => FailList.Add(item));
             }
         }
+
+        private void ExplorerItemClick(object sender, ItemClickEventArgs e)
+        {
+            var itemInfo = e.ClickedItem as FilesInfo;
+
+            SelectedDatum = itemInfo.datum;
+        }
+
+        private void TreeView_ItemInvoked(TreeView sender, TreeViewItemInvokedEventArgs args)
+        {
+            var content = ((args.InvokedItem as TreeViewNode).Content as ExplorerItem);
+            SelectedDatum = content.datum;
+
+        }
+
+        private void FailListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count != 1)
+                return;
+
+            SelectedDatum = e.AddedItems[0] as Datum;
+        }
+
+        private void VideoPlayButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(SelectedDatum== null) return;
+
+            Views.DetailInfoPage.PlayeVideo(SelectedDatum.pc);
+
+            
+        }
+
     }
     public class SpliderInfoProgress
     {

@@ -27,6 +27,7 @@
                          Opacity="0.8" />
 
         <converter:BytesToSizeStrConverter x:Key="BytesToSizeStrConverter" />
+        <converter:BoolToVisiableConverter x:Key="BoolToVisiableConverter" />
 
         <!--提示-->
         <TeachingTip x:Name="HintTeachingTip" />
@@ -426,11 +427,10 @@
                  Message="Essential app message for your users to be informed of, acknowledge, or take action on." />
 
         <!--搜索框（匹配失败列表显示时显示）-->
-        <local:FileAutoSuggestBox x:Name="MyFileAutoSuggestBox"
-                                  Grid.Row="1"
+        <local:FileAutoSuggestBox Grid.Row="1"
                                   Margin="10,2"
                                   TextChanged="FileAutoSuggestBox_TextChanged"
-                                  Visibility="Collapsed" />
+                                  Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}" />
 
         <!--封面预览-->
         <GridView Grid.Row="2"
@@ -552,7 +552,6 @@
 
                 <ToggleSwitch x:Name="ShowType_ToggleSwitch"
                               VerticalAlignment="Center"
-                              Visibility="{x:Bind IsShowFailListView}"
                               Margin="0,0,0,15"
                               Toggled="ShowType_ToggleSwitch_Toggled"
                               OnContent="匹配失败"
@@ -565,8 +564,8 @@
 
             </StackPanel>
 
-            <StackPanel x:Name="ShowControl_StackPanel"
-                        RelativePanel.AlignRightWithPanel="True"
+            <StackPanel RelativePanel.AlignRightWithPanel="True"
+                        Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}"
                         Orientation="Horizontal"
                         RelativePanel.AlignVerticalCenterWithPanel="True"
                         ContextFlyout="{StaticResource PageFlyout}"
@@ -587,7 +586,6 @@
                 <!--加载全部-->
                 <ToggleButton x:Name="LoadAll_ToggleButton"
                               Content="加载全部"
-                              Visibility="Visible"
                               IsChecked="{x:Bind data:AppSettings.IsIncrementalShowInDisplay,Mode=TwoWay}"
                               Checked="LoadAll_ToggleButton_Checked"
                               Unchecked="LoadAll_ToggleButton_UnChecked" />
@@ -620,7 +618,13 @@
                         </Button>
                     </StackPanel>
 
-                    <Grid x:Name="ShowCount_Grid"
+                    <local:ShowCountControl x:Name="ShowCount_Control"
+                                            CurrentCount="{x:Bind IncrementalFileGrid.Count,Mode=OneWay}"
+                                            AllCount="{x:Bind  FileGrid.Count,Mode=OneWay}"
+                                            Clicked="ToTopButton_Click"
+                                            Visibility="Collapsed" />
+
+                    <!--<Grid x:Name="ShowCount_Grid"
                           BorderBrush="{ThemeResource ControlElevationBorderBrush}"
                           BorderThickness="1"
                           CornerRadius="5"
@@ -667,13 +671,20 @@
                                 FontFamily="Segoe Fluent Icons"
                                 Content="&#xE098;"
                                 Click="ToTopButton_Click"/>
-                    </Grid>
+                    </Grid>-->
 
                 </Grid>
 
-
-
             </StackPanel>
+
+            <Grid Width="150"
+                  RelativePanel.AlignRightWithPanel="True"
+                  RelativePanel.AlignVerticalCenterWithPanel="True"
+                  Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}">
+                <local:ShowCountControl x:Name="FailShowCountControl"
+                                        CurrentCount="{x:Bind FailFileGrid_part.Count,Mode=OneWay}"
+                                        Clicked="ToTopButton_Click" />
+            </Grid>
         </RelativePanel>
     </Grid>
 </UserControl>

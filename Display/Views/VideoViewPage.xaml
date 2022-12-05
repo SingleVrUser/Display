@@ -13,6 +13,6 @@
         Click="{x:Bind OnClicked}"
         VideoPlayClick="{x:Bind VideoPlay_Click}"
         SingleVideoPlayClick="{x:Bind SingleVideoPlay_Click}"
-        IsShowFailListView="True"/>
+        IsShowFailListView="{x:Bind data:AppSettings.IsShowFailListInDisplay}"/>
 
 </Page>

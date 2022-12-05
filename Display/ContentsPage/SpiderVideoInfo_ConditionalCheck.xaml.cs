@@ -1,25 +1,13 @@
 ﻿using Data;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Storage;
 using Windows.System;
-using static Data.FilesInfo;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -33,8 +21,6 @@ namespace Display.ContentsPage
     {
         private WebApi webapi;
         ObservableCollection<ConditionCheck> ConditionCheckItems;
-        ConditionCheck JavbusItem;
-        ConditionCheck JavdbItem;
         ConditionCheck ImageItem;
 
         SpiderVideoInfo lastPage;
@@ -77,28 +63,48 @@ namespace Display.ContentsPage
 
             if (AppSettings.isUseJavBus)
             {
-                JavbusItem = new ConditionCheck()
+                var CheckItem = new ConditionCheck()
                 {
                     Condition = "访问 JavBus",
                     CheckUrl = AppSettings.JavBus_BaseUrl,
                 };
 
-                ConditionCheckItems.Add(JavbusItem);
+                ConditionCheckItems.Add(CheckItem);
+            }
+            if (AppSettings.isUseLibreDmm)
+            {
+                var CheckItem = new ConditionCheck()
+                {
+                    Condition = "访问 LibreDmm",
+                    CheckUrl = AppSettings.LibreDmm_BaseUrl,
+                };
+
+                ConditionCheckItems.Add(CheckItem);
+            }
+            if (AppSettings.isUseFc2Hub)
+            {
+                var CheckItem = new ConditionCheck()
+                {
+                    Condition = "访问 Fc2hub",
+                    CheckUrl = AppSettings.Fc2hub_BaseUrl,
+                };
+
+                ConditionCheckItems.Add(CheckItem);
             }
 
             if (AppSettings.isUseJavDB)
             {
-                JavdbItem = new ConditionCheck()
+                var CheckItem = new ConditionCheck()
                 {
                     Condition = "访问 JavDB",
                     CheckUrl = AppSettings.JavDB_BaseUrl,
                 };
 
-                ConditionCheckItems.Add(JavdbItem);
+                ConditionCheckItems.Add(CheckItem);
             }
 
             //至少选择一个搜刮源
-            if(!(AppSettings.isUseJavDB || AppSettings.isUseJavBus))
+            if(!(AppSettings.isUseJavBus || AppSettings.isUseLibreDmm || AppSettings.isUseFc2Hub || AppSettings.isUseJavDB))
             {
                 spiderOrigin_TextBlock.Visibility = Visibility.Visible;
             }

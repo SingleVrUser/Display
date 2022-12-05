@@ -754,6 +754,8 @@ namespace Data
             }
         }
 
+        public Datum datum;
+
         public string IconPath
         {
             get
@@ -816,6 +818,8 @@ namespace Data
         }
         public FilesInfo(Datum data)
         {
+            this.datum= data;
+
             Name = data.n;
             Cid = data.cid;
             Fid = data.fid;
@@ -855,6 +859,8 @@ namespace Data
                 }
             }
         }
+
+        public Datum datum;
 
         public static string GetVideoQualityFromVdi(int vdi)
         {

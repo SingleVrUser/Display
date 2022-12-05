@@ -4,8 +4,11 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Windows.Foundation;
 
 namespace Display.Control
 {
@@ -99,6 +102,7 @@ namespace Display.Control
                     Type = FilesInfo.FileType.Folder,
                     Cid = item.cid,
                     HasUnrealizedChildren = hasUnrealizedChildren,
+                    datum= item
                 };
 
                 list.Add(Folders);
@@ -111,6 +115,8 @@ namespace Display.Control
         /// 点击了TreeView选项
         /// </summary>
         private string _lastInvokedCid = "";
+
+        public event TypedEventHandler<TreeView, TreeViewItemInvokedEventArgs> ItemInvoked;
         private void TreeView_ItemInvoked(TreeView sender, TreeViewItemInvokedEventArgs args)
         {
             var content = ((args.InvokedItem as TreeViewNode).Content as ExplorerItem);
@@ -121,6 +127,9 @@ namespace Display.Control
             else _lastInvokedCid = cid;
 
             tryUpdataFolderInfo(cid);
+
+            ItemInvoked?.Invoke(sender, args);
+
         }
 
         /// <summary>
@@ -300,6 +309,8 @@ namespace Display.Control
 
         private List<lastUnAllShowFolderItem> _markShowPartFolderItemList = new();
         private lastUnAllShowFolderItem _lastFolderItemList;
+
+
         /// <summary>
         /// 填充之前TreeView未加载的子节点
         /// </summary>
@@ -535,12 +546,20 @@ namespace Display.Control
             ShowNumTextBlock.Visibility = Visibility.Collapsed;
         }
 
+        public event ItemClickEventHandler ItemClick;
+
         //点击了详情页的列表
         private void FilsInfoListView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var itemInfo = e.ClickedItem as FilesInfo;
 
-            tryUpdataFolderInfo(itemInfo.Cid);
+            //文件夹
+            if (string.IsNullOrEmpty(itemInfo.Fid))
+            {
+                tryUpdataFolderInfo(itemInfo.Cid);
+            }
+
+            ItemClick?.Invoke(sender, e);
         }
 
         //删除文件夹
