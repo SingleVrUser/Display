@@ -569,7 +569,6 @@ namespace Display.ContentsPage
             dialog.Content = ContentGrid;
 
             var result = await dialog.ShowAsync();
-
         }
 
         private void ProgressMore_Click(object sender, RoutedEventArgs e)

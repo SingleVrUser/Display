@@ -189,8 +189,8 @@
                                            Tapped="askLookFailResult_Tapped"
                                            PointerEntered="FailCountTextBlock_PointerEntered"
                                            PointerExited="FailCountTextBlock_PointerExited">
-                                <Run>失败数</Run>
-                                <Run x:Name="FailCount_Run">0</Run>
+                                    <Run>失败数</Run>
+                                    <Run x:Name="FailCount_Run">0</Run>
                                 </TextBlock>
                             </StackPanel>
 

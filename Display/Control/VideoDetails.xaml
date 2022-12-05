@@ -1,13 +1,16 @@
 ﻿<UserControl x:Class="Display.Control.VideoDetails"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="using:Display.Control"
-             xmlns:page="using:Display.ContentsPage"
+             xmlns:converter="using:Display.Converter"
              xmlns:data="using:Data"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d">
-
+    <UserControl.Resources>
+        <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter"/>
+    </UserControl.Resources>
+    
+    
     <Grid BorderThickness="0,1,0,0"
           Loaded="GridlLoaded"
           RowSpacing="10">
@@ -173,10 +176,12 @@
                     </Grid.ColumnDefinitions>
 
                     <!--封面图-->
-                    <Grid CornerRadius="4">
+                    <Grid CornerRadius="4"
+                          x:Name="Cover_Grid">
+                        
                         <Image x:FieldModifier="public"
                                x:Name="Cover_Image"
-                               Source="{x:Bind resultinfo.imagepath}"
+                               Source="{x:Bind resultinfo.imagepath,Converter={StaticResource NotExistsImagePathConverter}}"
                                HorizontalAlignment="Left"
                                VerticalAlignment="Center"
                                MaxHeight="780">
@@ -193,6 +198,16 @@
                                 </MenuFlyout>
                             </Image.ContextFlyout>
                         </Image>
+
+                        <Grid x:Name="VideoPlayIconInCover" Visibility="Collapsed">
+                            <Grid.Background>
+                                <SolidColorBrush Color="Gray" Opacity="0.1"/>
+                            </Grid.Background>
+                            <FontIcon FontFamily="Segoe Fluent Icons"
+                                      Glyph="&#xF5B0;"
+                                      Foreground="CornflowerBlue"
+                                      FontSize="50"/>
+                        </Grid>
                     </Grid>
 
                     <!--右侧信息-->
@@ -216,6 +231,7 @@
                                        FontFamily="JetBrains Mono"
                                        FontSize="24"
                                        FontWeight="Bold" />
+                            
                             <HyperlinkButton NavigateUri="{x:Bind resultinfo.busurl}"
                                              Opacity="0.2">
                                 <FontIcon FontFamily="Segoe Fluent Icons"

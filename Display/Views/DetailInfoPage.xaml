@@ -21,7 +21,8 @@
             LabelClick="{x:Bind Label_Click}"
             VideoPlayClick="{x:Bind VideoPlay_Click}"
             DeleteClick="{x:Bind Delete_Click}"
-            resultinfo="{x:Bind DetailInfo, Mode=TwoWay}"/>
+            resultinfo="{x:Bind DetailInfo, Mode=TwoWay}"
+            CoverTapped="{x:Bind CoverTapped}"/>
     </Grid>
 
 

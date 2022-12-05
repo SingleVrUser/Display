@@ -1,5 +1,6 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -147,7 +148,6 @@ namespace Data
 
         }
 
-
         /// <summary>
         /// List<class>转换,VideoInfo ==> VideoCoverDisplayClass
         /// </summary>
@@ -276,6 +276,30 @@ namespace Data
             TimeSpan ts = TimeSpan.FromSeconds(Second);
 
             return ts.ToString(formatStr);
+        }
+
+        public static string ConvertPtTimeToTotalMinute(string PtTimeStr)
+        {
+            int totalMinute = 0;
+
+            var match = Regex.Match(PtTimeStr, @"PT((\d+)H)?(\d+)M(\d+)S", RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                int result;
+                if (int.TryParse(match.Groups[2].Value, out result))
+                {
+                    totalMinute += result * 60;
+                }
+
+                if (int.TryParse(match.Groups[3].Value, out result))
+                {
+                    totalMinute += result;
+                }
+
+                return $"{totalMinute}分钟";
+            }
+
+            return PtTimeStr;
         }
 
         /// <summary>

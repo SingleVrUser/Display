@@ -170,8 +170,6 @@ namespace Data
             return result;
         }
 
-
-
         /// <summary>
         /// 导入CidList获取到的所有信息到数据库
         /// </summary>
@@ -286,7 +284,6 @@ namespace Data
                 return null;
             }
 
-
             //统计请求速度
             int sendCount = 0;
             long nowDate = DateTimeOffset.Now.ToUnixTimeSeconds();
@@ -356,8 +353,6 @@ namespace Data
 
             return getFilesProgressInfo;
         }
-
-        //public async Task<>
 
         /// <summary>
         /// 获取文件信息
