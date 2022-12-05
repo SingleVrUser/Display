@@ -23,6 +23,8 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
 {
     public static readonly DependencyProperty IsShowFailListViewProperty =
     DependencyProperty.Register("IsShowFailListView", typeof(bool), typeof(VideoCoverDisplay), null);
+    public static readonly DependencyProperty IsShowFailListButtonProperty =
+    DependencyProperty.Register("IsShowFailListButton", typeof(bool), typeof(VideoCoverDisplay), null);
 
     public bool IsShowSuccessListView
     {
@@ -38,9 +40,14 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
             OnPropertyChanged(nameof(IsShowSuccessListView));
         }
     }
+    public bool IsShowFailListButton
+    {
+        get { return (bool)GetValue(IsShowFailListButtonProperty); }
+        set { SetValue(IsShowFailListButtonProperty, value); }
+    }
 
     ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-    ObservableCollection<AccountContentInPage> AccountInPage = new ObservableCollection<AccountContentInPage>();
+    ObservableCollection<AccountContentInPage> AccountInPage;
     ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)ApplicationData.Current.LocalSettings.Values["DisplaySettings"];
 
     private List<VideoCoverDisplayClass> _FileGrid;
@@ -52,6 +59,9 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         }
         set
         {
+            if (_FileGrid == value)
+                return;
+
             _FileGrid = value;
 
             tryDisplayInfo(0);
@@ -134,29 +144,6 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     {
         this.InitializeComponent();
 
-        loadData();
-    }
-
-
-    private void loadData()
-    {
-        //增量显示
-        if (LoadAll_ToggleButton.IsChecked == true)
-        {
-            ShowCount_Control.Visibility= Visibility.Visible;
-
-        }
-        //每页显示指定数量
-        else
-        {
-            PageControl_StackPanel.Visibility = Visibility.Visible;
-            TryInitShowCountPerPage();
-            FileGrid_part = new();
-            BasicGridView.ItemsSource = FileGrid_part;
-        }
-
-        //加载控件默认设置，每页最大显示数量，图标显示大小
-        LoadDefaultSettings();
     }
 
     /// <summary>
@@ -164,6 +151,9 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     /// </summary>
     private void TryInitShowCountPerPage()
     {
+        if (AccountInPage == null)
+            AccountInPage = new();
+
         if (AccountInPage.Count == 0)
         {
             for (var i = 10; i < 100; i += 20)
@@ -188,6 +178,9 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     /// </summary>
     private void tryDisplayInfo(int newStartValue)
     {
+        //loadData();
+
+        //加载全部
         if(LoadAll_ToggleButton.IsChecked == true)
         {
             if (IncrementalFileGrid != null)
@@ -201,7 +194,7 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
                 }
 
             }
-            else if(FileGrid.Count!=0)
+            else if (FileGrid.Count != 0)
             {
                 IncrementalFileGrid = new(FileGrid);
 
@@ -214,6 +207,15 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         }
         else
         {
+            if (ContentAcountListView.SelectedItem == null)
+            {
+                TryInitShowCountPerPage();
+                LoadDefaultSettings();
+            }
+
+            PageControl_StackPanel.Visibility = Visibility.Visible;
+            FileGrid_part = new();
+            BasicGridView.ItemsSource = FileGrid_part;
             totalPageCount = (int)Math.Ceiling((double)FileGrid.Count / showCountInPage);
             DisplayInfoPerPage(newStartValue);
         }
@@ -281,7 +283,7 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     }
 
     /// <summary>
-    /// 加载应用设置
+    /// 初始化应用设置(每页最大显示数量，图片大小)
     /// </summary>
     private void LoadDefaultSettings()
     {
@@ -762,7 +764,6 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
             await BasicGridView.TryStartConnectedAnimationAsync(animation, item, "showImage");
         }
 
-
     }
 
     public void PrepareAnimation(VideoCoverDisplayClass item)
@@ -793,18 +794,21 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     private async void ShowType_ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
     {
         var toggleswitch = sender as ToggleSwitch;
+
         //匹配失败
         if (toggleswitch.IsOn)
         {
+            IsShowFailListView = true;
+            ShowCount_Control.Visibility = Visibility.Collapsed;
+
             if (FailFileGrid_part == null)
             {
                 var AllCount = await DataAccess.CheckFailFilesCount();
-                FailShowCountControl.AllCount= AllCount;
+                FailShowCountControl.AllCount = AllCount;
                 FailFileGrid_part = new() { AllCount = AllCount };
             }
 
             BasicGridView.ItemsSource = FailFileGrid_part;
-            IsShowFailListView = true;
 
             if (FailFileGrid_part.Count == 0)
             {
@@ -816,18 +820,28 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         //匹配成功
         else
         {
-            //增量加载
-            if (LoadAll_ToggleButton.IsChecked == true)
+            IsShowFailListView = false;
+            if (FileGrid == null)
             {
-                BasicGridView.ItemsSource = IncrementalFileGrid;
+                List<VideoInfo> VideoInfoList = DataAccess.LoadAllVideoInfo(-1);
+                FileGrid = FileMatch.getFileGrid(VideoInfoList);
             }
-            //每页固定加载数
             else
             {
-                BasicGridView.ItemsSource = FileGrid_part;
+                //增量加载
+                if (LoadAll_ToggleButton.IsChecked == true)
+                {
+                    ShowCount_Control.Visibility = Visibility.Visible;
+                    BasicGridView.ItemsSource = IncrementalFileGrid;
+                }
+                //每页固定加载数
+                else
+                {
+                    ShowCount_Control.Visibility = Visibility.Collapsed;
+                    BasicGridView.ItemsSource = FileGrid_part;
+                }
             }
 
-            IsShowFailListView = false;
         }
     }
 
@@ -854,9 +868,7 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     private async void FileAutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
         if (!(sender is AutoSuggestBox suggestBox))
-        {
             return;
-        }
 
         var checkTest = suggestBox.Text;
 
@@ -874,6 +886,9 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         if (ShowCount_Control == null)
             return;
 
+        if (IsShowFailListView)
+            return;
+
         ShowCount_Control.Visibility = Visibility.Visible;
         PageControl_StackPanel.Visibility = Visibility.Collapsed;
 
@@ -888,6 +903,9 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     private void LoadAll_ToggleButton_UnChecked(object sender, RoutedEventArgs e)
     {
         if (PageControl_StackPanel == null)
+            return;
+
+        if (IsShowFailListView)
             return;
 
         PageControl_StackPanel.Visibility = Visibility.Visible;

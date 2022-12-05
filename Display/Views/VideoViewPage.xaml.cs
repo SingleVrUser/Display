@@ -42,13 +42,13 @@ namespace Display.Views
         /// </summary>
         private void LoadSqlData()
         {
-            if (videoControl.FileGrid == null)
+
+            if (!AppSettings.IsShowFailListInDisplay)
             {
-                videoControl.FileGrid = new();
+                List<VideoInfo> VideoInfoList = DataAccess.LoadAllVideoInfo(-1);
+                videoControl.FileGrid = FileMatch.getFileGrid(VideoInfoList);
             }
 
-            List<VideoInfo> VideoInfoList = DataAccess.LoadAllVideoInfo(-1);
-            videoControl.FileGrid = FileMatch.getFileGrid(VideoInfoList);
         }
 
 
@@ -146,8 +146,6 @@ namespace Display.Views
                 }
             }
         }
-
     }
 
-   
 }

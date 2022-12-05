@@ -20,15 +20,15 @@ namespace Display.Views
         //为返回动画做准备（需启动缓存）
         VideoCoverDisplayClass _storeditem;
 
+        private static readonly DependencyProperty ShowNameProperty =
+            DependencyProperty.Register("ShowName", typeof(string), typeof(ActorInfoPage), null);
+
         //ShowName需要实时更新
         private string ShowName
         {
             get { return (string)GetValue(ShowNameProperty); }
             set { SetValue(ShowNameProperty, value); }
         }
-
-        private static readonly DependencyProperty ShowNameProperty =
-            DependencyProperty.Register("ShowName", typeof(string), typeof(ActorInfoPage), null);
 
         public ActorInfoPage()
         {
@@ -74,11 +74,6 @@ namespace Display.Views
 
             //显示的是演员还是标签
             List<VideoInfo> VideoInfoList = FileMatch.getVideoInfoFromType(type, ShowName);
-
-            if (videoControl.FileGrid == null)
-            {
-                videoControl.FileGrid = new();
-            }
 
             var newFileGrid = FileMatch.getFileGrid(VideoInfoList);
 

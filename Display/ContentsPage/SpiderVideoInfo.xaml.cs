@@ -392,7 +392,9 @@ namespace Display.ContentsPage
                         //先从fc2hub中搜索
                         resultInfo = await network.SearchInfoFromFc2Hub(VideoName);
                     }
-                    else if(AppSettings.isUseJavDB && !string.IsNullOrEmpty(AppSettings.javdb_Cookie))
+
+                    //搜索无果，尝试用javdb
+                    if(resultInfo == null&& AppSettings.isUseJavDB && !string.IsNullOrEmpty(AppSettings.javdb_Cookie))
                     {
                         progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待3~6秒" } });
                         await GetInfoFromNetwork.RandomTimeDelay(3, 6);
@@ -569,7 +571,6 @@ namespace Display.ContentsPage
             dialog.Content = ContentGrid;
 
             var result = await dialog.ShowAsync();
-
         }
 
         private void ProgressMore_Click(object sender, RoutedEventArgs e)
