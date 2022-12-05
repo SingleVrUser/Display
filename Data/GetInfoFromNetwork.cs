@@ -141,7 +141,7 @@ namespace Data
                         videoInfo.producer = valueNodes[i].InnerText.Trim();
                         break;
                     case "Volume":
-                        videoInfo.lengthtime = valueNodes[i].InnerText.Trim();
+                        videoInfo.lengthtime = valueNodes[i].InnerText.Trim().Replace(" minutes", "分钟");
                         break;
                 }
             }
@@ -223,7 +223,7 @@ namespace Data
                 }
                 else if (header == "長度:")
                 {
-                    videoInfo.lengthtime = AttributeNode.LastChild.InnerText.Trim();
+                    videoInfo.lengthtime = AttributeNode.LastChild.InnerText.Trim().Replace("分鐘","分钟");
                 }
                 else if (header == "導演:")
                 {
@@ -329,8 +329,9 @@ namespace Data
 
             videoInfo.title = json.name;
             videoInfo.truename = CID;
-            videoInfo.releasetime = json.datePublished;
-            videoInfo.lengthtime = json.duration;
+            videoInfo.releasetime = json.datePublished.Replace("/","-");
+            //PTxHxMxS转x分钟
+            videoInfo.lengthtime = Data.FileMatch.ConvertPtTimeToTotalMinute(json.duration);
             videoInfo.director = json.director;
             videoInfo.producer = "fc2";
 
@@ -472,7 +473,7 @@ namespace Data
                 }
                 else if (key.Contains("時長"))
                 {
-                    videoInfo.lengthtime = valueNode.InnerText;
+                    videoInfo.lengthtime = valueNode.InnerText.Trim().Replace(" 分鍾", "分钟");
                 }
                 else if (key.Contains("片商") || key.Contains("賣家"))
                 {

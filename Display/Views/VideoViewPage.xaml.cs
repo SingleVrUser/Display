@@ -146,8 +146,6 @@ namespace Display.Views
                 }
             }
         }
-
     }
 
-   
 }

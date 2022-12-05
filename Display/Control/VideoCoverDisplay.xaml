@@ -9,6 +9,7 @@
              mc:Ignorable="d"
              CacheMode="BitmapCache">
 
+    
 
     <Control.Resources>
         <!--AppBarToggleButton选中后的效果-->
@@ -28,6 +29,7 @@
 
         <converter:BytesToSizeStrConverter x:Key="BytesToSizeStrConverter" />
         <converter:BoolToVisiableConverter x:Key="BoolToVisiableConverter" />
+        <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter" />
 
         <!--提示-->
         <TeachingTip x:Name="HintTeachingTip" />
@@ -79,7 +81,7 @@
                         <Grid x:Name="showImage"
                               CornerRadius="5">
                             <Image Stretch="UniformToFill"
-                                   Source="{x:Bind imagepath}"
+                                   Source="{x:Bind imagepath,Converter={StaticResource NotExistsImagePathConverter}}"
                                    Width="{x:Bind imagewidth,Mode=OneWay}"
                                    Height="{x:Bind imageheight,Mode=OneWay}" />
 
@@ -114,7 +116,6 @@
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <Grid.Background>
-                                <!--<AcrylicBrush TintOpacity="0.03600000170990825" TintColor="#FF000000" FallbackColor="#FF008000" />-->
                                 <LinearGradientBrush StartPoint="0.5,0"
                                                      EndPoint="0.5,1"
                                                      Opacity="0.7">

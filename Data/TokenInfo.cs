@@ -625,12 +625,17 @@ namespace Data
                 ShowLabel = "4K";
             }
 
-            this.realeaseYear = videoinfo.releasetime.Split('-')[0];
+            if (videoinfo.releasetime.Contains("/"))
+            {
+                this.realeaseYear = videoinfo.releasetime.Split('/')[0];
+            }
+            else
+            {
+                this.realeaseYear = videoinfo.releasetime.Split('-')[0];
+            }
             this.isShowLabel = isShowLabel;
             this.ShowLabel = ShowLabel;
-            //this.isLookLater = videoinfo.look_later == 0 ? false : true;
             this.score = videoinfo.score;
-            //this.isLike = videoinfo.is_like == 0 ? false : true;
         }
 
         public string realeaseYear { get; set; }
