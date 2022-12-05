@@ -12,8 +12,9 @@ public class IncrementalLoadingdFileCollection : ObservableCollection<Datum>, IS
 {
     public string filterName { get; set; } = string.Empty;
 
-    public bool HasMoreItems { get; set; } = true;
+    public int AllCount { get; set; }
 
+    public bool HasMoreItems { get; set; } = true;
 
     public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
     {

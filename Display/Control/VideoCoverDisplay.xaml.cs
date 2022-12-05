@@ -24,10 +24,19 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     public static readonly DependencyProperty IsShowFailListViewProperty =
     DependencyProperty.Register("IsShowFailListView", typeof(bool), typeof(VideoCoverDisplay), null);
 
+    public bool IsShowSuccessListView
+    {
+        get => !IsShowFailListView;
+    }
+
     public bool IsShowFailListView
     {
         get { return (bool)GetValue(IsShowFailListViewProperty); }
-        set { SetValue(IsShowFailListViewProperty, value); }
+        set
+        {
+            SetValue(IsShowFailListViewProperty, value);
+            OnPropertyChanged(nameof(IsShowSuccessListView));
+        }
     }
 
     ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
@@ -71,7 +80,20 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public Model.IncrementalLoadingdFileCollection FailFileGrid_part = new();
+    private Model.IncrementalLoadingdFileCollection _failFileGrid_part;
+    public Model.IncrementalLoadingdFileCollection FailFileGrid_part
+    {
+        get => _failFileGrid_part;
+        set
+        {
+            if (_failFileGrid_part == value)
+                return;
+
+            _failFileGrid_part = value;
+
+            OnPropertyChanged();
+        }
+    }
 
     //item开始Index
     private int startValue = 0;
@@ -121,7 +143,7 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         //增量显示
         if (LoadAll_ToggleButton.IsChecked == true)
         {
-            ShowCount_Grid.Visibility= Visibility.Visible;
+            ShowCount_Control.Visibility= Visibility.Visible;
 
         }
         //每页显示指定数量
@@ -170,12 +192,6 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         {
             if (IncrementalFileGrid != null)
             {
-                //IncrementalFileGrid.Clear();
-                //if(!IncrementalFileGrid.HasMoreItems)
-                //    IncrementalFileGrid.HasMoreItems = true;
-
-                //IncrementalFileGrid.AllItems = FileGrid;
-
                 IncrementalFileGrid = new(FileGrid);
                 BasicGridView.ItemsSource = IncrementalFileGrid;
 
@@ -780,10 +796,15 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         //匹配失败
         if (toggleswitch.IsOn)
         {
-            BasicGridView.ItemsSource = FailFileGrid_part;
+            if (FailFileGrid_part == null)
+            {
+                var AllCount = await DataAccess.CheckFailFilesCount();
+                FailShowCountControl.AllCount= AllCount;
+                FailFileGrid_part = new() { AllCount = AllCount };
+            }
 
-            MyFileAutoSuggestBox.Visibility = Visibility.Visible;
-            ShowControl_StackPanel.Visibility= Visibility.Collapsed;
+            BasicGridView.ItemsSource = FailFileGrid_part;
+            IsShowFailListView = true;
 
             if (FailFileGrid_part.Count == 0)
             {
@@ -806,8 +827,7 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
                 BasicGridView.ItemsSource = FileGrid_part;
             }
 
-            MyFileAutoSuggestBox.Visibility = Visibility.Collapsed;
-            ShowControl_StackPanel.Visibility = Visibility.Visible;
+            IsShowFailListView = false;
         }
     }
 
@@ -840,10 +860,10 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
 
         var checkTest = suggestBox.Text;
 
-        FailFileGrid_part.filterName= checkTest;
+        FailFileGrid_part = new() { filterName= checkTest};
         var lists = await DataAccess.LoadFailFileInfo(0,30,checkTest);
-
-        FailFileGrid_part.Clear();
+        FailShowCountControl.AllCount = await DataAccess.CheckFailFilesCount(checkTest);
+        BasicGridView.ItemsSource = FailFileGrid_part;
         lists.ForEach(datum => FailFileGrid_part.Add(datum));
 
     }
@@ -851,10 +871,10 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     //加载全部
     private void LoadAll_ToggleButton_Checked(object sender, RoutedEventArgs e)
     {
-        if (ShowCount_Grid == null)
+        if (ShowCount_Control == null)
             return;
 
-        ShowCount_Grid.Visibility = Visibility.Visible;
+        ShowCount_Control.Visibility = Visibility.Visible;
         PageControl_StackPanel.Visibility = Visibility.Collapsed;
 
 
@@ -871,7 +891,7 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
             return;
 
         PageControl_StackPanel.Visibility = Visibility.Visible;
-        ShowCount_Grid.Visibility = Visibility.Collapsed;
+        ShowCount_Control.Visibility = Visibility.Collapsed;
 
         TryInitShowCountPerPage();
         BasicGridView.ItemsSource = FileGrid_part;
@@ -880,11 +900,14 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
 
     private void ToTopButton_Click(object sender, RoutedEventArgs e)
     {
-        if (!(BasicGridView.ItemsSource is IncrementalLoadingdVideoFileCollection collection))
-            return;
+        if (BasicGridView.ItemsSource is IncrementalLoadingdVideoFileCollection successCollection)
+            BasicGridView.ScrollIntoView(successCollection.First());
 
-        BasicGridView.ScrollIntoView(collection.First());
+        if (BasicGridView.ItemsSource is Model.IncrementalLoadingdFileCollection failCollection)
+            BasicGridView.ScrollIntoView(failCollection.First());
+
     }
+
 }
 
 

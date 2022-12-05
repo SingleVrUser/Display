@@ -485,6 +485,31 @@ namespace Data
 
             return data;
         }
+
+        public static async Task<int> CheckFailFilesCount(string n = "")
+        {
+            int count = 0;
+            using (SqliteConnection db =
+               new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                string queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n}%'";
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"SELECT COUNT(n) FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{queryStr}", db);
+
+                SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
+
+                query.Read();
+                count = query.GetInt32(0);
+                query.Close();
+                db.Close();
+            }
+
+            return count;
+        }
+
         /// <summary>
         /// 通过truename查询文件列表
         /// </summary>

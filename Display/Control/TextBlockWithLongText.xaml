@@ -13,7 +13,7 @@
         </Style>
     </UserControl.Resources>
     
-    <TextBlock x:Name="LongTextBlock" Text="{x:Bind StringValue,Mode=OneWay}" TextTrimming="WordEllipsis" IsTextSelectionEnabled="{x:Bind IsFirstTextSelectionEnabled}">
+    <TextBlock x:Name="LongTextBlock" Text="{x:Bind StringValue,Mode=OneWay}" TextTrimming="CharacterEllipsis" IsTextSelectionEnabled="{x:Bind IsFirstTextSelectionEnabled}">
         <TextBlock.ContextFlyout>
             <Flyout>
                 <TextBlock Text="{x:Bind StringValue,Mode=OneWay}" IsTextSelectionEnabled="{x:Bind IsSecondTextSelectionEnabled}"/>

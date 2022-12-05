@@ -73,6 +73,7 @@
     <None Remove="Control\Explorer.xaml" />
     <None Remove="Control\FileAutoSuggestBox.xaml" />
     <None Remove="Control\MultipleCoverShow.xaml" />
+    <None Remove="Control\ShowCountControl.xaml" />
     <None Remove="Control\StatusShow.xaml" />
     <None Remove="Control\TextBlockWithLongText.xaml" />
     <None Remove="Control\TextBlockWithStressText.xaml" />
@@ -307,6 +308,9 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="Control\ShowCountControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="ContentsPage\FileInfoInCidSmoke.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
