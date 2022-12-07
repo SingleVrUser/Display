@@ -76,9 +76,6 @@ namespace Display
         /// <param name="e"></param>
         private void NavView_Loaded(object sender, RoutedEventArgs e)
         {
-            // Add handler for ContentFrame navigation.
-            //ContentFrame.Navigated += On_Navigated;
-
             // NavView doesn't load any page by default, so load home page.
             //数据文件存在
             if (File.Exists(DataAccess.dbpath))
@@ -106,46 +103,6 @@ namespace Display
 
         }
 
-        //private void CoreDispatcher_AcceleratorKeyActivated(CoreDispatcher sender, AcceleratorKeyEventArgs args)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        /// <summary>
-        /// ContentFrame跳转的Handler
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        //private void On_Navigated(object sender, NavigationEventArgs e)
-        //{
-        //    if (ContentFrame.SourcePageType == typeof(SettingsPage))
-        //    {
-        //        NavView.Header = "设置";
-        //        NavView.SelectedItem = (NavigationViewItem)NavView.SettingsItem;
-        //    }
-        //    else if (ContentFrame.SourcePageType != null)
-        //    {
-        //        var item = _pages.FirstOrDefault(p => p.Page == e.SourcePageType);
-
-        //        // MenuItems or FooterMenuItems
-
-        //        var items = NavView.MenuItems
-        //            .OfType<NavigationViewItem>()
-        //            .FirstOrDefault(n => n.Tag.Equals(item.Tag));
-
-        //        if (items == null && NavView.FooterMenuItems != null)
-        //        {
-        //            items = NavView.FooterMenuItems.
-        //                OfType<NavigationViewItem>()
-        //                .FirstOrDefault(n => n.Tag.Equals(item.Tag));
-        //        }
-
-        //        NavView.Header = ((NavigationViewItem)NavView.SelectedItem)?.Content?.ToString();
-        //        NavView.SelectedItem = items;
-
-        //    }
-        //}
 
         /// <summary>
         /// NavigationView的选择改变
@@ -186,6 +143,8 @@ namespace Display
                 _page = itme.Page;
             }
             var preNavPageType = ContentFrame.CurrentSourcePageType;
+
+            //当前页面不跳转
             if (!(_page is null) && !Type.Equals(preNavPageType, _page))
             {
                 ContentFrame.Navigate(_page, null, transitionInfo);
@@ -294,7 +253,6 @@ namespace Display
             {
                 cancelFullScreen();
             }
-            //SetTitleBar(AppTitleBar);
         }
 
         private void RootGrid_KeyDown(object sender, KeyRoutedEventArgs e)

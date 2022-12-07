@@ -57,7 +57,7 @@ namespace Display.Views
             var VideoPlayButton = (Button)sender;
             var datum = VideoPlayButton.DataContext as Datum;
 
-            Views.DetailInfoPage.PlayeVideo(datum.pc);
+            Views.DetailInfoPage.PlayeVideo(datum.pc, this.XamlRoot);
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace Display.Views
             }
             else if (videoInfoList.Count == 1)
             {
-                Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc);
+                Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
             }
 
             //有多集
@@ -122,10 +122,7 @@ namespace Display.Views
         {
             var SingleVideoInfo = e.ClickedItem as Data.Datum;
 
-
-            Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc);
-
-            //VideoPlayWindow.createNewWindow(FileMatch.getVideoPlayUrl(SingleVideoInfo.pc));
+            Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc, this.XamlRoot);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)

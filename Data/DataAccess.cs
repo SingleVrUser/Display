@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Windows.Media;
 using Windows.Storage;
 
@@ -49,6 +50,7 @@ namespace Data
             {
                 db.Open();
 
+                //文件信息
                 string tableCommand = "CREATE TABLE IF NOT " +
                     $"EXISTS {TABLENAME} ( " +
                       "fid text," +
@@ -88,6 +90,7 @@ namespace Data
                 SqliteCommand createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteReader();
 
+                //番号详情
                 tableCommand = "CREATE TABLE IF NOT " +
                     $"EXISTS VideoInfo ( " +
                       "truename TEXT NOT NULL," +
@@ -113,6 +116,7 @@ namespace Data
                 createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteReader();
 
+                //番号匹配
                 tableCommand = "CREATE TABLE IF NOT " +
                     $"EXISTS FileToInfo ( " +
                       "file_pickcode text," +
@@ -120,7 +124,19 @@ namespace Data
                       "issuccess integer," +
                       "PRIMARY KEY('file_pickcode')" +
                       ") ";
+                createTable = new SqliteCommand(tableCommand, db);
+                createTable.ExecuteReader();
 
+                //下载历史
+                tableCommand = "CREATE TABLE IF NOT " +
+                    $"EXISTS DownHistory ( " +
+                      "file_pickcode text," +
+                      "file_name text," +
+                      "true_url text," +
+                      "ua text," +
+                      "add_time integer," +
+                      "PRIMARY KEY('file_pickcode')" +
+                      ") ";
                 createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteReader();
             }
@@ -382,6 +398,35 @@ namespace Data
                 db.Close();
             }
         }
+        
+        /// <summary>
+        /// 添加下载记录
+        /// </summary>
+        /// <param name="data"></param>
+        public static void AddDownHistory(DownInfo data)
+        {
+            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
+            using (SqliteConnection db =
+              new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand insertCommand = new SqliteCommand();
+                insertCommand.Connection = db;
+
+                //添加信息，如果已经存在则替换
+                insertCommand.CommandText = $"INSERT OR REPLACE INTO DownHistory VALUES (@file_pickcode,@file_name,@true_url,@ua,@add_time);";
+
+                insertCommand.Parameters.AddWithValue("@file_pickcode", data.pickCode);
+                insertCommand.Parameters.AddWithValue("@file_name", data.fileName);
+                insertCommand.Parameters.AddWithValue("@true_url", data.trueUrl);
+                insertCommand.Parameters.AddWithValue("@ua", data.ua);
+                insertCommand.Parameters.AddWithValue("@add_time", data.addTime);
+                insertCommand.ExecuteReader();
+
+                db.Close();
+            }
+        }
 
         /// <summary>
         /// 查找truename
@@ -458,7 +503,14 @@ namespace Data
         /// <returns></returns>
         public static async Task<List<Datum>> LoadFailFileInfo(int offset = 0, int limit = -1, string n = "")
         {
+
             List<Datum> data = new List<Datum>();
+
+
+            if (n.Contains("'"))
+            {
+                n = n.Replace("'", "%");
+            }
 
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
@@ -466,10 +518,6 @@ namespace Data
             {
                 db.Open();
 
-                if (n.Contains("'"))
-                {
-                    n = n.Replace("'", "%");
-                }
 
                 string queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n}%'";
 
@@ -490,6 +538,11 @@ namespace Data
 
         public static async Task<int> CheckFailFilesCount(string n = "")
         {
+            if (n.Contains("'"))
+            {
+                n = n.Replace("'", "%");
+            }
+
             int count = 0;
             using (SqliteConnection db =
                new SqliteConnection($"Filename={dbpath}"))
@@ -646,8 +699,6 @@ namespace Data
 
             return imagePath;
         }
-
-
 
         /// <summary>
         /// 加载已存在的videoInfo数据
@@ -901,64 +952,99 @@ namespace Data
             {
                 db.Open();
 
-                //查询文件名和对应的id
+
+                //查询文件名称
                 SqliteCommand selectCommand = new SqliteCommand
-                    ($"SELECT FilesInfo.cid, FileToInfo.truename FROM FilesInfo ,FileToInfo WHERE FileToInfo.file_pickcode == FilesInfo.pc AND FileToInfo.file_pickcode == '{file_pickCode}' LIMIT 1", db);
+                    ($"SELECT cid,n FROM FilesInfo WHERE pc == '{file_pickCode}'", db);
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
                 query.Read();
 
-
-                string folderCid=null;
-                string truename = null;
-
-                if (query.HasRows)
+                //查询无果，几乎不可能发生
+                if (!query.HasRows)
                 {
-                    folderCid = query["cid"] as string;
-                    truename = query["truename"] as string;
-                }
-                else
-                {
-
+                    query.Close();
+                    db.Close();
+                    return subDicts;
                 }
 
+                string folderCid = query["cid"] as string;
+                string fileName = query["n"] as string;
                 query.Close();
 
-                if (string.IsNullOrEmpty(folderCid) || string.IsNullOrEmpty(truename))
-                    return subDicts;
+                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
 
-                var tuple = FileMatch.SpliteLeftAndRightFromCid(truename);
-                string leftName = tuple.Item1.Replace("FC2", "FC");
-                string rightNumber = tuple.Item2;
+                int numResult;
+                bool NameIsNumber = Int32.TryParse(fileNameWithoutExtension, out numResult);
 
-                //先通过truename查询字幕文件
-                selectCommand = new SqliteCommand
-                    ($"SELECT pc,n FROM FilesInfo WHERE (ico == 'srt' OR ico == 'ass' OR ico == 'ssa') AND n LIKE '%{leftName}%{rightNumber}%'", db);
-
-                query = selectCommand.ExecuteReader();
-                while(query.Read())
+                //1.首先查询同名字幕文件(纯数字则跳过，长度小于10也跳过)
+                if (!NameIsNumber && fileNameWithoutExtension.Length>10)
                 {
-                    subDicts.Add(query["pc"] as string, query["n"] as string);
+                    selectCommand = new SqliteCommand
+                        ($"SELECT pc, n FROM FilesInfo WHERE (ico == 'srt' OR ico == 'ass' OR ico == 'ssa') AND n LIKE '%{fileNameWithoutExtension}%'", db);
+
+                    query = selectCommand.ExecuteReader();
+                    while (query.Read())
+                    {
+                        subDicts.Add(query["pc"] as string, query["n"] as string);
+                    }
                 }
 
-                //查询失败，从上一级文件夹的名称入手
-                if(subDicts.Count == 0)
+                //2.没有同名字幕文件，根据番号特点匹配（字母+数字），这里的方法正常的视频不通用
+                if (subDicts.Count == 0 && !NameIsNumber)
                 {
-                    //查询上一级文件夹的信息
-                    var FolderDatum = DataAccess.getUpperLevelFolderCid(folderCid);
-
-                    //文件夹名称是否和truename对应
-                    Match match = Regex.Match(FolderDatum.n, $"[~a-z]{leftName}.{1,2}{rightNumber}[~0-9]",RegexOptions.IgnoreCase);
-                    if (match.Success)
+                    string truename = FileMatch.MatchName(fileName);
+                    if (string.IsNullOrEmpty(folderCid) || string.IsNullOrEmpty(truename))
                     {
-                        //查询文件cid下的字幕
-                        selectCommand = new SqliteCommand
-                            ($"SELECT pc,n FROM FilesInfo WHERE (ico == 'srt' OR ico == 'ass' OR ico == 'ssa') AND cid == '{folderCid}'", db);
+                        db.Close();
+                        return subDicts;
+                    }
 
-                        query = selectCommand.ExecuteReader();
-                        while (query.Read())
+                    var tuple = FileMatch.SpliteLeftAndRightFromCid(truename);
+                    string leftName = tuple.Item1.Replace("FC2", "FC");
+                    string rightNumber = tuple.Item2;
+
+                    //通过truename查询字幕文件
+                    selectCommand = new SqliteCommand
+                        ($"SELECT pc,n FROM FilesInfo WHERE (ico == 'srt' OR ico == 'ass' OR ico == 'ssa') AND n LIKE '%{leftName}%{rightNumber}%'", db);
+
+                    query = selectCommand.ExecuteReader();
+                    while (query.Read())
+                    {
+                        subDicts.Add(query["pc"] as string, query["n"] as string);
+                    }
+
+                }
+
+                //3.查询失败，从上一级文件夹的名称入手
+                if (subDicts.Count == 0)
+                {
+                    //查询文件cid下的字幕
+                    selectCommand = new SqliteCommand
+                        ($"SELECT pc,n FROM FilesInfo WHERE (ico == 'srt' OR ico == 'ass' OR ico == 'ssa') AND cid == '{folderCid}'", db);
+
+                    query = selectCommand.ExecuteReader();
+
+                    Dictionary<string, string> tmpDict = new();
+                    while (query.Read())
+                    {
+                        tmpDict.Add(query["pc"] as string, query["n"] as string);
+                    }
+
+                    if(!NameIsNumber)
+                    {
+                        subDicts = tmpDict;
+                    }
+                    else
+                    {
+                        foreach(var item in tmpDict)
                         {
-                            subDicts.Add(query["pc"] as string, query["n"] as string);
+                            Match match = Regex.Match(item.Value, $"(^|[^0-9]){fileNameWithoutExtension}($|[^0-9])");
+
+                            if(match.Success)
+                            {
+                                subDicts.Add(item.Key,item.Value);
+                            }
                         }
                     }
                 }
@@ -968,7 +1054,6 @@ namespace Data
 
             return subDicts;
         }
-
 
         /// <summary>
         /// 获取演员出演的视频信息（By TrueName）
@@ -1069,6 +1154,38 @@ namespace Data
                 while (query.Read())
                 {
                     data.Add(tryCovertQueryToDatum(query));
+                }
+
+                db.Close();
+            }
+
+            return data;
+        }
+
+        /// <summary>
+        /// 通过pickCode和ua获取下载记录
+        /// </summary>
+        /// <param name="cid"></param>
+        /// <returns></returns>
+        public static DownInfo GetDownHistoryBypcAndua(string picoCode, string ua)
+        {
+            DownInfo data = null;
+
+            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
+            using (SqliteConnection db =
+               new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    //($"SELECT n,cid,fid,vdi,pid FROM {TABLENAME} WHERE cid == {cid} or pid == {cid}", db);
+                    ($"SELECT * FROM DownHistory WHERE file_pickcode == '{picoCode}' and ua == '{ua}' LIMIT 1", db);
+
+                SqliteDataReader query = selectCommand.ExecuteReader();
+
+                while (query.Read())
+                {
+                    data = tryCovertQueryToDownHistory(query);
                 }
 
                 db.Close();
@@ -1407,6 +1524,26 @@ namespace Data
 
         }
 
+        /// <summary>
+        /// 添加数据库查询结果到DownInfo格式
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        private static DownInfo tryCovertQueryToDownHistory(SqliteDataReader query)
+        {
+            DownInfo downInfo = new();
+
+            if (query.FieldCount == 0) return downInfo;
+
+            downInfo.pickCode = query["file_pickcode"] as string;
+            downInfo.fileName = query["file_name"] as string;
+            downInfo.trueUrl = query["true_url"] as string;
+            downInfo.ua = query["ua"] as string;
+            downInfo.addTime = Convert.ToInt64(query["add_time"]);
+
+            return downInfo;
+
+        }
     }
 
 }

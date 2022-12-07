@@ -1603,4 +1603,34 @@ namespace Data
         public int ratingCount { get; set; }
         public int ratingValue { get; set; }
     }
+
+    //下载链接历史
+    public class DownInfo
+    {
+        public string pickCode { get; set; }
+        public string fileName { get; set; }
+        public string trueUrl { get; set; }
+        public string ua { get; set; }
+        public long addTime { get; set; } = DateTimeOffset.Now.ToUnixTimeSeconds();
+    }
+
+    //字幕文件信息
+    public class SubInfo
+    {
+        public string pickcode { get; set; }
+        public string name { get; set; }
+        public string fileBelongPickcode { get; set; }
+
+        public SubInfo(string pickcode, string name, string fileBelongPickcode)
+        {
+            this.pickcode = pickcode;
+            this.name = name;
+            this.fileBelongPickcode = fileBelongPickcode;
+        }
+
+        public SubInfo()
+        {
+
+        }
+    }
 }

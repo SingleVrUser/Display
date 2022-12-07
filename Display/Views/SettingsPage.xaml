@@ -2,6 +2,7 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:local="using:Display.Views"
+      xmlns:converter="using:Display.Converter"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:control="using:Display.Control"
@@ -51,10 +52,13 @@
 
         </Style>
         <DataTemplate x:Key="PivotHeaderTemplate">
-
         </DataTemplate>
+
+        <converter:BoolToVisiableConverter x:Key="BoolToVisiableConverter" />
+
     </Page.Resources>
     <Grid>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
@@ -78,18 +82,18 @@
         </StackPanel>
 
         <ScrollViewer Grid.Row="1">
-            <Grid
-              Margin="10,0"
-              Padding="5"
-              RowSpacing="5"
-              BorderThickness="0,1,0,0"
-              BorderBrush="{ThemeResource CircleElevationBorderBrush}">
-            <Grid.Resources>
-                <Style TargetType="TextBlock">
-                    <Setter Property="FontSize"
-                            Value="15" />
-                </Style>
-            </Grid.Resources>
+            <Grid Margin="10,0"
+                  Padding="5"
+                  RowSpacing="5"
+                  BorderThickness="0,1,0,0"
+                  BorderBrush="{ThemeResource CircleElevationBorderBrush}">
+                <Grid.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="FontSize"
+                                Value="15" />
+                    </Style>
+                </Grid.Resources>
+
                 <StackPanel Spacing="5">
                     <!--通用-->
                     <StackPanel Spacing="5">
@@ -119,6 +123,7 @@
                         <Expander Header="115"
                                   HorizontalContentAlignment="Stretch">
 
+
                             <StackPanel Padding="50,0"
                                         Spacing="10">
                                 <RelativePanel>
@@ -146,6 +151,39 @@
                                     <TextBlock Text="单次请求后等待" />
                                     <TextBlock Text="1s"
                                                RelativePanel.AlignRightWithPanel="True" />
+                                </RelativePanel>
+
+                                <RelativePanel>
+                                    <TextBlock Text="记录下载请求"
+                                               RelativePanel.AlignVerticalCenterWithPanel="True" />
+                                    <ToggleSwitch x:Name="IsRecordDownRequest_ToggleSwitch"
+                                                  OnContent="开启"
+                                                  OffContent="关闭"
+                                                  RelativePanel.AlignRightWithPanel="True"
+                                                  Margin="0,0,-70,0"
+                                                  IsOn="{x:Bind data:AppSettings.IsRecordDownRequest,Mode=TwoWay}" />
+                                </RelativePanel>
+
+                                <RelativePanel x:Name="RecordDownRequest_RelativePanel"
+                                               Visibility="{x:Bind IsRecordDownRequest_ToggleSwitch.IsOn,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}">
+                                    <TextBlock Text="下载链接失效时间"
+                                               RelativePanel.AlignVerticalCenterWithPanel="True" />
+
+                                    <TextBlock x:Name="OverdueTime_TextBlock"
+                                               Text="{x:Bind data:FileMatch.ConvertInt32ToDateStr(OverdueTime_NumberBox.Value) ,Mode=OneWay}"
+                                               RelativePanel.LeftOf="OverdueTime_NumberBox"
+                                               RelativePanel.AlignVerticalCenterWithPanel="True"
+                                               Margin="10,0"
+                                               Opacity="0.5" />
+
+                                    <NumberBox x:Name="OverdueTime_NumberBox"
+                                               SmallChange="60"
+                                               LargeChange="3600"
+                                               Minimum="0"
+                                               Value="{x:Bind data:AppSettings.DownUrlOverdueTime,Mode=TwoWay}"
+                                               ValueChanged="NumberBox_ValueChanged"
+                                               RelativePanel.AlignRightWithPanel="True" />
+
                                 </RelativePanel>
 
                             </StackPanel>
@@ -198,6 +236,20 @@
                                             Content="打开路径"
                                             RelativePanel.AlignRightWithPanel="True"
                                             Margin="3,0,0,0" />
+                                </RelativePanel>
+
+                                <RelativePanel Visibility="Visible">
+
+                                    <TextBlock x:Name="FindSubFile_Title"
+                                               RelativePanel.AlignVerticalCenterWithPanel="True"
+                                               Margin="0,0,10,0">加载字幕</TextBlock>
+
+                                    <ToggleSwitch x:Name="FindSubFile_ToggleSwitch"
+                                                  OnContent="启动"
+                                                  OffContent="关闭"
+                                                  IsOn="{x:Bind data:AppSettings.IsFindSub,Mode=TwoWay}"
+                                                  RelativePanel.AlignRightWithPanel="True"
+                                                  Margin="0,0,-70,0" />
                                 </RelativePanel>
 
                             </StackPanel>
@@ -388,8 +440,8 @@
                                                 Value="50,0" />
                                     </Style>
                                 </StackPanel.Resources>
-                                
-                                
+
+
                                 <RelativePanel>
                                     <TextBlock x:Name="Image_TextBlox"
                                                RelativePanel.AlignVerticalCenterWithPanel="True"
@@ -596,7 +648,7 @@
                 </StackPanel>
 
 
-        </Grid>
+            </Grid>
 
         </ScrollViewer>
 

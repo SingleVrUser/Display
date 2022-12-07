@@ -61,6 +61,7 @@
     <None Remove="ContentsPage\GetThumbnail.xaml" />
     <None Remove="ContentsPage\Import115DataToLocalDataAccess\InputCidManually.xaml" />
     <None Remove="ContentsPage\LoginPage.xaml" />
+    <None Remove="ContentsPage\SelectSingleSubFileToSelected.xaml" />
     <None Remove="ContentsPage\SelectSingleVideoToPlay.xaml" />
     <None Remove="ContentsPage\spiderVideoInfo.xaml" />
     <None Remove="ContentsPage\SpiderVideoInfo_ConditionalCheck.xaml" />
@@ -308,6 +309,9 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="ContentsPage\SelectSingleSubFileToSelected.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Control\ShowCountControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
