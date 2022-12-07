@@ -2,11 +2,13 @@
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Windows.Media;
 using Windows.Storage;
 
 namespace Data
@@ -212,14 +214,14 @@ namespace Data
         {
             var Files = GetAllFilesTraverse(cid);
             List<string> cidList = new();
-            foreach(var file in Files)
+            foreach (var file in Files)
             {
                 if (!cidList.Contains(file.cid))
                 {
                     cidList.Add(file.cid);
                 }
             }
-            foreach(var cidFolder in cidList)
+            foreach (var cidFolder in cidList)
             {
                 DeleteDirectoryAndFiles_InFilesInfoTable(cidFolder);
             }
@@ -273,7 +275,7 @@ namespace Data
         /// </summary>
         /// <param name="pickCode"></param>
         /// <param name="truename"></param>
-        public static void AddFileToInfo(string pickCode,string truename,bool issuccess= false,bool isReplace = false)
+        public static void AddFileToInfo(string pickCode, string truename, bool issuccess = false, bool isReplace = false)
         {
             using (SqliteConnection db =
               new SqliteConnection($"Filename={dbpath}"))
@@ -284,12 +286,12 @@ namespace Data
                 insertCommand.Connection = db;
 
                 //唯一值（pc）重复 则代替 （replace）
-                string replaceStr = isReplace ? " OR REPLACE":string.Empty;
+                string replaceStr = isReplace ? " OR REPLACE" : string.Empty;
                 insertCommand.CommandText = $"INSERT{replaceStr} INTO FileToInfo VALUES (@file_pickcode,@truename,@issuccess);";
 
                 insertCommand.Parameters.AddWithValue("@file_pickcode", pickCode);
 
-                if(truename == null)
+                if (truename == null)
                 {
                     truename = string.Empty;
                 }
@@ -300,7 +302,7 @@ namespace Data
                 {
                     insertCommand.ExecuteReader();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Debug.WriteLine(e.Message);
                 }
@@ -314,7 +316,7 @@ namespace Data
         /// </summary>
         /// <param name="truename"></param>
         /// <param name="isSuccess"></param>
-        public static void UpdataFileToInfo(string truename,bool isSuccess)
+        public static void UpdataFileToInfo(string truename, bool isSuccess)
         {
             using (SqliteConnection db =
               new SqliteConnection($"Filename={dbpath}"))
@@ -454,7 +456,7 @@ namespace Data
         /// 查询失败列表
         /// </summary>
         /// <returns></returns>
-        public static async Task<List<Datum>> LoadFailFileInfo(int offset = 0,int limit = -1,string n = "")
+        public static async Task<List<Datum>> LoadFailFileInfo(int offset = 0, int limit = -1, string n = "")
         {
             List<Datum> data = new List<Datum>();
 
@@ -466,7 +468,7 @@ namespace Data
 
                 if (n.Contains("'"))
                 {
-                    n = n.Replace("'","%");
+                    n = n.Replace("'", "%");
                 }
 
                 string queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n}%'";
@@ -645,12 +647,14 @@ namespace Data
             return imagePath;
         }
 
+
+
         /// <summary>
         /// 加载已存在的videoInfo数据
         /// </summary>
         /// <param name="limit"></param>
         /// <returns></returns>
-        public static List<VideoInfo> LoadAllVideoInfo(int limit = 1,int offset = 0)
+        public static List<VideoInfo> LoadAllVideoInfo(int limit = 1, int offset = 0)
         {
             List<VideoInfo> data = new List<VideoInfo>();
 
@@ -683,7 +687,7 @@ namespace Data
         /// </summary>
         /// <param name="limit"></param>
         /// <returns></returns>
-        public static string GetLastestFolderPid(string pickCode,int timeEdit = 0)
+        public static string GetLastestFolderPid(string pickCode, int timeEdit = 0)
         {
             string pid = String.Empty;
 
@@ -707,7 +711,7 @@ namespace Data
 
                 while (query.Read())
                 {
-                    if(query.FieldCount != 0)
+                    if (query.FieldCount != 0)
                     {
                         pid = query["pid"] as string;
                         break;
@@ -886,6 +890,87 @@ namespace Data
         }
 
         /// <summary>
+        /// 查询PickCode文件对应的字幕文件（首先匹配文件名，其次匹配上一级文件夹的名称）
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<string,string> FindSubFile(string file_pickCode)
+        {
+            Dictionary<string, string>  subDicts = new();
+            using (SqliteConnection db =
+                new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                //查询文件名和对应的id
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"SELECT FilesInfo.cid, FileToInfo.truename FROM FilesInfo ,FileToInfo WHERE FileToInfo.file_pickcode == FilesInfo.pc AND FileToInfo.file_pickcode == '{file_pickCode}' LIMIT 1", db);
+
+                SqliteDataReader query = selectCommand.ExecuteReader();
+                query.Read();
+
+
+                string folderCid=null;
+                string truename = null;
+
+                if (query.HasRows)
+                {
+                    folderCid = query["cid"] as string;
+                    truename = query["truename"] as string;
+                }
+                else
+                {
+
+                }
+
+                query.Close();
+
+                if (string.IsNullOrEmpty(folderCid) || string.IsNullOrEmpty(truename))
+                    return subDicts;
+
+                var tuple = FileMatch.SpliteLeftAndRightFromCid(truename);
+                string leftName = tuple.Item1.Replace("FC2", "FC");
+                string rightNumber = tuple.Item2;
+
+                //先通过truename查询字幕文件
+                selectCommand = new SqliteCommand
+                    ($"SELECT pc,n FROM FilesInfo WHERE (ico == 'srt' OR ico == 'ass' OR ico == 'ssa') AND n LIKE '%{leftName}%{rightNumber}%'", db);
+
+                query = selectCommand.ExecuteReader();
+                while(query.Read())
+                {
+                    subDicts.Add(query["pc"] as string, query["n"] as string);
+                }
+
+                //查询失败，从上一级文件夹的名称入手
+                if(subDicts.Count == 0)
+                {
+                    //查询上一级文件夹的信息
+                    var FolderDatum = DataAccess.getUpperLevelFolderCid(folderCid);
+
+                    //文件夹名称是否和truename对应
+                    Match match = Regex.Match(FolderDatum.n, $"[~a-z]{leftName}.{1,2}{rightNumber}[~0-9]",RegexOptions.IgnoreCase);
+                    if (match.Success)
+                    {
+                        //查询文件cid下的字幕
+                        selectCommand = new SqliteCommand
+                            ($"SELECT pc,n FROM FilesInfo WHERE (ico == 'srt' OR ico == 'ass' OR ico == 'ssa') AND cid == '{folderCid}'", db);
+
+                        query = selectCommand.ExecuteReader();
+                        while (query.Read())
+                        {
+                            subDicts.Add(query["pc"] as string, query["n"] as string);
+                        }
+                    }
+                }
+
+                db.Close();
+            }
+
+            return subDicts;
+        }
+
+
+        /// <summary>
         /// 获取演员出演的视频信息（By TrueName）
         /// </summary>
         /// <param name="actorName"></param>
@@ -909,7 +994,7 @@ namespace Data
 
                 //vdi = 0，即视频转码未成功，无法在线观看
                 //selectCommand = new SqliteCommand ($"SELECT * from FilesInfo WHERE uid != 0 AND vdi != 0 AND n LIKE '%{leftName}%{rightNumber}%'", db);
-                selectCommand = new SqliteCommand ($"SELECT * from FilesInfo WHERE uid != 0 AND iv = 1 AND n LIKE '%{leftName}%{rightNumber}%'", db);
+                selectCommand = new SqliteCommand($"SELECT * from FilesInfo WHERE uid != 0 AND iv = 1 AND n LIKE '%{leftName}%{rightNumber}%'", db);
 
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
@@ -1004,10 +1089,10 @@ namespace Data
             foreach (var currentFile in dataList)
             {
                 //文件夹
-                if(currentFile.fid == "")
+                if (currentFile.fid == "")
                 {
                     List<Datum> newDataList = GetListByCid(currentFile.cid);
-                    newData.AddRange( GetAllFilesInFolderList(newDataList));
+                    newData.AddRange(GetAllFilesInFolderList(newDataList));
                 }
             }
 
@@ -1024,7 +1109,7 @@ namespace Data
         /// <returns></returns>
         public static List<Datum> GetAllFilesTraverse(string cid, List<Datum> AllDatumList = null)
         {
-            if(AllDatumList == null)
+            if (AllDatumList == null)
             {
                 AllDatumList = new List<Datum>();
             }
@@ -1032,10 +1117,10 @@ namespace Data
             List<Datum> datumList = GetListByCid(cid);
             AllDatumList.AddRange(datumList);
 
-            foreach(Datum datum in datumList)
+            foreach (Datum datum in datumList)
             {
                 //文件夹
-                if(datum.fid == "")
+                if (datum.fid == "")
                 {
                     AllDatumList = GetAllFilesTraverse(datum.cid, AllDatumList);
                 }
@@ -1236,7 +1321,7 @@ namespace Data
 
                 if (upperLevelFolderInfo.pid == "0")
                 {
-                    ForlderToRootList.Add(new Datum() { cid = "0" , n="根目录"});
+                    ForlderToRootList.Add(new Datum() { cid = "0", n = "根目录" });
                     break;
                 }
             }

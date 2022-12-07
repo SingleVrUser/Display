@@ -178,14 +178,7 @@ namespace Display.Views
 
         private async void ImageSavePath_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            FolderPicker folderPicker = new();
-            folderPicker.FileTypeFilter.Add("*");
-            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.AppMainWindow);
-            folderPicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
-
-            WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hwnd);
-
-            var folder = await folderPicker.PickSingleFolderAsync();
+            var folder = await OpenFolder(PickerLocationId.PicturesLibrary);
 
             if (folder != null)
             {
@@ -245,14 +238,7 @@ namespace Display.Views
 
         private async void ActorInfoSavePath_Click(object sender, RoutedEventArgs e)
         {
-            FolderPicker folderPicker = new();
-            folderPicker.FileTypeFilter.Add("*");
-            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.AppMainWindow);
-            folderPicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
-
-            WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hwnd);
-
-            var folder = await folderPicker.PickSingleFolderAsync();
+            var folder = await OpenFolder(PickerLocationId.PicturesLibrary);
 
             if (folder != null)
             {
@@ -270,10 +256,43 @@ namespace Display.Views
             }
         }
 
+
+        private async void SubSavePath_Click(object sender, RoutedEventArgs e)
+        {
+            var folder = await OpenFolder(PickerLocationId.PicturesLibrary);
+
+            if (folder != null)
+            {
+                if (folder.Path == AppSettings.Sub_SavePath)
+                {
+                    ShowTeachingTip("选择目录与原目录相同，未修改");
+                }
+                else
+                {
+                    SubSavePath_TextBox.Text = folder.Path;
+                    AppSettings.Sub_SavePath = folder.Path;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 打开字幕文件的存放路径
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SubOpenPath_Click(object sender, RoutedEventArgs e)
+        {
+            FileMatch.LaunchFolder(AppSettings.Sub_SavePath);
+        }
+
+        /// <summary>
+        /// 打开演员信息存放路径
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ActorInfoOpenPath_Click(object sender, RoutedEventArgs e)
         {
-            string ActorInfoPath = AppSettings.ActorInfo_SavePath;
-            FileMatch.LaunchFolder(ActorInfoPath);
+            FileMatch.LaunchFolder(AppSettings.ActorInfo_SavePath);
         }
 
         /// <summary>
@@ -283,8 +302,7 @@ namespace Display.Views
         /// <param name="e"></param>
         private void ImageOpenPath_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            string ImagePath = AppSettings.Image_SavePath;
-            FileMatch.LaunchFolder(ImagePath);
+            FileMatch.LaunchFolder(AppSettings.Image_SavePath);
         }
 
         /// <summary>
@@ -881,5 +899,17 @@ namespace Display.Views
             BitCometSavePath_TextBox.Text = null;
         }
 
+        public async static Task<StorageFolder> OpenFolder(PickerLocationId SuggestedStartLocation)
+        {
+            FolderPicker folderPicker = new();
+            folderPicker.FileTypeFilter.Add("*");
+            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.AppMainWindow);
+            folderPicker.SuggestedStartLocation = SuggestedStartLocation;
+
+            WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hwnd);
+
+            return await folderPicker.PickSingleFolderAsync();
+
+        }
     }
 }

@@ -891,7 +891,7 @@ namespace Display.ContentsPage
             string actorName = ShoeActorName.Text;
             string savePath = Path.Combine(AppSettings.ActorInfo_SavePath, actorName);
 
-            //string imageFullPath =  await GetInfoFromNetwork.downloadImage(imageUrl, savePath, "face",true);
+            //string imageFullPath =  await GetInfoFromNetwork.downloadFile(imageUrl, savePath, "face",true);
 
             foreach(var item in actorinfo)
             {

@@ -157,6 +157,27 @@ public class AppSettings
     }
 
     /// <summary>
+    /// 字幕保存地址
+    /// </summary>
+    public static string Sub_SavePath
+    {
+        get
+        {
+            string savePath = localSettings.Values["SubSave_Path"] as string;
+            if (string.IsNullOrEmpty(savePath))
+            {
+                savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "Sub");
+                FileMatch.CreateDirectoryIfNotExists(savePath);
+            }
+            return savePath;
+        }
+        set
+        {
+            localSettings.Values["SubSave_Path"] = value;
+        }
+    }
+
+    /// <summary>
     /// 图片保存地址
     /// </summary>
     public static string ActorInfo_SavePath

@@ -382,7 +382,15 @@
                         <!--保存路径-->
                         <Expander Header="保存路径">
                             <StackPanel Spacing="5">
-                                <RelativePanel Padding="50,0">
+                                <StackPanel.Resources>
+                                    <Style TargetType="RelativePanel">
+                                        <Setter Property="Padding"
+                                                Value="50,0" />
+                                    </Style>
+                                </StackPanel.Resources>
+                                
+                                
+                                <RelativePanel>
                                     <TextBlock x:Name="Image_TextBlox"
                                                RelativePanel.AlignVerticalCenterWithPanel="True"
                                                Margin="0,0,10,0">图片</TextBlock>
@@ -400,7 +408,7 @@
                                             Margin="3,0,0,0" />
                                 </RelativePanel>
 
-                                <RelativePanel Padding="50,0">
+                                <RelativePanel>
                                     <TextBlock x:Name="DataAccess_TextBlox"
                                                RelativePanel.AlignVerticalCenterWithPanel="True"
                                                Margin="0,0,10,0">数据</TextBlock>
@@ -417,7 +425,7 @@
                                             Margin="3,0,0,0" />
                                 </RelativePanel>
 
-                                <RelativePanel Padding="50,0">
+                                <RelativePanel>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock x:Name="ActorInfo_TextBlox"
                                                    VerticalAlignment="Center"
@@ -436,6 +444,29 @@
                                             RelativePanel.AlignRightWithPanel="True"
                                             Margin="3,0,0,0" />
                                 </RelativePanel>
+
+
+                                <RelativePanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock x:Name="Sub_TextBlox"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,10,0">字幕文件</TextBlock>
+                                        <TextBox x:Name="SubSavePath_TextBox"
+                                                 Width="570"
+                                                 Text="{x:Bind data:AppSettings.Sub_SavePath}" />
+                                    </StackPanel>
+
+                                    <Button Click="SubSavePath_Click"
+                                            Content="修改"
+                                            RelativePanel.LeftOf="SubOpenPath" />
+                                    <Button x:Name="SubOpenPath"
+                                            Click="SubOpenPath_Click"
+                                            Content="打开路径"
+                                            RelativePanel.AlignRightWithPanel="True"
+                                            Margin="3,0,0,0" />
+                                </RelativePanel>
+
+
                             </StackPanel>
                         </Expander>
 
