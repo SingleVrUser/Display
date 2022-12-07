@@ -397,7 +397,7 @@ public class AppSettings
             var thumbnialOrigin = localSettings.Values["thumbnialOrigin"];
             if (thumbnialOrigin == null)
             {
-                return (int)Origin.Local;
+                return (int)Origin.Web;
             }
             else
             {
