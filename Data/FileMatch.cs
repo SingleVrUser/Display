@@ -367,6 +367,10 @@ namespace Data
             foreach (var cookies in cookiesList)
             {
                 var item = cookies.Split('=');
+
+                if (item.Length != 2)
+                    continue;
+
                 string key = item[0].Trim();
                 string value = item[1].Trim();
                 switch (key)
