@@ -1,20 +1,12 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using Windows.Media;
 using Windows.Storage;
-using Windows.Storage.Pickers;
 using Windows.System;
 
 namespace Data
@@ -271,6 +263,9 @@ namespace Data
 
         public static string ConvertInt32ToDateStr(double Second)
         {
+            if (Second is double.NaN)
+                return Second.ToString();
+
             string formatStr;
 
             if (Second < 60)
@@ -278,7 +273,7 @@ namespace Data
                 formatStr = "ss'秒'";
             }
             else if (Second < 3600)
-            {
+            {   
                 formatStr = "mm'分'ss'秒'";
             }
             else if (Second < 86400)

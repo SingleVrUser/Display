@@ -1,25 +1,22 @@
-﻿using Newtonsoft.Json;
+﻿using HtmlAgilityPack;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Storage;
-using Microsoft.Toolkit.Uwp.Notifications;
-using System.Text.RegularExpressions;
-using System.Diagnostics;
-using RestSharp;
-using Windows.UI.Notifications;
-using HtmlAgilityPack;
-using Windows.Media.Ocr;
-using Windows.Media.Protection.PlayReady;
-using System.IO;
 using System.Web;
+using Windows.Storage;
 using OpenCvSharp;
 
 namespace Data
@@ -49,9 +46,7 @@ namespace Data
         /// </summary>
         public void InitializeInternet()
         {
-            var handler = new HttpClientHandler { UseCookies = false };
-            Client = new HttpClient(handler);
-            Client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0");
+            Client = GetInfoFromNetwork.CreateClient(new() { { "user-agent", GetInfoFromNetwork.BrowserUserAgent} });
 
             var cookie = AppSettings._115_Cookie;
 
@@ -617,12 +612,12 @@ namespace Data
             //BitComet支持文件和文件夹
             else if (downType == downType.bc)
             {
-                success = await RequestDownByBitComet(videoInfoList, save_path: savePath, topFolderName: topFolderName);
+                success = await RequestDownByBitComet(videoInfoList,GetInfoFromNetwork.DesktopUserAgent, save_path: savePath, topFolderName: topFolderName);
             }
             //Arai2也支持文件和文件夹
             else if (downType == downType.aria2)
             {
-                success = await RequestDownByAria2(videoInfoList, save_path: savePath, topFolderName: topFolderName);
+                success = await RequestDownByAria2(videoInfoList, GetInfoFromNetwork.DesktopUserAgent, save_path: savePath, topFolderName: topFolderName);
             }
 
             return success;
@@ -697,7 +692,7 @@ namespace Data
         /// </summary>
         /// <param name="videoInfoList"></param>
         /// <returns></returns>
-        async Task<bool> RequestDownByBitComet(List<Datum> videoInfoList, string save_path, string ua= "Mozilla/5.0; 115Desktop/2.0.1.7", string topFolderName = null)
+        async Task<bool> RequestDownByBitComet(List<Datum> videoInfoList, string ua, string save_path, string topFolderName = null)
         {
             bool success=true;
 
@@ -757,7 +752,7 @@ namespace Data
         /// </summary>
         /// <param name="videoInfoList"></param>
         /// <returns></returns>
-        async Task<bool> RequestDownByAria2(List<Datum> videoInfoList, string save_path, string ua = "Mozilla/5.0; 115Desktop/2.0.1.7", string topFolderName = null)
+        async Task<bool> RequestDownByAria2(List<Datum> videoInfoList, string ua, string save_path, string topFolderName = null)
         {
             var Aria2Settings = AppSettings.Aria2Settings;
 
@@ -1123,9 +1118,30 @@ namespace Data
         /// </summary>
         /// <param name="pickcode"></param>
         /// <returns></returns>
-        public Dictionary<string,string> GetDownUrl(string pickcode,string ua= "Mozilla/5.0; 115Desktop/2.0.1.7")
+        public Dictionary<string,string> GetDownUrl(string pickcode,string ua)
         {
             Dictionary<string, string> downUrlList = new();
+
+            if(AppSettings.IsRecordDownRequest)
+            {
+                var downHistory = DataAccess.GetDownHistoryBypcAndua(pickcode, ua);
+                //查看之前是否已请求
+                if (downHistory != null)
+                {
+                    if (downHistory.pickCode == pickcode && downHistory.ua == ua)
+                    {
+                        var nowData = DateTimeOffset.Now.ToUnixTimeSeconds();
+
+                        if (nowData - downHistory.addTime < AppSettings.DownUrlOverdueTime)
+                        {
+                            downUrlList.Add(downHistory.fileName, downHistory.trueUrl);
+
+                            return downUrlList;
+                        }
+                    }
+                }
+            }
+
             long tm = DateTimeOffset.Now.ToUnixTimeSeconds();
             string src = $"{{\"pickcode\":\"{pickcode}\"}}";
             var item = m115.encode(src, tm);
@@ -1186,9 +1202,16 @@ namespace Data
                         {
                             var downUrl = videoInfo["url"]?["url"].ToString();
                             downUrlList.Add(videoInfo["file_name"].ToString(), downUrl);
+                            break;
                         }
 
                     }
+                }
+
+                //需要记录下载地址且成功获取到地址
+                if (AppSettings.IsRecordDownRequest && downUrlList.Count > 0)
+                {
+                    DataAccess.AddDownHistory(new DownInfo() { pickCode = pickcode, ua = ua, fileName = downUrlList.First().Key, trueUrl = downUrlList.First().Value });
                 }
             }
 
@@ -1203,10 +1226,9 @@ namespace Data
         /// <param name="showWindow"></param>
         /// <param name="referrerUrl"></param>
         /// <param name="user_agnet"></param>
-        public static void Play115SourceVideoWithPotPlayer(string playUrl, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string user_agnet = "Mozilla/5.0; 115Desktop/2.0.1.7", string subFile = null)
+        public static void Play115SourceVideoWithPotPlayer(string playUrl, string user_agnet, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string subFile = null)
         {
             var process = new Process();
-
 
             string addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty : @$" /sub=""{subFile}""";
 
@@ -1317,7 +1339,7 @@ namespace Data
         /// <param name="showWindow"></param>
         /// <param name="referrerUrl"></param>
         /// <param name="user_agnet"></param>
-        public void Play115SourceVideoWithMpv(string playUrl, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string user_agnet = "Mozilla/5.0; 115Desktop/2.0.1.7",string title=null,string subFile=null)
+        public void Play115SourceVideoWithMpv(string playUrl, string user_agnet, string FileName, bool showWindow = true, string referrerUrl = "https://115.com",string title=null,string subFile=null)
         {
             var process = new Process();
             
@@ -1357,7 +1379,7 @@ namespace Data
         /// <param name="showWindow"></param>
         /// <param name="referrerUrl"></param>
         /// <param name="user_agnet"></param>
-        public static void Play115SourceVideoWithVlc(string playUrl, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string user_agnet = "Mozilla/5.0; 115Desktop/2.0.1.7",string title=null, string subFile = null)
+        public static void Play115SourceVideoWithVlc(string playUrl, string user_agnet, string FileName, bool showWindow = true, string referrerUrl = "https://115.com",string title=null, string subFile = null)
         {
             var process = new Process();
 
@@ -1410,27 +1432,27 @@ namespace Data
         /// 原画播放
         /// </summary>
         /// <param name="pickcode"></param>
-        public async void PlayVideoWithOriginUrl(string pickcode ,playMethod playMethod,string subFilePickCode, string subFileName)
+        public async void PlayVideoWithOriginUrl(string pickcode ,playMethod playMethod, XamlRoot xamlRoot, SubInfo subInfo=null)
         {
             //播放路径检查选择
             string savePath = string.Empty;
             string ua = string.Empty;
             string downUrl;
-            string subFile;
+            string subFile = null;
 
             switch (playMethod)
             {
                 case playMethod.pot:
                     savePath = AppSettings.PotPlayerExePath;
-                    ua = "Mozilla/5.0; Windows NT/10.0.19044; 115Desktop/2.0.1.7";
+                    ua = GetInfoFromNetwork.DesktopUserAgent;
                     break;
                 case playMethod.mpv:
                     savePath = AppSettings.MpvExePath;
-                    ua = "Mozilla/5.0; Windows NT/10.0.19044; 115Desktop/2.0.1.7";
+                    ua = GetInfoFromNetwork.DesktopUserAgent;
                     break;
                 case playMethod.vlc:
                     savePath = AppSettings.VlcExePath;
-                    ua = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36 115Browser/8.3.0";
+                    ua = GetInfoFromNetwork.BrowserUserAgent;
                     //ua = "Mozilla/5.0; Windows NT/10.0.19044; 115Desktop/2.0.1.7";
                     //ua = "VLC/3.0.12.1 LibVLC/3.0.12.1";
                     //ua = "nPlayer/3.0";
@@ -1439,7 +1461,22 @@ namespace Data
             }
 
             if (string.IsNullOrEmpty(savePath))
-                return;
+            {
+                ContentDialog dialog = new ContentDialog()
+                {
+                    XamlRoot = xamlRoot,
+                    Title = "播放失败",
+                    CloseButtonText = "返回",
+                    DefaultButton = ContentDialogButton.Close,
+                    Content = "未设置播放器程序路径，请到设置中设置"
+                };
+
+                await dialog.ShowAsync();
+
+            }
+
+            if (AppSettings.IsFindSub && subInfo!= null)
+                subFile = await TryDownSubFile(subInfo);
 
             switch (playMethod)
             {
@@ -1448,8 +1485,7 @@ namespace Data
                     if (downUrlList.Count == 0) return;
 
                     downUrl = downUrlList.First().Value;
-                    subFile = await TryDownSubFile(subFilePickCode, subFileName, ua);
-                    Play115SourceVideoWithPotPlayer(downUrl, savePath, false, user_agnet: ua, subFile: subFile);
+                    Play115SourceVideoWithPotPlayer(downUrl, user_agnet: ua, savePath, false, subFile: subFile);
                     break;
                 case playMethod.mpv:
                     downUrlList = GetDownUrl(pickcode,ua);
@@ -1457,8 +1493,7 @@ namespace Data
 
 
                     downUrl = downUrlList.First().Value;
-                    subFile = await TryDownSubFile(subFilePickCode, subFileName, ua);
-                    Play115SourceVideoWithMpv(downUrl, savePath, false,user_agnet:ua, title: downUrlList.First().Key, subFile: subFile);
+                    Play115SourceVideoWithMpv(downUrl, user_agnet: ua, savePath, false, title: downUrlList.First().Key, subFile: subFile);
                     break;
                 case playMethod.vlc:
                     //vlc不支持带“; ”的user-agent
@@ -1466,14 +1501,19 @@ namespace Data
                     if (downUrlList.Count == 0) return;
 
                     downUrl = downUrlList.First().Value;
-                    subFile = await TryDownSubFile(subFilePickCode, subFileName, ua);
-                    Play115SourceVideoWithVlc(downUrl, savePath, false, user_agnet: ua,title:downUrlList.First().Key, subFile: subFile);
+                    Play115SourceVideoWithVlc(downUrl, user_agnet: ua, savePath, false,title:downUrlList.First().Key, subFile: subFile);
                     break;
             }
         }
 
-        private async Task<string> TryDownSubFile(string pickCode,string fileName, string ua)
+        private async Task<string> TryDownSubFile(SubInfo subInfo)
         {
+            string pickCode = subInfo.pickcode;
+            string fileName = subInfo.name;
+
+            //为预防字幕文件没有具体名称，只有数字，更改字幕文件名为 pickCode+字幕文件名
+            fileName = $"{pickCode}_{fileName}";
+
             if (!string.IsNullOrEmpty(pickCode))
             {
                 var Sub_SavePath = AppSettings.Sub_SavePath;
@@ -1482,6 +1522,8 @@ namespace Data
                 //已存在
                 if (File.Exists(subFile))
                     return subFile;
+
+                string ua = GetInfoFromNetwork.BrowserUserAgent;
 
                 //不存在则获取下载链接并下载
                 var subUrlList = GetDownUrl(pickCode, ua);
@@ -1492,7 +1534,7 @@ namespace Data
 
                 var sub_Url = subUrlList.First().Value;
 
-                subFile = await GetInfoFromNetwork.downloadFile(sub_Url, Sub_SavePath, fileName, false,new Dictionary<string, string>
+                subFile = await GetInfoFromNetwork.downloadFile(sub_Url, Sub_SavePath, fileName, false,new()
                 {
                     {"user-agent", ua }
                 });

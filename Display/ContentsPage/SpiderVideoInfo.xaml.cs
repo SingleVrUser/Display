@@ -643,7 +643,7 @@ namespace Display.ContentsPage
         {
             if(SelectedDatum== null) return;
 
-            Views.DetailInfoPage.PlayeVideo(SelectedDatum.pc);
+            Views.DetailInfoPage.PlayeVideo(SelectedDatum.pc, this.XamlRoot);
 
             
         }

@@ -1,4 +1,5 @@
 ﻿using Data;
+using Display.ContentsPage;
 using Display.Control;
 using LiveChartsCore.Drawing;
 using Microsoft.UI.Xaml;
@@ -141,7 +142,7 @@ namespace Display.Views
             //一集
             else if (videoInfoList.Count == 1)
             {
-                PlayeVideo(videoInfoList[0].pc);
+                PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
             }
 
             //有多集
@@ -156,7 +157,7 @@ namespace Display.Views
                 multisetList = multisetList.OrderBy(item => item.n).ToList();
 
                 ContentsPage.SelectSingleVideoToPlay newPage = new ContentsPage.SelectSingleVideoToPlay(multisetList);
-                newPage.ContentListView.ItemClick += ContentListView_ItemClick;
+                newPage.ContentListView.ItemClick += VideoInfoListView_ItemClick;
 
                 VideoPlayButton.Flyout = new Flyout()
                 {
@@ -165,31 +166,81 @@ namespace Display.Views
             }
         }
 
-        private void ContentListView_ItemClick(object sender, ItemClickEventArgs e)
+        private void VideoInfoListView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var SingleVideoInfo = e.ClickedItem as Data.Datum;
-            PlayeVideo(SingleVideoInfo.pc);
+            PlayeVideo(SingleVideoInfo.pc,this.XamlRoot);
         }
 
-        public static void PlayeVideo(string pickCode)
+        private static void SubInfoListView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            string subFilePickCode = string.Empty;
-            string subFileName = string.Empty;
+            var SingleVideoInfo = e.ClickedItem as Data.SubInfo;
+
+            PlayeVideo(SingleVideoInfo.fileBelongPickcode, subInfo:SingleVideoInfo);
+        }
+
+        public async static void PlayeVideo(string pickCode,XamlRoot xamlRoot=null, SubInfo subInfo=null)
+        {
+            //115Cookie未空
+            if (string.IsNullOrEmpty(AppSettings._115_Cookie) && xamlRoot!=null)
+            {
+                ContentDialog dialog = new ContentDialog()
+                {
+                    XamlRoot = xamlRoot,
+                    Title = "播放失败",
+                    CloseButtonText = "返回",
+                    DefaultButton = ContentDialogButton.Close,
+                    Content = "115未登录，无法播放视频，请先登录"
+                };
+
+                await dialog.ShowAsync();
+            }
 
             //是否需要加载字幕
-            if (AppSettings.IsFindSub)
+            if (AppSettings.IsFindSub && subInfo == null)
             {
                 var subDict = DataAccess.FindSubFile(pickCode);
-
+                
                 if (subDict.Count == 1)
                 {
-                    subFilePickCode = subDict.First().Key.ToString();
-                    subFileName = subDict.First().Value.ToString();
+                    string subFilePickCode = subDict.First().Key.ToString();
+                    string subFileName = subDict.First().Value.ToString();
+                    subInfo = new(subFilePickCode,subFileName,pickCode);
                 }
                 //TODO 多字幕文件选择
-                else if(subDict.Count > 1)
+                else if(subDict.Count > 1 && xamlRoot!=null)
                 {
+                    List<SubInfo> subInfos = new();
+                    subDict.ToList().ForEach(item => subInfos.Add(new(item.Key, item.Value, pickCode)));
 
+                    //按名称排序
+                    subInfos = subInfos.OrderBy(item => item.name).ToList();
+
+                    ContentsPage.SelectSingleSubFileToSelected newPage = new(subInfos);
+                    newPage.ContentListView.ItemClick += SubInfoListView_ItemClick; ;
+
+                    ContentDialog dialog = new();
+                    dialog.XamlRoot = xamlRoot;
+                    dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
+                    dialog.Title = "选择字幕";
+                    dialog.PrimaryButtonText = "直接播放";
+                    dialog.CloseButtonText = "返回";
+                    dialog.Content = newPage;
+                    dialog.DefaultButton = ContentDialogButton.Close;
+
+                    var result = await dialog.ShowAsync();
+
+                    //返回
+                    switch (result)
+                    {
+                        //直接播放
+                        case ContentDialogResult.Primary:
+
+                            break;
+
+                        default:
+                            return;
+                    }
                 }
             }
 
@@ -203,21 +254,23 @@ namespace Display.Views
                 //PotPlayer播放
                 case 1:
                     WebApi webapi = new();
-                    webapi.PlayVideoWithOriginUrl(pickCode, playMethod.pot, subFilePickCode, subFileName);
+                    webapi.PlayVideoWithOriginUrl(pickCode, playMethod.pot, xamlRoot,subInfo);
                     break;
                 //mpv播放
                 case 2:
                     webapi = new();
-                    webapi.PlayVideoWithOriginUrl(pickCode,playMethod.mpv, subFilePickCode, subFileName);
+                    webapi.PlayVideoWithOriginUrl(pickCode,playMethod.mpv, xamlRoot, subInfo);
                     break;
                 //vlc播放
                 case 3:
                     webapi = new();
-                    webapi.PlayVideoWithOriginUrl(pickCode, playMethod.vlc, subFilePickCode, subFileName);
+                    webapi.PlayVideoWithOriginUrl(pickCode, playMethod.vlc, xamlRoot, subInfo);
                     break;
 
             }
         }
+
+
         /// <summary>
         /// 点击了删除键
         /// </summary>
@@ -284,7 +337,7 @@ namespace Display.Views
             //一集
             else if (videoInfoList.Count == 1)
             {
-                PlayeVideo(videoInfoList[0].pc);
+                PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
             }
 
             //有多集
@@ -299,7 +352,7 @@ namespace Display.Views
                 multisetList = multisetList.OrderBy(item => item.n).ToList();
 
                 ContentsPage.SelectSingleVideoToPlay newPage = new ContentsPage.SelectSingleVideoToPlay(multisetList);
-                newPage.ContentListView.ItemClick += ContentListView_ItemClick;
+                newPage.ContentListView.ItemClick += VideoInfoListView_ItemClick;
 
                 ContentDialog dialog = new();
                 dialog.XamlRoot = this.XamlRoot;

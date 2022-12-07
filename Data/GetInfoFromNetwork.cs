@@ -18,14 +18,30 @@ namespace Data
         private HttpClient Client;
         private HttpClient ClientWithJavDBCookie;
 
-        private string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0";
+        public static string BrowserUserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36 115Browser/8.3.0";
+        public static string DesktopUserAgent = "Mozilla/5.0; Windows NT/10.0.19044; 115Desktop/2.0.1.7";
 
         public GetInfoFromNetwork()
         {
-            Client = new HttpClient();
+            Client = CreateClient(new() { { "user-agent", BrowserUserAgent } });
+        }
+
+        public static HttpClient CreateClient(Dictionary<string, string> headers)
+        {
+            if (headers == null || headers.Count == 0)
+            {
+                return new HttpClient();
+            }
+
             var handler = new HttpClientHandler { UseCookies = false };
-            Client = new HttpClient(handler);
-            Client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0");
+            var Client = new HttpClient(handler);
+
+            foreach (var header in headers)
+            {
+                Client.DefaultRequestHeaders.Add(header.Key, header.Value);
+            }
+
+            return Client;
         }
 
         public static string UrlCombine(string uri1, string uri2)
@@ -49,7 +65,7 @@ namespace Data
             {
                 resp = await Client.GetAsync(checkUrl);
             }
-            catch(HttpRequestException)
+            catch (HttpRequestException)
             {
                 isUseful = false;
             }
@@ -95,7 +111,7 @@ namespace Data
             if (Client == null)
             {
                 Client = CreateClient(new Dictionary<string, string>() {
-                        {"user-agent" ,DefaultUserAgent}
+                        {"user-agent" ,BrowserUserAgent}
                     });
             }
             string strResult = await RequestHelper.RequestHtml(Client, url);
@@ -112,7 +128,7 @@ namespace Data
             videoInfo.truename = CID;
 
             var titleNode = htmlDoc.DocumentNode.SelectSingleNode("//h1");
-            if(titleNode!=null)
+            if (titleNode != null)
                 videoInfo.title = titleNode.InnerText.Trim();
 
             var keyNodes = htmlDoc.DocumentNode.SelectNodes("//div[@class='col-md-4']/dl/dt");
@@ -161,7 +177,7 @@ namespace Data
 
             return videoInfo;
         }
-        
+
         /// <summary>
         /// 从javbus中搜索影片信息
         /// </summary>
@@ -182,7 +198,7 @@ namespace Data
             if (Client == null)
             {
                 Client = CreateClient(new Dictionary<string, string>() {
-                        {"user-agent" ,DefaultUserAgent}
+                        {"user-agent" ,BrowserUserAgent}
                     });
             }
 
@@ -226,7 +242,7 @@ namespace Data
                 }
                 else if (header == "長度:")
                 {
-                    videoInfo.lengthtime = AttributeNode.LastChild.InnerText.Trim().Replace("分鐘","分钟");
+                    videoInfo.lengthtime = AttributeNode.LastChild.InnerText.Trim().Replace("分鐘", "分钟");
                 }
                 else if (header == "導演:")
                 {
@@ -303,14 +319,14 @@ namespace Data
             string BaseUrl = AppSettings.Fc2hub_BaseUrl;
             string SavePath = AppSettings.Image_SavePath;
 
-            string url = $"{BaseUrl}search?kw={CID.Replace("FC2-","")}";
+            string url = $"{BaseUrl}search?kw={CID.Replace("FC2-", "")}";
 
             videoInfo.busurl = url;
 
             if (Client == null)
             {
                 Client = CreateClient(new Dictionary<string, string>() {
-                        {"user-agent" ,DefaultUserAgent}
+                        {"user-agent" ,BrowserUserAgent}
                     });
             }
 
@@ -327,11 +343,11 @@ namespace Data
 
             var json = JsonConvert.DeserializeObject<FcJson>(jsonString);
 
-            if(json.name == null || json.image == null) return null;
+            if (json.name == null || json.image == null) return null;
 
             videoInfo.title = json.name;
             videoInfo.truename = CID;
-            videoInfo.releasetime = json.datePublished.Replace("/","-");
+            videoInfo.releasetime = json.datePublished.Replace("/", "-");
             //PTxHxMxS转x分钟
             videoInfo.lengthtime = Data.FileMatch.ConvertPtTimeToTotalMinute(json.duration);
             videoInfo.director = json.director;
@@ -340,12 +356,12 @@ namespace Data
             if (json.genre != null)
                 videoInfo.category = string.Join(",", json.genre);
 
-            if(json.actor!= null)
+            if (json.actor != null)
                 videoInfo.actor = string.Join(",", json.actor);
 
 
             string ImageUrl = string.Empty;
-            if(json.image != null)
+            if (json.image != null)
             {
                 ImageUrl = json.image;
             }
@@ -355,7 +371,7 @@ namespace Data
 
                 if (imageNode != null)
                 {
-                    ImageUrl= imageNode.GetAttributeValue("content",string.Empty);
+                    ImageUrl = imageNode.GetAttributeValue("content", string.Empty);
                 }
             }
 
@@ -420,7 +436,7 @@ namespace Data
                 {
                     ClientWithJavDBCookie = CreateClient(new Dictionary<string, string>() {
                         {"cookie",AppSettings.javdb_Cookie },
-                        {"user-agent" ,DefaultUserAgent}
+                        {"user-agent" ,BrowserUserAgent}
                     });
                 }
 
@@ -431,7 +447,7 @@ namespace Data
                 if (Client == null)
                 {
                     Client = CreateClient(new Dictionary<string, string>() {
-                        {"user-agent" ,DefaultUserAgent}
+                        {"user-agent" ,BrowserUserAgent}
                     });
                 }
 
@@ -450,7 +466,7 @@ namespace Data
             var ImageUrl = video_meta_panelNode.SelectSingleNode(".//img[@class='video-cover']").Attributes["src"].Value;
             if (!ImageUrl.Contains("http"))
             {
-                ImageUrl = UrlCombine(JavDBUrl,ImageUrl);
+                ImageUrl = UrlCombine(JavDBUrl, ImageUrl);
             }
 
             var AttributeNodes = video_meta_panelNode.SelectNodes(".//div[contains(@class,'panel-block')]");
@@ -527,7 +543,7 @@ namespace Data
 
             //样品图片
             var preview_imagesSingesNode = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class,'preview-images')]");
-            if(preview_imagesSingesNode != null)
+            if (preview_imagesSingesNode != null)
             {
                 var preview_imagesNodes = preview_imagesSingesNode.SelectNodes(".//a[@class='tile-item']");
                 List<string> sampleUrlList = new();
@@ -559,7 +575,7 @@ namespace Data
             string url = $"{JavDBUrl}/search?q={CID}&f=all";
 
             // 访问
-            string strResult = await RequestHelper.RequestHtml(Client,url);
+            string strResult = await RequestHelper.RequestHtml(Client, url);
 
             HtmlDocument htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(strResult);
@@ -653,9 +669,8 @@ namespace Data
         /// <param name="isReplaceExistsImage">是否取代存在的文件，默认为否</param>
         /// <param name="headers">需要的header，可选</param>
         /// <returns>下载后的文件路径</returns>
-        public static async Task<string> downloadFile(string url, string filePath, string fileName, bool isReplaceExistsImage = false, Dictionary<string, string> headers=null)
+        public static async Task<string> downloadFile(string url, string filePath, string fileName, bool isReplaceExistsImage = false, Dictionary<string, string> headers = null)
         {
-            HttpClient Client = CreateClient(headers);
 
             string localFilename;
             if (fileName.Contains("."))
@@ -678,9 +693,11 @@ namespace Data
 
             if (!File.Exists(localPath) || isReplaceExistsImage)
             {
+                HttpClient Client = CreateClient(headers);
+
                 int maxTryCount = 3;
 
-                for(int i = 0; i < maxTryCount; i++)
+                for (int i = 0; i < maxTryCount; i++)
                 {
                     try
                     {
@@ -690,7 +707,7 @@ namespace Data
                         isSuccessDown = true;
                         break;
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         Debug.WriteLine($"下载文件时发生错误：{ex.Message}");
                     }
@@ -705,23 +722,5 @@ namespace Data
 
         }
 
-        private static HttpClient CreateClient(Dictionary<string,string> headers)
-        {
-            if (headers == null || headers.Count == 0)
-            {
-                return new HttpClient();
-            }
-
-            var handler = new HttpClientHandler { UseCookies = false };
-            var Client = new HttpClient(handler);
-
-            foreach(var header in headers)
-            {
-                //Client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0");
-                Client.DefaultRequestHeaders.Add(header.Key, header.Value);
-            }
-
-            return Client;
-        }
     }
 }

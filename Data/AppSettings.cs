@@ -426,8 +426,48 @@ public class AppSettings
             localSettings.Values["IsFindSub"] = value;
         }
     }
+    
+    /// <summary>
+    /// 是否记录下载请求
+    /// </summary>
+    public static bool IsRecordDownRequest
+    {
+        get
+        {
+            bool isUse = true;
 
+            if (localSettings.Values["IsRecordDownRequest"] is bool value)
+            {
+                isUse = value;
+            }
+            return isUse;
+        }
+        set
+        {
+            localSettings.Values["IsRecordDownRequest"] = value;
+        }
+    }    
 
+    /// <summary>
+    /// 下载链接失效时间
+    /// </summary>
+    public static double DownUrlOverdueTime
+    {
+        get
+        {
+            double OverdueTime = 86400.0;
+
+            if (localSettings.Values["DownUrlOverdueTime"] is double value)
+            {
+                OverdueTime = value;
+            }
+            return OverdueTime;
+        }
+        set
+        {
+            localSettings.Values["DownUrlOverdueTime"] = value;
+        }
+    }
 
     public enum Origin { Local = 0, Web = 1 }
     /// <summary>
@@ -453,7 +493,6 @@ public class AppSettings
             localSettings.Values["thumbnialOrigin"] = value;
         }
     }
-
 
     //默认下载方式
     public static string DefaultDownMethod
@@ -582,7 +621,6 @@ public class AppSettings
         }
 
     }
-
 
     //展示页设置
 

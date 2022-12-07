@@ -389,7 +389,7 @@
 
             <Expander.Header>
                 <Grid>
-                    <control:TextBlockWithLongText StringValue="检查环境" />
+                    <control:TextBlockWithLongText StringValue="检查环境" IsFirstTextSelectionEnabled="False"/>
                     <!--<TextBlock x:FieldModifier="public" x:Name="status_TextBlock"
                        HorizontalAlignment="Right"
                        Style="{StaticResource CaptionTextBlockStyle}"/>-->

@@ -119,7 +119,7 @@ namespace Display.Views
             }
             else if (videoInfoList.Count == 1)
             {
-                Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc);
+                Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
             }
 
             //有多集
@@ -149,7 +149,7 @@ namespace Display.Views
         {
             var SingleVideoInfo = e.ClickedItem as Data.Datum;
 
-            Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc);
+            Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc, this.XamlRoot);
         }
 
     }

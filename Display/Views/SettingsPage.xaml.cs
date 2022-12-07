@@ -44,8 +44,15 @@ namespace Display.Views
         {
             this.InitializeComponent();
 
+            this.Loaded += PageLoaded;
+
+        }
+
+        private void PageLoaded(object sender, RoutedEventArgs e)
+        {
             InitializationView();
 
+            this.Loaded -= PageLoaded;
         }
 
         private async void InitializationView()
@@ -70,31 +77,6 @@ namespace Display.Views
             DataAccessSavePath_TextBox.Text = AppSettings.DataAccess_SavePath;
         }
 
-        ///// <summary>
-        ///// 检查Cookie是否可用
-        ///// </summary>
-        ///// <param name="sender"></param>
-        ///// <param name="e"></param>
-        //private async void CheckAvailableButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-        //{
-        //    //状态图标初始化
-        //    CheckMarkIcon.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-        //    ErrorIcon.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-
-        //    Cookie_StateProgressRing.IsActive = true;
-
-        //    if (await webapi.UpdateLoginInfo())
-        //    {
-        //        CheckMarkIcon.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-        //    }
-        //    else
-        //    {
-        //        ErrorIcon.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-        //    }
-
-        //    Cookie_StateProgressRing.IsActive = false;
-        //}
-
         private void updateUserInfo()
         {
             userInfoControl.userinfo = WebApi.UserInfo == null ? null: WebApi.UserInfo.data;
@@ -104,11 +86,6 @@ namespace Display.Views
         {
             userInfoControl.status = WebApi.UserInfo == null ? "NoLogin" : "Login";
         }
-
-        //private void update_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-        //{
-        //    userInfoControl.status = "Update";
-        //}
 
         private void LoginButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
@@ -211,7 +188,6 @@ namespace Display.Views
 
             // 数据库的图片地址无需修改
             if (!isSrcPathError && imagePath.Replace(srcPath, dstPath) == imagePath && File.Exists(imagePath)) return;
-            //if (imagePath.Replace(srcPath, dstPath) == imagePath) return;
 
             //提醒修改数据文件
             ContentDialog dialog = new ContentDialog();
@@ -219,7 +195,6 @@ namespace Display.Views
             dialog.Title = "提醒";
             dialog.PrimaryButtonText = "修改";
             dialog.CloseButtonText = "不修改";
-            //dialog.DefaultButton = ContentDialogButton.Primary;
 
             var updateImagePathPage = new ContentsPage.UpdateImagePath(imagePath, srcPath, dstPath);
             dialog.Content = updateImagePathPage;
@@ -505,6 +480,7 @@ namespace Display.Views
                 {
                     case "WebView":
                         Resolution_RelativePanel.Visibility = Visibility.Collapsed;
+                        FindSubFile_ToggleSwitch.IsEnabled = false;
                         break;
 
                     case "PotPlayer":
@@ -512,6 +488,7 @@ namespace Display.Views
                         resolutionSelectionCollection.Add("原画");
                         resolutionSelection_ComboBox.SelectedIndex = 0;
                         Resolution_RelativePanel.Visibility = Visibility.Visible;
+                        FindSubFile_ToggleSwitch.IsEnabled = true;
 
                         PlayerExePath_RelativePanel.Visibility = Visibility.Visible;
 
@@ -523,6 +500,7 @@ namespace Display.Views
                         resolutionSelection_ComboBox.SelectedIndex = 0;
                         Resolution_RelativePanel.Visibility = Visibility.Visible;
 
+                        FindSubFile_ToggleSwitch.IsEnabled = true;
 
                         PlayerExePath_RelativePanel.Visibility = Visibility.Collapsed;
 
@@ -533,6 +511,7 @@ namespace Display.Views
                         resolutionSelectionCollection.Add("原画");
                         resolutionSelection_ComboBox.SelectedIndex = 0;
                         Resolution_RelativePanel.Visibility = Visibility.Visible;
+                        FindSubFile_ToggleSwitch.IsEnabled = true;
 
                         PlayerExePath_RelativePanel.Visibility = Visibility.Collapsed;
 
@@ -909,6 +888,11 @@ namespace Display.Views
             WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hwnd);
 
             return await folderPicker.PickSingleFolderAsync();
+
+        }
+
+        private void NumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+        {
 
         }
     }
