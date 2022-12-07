@@ -427,8 +427,6 @@ public class AppSettings
         }
     }
 
-
-
     public enum Origin { Local = 0, Web = 1 }
     /// <summary>
     /// 缩略图的显示来源
@@ -453,7 +451,6 @@ public class AppSettings
             localSettings.Values["thumbnialOrigin"] = value;
         }
     }
-
 
     //默认下载方式
     public static string DefaultDownMethod
@@ -582,7 +579,6 @@ public class AppSettings
         }
 
     }
-
 
     //展示页设置
 
