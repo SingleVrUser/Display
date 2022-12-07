@@ -141,13 +141,6 @@ namespace Display.Control
             VideoPlayClick?.Invoke(sender, args);
         }
 
-        ////点击了多集中的具体集数
-        //public event ItemClickEventHandler MultisetListClick;
-        //private void StationsList_OnItemClick(object sender, ItemClickEventArgs e)
-        //{
-        //    MultisetListClick?.Invoke(sender, e);
-        //}
-
         private async void DownButton_Click(object sender, RoutedEventArgs e)
         {
             string name = resultinfo.truename;

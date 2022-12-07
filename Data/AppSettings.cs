@@ -384,8 +384,31 @@ public class AppSettings
         }
     }
 
-    public enum Origin { Local = 0, Web = 1 }
 
+    /// <summary>
+    /// 是否搜索字幕
+    /// </summary>
+    public static bool IsFindSub
+    {
+        get
+        {
+            bool isUse = true;
+
+            if (localSettings.Values["IsFindSub"] is bool value)
+            {
+                isUse = value;
+            }
+            return isUse;
+        }
+        set
+        {
+            localSettings.Values["IsFindSub"] = value;
+        }
+    }
+
+
+
+    public enum Origin { Local = 0, Web = 1 }
     /// <summary>
     /// 缩略图的显示来源
     /// </summary>

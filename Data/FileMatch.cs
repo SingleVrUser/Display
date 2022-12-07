@@ -7,10 +7,12 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Windows.Media;
 using Windows.Storage;
 using Windows.System;
 
@@ -44,7 +46,7 @@ namespace Data
         /// </summary>
         /// <param name="src_text"></param>
         /// <returns></returns>
-        public static string MatchName(string src_text)
+        public static string MatchName(string src_text,string file_cid="")
         {
             //提取文件名
             string name = Regex.Match(src_text, @"(.*)(\.\w{3,5})?$",RegexOptions.IgnoreCase).Groups[1].Value;
@@ -147,7 +149,16 @@ namespace Data
             }
 
             //如果最后仍然匹配不了番号，则尝试使用文件所在文件夹的名字去匹配
-            // ……
+            if (!string.IsNullOrEmpty(file_cid))
+            {
+                var FolderDatum = DataAccess.getUpperLevelFolderCid(file_cid);
+
+                if (!string.IsNullOrEmpty(FolderDatum.n))
+                {
+                    return MatchName(FolderDatum.n);
+                }
+            }
+
             return null;
 
         }
@@ -325,8 +336,9 @@ namespace Data
                 if (file_info.iv == 1)
                 {
                     //根据视频名称匹配番号
-                    var VideoName = FileMatch.MatchName(FileName);
+                    var VideoName = FileMatch.MatchName(FileName,file_info.cid);
 
+                    //无论匹配与否，都存入数据库
                     DataAccess.AddFileToInfo(file_info.pc, VideoName);
 
                     //未匹配
@@ -335,6 +347,7 @@ namespace Data
                         resultList.Add(new MatchVideoResult() { status = false, OriginalName = file_info.n, statusCode = -1, message = "匹配失败"});
                         continue;
                     }
+
 
                     //匹配后，查询是否重复匹配
                     var existsResult = resultList.Where(x => x.MatchName == VideoName).FirstOrDefault();

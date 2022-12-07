@@ -77,7 +77,8 @@
                      Message="隐藏模式未启动，请注意：退出隐藏模式不能获取到已隐藏的文件" />
         </StackPanel>
 
-        <Grid Grid.Row="1"
+        <ScrollViewer Grid.Row="1">
+            <Grid
               Margin="10,0"
               Padding="5"
               RowSpacing="5"
@@ -89,7 +90,6 @@
                             Value="15" />
                 </Style>
             </Grid.Resources>
-            <ScrollViewer>
                 <StackPanel Spacing="5">
                     <!--通用-->
                     <StackPanel Spacing="5">
@@ -565,9 +565,9 @@
                 </StackPanel>
 
 
-            </ScrollViewer>
         </Grid>
 
+        </ScrollViewer>
 
         <TeachingTip x:Name="LightDismissTeachingTip"
                      IsLightDismissEnabled="True" />
