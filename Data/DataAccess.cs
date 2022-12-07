@@ -908,7 +908,6 @@ namespace Data
                 SqliteDataReader query = selectCommand.ExecuteReader();
                 query.Read();
 
-
                 string folderCid=null;
                 string truename = null;
 
@@ -916,13 +915,25 @@ namespace Data
                 {
                     folderCid = query["cid"] as string;
                     truename = query["truename"] as string;
+                    query.Close();
                 }
                 else
                 {
+                    //尝试使用文件匹配
+                    selectCommand = new SqliteCommand
+                        ($"SELECT cid,n FROM FilesInfo WHERE pc == '{file_pickCode}'", db);
 
+                    query = selectCommand.ExecuteReader();
+                    query.Read();
+                    if (query.HasRows)
+                    {
+                        folderCid = query["cid"] as string;
+                        string file_name = query["n"] as string;
+
+                        truename = FileMatch.MatchName(file_name);
+                        query.Close();
+                    }
                 }
-
-                query.Close();
 
                 if (string.IsNullOrEmpty(folderCid) || string.IsNullOrEmpty(truename))
                     return subDicts;

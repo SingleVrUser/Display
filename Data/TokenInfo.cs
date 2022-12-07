@@ -1603,4 +1603,14 @@ namespace Data
         public int ratingCount { get; set; }
         public int ratingValue { get; set; }
     }
+
+
+    //下载链接信息历史
+    public class DownUrlInfo
+    {
+        public string pickCode { get; set; }
+        public string fileName { get; set; }
+        public string trueUrl { get; set; }
+        public string ua { get; set; }
+    }
 }

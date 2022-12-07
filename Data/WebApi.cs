@@ -1,26 +1,20 @@
-﻿using Newtonsoft.Json;
+﻿using HtmlAgilityPack;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Storage;
-using Microsoft.Toolkit.Uwp.Notifications;
-using System.Text.RegularExpressions;
-using System.Diagnostics;
-using RestSharp;
-using Windows.UI.Notifications;
-using HtmlAgilityPack;
-using Windows.Media.Ocr;
-using Windows.Media.Protection.PlayReady;
-using System.IO;
 using System.Web;
-using OpenCvSharp;
+using Windows.Storage;
 
 namespace Data
 {
@@ -35,6 +29,8 @@ namespace Data
         public TokenInfo TokenInfo;
 
         //string api_version = "2.0.1.7";
+
+        public static List<DownUrlInfo> downUrlHistory;
 
         public WebApi(bool useCookie=true)
         {
@@ -1126,6 +1122,20 @@ namespace Data
         public Dictionary<string,string> GetDownUrl(string pickcode,string ua= "Mozilla/5.0; 115Desktop/2.0.1.7")
         {
             Dictionary<string, string> downUrlList = new();
+
+            //查看之前是否已请求
+            if (downUrlHistory != null)
+            {
+                var history = downUrlHistory.Where(item => item.pickCode == pickcode && item.ua == ua).ToList();
+
+                if(history.Count > 0)
+                {
+                    downUrlList.Add(history[0].fileName, history[0].trueUrl);
+
+                    return downUrlList;
+                }
+            }
+
             long tm = DateTimeOffset.Now.ToUnixTimeSeconds();
             string src = $"{{\"pickcode\":\"{pickcode}\"}}";
             var item = m115.encode(src, tm);
@@ -1186,9 +1196,19 @@ namespace Data
                         {
                             var downUrl = videoInfo["url"]?["url"].ToString();
                             downUrlList.Add(videoInfo["file_name"].ToString(), downUrl);
+                            break;
                         }
 
                     }
+                }
+
+                //成功获取到地址
+                if (downUrlList.Count > 0)
+                {
+                    if (downUrlHistory == null)
+                        downUrlHistory = new();
+
+                    downUrlHistory.Add(new DownUrlInfo() { pickCode = pickcode,ua = ua,fileName = downUrlList.First().Key,trueUrl = downUrlList.First().Value });
                 }
             }
 
