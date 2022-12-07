@@ -63,9 +63,9 @@
                 <ListView.Header>
                     <Grid ColumnSpacing="5"
                             MinWidth="200"
-                            Margin="16,0,12,0"
-                            BorderBrush="{ThemeResource AccentAcrylicInAppFillColorBaseBrush}"
-                            BorderThickness="0,0,0,1">
+                          Margin="16,0,12,0"
+                          BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                          BorderThickness="0,0,0,1">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="50"/>

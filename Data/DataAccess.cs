@@ -1179,11 +1179,11 @@ namespace Data
         }
 
         /// <summary>
-        /// 获取该cid文件夹上一层目录的cid
+        /// 获取该cid文件夹上一层目录的信息
         /// </summary>
         /// <param name="cid"></param>
         /// <returns></returns>
-        private static Datum getUpperLevelFolderCid(string cid)
+        public static Datum getUpperLevelFolderCid(string cid)
         {
             Datum datum = new Datum();
 
