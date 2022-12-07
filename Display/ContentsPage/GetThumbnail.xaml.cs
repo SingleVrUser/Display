@@ -505,7 +505,7 @@ namespace Display.ContentsPage
                 {
                     string SavePath = Path.Combine(AppSettings.Image_SavePath,thumbnail.name);
                     string SaveName = $"Thumbnail_{j}";
-                    string saveImagePath = await GetInfoFromNetwork.downloadImage(DownUrlList[j],SavePath,SaveName);
+                    string saveImagePath = await GetInfoFromNetwork.downloadFile(DownUrlList[j],SavePath,SaveName);
                     //Debug.WriteLine($@"下载：{} => {SavePath} => {SaveName}");
 
                     if(j == 1)

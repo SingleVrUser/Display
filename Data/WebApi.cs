@@ -1203,12 +1203,15 @@ namespace Data
         /// <param name="showWindow"></param>
         /// <param name="referrerUrl"></param>
         /// <param name="user_agnet"></param>
-        public static void Play115SourceVideoWithPotPlayer(string playUrl, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string user_agnet = "Mozilla/5.0; 115Desktop/2.0.1.7")
+        public static void Play115SourceVideoWithPotPlayer(string playUrl, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string user_agnet = "Mozilla/5.0; 115Desktop/2.0.1.7", string subFile = null)
         {
             var process = new Process();
 
+
+            string addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty : @$" /sub=""{subFile}""";
+
             process.StartInfo.FileName = FileName;
-            process.StartInfo.Arguments = @$" ""{playUrl}"" /user_agent=""{user_agnet}"" /referer=""{referrerUrl}""";
+            process.StartInfo.Arguments = @$" ""{playUrl}"" /user_agent=""{user_agnet}"" /referer=""{referrerUrl}""{addSubFile}";
             process.StartInfo.UseShellExecute = false;
             if (!showWindow)
             {
@@ -1314,7 +1317,7 @@ namespace Data
         /// <param name="showWindow"></param>
         /// <param name="referrerUrl"></param>
         /// <param name="user_agnet"></param>
-        public void Play115SourceVideoWithMpv(string playUrl, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string user_agnet = "Mozilla/5.0; 115Desktop/2.0.1.7",string title=null)
+        public void Play115SourceVideoWithMpv(string playUrl, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string user_agnet = "Mozilla/5.0; 115Desktop/2.0.1.7",string title=null,string subFile=null)
         {
             var process = new Process();
             
@@ -1331,10 +1334,12 @@ namespace Data
                 addTitle = @$"  --title=""{title}""";
             }
 
+            string addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty: @$" --sub-file=""{subFile}""";
+
             process.StartInfo.FileName = FileName;
 
             process.StartInfo.FileName = FileName;
-            process.StartInfo.Arguments = @$" ""{playUrl}"" --referrer=""{referrerUrl}"" --user-agent=""{user_agnet}""{addTitle}";
+            process.StartInfo.Arguments = @$" ""{playUrl}"" --referrer=""{referrerUrl}"" --user-agent=""{user_agnet}""{addTitle}{addSubFile}";
             process.StartInfo.UseShellExecute = false;
             if (!showWindow)
             {
@@ -1352,7 +1357,7 @@ namespace Data
         /// <param name="showWindow"></param>
         /// <param name="referrerUrl"></param>
         /// <param name="user_agnet"></param>
-        public static void Play115SourceVideoWithVlc(string playUrl, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string user_agnet = "Mozilla/5.0; 115Desktop/2.0.1.7",string title=null)
+        public static void Play115SourceVideoWithVlc(string playUrl, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string user_agnet = "Mozilla/5.0; 115Desktop/2.0.1.7",string title=null, string subFile = null)
         {
             var process = new Process();
 
@@ -1368,9 +1373,10 @@ namespace Data
                 addTitle = $" :meta-title={title}";
             }
 
+            string addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty : @$" :sub-file=""{subFile}""";
 
             process.StartInfo.FileName = FileName;
-            process.StartInfo.Arguments = @$" ""{playUrl}"" :http-referrer=""{referrerUrl}"" :http-user-agent=""{user_agnet}""{addTitle}";
+            process.StartInfo.Arguments = @$" ""{playUrl}"" :http-referrer=""{referrerUrl}"" :http-user-agent=""{user_agnet}""{addTitle}{addSubFile}";
             //process.StartInfo.Arguments = @$" ""{playUrl}""";
             process.StartInfo.UseShellExecute = false;
             if (!showWindow)
@@ -1404,11 +1410,13 @@ namespace Data
         /// 原画播放
         /// </summary>
         /// <param name="pickcode"></param>
-        public void PlayVideoWithOriginUrl(string pickcode ,playMethod playMethod)
+        public async void PlayVideoWithOriginUrl(string pickcode ,playMethod playMethod,string subFilePickCode, string subFileName)
         {
             //播放路径检查选择
             string savePath = string.Empty;
             string ua = string.Empty;
+            string downUrl;
+            string subFile;
 
             switch (playMethod)
             {
@@ -1439,16 +1447,18 @@ namespace Data
                     var downUrlList = GetDownUrl(pickcode, ua);
                     if (downUrlList.Count == 0) return;
 
-                    var downUrl = downUrlList.First().Value;
-
-                    Play115SourceVideoWithPotPlayer(downUrl, savePath, false, user_agnet: ua);
+                    downUrl = downUrlList.First().Value;
+                    subFile = await TryDownSubFile(subFilePickCode, subFileName, ua);
+                    Play115SourceVideoWithPotPlayer(downUrl, savePath, false, user_agnet: ua, subFile: subFile);
                     break;
                 case playMethod.mpv:
                     downUrlList = GetDownUrl(pickcode,ua);
                     if (downUrlList.Count == 0) return;
 
+
                     downUrl = downUrlList.First().Value;
-                    Play115SourceVideoWithMpv(downUrl, savePath, false,user_agnet:ua, title: downUrlList.First().Key);
+                    subFile = await TryDownSubFile(subFilePickCode, subFileName, ua);
+                    Play115SourceVideoWithMpv(downUrl, savePath, false,user_agnet:ua, title: downUrlList.First().Key, subFile: subFile);
                     break;
                 case playMethod.vlc:
                     //vlc不支持带“; ”的user-agent
@@ -1456,11 +1466,41 @@ namespace Data
                     if (downUrlList.Count == 0) return;
 
                     downUrl = downUrlList.First().Value;
-
-                    Play115SourceVideoWithVlc(downUrl, savePath, false, user_agnet: ua,title:downUrlList.First().Key);
+                    subFile = await TryDownSubFile(subFilePickCode, subFileName, ua);
+                    Play115SourceVideoWithVlc(downUrl, savePath, false, user_agnet: ua,title:downUrlList.First().Key, subFile: subFile);
                     break;
             }
         }
 
+        private async Task<string> TryDownSubFile(string pickCode,string fileName, string ua)
+        {
+            if (!string.IsNullOrEmpty(pickCode))
+            {
+                var Sub_SavePath = AppSettings.Sub_SavePath;
+                string subFile = Path.Combine(Sub_SavePath, fileName);
+
+                //已存在
+                if (File.Exists(subFile))
+                    return subFile;
+
+                //不存在则获取下载链接并下载
+                var subUrlList = GetDownUrl(pickCode, ua);
+                if (subUrlList.Count == 0)
+                {
+                    return null;
+                }
+
+                var sub_Url = subUrlList.First().Value;
+
+                subFile = await GetInfoFromNetwork.downloadFile(sub_Url, Sub_SavePath, fileName, false,new Dictionary<string, string>
+                {
+                    {"user-agent", ua }
+                });
+
+                return subFile;
+            }
+
+            return null;
+        }
     }
 }

@@ -169,12 +169,31 @@ namespace Display.Views
         {
             var SingleVideoInfo = e.ClickedItem as Data.Datum;
             PlayeVideo(SingleVideoInfo.pc);
-            //VideoPlayWindow.createNewWindow();
-
         }
 
         public static void PlayeVideo(string pickCode)
         {
+            string subFilePickCode = string.Empty;
+            string subFileName = string.Empty;
+
+            //是否需要加载字幕
+            if (AppSettings.IsFindSub)
+            {
+                var subDict = DataAccess.FindSubFile(pickCode);
+
+                if (subDict.Count == 1)
+                {
+                    subFilePickCode = subDict.First().Key.ToString();
+                    subFileName = subDict.First().Value.ToString();
+                }
+                //TODO 多字幕文件选择
+                else if(subDict.Count > 1)
+                {
+
+                }
+            }
+
+            //选择播放器播放
             switch (AppSettings.PlayerSelection)
             {
                 //浏览器播放
@@ -184,17 +203,17 @@ namespace Display.Views
                 //PotPlayer播放
                 case 1:
                     WebApi webapi = new();
-                    webapi.PlayVideoWithOriginUrl(pickCode, playMethod.pot);
+                    webapi.PlayVideoWithOriginUrl(pickCode, playMethod.pot, subFilePickCode, subFileName);
                     break;
                 //mpv播放
                 case 2:
                     webapi = new();
-                    webapi.PlayVideoWithOriginUrl(pickCode,playMethod.mpv);
+                    webapi.PlayVideoWithOriginUrl(pickCode,playMethod.mpv, subFilePickCode, subFileName);
                     break;
                 //vlc播放
                 case 3:
                     webapi = new();
-                    webapi.PlayVideoWithOriginUrl(pickCode, playMethod.vlc);
+                    webapi.PlayVideoWithOriginUrl(pickCode, playMethod.vlc, subFilePickCode, subFileName);
                     break;
 
             }

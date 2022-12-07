@@ -157,7 +157,7 @@ namespace Data
             //下载封面
             string filePath = Path.Combine(SavePath, CID);
             videoInfo.imageurl = ImageUrl;
-            videoInfo.imagepath = await downloadImage(ImageUrl, filePath, CID);
+            videoInfo.imagepath = await downloadFile(ImageUrl, filePath, CID);
 
             return videoInfo;
         }
@@ -270,7 +270,7 @@ namespace Data
             ////下载封面
             string filePath = Path.Combine(SavePath, CID);
             videoInfo.imageurl = ImageUrl;
-            videoInfo.imagepath = await downloadImage(ImageUrl, filePath, CID);
+            videoInfo.imagepath = await downloadFile(ImageUrl, filePath, CID);
 
             var sampleBox_Nodes = htmlDoc.DocumentNode.SelectNodes("//a[@class='sample-box']");
             List<string> sampleUrlList = new();
@@ -364,7 +364,7 @@ namespace Data
                 ////下载封面
                 string filePath = Path.Combine(SavePath, CID);
                 videoInfo.imageurl = ImageUrl;
-                videoInfo.imagepath = await downloadImage(ImageUrl, filePath, CID);
+                videoInfo.imagepath = await downloadFile(ImageUrl, filePath, CID);
             }
 
             ////预览图不要了
@@ -523,7 +523,7 @@ namespace Data
             string filePath = Path.Combine(SavePath, CID);
 
             videoInfo.imageurl = ImageUrl;
-            videoInfo.imagepath = await downloadImage(ImageUrl, filePath, CID);
+            videoInfo.imagepath = await downloadFile(ImageUrl, filePath, CID);
 
             //样品图片
             var preview_imagesSingesNode = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class,'preview-images')]");
@@ -645,25 +645,38 @@ namespace Data
         }
 
         /// <summary>
-        /// 下载图片，并返回图片路径
+        /// 下载文件，并返回文件路径
         /// </summary>
-        /// <param name="url"></param>
-        /// <param name="filePath"></param>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        public static async Task<string> downloadImage(string url, string imagePath, string imageName, bool isReplaceExistsImage = false)
+        /// <param name="url">下载地址</param>
+        /// <param name="filePath">保存路径</param>
+        /// <param name="fileName">文件的名称</param>
+        /// <param name="isReplaceExistsImage">是否取代存在的文件，默认为否</param>
+        /// <param name="headers">需要的header，可选</param>
+        /// <returns>下载后的文件路径</returns>
+        public static async Task<string> downloadFile(string url, string filePath, string fileName, bool isReplaceExistsImage = false, Dictionary<string, string> headers=null)
         {
-            HttpClient Client = new HttpClient();
+            HttpClient Client = CreateClient(headers);
 
-            string localFilename = $"{imageName}{Path.GetExtension(url)}";
-            string localPath = Path.Combine(imagePath, localFilename);
-
-            if (!File.Exists(imagePath))
+            string localFilename;
+            if (fileName.Contains("."))
             {
-                Directory.CreateDirectory(imagePath);
+                localFilename = fileName;
+            }
+            else
+            {
+                localFilename = $"{fileName}{Path.GetExtension(url)}";
             }
 
-            if (isReplaceExistsImage || !File.Exists(localPath))
+            string localPath = Path.Combine(filePath, localFilename);
+
+            bool isSuccessDown = false;
+
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+
+            if (!File.Exists(localPath) || isReplaceExistsImage)
             {
                 int maxTryCount = 3;
 
@@ -671,26 +684,34 @@ namespace Data
                 {
                     try
                     {
-                        byte[] imageBytes = await Client.GetByteArrayAsync(url);
+                        byte[] fileBytes = await Client.GetByteArrayAsync(url);
 
-                        File.WriteAllBytes(localPath, imageBytes);
-
+                        File.WriteAllBytes(localPath, fileBytes);
+                        isSuccessDown = true;
                         break;
                     }
                     catch(Exception ex)
                     {
-                        Debug.WriteLine($"下载图片时发生错误：{ex.Message}");
+                        Debug.WriteLine($"下载文件时发生错误：{ex.Message}");
                     }
                 }
-
             }
 
-            return localPath;
+            if (isSuccessDown)
+                return localPath;
+            else
+                return null;
+
 
         }
 
-        private HttpClient CreateClient(Dictionary<string,string> headers)
+        private static HttpClient CreateClient(Dictionary<string,string> headers)
         {
+            if (headers == null || headers.Count == 0)
+            {
+                return new HttpClient();
+            }
+
             var handler = new HttpClientHandler { UseCookies = false };
             var Client = new HttpClient(handler);
 
