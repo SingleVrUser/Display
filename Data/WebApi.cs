@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using HtmlAgilityPack;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using System;
@@ -13,7 +16,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using OpenCvSharp;
+using Windows.Storage;
 
 namespace Data
 {
@@ -28,8 +31,6 @@ namespace Data
         public TokenInfo TokenInfo;
 
         //string api_version = "2.0.1.7";
-
-        public static List<DownUrlInfo> downUrlHistory;
 
         public WebApi(bool useCookie=true)
         {
@@ -1179,7 +1180,6 @@ namespace Data
                         {
                             var downUrl = videoInfo["url"]?["url"].ToString();
                             downUrlList.Add(videoInfo["file_name"].ToString(), downUrl);
-                            break;
                         }
 
                     }

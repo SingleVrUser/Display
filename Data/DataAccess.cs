@@ -978,7 +978,7 @@ namespace Data
                 bool NameIsNumber = Int32.TryParse(fileNameWithoutExtension, out numResult);
 
                 //1.首先查询同名字幕文件(纯数字则跳过，长度小于10也跳过)
-                if (!NameIsNumber && fileNameWithoutExtension.Length>10)
+                if (!NameIsNumber && fileNameWithoutExtension.Length > 10)
                 {
                     selectCommand = new SqliteCommand
                         ($"SELECT pc, n FROM FilesInfo WHERE (ico == 'srt' OR ico == 'ass' OR ico == 'ssa') AND n LIKE '%{fileNameWithoutExtension}%'", db);
@@ -988,12 +988,7 @@ namespace Data
                     {
                         subDicts.Add(query["pc"] as string, query["n"] as string);
                     }
-                    query = selectCommand.ExecuteReader();
-                    query.Read();
-                    if (query.HasRows)
-                    {
-                        folderCid = query["cid"] as string;
-                        string file_name = query["n"] as string;
+                }
 
                 //2.没有同名字幕文件，根据番号特点匹配（字母+数字），这里的方法正常的视频不通用
                 if (subDicts.Count == 0 && !NameIsNumber)
