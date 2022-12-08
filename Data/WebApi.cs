@@ -1,7 +1,4 @@
-﻿using HtmlAgilityPack;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using System;
@@ -16,7 +13,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using Windows.Storage;
 using OpenCvSharp;
 
 namespace Data
@@ -32,6 +28,8 @@ namespace Data
         public TokenInfo TokenInfo;
 
         //string api_version = "2.0.1.7";
+
+        public static List<DownUrlInfo> downUrlHistory;
 
         public WebApi(bool useCookie=true)
         {
@@ -1121,27 +1119,6 @@ namespace Data
         public Dictionary<string,string> GetDownUrl(string pickcode,string ua)
         {
             Dictionary<string, string> downUrlList = new();
-
-            if(AppSettings.IsRecordDownRequest)
-            {
-                var downHistory = DataAccess.GetDownHistoryBypcAndua(pickcode, ua);
-                //查看之前是否已请求
-                if (downHistory != null)
-                {
-                    if (downHistory.pickCode == pickcode && downHistory.ua == ua)
-                    {
-                        var nowData = DateTimeOffset.Now.ToUnixTimeSeconds();
-
-                        if (nowData - downHistory.addTime < AppSettings.DownUrlOverdueTime)
-                        {
-                            downUrlList.Add(downHistory.fileName, downHistory.trueUrl);
-
-                            return downUrlList;
-                        }
-                    }
-                }
-            }
-
             long tm = DateTimeOffset.Now.ToUnixTimeSeconds();
             string src = $"{{\"pickcode\":\"{pickcode}\"}}";
             var item = m115.encode(src, tm);
@@ -1206,12 +1183,6 @@ namespace Data
                         }
 
                     }
-                }
-
-                //需要记录下载地址且成功获取到地址
-                if (AppSettings.IsRecordDownRequest && downUrlList.Count > 0)
-                {
-                    DataAccess.AddDownHistory(new DownInfo() { pickCode = pickcode, ua = ua, fileName = downUrlList.First().Key, trueUrl = downUrlList.First().Value });
                 }
             }
 

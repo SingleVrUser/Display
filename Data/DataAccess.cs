@@ -988,7 +988,12 @@ namespace Data
                     {
                         subDicts.Add(query["pc"] as string, query["n"] as string);
                     }
-                }
+                    query = selectCommand.ExecuteReader();
+                    query.Read();
+                    if (query.HasRows)
+                    {
+                        folderCid = query["cid"] as string;
+                        string file_name = query["n"] as string;
 
                 //2.没有同名字幕文件，根据番号特点匹配（字母+数字），这里的方法正常的视频不通用
                 if (subDicts.Count == 0 && !NameIsNumber)
