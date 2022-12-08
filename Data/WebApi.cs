@@ -1,15 +1,12 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using RestSharp;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -28,8 +25,6 @@ namespace Data
         public TokenInfo TokenInfo;
 
         //string api_version = "2.0.1.7";
-
-        public static List<DownUrlInfo> downUrlHistory;
 
         public WebApi(bool useCookie=true)
         {
@@ -1179,7 +1174,6 @@ namespace Data
                         {
                             var downUrl = videoInfo["url"]?["url"].ToString();
                             downUrlList.Add(videoInfo["file_name"].ToString(), downUrl);
-                            break;
                         }
 
                     }
