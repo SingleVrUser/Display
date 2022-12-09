@@ -15,8 +15,8 @@ namespace Data
 {
     public class GetInfoFromNetwork
     {
-        private HttpClient Client;
-        private HttpClient ClientWithJavDBCookie;
+        private static HttpClient Client;
+        private static HttpClient ClientWithJavDBCookie;
 
         public static string BrowserUserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36 115Browser/8.3.0";
         public static string DesktopUserAgent = "Mozilla/5.0; Windows NT/10.0.19044; 115Desktop/2.0.1.7";
@@ -34,7 +34,7 @@ namespace Data
             }
 
             var handler = new HttpClientHandler { UseCookies = false };
-            var Client = new HttpClient(handler);
+            Client = new HttpClient(handler);
 
             foreach (var header in headers)
             {
@@ -89,7 +89,6 @@ namespace Data
             {
                 await Task.Delay(1000);
             }
-
         }
 
         /// <summary>
@@ -647,15 +646,26 @@ namespace Data
                     }
 
                 }
-                if (search_left_cid == left_cid && search_right_cid == right_cid)
+
+                int currentNum;
+                int searchNum;
+
+                if (search_left_cid == left_cid
+                         && (search_right_cid == right_cid
+                                || (Int32.TryParse(right_cid, out currentNum)
+                                        && Int32.TryParse(right_cid, out searchNum)
+                                            && currentNum.Equals(searchNum))))
                 {
                     var detail_url = SearchResultNodes[i].SelectSingleNode(".//a").Attributes["href"].Value;
                     detail_url = UrlCombine(AppSettings.JavDB_BaseUrl, detail_url);
                     result = detail_url;
                     break;
                 }
-            }
+                else
+                {
 
+                }
+            }
 
             return result;
         }
@@ -691,6 +701,7 @@ namespace Data
                 Directory.CreateDirectory(filePath);
             }
 
+            //不存在
             if (!File.Exists(localPath) || isReplaceExistsImage)
             {
                 HttpClient Client = CreateClient(headers);
@@ -712,6 +723,11 @@ namespace Data
                         Debug.WriteLine($"下载文件时发生错误：{ex.Message}");
                     }
                 }
+            }
+            //存在
+            else
+            {
+                isSuccessDown = true;
             }
 
             if (isSuccessDown)

@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
@@ -911,7 +912,6 @@ namespace Data
         {
             List<VideoInfo> data = new List<VideoInfo>();
 
-            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
                 new SqliteConnection($"Filename={dbpath}"))
             {
@@ -1066,6 +1066,8 @@ namespace Data
 
             string leftName = tuple.Item1.Replace("FC2", "FC");
             string rightNumber = tuple.Item2;
+            if(rightNumber.StartsWith("0"))
+                rightNumber = rightNumber.Substring(1);
 
             List<Datum> data = new List<Datum>();
 

@@ -106,7 +106,11 @@ namespace Display.ContentsPage
 
             currentWindow.Closed += CurrentWindow_Closed;
             await ShowMatchResult();
+
+            await SpliderVideoInfo(matchVideoResults);
+
             currentWindow.Closed -= CurrentWindow_Closed;
+
         }
 
         private async void CurrentWindow_Closed(object sender, WindowEventArgs args)
@@ -186,7 +190,6 @@ namespace Display.ContentsPage
 
             TopProgressBar.Visibility = Visibility.Collapsed;
 
-            SpliderVideoInfo(matchVideoResults);
 
         }
 
@@ -203,10 +206,8 @@ namespace Display.ContentsPage
         /// <summary>
         /// 开始从网络中检索视频信息
         /// </summary>
-        private async void SpliderVideoInfo(List<MatchVideoResult> matchVideoResults)
+        private async Task SpliderVideoInfo(List<MatchVideoResult> matchVideoResults)
         {
-            currentWindow.Closed += CurrentWindow_Closed;
-
             network = new();
             VideoInfo_Grid.Visibility = Visibility.Visible;
             TopProgressBar.Visibility = Visibility.Visible;
@@ -289,8 +290,6 @@ namespace Display.ContentsPage
             });
 
             await SearchAllInfo(matchVideoResults, progress);
-
-            currentWindow.Closed -= CurrentWindow_Closed;
         }
 
         private void tryUpdateVideoInfo(VideoInfo newInfo)
@@ -309,8 +308,6 @@ namespace Display.ContentsPage
 
         private async Task SearchAllInfo(List<MatchVideoResult> matchVideoResults, IProgress<SpliderInfoProgress> progress)
         {
-            //int i = 0;
-            //foreach (var matchResult in matchVideoResults)
             for(int i = 0;i<matchVideoResults.Count;i++)
             {
                 if (s_cts.IsCancellationRequested)
