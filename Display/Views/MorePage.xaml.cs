@@ -61,19 +61,11 @@ namespace Display.Views
                 IconPath = "/Assets/Svg/image_icon.svg",
                 Description = "获取视频缩略图"
             });
-            //DataSource.Add(new FunctionModule()
-            //{
-            //    Name = "文件列表",
-            //    IconPath = "/Assets/Svg/file_alt_icon.svg",
-            //    Description = "115中的文件列表",
-            //    Label = "测试中"
-            //});
             DataSource.Add(new FunctionModule()
             {
                 Name = "浏览器",
                 IconPath = "/Assets/Svg/explorer_internet_logo_logos_icon.svg",
-                Description = "使用 WebView2 浏览115内容",
-                Label = "测试中"
+                Description = "115网页版，并附加下载选项"
             });
             DataSource.Add(new FunctionModule()
             {

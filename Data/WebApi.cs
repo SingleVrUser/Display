@@ -33,7 +33,7 @@ namespace Data
 
         //string api_version = "2.0.1.7";
 
-        public WebApi(bool useCookie=true)
+        public WebApi(bool useCookie = true)
         {
             if (useCookie)
             {
@@ -46,7 +46,7 @@ namespace Data
         /// </summary>
         public void InitializeInternet()
         {
-            Client = GetInfoFromNetwork.CreateClient(new() { { "user-agent", GetInfoFromNetwork.BrowserUserAgent} });
+            Client = GetInfoFromNetwork.CreateClient(new() { { "user-agent", GetInfoFromNetwork.BrowserUserAgent } });
 
             var cookie = AppSettings._115_Cookie;
 
@@ -130,7 +130,7 @@ namespace Data
             }
             catch (AggregateException e)
             {
-                FileMatch.tryToast("网络异常","检查115隐藏状态时出现异常：",e.Message);
+                FileMatch.tryToast("网络异常", "检查115隐藏状态时出现异常：", e.Message);
 
                 return result;
             }
@@ -207,7 +207,7 @@ namespace Data
                 if (!string.IsNullOrEmpty(pid) && Data.StaticData.isJumpExistsFolder)
                 {
                     //如果修改时间未变，但移动了位置
-                    if(pid == cidCategory.paths.Last().file_id)
+                    if (pid == cidCategory.paths.Last().file_id)
                     {
                         DataAccess.AddFilesInfo(FolderCategory.ConvertFolderToDatum(cidCategory, cid));
                     }
@@ -236,7 +236,7 @@ namespace Data
                     //删除后重新添加
                     DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(cid);
 
-                    if(addToDataAccessList.Count > 0)
+                    if (addToDataAccessList.Count > 0)
                     {
                         //需要添加进数据库的Datum
                         foreach (var item in addToDataAccessList)
@@ -355,7 +355,7 @@ namespace Data
         /// <param name="cid"></param>
         /// <param name="limit"></param>
         /// <returns></returns>
-        public WebFileInfo GetFile(string cid, int limit = 40,bool userApi2=false)
+        public WebFileInfo GetFile(string cid, int limit = 40, bool userApi2 = false)
         {
             WebFileInfo WebFileInfoResult = new();
 
@@ -392,7 +392,7 @@ namespace Data
             //te，tp简单用t替换，接口2没有te,tp
             if (userApi2)
             {
-                foreach(var item in WebFileInfoResult.data)
+                foreach (var item in WebFileInfoResult.data)
                 {
                     //item.t 可能是 "1658999027" 也可能是 "2022-07-28 17:03"
 
@@ -406,7 +406,7 @@ namespace Data
                     //"2022-07-28 17:03"
                     else
                     {
-                        
+
                     }
                 }
             }
@@ -445,7 +445,7 @@ namespace Data
                 WebFileInfoResult = GetFile(cid, limit, true);
             }
             //未加载全部
-            else if(WebFileInfoResult.count > limit)
+            else if (WebFileInfoResult.count > limit)
             {
                 WebFileInfoResult = GetFile(cid, WebFileInfoResult.count, userApi2);
             }
@@ -461,7 +461,7 @@ namespace Data
         /// <returns></returns>
         public async Task<FolderCategory> GetFolderCategory(string cid)
         {
-            FolderCategory WebFileInfoResult=null;
+            FolderCategory WebFileInfoResult = null;
 
             string url = $"https://webapi.115.com/category/get?cid={cid}";
             HttpResponseMessage response;
@@ -469,11 +469,12 @@ namespace Data
             {
                 response = await Client.GetAsync(url);
             }
-            catch(AggregateException e)
+            catch (AggregateException e)
             {
                 FileMatch.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
                 return WebFileInfoResult;
-            }catch(HttpRequestException e)
+            }
+            catch (HttpRequestException e)
             {
                 FileMatch.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
                 return WebFileInfoResult;
@@ -555,7 +556,7 @@ namespace Data
             {
                 QRCodeClient = new HttpClient();
             }
-        
+
             string url = $"https://qrcodeapi.115.com/get/status/?uid={QRCodeInfo.data.uid}&time={QRCodeInfo.data.time}&sign={QRCodeInfo.data.sign}&_={DateTimeOffset.Now.ToUnixTimeSeconds()}";
 
             try
@@ -601,8 +602,8 @@ namespace Data
             return QRCodeInfo;
         }
 
-        public enum downType {_115 ,bc, aria2};
-        public async Task<bool> RequestDown(List<Datum> videoInfoList, downType downType=downType._115, string savePath = null,string topFolderName=null)
+        public enum downType { _115, bc, aria2 };
+        public async Task<bool> RequestDown(List<Datum> videoInfoList, downType downType = downType._115, string savePath = null, string topFolderName = null)
         {
             bool success = false;
 
@@ -612,7 +613,7 @@ namespace Data
             //BitComet支持文件和文件夹
             else if (downType == downType.bc)
             {
-                success = await RequestDownByBitComet(videoInfoList,GetInfoFromNetwork.DesktopUserAgent, save_path: savePath, topFolderName: topFolderName);
+                success = await RequestDownByBitComet(videoInfoList, GetInfoFromNetwork.DesktopUserAgent, save_path: savePath, topFolderName: topFolderName);
             }
             //Arai2也支持文件和文件夹
             else if (downType == downType.aria2)
@@ -694,7 +695,7 @@ namespace Data
         /// <returns></returns>
         async Task<bool> RequestDownByBitComet(List<Datum> videoInfoList, string ua, string save_path, string topFolderName = null)
         {
-            bool success=true;
+            bool success = true;
 
             var BitCometSettings = AppSettings.BitCometSettings;
 
@@ -718,7 +719,7 @@ namespace Data
 
             //应用设置中没有，则从比特彗星的设置中读取
             if (string.IsNullOrEmpty(save_path))
-                save_path = await getBitCometDefaultSavePath(client,baseUrl);
+                save_path = await getBitCometDefaultSavePath(client, baseUrl);
 
             if (topFolderName != null)
                 save_path = Path.Combine(save_path, topFolderName);
@@ -728,7 +729,7 @@ namespace Data
                 string pc = datum.pc;
 
                 //文件夹
-                if (string.IsNullOrEmpty(datum.fid)||(!string.IsNullOrEmpty(datum.fid) && datum.fid == "0"))
+                if (string.IsNullOrEmpty(datum.fid) || (!string.IsNullOrEmpty(datum.fid) && datum.fid == "0"))
                 {
                     string newSavePath = Path.Combine(save_path, datum.n);
                     //遍历文件夹并下载
@@ -772,16 +773,16 @@ namespace Data
             if (topFolderName != null)
                 save_path = Path.Combine(save_path, topFolderName);
 
-            bool success =  await GetAllFilesTraverseAndDownByAria2(videoInfoList, Aria2Settings.ApiUrl, Aria2Settings.Password, save_path,ua);
+            bool success = await GetAllFilesTraverseAndDownByAria2(videoInfoList, Aria2Settings.ApiUrl, Aria2Settings.Password, save_path, ua);
 
             return success;
         }
 
-        public async Task<bool> GetAllFilesTraverseAndDownByAria2(List<Datum> videoInfoList,string apiUrl,string password,string save_path,string ua)
+        public async Task<bool> GetAllFilesTraverseAndDownByAria2(List<Datum> videoInfoList, string apiUrl, string password, string save_path, string ua)
         {
             bool success = true;
 
-            Dictionary<string,string> fileList = new();
+            Dictionary<string, string> fileList = new();
 
             foreach (Datum datum in videoInfoList)
             {
@@ -799,9 +800,9 @@ namespace Data
                     }
 
                     string newSavePath = Path.Combine(save_path, datum.n);
-                    bool isOK = await GetAllFilesTraverseAndDownByAria2(webFileInfo.data.ToList(),apiUrl, password, newSavePath, ua);
+                    bool isOK = await GetAllFilesTraverseAndDownByAria2(webFileInfo.data.ToList(), apiUrl, password, newSavePath, ua);
 
-                    if(!isOK)
+                    if (!isOK)
                         success = false;
                 }
 
@@ -810,7 +811,7 @@ namespace Data
                 {
                     //一般只有一个
                     var downUrlList = GetDownUrl(datum.pc, ua);
-                    if(downUrlList.Count == 0)
+                    if (downUrlList.Count == 0)
                     {
                         success = false;
                         continue;
@@ -826,7 +827,7 @@ namespace Data
             //文件
             if (fileList.Count > 0)
             {
-                foreach(var file in fileList)
+                foreach (var file in fileList)
                 {
 
                     bool isOK = await pushDownRequestToAria2(apiUrl, password, new List<string>() { file.Value }, ua, save_path, file.Key);
@@ -848,21 +849,21 @@ namespace Data
         /// <param name="ua"></param>
         /// <param name="save_path"></param>
         /// <returns></returns>
-        async Task<bool> pushDownRequestToAria2(string apiUrl,string password,List<string> urls, string ua, string save_path,string sha1=null)
+        async Task<bool> pushDownRequestToAria2(string apiUrl, string password, List<string> urls, string ua, string save_path, string sha1 = null)
         {
             bool success = false;
 
-            save_path=save_path.Replace("\\", "/");
+            save_path = save_path.Replace("\\", "/");
 
             string gid = sha1 != null ? sha1 : DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
 
-            string myContent = "{\"jsonrpc\":\"2.0\","+
-                "\"method\": \"aria2.addUri\","+
-                "\"id\": \""+ gid + "\"," +
-                "\"params\": [ \""+ password + "\","+
+            string myContent = "{\"jsonrpc\":\"2.0\"," +
+                "\"method\": \"aria2.addUri\"," +
+                "\"id\": \"" + gid + "\"," +
+                "\"params\": [ \"" + password + "\"," +
                             "[\"" + string.Join("\",\"", urls) + "\"]," +
-                            "{\"referer\": \"https://115.com/?cid=0&offset=0&tab=&mode=wangpan\","+
-                            "\"header\": [\"User-Agent: " + ua +"\"],"+
+                            "{\"referer\": \"https://115.com/?cid=0&offset=0&tab=&mode=wangpan\"," +
+                            "\"header\": [\"User-Agent: " + ua + "\"]," +
                             "\"dir\": \"" + save_path + "\"}]}";
 
             HttpClient client = new HttpClient()
@@ -892,7 +893,7 @@ namespace Data
             return success;
         }
 
-        async Task<bool> pushOneFileDownRequestToBitComet(HttpClient client, string baseUrl, Datum datum,string ua,string save_path)
+        async Task<bool> pushOneFileDownRequestToBitComet(HttpClient client, string baseUrl, Datum datum, string ua, string save_path)
         {
             bool success = false;
 
@@ -920,7 +921,7 @@ namespace Data
             //获取该文件夹下的文件和文件夹
             WebFileInfo webFileInfo = GetFile(datum.cid);
 
-            foreach(var data in webFileInfo.data)
+            foreach (var data in webFileInfo.data)
             {
                 //文件夹
                 if (string.IsNullOrEmpty(data.fid) || (!string.IsNullOrEmpty(data.fid) && data.fid == "0"))
@@ -952,7 +953,7 @@ namespace Data
         /// <param name="user_agent">下载需要的user_agent</param>
         /// <param name="cookie">个别需要的Cookie</param>
         /// <returns></returns>
-        async Task<bool> pushDownRequestToBitComet(HttpClient client,string baseUrl, string downUrl, string save_path, string filename="",string referrer="",string user_agent="",string cookie="")
+        async Task<bool> pushDownRequestToBitComet(HttpClient client, string baseUrl, string downUrl, string save_path, string filename = "", string referrer = "", string user_agent = "", string cookie = "")
         {
             bool isOk = false;
 
@@ -970,7 +971,7 @@ namespace Data
             };
             var content = new FormUrlEncodedContent(values);
 
-            var response = await client.PostAsync(baseUrl +"/panel/task_add_httpftp_result", content);
+            var response = await client.PostAsync(baseUrl + "/panel/task_add_httpftp_result", content);
 
             if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
                 isOk = true;
@@ -984,13 +985,13 @@ namespace Data
         /// <param name="client"></param>
         /// <param name="baseUrl"></param>
         /// <returns></returns>
-        async Task<string> getBitCometDefaultSavePath(HttpClient client,string baseUrl)
+        async Task<string> getBitCometDefaultSavePath(HttpClient client, string baseUrl)
         {
             string savePath = null;
 
             var response = await client.GetAsync(baseUrl + "/panel/task_add_httpftp");
 
-            if(response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
+            if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
             {
                 HtmlDocument htmlDoc = new HtmlDocument();
                 htmlDoc.LoadHtml(await response.Content.ReadAsStringAsync());
@@ -1050,7 +1051,7 @@ namespace Data
             string currentCookie;
 
             IEnumerable<string> value;
-            bool haveCookie = Client.DefaultRequestHeaders.TryGetValues("Cookie",out value);
+            bool haveCookie = Client.DefaultRequestHeaders.TryGetValues("Cookie", out value);
             if (haveCookie)
             {
                 currentCookie = value.SingleOrDefault();
@@ -1118,10 +1119,24 @@ namespace Data
         /// </summary>
         /// <param name="pickcode"></param>
         /// <returns></returns>
-        public Dictionary<string,string> GetDownUrl(string pickcode,string ua)
+        public Dictionary<string, string> GetDownUrl(string pickcode, string ua)
         {
             Dictionary<string, string> downUrlList = new();
+
             long tm = DateTimeOffset.Now.ToUnixTimeSeconds();
+
+            if (AppSettings.IsRecordDownRequest)
+            {
+                var downUrlInfo = DataAccess.GetDownHistoryBypcAndua(pickcode, ua);
+
+                //检查链接是否失效
+                if (downUrlInfo!=null && (tm - downUrlInfo.addTime) > AppSettings.DownUrlOverdueTime)
+                {
+                    downUrlList.Add(downUrlInfo.fileName, downUrlInfo.trueUrl);
+                    return downUrlList;
+                }
+            }
+
             string src = $"{{\"pickcode\":\"{pickcode}\"}}";
             var item = m115.encode(src, tm);
             byte[] data = item.Item1;
@@ -1160,7 +1175,7 @@ namespace Data
                 {
                     downurl_base64EncryptInfo = null;
                 }
-                
+
                 if (downurl_base64EncryptInfo != null && downurl_base64EncryptInfo.state)
                 {
                     string base64Text = downurl_base64EncryptInfo.data;
@@ -1184,6 +1199,18 @@ namespace Data
                         }
 
                     }
+                }
+
+                //添加下载记录
+                if (AppSettings.IsRecordDownRequest && downUrlList.Count != 0)
+                {
+                    DataAccess.AddDownHistory(new()
+                    {
+                        fileName = downUrlList.First().Key.ToString(),
+                        trueUrl = downUrlList.First().Value.ToString(),
+                        pickCode = pickcode,
+                        ua = ua
+                    });
                 }
             }
 
@@ -1311,10 +1338,10 @@ namespace Data
         /// <param name="showWindow"></param>
         /// <param name="referrerUrl"></param>
         /// <param name="user_agnet"></param>
-        public void Play115SourceVideoWithMpv(string playUrl, string user_agnet, string FileName, bool showWindow = true, string referrerUrl = "https://115.com",string title=null,string subFile=null)
+        public void Play115SourceVideoWithMpv(string playUrl, string user_agnet, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string title = null, string subFile = null)
         {
             var process = new Process();
-            
+
             string addTitle = string.Empty;
 
             if (title == null)
@@ -1328,7 +1355,7 @@ namespace Data
                 addTitle = @$"  --title=""{title}""";
             }
 
-            string addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty: @$" --sub-file=""{subFile}""";
+            string addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty : @$" --sub-file=""{subFile}""";
 
             process.StartInfo.FileName = FileName;
 
@@ -1351,12 +1378,12 @@ namespace Data
         /// <param name="showWindow"></param>
         /// <param name="referrerUrl"></param>
         /// <param name="user_agnet"></param>
-        public static void Play115SourceVideoWithVlc(string playUrl, string user_agnet, string FileName, bool showWindow = true, string referrerUrl = "https://115.com",string title=null, string subFile = null)
+        public static void Play115SourceVideoWithVlc(string playUrl, string user_agnet, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string title = null, string subFile = null)
         {
             var process = new Process();
 
             string addTitle = string.Empty;
-            if(title == null)
+            if (title == null)
             {
                 var matchTitle = Regex.Match(HttpUtility.UrlDecode(playUrl), @"/([-@.\w]+?\.\w+)\?t=");
                 if (matchTitle.Success)
@@ -1398,13 +1425,13 @@ namespace Data
                 FileMatch.PlayByVlc(m3U8Infos[0].Url, AppSettings.VlcExePath);
             }
         }
-    
-        public enum playMethod { pot,mpv,vlc}
+
+        public enum playMethod { pot, mpv, vlc }
         /// <summary>
         /// 原画播放
         /// </summary>
         /// <param name="pickcode"></param>
-        public async void PlayVideoWithOriginUrl(string pickcode ,playMethod playMethod, XamlRoot xamlRoot, SubInfo subInfo=null)
+        public async void PlayVideoWithOriginUrl(string pickcode, playMethod playMethod, XamlRoot xamlRoot, SubInfo subInfo = null)
         {
             //播放路径检查选择
             string savePath = string.Empty;
@@ -1447,7 +1474,7 @@ namespace Data
 
             }
 
-            if (AppSettings.IsFindSub && subInfo!= null)
+            if (AppSettings.IsFindSub && subInfo != null)
                 subFile = await TryDownSubFile(subInfo);
 
             switch (playMethod)
@@ -1460,7 +1487,7 @@ namespace Data
                     Play115SourceVideoWithPotPlayer(downUrl, user_agnet: ua, savePath, false, subFile: subFile);
                     break;
                 case playMethod.mpv:
-                    downUrlList = GetDownUrl(pickcode,ua);
+                    downUrlList = GetDownUrl(pickcode, ua);
                     if (downUrlList.Count == 0) return;
 
 
@@ -1469,11 +1496,11 @@ namespace Data
                     break;
                 case playMethod.vlc:
                     //vlc不支持带“; ”的user-agent
-                    downUrlList = GetDownUrl(pickcode,ua);
+                    downUrlList = GetDownUrl(pickcode, ua);
                     if (downUrlList.Count == 0) return;
 
                     downUrl = downUrlList.First().Value;
-                    Play115SourceVideoWithVlc(downUrl, user_agnet: ua, savePath, false,title:downUrlList.First().Key, subFile: subFile);
+                    Play115SourceVideoWithVlc(downUrl, user_agnet: ua, savePath, false, title: downUrlList.First().Key, subFile: subFile);
                     break;
             }
         }
@@ -1506,7 +1533,7 @@ namespace Data
 
                 var sub_Url = subUrlList.First().Value;
 
-                subFile = await GetInfoFromNetwork.downloadFile(sub_Url, Sub_SavePath, fileName, false,new()
+                subFile = await GetInfoFromNetwork.downloadFile(sub_Url, Sub_SavePath, fileName, false, new()
                 {
                     {"user-agent", ua }
                 });

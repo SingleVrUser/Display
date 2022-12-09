@@ -11,6 +11,7 @@ using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Linq;
 using OpenCvSharp.Flann;
+using System.ComponentModel;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -47,29 +48,11 @@ namespace Display.Views
 
         private void loadCover()
         {
-            //随机获取20个视频
+            //随机获取20个视频，每次启动自动获取一遍
             foreach (var item in DataAccess.getNameAndIamgeRandom())
             {
                 Items.Add(new VideoCoverDisplayClass(item));
             }
-
-            ////稍后观看
-            //foreach (var item in DataAccess.getNameAndImageFromLookLater())
-            //{
-            //    lookLaterList.Add(new VideoCoverDisplayClass(item));
-            //}
-
-            ////最近视频
-            //foreach (var item in DataAccess.getNameAndIamgeRecent())
-            //{
-            //    recentCoverList.Add(new VideoCoverDisplayClass(item));
-            //}
-
-            ////喜欢视频
-            //foreach (var item in DataAccess.getNameAndImageFromLike())
-            //{
-            //    LoveCoverList.Add(new VideoCoverDisplayClass(item));
-            //}
 
         }
 
@@ -159,6 +142,7 @@ namespace Display.Views
                     }
                 }
             }
+
             //对上一级页面的更改做出响应，删除或添加喜欢
             tryUpdateCoverShow();
 
@@ -166,49 +150,11 @@ namespace Display.Views
 
         private void tryUpdateCoverShow()
         {
-            //VideoCoverDisplayClass item;
-
-            //if(_navigationType == navigationAnimationType.image && _storedimage!= null)
-            //{
-            //    item = _storedimage.DataContext as VideoCoverDisplayClass;
-            //}
-            //else if(_navigationType == navigationAnimationType.gridView && _storeditem != null)
-            //{
-            //    item = _storeditem;
-            //}
-            //else
-            //{
-            //    return;
-            //}
-
-            ////删除了喜欢
-            //if (item.is_like == 0 && (LoveCoverList.Contains(item)))
-            //{
-            //    LoveCoverList.Remove(item);
-            //}
-            ////添加了喜欢
-            //else if (item.is_like == 1 && !LoveCoverList.Contains(item))
-            //{
-            //    LoveCoverList.Add(item);
-            //}
-
-            ////删除了稍后再看
-            //if (item.look_later == 0 && (lookLaterList.Contains(item)))
-            //{
-            //    lookLaterList.Remove(item);
-            //}
-            ////添加了稍后再看
-            //else if (item.look_later != 0 && !lookLaterList.Contains(item))
-            //{
-            //    lookLaterList.Add(item);
-            //}
-
             //稍后观看
             tryUpdateVideoCoverDisplayClass(DataAccess.getNameAndImageFromLookLater(),lookLaterList);
 
             //最近视频
             tryUpdateVideoCoverDisplayClass(DataAccess.getNameAndIamgeRecent(), recentCoverList);
-
 
             //喜欢视频
             tryUpdateVideoCoverDisplayClass(DataAccess.getNameAndImageFromLike(), LoveCoverList);
@@ -264,6 +210,20 @@ namespace Display.Views
             {
                 videoList.Add(new VideoCoverDisplayClass(item));
             }
+        }
+
+        private void MoreLikeVideoClick(object sender, RoutedEventArgs e)
+        {
+            Tuple<string, List<VideoCoverDisplayClass>> tuple = new("喜欢", LoveCoverList.ToList());
+
+            Frame.Navigate(typeof(ActorInfoPage), tuple);
+        }
+
+        private void MoreLookLaterVideoClick(object sender, RoutedEventArgs e)
+        {
+            Tuple<string, List<VideoCoverDisplayClass>> tuple = new("稍后观看", lookLaterList.ToList());
+
+            Frame.Navigate(typeof(ActorInfoPage), tuple);
         }
     }
 

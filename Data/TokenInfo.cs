@@ -531,7 +531,8 @@ namespace Data
             get => _imagepath;
             set
             {
-                _imagepath = value;
+                string path = value;
+                _imagepath = !string.IsNullOrEmpty(path) ? path : "ms-appx:///Assets/NoPicture.jpg";
                 OnPropertyChanged();
             }
         }
@@ -597,7 +598,6 @@ namespace Data
 
         public VideoCoverDisplayClass(VideoInfo videoinfo)
         {
-
             foreach (var VideoInfoItem in videoinfo.GetType().GetProperties())
             {
                 var key = VideoInfoItem.Name;
@@ -1253,7 +1253,7 @@ namespace Data
                 if (string.IsNullOrEmpty(_prifilePhotoPath))
                 {
                     //初始化
-                    _prifilePhotoPath = $"ms-appx:///Assets/NoPicture.jpg";
+                    _prifilePhotoPath = "ms-appx:///Assets/NoPicture.jpg";
 
                     //检查演员图片是否存在
                     string imagePath = Path.Combine(AppSettings.ActorInfo_SavePath, name, "face.jpg");
