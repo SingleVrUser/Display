@@ -647,15 +647,26 @@ namespace Data
                     }
 
                 }
-                if (search_left_cid == left_cid && search_right_cid == right_cid)
+
+                int currentNum;
+                int searchNum;
+
+                if (search_left_cid == left_cid
+                         && (search_right_cid == right_cid
+                                || (Int32.TryParse(right_cid, out currentNum)
+                                        && Int32.TryParse(right_cid, out searchNum)
+                                            && currentNum.Equals(searchNum))))
                 {
                     var detail_url = SearchResultNodes[i].SelectSingleNode(".//a").Attributes["href"].Value;
                     detail_url = UrlCombine(AppSettings.JavDB_BaseUrl, detail_url);
                     result = detail_url;
                     break;
                 }
-            }
+                else
+                {
 
+                }
+            }
 
             return result;
         }

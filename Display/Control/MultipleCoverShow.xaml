@@ -14,10 +14,26 @@
             <Setter Property="MaxWidth" Value="300"/>
             <Setter Property="MinHeight" Value="200"/>
             <Setter Property="MinWidth" Value="300"/>
+            <Setter Property="Stretch"
+                    Value="UniformToFill"/>
         </Style>
     </UserControl.Resources>
+    
     <StackPanel Padding="5">
-        <TextBlock Text="{x:Bind ShowName}" FontSize="18" FontWeight="Bold"/>
+        <RelativePanel>
+            <TextBlock Text="{x:Bind ShowName}"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       RelativePanel.AlignBottomWithPanel="True"/>
+
+            <HyperlinkButton RelativePanel.AlignRightWithPanel="True"
+                             RelativePanel.AlignVerticalCenterWithPanel="True"
+                             Click="MoreButton_Click"
+                             Visibility="{x:Bind MoreButtonVisibility}">
+                <SymbolIcon Symbol="More"
+                            Opacity="0.5" />
+            </HyperlinkButton>
+        </RelativePanel>
         <Grid>
             <StackPanel x:Name="NewAddStackPanel" BorderBrush="{ThemeResource AppBarBorderThemeBrush}" BorderThickness="1" CornerRadius="5" Margin="5" SizeChanged="NewAddStackPanel_SizeChanged">
                 <FlipView Height="250" ItemsSource="{x:Bind NewAddFlipItems, Mode=OneWay}"  Background="{ThemeResource BreadcrumbBarBackgroundBrush}">
@@ -32,6 +48,7 @@
                                 <GridView.ItemTemplate>
                                     <DataTemplate x:DataType="data:VideoCoverDisplayClass">
                                         <Image Height="200"
+                                               
                                                x:Name="showImage"
                                                Style="{StaticResource newAddCoverResources}"
                                                Source="{x:Bind imagepath}"

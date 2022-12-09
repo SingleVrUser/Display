@@ -3,7 +3,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -11,7 +13,6 @@ using System.Linq;
 
 namespace Display.Views
 {
-
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -41,6 +42,7 @@ namespace Display.Views
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+
             //过渡动画
             if (e.NavigationMode == NavigationMode.Back)
             {
@@ -67,17 +69,28 @@ namespace Display.Views
         private void LoadShowInfo(object item)
         {
             if (item == null) return;
-            string[] typeAndName = item as string[];
 
-            string type = typeAndName[0];
-            ShowName = typeAndName[1];
+            //需要显示的是搜索结果
+            if (item is string[] typeAndName)
+            {
+                string type = typeAndName[0];
+                ShowName = typeAndName[1];
 
-            //显示的是演员还是标签
-            List<VideoInfo> VideoInfoList = FileMatch.getVideoInfoFromType(type, ShowName);
+                //显示的是演员还是标签
+                List<VideoInfo> VideoInfoList = FileMatch.getVideoInfoFromType(type, ShowName);
 
-            var newFileGrid = FileMatch.getFileGrid(VideoInfoList);
+                var newFileGrid = FileMatch.getFileGrid(VideoInfoList);
 
-            videoControl.FileGrid = newFileGrid;
+                videoControl.FileGrid = newFileGrid;
+            }
+            //需要显示的是更多信息
+            else if(item is Tuple<string, List<VideoCoverDisplayClass>> moreVideos)
+            {
+                ShowName = moreVideos.Item1;
+
+                videoControl.FileGrid = moreVideos.Item2;
+            }
+
         }
 
         /// <summary>
@@ -93,7 +106,6 @@ namespace Display.Views
             Frame.Navigate(typeof(DetailInfoPage), item, new SuppressNavigationTransitionInfo());
         }
 
-
         /// <summary>
         /// 视频播放页面跳转
         /// </summary>
@@ -105,7 +117,6 @@ namespace Display.Views
 
             var VideoPlayButton = (Button)sender;
             var videoInfo = VideoPlayButton.DataContext as VideoCoverDisplayClass;
-
 
             List<Datum> videoInfoList = DataAccess.loadVideoInfoByTruename(videoInfo.truename);
 
@@ -143,14 +154,13 @@ namespace Display.Views
             }
         }
 
-
-
         private void ContentListView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var SingleVideoInfo = e.ClickedItem as Data.Datum;
 
             Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc, this.XamlRoot);
         }
+
 
     }
 
