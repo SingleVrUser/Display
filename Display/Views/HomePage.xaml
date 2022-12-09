@@ -11,12 +11,10 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <Style TargetType="Image" x:Key="newAddCoverResources">
-            <Setter Property="MaxWidth" Value="300"/>
-        </Style>
-        <Style TargetType="TextBlock" x:Key="TitleTextBlock">
-            <Setter Property="FontSize" Value="20"/>
-            <Setter Property="FontWeight" Value="bold"/>
+        <Style TargetType="Image"
+               x:Key="newAddCoverResources">
+            <Setter Property="MaxWidth"
+                    Value="300" />
         </Style>
 
     </Page.Resources>
@@ -59,17 +57,18 @@
                     <RelativePanel Margin="10,0,10,0">
                         <TextBlock Grid.Row="0"
                                    Text="随机20部"
-                                   Style="{StaticResource TitleTextBlock}" RelativePanel.AlignVerticalCenterWithPanel="True"/>
+                                   FontSize="20"
+                                   FontWeight="Bold"
+                                   RelativePanel.AlignVerticalCenterWithPanel="True"/>
                         <HyperlinkButton
                             Width="45"
                             Height="45"
                             x:Name="RefreshHyperlinkButton"
                             RelativePanel.AlignRightWithPanel="True"
                             RelativePanel.AlignVerticalCenterWithPanel="True"
-                            Opacity="0.5"
                             Click="UpdateRandomCover_Click"
                             CornerRadius="20">
-                            <SymbolIcon Symbol="Refresh" />
+                            <SymbolIcon Symbol="Refresh" Opacity="0.2"/>
                         </HyperlinkButton>
                     </RelativePanel>
 
@@ -132,9 +131,19 @@
 
             <control:MultipleCoverShow Grid.Row="1" ShowName="最新视频" CoverList="{x:Bind recentCoverList}" ItemClick="MultipleCoverShow_ItemClick"/>
 
-            <control:MultipleCoverShow Grid.Row="2" ShowName="喜欢视频" CoverList="{x:Bind LoveCoverList}" ItemClick="MultipleCoverShow_ItemClick"/>
+            <control:MultipleCoverShow Grid.Row="2"
+                                       ShowName="喜欢视频"
+                                       CoverList="{x:Bind LoveCoverList}"
+                                       ItemClick="MultipleCoverShow_ItemClick"
+                                       MoreClick="MoreLikeVideoClick"
+                                       MoreButtonVisibility="Visible"/>
 
-            <control:MultipleCoverShow Grid.Row="3" ShowName="稍后观看" CoverList="{x:Bind lookLaterList}" ItemClick="MultipleCoverShow_ItemClick"/>
+            <control:MultipleCoverShow Grid.Row="3"
+                                       ShowName="稍后观看"
+                                       CoverList="{x:Bind lookLaterList}"
+                                       ItemClick="MultipleCoverShow_ItemClick"
+                                       MoreClick="MoreLookLaterVideoClick"
+                                       MoreButtonVisibility="Visible" />
         </Grid>
     </ScrollViewer>
 

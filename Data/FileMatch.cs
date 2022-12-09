@@ -202,19 +202,15 @@ namespace Data
             {
                 case "番号" or "truename":
                     trueType = "truename";
-                    //item = DataAccess.loadVideoInfoByName(keywords);
                     break;
                 case "演员" or "actor":
                     trueType = "actor";
-                    //item = DataAccess.loadVideoInfoByActor(keywords);
                     break;
                 case "标签" or "category":
                     trueType = "category";
-                    //item = DataAccess.loadVideoInfoByLabel(keywords);
                     break;
                 default:
                     trueType = "truename";
-                    //item = DataAccess.loadVideoInfoByName(keywords);
                     break;
             }
 

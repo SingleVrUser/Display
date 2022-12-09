@@ -15,7 +15,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Windows.Storage;
-using Windows.Web.Http;
 
 namespace Display.Control;
 
