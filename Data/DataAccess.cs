@@ -292,7 +292,7 @@ namespace Data
         /// </summary>
         /// <param name="pickCode"></param>
         /// <param name="truename"></param>
-        public static void AddFileToInfo(string pickCode, string truename, bool issuccess = false, bool isReplace = false)
+        public static void AddFileToInfo(string pickCode, string truename, bool issuccess = false, bool isReplace = true)
         {
             using (SqliteConnection db =
               new SqliteConnection($"Filename={dbpath}"))
