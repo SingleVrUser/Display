@@ -44,6 +44,9 @@ namespace Data
             //提取文件名
             string name = Regex.Match(src_text, @"(.*)(\.\w{3,5})?$",RegexOptions.IgnoreCase).Groups[1].Value;
 
+            //删除空格
+            name = src_text.Replace(" ", "");
+
             //转小写
             string name_lc = name.ToLower();
 
