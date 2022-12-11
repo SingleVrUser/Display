@@ -48,6 +48,7 @@
                                 <GridView.ItemTemplate>
                                     <DataTemplate x:DataType="data:VideoCoverDisplayClass">
                                         <Image Height="200"
+                                               
                                                x:Name="showImage"
                                                Style="{StaticResource newAddCoverResources}"
                                                Source="{x:Bind imagepath}"

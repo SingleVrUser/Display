@@ -12,14 +12,18 @@
             <Setter Property="FontWeight" Value="Light"/>
         </Style>
     </UserControl.Resources>
-    
-    <TextBlock x:Name="LongTextBlock" Text="{x:Bind StringValue,Mode=OneWay}"
-               TextTrimming="CharacterEllipsis"
-               IsTextSelectionEnabled="{x:Bind IsFirstTextSelectionEnabled}">
-        <TextBlock.ContextFlyout>
-            <Flyout>
-                <TextBlock Text="{x:Bind StringValue,Mode=OneWay}" IsTextSelectionEnabled="{x:Bind IsSecondTextSelectionEnabled}"/>
-            </Flyout>
-        </TextBlock.ContextFlyout>
+
+    <Grid>
+        <TextBlock x:Name="LongTextBlock"
+                   Text="{x:Bind StringValue,Mode=OneWay}"
+                   TextTrimming="CharacterEllipsis"
+                   IsTextSelectionEnabled="{x:Bind IsFirstTextSelectionEnabled}">
+            <TextBlock.ContextFlyout>
+                <Flyout>
+                    <TextBlock Text="{x:Bind StringValue,Mode=OneWay}"
+                               IsTextSelectionEnabled="{x:Bind IsSecondTextSelectionEnabled}" />
+                </Flyout>
+            </TextBlock.ContextFlyout>
     </TextBlock>
+    </Grid>
 </UserControl>
