@@ -170,18 +170,27 @@ namespace Display.Views
                 }
             }
         }
+
         /// <summary>
         /// 尝试更新图片保存目录
         /// </summary>
         /// <param name="folderPath"></param>
         private async void tryUpdateImagePath(string folderPath)
         {
+            //原来的地址
             string srcPath = AppSettings.Image_SavePath;
-            string dstPath = folderPath;
-            string imagePath = DataAccess.GetOneImagePath();
-            if (string.IsNullOrEmpty(imagePath)) return;
 
+            //需要修改的地址
+            string dstPath = folderPath;
             AppSettings.Image_SavePath = folderPath;
+
+            //检查数据库的是否需要修改
+            string imagePath = DataAccess.GetOneImagePath();
+            if (string.IsNullOrEmpty(imagePath))
+            {
+                ShowTeachingTip("图片保存地址修改完成");
+                return;
+            }
 
             var imageRelativePath = Path.GetRelativePath(srcPath, imagePath);
             var isSrcPathError = imageRelativePath.Split('\\').Length > 2;
@@ -204,13 +213,14 @@ namespace Display.Views
             {
                 //修改数据库图片地址
                 DataAccess.UpdateAllImagePath(updateImagePathPage.srcPath, updateImagePathPage.dstPath);
-                ShowTeachingTip("修改成功，重启后生效");
+                ShowTeachingTip("图片保存地址 和 数据库中已有的图片地址 修改完成");
+            }
+            else
+            {
+                ShowTeachingTip("图片保存地址修改完成");
             }
 
         }
-
-
-
         private async void ActorInfoSavePath_Click(object sender, RoutedEventArgs e)
         {
             var folder = await OpenFolder(PickerLocationId.PicturesLibrary);
@@ -363,9 +373,7 @@ namespace Display.Views
                     paragraph.Inlines.Add(new LineBreak());
                     paragraph.Inlines.Add(new Run() { Text = "复制原数据文件到目标目录（如果目标目录下没有数据文件）" });
 
-
                     TextHighlightingRichTextBlock.Blocks.Add(paragraph);
-
 
                     dialog.Content = TextHighlightingRichTextBlock;
 
