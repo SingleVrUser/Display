@@ -156,7 +156,7 @@ namespace Display.Views
 
                 multisetList = multisetList.OrderBy(item => item.n).ToList();
 
-                ContentsPage.SelectSingleVideoToPlay newPage = new ContentsPage.SelectSingleVideoToPlay(multisetList);
+                ContentsPage.DetailInfo.SelectSingleVideoToPlay newPage = new ContentsPage.DetailInfo.SelectSingleVideoToPlay(multisetList);
                 newPage.ContentListView.ItemClick += VideoInfoListView_ItemClick;
 
                 VideoPlayButton.Flyout = new Flyout()
@@ -216,7 +216,7 @@ namespace Display.Views
                     //按名称排序
                     subInfos = subInfos.OrderBy(item => item.name).ToList();
 
-                    ContentsPage.SelectSingleSubFileToSelected newPage = new(subInfos);
+                    ContentsPage.DetailInfo.SelectSingleSubFileToSelected newPage = new(subInfos);
                     newPage.ContentListView.ItemClick += SubInfoListView_ItemClick; ;
 
                     ContentDialog dialog = new();
@@ -351,7 +351,7 @@ namespace Display.Views
 
                 multisetList = multisetList.OrderBy(item => item.n).ToList();
 
-                ContentsPage.SelectSingleVideoToPlay newPage = new ContentsPage.SelectSingleVideoToPlay(multisetList);
+                ContentsPage.DetailInfo.SelectSingleVideoToPlay newPage = new ContentsPage.DetailInfo.SelectSingleVideoToPlay(multisetList);
                 newPage.ContentListView.ItemClick += VideoInfoListView_ItemClick;
 
                 ContentDialog dialog = new();

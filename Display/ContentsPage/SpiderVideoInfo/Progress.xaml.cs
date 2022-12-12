@@ -1,4 +1,8 @@
-﻿using Data;
+﻿// Copyright (c) Microsoft Corporation and Contributors.
+// Licensed under the MIT License.
+
+using Data;
+using Display.Control;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using Microsoft.UI.Input;
@@ -8,159 +12,62 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Display.ContentsPage
+namespace Display.ContentsPage.SpiderVideoInfo
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class SpiderVideoInfo : Page, INotifyPropertyChanged
+    public sealed partial class Progress : Page
     {
-        GetInfoFromNetwork network;
-        VideoInfo videoInfo = new VideoInfo();
-        List<string> FailVideoNameList;
-
-
-        private Model.IncrementalLoadingdFileCollection _failList;
-        Model.IncrementalLoadingdFileCollection FailList
-        {
-            get => _failList;
-            set
-            {
-                if (_failList == value)
-                    return;
-
-                _failList = value;
-
-                OnPropertyChanged();
-            }
-        }
-
         CancellationTokenSource s_cts = new();
+        List<MatchVideoResult> matchVideoResults;
+        VideoInfo videoInfo = new VideoInfo();
+        List<string> folderNameList = new();
+        List<Datum> datumList = new();
+        GetInfoFromNetwork network;
+        List<string> FailVideoNameList;
         public Window currentWindow;
 
-        List<MatchVideoResult> matchVideoResults;
-
-        private Datum _selectedDatum;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public Datum SelectedDatum
-        {
-            get => _selectedDatum;
-            set
-            {
-                if (_selectedDatum == value)
-                    return;
-                _selectedDatum = value;
-
-                OnPropertyChanged();
-            }
-        }
-
-
-        public void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            // Raise the PropertyChanged event, passing the name of the property whose value has changed.
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public SpiderVideoInfo()
+        public Progress(Window currentWindow, List<string> folderNameList, List<Datum> datumList)
         {
             this.InitializeComponent();
+
+            this.currentWindow = currentWindow;
+            this.folderNameList = folderNameList;
+            this.datumList = datumList;
+
+            this.Loaded += PageLoaded;
         }
 
-        private void Expander_Expanding(Expander sender, ExpanderExpandingEventArgs args)
+        private async void PageLoaded(object sender, RoutedEventArgs e)
         {
-            if ((sender.Content as SpiderVideoInfo_ConditionalCheck) == null)
-            {
-                sender.Content = new ContentsPage.SpiderVideoInfo_ConditionalCheck(this);
-            }
-        }
-
-        //匹配名称
-        private async void StartMatchName_ButtonClick(object sender, RoutedEventArgs e)
-        {
-            //检查是否有选中文件
-            if (Explorer.FolderTreeView.SelectedNodes.Count == 0)
-            {
-                SelectNull_TeachintTip.IsOpen = true;
-                return;
-            }
-
-            //隐藏文件信息
-            CurrentFileInfo_Grid.Visibility = Visibility.Collapsed;
-            //显示进度
-            FindMoreVideoInfo_Grid.Visibility = Visibility.Visible;
-            //不在监听文件信息的显示
-            Explorer.ItemClick -= ExplorerItemClick;
-            Explorer.ItemInvoked -= TreeView_ItemInvoked;
-
             currentWindow.Closed += CurrentWindow_Closed;
+
             await ShowMatchResult();
 
             await SpliderVideoInfo(matchVideoResults);
 
             currentWindow.Closed -= CurrentWindow_Closed;
-
         }
 
-        private async void CurrentWindow_Closed(object sender, WindowEventArgs args)
-        {
-            args.Handled = true;
-            var window = (sender as Window);
-
-            ContentDialog dialog = new ContentDialog();
-
-            // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
-            dialog.XamlRoot = this.XamlRoot;
-            dialog.Title = "确认";
-            dialog.PrimaryButtonText = "关闭";
-            dialog.CloseButtonText = "返回";
-            dialog.DefaultButton = ContentDialogButton.Primary;
-            dialog.Content = "关闭窗口后将取消当前任务，是否继续关闭";
-
-            var result = await dialog.ShowAsync();
-            if (result == ContentDialogResult.Primary)
-            {
-                s_cts.Cancel();
-
-                window.Closed -= CurrentWindow_Closed;
-                window.Close();
-            }
-        }
-
+        /// <summary>
+        /// 显示正则匹配的结果
+        /// </summary>
+        /// <returns></returns>
         private async Task ShowMatchResult()
         {
             TopProgressBar.Visibility = Visibility.Visible;
-            var treeView = Explorer.FolderTreeView;
-
-            List<Datum> datumList = new();
-            foreach (var node in treeView.SelectedNodes)
-            {
-                var explorer = node.Content as ExplorerItem;
-
-                if (explorer == null) continue;
-                var cid = explorer.Cid;
-                //var StoreDataList = Explorer.StoreDataList;
-
-                var item = await Task.Run(() => Explorer.GetFilesFromItems(cid, FilesInfo.FileType.File));
-
-                datumList.AddRange(item);
-            }
 
             //目前datumList仅有一级目录文件
-
             //遍历获取文件列表中所有的文件
-            datumList = await Task.Run(()=> datumList = DataAccess.GetAllFilesInFolderList(datumList));
+            datumList = await Task.Run(() => datumList = DataAccess.GetAllFilesInFolderList(datumList));
 
             //初始化进度环
             ProgressRing_Grid.Visibility = Visibility.Visible;
@@ -189,262 +96,6 @@ namespace Display.ContentsPage
             }
 
             TopProgressBar.Visibility = Visibility.Collapsed;
-
-
-        }
-
-        private void ResetMatchCountInfo(List<MatchVideoResult> matchVideoResults)
-        {
-            overallProgress.Maximum = matchVideoResults.Count;
-            countProgress_TextBlock.Text = $"{overallProgress.Value}/{matchVideoResults.Count}";
-            if(matchVideoResults.Count == 0)
-            {
-                percentProgress_TextBlock.Text = $"100%";
-            }
-        }
-
-        /// <summary>
-        /// 开始从网络中检索视频信息
-        /// </summary>
-        private async Task SpliderVideoInfo(List<MatchVideoResult> matchVideoResults)
-        {
-            network = new();
-            VideoInfo_Grid.Visibility = Visibility.Visible;
-            TopProgressBar.Visibility = Visibility.Visible;
-            StartMatchName_Button.IsEnabled = false;
-            FailVideoNameList = new();
-
-            var startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
-
-            ProgressMore_TextBlock.Text = $"失败数：0";
-            var progress = new Progress<SpliderInfoProgress>(progressPercent =>
-            {
-                //更新进度信息
-                if (progressPercent.index != 0)
-                {
-                    overallProgress.Value = progressPercent.index;
-                }
-
-                tryUpdateVideoInfo(progressPercent.videoInfo);
-                var matchResult = progressPercent.matchResult;
-
-                //匹配失败/检索失败
-                if (!matchResult.status)
-                {
-                    FailVideoNameList.Add(matchResult.OriginalName);
-
-                    ProgressMore_TextBlock.Text = $"失败数：{FailVideoNameList.Count}";
-                    SearchProgress_TextBlock.Text = $"{matchResult.OriginalName}";
-                    SearchMessage_TextBlock.Text = $"❌{matchResult.message}";
-
-                }
-                //匹配成功/跳过非视频文件/跳过重复番号
-                else
-                {
-                    if(matchResult.MatchName != null)
-                    {
-                        //匹配成功
-                        if(matchResult.OriginalName!= null)
-                        {
-                            SearchProgress_TextBlock.Text = $"{matchResult.OriginalName} => {matchResult.MatchName}";
-                            SearchMessage_TextBlock.Text = $"✔{matchResult.message}";
-                        }
-                        //匹配中
-                        else
-                        {
-                            SearchProgress_TextBlock.Text = $"{matchResult.MatchName}";
-                            SearchMessage_TextBlock.Text = $"🐬{matchResult.message}";
-                        }
-                    }
-                    // 其他
-                    else
-                    {
-                        SearchProgress_TextBlock.Text = $"{matchResult.OriginalName}";
-                        SearchMessage_TextBlock.Text = $"✨{matchResult.message}";
-                    }
-                }
-
-
-                percentProgress_TextBlock.Text = $"{(int)overallProgress.Value * 100 / matchVideoResults.Count}%";
-                countProgress_TextBlock.Text = $"{overallProgress.Value}/{matchVideoResults.Count}";
-
-                //100%
-                if (overallProgress.Value == overallProgress.Maximum)
-                {
-                    //Debug.WriteLine($"完成……");
-
-                    ProgressRing_StackPanel.SetValue(Grid.ColumnSpanProperty, 1);
-                    SearchResult_StackPanel.Visibility = Visibility.Visible;
-                    SearchProgress_TextBlock.Visibility = Visibility.Collapsed;
-
-                    AllCount_Run.Text = $"{matchVideoResults.Count}";
-                    VideoCount_Run.Text = $"{matchVideoResults.Where(info=>info.statusCode != 0).ToList().Count}";
-                    FailCount_Run.Text = $"{FailVideoNameList.Count}";
-
-                    StartMatchName_Button.IsEnabled = true;
-                    TopProgressBar.Visibility = Visibility.Collapsed;
-
-                    //显示总耗时
-                    SearchMessage_TextBlock.Text = $"⏱总耗时：{FileMatch.ConvertInt32ToDateStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime)}";
-                }
-            });
-
-            await SearchAllInfo(matchVideoResults, progress);
-        }
-
-        private void tryUpdateVideoInfo(VideoInfo newInfo)
-        {
-            if (newInfo == null) return;
-
-            foreach (var VideoInfoItem in newInfo.GetType().GetProperties())
-            {
-                var key = VideoInfoItem.Name;
-                var value = VideoInfoItem.GetValue(newInfo);
-
-                var newItem = videoInfo.GetType().GetProperty(key);
-                newItem.SetValue(videoInfo, value);
-            }
-        }
-
-        private async Task SearchAllInfo(List<MatchVideoResult> matchVideoResults, IProgress<SpliderInfoProgress> progress)
-        {
-            for(int i = 0;i<matchVideoResults.Count;i++)
-            {
-                if (s_cts.IsCancellationRequested)
-                {
-                    return;
-                }
-
-                var matchResult = matchVideoResults[i];
-
-
-                SpliderInfoProgress spliderInfoProgress = new();
-                spliderInfoProgress.matchResult = matchResult;
-
-                //存在匹配文件
-                if (matchResult.MatchName != null)
-                {
-                    spliderInfoProgress.videoInfo = await SearchInfoByWeb(matchResult.MatchName, progress);
-
-                    //检索失败
-                    if (spliderInfoProgress.videoInfo == null)
-                    {
-                        spliderInfoProgress.matchResult.status = false;
-                        spliderInfoProgress.matchResult.statusCode = -2;
-                        spliderInfoProgress.matchResult.message = "检索失败";
-                    }
-                    //成功
-                    else
-                    {
-                        spliderInfoProgress.matchResult.status = true;
-                        spliderInfoProgress.matchResult.statusCode = 1;
-                        spliderInfoProgress.matchResult.message = "检索成功";
-                    }
-
-                }
-
-                spliderInfoProgress.index = i+1;
-
-                //获取到该信息，在UI上显示
-                progress.Report(spliderInfoProgress);
-
-            }
-        }
-
-        /// <summary>
-        /// 按顺序从网站中获取信息
-        /// </summary>
-        /// <param name="VideoName"></param>
-        /// <returns></returns>
-        private async Task<VideoInfo> SearchInfoByWeb(string VideoName, IProgress<SpliderInfoProgress> progress)
-        {
-            VideoInfo resultInfo = null;
-
-            var result = DataAccess.SelectTrueName(VideoName.ToUpper());
-
-            //如果数据库已存在该数据
-            if (result.Count != 0)
-            {
-                //使用第一个符合条件的Name
-                resultInfo = DataAccess.LoadOneVideoInfoByCID(result[0]);
-
-                progress.Report(new SpliderInfoProgress() {
-                    matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "数据库已存在" } });
-
-                DataAccess.UpdataFileToInfo(VideoName, true);
-
-            }
-            // 数据库中不存在该数据
-            // 从相关网站中搜索
-            else
-            {
-                //Fc2类型
-                if (VideoName.ToLower().Contains("fc2-"))
-                {
-                    if (AppSettings.isUseFc2Hub)
-                    {
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~2秒" } });
-                        await GetInfoFromNetwork.RandomTimeDelay(1, 2);
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从fc2hub中搜索" } });
-                        //先从fc2hub中搜索
-                        resultInfo = await network.SearchInfoFromFc2Hub(VideoName);
-                    }
-
-                    //搜索无果，尝试用javdb
-                    if(resultInfo == null&& AppSettings.isUseJavDB && !string.IsNullOrEmpty(AppSettings.javdb_Cookie))
-                    {
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待3~6秒" } });
-                        await GetInfoFromNetwork.RandomTimeDelay(3, 6);
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavDB中搜索" } });
-                        resultInfo = await network.SearchInfoFromJavDB(VideoName);
-                    }
-
-                }
-                else
-                {
-                    if (AppSettings.isUseJavBus)
-                    {
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~3秒" } });
-                        await GetInfoFromNetwork.RandomTimeDelay(1, 3);
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavBus中搜索" } });
-                        //先从javbus中搜索
-                        resultInfo = await network.SearchInfoFromJavBus(VideoName);
-                    }
-
-                    //搜索无果，使用libredmm搜索
-                    if (resultInfo == null && AppSettings.isUseLibreDmm)
-                    {
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~2秒" } });
-                        await GetInfoFromNetwork.RandomTimeDelay(1, 2);
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从LibreDmm中搜索" } });
-                        resultInfo = await network.SearchInfoFromLibreDmm(VideoName);
-                    }
-
-                    //搜索无果，使用javdb搜索
-                    if (resultInfo == null && AppSettings.isUseJavDB)
-                    {
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待3~6秒" } });
-                        await GetInfoFromNetwork.RandomTimeDelay(3, 6);
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavDB中搜索" } });
-                        resultInfo = await network.SearchInfoFromJavDB(VideoName);
-                    }
-                }
-
-                //多次搜索无果，退出
-                if (resultInfo == null)
-                {
-                    DataAccess.UpdataFileToInfo(VideoName, false);
-                    return null;
-                }
-
-                // 添加进数据库
-                DataAccess.AddVideoInfo(resultInfo);
-
-                //更新FileToInfo表
-                DataAccess.UpdataFileToInfo(VideoName,true);
-            }
-
-            return resultInfo;
         }
 
         /// <summary>
@@ -515,6 +166,12 @@ namespace Display.ContentsPage
 
         }
 
+        /// <summary>
+        /// 分析文件信息（饼形图）
+        /// </summary>
+        /// <param name="DataInfo"></param>
+        /// <param name="TypeInfo"></param>
+        /// <param name="Name"></param>
         private void UpdateFileStaticstics(Datum DataInfo, FileStatistics TypeInfo, string Name)
         {
             TypeInfo.size += DataInfo.s;
@@ -526,7 +183,7 @@ namespace Display.ContentsPage
 
                 if (tmpData == null)
                 {
-                    TypeInfo.data.Add(new FileStatistics.Data() { name = Name, count = 1,size = DataInfo.s});
+                    TypeInfo.data.Add(new FileStatistics.Data() { name = Name, count = 1, size = DataInfo.s });
                 }
                 else
                 {
@@ -540,17 +197,321 @@ namespace Display.ContentsPage
             }
         }
 
+        /// <summary>
+        /// 开始从网络中检索视频信息
+        /// </summary>
+        private async Task SpliderVideoInfo(List<MatchVideoResult> matchVideoResults)
+        {
+            if(network ==null)
+                network = new();
+
+            VideoInfo_Grid.Visibility = Visibility.Visible;
+            TopProgressBar.Visibility = Visibility.Visible;
+            //StartMatchName_Button.IsEnabled = false;
+            FailVideoNameList = new();
+
+            var startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+
+            ProgressMore_TextBlock.Text = $"失败数：0";
+            var progress = new Progress<SpliderInfoProgress>(progressPercent =>
+            {
+                //更新进度信息
+                if (progressPercent.index != 0)
+                {
+                    overallProgress.Value = progressPercent.index;
+                }
+
+                tryUpdateVideoInfo(progressPercent.videoInfo);
+                var matchResult = progressPercent.matchResult;
+
+                //匹配失败/检索失败
+                if (!matchResult.status)
+                {
+                    FailVideoNameList.Add(matchResult.OriginalName);
+
+                    ProgressMore_TextBlock.Text = $"失败数：{FailVideoNameList.Count}";
+                    SearchProgress_TextBlock.Text = $"{matchResult.OriginalName}";
+                    SearchMessage_TextBlock.Text = $"❌{matchResult.message}";
+
+                }
+                //匹配成功/跳过非视频文件/跳过重复番号
+                else
+                {
+                    if (matchResult.MatchName != null)
+                    {
+                        //匹配成功
+                        if (matchResult.OriginalName != null)
+                        {
+                            SearchProgress_TextBlock.Text = $"{matchResult.OriginalName} => {matchResult.MatchName}";
+                            SearchMessage_TextBlock.Text = $"✔{matchResult.message}";
+                        }
+                        //匹配中
+                        else
+                        {
+                            SearchProgress_TextBlock.Text = $"{matchResult.MatchName}";
+                            SearchMessage_TextBlock.Text = $"🐬{matchResult.message}";
+                        }
+                    }
+                    // 其他
+                    else
+                    {
+                        SearchProgress_TextBlock.Text = $"{matchResult.OriginalName}";
+                        SearchMessage_TextBlock.Text = $"✨{matchResult.message}";
+                    }
+                }
+
+
+                percentProgress_TextBlock.Text = $"{(int)overallProgress.Value * 100 / matchVideoResults.Count}%";
+                countProgress_TextBlock.Text = $"{overallProgress.Value}/{matchVideoResults.Count}";
+
+                //100%
+                if (overallProgress.Value == overallProgress.Maximum)
+                {
+                    //Debug.WriteLine($"完成……");
+
+                    ProgressRing_StackPanel.SetValue(Grid.ColumnSpanProperty, 1);
+                    SearchResult_StackPanel.Visibility = Visibility.Visible;
+                    SearchProgress_TextBlock.Visibility = Visibility.Collapsed;
+
+                    AllCount_Run.Text = $"{matchVideoResults.Count}";
+                    VideoCount_Run.Text = $"{matchVideoResults.Where(info => info.statusCode != 0).ToList().Count}";
+                    FailCount_Run.Text = $"{FailVideoNameList.Count}";
+
+                    //StartMatchName_Button.IsEnabled = true;
+                    TopProgressBar.Visibility = Visibility.Collapsed;
+
+                    //显示总耗时
+                    SearchMessage_TextBlock.Text = $"⏱总耗时：{FileMatch.ConvertInt32ToDateStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime)}";
+                }
+            });
+
+            await SearchAllInfo(matchVideoResults, progress);
+        }
+
+        /// <summary>
+        /// 搜索所有的信息
+        /// </summary>
+        /// <param name="matchVideoResults"></param>
+        /// <param name="progress"></param>
+        /// <returns></returns>
+        private async Task SearchAllInfo(List<MatchVideoResult> matchVideoResults, IProgress<SpliderInfoProgress> progress)
+        {
+            for (int i = 0; i < matchVideoResults.Count; i++)
+            {
+                if (s_cts.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                var matchResult = matchVideoResults[i];
+
+
+                SpliderInfoProgress spliderInfoProgress = new();
+                spliderInfoProgress.matchResult = matchResult;
+
+                //存在匹配文件
+                if (matchResult.MatchName != null)
+                {
+                    spliderInfoProgress.videoInfo = await SearchInfoByWeb(matchResult.MatchName, progress);
+
+                    //检索失败
+                    if (spliderInfoProgress.videoInfo == null)
+                    {
+                        spliderInfoProgress.matchResult.status = false;
+                        spliderInfoProgress.matchResult.statusCode = -2;
+                        spliderInfoProgress.matchResult.message = "检索失败";
+                    }
+                    //成功
+                    else
+                    {
+                        spliderInfoProgress.matchResult.status = true;
+                        spliderInfoProgress.matchResult.statusCode = 1;
+                        spliderInfoProgress.matchResult.message = "检索成功";
+                    }
+
+                }
+
+                spliderInfoProgress.index = i + 1;
+
+                //获取到该信息，在UI上显示
+                progress.Report(spliderInfoProgress);
+
+            }
+        }
+
+        /// <summary>
+        /// 更新显示的VideoInfo
+        /// </summary>
+        /// <param name="newInfo"></param>
+        private void tryUpdateVideoInfo(VideoInfo newInfo)
+        {
+            if (newInfo == null) return;
+
+            foreach (var VideoInfoItem in newInfo.GetType().GetProperties())
+            {
+                var key = VideoInfoItem.Name;
+                var value = VideoInfoItem.GetValue(newInfo);
+
+                var newItem = videoInfo.GetType().GetProperty(key);
+                newItem.SetValue(videoInfo, value);
+            }
+        }
+
+        /// <summary>
+        /// 按顺序从网站中获取信息
+        /// </summary>
+        /// <param name="VideoName"></param>
+        /// <returns></returns>
+        private async Task<VideoInfo> SearchInfoByWeb(string VideoName, IProgress<SpliderInfoProgress> progress)
+        {
+            VideoInfo resultInfo = null;
+
+            var result = DataAccess.SelectTrueName(VideoName.ToUpper());
+
+            //如果数据库已存在该数据
+            if (result.Count != 0)
+            {
+                //使用第一个符合条件的Name
+                resultInfo = DataAccess.LoadOneVideoInfoByCID(result[0]);
+
+                progress.Report(new SpliderInfoProgress()
+                {
+                    matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "数据库已存在" }
+                });
+
+                DataAccess.UpdataFileToInfo(VideoName, true);
+
+            }
+            // 数据库中不存在该数据
+            // 从相关网站中搜索
+            else
+            {
+                //Fc2类型
+                if (VideoName.ToLower().Contains("fc2-"))
+                {
+                    if (AppSettings.isUseFc2Hub)
+                    {
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~2秒" } });
+                        await GetInfoFromNetwork.RandomTimeDelay(1, 2);
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从fc2hub中搜索" } });
+                        //先从fc2hub中搜索
+                        resultInfo = await network.SearchInfoFromFc2Hub(VideoName);
+                    }
+
+                    //搜索无果，尝试用javdb
+                    if (resultInfo == null && AppSettings.isUseJavDB && !string.IsNullOrEmpty(AppSettings.javdb_Cookie))
+                    {
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待3~6秒" } });
+                        await GetInfoFromNetwork.RandomTimeDelay(3, 6);
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavDB中搜索" } });
+                        resultInfo = await network.SearchInfoFromJavDB(VideoName);
+                    }
+
+                }
+                else
+                {
+                    if (AppSettings.isUseJavBus)
+                    {
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~3秒" } });
+                        await GetInfoFromNetwork.RandomTimeDelay(1, 3);
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavBus中搜索" } });
+                        //先从javbus中搜索
+                        resultInfo = await network.SearchInfoFromJavBus(VideoName);
+                    }
+
+                    //搜索无果，使用libredmm搜索
+                    if (resultInfo == null && AppSettings.isUseLibreDmm)
+                    {
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~2秒" } });
+                        await GetInfoFromNetwork.RandomTimeDelay(1, 2);
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从LibreDmm中搜索" } });
+                        resultInfo = await network.SearchInfoFromLibreDmm(VideoName);
+                    }
+
+                    //搜索无果，使用javdb搜索
+                    if (resultInfo == null && AppSettings.isUseJavDB)
+                    {
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待3~6秒" } });
+                        await GetInfoFromNetwork.RandomTimeDelay(3, 6);
+                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavDB中搜索" } });
+                        resultInfo = await network.SearchInfoFromJavDB(VideoName);
+                    }
+                }
+
+                //多次搜索无果，退出
+                if (resultInfo == null)
+                {
+                    DataAccess.UpdataFileToInfo(VideoName, false);
+                    return null;
+                }
+
+                // 添加进数据库
+                DataAccess.AddVideoInfo(resultInfo);
+
+                //更新FileToInfo表
+                DataAccess.UpdataFileToInfo(VideoName, true);
+            }
+
+            return resultInfo;
+        }
+
+        /// <summary>
+        /// 当前窗口请求关闭，显示关闭提示，如确定关闭则退出当前所有进程
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private async void CurrentWindow_Closed(object sender, WindowEventArgs args)
+        {
+            args.Handled = true;
+            var window = (sender as Window);
+
+            ContentDialog dialog = new ContentDialog();
+
+            // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
+            dialog.XamlRoot = this.XamlRoot;
+            dialog.Title = "确认";
+            dialog.PrimaryButtonText = "关闭";
+            dialog.CloseButtonText = "返回";
+            dialog.DefaultButton = ContentDialogButton.Primary;
+            dialog.Content = "关闭窗口后将取消当前任务，是否继续关闭";
+
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                s_cts.Cancel();
+
+                window.Closed -= CurrentWindow_Closed;
+                window.Close();
+            }
+        }
+
+        private void ResetMatchCountInfo(List<MatchVideoResult> matchVideoResults)
+        {
+            overallProgress.Maximum = matchVideoResults.Count;
+            countProgress_TextBlock.Text = $"{overallProgress.Value}/{matchVideoResults.Count}";
+            if (matchVideoResults.Count == 0)
+            {
+                percentProgress_TextBlock.Text = $"100%";
+            }
+        }
+
+        #region 鼠标手势变化
         private void FailCountTextBlock_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
         }
-
         private void FailCountTextBlock_PointerExited(object sender, PointerRoutedEventArgs e)
         {
 
             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
+        #endregion
 
+        /// <summary>
+        /// 点击“失败数：xx”显示失败列表
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void askLookFailResult_Tapped(object sender, TappedRoutedEventArgs e)
         {
             ContentDialog dialog = new ContentDialog();
@@ -567,115 +528,18 @@ namespace Display.ContentsPage
             ContentGrid.Children.Add(new ListView() { ItemsSource = FailVideoNameList });
             dialog.Content = ContentGrid;
 
-            var result = await dialog.ShowAsync();
+            await dialog.ShowAsync();
         }
 
+        /// <summary>
+        /// 点击了进度中的更多
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ProgressMore_Click(object sender, RoutedEventArgs e)
         {
             FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
         }
 
-        private void RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count == 0) return;
-
-            if (e.AddedItems[0] is RadioButton radioButton)
-            {
-                switch (radioButton.Content)
-                {
-                    case "本地数据库":
-                        Explorer.Visibility = Visibility.Visible;
-                        FailListGrid.Visibility = Visibility.Collapsed;
-                        break;
-                    case "匹配失败":
-
-                        FailListGrid.Visibility = Visibility.Visible;
-                        Explorer.Visibility = Visibility.Collapsed;
-                        tryShowFailList();
-                        break;
-                }
-            }
-
-        }
-
-        private async void tryShowFailList()
-        {
-            if (FailListView.ItemsSource == null)
-            {
-                FailList = new();
-                FailListView.ItemsSource = FailList;
-            }
-
-            if (FailList.Count == 0)
-            {
-                var list = await DataAccess.LoadFailFileInfo(0,30);
-
-                list.ForEach(item => FailList.Add(item));
-            }
-        }
-
-        private void ExplorerItemClick(object sender, ItemClickEventArgs e)
-        {
-            var itemInfo = e.ClickedItem as FilesInfo;
-
-            SelectedDatum = itemInfo.datum;
-        }
-
-        private void TreeView_ItemInvoked(TreeView sender, TreeViewItemInvokedEventArgs args)
-        {
-            var content = ((args.InvokedItem as TreeViewNode).Content as ExplorerItem);
-            SelectedDatum = content.datum;
-
-        }
-
-        private void FailListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count != 1)
-                return;
-
-            SelectedDatum = e.AddedItems[0] as Datum;
-        }
-
-        private void VideoPlayButton_Click(object sender, RoutedEventArgs e)
-        {
-            if(SelectedDatum== null) return;
-
-            Views.DetailInfoPage.PlayeVideo(SelectedDatum.pc, this.XamlRoot);
-
-            
-        }
-
-    }
-    public class SpliderInfoProgress
-    {
-        public VideoInfo videoInfo { get; set; }
-        public MatchVideoResult matchResult { get; set; }
-
-        public int index { get; set; } = 0;
-    }
-
-    public enum FileFormat { Video, Subtitles, Torrent, Image, Audio,Archive }
-
-    public class FileStatistics
-    {
-        public FileStatistics(FileFormat name)
-        {
-            type = name;
-            size = 0;
-            count = 0;
-            data = new();
-        }
-
-        public FileFormat type { get; set; }
-        public long size { get; set; }
-        public int count { get; set; }
-        public List<Data> data { get; set; }
-
-        public class Data
-        {
-            public string name { get; set; }
-            public int count { get; set; } = 0;
-            public long size { get; set; } = 0;
-        }
     }
 }

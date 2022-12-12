@@ -45,7 +45,7 @@ namespace Display
 
             webview.CoreWebView2Initialized += Webview_CoreWebView2Initialized;
 
-
+            appwindow = App.getAppWindow(this);
         }
 
         private void VideoPlayWindow_Closed(object sender, WindowEventArgs args)

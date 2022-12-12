@@ -12,22 +12,21 @@ using Windows.System;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Display.ContentsPage
+namespace Display.ContentsPage.SpiderVideoInfo
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class SpiderVideoInfo_ConditionalCheck : Page
+    public sealed partial class ConditionalCheck : Page
     {
         private WebApi webapi;
         ObservableCollection<ConditionCheck> ConditionCheckItems;
         ConditionCheck ImageItem;
 
-        SpiderVideoInfo lastPage;
+        SpiderVideoInfo.MainPage lastPage;
         GetInfoFromNetwork network;
 
-
-        public SpiderVideoInfo_ConditionalCheck(ContentsPage.SpiderVideoInfo page)
+        public ConditionalCheck(MainPage page)
         {
             this.InitializeComponent();
             lastPage = page;
@@ -35,7 +34,7 @@ namespace Display.ContentsPage
             IntitializeView();
         }
 
-        public SpiderVideoInfo_ConditionalCheck()
+        public ConditionalCheck()
         {
             this.InitializeComponent();
 
