@@ -601,20 +601,33 @@ namespace Data
             //搜索无果，退出
             if (SearchResultNodes == null) return null;
 
-            string left_cid;
-            string right_cid;
+            string left_cid = null;
+            string right_cid = null;
 
             var split_result = CID.Split(new char[] { '-', '_' });
-            if (CID.Contains("HEYDOUGA"))
+            if (split_result.Length == 1)
             {
-                left_cid = split_result[1];
-                right_cid = split_result[2];
+                var match_result = Regex.Match(CID, @"([A-Z]+)(\d+)");
+                if (match_result == null) return null;
+
+                left_cid = match_result.Groups[1].Value;
+                right_cid = match_result.Groups[2].Value;
             }
-            else
+            else if (split_result.Length == 2)
             {
                 left_cid = split_result[0];
                 right_cid = split_result[1];
             }
+            else if (split_result.Length == 3)
+            {
+                if (CID.Contains("HEYDOUGA"))
+                {
+                    left_cid = split_result[1];
+                    right_cid = split_result[2];
+                }
+            }
+            else
+                return null;
 
             string search_left_cid = null;
             string search_right_cid = null;
@@ -627,7 +640,7 @@ namespace Data
                 split_result = title.Split(new char[] { '-', '_' });
                 if (split_result.Length == 1)
                 {
-                    var match_result = Regex.Match(title, @"([a-zA-Z]+)(\d+)");
+                    var match_result = Regex.Match(title, @"([A-Z]+)(\d+)");
                     if (match_result == null) continue;
                     search_left_cid = match_result.Groups[1].Value;
                     search_right_cid = match_result.Groups[2].Value;
@@ -644,7 +657,6 @@ namespace Data
                         search_left_cid = split_result[1];
                         search_right_cid = split_result[2];
                     }
-
                 }
 
                 int currentNum;
