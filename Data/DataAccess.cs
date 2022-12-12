@@ -18,7 +18,6 @@ namespace Data
     public static class DataAccess
     {
         private const string DBNAME = "115_uwp.db";
-        private const string TABLENAME = "FilesInfo";
         public static string dbpath
         {
             get { return NewDBPath(AppSettings.DataAccess_SavePath); }
@@ -53,7 +52,7 @@ namespace Data
 
                 //文件信息
                 string tableCommand = "CREATE TABLE IF NOT " +
-                    $"EXISTS {TABLENAME} ( " +
+                    "EXISTS FilesInfo ( " +
                       "fid text," +
                       "uid integer," +
                       "aid integer," +
@@ -140,8 +139,33 @@ namespace Data
                       ") ";
                 createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteReader();
-            }
 
+                //搜刮记录
+                tableCommand = "CREATE TABLE IF NOT " +
+                    $"EXISTS SpiderLog ( " +
+                      "task_id INTEGER," +
+                      "time text," +
+                      "done text," +
+                      "PRIMARY KEY('task_id')" +
+                      ") ";
+                createTable = new SqliteCommand(tableCommand, db);
+                createTable.ExecuteReader();
+
+                //搜刮任务
+                tableCommand = "CREATE TABLE IF NOT " +
+                    $"EXISTS SpiderTask ( " +
+                      "name text," +
+                      "bus text," +
+                      "libre text," +
+                      "fc text," +
+                      "db text," +
+                      "done integer," +
+                      "tadk_id integer," +
+                      "PRIMARY KEY('name')" +
+                      ") ";
+                createTable = new SqliteCommand(tableCommand, db);
+                createTable.ExecuteReader();
+            }
         }
 
         public static string NewDBPath(string newPath)
@@ -157,6 +181,7 @@ namespace Data
             await folder.CreateFileAsync(DBNAME, CreationCollisionOption.OpenIfExists);
         }
 
+        #region 删除
         /// <summary>
         /// 删除FilesInfo表中的所有数据
         /// </summary>
@@ -244,6 +269,9 @@ namespace Data
             }
 
         }
+        #endregion
+
+        #region 添加
 
         /// <summary>
         /// 添加115文件信息
@@ -271,7 +299,7 @@ namespace Data
                 }
 
                 //唯一值（pc）重复 则代替 （replace）
-                insertCommand.CommandText = $"INSERT OR REPLACE INTO {TABLENAME} VALUES ({string.Join(",", keyList)});";
+                insertCommand.CommandText = $"INSERT OR REPLACE INTO FilesInfo VALUES ({string.Join(",", keyList)});";
 
                 foreach (var item in data.GetType().GetProperties())
                 {
@@ -292,7 +320,7 @@ namespace Data
         /// </summary>
         /// <param name="pickCode"></param>
         /// <param name="truename"></param>
-        public static void AddFileToInfo(string pickCode, string truename, bool issuccess = false, bool isReplace = true)
+        public static void AddFileToInfo(string pickCode, string truename, bool issuccess = false, bool isReplace = false)
         {
             using (SqliteConnection db =
               new SqliteConnection($"Filename={dbpath}"))
@@ -303,7 +331,7 @@ namespace Data
                 insertCommand.Connection = db;
 
                 //唯一值（pc）重复 则代替 （replace）
-                string replaceStr = isReplace ? " OR REPLACE" : string.Empty;
+                string replaceStr = isReplace ? " OR REPLACE" : " OR IGNORE";
                 insertCommand.CommandText = $"INSERT{replaceStr} INTO FileToInfo VALUES (@file_pickcode,@truename,@issuccess);";
 
                 insertCommand.Parameters.AddWithValue("@file_pickcode", pickCode);
@@ -321,38 +349,7 @@ namespace Data
                 }
                 catch (Exception e)
                 {
-                    Debug.WriteLine(e.Message);
-                }
-
-                db.Close();
-            }
-        }
-
-        /// <summary>
-        /// 更新FileToInfo表
-        /// </summary>
-        /// <param name="truename"></param>
-        /// <param name="isSuccess"></param>
-        public static void UpdataFileToInfo(string truename, bool isSuccess)
-        {
-            using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
-            {
-                db.Open();
-
-                SqliteCommand Command = new SqliteCommand();
-                Command.Connection = db;
-
-                //唯一值（pc）重复 则代替 （replace）
-                Command.CommandText = $"UPDATE FileToInfo set issuccess = {isSuccess} WHERE truename = '{truename}'";
-
-                try
-                {
-                    Command.ExecuteReader();
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e.Message);
+                    Debug.WriteLine($"添加FileToInfo数据时发生错误:{e.Message}");
                 }
 
                 db.Close();
@@ -399,7 +396,7 @@ namespace Data
                 db.Close();
             }
         }
-        
+
         /// <summary>
         /// 添加下载记录
         /// </summary>
@@ -430,13 +427,12 @@ namespace Data
         }
 
         /// <summary>
-        /// 查找truename
+        /// 插入搜刮日志并返回Task_id
         /// </summary>
-        /// <param name="truename"></param>
-        /// <returns></returns>
-        public static List<String> SelectTrueName(string truename)
+        /// <param name="data"></param>
+        public static long InsertSpiderLog()
         {
-            List<String> entries = new List<string>();
+            long task_id = 0;
 
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
@@ -444,38 +440,103 @@ namespace Data
             {
                 db.Open();
 
-                SqliteCommand selectCommand = new SqliteCommand();
-                if (truename.Contains("_"))
-                {
-                    selectCommand = new SqliteCommand
-                        ($"SELECT truename FROM VideoInfo WHERE truename COLLATE NOCASE in ('{truename}', '{truename.Replace('_', '-')}', '{truename.Replace("_", "")}' )", db);
-                }
-                else
-                {
-                    selectCommand = new SqliteCommand
-                        ($"SELECT truename FROM VideoInfo WHERE truename COLLATE NOCASE in ('{truename}', '{truename.Replace("-", "_")}', '{truename.Replace("-", "")}')", db);
-                }
+                SqliteCommand Command = new SqliteCommand();
+                Command.Connection = db;
 
-                SqliteDataReader query = selectCommand.ExecuteReader();
+                long addTime = DateTimeOffset.Now.ToUnixTimeSeconds();
 
-                while (query.Read())
-                {
-                    entries.Add(query.GetString(0));
-                }
+                //插入新记录
+                Command.CommandText = $"INSERT INTO SpiderLog VALUES (NULL,@time,0);";
+                Command.Parameters.AddWithValue("@time", addTime);
+                Command.ExecuteReader();
+
+                //查询Task_ID
+                Command = new($"SELECT task_id FROM SpiderLog WHERE time == '{addTime}'", db);
+                task_id = (long)Command.ExecuteScalar();
 
                 db.Close();
             }
 
-            return entries;
+            return task_id;
+        }
+        
+        /// <summary>
+        /// 添加搜刮任务
+        /// </summary>
+        /// <param name="data"></param>
+        public static void AddSpiderTask(string name, long task_id)
+        {
+            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
+            using (SqliteConnection db =
+              new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand insertCommand = new SqliteCommand();
+                insertCommand.Connection = db;
+
+                //添加信息，如果已经存在则替换
+                insertCommand.CommandText = $"INSERT OR REPLACE INTO SpiderTask VALUES (@name,@bus,@libre,@fc,@db,@done,@task_id);";
+
+                //fc只有javdb，fc2club能刮
+                bool isFc = name.Contains("FC2");
+
+                insertCommand.Parameters.AddWithValue("@name", name);
+                insertCommand.Parameters.AddWithValue("@bus", isFc?"done":"ready");
+                insertCommand.Parameters.AddWithValue("@libre", isFc ? "done" : "ready");
+                insertCommand.Parameters.AddWithValue("@fc", isFc ? "ready" : "done");
+                insertCommand.Parameters.AddWithValue("@db", "ready");
+                insertCommand.Parameters.AddWithValue("@done", false);
+                insertCommand.Parameters.AddWithValue("@task_id", task_id);
+
+                insertCommand.ExecuteReader();
+                db.Close();
+            }
+        }
+
+        #endregion
+
+        #region 更新
+
+        /// <summary>
+        /// 更新FileToInfo表
+        /// </summary>
+        /// <param name="truename"></param>
+        /// <param name="isSuccess"></param>
+        public static void UpdataFileToInfo(string truename, bool isSuccess)
+        {
+            using (SqliteConnection db =
+              new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand Command = new SqliteCommand();
+                Command.Connection = db;
+
+                //唯一值（pc）重复 则代替 （replace）
+                Command.CommandText = $"UPDATE FileToInfo set issuccess = {isSuccess} WHERE truename = '{truename}'";
+
+                try
+                {
+                    Command.ExecuteReader();
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e.Message);
+                }
+
+                db.Close();
+            }
         }
 
         /// <summary>
-        /// 加载DBNAME数据
+        /// 更新数据信息
         /// </summary>
+        /// <param name="truename"></param>
         /// <returns></returns>
-        public static List<Datum> LoadDataAccess()
+        public static void UpdateSingleDataFromVideoInfo(string truename, string key, string value)
         {
-            List<Datum> data = new List<Datum>();
+            //VideoInfo data = new VideoInfo();
 
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
@@ -484,87 +545,101 @@ namespace Data
                 db.Open();
 
                 SqliteCommand selectCommand = new SqliteCommand
-                    ($"SELECT * from {TABLENAME}", db);
+                    ($"UPDATE VideoInfo SET {key} = '{value}' WHERE truename = '{truename}'", db);
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
 
-                while (query.Read())
-                {
-                    data.Add(tryCovertQueryToDatum(query));
-                }
                 db.Close();
             }
 
-            return data;
+            //return data;
         }
 
         /// <summary>
-        /// 查询失败列表
+        /// 更新图片地址
         /// </summary>
+        /// <param name="truename"></param>
         /// <returns></returns>
-        public static async Task<List<Datum>> LoadFailFileInfo(int offset = 0, int limit = -1, string n = "")
+        public static void UpdateAllImagePath(string srcPath, string dstPath)
         {
-
-            List<Datum> data = new List<Datum>();
-
-
-            if (n.Contains("'"))
-            {
-                n = n.Replace("'", "%");
-            }
-
-            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
                new SqliteConnection($"Filename={dbpath}"))
             {
                 db.Open();
 
-
-                string queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n}%'";
-
                 SqliteCommand selectCommand = new SqliteCommand
-                    ($"SELECT * FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{queryStr} LIMIT {limit} offset {offset}", db);
+                    ($"update VideoInfo set imagepath = REPLACE(imagepath,'{srcPath}','{dstPath}')", db);
 
-                SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
+                SqliteDataReader query = selectCommand.ExecuteReader();
 
-                while (query.Read())
+                db.Close();
+            }
+
+            //return data;
+        }
+
+        /// <summary>
+        /// 更新SpiderTask表（源搜刮中，源搜刮完成，全部搜刮完成）
+        /// </summary>
+        /// <param name="truename"></param>
+        /// <param name="isSuccess"></param>
+        public static void UpdataSpiderTask(string Name,SpiderSource SpiderSource ,SpiderStates SpiderSourceStatus,bool IsAllDone = false)
+        {
+            using (SqliteConnection db =
+              new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand Command = new SqliteCommand();
+                Command.Connection = db;
+
+                Command.CommandText = $"update SpiderTask SET {SpiderSource.name} = '{SpiderSourceStatus}' , done = {IsAllDone} WHERE name == '{Name}'";
+
+                try
                 {
-                    data.Add(tryCovertQueryToDatum(query));
+                    Command.ExecuteReader();
                 }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e.Message);
+                }
+
                 db.Close();
             }
-
-            return data;
         }
 
-        public static async Task<int> CheckFailFilesCount(string n = "")
+        /// <summary>
+        /// 更新SpiderLog中的Task_Id为已完成
+        /// </summary>
+        /// <param name="task_id"></param>
+        public static void UpdataSpiderLogDone(long task_id)
         {
-            if (n.Contains("'"))
-            {
-                n = n.Replace("'", "%");
-            }
-
-            int count = 0;
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={dbpath}"))
             {
                 db.Open();
 
-                string queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n}%'";
+                SqliteCommand Command = new SqliteCommand();
+                Command.Connection = db;
 
-                SqliteCommand selectCommand = new SqliteCommand
-                    ($"SELECT COUNT(n) FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{queryStr}", db);
+                Command.CommandText = $"UPDATE SpiderLog SET done = 1 WHERE task_id == {task_id}";
 
-                SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
+                try
+                {
+                    Command.ExecuteReader();
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e.Message);
+                }
 
-                query.Read();
-                count = query.GetInt32(0);
-                query.Close();
                 db.Close();
             }
-
-            return count;
         }
+
+        #endregion
+
+        #region 查询
 
         /// <summary>
         /// 通过truename查询文件列表
@@ -627,13 +702,52 @@ namespace Data
         }
 
         /// <summary>
-        /// 更新数据信息
+        /// 查找truename
         /// </summary>
         /// <param name="truename"></param>
         /// <returns></returns>
-        public static void UpdateSingleDataFromVideoInfo(string truename, string key, string value)
+        public static List<String> SelectTrueName(string truename)
         {
-            //VideoInfo data = new VideoInfo();
+            List<String> entries = new List<string>();
+
+            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
+            using (SqliteConnection db =
+              new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand selectCommand = new SqliteCommand();
+                if (truename.Contains("_"))
+                {
+                    selectCommand = new SqliteCommand
+                        ($"SELECT truename FROM VideoInfo WHERE truename COLLATE NOCASE in ('{truename}', '{truename.Replace('_', '-')}', '{truename.Replace("_", "")}' )", db);
+                }
+                else
+                {
+                    selectCommand = new SqliteCommand
+                        ($"SELECT truename FROM VideoInfo WHERE truename COLLATE NOCASE in ('{truename}', '{truename.Replace("-", "_")}', '{truename.Replace("-", "")}')", db);
+                }
+
+                SqliteDataReader query = selectCommand.ExecuteReader();
+
+                while (query.Read())
+                {
+                    entries.Add(query.GetString(0));
+                }
+
+                db.Close();
+            }
+
+            return entries;
+        }
+
+        /// <summary>
+        /// 加载DBNAME数据
+        /// </summary>
+        /// <returns></returns>
+        public static List<Datum> LoadDataAccess()
+        {
+            List<Datum> data = new List<Datum>();
 
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
@@ -642,39 +756,120 @@ namespace Data
                 db.Open();
 
                 SqliteCommand selectCommand = new SqliteCommand
-                    ($"UPDATE VideoInfo SET {key} = '{value}' WHERE truename = '{truename}'", db);
+                    ($"SELECT * from FilesInfo", db);
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
 
+                while (query.Read())
+                {
+                    data.Add(tryCovertQueryToDatum(query));
+                }
                 db.Close();
             }
 
-            //return data;
+            return data;
         }
 
         /// <summary>
-        /// 更新图片地址
+        /// 查询失败列表
         /// </summary>
-        /// <param name="truename"></param>
         /// <returns></returns>
-        public static void UpdateAllImagePath(string srcPath, string dstPath)
+        public static async Task<List<Datum>> LoadFailFileInfo(int offset = 0, int limit = -1, string n = "")
         {
+
+            List<Datum> data = new List<Datum>();
+
+
+            if (n.Contains("'"))
+            {
+                n = n.Replace("'", "%");
+            }
+
+            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
                new SqliteConnection($"Filename={dbpath}"))
             {
                 db.Open();
 
-                SqliteCommand selectCommand = new SqliteCommand
-                    ($"update VideoInfo set imagepath = REPLACE(imagepath,'{srcPath}','{dstPath}')", db);
 
-                SqliteDataReader query = selectCommand.ExecuteReader();
+                string queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n}%'";
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"SELECT * FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{queryStr} LIMIT {limit} offset {offset}", db);
+
+                SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
+
+                while (query.Read())
+                {
+                    data.Add(tryCovertQueryToDatum(query));
+                }
+                db.Close();
+            }
+
+            return data;
+        }
+
+        /// <summary>
+        /// 检查失败列表数量
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        public static async Task<int> CheckFailFilesCount(string n = "")
+        {
+            if (n.Contains("'"))
+            {
+                n = n.Replace("'", "%");
+            }
+
+            int count = 0;
+            using (SqliteConnection db =
+               new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                string queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n}%'";
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"SELECT COUNT(n) FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{queryStr}", db);
+
+                SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
+
+                query.Read();
+                count = query.GetInt32(0);
+                query.Close();
+                db.Close();
+            }
+
+            return count;
+        }
+
+        /// <summary>
+        /// 查询最近一次的未完成搜刮记录
+        /// </summary>
+        /// <returns>Tuple (task_id,add_time)</returns>
+        public static Tuple<long,long> GetLastestUnfinishedSpiderLog()
+        {
+            Tuple<long, long> tuple = null;
+            using (SqliteConnection db =
+            new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"SELECT task_id, time FROM SpiderLog WHERE done != '1' ORDER BY time DESC LIMIT 1", db);
+
+                var query = selectCommand.ExecuteReader();
+                if (query.Read())
+                {
+                    tuple = new(query.GetInt64(0), query.GetInt64(1));
+                }
 
                 db.Close();
             }
 
-            //return data;
+            return tuple;
         }
-
+        
         /// <summary>
         /// 获取一个图片地址
         /// </summary>
@@ -699,6 +894,62 @@ namespace Data
             }
 
             return imagePath;
+        }
+
+        /// <summary>
+        /// 获取可用搜刮任务的一个name
+        /// </summary>
+        /// <param name="spiderSource"></param>
+        /// <returns></returns>
+        public static string GetOneSpiderTask(SpiderSource spiderSource)
+        {
+            string name = string.Empty;
+
+            using (SqliteConnection db =
+            new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"SELECT name from SpiderTask WHERE Done == 0 AND (libre != 'doing' AND bus != 'doing' AND fc != 'doing' AND db != 'doing' AND fc != 'doing') AND {spiderSource.name} == 'ready' LIMIT 1", db);
+
+                SqliteDataReader query = selectCommand.ExecuteReader();
+                while (query.Read())
+                {
+                    name = query.GetString(0);
+                }
+                db.Close();
+            }
+
+            return name;
+        }
+
+        /// <summary>
+        /// 是否所有的搜刮源都尝试搜刮了name
+        /// </summary>
+        /// <param name="spiderSource"></param>
+        /// <returns></returns>
+        public static bool IsAllSpiderSourceAttempt(string QueryName)
+        {
+            bool isDone = false;
+
+            using (SqliteConnection db =
+            new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"SELECT name FROM SpiderTask WHERE name == '{QueryName}' AND libre == 'done' AND bus == 'done' AND fc == 'done' AND db == 'done' AND done == 0", db);
+
+                string name = (string)selectCommand.ExecuteScalar();
+
+                if (!string.IsNullOrEmpty(name))
+                    isDone= true;
+
+                db.Close();
+            }
+
+            return isDone;
         }
 
         /// <summary>
@@ -1116,7 +1367,7 @@ namespace Data
                 db.Open();
 
                 SqliteCommand selectCommand = new SqliteCommand
-                    ($"SELECT * FROM {TABLENAME} WHERE pid == {pid} LIMIT {limit}", db);
+                    ($"SELECT * FROM FilesInfo WHERE pid == {pid} LIMIT {limit}", db);
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
 
@@ -1149,7 +1400,7 @@ namespace Data
 
                 SqliteCommand selectCommand = new SqliteCommand
                     //($"SELECT n,cid,fid,vdi,pid FROM {TABLENAME} WHERE cid == {cid} or pid == {cid}", db);
-                    ($"SELECT * FROM {TABLENAME} WHERE cid == {cid} and uid != 0 or pid == {cid} LIMIT {limit}", db);
+                    ($"SELECT * FROM FilesInfo WHERE cid == {cid} and uid != 0 or pid == {cid} LIMIT {limit}", db);
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
 
@@ -1450,6 +1701,10 @@ namespace Data
             return ForlderToRootList;
         }
 
+        #endregion
+
+        #region 格式转换
+
         /// <summary>
         /// 添加数据库查询结果到VideoInfo格式
         /// </summary>
@@ -1546,6 +1801,8 @@ namespace Data
             return downInfo;
 
         }
+
+        #endregion
     }
 
 }

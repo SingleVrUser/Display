@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Data;
+using Display.ContentsPage.Import115DataToLocalDataAccess;
 using Display.Control;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
@@ -12,15 +13,18 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Media;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace Display.ContentsPage.SpiderVideoInfo
 {
+
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -69,31 +73,25 @@ namespace Display.ContentsPage.SpiderVideoInfo
             //遍历获取文件列表中所有的文件
             datumList = await Task.Run(() => datumList = DataAccess.GetAllFilesInFolderList(datumList));
 
+            ShowFilesPieCharts(datumList);
+
+            if (s_cts.IsCancellationRequested) return;
+
+            //挑选符合条件的视频文件
+            matchVideoResults = await Task.Run(() => FileMatch.GetVideoAndMatchFile(datumList));
+
             //初始化进度环
             ProgressRing_Grid.Visibility = Visibility.Visible;
-            overallProgress.Maximum = datumList.Count;
+            overallProgress.Maximum = matchVideoResults.Count;
             overallProgress.Value = 0;
-            countProgress_TextBlock.Text = $"0/{datumList.Count}";
+            countProgress_TextBlock.Text = $"0/{matchVideoResults.Count}";
 
             //初始化显示信息
             SearchProgress_TextBlock.Visibility = Visibility.Visible;
             SearchResult_StackPanel.Visibility = Visibility.Collapsed;
             ProgressRing_StackPanel.SetValue(Grid.ColumnSpanProperty, 2);
 
-            ShowFilesPieCharts(datumList);
-
-            if (s_cts.IsCancellationRequested)
-            {
-                return;
-            }
-
-            //挑选符合条件的视频文件
-            matchVideoResults = await Task.Run(() => FileMatch.GetVideoAndMatchFile(datumList));
-
-            if (s_cts.IsCancellationRequested)
-            {
-                return;
-            }
+            if (s_cts.IsCancellationRequested) return;
 
             TopProgressBar.Visibility = Visibility.Collapsed;
         }
@@ -213,6 +211,20 @@ namespace Display.ContentsPage.SpiderVideoInfo
             var startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
 
             ProgressMore_TextBlock.Text = $"失败数：0";
+
+            //记录到SpiderLog
+            long task_id = DataAccess.InsertSpiderLog();
+
+            //记录到SpiderTask
+            foreach(var item in matchVideoResults)
+            {
+                if (item.MatchName == null)
+                    continue;
+
+                DataAccess.AddSpiderTask(item.MatchName, task_id);
+            }
+
+            //报告Task进度
             var progress = new Progress<SpliderInfoProgress>(progressPercent =>
             {
                 //更新进度信息
@@ -232,7 +244,6 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     ProgressMore_TextBlock.Text = $"失败数：{FailVideoNameList.Count}";
                     SearchProgress_TextBlock.Text = $"{matchResult.OriginalName}";
                     SearchMessage_TextBlock.Text = $"❌{matchResult.message}";
-
                 }
                 //匹配成功/跳过非视频文件/跳过重复番号
                 else
@@ -260,7 +271,6 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     }
                 }
 
-
                 percentProgress_TextBlock.Text = $"{(int)overallProgress.Value * 100 / matchVideoResults.Count}%";
                 countProgress_TextBlock.Text = $"{overallProgress.Value}/{matchVideoResults.Count}";
 
@@ -285,7 +295,126 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 }
             });
 
-            await SearchAllInfo(matchVideoResults, progress);
+            await SearchAllInfoMultiTask(task_id, progress);
+
+            //await SearchAllInfo(matchVideoResults, progress);
+
+        }
+
+        /// <summary>
+        /// 每个搜刮源分配一个线程（数据来源与本地数据库）
+        /// </summary>
+        /// <returns></returns>
+        private async Task SearchAllInfoMultiTask(long task_id, IProgress<SpliderInfoProgress> progress)
+        {
+            List<Task> tasks = new List<Task>();
+
+            if (AppSettings.isUseJavBus)
+                tasks.Add(Task.Run(() => CreadSpiderTask(SpiderSourceName.javbus)));
+            if (AppSettings.isUseLibreDmm)
+                tasks.Add(Task.Run(() => CreadSpiderTask(SpiderSourceName.libredmm)));
+            if (AppSettings.isUseFc2Hub)
+                tasks.Add(Task.Run(() => CreadSpiderTask(SpiderSourceName.fc2club)));
+            if (AppSettings.isUseJavDB)
+                tasks.Add(Task.Run(() => CreadSpiderTask(SpiderSourceName.javdb)));
+
+            await Task.WhenAll(tasks);
+
+            //所有任务已结束
+            DataAccess.UpdataSpiderLogDone(task_id);
+
+            System.Diagnostics.Debug.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>所有搜刮任务已完成<<<<<<<<<<<<<<<<<<<<<<<<<");
+        }
+
+        private async Task CreadSpiderTask(SpiderSourceName spiderSourceName)
+        {
+            string name;
+            VideoInfo resultInfo = null;
+            SpiderSource spiderSource = new(spiderSourceName);
+
+            while (true)
+            {
+                //查询待搜刮的name
+                name = DataAccess.GetOneSpiderTask(spiderSource);
+
+                if (string.IsNullOrEmpty(name))
+                    break;
+
+                var result = DataAccess.SelectTrueName(name);
+
+                //如果数据库已存在该数据，直接从数据库中读取
+                if (result.Count != 0)
+                {
+                    //使用第一个符合条件的Name
+                    resultInfo = DataAccess.LoadOneVideoInfoByCID(result[0]);
+
+                    DataAccess.UpdataFileToInfo(name, true);
+                }
+                //数据库没有，则开始搜刮
+                else
+                {
+                    //记录为正在进行
+                    DataAccess.UpdataSpiderTask(name, spiderSource, SpiderStates.doing);
+                    switch (spiderSourceName)
+                    {
+                        case SpiderSourceName.javbus:
+                            System.Diagnostics.Debug.WriteLine("访问JavBus");
+                            resultInfo = await network.SearchInfoFromJavBus(name);
+                            System.Diagnostics.Debug.WriteLine("JavBus等待 1~3 s");
+                            await GetInfoFromNetwork.RandomTimeDelay(1, 3);
+                            System.Diagnostics.Debug.WriteLine("JavBus等待时间到");
+                            break;
+                        case SpiderSourceName.libredmm:
+                            System.Diagnostics.Debug.WriteLine("访问LibreDmm");
+                            resultInfo = await network.SearchInfoFromLibreDmm(name);
+                            System.Diagnostics.Debug.WriteLine("LibreDmm等待 1~2 s");
+                            await GetInfoFromNetwork.RandomTimeDelay(1, 2);
+                            System.Diagnostics.Debug.WriteLine("LibreDmm等待时间到");
+                            break;
+                        case SpiderSourceName.fc2club:
+                            System.Diagnostics.Debug.WriteLine("访问Fc2Hub");
+                            resultInfo = await network.SearchInfoFromFc2Hub(name);
+                            System.Diagnostics.Debug.WriteLine("Fc2Hub等待 1~2 s");
+                            await GetInfoFromNetwork.RandomTimeDelay(1, 2);
+                            System.Diagnostics.Debug.WriteLine("Fc2Hub等待时间到");
+                            break;
+                        case SpiderSourceName.javdb:
+                            System.Diagnostics.Debug.WriteLine("访问JavDB");
+                            resultInfo = await network.SearchInfoFromJavDB(name);
+                            System.Diagnostics.Debug.WriteLine("JavDB等待 3~6 s");
+                            await GetInfoFromNetwork.RandomTimeDelay(3, 6);
+                            System.Diagnostics.Debug.WriteLine("JavDB等待时间到");
+                            break;
+                    }
+                    //记录为已完成
+                    DataAccess.UpdataSpiderTask(name, spiderSource, SpiderStates.done);
+                }
+
+                //检查一下是否需要标记为全部完成
+                //搜刮成功
+                if (resultInfo != null)
+                {
+                    //更新SpiderTask
+                    DataAccess.UpdataSpiderTask(name, spiderSource, SpiderStates.done, true);
+
+                    // 添加搜刮信息到数据库
+                    DataAccess.AddVideoInfo(resultInfo);
+
+                    //更新FileToInfo表
+                    DataAccess.UpdataFileToInfo(name, true);
+                }
+                else
+                {
+                    //检查是否还有其他搜刮源未尝试，全部源都尝试过就标记为AllDone
+                    if (DataAccess.IsAllSpiderSourceAttempt(name))
+                    {
+                        DataAccess.UpdataSpiderTask(name, spiderSource, SpiderStates.done, true);
+                    }
+                }
+
+                //继续下一个搜刮
+            }
+
         }
 
         /// <summary>

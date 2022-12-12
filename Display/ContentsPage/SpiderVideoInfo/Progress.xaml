@@ -181,6 +181,7 @@
                                            HorizontalAlignment="Center"
                                            Foreground="Gray" />
                             </StackPanel>
+                            
                             <ProgressRing x:Name="overallProgress"
                                           Width="120"
                                           Height="120"
