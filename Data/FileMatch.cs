@@ -105,7 +105,14 @@ namespace Data
             match = Regex.Match(no_domain, @"(red[01]\d\d|sky[0-3]\d\d|ex00[01]\d)", RegexOptions.IgnoreCase);
             if (match.Success)
             {
-                return match.Groups[1].Value;
+                string matchName = match.Groups[1].Value;
+                match = Regex.Match(matchName, @"([a-z]+)(\d+)", RegexOptions.IgnoreCase);
+                if (match.Success)
+                {
+                    return $"{match.Groups[1].Value}-{match.Groups[2].Value}";
+                }
+
+                return matchName;
             }
             //然后再将影片视作缺失了 - 分隔符来匹配
             match = Regex.Match(no_domain, @"([a-z]{2,})0*(\d{2,5})", RegexOptions.IgnoreCase);
