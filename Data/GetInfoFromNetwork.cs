@@ -589,6 +589,7 @@ namespace Data
             return result;
         }
 
+
         /// <summary>
         /// 从JavDB众多搜索结果中搜索出符合条件的
         /// </summary>
@@ -606,20 +607,29 @@ namespace Data
             string right_cid = null;
 
             var split_result = CID.Split(new char[] { '-', '_' });
-            if (CID.Contains("HEYDOUGA") && split_result.Length==3)
+            if (split_result.Length == 1)
             {
-                left_cid = split_result[1];
-                right_cid = split_result[2];
+                var match_result = Regex.Match(CID, @"([A-Z]+)(\d+)");
+                if (match_result == null) return null;
+
+                left_cid = match_result.Groups[1].Value;
+                right_cid = match_result.Groups[2].Value;
             }
             else if (split_result.Length == 2)
             {
                 left_cid = split_result[0];
                 right_cid = split_result[1];
             }
-            else
+            else if (split_result.Length == 3)
             {
-                Debug.WriteLine($"未知的结果：{split_result}");
+                if (CID.Contains("HEYDOUGA"))
+                {
+                    left_cid = split_result[1];
+                    right_cid = split_result[2];
+                }
             }
+            else
+                return null;
 
             string search_left_cid = null;
             string search_right_cid = null;
@@ -632,7 +642,7 @@ namespace Data
                 split_result = title.Split(new char[] { '-', '_' });
                 if (split_result.Length == 1)
                 {
-                    var match_result = Regex.Match(title, @"([a-zA-Z]+)(\d+)");
+                    var match_result = Regex.Match(title, @"([A-Z]+)(\d+)");
                     if (match_result == null) continue;
                     search_left_cid = match_result.Groups[1].Value;
                     search_right_cid = match_result.Groups[2].Value;
