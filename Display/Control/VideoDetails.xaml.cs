@@ -159,7 +159,7 @@ namespace Display.Control
 
             videoinfoList = videoinfoList.OrderBy(item => item.n).ToList();
 
-            var DownDialogContent = new ContentsPage.DownDialogContent(videoinfoList);
+            var DownDialogContent = new ContentsPage.DetailInfo.DownDialogContent(videoinfoList);
 
             dialog.Content = DownDialogContent;
             var result = await dialog.ShowAsync();
@@ -273,7 +273,7 @@ namespace Display.Control
             SmokeGridCancel();
         }
 
-        ContentsPage.FindInfoAgainSmoke FindInfoAgainSmoke;
+        ContentsPage.DetailInfo.FindInfoAgainSmoke FindInfoAgainSmoke;
         private void FindAppBarButton_Click(object sender, RoutedEventArgs e)
         {
             SmokeGrid.Visibility = Visibility.Visible;
@@ -440,7 +440,7 @@ namespace Display.Control
             LightDismissTeachingTip.IsOpen = true;
         }
 
-        ContentsPage.FileInfoInCidSmoke FileInfoInCidSmokePage;
+        ContentsPage.DetailInfo.FileInfoInCidSmoke FileInfoInCidSmokePage;
         private void MoreInfoAppBarButton_Click(object sender, RoutedEventArgs e)
         {
             SmokeGrid.Visibility = Visibility.Visible;
