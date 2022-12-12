@@ -98,14 +98,12 @@ namespace Data
         /// <returns></returns>
         public async Task<VideoInfo> SearchInfoFromLibreDmm(string CID)
         {
-            VideoInfo videoInfo = new VideoInfo();
             string BusUrl = AppSettings.LibreDmm_BaseUrl;
             string SavePath = AppSettings.Image_SavePath;
 
             CID = CID.ToUpper();
             string url = UrlCombine(BusUrl, $"movies/{CID}");
 
-            videoInfo.busurl = url;
 
             if (Client == null)
             {
@@ -121,6 +119,9 @@ namespace Data
             var ImageUrlNode = htmlDoc.DocumentNode.SelectSingleNode("//img[@class='img-fluid']");
             //搜索无果，退出
             if (ImageUrlNode == null) return null;
+
+            VideoInfo videoInfo = new VideoInfo();
+            videoInfo.busurl = url;
 
             var ImageUrl = ImageUrlNode.Attributes["src"].Value;
 
@@ -601,19 +602,23 @@ namespace Data
             //搜索无果，退出
             if (SearchResultNodes == null) return null;
 
-            string left_cid;
-            string right_cid;
+            string left_cid = null;
+            string right_cid = null;
 
             var split_result = CID.Split(new char[] { '-', '_' });
-            if (CID.Contains("HEYDOUGA"))
+            if (CID.Contains("HEYDOUGA") && split_result.Length==3)
             {
                 left_cid = split_result[1];
                 right_cid = split_result[2];
             }
-            else
+            else if (split_result.Length == 2)
             {
                 left_cid = split_result[0];
                 right_cid = split_result[1];
+            }
+            else
+            {
+                Debug.WriteLine($"未知的结果：{split_result}");
             }
 
             string search_left_cid = null;
@@ -644,7 +649,6 @@ namespace Data
                         search_left_cid = split_result[1];
                         search_right_cid = split_result[2];
                     }
-
                 }
 
                 int currentNum;

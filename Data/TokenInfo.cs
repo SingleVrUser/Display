@@ -1633,4 +1633,35 @@ namespace Data
 
         }
     }
+
+
+    public enum SpiderSourceName { javbus, libredmm, fc2club, javdb }
+    public class SpiderSource
+    {
+        public string name { get;}
+
+        public SpiderSource(SpiderSourceName source)
+        {
+            string name = string.Empty;
+            switch (source)
+            {
+                case SpiderSourceName.javbus:
+                    name = "bus";
+                    break;
+                case SpiderSourceName.libredmm:
+                    name = "libre";
+                    break;
+                case SpiderSourceName.fc2club:
+                    name = "fc";
+                    break;
+                case SpiderSourceName.javdb:
+                    name = "db";
+                    break;
+            }
+
+            this.name = name;
+        }
+    }
+
+    public enum SpiderStates { ready,doing,done }
 }
