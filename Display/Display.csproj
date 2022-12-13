@@ -26,6 +26,13 @@
     <ApplicationIcon>Assets\pokeball.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Assets\Models\**" />
+    <Content Remove="Assets\Models\**" />
+    <EmbeddedResource Remove="Assets\Models\**" />
+    <None Remove="Assets\Models\**" />
+    <Page Remove="Assets\Models\**" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Remove="Assets\BadgeLogo.scale-100.png" />
     <Content Remove="Assets\BadgeLogo.scale-125.png" />
     <Content Remove="Assets\BadgeLogo.scale-150.png" />
@@ -292,7 +299,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Assets\115\file_type\" />
-    <Folder Include="Assets\Models\caffe\" />
     <Folder Include="ContentsPage\DetailInfo\" />
   </ItemGroup>
   <ItemGroup>
@@ -372,5 +378,8 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="ContentsPage\CalculateLocalFileSha1.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Remove="Assets\Models\**" />
   </ItemGroup>
 </Project>
