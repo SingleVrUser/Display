@@ -15,6 +15,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.ApplicationModel;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
@@ -114,7 +115,7 @@ namespace Display.ContentsPage
             selectedCheckBox.Content = $"共选 {selectedItemCount} 项";
         }
 
-        private void StartButton_Click(object sender, RoutedEventArgs e)
+        private async void StartButton_Click(object sender, RoutedEventArgs e)
         {
             if (BasicGridView.SelectedItems.Count == 0) return;
 
@@ -128,7 +129,25 @@ namespace Display.ContentsPage
                     break;
                 //在线视频
                 case 1:
-                    StartGetThumbnailFromWebVideo();
+                    //检查在线模型文件是否存在
+                    if (GetImageByOpenCV.IsModelFilesExists)
+                    {
+                        StartGetThumbnailFromWebVideo();
+                    }
+                    else
+                    {
+                        ContentDialog dialog = new ContentDialog();
+
+                        dialog.XamlRoot = this.XamlRoot;
+                        dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
+                        dialog.Title = "未找到训练模型";
+                        dialog.CloseButtonText = "返回";
+                        dialog.DefaultButton = ContentDialogButton.Close;
+                        dialog.Content = "未找到模型文件，需要下载指定训练模型并存放到相应路径，才能继续此操作";
+
+                        await dialog.ShowAsync();
+
+                    }
                     break;
             }
 
@@ -323,10 +342,6 @@ namespace Display.ContentsPage
 
                 progressinfo.text = $"{startText} - 获取到视频（总数：{videoInfoList.Count}，转码完成数：{videofileListAfterDecode.Count}，可播放数：{videoToThumbnail.pickCodeList.Count}）";
                 overallProgress.Report(progressinfo);
-
-
-
-
 
                 foreach (var pickCode in videoToThumbnail.pickCodeList)
                 {
@@ -608,6 +623,17 @@ namespace Display.ContentsPage
                     VisualStateManager.GoToState(this, "SelectedWebVideo", true);
                     break;
             }
+        }
+
+        private void OpenModelSavePath_HyperLinkClick(Microsoft.UI.Xaml.Documents.Hyperlink sender, Microsoft.UI.Xaml.Documents.HyperlinkClickEventArgs args)
+        {
+            string path = Path.Combine(Package.Current.InstalledLocation.Path, @"Assets\Models\caffe");
+            if(!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            FileMatch.LaunchFolder(path);
         }
     }
 
