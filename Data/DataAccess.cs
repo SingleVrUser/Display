@@ -529,10 +529,10 @@ namespace Data
                 bool isFc = name.Contains("FC2");
 
                 insertCommand.Parameters.AddWithValue("@name", name);
-                insertCommand.Parameters.AddWithValue("@bus", isFc?"done":"ready");
-                insertCommand.Parameters.AddWithValue("@libre", isFc ? "done" : "ready");
-                insertCommand.Parameters.AddWithValue("@fc", isFc ? "ready" : "done");
-                insertCommand.Parameters.AddWithValue("@db", "ready");
+                insertCommand.Parameters.AddWithValue("@bus", !isFc && AppSettings.isUseJavBus?"ready": "done");
+                insertCommand.Parameters.AddWithValue("@libre", !isFc && AppSettings.isUseLibreDmm ? "ready" : "done");
+                insertCommand.Parameters.AddWithValue("@fc", isFc && AppSettings.isUseFc2Hub ? "ready" : "done");
+                insertCommand.Parameters.AddWithValue("@db", AppSettings.isUseFc2Hub ? "ready" : "done");
                 insertCommand.Parameters.AddWithValue("@done", false);
                 insertCommand.Parameters.AddWithValue("@task_id", task_id);
 
@@ -1506,7 +1506,7 @@ namespace Data
             foreach (var currentFile in dataList)
             {
                 //文件夹
-                if (currentFile.fid == "")
+                if (string.IsNullOrEmpty(currentFile.fid))
                 {
                     List<Datum> newDataList = GetListByCid(currentFile.cid);
                     newData.AddRange(GetAllFilesInFolderList(newDataList));

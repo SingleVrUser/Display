@@ -52,7 +52,6 @@ namespace Display.ContentsPage
         {
             this.InitializeComponent();
 
-
         }
 
         private async void Grid_Loaded(object sender, RoutedEventArgs e)
@@ -96,7 +95,7 @@ namespace Display.ContentsPage
         }
 
         ActorsInfo _storedItem;
-        private void BasicGridView_ItemClick(object sender, ItemClickEventArgs e)
+        private async void BasicGridView_ItemClick(object sender, ItemClickEventArgs e)
         {
             ConnectedAnimation animation = null;
 
@@ -108,7 +107,18 @@ namespace Display.ContentsPage
             }
             var actorInfo = e.ClickedItem as ActorsInfo;
 
-            var ImageUrlList = GetImageUrlListFromFileTree( actorInfo.name);
+            string filePath = AppSettings.ActorFileTree_SavePath;
+
+
+            progress_TextBlock.Text = "正在获取GFriend仓库信息……";
+            if (!await tryUpdateFileTree(filePath))
+            {
+                progress_TextBlock.Text = "获取GFriend仓库信息失败!";
+                return;
+            }
+            progress_TextBlock.Text = "获取仓库信息成功";
+
+            var ImageUrlList = GetImageUrlListFromFileTreeAsync(actorInfo.name,filePath:filePath);
 
             ShowImageList.Clear();
 
@@ -135,20 +145,14 @@ namespace Display.ContentsPage
 
 
         //JObject json;
-        private List<string> GetImageUrlListFromFileTree(string actorName,int count = -1)
+        private List<string> GetImageUrlListFromFileTreeAsync(string actorName,int maxCount = -1, string filePath = null)
         {
-            //if (json == null)
-            //{
-            //    string filePath = AppSettings.ActorFileTree_SavePath;
+            if(string.IsNullOrEmpty(filePath))
+            {
+                filePath = AppSettings.ActorFileTree_SavePath;
+            }
 
-            //    var lines = await File.ReadAllLinesAsync(filePath);
-            //    string textContent = string.Join(Environment.NewLine, lines);
-            //    json = JsonConvert.DeserializeObject<JObject>(textContent);
-            //}
-            //List<string> result = getImageUrlFormFileTreeContent(json, actorName, count);
-
-            List<string> result = getImageUrlFormFileTree(AppSettings.ActorFileTree_SavePath, actorName, count);
-
+            List<string> result = getImageUrlFormFileTree(filePath, actorName, maxCount);
 
             return result;
         }
@@ -161,23 +165,13 @@ namespace Display.ContentsPage
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
             BasicGridView.SelectedItems.Clear();
-            //BasicGridView.DeselectRange(new ItemIndexRange(0, (uint)actorinfo.Count));
         }
 
         private void BasicGridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //int totalItemCount = actorinfo.Count;
             var selectedItemCount = BasicGridView.SelectedItems.Count;
 
             selectedCheckBox.Content = $"共选 {selectedItemCount} 项";
-            //if(selectedItemCount< totalItemCount)
-            //{
-            //    selectedCheckBox.Content = $"共选 {selectedItemCount} 项";
-            //}
-            //else if (selectedItemCount == totalItemCount)
-            //{
-            //    selectedCheckBox.Content = "取消全选";
-            //}
         }
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
@@ -243,15 +237,8 @@ namespace Display.ContentsPage
                 progress.Report(new progressClass() { text = "获取GFriend仓库信息失败!" });
                 return;
             }
-            //else
-            //    progress.Report(new progressClass() { text = "开始下载头像" });
-
-            //IEnumerable<string> line = File.ReadLines(filePath);
-
-            //var textContent = string.Join(Environment.NewLine, line);
 
             for (int i = 0;i< actorinfos.Count;i++)
-            //foreach (var item in actorinfo)
             {
                 if (s_cts.IsCancellationRequested)
                 {
@@ -263,7 +250,6 @@ namespace Display.ContentsPage
                 progressinfo.status = Status.doing;
 
                 var item = actorinfos[i];
-                //item.Status = Status.doing;
 
                 //演员名
                 var actorName = item.name;
@@ -279,7 +265,7 @@ namespace Display.ContentsPage
                 if (!File.Exists(iamgeSavePath))
                 {
                     string ImageUrl = string.Empty;
-                    var ImageUrlList = GetImageUrlListFromFileTree(actorName, 1);
+                    var ImageUrlList = GetImageUrlListFromFileTreeAsync(actorName, 1);
                     if (ImageUrlList.Count>0) ImageUrl = ImageUrlList[0];
 
                     if (string.IsNullOrEmpty(ImageUrl))
@@ -308,13 +294,12 @@ namespace Display.ContentsPage
 
         }
 
-        private List<string> getImageUrlFormFileTree(string filePath,string actorName, int count)
+        private List<string> getImageUrlFormFileTree(string filePath,string actorName, int maxCount)
         {
             List<string> urlList = new();
 
             string key = String.Empty;
             string path = String.Empty;
-            //string name = String.Empty;
 
             foreach (var line in File.ReadLines(filePath))
             {
@@ -358,11 +343,15 @@ namespace Display.ContentsPage
 
                             if (url.Contains(actorName))
                             {
-                                urlList.Add($"https://raw.githubusercontent.com/gfriends/gfriends/master/{key}/{path}/{url}");
-
-                                if(urlList.Count == count)
+                                string imageUrl = $"https://raw.githubusercontent.com/gfriends/gfriends/master/{key}/{path}/{url}";
+                                if (!urlList.Contains(imageUrl))
                                 {
-                                    break;
+                                    urlList.Add(imageUrl);
+
+                                    if (urlList.Count == maxCount)
+                                    {
+                                        break;
+                                    }
                                 }
                             }
 

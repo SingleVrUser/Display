@@ -262,13 +262,13 @@ namespace Display.ContentsPage
                 //最大获取数量
                 int imageCount = getThumbnailFromWebVideoSetting.imageCount;
 
-                string startText = $"【{i+1}/{thumbnailinfos.Count}】 {name}";
+                string startText = $"【{i + 1}/{thumbnailinfos.Count}】 {name}";
 
                 //保存路径
                 string SavePath = Path.Combine(AppSettings.Image_SavePath, name);
 
                 //缩略图已存在，跳过
-                string existsPath = Path.Combine(SavePath, $"Thumbnail_{imageCount-1}.jpg");
+                string existsPath = Path.Combine(SavePath, $"Thumbnail_{imageCount - 1}.jpg");
                 if (File.Exists(existsPath))
                 {
                     progressinfo.text = $"{startText} - 缩略图已存在，跳过该项目";
@@ -297,17 +297,17 @@ namespace Display.ContentsPage
                 overallProgress.Report(progressinfo);
 
                 //检查能否播放，获取总时长、总帧数
-                Dictionary<int,double> VideoIndexAndFrameCountDict = new();
+                Dictionary<int, double> VideoIndexAndFrameCountDict = new();
 
                 VideoToThumbnail videoToThumbnail = new VideoToThumbnail();
 
                 videoToThumbnail.name = name;
 
-                for (int j = 0;j< videofileListAfterDecode.Count;j++)
+                for (int j = 0; j < videofileListAfterDecode.Count; j++)
                 {
                     var videoInfo = videofileListAfterDecode[j];
                     var m3u8InfoList = await webApi.Getm3u8InfoByPickCode(videoInfo.pc);
-                    if(m3u8InfoList.Count > 0)
+                    if (m3u8InfoList.Count > 0)
                     {
                         ////总帧数计算
                         //var frameCount = openCV.getTotalFrameCount(m3u8InfoList[0].Url);
@@ -371,9 +371,9 @@ namespace Display.ContentsPage
                             {
 
                                 bool isGetImage = false;
-                                for(int tryCount = 0; tryCount < 20 && !isGetImage; tryCount++)
+                                for (int tryCount = 0; tryCount < 20 && !isGetImage; tryCount++)
                                 {
-                                    if(j + tryCount >= meu8Info.ts_info_list.Count)
+                                    if (j + tryCount >= meu8Info.ts_info_list.Count)
                                     {
                                         break;
                                     }
@@ -383,7 +383,7 @@ namespace Display.ContentsPage
                                     isGetImage = openCV.Task_GetThumbnailByVideoPath(tsUrl, 0, isShowWindow, getImageProgress, SavePath, $"Thumbnail_{count}", getThumbnailFromWebVideoSetting.isDetectFaces);
 
                                     //Debug.WriteLine("获取链接中的图片");
-                                    Debug.WriteLine($"【{tryCount+1}/20】url:{tsUrl}\ncurrentTime:{currentTime}");
+                                    Debug.WriteLine($"【{tryCount + 1}/20】url:{tsUrl}\ncurrentTime:{currentTime}");
                                 }
 
                                 //多次尝试后仍未获取人脸信息，就不检测人脸了，随便截一张
@@ -472,9 +472,9 @@ namespace Display.ContentsPage
         //    //进度
         //    var progress = new Progress<progressInfo>(info =>
         //    {
-                
+
         //        progressInfo = info;
-                
+
         //    });
 
         //    double length = 100 * 100;
@@ -487,7 +487,7 @@ namespace Display.ContentsPage
 
         private async void GetThumbnailFromUrl(List<ThumbnailInfo> thumbnailinfos, IProgress<progressClass> progress, CancellationTokenSource s_cts)
         {
-            for(int i = 0;i < thumbnailinfos.Count;i++)
+            for (int i = 0; i < thumbnailinfos.Count; i++)
             //foreach(var thumbnail in thumbnailinfos)
             {
                 progressClass progressinfo = new();
@@ -496,19 +496,19 @@ namespace Display.ContentsPage
 
                 var thumbnail = thumbnailinfos[i];
                 var DownUrlList = thumbnail.thumbnailDownUrlList;
-                
-                progressinfo.text = $"【{i+1}/{thumbnailinfos.Count}】{thumbnail.name}  （{DownUrlList.Count}张）";
+
+                progressinfo.text = $"【{i + 1}/{thumbnailinfos.Count}】{thumbnail.name}  （{DownUrlList.Count}张）";
                 progress.Report(progressinfo);
 
                 string imagePath = string.Empty;
-                for (int j = 0;j< DownUrlList.Count; j++)
+                for (int j = 0; j < DownUrlList.Count; j++)
                 {
-                    string SavePath = Path.Combine(AppSettings.Image_SavePath,thumbnail.name);
+                    string SavePath = Path.Combine(AppSettings.Image_SavePath, thumbnail.name);
                     string SaveName = $"Thumbnail_{j}";
-                    string saveImagePath = await GetInfoFromNetwork.downloadFile(DownUrlList[j],SavePath,SaveName);
+                    string saveImagePath = await GetInfoFromNetwork.downloadFile(DownUrlList[j], SavePath, SaveName);
                     //Debug.WriteLine($@"下载：{} => {SavePath} => {SaveName}");
 
-                    if(j == 1)
+                    if (j == 1)
                     {
                         imagePath = saveImagePath;
                         //imagePath = Path.Combine(SavePath, SaveName, Path.GetExtension(DownUrlList[j]));
@@ -569,14 +569,14 @@ namespace Display.ContentsPage
 
         private void ShowVideoPart_CheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            if(_storeThumbnailInfo == null)
+            if (_storeThumbnailInfo == null)
             {
                 _storeThumbnailInfo = thumbnailInfo.ToList();
             }
 
-            foreach(var item in _storeThumbnailInfo)
+            foreach (var item in _storeThumbnailInfo)
             {
-                if(item.thumbnailDownUrlList.Count > 0)
+                if (item.thumbnailDownUrlList.Count > 0)
                 {
                     thumbnailInfo.Remove(item);
                 }
@@ -586,7 +586,7 @@ namespace Display.ContentsPage
 
         private void ShowVideoPart_CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
-            if(_storeThumbnailInfo != null && _storeThumbnailInfo.Count > 0)
+            if (_storeThumbnailInfo != null && _storeThumbnailInfo.Count > 0)
             {
                 thumbnailInfo.Clear();
                 foreach (var item in _storeThumbnailInfo)
