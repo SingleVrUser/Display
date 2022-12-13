@@ -20,7 +20,7 @@
             <Setter Property="BorderBrush"
                     Value="{StaticResource ControlElevationBorderBrush}" />
             <Setter Property="BorderThickness"
-                    Value="2" />
+                    Value="1" />
             <Setter Property="Margin"
                     Value="2" />
             <Setter Property="Padding"
@@ -165,7 +165,7 @@
                 </Grid.ColumnDefinitions>-->
 
                 <TextBlock>
-                    <Run>正则匹配成功的番号占总视频数的</Run>
+                    <Run>正则匹配成功的番号占总视频数的:</Run>
                     <Run x:Name="FileNameSuccessRate_Run">100%</Run>
                 </TextBlock>
                 <TextBlock Grid.Row="1">

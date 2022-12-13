@@ -99,7 +99,11 @@
 
             <!--文件信息查看-->
             <Grid Grid.Row="2"
-                  Grid.Column="1">
+                  Grid.Column="1"
+                  BorderThickness="2"
+                  BorderBrush="{StaticResource ControlElevationBorderBrush}"
+                  Margin="2"
+                  CornerRadius="8">
 
                 <Grid>
                     <Grid.RowDefinitions>

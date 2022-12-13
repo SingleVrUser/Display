@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Data;
+using Display.WindowView;
 using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.Drawing;
@@ -19,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -41,14 +43,11 @@ namespace Display.ContentsPage.SpiderVideoInfo
         List<string> FailVideoNameList;
         public Window currentWindow;
 
-        public Progress(Window currentWindow, List<string> folderNameList, List<Datum> datumList)
+        public Progress(List<string> folderNameList, List<Datum> datumList)
         {
             this.InitializeComponent();
-
-            this.currentWindow = currentWindow;
             this.folderNameList = folderNameList;
             this.datumList = datumList;
-
             this.Loaded += PageLoaded;
         }
 
@@ -297,73 +296,6 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 DataAccess.AddSpiderTask(item.MatchName, task_id);
             }
 
-            //报告Task进度
-            //var progress = new Progress<SpliderInfoProgress>(progressPercent =>
-            //{
-            //    //更新进度信息
-            //    if (progressPercent.index != 0)
-            //    {
-            //        overallProgress.Value = progressPercent.index;
-            //    }
-
-            //    tryUpdateVideoInfo(progressPercent.videoInfo);
-            //    var matchResult = progressPercent.matchResult;
-
-            //    //匹配失败/检索失败
-            //    if (!matchResult.status)
-            //    {
-            //        FailVideoNameList.Add(matchResult.OriginalName);
-
-            //        ProgressMore_TextBlock.Text = $"失败数：{FailVideoNameList.Count}";
-            //        SearchProgress_TextBlock.Text = $"{matchResult.OriginalName}";
-            //        SearchMessage_TextBlock.Text = $"❌{matchResult.message}";
-            //    }
-            //    //匹配成功/跳过非视频文件/跳过重复番号
-            //    else
-            //    {
-            //        if (matchResult.MatchName != null)
-            //        {
-            //            //匹配成功
-            //            if (matchResult.OriginalName != null)
-            //            {
-            //                SearchProgress_TextBlock.Text = $"{matchResult.OriginalName} => {matchResult.MatchName}";
-            //                SearchMessage_TextBlock.Text = $"✔{matchResult.message}";
-            //            }
-            //            //匹配中
-            //            else
-            //            {
-            //                SearchProgress_TextBlock.Text = $"{matchResult.MatchName}";
-            //                SearchMessage_TextBlock.Text = $"🐬{matchResult.message}";
-            //            }
-            //        }
-            //        // 其他
-            //        else
-            //        {
-            //            SearchProgress_TextBlock.Text = $"{matchResult.OriginalName}";
-            //            SearchMessage_TextBlock.Text = $"✨{matchResult.message}";
-            //        }
-            //    }
-
-            //    percentProgress_TextBlock.Text = $"{(int)overallProgress.Value * 100 / matchVideoResults.Count}%";
-            //    countProgress_TextBlock.Text = $"{overallProgress.Value}/{matchVideoResults.Count}";
-
-            //    //100%
-            //    if (overallProgress.Value == overallProgress.Maximum)
-            //    {
-            //        ProgressRing_StackPanel.SetValue(Grid.ColumnSpanProperty, 1);
-            //        SearchResult_StackPanel.Visibility = Visibility.Visible;
-            //        SearchProgress_TextBlock.Visibility = Visibility.Collapsed;
-
-            //        AllCount_Run.Text = $"{matchVideoResults.Count}";
-            //        VideoCount_Run.Text = $"{matchVideoResults.Where(info => info.statusCode != 0).ToList().Count}";
-            //        FailCount_Run.Text = $"{FailVideoNameList.Count}";
-
-
-            //        //显示总耗时
-            //        SearchMessage_TextBlock.Text = $"⏱总耗时：{FileMatch.ConvertInt32ToDateStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime)}";
-            //    }
-            //});
-
             //匹配到的番号总数量
             int totalCount = matchVideoResults.Where(item=>!string.IsNullOrEmpty(item.MatchName)).ToList().Count;
 
@@ -371,6 +303,12 @@ namespace Display.ContentsPage.SpiderVideoInfo
             int videoCount = matchVideoResults.Where(info => info.statusCode != 0).ToList().Count;
 
             //正则匹配成功的番号占总视频数的
+            if (videoCount == 0)
+            {
+                TotalProgress_TextBlock.Text = "视频数为0,停止任务";
+                return;
+            }
+
             FileNameSuccessRate_Run.Text = $"{totalCount * 100 / videoCount}%";
 
             //统计成功和失败的名称
@@ -405,14 +343,12 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
                 i++;
                 System.Diagnostics.Debug.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>接受:{i} - {progressPercent.Name} - {progressPercent.SpiderSource} - {progressPercent.RequestStates} - {progressPercent.Message}");
-
+                
                 //更新整体进度
                 var currentCount = successList.Count + failureList.Count;
                 overallProgress.Value = currentCount;
                 percentProgress_TextBlock.Text = $"{currentCount * 100 / totalCount}%";
                 countProgress_TextBlock.Text = $"{currentCount}/{totalCount}";
-
-
 
             });
 
@@ -421,8 +357,6 @@ namespace Display.ContentsPage.SpiderVideoInfo
             await SearchAllInfoMultiTask(task_id, SpiderSourceProgress);
 
             //完成
-
-            //100%
             ProgressRing_StackPanel.SetValue(Grid.ColumnSpanProperty, 1);
             SearchResult_StackPanel.Visibility = Visibility.Visible;
             SearchProgress_TextBlock.Visibility = Visibility.Collapsed;
@@ -896,5 +830,14 @@ namespace Display.ContentsPage.SpiderVideoInfo
             FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
         }
 
+
+        public void CreateWindow()
+        {
+            CommonWindow window = new CommonWindow("搜刮进度");
+            this.currentWindow = window;
+            window.SetWindowSize(950, 730);
+            window.Content = this;
+            window.Activate();
+        }
     }
 }

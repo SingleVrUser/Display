@@ -103,11 +103,8 @@ namespace Display.ContentsPage.SpiderVideoInfo
             }
 
             //创建进度窗口
-            CommonWindow window = new CommonWindow("搜刮进度");
-            window.SetWindowSize(900,700);
-            var page = new ContentsPage.SpiderVideoInfo.Progress(window, folderNameList, datumList);
-            window.Content = page;
-            window.Activate();
+            var page = new ContentsPage.SpiderVideoInfo.Progress(folderNameList, datumList);
+            page.CreateWindow();
 
         }
 
