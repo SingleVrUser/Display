@@ -26,6 +26,13 @@
     <ApplicationIcon>Assets\pokeball.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Assets\Models\**" />
+    <Content Remove="Assets\Models\**" />
+    <EmbeddedResource Remove="Assets\Models\**" />
+    <None Remove="Assets\Models\**" />
+    <Page Remove="Assets\Models\**" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Remove="Assets\BadgeLogo.scale-100.png" />
     <Content Remove="Assets\BadgeLogo.scale-125.png" />
     <Content Remove="Assets\BadgeLogo.scale-150.png" />
@@ -64,6 +71,7 @@
     <None Remove="ContentsPage\SelectSingleSubFileToSelected.xaml" />
     <None Remove="ContentsPage\SelectSingleVideoToPlay.xaml" />
     <None Remove="ContentsPage\spiderVideoInfo.xaml" />
+    <None Remove="ContentsPage\SpiderVideoInfo\Progress.xaml" />
     <None Remove="ContentsPage\SpiderVideoInfo_ConditionalCheck.xaml" />
     <None Remove="ContentsPage\UpdateImagePath.xaml" />
     <None Remove="ContentsPage\VideoPlay - 复制.xaml" />
@@ -84,7 +92,6 @@
     <None Remove="Settings\GetVideoInfo.xaml" />
     <None Remove="VideoPlayWindow.xaml" />
     <None Remove="Views\BrowserPage.xaml" />
-    <None Remove="Views\BrowserWithTabPage.xaml" />
     <None Remove="Views\MorePage.xaml" />
     <None Remove="WindowView\CommonWindow.xaml" />
     <None Remove="WindowView\LoginWindow.xaml" />
@@ -106,8 +113,6 @@
     <Content Include="Views\ActorsPage.xaml.cs" />
     <Content Include="Views\DetailInfoPage.xaml" />
     <Content Include="Views\DetailInfoPage.xaml.cs" />
-    <Content Include="Views\FileListPage.xaml" />
-    <Content Include="Views\FileListPage.xaml.cs" />
     <Content Include="Views\HomePage.xaml" />
     <Content Include="Views\HomePage.xaml.cs" />
     <Content Include="Views\LoginPage.xaml" />
@@ -227,11 +232,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\BrowserWithTabPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
     <Page Update="Views\MorePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -257,9 +257,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Views\DetailInfoPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\FileListPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Views\HomePage.xaml">
@@ -302,13 +299,16 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Assets\115\file_type\" />
-    <Folder Include="Assets\Models\caffe\" />
+    <Folder Include="ContentsPage\DetailInfo\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Assets\SmallTile.scale-125.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="ContentsPage\SpiderVideoInfo\Progress.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="ContentsPage\SelectSingleSubFileToSelected.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -378,5 +378,8 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="ContentsPage\CalculateLocalFileSha1.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Remove="Assets\Models\**" />
   </ItemGroup>
 </Project>

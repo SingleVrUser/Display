@@ -24,6 +24,8 @@ public class RequestHelper
                 response = await client.GetAsync(uri);
                 strResult = await response.Content.ReadAsStringAsync();
 
+                strResult = strResult.Replace("\r", "").Replace("\n","").Trim();
+
                 break;
             }
             catch(Exception ex)
