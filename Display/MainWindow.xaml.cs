@@ -62,7 +62,6 @@ namespace Display
         private readonly List<(string Tag, Type Page)> _pages = new List<(string Tag, Type Page)>
         {
             ("home",typeof(HomePage)),
-            ("browser",typeof(BrowserPage)),
             ("videoView",typeof (VideoViewPage)),
             ("actorsview",typeof(ActorsPage)),
             ("setting",typeof(SettingsPage)),

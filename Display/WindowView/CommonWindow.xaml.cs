@@ -1,19 +1,7 @@
-﻿using Microsoft.UI;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.UI.Xaml;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -25,13 +13,15 @@ namespace Display.WindowView
     /// </summary>
     public sealed partial class CommonWindow : Window
     {
-        public CommonWindow()
+        public CommonWindow(string title = "Display")
         {
             this.InitializeComponent();
-            this.Title = "Display";
+            this.Title = title;
 
             var appwindow = App.getAppWindow(this);
             appwindow.SetIcon(Path.Combine(Package.Current.InstalledLocation.Path, "Assets/pokeball.ico"));
         }
+
+
     }
 }

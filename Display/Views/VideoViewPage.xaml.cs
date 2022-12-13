@@ -1,17 +1,10 @@
-﻿using ByteSizeLib;
-using Data;
-using Display.Control;
+﻿using Data;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -108,7 +101,7 @@ namespace Display.Views
 
                 multisetList = multisetList.OrderBy(item => item.n).ToList();
 
-                ContentsPage.SelectSingleVideoToPlay newPage = new ContentsPage.SelectSingleVideoToPlay(multisetList);
+                ContentsPage.DetailInfo.SelectSingleVideoToPlay newPage = new(multisetList);
                 newPage.ContentListView.ItemClick += ContentListView_ItemClick; ;
 
                 VideoPlayButton.Flyout = new Flyout()
