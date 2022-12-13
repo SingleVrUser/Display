@@ -22,6 +22,13 @@ namespace Data
         static string AgeconfigFile = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/age_deploy.prototxt");
         static string AgefaceModel = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/age_net.caffemodel");
 
+        public static bool IsModelFilesExists
+        {
+            get => File.Exists(faceProto)&& File.Exists(faceModel)
+                && File.Exists(genderProto) && File.Exists(genderModel)
+                && File.Exists(AgeconfigFile) && File.Exists(AgefaceModel);
+        }
+
         Net faceNet = CvDnn.ReadNetFromCaffe(faceProto, faceModel);
         Net genderNet = CvDnn.ReadNetFromCaffe(genderProto, genderModel);
         Net ageNet = CvDnn.ReadNetFromCaffe(AgeconfigFile, AgefaceModel);
@@ -691,7 +698,6 @@ namespace Data
         List<List<int>> getFaceBox(Mat frameImage)
         {
             List<List<int>> bboxes = new();
-
 
             using var blob = CvDnn.BlobFromImage(frameImage, 1.0, new OpenCvSharp.Size(300, 300),
                         new Scalar(104, 117, 123), false, false);

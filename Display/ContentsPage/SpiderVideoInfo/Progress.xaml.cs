@@ -275,6 +275,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             ShowSpiderInfoList();
             ShowSpiderCartesianChart();
 
+            CountInfo_Grid.Visibility = Visibility.Visible;
             //VideoInfo_Grid.Visibility = Visibility.Visible;
             TopProgressRing.IsActive = true;
 
@@ -296,24 +297,27 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 DataAccess.AddSpiderTask(item.MatchName, task_id);
             }
 
-            //匹配到的番号总数量
-            int totalCount = matchVideoResults.Where(item=>!string.IsNullOrEmpty(item.MatchName)).ToList().Count;
-
             //视频数量
             int videoCount = matchVideoResults.Where(info => info.statusCode != 0).ToList().Count;
+            AllVideoCount_Run.Text += videoCount.ToString();
 
-            //正则匹配成功的番号占总视频数的
             if (videoCount == 0)
             {
                 TotalProgress_TextBlock.Text = "视频数为0,停止任务";
                 return;
             }
 
+            //匹配到的番号总数量
+            int totalCount = matchVideoResults.Where(item=>!string.IsNullOrEmpty(item.MatchName)).ToList().Count;
+            MatchCidCount_Run.Text = totalCount.ToString();
+
+
+            //正则匹配成功的番号占总视频数的
             FileNameSuccessRate_Run.Text = $"{totalCount * 100 / videoCount}%";
 
-            //统计成功和失败的名称
-            List<string> successList = new();
-            List<string> failureList = new();
+            //统计成功的名称
+            int successCount = 0;
+            List<string> successVIdeoNameList = new();
 
             int i = 0;
             var SpiderSourceProgress = new Progress<SpiderInfo>(progressPercent =>
@@ -327,25 +331,27 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 //请求成功 (搜刮源或数据库)
                 if (progressPercent.RequestStates == RequestStates.success)
                 {
-                    successList.Add(progressPercent.Name);
+                    successCount++;
+                    CidSuccessCount_Run.Text = successCount.ToString();
+                    successVIdeoNameList.Add(progressPercent.Name);
                     UpdateSpiderCartesianChart(progressPercent.SpiderSource);
 
                 }
                 //请求失败(搜刮源)
                 else if (progressPercent.RequestStates == RequestStates.fail)
                 {
-                    failureList.Add(progressPercent.Name);
+                    FailVideoNameList.Add(progressPercent.Name);
                     UpdateSpiderCartesianChart(progressPercent.SpiderSource);
 
                     //番号搜刮成功率
-                    CidSuccessRate_Run.Text = $"{(totalCount - failureList.Count) * 100 / totalCount}%";
+                    CidSuccessRate_Run.Text = $"{(totalCount - FailVideoNameList.Count) * 100 / totalCount}%";
                 }
 
                 i++;
                 System.Diagnostics.Debug.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>接受:{i} - {progressPercent.Name} - {progressPercent.SpiderSource} - {progressPercent.RequestStates} - {progressPercent.Message}");
                 
                 //更新整体进度
-                var currentCount = successList.Count + failureList.Count;
+                var currentCount = successVIdeoNameList.Count + FailVideoNameList.Count;
                 overallProgress.Value = currentCount;
                 percentProgress_TextBlock.Text = $"{currentCount * 100 / totalCount}%";
                 countProgress_TextBlock.Text = $"{currentCount}/{totalCount}";
@@ -402,8 +408,6 @@ namespace Display.ContentsPage.SpiderVideoInfo
             DataAccess.DeleteSpiderLogTable();
             DataAccess.DeleteSpiderTaskTable();
 
-
-            //System.Diagnostics.Debug.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>所有搜刮任务已完成<<<<<<<<<<<<<<<<<<<<<<<<<");
         }
 
         //锁
@@ -531,7 +535,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     //宣告成功(数据库或搜刮源)
                     currentSpiderInfo.RequestStates = RequestStates.success;
                     currentSpiderInfo.Message = "搜刮完成";
-                    System.Diagnostics.Debug.WriteLine($"<<发送:{currentSpiderInfo.Name} - {currentSpiderInfo.SpiderSource}<{spiderSource.name}> - {currentSpiderInfo.RequestStates} - {currentSpiderInfo.Message}");
+                    //System.Diagnostics.Debug.WriteLine($"<<发送:{currentSpiderInfo.Name} - {currentSpiderInfo.SpiderSource}<{spiderSource.name}> - {currentSpiderInfo.RequestStates} - {currentSpiderInfo.Message}");
                     progress.Report(currentSpiderInfo);
 
                     lock (myLock)
@@ -561,7 +565,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                         //宣告失败(搜刮源)
                         currentSpiderInfo.RequestStates = RequestStates.fail;
                         currentSpiderInfo.Message = "搜刮失败";
-                        System.Diagnostics.Debug.WriteLine($"<<发送:{currentSpiderInfo.Name} - {currentSpiderInfo.SpiderSource} - {currentSpiderInfo.RequestStates} - {currentSpiderInfo.Message}");
+                        //System.Diagnostics.Debug.WriteLine($"<<发送:{currentSpiderInfo.Name} - {currentSpiderInfo.SpiderSource} - {currentSpiderInfo.RequestStates} - {currentSpiderInfo.Message}");
                         progress.Report(currentSpiderInfo);
                     }
                 }
