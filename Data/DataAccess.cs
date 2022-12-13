@@ -205,6 +205,50 @@ namespace Data
         }
 
         /// <summary>
+        /// 删除SpiderLog中的所有数据
+        /// </summary>
+        public static void DeleteSpiderLogTable()
+        {
+            using (SqliteConnection db =
+              new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand insertCommand = new SqliteCommand();
+                insertCommand.Connection = db;
+
+                // Use parameterized query to prevent SQL injection attacks
+                insertCommand.CommandText = $"DELETE FROM SpiderLog";
+
+                insertCommand.ExecuteReader();
+
+                db.Close();
+            }
+        }
+
+        /// <summary>
+        /// 删除SpiderTask中的所有数据
+        /// </summary>
+        public static void DeleteSpiderTaskTable()
+        {
+            using (SqliteConnection db =
+              new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand insertCommand = new SqliteCommand();
+                insertCommand.Connection = db;
+
+                // Use parameterized query to prevent SQL injection attacks
+                insertCommand.CommandText = $"DELETE FROM SpiderTask";
+
+                insertCommand.ExecuteReader();
+
+                db.Close();
+            }
+        }
+
+        /// <summary>
         /// 删除VideoInfo表中的一条记录
         /// </summary>
         public static void DeleteDataInVideoInfoTable(string truename)
@@ -269,6 +313,9 @@ namespace Data
             }
 
         }
+
+
+
         #endregion
 
         #region 添加
