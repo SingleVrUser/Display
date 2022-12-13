@@ -402,8 +402,6 @@ namespace Display.ContentsPage.SpiderVideoInfo
             DataAccess.DeleteSpiderLogTable();
             DataAccess.DeleteSpiderTaskTable();
 
-
-            //System.Diagnostics.Debug.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>所有搜刮任务已完成<<<<<<<<<<<<<<<<<<<<<<<<<");
         }
 
         //锁
