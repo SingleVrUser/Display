@@ -24,13 +24,23 @@
                     </AnimatedIcon.Source>
                 </AnimatedIcon>
             </HyperlinkButton>
+
             <StackPanel RelativePanel.AlignRightWithPanel="True" Orientation="Horizontal" Spacing="10">
-                <TextBlock Text="任务完成后通知"/>
-                <ToggleSwitch x:Name="IsToastAfterDone_ToggleSwitch" OnContent="打开" OffContent="关闭" IsOn="{x:Bind data:AppSettings.ProgressOfImportDataAccess_IsToastAfterTask,Mode=TwoWay}" MinWidth="0" Margin="0,0,10,0"/>
+                <TextBlock Text="任务完成后"/>
+                <ToggleSwitch x:Name="IsToastAfterDone_ToggleSwitch"
+                              OnContent="通知"
+                              OffContent="不通知"
+                              IsOn="{x:Bind data:AppSettings.ProgressOfImportDataAccess_IsToastAfterTask,Mode=TwoWay}"
+                              MinWidth="0"
+                              Margin="0,0,10,0" />
+                <ToggleSwitch OnContent="搜刮"
+                              OffContent="不搜刮"
+                              IsOn="{x:Bind data:AppSettings.ProgressOfImportDataAccess_IsStartSpiderAfterTask,Mode=TwoWay}"
+                              MinWidth="0"
+                              Margin="0,0,10,0" />
             </StackPanel>
         </RelativePanel>
         <Grid Margin="0,10,0,0" RowSpacing="10">
-            
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock x:Name="percent_TextBlock" Text="0%" FontSize="25" HorizontalAlignment="Center"/>
                 <TextBlock x:Name="countProgress_TextBlock" Text="0/0" FontSize="12" HorizontalAlignment="Center" Foreground="Gray"/>
@@ -187,6 +197,9 @@
             </ListView>
 
         </Expander>
+        
+        
+        
         <!--提示-->
         <!--出错-->
         <TeachingTip x:Name="ErrorTeachingTip"
@@ -196,5 +209,9 @@
                 <SymbolIconSource Symbol="Clear"/>
             </TeachingTip.IconSource>
         </TeachingTip>
+
+        <TeachingTip x:Name="WillStartSpiderTaskTip"
+                     Subtitle="即将开始搜刮任务"
+                     IsLightDismissEnabled="True" />
     </StackPanel>
 </Page>

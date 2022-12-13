@@ -262,12 +262,10 @@ namespace Display.Control
 
             foreach (var file in items)
             {
-                //FilesInfo.FileType fileType = file.pid == "" ? FilesInfo.FileType.File : FilesInfo.FileType.Folder;
                 FileInSelectFolder.Add(new FilesInfo(file));
             }
 
             var item = FileInSelectFolder;
-            //FileInSelectFolder.Clear();
         }
 
         /// <summary>

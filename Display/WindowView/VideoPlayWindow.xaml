@@ -41,7 +41,6 @@
                 <TextBlock Text="网页地址为空" FontSize="20"/>
             </StackPanel>
 
-
             <ProgressBar x:Name="NavigationProgressBar" IsIndeterminate="True" VerticalAlignment="Top"/>
         </Grid>
     </Grid>

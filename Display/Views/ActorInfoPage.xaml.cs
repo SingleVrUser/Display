@@ -144,7 +144,7 @@ namespace Display.Views
 
                 multisetList = multisetList.OrderBy(item => item.n).ToList();
 
-                ContentsPage.SelectSingleVideoToPlay newPage = new ContentsPage.SelectSingleVideoToPlay(multisetList);
+                ContentsPage.DetailInfo.SelectSingleVideoToPlay newPage = new(multisetList);
                 newPage.ContentListView.ItemClick += ContentListView_ItemClick; ;
 
                 VideoPlayButton.Flyout = new Flyout()

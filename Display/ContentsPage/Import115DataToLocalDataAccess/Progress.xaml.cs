@@ -1,4 +1,5 @@
 ﻿using Data;
+using Display.WindowView;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -7,9 +8,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.System;
+using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -188,7 +192,6 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                         tryToast("任务已结束", $"完成情况：{successCount}/{overallCount}，问题不大 😋");
                     }
 
-
                     //剩余时间改总耗时
                     leftTimeTitle_Run.Text = "总耗时：";
                     leftTime_Run.Text = FileMatch.ConvertInt32ToDateStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime);
@@ -215,6 +218,24 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             // 2.获取数据，获取所有文件的全部信息（大小和数量）
             await webapi.GetAllFileInfoToDataAccess(cidWithoutRootList, new GetFilesProgressInfo(), s_cts.Token, progress);
 
+            //搜刮完成,是否自动搜刮
+            if (AppSettings.ProgressOfImportDataAccess_IsStartSpiderAfterTask)
+            {
+                //提示将会开始搜刮
+                WillStartSpiderTaskTip.IsOpen = true;
+
+                await Task.Delay(3000);
+
+                List<string> folderList = FolderCategory.Select(item=>item.file_name).ToList();
+
+                //datum只用到其中的cid,所以只赋值cid (fid默认为空,不用理)
+                List<Datum> datumList = new();
+                cidWithoutRootList.ForEach(item => datumList.Add(new() { cid = item }));
+
+                var page = new ContentsPage.SpiderVideoInfo.Progress(folderList, datumList);
+                //创建搜刮进度窗口
+                page.CreateWindow();
+            }
 
             currentWindow.Closed -= CurrentWindow_Closed;
         }
