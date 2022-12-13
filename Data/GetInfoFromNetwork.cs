@@ -98,14 +98,12 @@ namespace Data
         /// <returns></returns>
         public async Task<VideoInfo> SearchInfoFromLibreDmm(string CID)
         {
-            VideoInfo videoInfo = new VideoInfo();
             string BusUrl = AppSettings.LibreDmm_BaseUrl;
             string SavePath = AppSettings.Image_SavePath;
 
             CID = CID.ToUpper();
             string url = UrlCombine(BusUrl, $"movies/{CID}");
 
-            videoInfo.busurl = url;
 
             if (Client == null)
             {
@@ -121,6 +119,9 @@ namespace Data
             var ImageUrlNode = htmlDoc.DocumentNode.SelectSingleNode("//img[@class='img-fluid']");
             //搜索无果，退出
             if (ImageUrlNode == null) return null;
+
+            VideoInfo videoInfo = new VideoInfo();
+            videoInfo.busurl = url;
 
             var ImageUrl = ImageUrlNode.Attributes["src"].Value;
 
@@ -587,6 +588,7 @@ namespace Data
 
             return result;
         }
+
 
         /// <summary>
         /// 从JavDB众多搜索结果中搜索出符合条件的

@@ -88,8 +88,7 @@ namespace Display.Views
                     break;
                 case "搜刮信息":
                     CommonWindow window2 = new CommonWindow();
-                    var page = new ContentsPage.SpiderVideoInfo();
-                    page.currentWindow = window2;
+                    var page = new ContentsPage.SpiderVideoInfo.MainPage();
                     window2.Content = page;
                     window2.Activate();
                     break;
@@ -103,11 +102,6 @@ namespace Display.Views
                     window4.Content = new BrowserPage(window4);
                     window4.Activate();
                     break;
-                case "文件列表":
-                    CommonWindow window5 = new CommonWindow();
-                    window5.Content = new FileListPage();
-                    window5.Activate();
-                    break;
                 case "演员头像":
                     CommonWindow window6 = new CommonWindow();
                     window6.Content = new ContentsPage.AddActorCover();
@@ -118,7 +112,6 @@ namespace Display.Views
                     window7.Content = new ContentsPage.GetThumbnail();
                     window7.Activate();
                     break;
-
             }
         }
     }

@@ -17,7 +17,47 @@ public class AppSettings
     /// <summary>
     /// 115导入数据库 进程界面 的 任务完成后通知
     /// </summary>
-    public static bool ProgressOfImportDataAccess_IsToastAfterTask;
+    public static bool ProgressOfImportDataAccess_IsToastAfterTask
+    {
+        get
+        {
+            bool isToast = false;
+
+            if (localSettings.Values["ProgressOfImportDataAccess_IsToastAfterTask"] is bool value)
+            {
+                isToast = value;
+            }
+
+            return isToast;
+        }
+        set
+        {
+            localSettings.Values["ProgressOfImportDataAccess_IsToastAfterTask"] = value;
+        }
+    }
+
+    /// <summary>
+    /// 115导入数据库 进程界面 的 任务完成后 开始搜刮任务
+    /// </summary>
+    /// 
+    public static bool ProgressOfImportDataAccess_IsStartSpiderAfterTask
+    {
+        get
+        {
+            bool isStart = true;
+
+            if (localSettings.Values["ProgressOfImportDataAccess_IsStartSpiderAfterTask"] is bool value)
+            {
+                isStart = value;
+            }
+
+            return isStart;
+        }
+        set
+        {
+            localSettings.Values["ProgressOfImportDataAccess_IsStartSpiderAfterTask"] = value;
+        }
+    }
 
     /// <summary>
     /// 115的Cookie

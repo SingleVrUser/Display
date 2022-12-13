@@ -41,6 +41,7 @@
                         <Setter Target="IsJumpVrVideo_ToggleSwitch.Visibility" Value="Visible" />
                         <Setter Target="IsSelectedFaceImage_ToggleSwitch.Visibility" Value="Visible" />
                         <Setter Target="IsShowWindows_ToggleSwitch.Visibility" Value="Visible" />
+                        <Setter Target="DownloadModelTip_RichTextBlock.Visibility" Value="Visible" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -79,6 +80,17 @@
 
                                 <ToggleSwitch x:Name="IsShowWindows_ToggleSwitch" Header="显示预览窗口" OnContent="显示" OffContent="不显示" IsOn="True" Visibility="Collapsed"/>
 
+                                <RichTextBlock x:Name="DownloadModelTip_RichTextBlock"
+                                               MaxWidth="220"
+                                               Visibility="Collapsed">
+                                    <Paragraph>
+                                        <Run>自v0.1.12起不再内嵌训练模型（Model），如需使用请自行</Run>
+                                        <Hyperlink NavigateUri="https://github.com/SingleVrUser/Display/releases/tag/v0.1.12">下载</Hyperlink>
+                                        <Run>并存到对应</Run>
+                                        <Hyperlink Click="OpenModelSavePath_HyperLinkClick">路径</Hyperlink>
+                                    </Paragraph>
+                                </RichTextBlock>
+                                
                             </StackPanel>
 
                         </Flyout>
