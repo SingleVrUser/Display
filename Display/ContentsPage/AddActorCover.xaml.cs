@@ -1,26 +1,18 @@
 ﻿using Data;
-using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
-using Microsoft.UI.Xaml.Media.Imaging;
-using Microsoft.UI.Xaml.Navigation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Numerics;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -108,7 +100,6 @@ namespace Display.ContentsPage
             var actorInfo = e.ClickedItem as ActorsInfo;
 
             string filePath = AppSettings.ActorFileTree_SavePath;
-
 
             progress_TextBlock.Text = "正在获取GFriend仓库信息……";
             if (!await tryUpdateFileTree(filePath))
@@ -433,8 +424,8 @@ namespace Display.ContentsPage
             }
             else
             {
-                var fileWriteTime = File.GetLastWriteTime(filePath);
                 //本地文件信息
+                var fileWriteTime = File.GetLastWriteTime(filePath);
 
                 //仓库信息
                 var dateStr = await GetGitUpdateDateStr();
@@ -458,11 +449,13 @@ namespace Display.ContentsPage
             return result;
         }
 
+        /// <summary>
+        /// 获取仓库最新的时间
+        /// </summary>
+        /// <returns></returns>
         private async Task<string> GetGitUpdateDateStr()
         {
-            var handler = new HttpClientHandler { UseCookies = false };
-            Client = new HttpClient(handler);
-            Client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0");
+            var Client = GetInfoFromNetwork.Client;
 
             string UpdateDateStr = string.Empty;
 

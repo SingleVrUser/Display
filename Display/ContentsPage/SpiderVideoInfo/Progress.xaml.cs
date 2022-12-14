@@ -61,6 +61,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             currentWindow.Closed -= CurrentWindow_Closed;
 
+            TopProgressRing.IsActive = false;
             TotalProgress_TextBlock.Text = "完成";
         }
 
@@ -310,6 +311,12 @@ namespace Display.ContentsPage.SpiderVideoInfo
             //匹配到的番号总数量
             int totalCount = matchVideoResults.Where(item=>!string.IsNullOrEmpty(item.MatchName)).ToList().Count;
             MatchCidCount_Run.Text = totalCount.ToString();
+
+            if (totalCount == 0)
+            {
+                TotalProgress_TextBlock.Text = "匹配到的番号数量为0,停止任务";
+                return;
+            }
 
 
             //正则匹配成功的番号占总视频数的

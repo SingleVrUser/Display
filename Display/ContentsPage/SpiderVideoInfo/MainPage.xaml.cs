@@ -1,5 +1,4 @@
 ﻿using Data;
-using Display.WindowView;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
@@ -64,10 +63,29 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// <param name="args"></param>
         private void Expander_Expanding(Expander sender, ExpanderExpandingEventArgs args)
         {
-            if ((sender.Content as ConditionalCheck) == null)
+            if (!(sender is Expander expander)) return;
+
+            if ((expander.Content as ConditionalCheck) == null)
             {
-                sender.Content = new ContentsPage.SpiderVideoInfo.ConditionalCheck(this);
+                expander.Content = new ContentsPage.SpiderVideoInfo.ConditionalCheck(this);
             }
+
+            expander.SetValue(Grid.ColumnProperty, 0);
+            expander.SetValue(Grid.ColumnSpanProperty, 2);
+        }
+
+
+        /// <summary>
+        /// 关闭Expander
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private void Expander_Collapsed(Expander sender, ExpanderCollapsedEventArgs args)
+        {
+            if (!(sender is Expander expander)) return;
+
+            expander.SetValue(Grid.ColumnProperty, 1);
+            expander.SetValue(Grid.ColumnSpanProperty, 1);
         }
 
         /// <summary>
@@ -119,17 +137,9 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             if (e.AddedItems[0] is RadioButton radioButton)
             {
-                switch (radioButton.Content)
+                if (radioButton.Name == nameof(matchFail_RadioButton))
                 {
-                    case "本地数据库":
-                        Explorer.Visibility = Visibility.Visible;
-                        FailListGrid.Visibility = Visibility.Collapsed;
-                        break;
-                    case "匹配失败":
-                        FailListGrid.Visibility = Visibility.Visible;
-                        Explorer.Visibility = Visibility.Collapsed;
-                        tryShowFailList();
-                        break;
+                    tryShowFailList();
                 }
             }
         }
@@ -147,8 +157,12 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             if (FailList.Count == 0)
             {
-                var list = await DataAccess.LoadFailFileInfo(0,30);
+                //失败总数
+                var failCount = await DataAccess.CheckFailFilesCount();
+                FailListTotalCount_Run.Text = $"/{failCount}";
 
+                //当前显示的
+                var list = await DataAccess.LoadFailFileInfo(0,30);
                 list.ForEach(item => FailList.Add(item));
             }
         }
@@ -162,6 +176,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
         {
             var itemInfo = e.ClickedItem as FilesInfo;
 
+            if (FileInfoShow_Grid.Visibility == Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
             SelectedDatum = itemInfo.datum;
         }
 
@@ -173,6 +188,8 @@ namespace Display.ContentsPage.SpiderVideoInfo
         private void TreeView_ItemInvoked(TreeView sender, TreeViewItemInvokedEventArgs args)
         {
             var content = ((args.InvokedItem as TreeViewNode).Content as ExplorerItem);
+
+            if(FileInfoShow_Grid.Visibility== Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
             SelectedDatum = content.datum;
         }
 

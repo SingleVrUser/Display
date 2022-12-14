@@ -75,7 +75,6 @@ namespace Display
         /// <param name="e"></param>
         private void NavView_Loaded(object sender, RoutedEventArgs e)
         {
-            // NavView doesn't load any page by default, so load home page.
             //数据文件存在
             if (File.Exists(DataAccess.dbpath))
             {
@@ -98,7 +97,56 @@ namespace Display
                         break;
                 }
             }
-                
+
+            //在这里检查应用更新
+            TryCheckAppUpdate();
+        }
+
+        /// <summary>
+        /// 检查应用更新
+        /// </summary>
+        private async void TryCheckAppUpdate()
+        {
+            if (!AppSettings.IsCheckUpdate)
+                return;
+
+            var ReleaseCheck = await AppInfo.GetLatestReleaseCheck();
+
+            if (ReleaseCheck == null) return;
+
+            //可以升级且最新版本不是忽略的版本
+            if (ReleaseCheck.CanUpdate && ReleaseCheck.LatestVersion != AppSettings.IgnoreUpdateAppVersion)
+            {
+                ContentDialog dialog = new ContentDialog();
+
+                // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
+                dialog.XamlRoot = ((Page)ContentFrame.Content).XamlRoot;
+                dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
+                dialog.Title = "有新版本可升级";
+                dialog.PrimaryButtonText = "下载";
+                dialog.SecondaryButtonText = "忽略该版本";
+                dialog.CloseButtonText = "取消";
+                dialog.DefaultButton = ContentDialogButton.Primary;
+                dialog.Content = new ContentsPage.UpdateAppPage(ReleaseCheck);
+
+                var result = await dialog.ShowAsync();
+
+                switch(result)
+                {
+                    //下载
+                    case ContentDialogResult.Primary:
+                        await Launcher.LaunchUriAsync(new Uri(ReleaseCheck.AppAsset.browser_download_url));
+                        break;
+                    //忽略该版本
+                    case ContentDialogResult.Secondary:
+                        AppSettings.IgnoreUpdateAppVersion = ReleaseCheck.LatestVersion;
+                        break;
+
+
+                    default:
+                        return;
+                }
+            }
 
         }
 
@@ -159,7 +207,6 @@ namespace Display
         {
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
         }
-
 
         private void NavigationViewControl_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)
         {
@@ -242,6 +289,11 @@ namespace Display
             ContentFrame.Navigate(typeof(ActorInfoPage), new string[] { type, sender.Text }, new SuppressNavigationTransitionInfo());
         }
 
+        /// <summary>
+        /// 点击了全屏或退出全屏按键
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void fullScrenWindowButton_Click(object sender, RoutedEventArgs e)
         {
             if (appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
@@ -254,6 +306,11 @@ namespace Display
             }
         }
 
+        /// <summary>
+        /// 监听ESC按键（退出全屏）
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void RootGrid_KeyDown(object sender, KeyRoutedEventArgs e)
         {
             if (e.Key == Windows.System.VirtualKey.Escape)
@@ -262,7 +319,9 @@ namespace Display
             }
         }
 
-        //进入全屏
+        /// <summary>
+        /// 进入全屏
+        /// </summary>
         private void enterlFullScreen()
         {
             if (appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
@@ -277,6 +336,9 @@ namespace Display
             }
         }
 
+        /// <summary>
+        /// 退出全屏
+        /// </summary>
         private void cancelFullScreen()
         {
             if (appwindow.Presenter.Kind == AppWindowPresenterKind.FullScreen)
@@ -299,10 +361,9 @@ namespace Display
             (sender as HyperlinkButton).Opacity = 0.2;
         }
 
-        private async void HyperlinkButton_Click(object sender, RoutedEventArgs e)
+        private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
         {
-            StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(AppSettings.DataAccess_SavePath);
-            await Launcher.LaunchFolderAsync(folder);
+            FileMatch.LaunchFolder(AppSettings.DataAccess_SavePath);
         }
     }
 }

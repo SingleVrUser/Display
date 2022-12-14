@@ -894,7 +894,7 @@ namespace Data
         /// 查询最近一次的未完成搜刮记录
         /// </summary>
         /// <returns>Tuple (task_id,add_time)</returns>
-        public static Tuple<long,long> GetLastestUnfinishedSpiderLog()
+        public static Tuple<long,long> GetLatestUnfinishedSpiderLog()
         {
             Tuple<long, long> tuple = null;
             using (SqliteConnection db =
@@ -1037,7 +1037,7 @@ namespace Data
         /// </summary>
         /// <param name="limit"></param>
         /// <returns></returns>
-        public static string GetLastestFolderPid(string pickCode, int timeEdit = 0)
+        public static string GetLatestFolderPid(string pickCode, int timeEdit = 0)
         {
             string pid = String.Empty;
 

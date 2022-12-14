@@ -189,15 +189,15 @@
                     <Run>正则匹配成功的番号数量:</Run>
                     <Run x:Name="MatchCidCount_Run">0</Run>
                 </TextBlock>
-                <TextBlock Grid.Row="2">
-                    <Run>正则匹配成功番号占:</Run>
-                    <Run x:Name="FileNameSuccessRate_Run">100%</Run>
-                </TextBlock>
-                <TextBlock Grid.Row="3"
+                <TextBlock Grid.Row="2"
                            Opacity="0.5"
                            FontSize="14">
                     <Run>番号搜刮成功数量:</Run>
                     <Run x:Name="CidSuccessCount_Run">0</Run>
+                </TextBlock>
+                <TextBlock Grid.Row="3">
+                    <Run>正则匹配成功番号占:</Run>
+                    <Run x:Name="FileNameSuccessRate_Run">100%</Run>
                 </TextBlock>
                 <TextBlock Grid.Row="4">
                     <Run>番号搜刮成功率:</Run>

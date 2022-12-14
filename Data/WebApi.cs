@@ -201,7 +201,7 @@ namespace Data
                 }
 
                 // 获取上一次已添加文件夹的pid（如果存在，且修改时间不变；不存在的默认值为string.empty）
-                var pid = DataAccess.GetLastestFolderPid(cidCategory.pick_code, cidCategory.utime);
+                var pid = DataAccess.GetLatestFolderPid(cidCategory.pick_code, cidCategory.utime);
 
                 // 该文件已存在数据库里，且修改时间不变
                 if (!string.IsNullOrEmpty(pid) && Data.StaticData.isJumpExistsFolder)
@@ -308,7 +308,7 @@ namespace Data
                         getFilesProgressInfo.addToDataAccessList.Add(item);
 
                         //查询数据库是否存在
-                        if (!string.IsNullOrEmpty(DataAccess.GetLastestFolderPid(item.pc, item.te)) && Data.StaticData.isJumpExistsFolder)
+                        if (!string.IsNullOrEmpty(DataAccess.GetLatestFolderPid(item.pc, item.te)) && Data.StaticData.isJumpExistsFolder)
                         {
                             //统计下级文件夹所含文件的数量
                             //通过数据库获取
