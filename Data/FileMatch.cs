@@ -20,6 +20,9 @@ namespace Data
         /// <returns></returns>
         public static string DeleteSomeKeywords(string name)
         {
+            if(name.Contains("ARA"))
+                Debug.WriteLine("停");
+
             List<string> reg_replace_list =
                 new List<string> { "uur76", @"({\d}K)?\d{2,3}fps", @"part\d", "@18P2P", @"[^\d]\d{3,6}P", @"\[?[0-9a-z]+?\.(com|cn|xyz|la|me|net|app|cc)\]?@?",
                                 @"SE\d{2}",@"EP\d{2}", @"S\d{1,2}E\d{1,2}", @"\D[hx]26[54]", "[-_][468]k", @"h_[0-9]{3,4}",@"[a-z0-9]{15,}",
@@ -44,7 +47,7 @@ namespace Data
             string name = Regex.Match(src_text, @"(.*)(\.\w{3,5})?$",RegexOptions.IgnoreCase).Groups[1].Value;
 
             //删除空格
-            name = src_text.Replace(" ", "");
+            name = src_text.Replace(" ", "_");
 
             //转小写
             string name_lc = name.ToLower();
@@ -63,7 +66,7 @@ namespace Data
             }
             else if (name_lc.Contains("heydouga"))
             {
-                match = Regex.Match(name, @"(heydouga)[-_]*(\d{4})[-_]0?(\d{3,5})", RegexOptions.IgnoreCase);
+                match = Regex.Match(name, @"(heydouga)[-_]*(\d{4})[-_]+0?(\d{3,5})", RegexOptions.IgnoreCase);
 
                 if (match.Success)
                 {
@@ -83,13 +86,13 @@ namespace Data
             }
 
             //匹配缩写成hey的heydouga影片。由于番号分三部分，要先于后面分两部分的进行匹配
-            match = Regex.Match(no_domain, @"(?:hey)[-_]*(\d{4})[-_]0?(\d{3,5})", RegexOptions.IgnoreCase);
+            match = Regex.Match(no_domain, @"(?:hey)[-_]*(\d{4})[-_]+0?(\d{3,5})", RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 return $"heydouga-" + string.Join("-", match.Groups.Values.Skip(1));
             }
             //普通番号，优先尝试匹配带分隔符的（如ABC - 123）
-            match = Regex.Match(no_domain, @"([a-z]{2,10})[-_]0*(\d{2,5})", RegexOptions.IgnoreCase);
+            match = Regex.Match(no_domain, @"([a-z]{2,10})[-_]+0*(\d{2,5})", RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 string number = match.Groups[2].Value;
@@ -125,7 +128,7 @@ namespace Data
             }
 
             //尝试匹配TMA制作的影片（如'T28-557'，他家的番号很乱）
-            match = Regex.Match(no_domain, @"(T28[-_]\d{3})", RegexOptions.IgnoreCase);
+            match = Regex.Match(no_domain, @"(T28[-_]+\d{3})", RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 return match.Groups[1].Value;
@@ -137,7 +140,7 @@ namespace Data
                 return match.Groups[1].Value;
             }
             //尝试匹配纯数字番号（无码影片）
-            match = Regex.Match(no_domain, @"(\d{6}[-_]\d{2,3})", RegexOptions.IgnoreCase);
+            match = Regex.Match(no_domain, @"(\d{6}[-_]+\d{2,3})", RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 return match.Groups[1].Value;

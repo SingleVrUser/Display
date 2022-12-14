@@ -135,7 +135,17 @@
             </Grid>
 
             <Grid Style="{StaticResource GridWithBrush}" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="各搜刮源访问次数"
+                           HorizontalAlignment="Right"
+                           FontSize="13"
+                           Opacity="0.5"/>
                 <lvc:CartesianChart x:Name="CartesianChart"
+                                    Grid.Row="1"
                                     Visibility="Collapsed"
                                     LegendPosition="Right"
                                     LegendBackground="{ThemeResource ApplicationPageBackgroundThemeBrush}">
