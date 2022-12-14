@@ -134,7 +134,7 @@ namespace Display.ContentsPage
 
             animation.TryStart(destinationElement);
 
-
+            progress_TextBlock.Text = string.Empty;
         }
 
         //防止动画开始时，双击触发退出事件
@@ -174,7 +174,7 @@ namespace Display.ContentsPage
             selectedCheckBox.Content = $"共选 {selectedItemCount} 项";
         }
 
-        private void StartButton_Click(object sender, RoutedEventArgs e)
+        private async void StartButton_Click(object sender, RoutedEventArgs e)
         {
             if (BasicGridView.SelectedItems.Count == 0) return;
 
@@ -219,11 +219,10 @@ namespace Display.ContentsPage
                 }
             });
 
-            Task.Run(() => getActorCoverByGit(actorinfo.ToList(), progress, s_cts));
+            await Task.Run(() => getActorCoverByGit(actorinfo.ToList(), progress, s_cts));
 
             BasicGridView.ItemClick += BasicGridView_ItemClick;
 
-            //getActorCoverByWebVideo();
         }
 
         private async void getActorCoverByGit(List<ActorsInfo> actorinfos,IProgress<progressClass> progress, CancellationTokenSource s_cts)
