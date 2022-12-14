@@ -299,7 +299,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             //视频数量
             int videoCount = matchVideoResults.Where(info => info.statusCode != 0).ToList().Count;
-            AllVideoCount_Run.Text += videoCount.ToString();
+            AllVideoCount_Run.Text = videoCount.ToString();
 
             if (videoCount == 0)
             {
@@ -327,6 +327,11 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 GridViewItem.State = progressPercent.State;
                 GridViewItem.Message = progressPercent.Message;
 
+                if(progressPercent.State == SpiderStates.awaiting)
+                {
+                    UpdateSpiderCartesianChart(progressPercent.SpiderSource);
+                }
+
                 //更新柱状图
                 //请求成功 (搜刮源或数据库)
                 if (progressPercent.RequestStates == RequestStates.success)
@@ -334,14 +339,14 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     successCount++;
                     CidSuccessCount_Run.Text = successCount.ToString();
                     successVIdeoNameList.Add(progressPercent.Name);
-                    UpdateSpiderCartesianChart(progressPercent.SpiderSource);
 
+                    UpdateSpiderCartesianChart(SpiderSourceName.local);
                 }
                 //请求失败(搜刮源)
                 else if (progressPercent.RequestStates == RequestStates.fail)
                 {
                     FailVideoNameList.Add(progressPercent.Name);
-                    UpdateSpiderCartesianChart(progressPercent.SpiderSource);
+                    UpdateSpiderCartesianChart(SpiderSourceName.local);
 
                     //番号搜刮成功率
                     CidSuccessRate_Run.Text = $"{(totalCount - FailVideoNameList.Count) * 100 / totalCount}%";
@@ -401,8 +406,8 @@ namespace Display.ContentsPage.SpiderVideoInfo
             currentSpiderInfo.Message = "完成";
             progress.Report(currentSpiderInfo);
 
-            //所有任务已结束（后面已经删除了,所以这个没用了）
-            DataAccess.UpdataSpiderLogDone(task_id);
+            ////所有任务已结束（后面已经删除了,所以这个没用了）
+            //DataAccess.UpdataSpiderLogDone(task_id);
 
             //删除SpiderTask和SpiderLog表中的所有数据
             DataAccess.DeleteSpiderLogTable();
@@ -522,11 +527,6 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
                 }
 
-                lock (myLock)
-                {
-                    //记录为已完成
-                    DataAccess.UpdataSpiderTask(name, spiderSource, SpiderStates.done);
-                }
 
                 //检查一下是否需要标记为全部完成
                 //搜刮成功
@@ -540,9 +540,8 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
                     lock (myLock)
                     {
-                        //更新SpiderTask
+                        //记录为已完成且已全部完成
                         DataAccess.UpdataSpiderTask(name, spiderSource, SpiderStates.done, true);
-
                     }
 
                     // 添加搜刮信息到数据库
@@ -554,7 +553,15 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 else
                 {
                     //检查是否还有其他搜刮源未尝试，全部源都尝试过就标记为AllDone,并宣告该番号搜刮失败
-                    if (DataAccess.IsAllSpiderSourceAttempt(name))
+                    bool IsAllSpiderSourceAttempt = false;
+                    lock (myLock)
+                    {
+                        //仅记录该搜刮源为已完成
+                        DataAccess.UpdataSpiderTask(name, spiderSource, SpiderStates.done);
+                        IsAllSpiderSourceAttempt = DataAccess.IsAllSpiderSourceAttempt(name);
+                    }
+
+                    if (IsAllSpiderSourceAttempt)
                     {
                         lock (myLock)
                         {
@@ -564,8 +571,8 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
                         //宣告失败(搜刮源)
                         currentSpiderInfo.RequestStates = RequestStates.fail;
+                        currentSpiderInfo.State = SpiderStates.ready;
                         currentSpiderInfo.Message = "搜刮失败";
-                        //System.Diagnostics.Debug.WriteLine($"<<发送:{currentSpiderInfo.Name} - {currentSpiderInfo.SpiderSource} - {currentSpiderInfo.RequestStates} - {currentSpiderInfo.Message}");
                         progress.Report(currentSpiderInfo);
                     }
                 }
