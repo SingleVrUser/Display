@@ -822,7 +822,7 @@ namespace Data
         }
         public FilesInfo(Datum data)
         {
-            this.datum= data;
+            this.datum = data;
 
             Name = data.n;
             Cid = data.cid;
@@ -1018,7 +1018,7 @@ namespace Data
                         if (key3 == ico)
                         {
                             string tmpPath = $"Assets/115/file_type/{key}/{key2}.svg";
-                            
+
                             if (!File.Exists(Path.Combine(Package.Current.InstalledLocation.Path, tmpPath)))
                                 IconPath = $"ms-appx:///Assets/115/file_type/{key}/{key}.svg";
                             else
@@ -1634,10 +1634,10 @@ namespace Data
     }
 
 
-    public enum SpiderSourceName { javbus, libredmm, fc2club, javdb , local}
+    public enum SpiderSourceName { javbus, libredmm, fc2club, javdb, local }
     public class SpiderSource
     {
-        public string name { get;}
+        public string name { get; }
 
         public SpiderSource(SpiderSourceName source)
         {
@@ -1663,22 +1663,22 @@ namespace Data
     }
 
 
-    public enum RequestStates { none, fail, success};
-    public enum SpiderStates { ready,doing,awaiting,done }
+    public enum RequestStates { none, fail, success };
+    public enum SpiderStates { ready, doing, awaiting, done }
 
-    public class SpiderInfo:INotifyPropertyChanged
+    public class SpiderInfo : INotifyPropertyChanged
     {
         public SpiderSourceName SpiderSource { get; set; }
 
-        public string Name { get;}
+        public string Name { get; }
 
-        public SpiderStates State { get; set;}
+        public SpiderStates State { get; set; }
         public bool IsEnable { get; set; }
         public Microsoft.UI.Xaml.Media.Brush EllipseColor
         {
             get
             {
-                switch(State)
+                switch (State)
                 {
                     case SpiderStates.ready:
                         return new SolidColorBrush(Colors.MediumSeaGreen);
@@ -1706,7 +1706,7 @@ namespace Data
             get => _spidercount;
             set
             {
-                if(_spidercount == value) return;
+                if (_spidercount == value) return;
 
                 _spidercount = value;
             }
@@ -1716,7 +1716,7 @@ namespace Data
         {
             get
             {
-                if(IsEnable)
+                if (IsEnable)
                     return Visibility.Visible;
                 else
                     return Visibility.Collapsed;
@@ -1739,10 +1739,10 @@ namespace Data
         }
 
         //初始化
-        public SpiderInfo(SpiderSourceName spiderSource,bool isEnable)
+        public SpiderInfo(SpiderSourceName spiderSource, bool isEnable)
         {
             this.SpiderSource = spiderSource;
-            this.IsEnable= isEnable;
+            this.IsEnable = isEnable;
 
             if (!IsEnable)
                 this.Message = "已禁用";
@@ -1764,5 +1764,7 @@ namespace Data
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
     }
+
 }

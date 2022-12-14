@@ -1,18 +1,39 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.Storage;
-using Windows.Storage.Pickers;
 
 namespace Data;
 
 public class AppSettings
 {
     public static ApplicationDataContainer localSettings { get { return ApplicationData.Current.LocalSettings; } }
+
+    /// <summary>
+    /// 是否检查更新
+    /// </summary>
+    public static bool IsCheckUpdate
+    {
+        get
+        {
+            bool check = true;
+            if(localSettings.Values["IsCheckUpdate"] is bool value)
+            {
+                check = value;
+            }
+            return check;
+        }
+        set=> localSettings.Values["IsCheckUpdate"] = value;
+    }
+    
+    /// <summary>
+    /// 忽略升级的版本号
+    /// </summary>
+    public static string IgnoreUpdateAppVersion
+    {
+        get => (string)localSettings.Values["IgnoreUpdateAppVersion"];
+        set => localSettings.Values["IgnoreUpdateAppVersion"] = value;
+    }
 
     /// <summary>
     /// 115导入数据库 进程界面 的 任务完成后通知

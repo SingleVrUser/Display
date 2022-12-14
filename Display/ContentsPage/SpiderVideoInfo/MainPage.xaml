@@ -14,342 +14,357 @@
     <Page.Resources>
         <converter:BytesToSizeStrConverter x:Key="BytesToSizeStrConverter" />
         <converter:IsVideoToVisiableConverter x:Key="IsVideoToVisiableConverter" />
+
     </Page.Resources>
 
     <Grid>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="48" />
-                <RowDefinition Height="40" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="*" />
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        </Grid.ColumnDefinitions>
 
-            <!--文件查看-->
-            <Grid Grid.Row="2">
-                <!--本地数据库-->
-                <control:Explorer x:Name="Explorer"
-                                  ItemClick="ExplorerItemClick"
-                                  ItemInvoked="TreeView_ItemInvoked" />
-
-                <!--失败列表-->
-                <Grid x:Name="FailListGrid">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-
-                    <StackPanel Orientation="Horizontal"
-                                HorizontalAlignment="Right"
-                                Opacity="0.5">
-                        <control:TextBlockWithLongText StringValue="显示数量：" />
-                        <control:TextBlockWithLongText StringValue="{x:Bind FailList.Count,Mode=OneWay}" />
-                    </StackPanel>
-
-                    <ListView x:Name="FailListView"
-                              Grid.Row="1"
-                              SelectionChanged="FailListView_SelectionChanged">
-                        <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="data:Datum">
-                                <TextBlock Text="{x:Bind n}" />
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </Grid>
-            </Grid>
-
-            <!--操作按钮-->
-            <Grid  Grid.Row="1"
-                   Grid.ColumnSpan="2"
-                   BorderThickness="0,0,0,1"
-                   BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-                   Padding="10,0">
+        <Grid Grid.ColumnSpan="2">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="48" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
 
-                <RadioButtons SelectedIndex="0"
-                              MaxColumns="3"
-                              SelectionChanged="RadioButtons_SelectionChanged">
-                    <RadioButton Content="本地数据库" />
-                    <RadioButton Content="匹配失败" />
-                </RadioButtons>
+                <!--操作按钮-->
+                <Grid Padding="10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
 
-                <StackPanel Orientation="Horizontal"
-                            Grid.Column="1"
-                            VerticalAlignment="Center">
-                    <TextBlock x:Name="StartMatchName_TextBlox"
-                               Text="选中所需文件夹后"
-                               Margin="0,0,5,0"
-                               RelativePanel.AlignVerticalCenterWithPanel="True"
-                               VerticalAlignment="Center" />
+                    <RadioButtons SelectedIndex="0"
+                                  Grid.Column="1"
+                                  MaxColumns="2"
+                                  CharacterSpacing="30"
+                                  SelectionChanged="RadioButtons_SelectionChanged">
+                        <RadioButton x:Name="localData_RadioButton"
+                                     Content="&#xE9F9;"
+                                     FontSize="20"
+                                     HorizontalContentAlignment="Center"
+                                     FontFamily="Segoe Fluent Icons"
+                                     Style="{StaticResource RadioButtonCustomizeStyle}"/>
+                        <RadioButton x:Name="matchFail_RadioButton"
+                                     Content="&#xF45E;"
+                                     FontSize="20"
+                                     FontFamily="Segoe Fluent Icons"
+                                     HorizontalContentAlignment="Center"
+                                     Style="{StaticResource RadioButtonCustomizeStyle}"/>
+
+                    </RadioButtons>
+
                     <Button x:Name="StartMatchName_Button"
-                            RelativePanel.AlignHorizontalCenterWithPanel="True"
-                            RelativePanel.RightOf="StartMatchName_TextBlox"
                             Margin="5,0,0,0"
-                            Click="StartMatchName_ButtonClick">开始</Button>
+                            Click="StartMatchName_ButtonClick"
+                            Content="开始搜刮"
+                            Visibility="{x:Bind localData_RadioButton.IsChecked,Mode=OneWay}" />
 
-                </StackPanel>
-            </Grid>
-
-            <!--文件信息查看-->
-            <Grid Grid.Row="2"
-                  Grid.Column="1"
-                  BorderThickness="2"
-                  BorderBrush="{StaticResource ControlElevationBorderBrush}"
-                  Margin="2"
-                  CornerRadius="8">
-
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="35" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Text="信息"
-                               Grid.ColumnSpan="2"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Center"
-                               FontWeight="Bold"
-                               FontSize="18" />
-
-                    <Button FontFamily="Segoe Fluent Icons"
-                            Grid.Column="1"
-                            Content="&#xE102;"
-                            CornerRadius="10"
-                            Padding="10"
-                            Visibility="{x:Bind SelectedDatum.iv,FallbackValue=Collapsed,Mode=OneWay,Converter={StaticResource IsVideoToVisiableConverter}}"
-                            HorizontalAlignment="Right"
-                            Click="VideoPlayButton_Click" />
-
-                    <ScrollViewer Grid.Row="1"
-                                  Padding="5">
-                        <Grid RowSpacing="5" ColumnSpacing="5">
-                            <Grid.Resources>
-                                <Style TargetType="TextBlock"
-                                       x:Key="TitleTextBlock">
-                                    <Setter Property="Opacity"
-                                            Value="0.4" />
-                                    <Setter Property="FontSize"
-                                            Value="18" />
-                                    
-                                    <Setter Property="HorizontalAlignment"
-                                            Value="Right" />
-                                </Style>
-
-                                <Style TargetType="control:TextBlockWithLongText">
-                                    <Setter Property="VerticalAlignment"
-                                            Value="Bottom" />
-                                </Style>
-                            </Grid.Resources>
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
-
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-
-                            <TextBlock Grid.Row="0"
-                                       Style="{StaticResource TitleTextBlock}">fid</TextBlock>
-                            <TextBlock Grid.Row="1"
-                                       Style="{StaticResource TitleTextBlock}">uid</TextBlock>
-                            <TextBlock Grid.Row="2"
-                                       Style="{StaticResource TitleTextBlock}">aid</TextBlock>
-                            <TextBlock Grid.Row="3"
-                                       Style="{StaticResource TitleTextBlock}">cid</TextBlock>
-                            <TextBlock Grid.Row="4"
-                                       Style="{StaticResource TitleTextBlock}">n</TextBlock>
-                            <TextBlock Grid.Row="5"
-                                       Style="{StaticResource TitleTextBlock}">s</TextBlock>
-                            <TextBlock Grid.Row="6"
-                                       Style="{StaticResource TitleTextBlock}">sta</TextBlock>
-                            <TextBlock Grid.Row="7"
-                                       Style="{StaticResource TitleTextBlock}">pt</TextBlock>
-                            <TextBlock Grid.Row="8"
-                                       Style="{StaticResource TitleTextBlock}">pid</TextBlock>
-                            <TextBlock Grid.Row="9"
-                                       Style="{StaticResource TitleTextBlock}">pc</TextBlock>
-                            <TextBlock Grid.Row="10"
-                                       Style="{StaticResource TitleTextBlock}">p</TextBlock>
-                            <TextBlock Grid.Row="11"
-                                       Style="{StaticResource TitleTextBlock}">m</TextBlock>
-                            <TextBlock Grid.Row="12"
-                                       Style="{StaticResource TitleTextBlock}">t</TextBlock>
-                            <TextBlock Grid.Row="13"
-                                       Style="{StaticResource TitleTextBlock}">te</TextBlock>
-                            <TextBlock Grid.Row="14"
-                                       Style="{StaticResource TitleTextBlock}">tp</TextBlock>
-                            <TextBlock Grid.Row="15"
-                                       Style="{StaticResource TitleTextBlock}">d</TextBlock>
-                            <TextBlock Grid.Row="16"
-                                       Style="{StaticResource TitleTextBlock}">c</TextBlock>
-                            <TextBlock Grid.Row="17"
-                                       Style="{StaticResource TitleTextBlock}">sh</TextBlock>
-                            <TextBlock Grid.Row="18"
-                                       Style="{StaticResource TitleTextBlock}">e</TextBlock>
-                            <TextBlock Grid.Row="19"
-                                       Style="{StaticResource TitleTextBlock}">ico</TextBlock>
-                            <TextBlock Grid.Row="20"
-                                       Style="{StaticResource TitleTextBlock}">sha</TextBlock>
-                            <TextBlock Grid.Row="21"
-                                       Style="{StaticResource TitleTextBlock}">fdes</TextBlock>
-                            <TextBlock Grid.Row="22"
-                                       Style="{StaticResource TitleTextBlock}">q</TextBlock>
-                            <TextBlock Grid.Row="23"
-                                       Style="{StaticResource TitleTextBlock}">hdf</TextBlock>
-                            <TextBlock Grid.Row="24"
-                                       Style="{StaticResource TitleTextBlock}">fvs</TextBlock>
-                            <TextBlock Grid.Row="25"
-                                       Style="{StaticResource TitleTextBlock}">u</TextBlock>
-                            <TextBlock Grid.Row="26"
-                                       Style="{StaticResource TitleTextBlock}">iv</TextBlock>
-                            <TextBlock Grid.Row="27"
-                                       Style="{StaticResource TitleTextBlock}">current_time</TextBlock>
-                            <TextBlock Grid.Row="28"
-                                       Style="{StaticResource TitleTextBlock}">played_end</TextBlock>
-                            <TextBlock Grid.Row="29"
-                                       Style="{StaticResource TitleTextBlock}">last_time</TextBlock>
-
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="0"
-                                                           StringValue="{x:Bind SelectedDatum.fid,Mode=OneWay}"/>
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="1"
-                                                           StringValue="{x:Bind SelectedDatum.uid,Mode=OneWay}"/>
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="2"
-                                                           StringValue="{x:Bind SelectedDatum.aid,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="3"
-                                                           StringValue="{x:Bind SelectedDatum.cid,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="4"
-                                                           StringValue="{x:Bind SelectedDatum.n,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="5"
-                                                           StringValue="{x:Bind SelectedDatum.s,Converter={StaticResource BytesToSizeStrConverter},Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="6"
-                                                           StringValue="{x:Bind SelectedDatum.sta,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="7"
-                                                           StringValue="{x:Bind SelectedDatum.pt,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="8"
-                                                           StringValue="{x:Bind SelectedDatum.pid,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="9"
-                                                           StringValue="{x:Bind SelectedDatum.pc,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="10"
-                                                           StringValue="{x:Bind SelectedDatum.p,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="11"
-                                                           StringValue="{x:Bind SelectedDatum.m,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="12"
-                                                           StringValue="{x:Bind SelectedDatum.t,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="13"
-                                                           StringValue="{x:Bind SelectedDatum.te,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="14"
-                                                           StringValue="{x:Bind SelectedDatum.tp,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="15"
-                                                           StringValue="{x:Bind SelectedDatum.d,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="16"
-                                                           StringValue="{x:Bind SelectedDatum.c,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="17"
-                                                           StringValue="{x:Bind SelectedDatum.sh,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="18"
-                                                           StringValue="{x:Bind SelectedDatum.e,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="19"
-                                                           StringValue="{x:Bind SelectedDatum.ico,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="20"
-                                                           StringValue="{x:Bind SelectedDatum.sha,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="21"
-                                                           StringValue="{x:Bind SelectedDatum.fdes,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="22"
-                                                           StringValue="{x:Bind SelectedDatum.q,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="23"
-                                                           StringValue="{x:Bind SelectedDatum.hdf,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="24"
-                                                           StringValue="{x:Bind SelectedDatum.fvs,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="25"
-                                                           StringValue="{x:Bind SelectedDatum.u,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="26"
-                                                           StringValue="{x:Bind SelectedDatum.iv,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="27"
-                                                           StringValue="{x:Bind SelectedDatum.current_time,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="28"
-                                                           StringValue="{x:Bind SelectedDatum.played_end,Mode=OneWay}" />
-                            <control:TextBlockWithLongText Grid.Column="1"
-                                                           Grid.Row="29"
-                                                           StringValue="{x:Bind SelectedDatum.last_time,Mode=OneWay}" />
-                        </Grid>
-                    </ScrollViewer>
-
+                    <TextBlock VerticalAlignment="Center"
+                               Visibility="{x:Bind matchFail_RadioButton.IsChecked,Mode=OneWay}">
+                        
+                        <Run Text="{x:Bind FailList.Count,Mode=OneWay}" />
+                        <Run x:Name="FailListTotalCount_Run"
+                             Foreground="DarkGray"
+                             FontSize="12" />
+                    </TextBlock>
                 </Grid>
+
+                <!--文件查看-->
+                <Grid Grid.Row="1">
+                    <!--本地数据库-->
+                    <control:Explorer x:Name="Explorer"
+                                      ItemClick="ExplorerItemClick"
+                                      ItemInvoked="TreeView_ItemInvoked"
+                                      Visibility="{x:Bind localData_RadioButton.IsChecked,Mode=OneWay}" />
+
+                    <!--失败列表-->
+                    <Grid x:Name="FailListGrid"
+                          Visibility="{x:Bind matchFail_RadioButton.IsChecked,Mode=OneWay}">
+                        <ListView x:Name="FailListView"
+                                  Grid.Row="1"
+                                  SelectionChanged="FailListView_SelectionChanged">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="data:Datum">
+                                    <TextBlock Text="{x:Bind n}" />
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+                </Grid>
+
+                <!--文件信息查看-->
+                <Grid Grid.Row="1"
+                      Grid.Column="1"
+                      x:Name="FileInfo_Grid"
+                      BorderThickness="2"
+                      BorderBrush="{StaticResource ControlElevationBorderBrush}"
+                      Margin="2"
+                      CornerRadius="8">
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="35" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="信息"
+                                   Grid.ColumnSpan="2"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   FontWeight="Bold"
+                                   FontSize="18" />
+
+                        <Button FontFamily="Segoe Fluent Icons"
+                                Grid.Column="1"
+                                Content="&#xE102;"
+                                CornerRadius="10"
+                                Padding="10"
+                                Visibility="{x:Bind SelectedDatum.iv,FallbackValue=Collapsed,Mode=OneWay,Converter={StaticResource IsVideoToVisiableConverter}}"
+                                HorizontalAlignment="Right"
+                                Click="VideoPlayButton_Click" />
+
+                        <ScrollViewer Grid.Row="1"
+                                      Padding="5">
+                            <Grid
+                                x:Name="FileInfoShow_Grid"
+                                RowSpacing="5"
+                                ColumnSpacing="5"
+                                Visibility="Collapsed">
+                                <Grid.Resources>
+                                    <Style TargetType="TextBlock"
+                                           x:Key="TitleTextBlock">
+                                        <Setter Property="Opacity"
+                                                Value="0.4" />
+                                        <Setter Property="FontSize"
+                                                Value="15" />
+
+                                        <Setter Property="HorizontalAlignment"
+                                                Value="Right" />
+                                    </Style>
+
+                                    <Style TargetType="control:TextBlockWithLongText">
+                                        <Setter Property="VerticalAlignment"
+                                                Value="Bottom" />
+                                    </Style>
+                                </Grid.Resources>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Row="0"
+                                           Style="{StaticResource TitleTextBlock}">fid</TextBlock>
+                                <TextBlock Grid.Row="1"
+                                           Style="{StaticResource TitleTextBlock}">uid</TextBlock>
+                                <TextBlock Grid.Row="2"
+                                           Style="{StaticResource TitleTextBlock}">aid</TextBlock>
+                                <TextBlock Grid.Row="3"
+                                           Style="{StaticResource TitleTextBlock}">cid</TextBlock>
+                                <TextBlock Grid.Row="4"
+                                           Style="{StaticResource TitleTextBlock}">名称</TextBlock>
+                                <TextBlock Grid.Row="5"
+                                           Style="{StaticResource TitleTextBlock}">大小</TextBlock>
+                                <TextBlock Grid.Row="6"
+                                           Style="{StaticResource TitleTextBlock}">sta</TextBlock>
+                                <TextBlock Grid.Row="7"
+                                           Style="{StaticResource TitleTextBlock}">pt</TextBlock>
+                                <TextBlock Grid.Row="8"
+                                           Style="{StaticResource TitleTextBlock}">pid</TextBlock>
+                                <TextBlock Grid.Row="9"
+                                           Style="{StaticResource TitleTextBlock}">pc</TextBlock>
+                                <TextBlock Grid.Row="10"
+                                           Style="{StaticResource TitleTextBlock}">p</TextBlock>
+                                <TextBlock Grid.Row="11"
+                                           Style="{StaticResource TitleTextBlock}">m</TextBlock>
+                                <TextBlock Grid.Row="12"
+                                           Style="{StaticResource TitleTextBlock}">t</TextBlock>
+                                <TextBlock Grid.Row="13"
+                                           Style="{StaticResource TitleTextBlock}">te</TextBlock>
+                                <TextBlock Grid.Row="14"
+                                           Style="{StaticResource TitleTextBlock}">tp</TextBlock>
+                                <TextBlock Grid.Row="15"
+                                           Style="{StaticResource TitleTextBlock}">d</TextBlock>
+                                <TextBlock Grid.Row="16"
+                                           Style="{StaticResource TitleTextBlock}">c</TextBlock>
+                                <TextBlock Grid.Row="17"
+                                           Style="{StaticResource TitleTextBlock}">sh</TextBlock>
+                                <TextBlock Grid.Row="18"
+                                           Style="{StaticResource TitleTextBlock}">e</TextBlock>
+                                <TextBlock Grid.Row="19"
+                                           Style="{StaticResource TitleTextBlock}">图标</TextBlock>
+                                <TextBlock Grid.Row="20"
+                                           Style="{StaticResource TitleTextBlock}">sha</TextBlock>
+                                <TextBlock Grid.Row="21"
+                                           Style="{StaticResource TitleTextBlock}">fdes</TextBlock>
+                                <TextBlock Grid.Row="22"
+                                           Style="{StaticResource TitleTextBlock}">q</TextBlock>
+                                <TextBlock Grid.Row="23"
+                                           Style="{StaticResource TitleTextBlock}">hdf</TextBlock>
+                                <TextBlock Grid.Row="24"
+                                           Style="{StaticResource TitleTextBlock}">fvs</TextBlock>
+                                <TextBlock Grid.Row="25"
+                                           Style="{StaticResource TitleTextBlock}">u</TextBlock>
+                                <TextBlock Grid.Row="26"
+                                           Style="{StaticResource TitleTextBlock}">iv</TextBlock>
+                                <TextBlock Grid.Row="27"
+                                           Style="{StaticResource TitleTextBlock}">current_time</TextBlock>
+                                <TextBlock Grid.Row="28"
+                                           Style="{StaticResource TitleTextBlock}">played_end</TextBlock>
+                                <TextBlock Grid.Row="29"
+                                           Style="{StaticResource TitleTextBlock}">last_time</TextBlock>
+
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="0"
+                                                               StringValue="{x:Bind SelectedDatum.fid,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="1"
+                                                               StringValue="{x:Bind SelectedDatum.uid,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="2"
+                                                               StringValue="{x:Bind SelectedDatum.aid,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="3"
+                                                               StringValue="{x:Bind SelectedDatum.cid,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="4"
+                                                               StringValue="{x:Bind SelectedDatum.n,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="5"
+                                                               StringValue="{x:Bind SelectedDatum.s,Converter={StaticResource BytesToSizeStrConverter},Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="6"
+                                                               StringValue="{x:Bind SelectedDatum.sta,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="7"
+                                                               StringValue="{x:Bind SelectedDatum.pt,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="8"
+                                                               StringValue="{x:Bind SelectedDatum.pid,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="9"
+                                                               StringValue="{x:Bind SelectedDatum.pc,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="10"
+                                                               StringValue="{x:Bind SelectedDatum.p,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="11"
+                                                               StringValue="{x:Bind SelectedDatum.m,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="12"
+                                                               StringValue="{x:Bind SelectedDatum.t,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="13"
+                                                               StringValue="{x:Bind SelectedDatum.te,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="14"
+                                                               StringValue="{x:Bind SelectedDatum.tp,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="15"
+                                                               StringValue="{x:Bind SelectedDatum.d,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="16"
+                                                               StringValue="{x:Bind SelectedDatum.c,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="17"
+                                                               StringValue="{x:Bind SelectedDatum.sh,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="18"
+                                                               StringValue="{x:Bind SelectedDatum.e,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="19"
+                                                               StringValue="{x:Bind SelectedDatum.ico,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="20"
+                                                               StringValue="{x:Bind SelectedDatum.sha,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="21"
+                                                               StringValue="{x:Bind SelectedDatum.fdes,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="22"
+                                                               StringValue="{x:Bind SelectedDatum.q,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="23"
+                                                               StringValue="{x:Bind SelectedDatum.hdf,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="24"
+                                                               StringValue="{x:Bind SelectedDatum.fvs,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="25"
+                                                               StringValue="{x:Bind SelectedDatum.u,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="26"
+                                                               StringValue="{x:Bind SelectedDatum.iv,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="27"
+                                                               StringValue="{x:Bind SelectedDatum.current_time,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="28"
+                                                               StringValue="{x:Bind SelectedDatum.played_end,Mode=OneWay}" />
+                                <control:TextBlockWithLongText Grid.Column="1"
+                                                               Grid.Row="29"
+                                                               StringValue="{x:Bind SelectedDatum.last_time,Mode=OneWay}" />
+                            </Grid>
+                        </ScrollViewer>
+
+                    </Grid>
+                </Grid>
+
+
             </Grid>
 
         </Grid>
 
+        <!--提示环境检查-->
         <Expander x:Name="Condiontion_CheckExpander"
+                  Grid.Column="1"
                   VerticalAlignment="Top"
                   HorizontalAlignment="Stretch"
                   ExpandDirection="Down"
                   Expanding="Expander_Expanding"
+                  Collapsed="Expander_Collapsed"
                   HorizontalContentAlignment="Stretch">
 
             <Expander.Resources>
@@ -377,7 +392,5 @@
                      PreferredPlacement="BottomLeft"
                      IsLightDismissEnabled="True">没有选择文件夹，请选择后继续</TeachingTip>
     </Grid>
-
-
 
 </Page>

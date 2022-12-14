@@ -15,7 +15,23 @@ namespace Data
 {
     public class GetInfoFromNetwork
     {
-        private static HttpClient Client;
+        private static HttpClient _client;
+        public static HttpClient Client
+        {
+            get
+            {
+                if (_client == null)
+                {
+                    _client = CreateClient(new() { { "user-agent", BrowserUserAgent } });
+                }
+
+                return _client;
+            }
+            set=> _client = value;
+        }
+
+
+
         private static HttpClient ClientWithJavDBCookie;
 
         public static string BrowserUserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36 115Browser/8.3.0";
@@ -23,7 +39,6 @@ namespace Data
 
         public GetInfoFromNetwork()
         {
-            Client = CreateClient(new() { { "user-agent", BrowserUserAgent } });
         }
 
         public static HttpClient CreateClient(Dictionary<string, string> headers)
@@ -34,7 +49,7 @@ namespace Data
             }
 
             var handler = new HttpClientHandler { UseCookies = false };
-            Client = new HttpClient(handler);
+            var Client = new HttpClient(handler);
 
             foreach (var header in headers)
             {
@@ -104,13 +119,13 @@ namespace Data
             CID = CID.ToUpper();
             string url = UrlCombine(BusUrl, $"movies/{CID}");
 
+            //if (Client == null)
+            //{
+            //    Client = CreateClient(new Dictionary<string, string>() {
+            //            {"user-agent" ,BrowserUserAgent}
+            //        });
+            //}
 
-            if (Client == null)
-            {
-                Client = CreateClient(new Dictionary<string, string>() {
-                        {"user-agent" ,BrowserUserAgent}
-                    });
-            }
             string strResult = await RequestHelper.RequestHtml(Client, url);
 
             HtmlDocument htmlDoc = new HtmlDocument();
@@ -195,12 +210,12 @@ namespace Data
 
             videoInfo.busurl = busurl;
 
-            if (Client == null)
-            {
-                Client = CreateClient(new Dictionary<string, string>() {
-                        {"user-agent" ,BrowserUserAgent}
-                    });
-            }
+            //if (Client == null)
+            //{
+            //    Client = CreateClient(new Dictionary<string, string>() {
+            //            {"user-agent" ,BrowserUserAgent}
+            //        });
+            //}
 
             string strResult = await RequestHelper.RequestHtml(Client, busurl);
 
@@ -323,12 +338,12 @@ namespace Data
 
             videoInfo.busurl = url;
 
-            if (Client == null)
-            {
-                Client = CreateClient(new Dictionary<string, string>() {
-                        {"user-agent" ,BrowserUserAgent}
-                    });
-            }
+            //if (Client == null)
+            //{
+            //    Client = CreateClient(new Dictionary<string, string>() {
+            //            {"user-agent" ,BrowserUserAgent}
+            //        });
+            //}
 
             string strResult = await RequestHelper.RequestHtml(Client, url);
 
@@ -569,8 +584,8 @@ namespace Data
             string JavDBUrl = AppSettings.JavDB_BaseUrl;
             string result;
 
-            if (Client == null)
-                Client = new HttpClient();
+            //if (Client == null)
+            //    Client = new HttpClient();
 
             string url = $"{JavDBUrl}/search?q={CID}&f=all";
 
@@ -588,7 +603,6 @@ namespace Data
 
             return result;
         }
-
 
         /// <summary>
         /// 从JavDB众多搜索结果中搜索出符合条件的
@@ -718,7 +732,7 @@ namespace Data
             //不存在
             if (!File.Exists(localPath) || isReplaceExistsImage)
             {
-                HttpClient Client = CreateClient(headers);
+                //HttpClient Client = CreateClient(headers);
 
                 int maxTryCount = 3;
 

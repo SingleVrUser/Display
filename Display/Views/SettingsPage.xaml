@@ -117,12 +117,25 @@
                                         <x:String>设置</x:String>
                                     </ComboBox>
                                 </RelativePanel>
+                                
+                                <RelativePanel>
+                                    <TextBlock RelativePanel.AlignVerticalCenterWithPanel="True"
+                                               Margin="0,0,10,0">启动时检查更新</TextBlock>
+
+                                    <ToggleSwitch RelativePanel.AlignRightWithPanel="True"
+                                                  OnContent="开启"
+                                                  OffContent="关闭"
+                                                  Margin="0,0,-70,0"
+                                                  IsOn="{x:Bind data:AppSettings.IsCheckUpdate,Mode=TwoWay}"/>
+                                </RelativePanel>
+                                
                             </StackPanel>
+                            
+                            
                         </Expander>
                         <!--115-->
                         <Expander Header="115"
                                   HorizontalContentAlignment="Stretch">
-
 
                             <StackPanel Padding="50,0"
                                         Spacing="10">
