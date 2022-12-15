@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Windows.Storage;
 using Windows.System;
 
@@ -20,9 +21,6 @@ namespace Data
         /// <returns></returns>
         public static string DeleteSomeKeywords(string name)
         {
-            if(name.Contains("ARA"))
-                Debug.WriteLine("停");
-
             List<string> reg_replace_list =
                 new List<string> { "uur76", @"({\d}K)?\d{2,3}fps", @"part\d", "@18P2P", @"[^\d]\d{3,6}P", @"\[?[0-9a-z]+?\.(com|cn|xyz|la|me|net|app|cc)\]?@?",
                                 @"SE\d{2}",@"EP\d{2}", @"S\d{1,2}E\d{1,2}", @"\D[hx]26[54]", "[-_][468]k", @"h_[0-9]{3,4}",@"[a-z0-9]{15,}",
@@ -34,6 +32,25 @@ namespace Data
             }
 
             return name;
+        }
+
+        public static bool IsFC2(string cid)
+        {
+            return cid.Contains("FC2");
+        }
+
+        /// <summary>
+        /// 是否是特殊番号(用于区分AvMoo和AvSox)
+        /// </summary>
+        /// <param name="cid"></param>
+        /// <returns></returns>
+        public static bool IsSpecialCid(string cid)
+        {
+            string CID = cid.ToUpper();
+
+            //FC2 / 无分隔符 / HEY / HEYZO / 无字母 / 字母+数字+字母 / 有分隔符但是是特殊字母
+            return IsFC2(CID) || !CID.Contains('-') || CID.Contains("HEY") || !Regex.Match(CID, "[A-Z]").Success
+                || Regex.Match(CID, @"[A-Z]\d[A-z]").Success || (CID.Contains('-') && (CID.Contains("SKYHUD-") || CID.Contains("SKY-") || CID.Contains("RED-")));
         }
 
         /// <summary>
@@ -82,7 +99,6 @@ namespace Data
                 {
                     return MatchName(no_domain);
                 }
-
             }
 
             //匹配缩写成hey的heydouga影片。由于番号分三部分，要先于后面分两部分的进行匹配

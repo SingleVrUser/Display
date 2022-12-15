@@ -23,7 +23,7 @@
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="local:FunctionModule">
                     <Grid>
-                        <StackPanel Width="180" Height="200" CornerRadius="5" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="1" Spacing="5">
+                        <StackPanel Width="180" Height="200" CornerRadius="5" BorderBrush="{ThemeResource ControlElevationBorderBrush}" Padding="2" BorderThickness="1" Spacing="5">
                             <Image Height="55" Source="{x:Bind IconPath}" Margin="0,30,0,20"/>
                             <TextBlock
                                 HorizontalAlignment="Center"

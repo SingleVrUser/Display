@@ -119,7 +119,7 @@
                                                    Width="120" />
                                         </Grid>
                                         
-                                        <StackPanel VerticalAlignment="Center" Margin="5">
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="5">
                                             <TextBlock Text="{x:Bind truename}" FontFamily="JetBrains Mono"/>
                                             <control:TextBlockWithLongText Grid.Row="1" StringValue="{x:Bind actor}" IsFirstTextSelectionEnabled="False"/>
                                             <control:TextBlockWithLongText Grid.Row="1" StringValue="{x:Bind category}" IsFirstTextSelectionEnabled="False"/>

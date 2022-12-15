@@ -51,17 +51,33 @@ namespace Display.ContentsPage.DetailInfo
                 if(info!=null)
                     infos.Add(info);
             }
-            if (!cidName.ToLower().Contains("fc") && JavLibDmm_CheckBox.IsChecked == true)
+            if (!cidName.ToLower().Contains("fc") && Jav321_CheckBox.IsChecked == true)
+            {
+                var info = await SearchNetwork.SearchInfoFromJav321(cidName);
+                if(info!=null)
+                    infos.Add(info);
+            }
+            if (!cidName.ToLower().Contains("fc") && AvMoo_CheckBox.IsChecked == true)
+            {
+                var info = await SearchNetwork.SearchInfoFromAvMoo(cidName);
+                if(info!=null)
+                    infos.Add(info);
+            }
+            if (!cidName.ToLower().Contains("fc") && LibreDmm_CheckBox.IsChecked == true)
             {
                 var info = await SearchNetwork.SearchInfoFromLibreDmm(cidName);
                 if(info!=null)
                     infos.Add(info);
             }
-
-
             if (cidName.ToLower().Contains("fc") && Fc2Hub_CheckBox.IsChecked == true)
             {
                 var info = await SearchNetwork.SearchInfoFromFc2Hub(cidName);
+                if (info != null)
+                    infos.Add(info);
+            }
+            if (AvSox_CheckBox.IsChecked == true)
+            {
+                var info = await SearchNetwork.SearchInfoFromAvSox(cidName);
                 if (info != null)
                     infos.Add(info);
             }

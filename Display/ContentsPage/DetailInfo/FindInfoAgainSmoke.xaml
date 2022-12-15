@@ -24,11 +24,26 @@
         </Grid.RowDefinitions>
 
         <RelativePanel>
-            <StackPanel Orientation="Horizontal">
+            <VariableSizedWrapGrid Orientation="Horizontal" MaximumRowsOrColumns="5">
+                <VariableSizedWrapGrid.Resources>
+                    <Style TargetType="CheckBox" BasedOn="{StaticResource DefaultCheckBoxStyle}">
+                        <Setter Property="MinWidth"
+                                Value="80" />
+                    </Style>
+                </VariableSizedWrapGrid.Resources>
                 <CheckBox x:Name="JavBus_CheckBox"
                           Content="JavBus"
-                          IsChecked="{x:Bind data:AppSettings.isUseJavBus}" />
-                <CheckBox x:Name="JavLibDmm_CheckBox"
+                          IsChecked="{x:Bind data:AppSettings.isUseJavBus}"/>
+                <CheckBox x:Name="Jav321_CheckBox"
+                          Content="Jav321"
+                          IsChecked="{x:Bind data:AppSettings.isUseJav321}" />
+                <CheckBox x:Name="AvMoo_CheckBox"
+                          Content="AvMoo"
+                          IsChecked="{x:Bind data:AppSettings.isUseAvMoo}" />
+                <CheckBox x:Name="AvSox_CheckBox"
+                          Content="AvSox"
+                          IsChecked="{x:Bind data:AppSettings.isUseAvSox}" />
+                <CheckBox x:Name="LibreDmm_CheckBox"
                           Content="libredmm"
                           IsChecked="{x:Bind data:AppSettings.isUseLibreDmm}" />
                 <CheckBox x:Name="Fc2Hub_CheckBox"
@@ -37,7 +52,7 @@
                 <CheckBox x:Name="JavDB_CheckBox"
                           Content="JavDB"
                           IsChecked="{x:Bind data:AppSettings.isUseJavDB}" />
-            </StackPanel>
+            </VariableSizedWrapGrid>
 
             <!--刷新-->
             <Button  RelativePanel.AlignRightWithPanel="True"
@@ -67,8 +82,9 @@
                             </Style>
                         </Grid.Resources>
 
-                        <Image Source="{x:Bind imagepath}"
-                               Margin="2" />
+                        <Grid CornerRadius="3">
+                            <Image Source="{x:Bind imagepath}"/>
+                        </Grid>
 
                         <Grid Grid.Column="1" Padding="2" VerticalAlignment="Center" ColumnSpacing="5">
                             <Grid.RowDefinitions>
@@ -103,11 +119,13 @@
 
                             <TextBlock Grid.Column="1"
                                        Grid.Row="1"
-                                       Text="{x:Bind actor}" />
+                                       Text="{x:Bind actor}"
+                                       TextTrimming="CharacterEllipsis"/>
                             
                             <TextBlock Grid.Column="1"
                                        Grid.Row="2"
-                                       Text="{x:Bind category}" />
+                                       Text="{x:Bind category}"
+                                       TextTrimming="CharacterEllipsis"/>
                             
                             <TextBlock Grid.Column="1"
                                        Grid.Row="3"

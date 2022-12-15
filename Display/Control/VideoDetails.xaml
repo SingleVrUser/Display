@@ -234,9 +234,13 @@
                                        FontWeight="Bold" />
                             
                             <HyperlinkButton NavigateUri="{x:Bind resultinfo.busurl}"
-                                             Opacity="0.2">
+                                             Opacity="1"
+                                             CornerRadius="10"
+                                             Padding="5">
                                 <FontIcon FontFamily="Segoe Fluent Icons"
-                                          Glyph="&#xF6FA;" />
+                                          Glyph="&#xF6FA;"
+                                          Foreground="LightGray"
+                                          Opacity="0.3"/>
                             </HyperlinkButton>
                         </StackPanel>
 

@@ -1613,6 +1613,61 @@ namespace Data
         public long addTime { get; set; } = DateTimeOffset.Now.ToUnixTimeSeconds();
     }
 
+
+    public class Jav321Json
+    {
+        public Cursor_Jav321 cursor { get; set; }
+        public int code { get; set; }
+        public Response_Jav321 response { get; set; }
+        public string order { get; set; }
+    }
+
+    public class Cursor_Jav321
+    {
+        public bool hasPrev { get; set; }
+        public object prev { get; set; }
+        public int total { get; set; }
+        public bool hasNext { get; set; }
+        public string next { get; set; }
+    }
+
+    public class Response_Jav321
+    {
+        public int lastModified { get; set; }
+        public object[] posts { get; set; }
+        public Thread_Jav321 thread { get; set; }
+    }
+
+    public class Thread_Jav321
+    {
+        public string feed { get; set; }
+        public string clean_title { get; set; }
+        public int dislikes { get; set; }
+        public int likes { get; set; }
+        public string message { get; set; }
+        public bool ratingsEnabled { get; set; }
+        public bool isSpam { get; set; }
+        public bool isDeleted { get; set; }
+        public string category { get; set; }
+        public bool adsDisabled { get; set; }
+        public string author { get; set; }
+        public string id { get; set; }
+        public string signedLink { get; set; }
+        public DateTime createdAt { get; set; }
+        public bool hasStreaming { get; set; }
+        public string raw_message { get; set; }
+        public bool isClosed { get; set; }
+        public string link { get; set; }
+        public string slug { get; set; }
+        public string forum { get; set; }
+        public string[] identifiers { get; set; }
+        public int posts { get; set; }
+        public int[] moderators { get; set; }
+        public bool validateAllPosts { get; set; }
+        public string title { get; set; }
+        public object highlightedPost { get; set; }
+    }
+
     //字幕文件信息
     public class SubInfo
     {
@@ -1634,7 +1689,7 @@ namespace Data
     }
 
 
-    public enum SpiderSourceName { javbus, libredmm, fc2club, javdb, local }
+    public enum SpiderSourceName { javbus, jav321, avmoo, avsox, libredmm, fc2club, javdb, local }
     public class SpiderSource
     {
         public string name { get; }
@@ -1646,6 +1701,15 @@ namespace Data
             {
                 case SpiderSourceName.javbus:
                     name = "bus";
+                    break;
+                case SpiderSourceName.jav321:
+                    name = "jav321";
+                    break;
+                case SpiderSourceName.avmoo:
+                    name = "avmoo";
+                    break;
+                case SpiderSourceName.avsox:
+                    name = "avsox";
                     break;
                 case SpiderSourceName.libredmm:
                     name = "libre";

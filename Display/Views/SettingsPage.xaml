@@ -107,7 +107,7 @@
 
                                 <RelativePanel>
                                     <TextBlock RelativePanel.AlignVerticalCenterWithPanel="True"
-                                               Margin="0,0,10,0">启动时显示</TextBlock>
+                                               Margin="0,0,10,0">初始页</TextBlock>
                                     <ComboBox RelativePanel.AlignRightWithPanel="True"
                                               SelectedIndex="{x:Bind data:AppSettings.StartPageIndex, Mode=TwoWay}">
                                         <x:String>主页</x:String>
@@ -117,17 +117,29 @@
                                         <x:String>设置</x:String>
                                     </ComboBox>
                                 </RelativePanel>
+
+                                <RelativePanel>
+                                    <TextBlock RelativePanel.AlignVerticalCenterWithPanel="True"
+                                               Margin="0,0,10,0">左侧导航</TextBlock>
+
+                                    <ToggleSwitch RelativePanel.AlignRightWithPanel="True"
+                                                  OnContent="展开"
+                                                  OffContent="紧凑"
+                                                  Margin="0,0,-70,0"
+                                                  IsOn="{x:Bind data:AppSettings.IsNavigationViewPaneOpen,Mode=TwoWay}" />
+                                </RelativePanel>
                                 
                                 <RelativePanel>
                                     <TextBlock RelativePanel.AlignVerticalCenterWithPanel="True"
-                                               Margin="0,0,10,0">启动时检查更新</TextBlock>
+                                               Margin="0,0,10,0">检查更新</TextBlock>
 
                                     <ToggleSwitch RelativePanel.AlignRightWithPanel="True"
                                                   OnContent="开启"
                                                   OffContent="关闭"
                                                   Margin="0,0,-70,0"
-                                                  IsOn="{x:Bind data:AppSettings.IsCheckUpdate,Mode=TwoWay}"/>
+                                                  IsOn="{x:Bind data:AppSettings.IsCheckUpdate,Mode=TwoWay}" />
                                 </RelativePanel>
+                                
                                 
                             </StackPanel>
                             
@@ -194,7 +206,6 @@
                                                LargeChange="3600"
                                                Minimum="0"
                                                Value="{x:Bind data:AppSettings.DownUrlOverdueTime,Mode=TwoWay}"
-                                               ValueChanged="NumberBox_ValueChanged"
                                                RelativePanel.AlignRightWithPanel="True" />
 
                                 </RelativePanel>
@@ -302,10 +313,19 @@
                                                 <ToggleButton Content="JavBus"
                                                               IsChecked="{x:Bind data:AppSettings.isUseJavBus,Mode=TwoWay}"
                                                               Unchecked="ToggleButton_Unchecked" />
-                                                <ToggleButton Content="LibDmm"
+                                                <ToggleButton Content="Jav321"
+                                                              IsChecked="{x:Bind data:AppSettings.isUseJav321,Mode=TwoWay}"
+                                                              Unchecked="ToggleButton_Unchecked" />
+                                                <ToggleButton Content="AvMoo"
+                                                              IsChecked="{x:Bind data:AppSettings.isUseAvMoo,Mode=TwoWay}"
+                                                              Unchecked="ToggleButton_Unchecked" />
+                                                <ToggleButton Content="AvSox"
+                                                              IsChecked="{x:Bind data:AppSettings.isUseAvSox,Mode=TwoWay}"
+                                                              Unchecked="ToggleButton_Unchecked" />
+                                                <ToggleButton Content="LibreDmm"
                                                               IsChecked="{x:Bind data:AppSettings.isUseLibreDmm,Mode=TwoWay}"
                                                               Unchecked="ToggleButton_Unchecked" />
-                                                <ToggleButton Content="fc2hub"
+                                                <ToggleButton Content="Fc2hub"
                                                               IsChecked="{x:Bind data:AppSettings.isUseFc2Hub,Mode=TwoWay}"
                                                               Unchecked="ToggleButton_Unchecked" />
                                                 <ToggleButton Content="JavDB"
@@ -335,6 +355,81 @@
                                             <RelativePanel>
                                                 <TextBlock Text="单次请求后等待" />
                                                 <TextBlock Text="1~3 s"
+                                                           RelativePanel.AlignRightWithPanel="True" />
+                                            </RelativePanel>
+                                        </StackPanel>
+                                    </PivotItem>
+
+                                    <PivotItem Header="Jav321">
+                                        <StackPanel Padding="50,10"
+                                                    Spacing="10">
+                                            <RelativePanel>
+                                                <TextBlock x:Name="Jav321Url_TextBlox"
+                                                           RelativePanel.AlignVerticalCenterWithPanel="True"
+                                                           Margin="0,0,10,0">地址</TextBlock>
+                                                <TextBox x:Name="Jav321Url_TextBox"
+                                                         Width="600"
+                                                         RelativePanel.RightOf="Jav321Url_TextBlox"
+                                                         Text="{x:Bind data:AppSettings.Jav321_BaseUrl}" />
+                                                <Button x:Name="Jav321Change_Button"
+                                                        Click="Jav321Change_Button_Click"
+                                                        Content="修改"
+                                                        RelativePanel.AlignRightWithPanel="True" />
+                                            </RelativePanel>
+
+                                            <RelativePanel>
+                                                <TextBlock Text="单次请求后等待" />
+                                                <TextBlock Text="1~3 s"
+                                                           RelativePanel.AlignRightWithPanel="True" />
+                                            </RelativePanel>
+                                        </StackPanel>
+                                    </PivotItem>
+
+                                    <PivotItem Header="AvMoo">
+                                        <StackPanel Padding="50,10"
+                                                    Spacing="10">
+                                            <RelativePanel>
+                                                <TextBlock x:Name="AvMooUrl_TextBlox"
+                                                           RelativePanel.AlignVerticalCenterWithPanel="True"
+                                                           Margin="0,0,10,0">地址</TextBlock>
+                                                <TextBox x:Name="AvMooUrl_TextBox"
+                                                         Width="600"
+                                                         RelativePanel.RightOf="AvMooUrl_TextBlox"
+                                                         Text="{x:Bind data:AppSettings.AvMoo_BaseUrl}" />
+                                                <Button x:Name="AvMooUrlChange_Button"
+                                                        Click="AvMooUrlChange_Button_Click"
+                                                        Content="修改"
+                                                        RelativePanel.AlignRightWithPanel="True" />
+                                            </RelativePanel>
+
+                                            <RelativePanel>
+                                                <TextBlock Text="单次请求后等待" />
+                                                <TextBlock Text="1~2 s"
+                                                           RelativePanel.AlignRightWithPanel="True" />
+                                            </RelativePanel>
+                                        </StackPanel>
+                                    </PivotItem>
+
+                                    <PivotItem Header="AvSox">
+                                        <StackPanel Padding="50,10"
+                                                    Spacing="10">
+                                            <RelativePanel>
+                                                <TextBlock x:Name="AvSoxUrl_TextBlox"
+                                                           RelativePanel.AlignVerticalCenterWithPanel="True"
+                                                           Margin="0,0,10,0">地址</TextBlock>
+                                                <TextBox x:Name="AvSoxUrl_TextBox"
+                                                         Width="600"
+                                                         RelativePanel.RightOf="AvSoxUrl_TextBlox"
+                                                         Text="{x:Bind data:AppSettings.AvSox_BaseUrl}" />
+                                                <Button x:Name="AvSoxUrlChange_Button"
+                                                        Click="AvSoxUrlChange_Button_Click"
+                                                        Content="修改"
+                                                        RelativePanel.AlignRightWithPanel="True" />
+                                            </RelativePanel>
+
+                                            <RelativePanel>
+                                                <TextBlock Text="单次请求后等待" />
+                                                <TextBlock Text="1~2 s"
                                                            RelativePanel.AlignRightWithPanel="True" />
                                             </RelativePanel>
                                         </StackPanel>

@@ -1,28 +1,22 @@
-﻿using Microsoft.UI.Xaml.Controls;
-using System;
-using Display;
-using Windows.Storage;
-using Windows.Storage.Pickers;
-using Data;
-using System.Threading;
-using System.Threading.Tasks;
-using Windows.System;
+﻿using Data;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
-using Windows.ApplicationModel.DataTransfer;
-using System.Text.Json;
-using System.IO;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI;
-using System.Collections.ObjectModel;
-using System.Net.Http;
-using Windows.Media.Protection.PlayReady;
-using RestSharp;
-using System.Net;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using System.Text;
+using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
+using Windows.Storage.Pickers;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -45,7 +39,6 @@ namespace Display.Views
             this.InitializeComponent();
 
             this.Loaded += PageLoaded;
-
         }
 
         private void PageLoaded(object sender, RoutedEventArgs e)
@@ -57,21 +50,24 @@ namespace Display.Views
 
         private async void InitializationView()
         {
-            webapi = new();
-            if (!string.IsNullOrEmpty(AppSettings._115_Cookie) && WebApi.UserInfo == null)
+            //初始化115状态
+            await Task.Run(async () =>
             {
-                var isLogin = await webapi.UpdateLoginInfo();
-
-                if (isLogin)
+                webapi = new();
+                if (!string.IsNullOrEmpty(AppSettings._115_Cookie) && WebApi.UserInfo == null)
                 {
-                    //检查一下是否为隐藏模式
-                    await webapi.IsHiddenModel();
+                    var isLogin = await webapi.UpdateLoginInfo();
+
+                    if (isLogin)
+                    {
+                        //检查一下是否为隐藏模式
+                        await webapi.IsHiddenModel();
+                    }
                 }
-            }
+            });
 
             updateUserInfo();
             updateLoginStatus();
-
             infobar.IsOpen = WebApi.isEnterHiddenMode == true ? false : true;
 
             DataAccessSavePath_TextBox.Text = AppSettings.DataAccess_SavePath;
@@ -306,6 +302,24 @@ namespace Display.Views
 
             ShowTeachingTip("修改完成");
         }
+        private void Jav321Change_Button_Click(object sender, RoutedEventArgs e)
+        {
+            AppSettings.Jav321_BaseUrl = Jav321Url_TextBox.Text;
+
+            ShowTeachingTip("修改完成");
+        }
+        private void AvMooUrlChange_Button_Click(object sender, RoutedEventArgs e)
+        {
+            AppSettings.AvMoo_BaseUrl = AvMooUrl_TextBox.Text;
+
+            ShowTeachingTip("修改完成");
+        }
+        private void AvSoxUrlChange_Button_Click(object sender, RoutedEventArgs e)
+        {
+            AppSettings.AvSox_BaseUrl = AvSoxUrl_TextBox.Text;
+
+            ShowTeachingTip("修改完成");
+        }
         private void LibreDmmUrlChange_Button_Click(object sender, RoutedEventArgs e)
         {
             AppSettings.LibreDmm_BaseUrl = LibreDmm_TextBox.Text;
@@ -329,10 +343,10 @@ namespace Display.Views
         {
             AppSettings.javdb_Cookie = JavDBCookie_TextBox.Text;
 
+            GetInfoFromNetwork.IsJavDbCookieVisiable = true;
+
             ShowTeachingTip("修改完成");
         }
-
-
 
         private async void DataAccessSavePath_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
@@ -447,6 +461,11 @@ namespace Display.Views
 
         }
 
+        /// <summary>
+        /// 如果选中的搜刮源少于一个，则提示
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ToggleButton_Unchecked(object sender, RoutedEventArgs e)
         {
             var toggleButton = sender as Microsoft.UI.Xaml.Controls.Primitives.ToggleButton;
@@ -456,16 +475,25 @@ namespace Display.Views
             switch (toggleButton.Content)
             {
                 case "JavBus":
-                    otherOriginUse = AppSettings.isUseLibreDmm || AppSettings.isUseFc2Hub || AppSettings.isUseJavDB;
+                    otherOriginUse = AppSettings.isUseJav321 || AppSettings.isUseAvMoo || AppSettings.isUseAvSox || AppSettings.isUseLibreDmm || AppSettings.isUseFc2Hub || AppSettings.isUseJavDB;
+                    break;
+                case "Jav321":
+                    otherOriginUse = AppSettings.isUseJavBus || AppSettings.isUseAvMoo || AppSettings.isUseAvSox || AppSettings.isUseLibreDmm || AppSettings.isUseFc2Hub || AppSettings.isUseJavDB;
+                    break;
+                case "AvMoo":
+                    otherOriginUse = AppSettings.isUseJavBus || AppSettings.isUseJav321 || AppSettings.isUseAvSox || AppSettings.isUseLibreDmm || AppSettings.isUseFc2Hub || AppSettings.isUseJavDB;
+                    break;
+                case "AvSox":
+                    otherOriginUse = AppSettings.isUseJavBus || AppSettings.isUseJav321 || AppSettings.isUseAvMoo || AppSettings.isUseLibreDmm || AppSettings.isUseFc2Hub || AppSettings.isUseJavDB;
                     break;
                 case "LibreDmm":
-                    otherOriginUse = AppSettings.isUseJavBus || AppSettings.isUseFc2Hub || AppSettings.isUseJavDB;
+                    otherOriginUse = AppSettings.isUseJavBus || AppSettings.isUseJav321 || AppSettings.isUseAvMoo || AppSettings.isUseAvSox || AppSettings.isUseFc2Hub || AppSettings.isUseJavDB;
                     break;
                 case "Fc2hub":
-                    otherOriginUse = AppSettings.isUseJavBus || AppSettings.isUseLibreDmm || AppSettings.isUseJavDB;
+                    otherOriginUse = AppSettings.isUseJavBus || AppSettings.isUseJav321 || AppSettings.isUseAvMoo || AppSettings.isUseAvSox || AppSettings.isUseLibreDmm || AppSettings.isUseJavDB;
                     break;
                 case "JavDB":
-                    otherOriginUse = AppSettings.isUseJavBus || AppSettings.isUseLibreDmm || AppSettings.isUseFc2Hub;
+                    otherOriginUse = AppSettings.isUseJavBus || AppSettings.isUseJav321 || AppSettings.isUseAvMoo || AppSettings.isUseAvSox || AppSettings.isUseLibreDmm || AppSettings.isUseFc2Hub;
                     break;
             }
 
@@ -899,9 +927,5 @@ namespace Display.Views
 
         }
 
-        private void NumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
-        {
-
-        }
     }
 }

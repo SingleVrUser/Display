@@ -95,6 +95,7 @@
             </Grid>
 
             <Grid Grid.Row="2"
+                  x:Name="SpiderInfo_Grid"
                   Style="{StaticResource GridWithBrush}">
                 <GridView x:Name="SpiderInfo_GridView" SelectionMode="None">
                     <GridView.ItemContainerStyle>
@@ -125,7 +126,7 @@
                                 <Grid Grid.Row="1"
                                       BorderBrush="{StaticResource CardStrokeColorDefault}" BorderThickness="1" CornerRadius="5"
                                       Padding="5">
-                                    <TextBlock Text="{x:Bind Message,Mode=OneWay}"/>
+                                    <TextBlock Text="{x:Bind Message,Mode=OneWay}" TextWrapping="WrapWholeWords"/>
                                 </Grid>
                                 
                             </Grid>
@@ -134,7 +135,11 @@
                 </GridView>
             </Grid>
 
-            <Grid Style="{StaticResource GridWithBrush}" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2">
+            <Grid Style="{StaticResource GridWithBrush}"
+                  Grid.Row="2"
+                  Grid.Column="1"
+                  Grid.ColumnSpan="2"
+                  Visibility="{x:Bind CartesianChart.Visibility,Mode=OneWay}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="*" />
@@ -373,13 +378,17 @@
                                  Click="ProgressMore_Click">
                     <FlyoutBase.AttachedFlyout>
                         <Flyout>
-                            <TextBlock x:Name="ProgressMore_TextBlock" />
+                            <TextBlock x:Name="ProgressMore_TextBlock"
+                                       Text="{x:Bind FailCount_Run.Text,Mode=OneWay}"/>
                         </Flyout>
                     </FlyoutBase.AttachedFlyout>
                 </HyperlinkButton>
             </Grid>
-
         </Grid>
+
+        <TeachingTip x:Name="JavDbCookieVisiable_TeachingTip"
+                     Title="提示"
+                     Subtitle="JavDb访问Fc2时提示异常，Cookie可能已经失效" />
     </Grid>
 
 </Page>
