@@ -203,6 +203,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             if (e.AddedItems.Count != 1)
                 return;
 
+            if (FileInfoShow_Grid.Visibility == Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
             SelectedDatum = e.AddedItems[0] as Datum;
         }
 

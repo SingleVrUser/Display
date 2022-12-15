@@ -36,6 +36,23 @@ public class AppSettings
     }
 
     /// <summary>
+    /// 是否左侧导航是否展开
+    /// </summary>
+    public static bool IsNavigationViewPaneOpen
+    {
+        get
+        {
+            bool _value = false;
+            if (localSettings.Values["IsNavigationViewPaneOpen"] is bool value)
+            {
+                _value = value;
+            }
+            return _value;
+        }
+        set => localSettings.Values["IsNavigationViewPaneOpen"] = value;
+    }
+
+    /// <summary>
     /// 115导入数据库 进程界面 的 任务完成后通知
     /// </summary>
     public static bool ProgressOfImportDataAccess_IsToastAfterTask
@@ -136,6 +153,72 @@ public class AppSettings
         set
         {
             localSettings.Values["JavBus_BaseUrl"] = value;
+        }
+    }
+
+    /// <summary>
+    /// AvMoo网址
+    /// </summary>
+    /// 
+    private static string _avmoo_BaseUrl = "https://avmoo.click/";
+    public static string AvMoo_BaseUrl
+    {
+        get
+        {
+            var url = localSettings.Values["AvMoo_BaseUrl"] as string;
+            if (string.IsNullOrEmpty(url))
+            {
+                url = _avmoo_BaseUrl;
+            }
+            return url;
+        }
+        set
+        {
+            localSettings.Values["AvMoo_BaseUrl"] = value;
+        }
+    }
+
+    /// <summary>
+    /// AvSox网址
+    /// </summary>
+    /// 
+    private static string _avsox_BaseUrl = "https://avsox.click/";
+    public static string AvSox_BaseUrl
+    {
+        get
+        {
+            var url = localSettings.Values["AvSox_BaseUrl"] as string;
+            if (string.IsNullOrEmpty(url))
+            {
+                url = _avsox_BaseUrl;
+            }
+            return url;
+        }
+        set
+        {
+            localSettings.Values["AvSox_BaseUrl"] = value;
+        }
+    }
+
+    /// <summary>
+    /// Jav321网址
+    /// </summary>
+    /// 
+    private static string _jav321_BaseUrl = "https://www.jav321.com/";
+    public static string Jav321_BaseUrl
+    {
+        get
+        {
+            var url = localSettings.Values["Jav321_BaseUrl"] as string;
+            if (string.IsNullOrEmpty(url))
+            {
+                url = _jav321_BaseUrl;
+            }
+            return url;
+        }
+        set
+        {
+            localSettings.Values["Jav321_BaseUrl"] = value;
         }
     }
 
@@ -352,6 +435,69 @@ public class AppSettings
         set
         {
             localSettings.Values["isUseJavBus"] = value;
+        }
+    }
+
+    /// <summary>
+    /// 是否使用AvMoo
+    /// </summary>
+    public static bool isUseAvMoo
+    {
+        get
+        {
+            bool useJavBus = true;
+
+            if (localSettings.Values["isUseAvMoo"] is bool value)
+            {
+                useJavBus = value;
+            }
+            return useJavBus;
+        }
+        set
+        {
+            localSettings.Values["isUseAvMoo"] = value;
+        }
+    }
+    
+    /// <summary>
+    /// 是否使用AvSox
+    /// </summary>
+    public static bool isUseAvSox
+    {
+        get
+        {
+            bool useJavBus = true;
+
+            if (localSettings.Values["isUseAvSox"] is bool value)
+            {
+                useJavBus = value;
+            }
+            return useJavBus;
+        }
+        set
+        {
+            localSettings.Values["isUseAvSox"] = value;
+        }
+    }
+    
+    /// <summary>
+    /// 是否使用Jav321
+    /// </summary>
+    public static bool isUseJav321
+    {
+        get
+        {
+            bool useJavBus = true;
+
+            if (localSettings.Values["isUseJav321"] is bool value)
+            {
+                useJavBus = value;
+            }
+            return useJavBus;
+        }
+        set
+        {
+            localSettings.Values["isUseJav321"] = value;
         }
     }
 

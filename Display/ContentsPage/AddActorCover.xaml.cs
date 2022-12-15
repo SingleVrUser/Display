@@ -210,13 +210,13 @@ namespace Display.ContentsPage
                 }
             });
 
-            await Task.Run(() => getActorCoverByGit(actorinfo.ToList(), progress, s_cts));
+            await getActorCoverByGit(actorinfo.ToList(), progress, s_cts);
 
             BasicGridView.ItemClick += BasicGridView_ItemClick;
 
         }
 
-        private async void getActorCoverByGit(List<ActorsInfo> actorinfos,IProgress<progressClass> progress, CancellationTokenSource s_cts)
+        private async Task getActorCoverByGit(List<ActorsInfo> actorinfos,IProgress<progressClass> progress, CancellationTokenSource s_cts)
         {
             string filePath = AppSettings.ActorFileTree_SavePath;
 

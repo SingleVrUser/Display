@@ -38,7 +38,8 @@
                         IsTitleBarAutoPaddingEnabled="True"
                         PaneDisplayMode="Auto"
                         DisplayModeChanged="NavigationViewControl_DisplayModeChanged"
-                        OpenPaneLength="150">
+                        OpenPaneLength="150"
+                        IsPaneOpen="{x:Bind data:AppSettings.IsNavigationViewPaneOpen}">
             <!--调整NavigationView样式-->
             <NavigationView.Resources>
                 <Thickness x:Key="NavigationViewMinimalHeaderMargin">-65,43,0,3</Thickness>
@@ -96,7 +97,6 @@
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 
-
                 <NavigationViewItem Content="其他"
                                 Tag="more">
                     <NavigationViewItem.Icon>

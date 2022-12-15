@@ -10,11 +10,14 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Windows.Media.Ocr;
 
 namespace Data
 {
     public class GetInfoFromNetwork
     {
+        public static bool IsJavDbCookieVisiable = true;
+
         private static HttpClient _client;
         public static HttpClient Client
         {
@@ -29,8 +32,6 @@ namespace Data
             }
             set=> _client = value;
         }
-
-
 
         private static HttpClient ClientWithJavDBCookie;
 
@@ -119,27 +120,21 @@ namespace Data
             CID = CID.ToUpper();
             string url = UrlCombine(BusUrl, $"movies/{CID}");
 
-            //if (Client == null)
-            //{
-            //    Client = CreateClient(new Dictionary<string, string>() {
-            //            {"user-agent" ,BrowserUserAgent}
-            //        });
-            //}
-
             string strResult = await RequestHelper.RequestHtml(Client, url);
 
             HtmlDocument htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(strResult);
 
+            //搜索封面
+            string ImageUrl = null;
             var ImageUrlNode = htmlDoc.DocumentNode.SelectSingleNode("//img[@class='img-fluid']");
-            //搜索无果，退出
-            if (ImageUrlNode == null) return null;
+            if (ImageUrlNode != null)
+            {
+                ImageUrl = ImageUrlNode.Attributes["src"].Value;
+            }
 
             VideoInfo videoInfo = new VideoInfo();
             videoInfo.busurl = url;
-
-            var ImageUrl = ImageUrlNode.Attributes["src"].Value;
-
             videoInfo.truename = CID;
 
             var titleNode = htmlDoc.DocumentNode.SelectSingleNode("//h1");
@@ -186,9 +181,12 @@ namespace Data
             }
 
             //下载封面
-            string filePath = Path.Combine(SavePath, CID);
-            videoInfo.imageurl = ImageUrl;
-            videoInfo.imagepath = await downloadFile(ImageUrl, filePath, CID);
+            if (!string.IsNullOrEmpty(ImageUrl))
+            {
+                string filePath = Path.Combine(SavePath, CID);
+                videoInfo.imageurl = ImageUrl;
+                videoInfo.imagepath = await downloadFile(ImageUrl, filePath, CID);
+            }
 
             return videoInfo;
         }
@@ -210,20 +208,14 @@ namespace Data
 
             videoInfo.busurl = busurl;
 
-            //if (Client == null)
-            //{
-            //    Client = CreateClient(new Dictionary<string, string>() {
-            //            {"user-agent" ,BrowserUserAgent}
-            //        });
-            //}
-
             string strResult = await RequestHelper.RequestHtml(Client, busurl);
 
             HtmlDocument htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(strResult);
 
+
+            //搜索封面
             var ImageUrlNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='col-md-9 screencap']//a//img");
-            //搜索无果，退出
             if (ImageUrlNode == null) return null;
 
             var ImageUrl = ImageUrlNode.Attributes["src"].Value;
@@ -232,6 +224,7 @@ namespace Data
                 ImageUrl = UrlCombine(JavBusUrl, ImageUrl);
             }
 
+            //标题（不可或缺）
             var title = ImageUrlNode.Attributes["title"].Value;
             videoInfo.title = title;
 
@@ -246,11 +239,6 @@ namespace Data
 
                 var header = AttributeNode.FirstChild.InnerText.Trim();
 
-                //if (header == "識別碼:")
-                //{
-                //    videoInfo.truename = AttributeNode.SelectNodes(".//span")[1].InnerText.Trim();
-                //    CID = videoInfo.truename;
-                //}
                 if (header == "發行日期:")
                 {
                     videoInfo.releasetime = AttributeNode.LastChild.InnerText.Trim();
@@ -298,10 +286,13 @@ namespace Data
                 }
             }
 
-            ////下载封面
-            string filePath = Path.Combine(SavePath, CID);
-            videoInfo.imageurl = ImageUrl;
-            videoInfo.imagepath = await downloadFile(ImageUrl, filePath, CID);
+            //下载封面
+            if (!string.IsNullOrEmpty(ImageUrl))
+            {
+                string filePath = Path.Combine(SavePath, CID);
+                videoInfo.imageurl = ImageUrl;
+                videoInfo.imagepath = await downloadFile(ImageUrl, filePath, CID);
+            }
 
             var sampleBox_Nodes = htmlDoc.DocumentNode.SelectNodes("//a[@class='sample-box']");
             List<string> sampleUrlList = new();
@@ -323,6 +314,173 @@ namespace Data
         }
 
         /// <summary>
+        /// 从jav321中搜索影片信息
+        /// </summary>
+        /// <param name="CID"></param>
+        /// <returns></returns>
+        public async Task<VideoInfo> SearchInfoFromJav321(string CID)
+        {
+            VideoInfo videoInfo = new VideoInfo();
+            string SearchUrl = UrlCombine(AppSettings.Jav321_BaseUrl,"search");
+
+            CID = CID.ToUpper();
+
+            var postValues = new Dictionary<string, string>
+                {
+                    { "sn", CID}
+                };
+
+            Tuple<string,string> result = await RequestHelper.PostHtml(Client, SearchUrl, postValues);
+            if (result == null) return null;
+            videoInfo.busurl= result.Item1;
+
+            string strResult = result.Item2;
+
+            HtmlDocument htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(strResult);
+
+            //标题
+            var TitleNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='panel-heading']/h3");
+            if (TitleNode == null) return null;
+            videoInfo.title = TitleNode.FirstChild.InnerText;
+
+            //图片地址
+            var ImageNodes = htmlDoc.DocumentNode.SelectNodes("/html/body/div[@class='row'][2]/div[@class='col-md-3']/div//img[@class='img-responsive']");
+            string ImageUrl = string.Empty;
+            List<string> sampleUrlList = new List<string>();
+
+            //没有样图
+            if (ImageNodes == null)
+            {
+                var ImageNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='panel-body'][1]/div[@class='row'][1]/div[@class='col-md-3'][1]/img[@class='img-responsive']");
+                if(ImageNode== null) return null;
+
+                string imgSrc = ImageNode.GetAttributeValue("src", string.Empty);
+
+                if(!imgSrc.EndsWith("webp"))
+                    ImageUrl = imgSrc;
+            }
+            //有样图
+            else
+            {
+                //第一张为封面
+                //其余为缩略图
+                for (int i = 0; i < ImageNodes.Count; i++)
+                {
+                    var imageNode = ImageNodes[i];
+                    string imageUrl = imageNode.GetAttributeValue("src", string.Empty);
+
+                    if (imageUrl.EndsWith("webp")) continue;
+
+                    if (i == 0)
+                    {
+                        ImageUrl = imageUrl;
+                    }
+                    else
+                    {
+                        sampleUrlList.Add(imageUrl);
+                    }
+                }
+            }
+
+            //CID
+            videoInfo.truename = CID;
+
+            //其他信息
+            var InfoNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='col-md-9']");
+
+            //解析
+            Dictionary<string, string> infos = new Dictionary<string, string>();
+            string key = null;
+            List<string> values = new List<string>();
+            foreach (var info in InfoNode.ChildNodes)
+            {
+                string name = info.Name;
+
+                string innerText = info.InnerText.Trim();
+
+                //key(b)
+                if (name == "b")
+                {
+                    //前一key已检索完成
+                    if (values.Count != 0)
+                    {
+                        infos[key] = string.Join(",", values);
+
+                        System.Diagnostics.Debug.WriteLine($"添加{infos[key]}");
+                        values.Clear();
+                    }
+
+                    key = innerText;
+
+                }
+                //value（可跳转的a）
+                else if (name == "a")
+                {
+                    values.Add(innerText);
+                }
+                //value（不可跳转的#text）
+                else if (name == "#text" && innerText.Contains(":"))
+                {
+                    string value = innerText.Replace(":", string.Empty);
+
+                    //每个演员名之间是用“&nbsp;”分割
+                    if (value.Contains("&nbsp;"))
+                        value = value.Replace(" &nbsp; ", ",").Replace(" &nbsp;", "");
+
+                    if (!string.IsNullOrEmpty(value))
+                        values.Add(value);
+                }
+            }
+            //最后的添加
+            infos[key] = string.Join(",", values);
+            values.Clear();
+
+            //添加进VideoInfo
+            foreach (var info in infos)
+            {
+                switch (info.Key)
+                {
+                    case "出演者":
+                        videoInfo.actor= info.Value;
+                        break;
+                    case "メーカー":
+                        videoInfo.producer = info.Value;
+                        break;
+                    case "シリーズ":
+                        videoInfo.series = info.Value;
+                        break;
+                    case "ジャンル":
+                        videoInfo.category = info.Value;
+                        break;
+                    case "配信開始日":
+                        videoInfo.releasetime = info.Value;
+                        break;
+                    case "収録時間":
+                        videoInfo.lengthtime = info.Value.Replace(" minutes", "分钟");
+                        break;
+                }
+            }
+
+            if (sampleUrlList != null)
+            {
+                videoInfo.sampleImageList = string.Join(",", sampleUrlList);
+            }
+
+            ////下载封面
+            if (!string.IsNullOrEmpty(ImageUrl))
+            {
+                string SavePath = AppSettings.Image_SavePath;
+                string filePath = Path.Combine(SavePath, CID);
+                videoInfo.imageurl = ImageUrl;
+                videoInfo.imagepath = await downloadFile(ImageUrl, filePath, CID);
+            }
+            //（接受无封面）
+
+            return videoInfo;
+        }
+
+        /// <summary>
         /// 从Fc2Hub中搜索影片信息
         /// </summary>
         /// <param name="CID"></param>
@@ -337,13 +495,6 @@ namespace Data
             string url = $"{BaseUrl}search?kw={CID.Replace("FC2-", "")}";
 
             videoInfo.busurl = url;
-
-            //if (Client == null)
-            //{
-            //    Client = CreateClient(new Dictionary<string, string>() {
-            //            {"user-agent" ,BrowserUserAgent}
-            //        });
-            //}
 
             string strResult = await RequestHelper.RequestHtml(Client, url);
 
@@ -398,21 +549,431 @@ namespace Data
                 videoInfo.imagepath = await downloadFile(ImageUrl, filePath, CID);
             }
 
-            ////预览图不要了
-            //var sampleBox_Nodes = htmlDoc.DocumentNode.SelectNodes("//a[@class='sample-box']");
-            //List<string> sampleUrlList = new();
-            //if (sampleBox_Nodes != null)
-            //{
-            //    foreach (var node in sampleBox_Nodes)
-            //    {
-            //        string sampleImageUrl = node.Attributes["href"].Value;
+            return videoInfo;
+        }
 
-            //        sampleUrlList.Add(sampleImageUrl);
-            //    }
-            //    videoInfo.sampleImageList = string.Join(",", sampleUrlList);
-            //}
+        /// <summary>
+        /// 从AvMoo中搜索影片信息
+        /// </summary>
+        /// <param name="CID"></param>
+        /// <returns></returns>
+        public async Task<VideoInfo> SearchInfoFromAvMoo(string CID)
+        {
+            CID = CID.ToUpper();
+
+            var detail_url = await GetDetailUrlFromAvMooResult(CID);
+            //搜索无果，退出
+            if (detail_url == null) return null;
+
+            string strResult = await RequestHelper.RequestHtml(Client, detail_url);
+            if(string.IsNullOrEmpty(strResult)) return null;
+
+            VideoInfo videoInfo = new VideoInfo();
+            videoInfo.busurl = detail_url;
+            videoInfo.truename = CID;
+
+            videoInfo = await AnalysisInfoFromAvSoxOrAvMoo(strResult, videoInfo);
+
+            //如果失败，videoInfo可能会变成null
 
             return videoInfo;
+        }
+
+        /// <summary>
+        /// 向AvMoo发送搜索请求
+        /// </summary>
+        /// <param name="CID"></param>
+        /// <returns></returns>
+        private async Task<string> GetDetailUrlFromAvMooResult(string CID)
+        {
+            string result;
+            string url = UrlCombine(AppSettings.AvMoo_BaseUrl, $"cn/search/{CID}");
+
+            // 访问
+            string strResult = await RequestHelper.RequestHtml(Client, url);
+
+            HtmlDocument htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(strResult);
+
+            result = GetDetailUrlFromAvMooSearchResult(htmlDoc, CID);
+
+            return result;
+        }
+
+        /// <summary>
+        /// 从AvMoo众多搜索结果中搜索出符合条件的
+        /// </summary>
+        /// <returns></returns>
+        private string GetDetailUrlFromAvMooSearchResult(HtmlDocument htmlDoc, string CID)
+        {
+            string result = null;
+
+            //是否提示搜索失败
+            var alertNode = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class,'alert-danger')]");
+            if (alertNode != null) return null;
+
+            var SearchResultNodes = htmlDoc.DocumentNode.SelectNodes("//div[@id='waterfall']/div[@class='item']");
+
+            //搜索无果，退出
+            if (SearchResultNodes == null) return null;
+
+            //分割通过正则匹配得到的CID
+            var spliteResult = SpliteLocalCID(CID);
+            if (spliteResult == null) return null;
+
+            string left_cid = spliteResult.Item1;
+            string right_cid = spliteResult.Item2;
+
+            string search_left_cid;
+            string search_right_cid;
+            for (var i = 0; i < SearchResultNodes.Count; i++)
+            {
+                var movie_list = SearchResultNodes[i];
+                var title = movie_list.SelectSingleNode(".//div[@class='photo-info']/span/date").InnerText.ToUpper();
+
+                var split_result = title.Split(new char[] { '-', '_' });
+                if (split_result.Length == 1)
+                {
+                    var match_result = Regex.Match(title, @"([A-Z]+)(\d+)");
+                    if (match_result == null) continue;
+                    search_left_cid = match_result.Groups[1].Value;
+                    search_right_cid = match_result.Groups[2].Value;
+                }
+                else if (split_result.Length == 2)
+                {
+                    search_left_cid = split_result[0];
+                    search_right_cid = split_result[1];
+                }
+                else
+                    continue;
+
+                int currentNum;
+                int searchNum;
+
+                if (search_left_cid == left_cid
+                         && (search_right_cid == right_cid
+                                || (Int32.TryParse(right_cid, out currentNum)
+                                        && Int32.TryParse(right_cid, out searchNum)
+                                            && currentNum.Equals(searchNum))))
+                {
+                    var detail_url = SearchResultNodes[i].SelectSingleNode(".//a[@class='movie-box']").Attributes["href"].Value;
+
+                    //只有“//”没有“http(s)://”
+                    if (!detail_url.Contains("http") && detail_url.Contains("//"))
+                    {
+                        detail_url = $"https:{detail_url}";
+                    }
+
+                    result = detail_url;
+                    break;
+                }
+                else
+                    continue;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 解析html内容（只适合与AvSox和AvMoo），补充VideoInfo
+        /// </summary>
+        /// <param name="strResult"></param>
+        /// <param name="videoInfo"></param>
+        /// <returns></returns>
+        private async Task<VideoInfo> AnalysisInfoFromAvSoxOrAvMoo(string strResult, VideoInfo videoInfo)
+        {
+            HtmlDocument htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(strResult);
+
+            string CID = videoInfo.truename;
+
+            //封面图
+            string CoverUrl = null;
+            var ImageNode = htmlDoc.DocumentNode.SelectSingleNode("//a[@class='bigImage']");
+            if (ImageNode == null) return null;
+            CoverUrl = ImageNode.Attributes["href"].Value;
+            videoInfo.imageurl = CoverUrl;
+
+            //标题（AvMoox在a标签上，AvSox在img标签上）
+            var result = ImageNode.GetAttributeValue("title", string.Empty);
+            if (!string.IsNullOrEmpty(result))
+            {
+                videoInfo.title = result;
+            }
+            else
+            {
+                var ImgNode = ImageNode.SelectSingleNode(".//img");
+
+                if(ImgNode == null) return null;
+
+                result = ImgNode.GetAttributeValue("title", string.Empty);
+
+                if (string.IsNullOrEmpty(result))
+                    return null;
+
+                videoInfo.title = result;
+            }
+
+            //其他信息
+            var InfoNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='row movie']/div[@class='col-md-3 info']");
+
+            //解析
+            Dictionary<string, string> infos = new Dictionary<string, string>();
+            string key = null;
+            List<string> values = new List<string>();
+            foreach (var info in InfoNode.ChildNodes)
+            {
+                string name = info.Name;
+
+                if (name != "p") continue;
+
+                if (info.HasAttributes)
+                {
+                    var className = info.GetAttributeValue("class", string.Empty);
+
+                    string InnerText = info.InnerText.Replace(":", string.Empty).Trim();
+
+                    if (className == "header")
+                    {
+                        //前一key已检索完成
+                        if (values.Count != 0)
+                        {
+                            infos[key] = string.Join(",", values);
+
+                            values.Clear();
+                        }
+
+                        key = InnerText;
+                    }
+                    else if (!string.IsNullOrEmpty(InnerText))
+                    {
+                        values.Add(InnerText);
+                    }
+                }
+                else
+                {
+                    foreach (var child in info.ChildNodes)
+                    {
+                        var className = child.GetAttributeValue("class", string.Empty);
+
+                        string childInnerText = child.InnerText.Replace(":", string.Empty).Trim();
+
+                        if (className == "header")
+                        {
+                            //前一key已检索完成
+                            if (values.Count != 0)
+                            {
+                                infos[key] = string.Join(",", values);
+
+                                values.Clear();
+                            }
+
+                            key = childInnerText;
+                        }
+                        else if (!string.IsNullOrEmpty(childInnerText))
+                        {
+                            values.Add(childInnerText);
+                        }
+                    }
+
+                }
+            }
+            //最后的添加
+            infos[key] = string.Join(",", values);
+            values.Clear();
+
+            //添加进VideoInfo
+            foreach (var info in infos)
+            {
+                switch (info.Key)
+                {
+                    case "发行时间":
+                        videoInfo.releasetime = info.Value;
+                        break;
+                    case "长度":
+                        videoInfo.lengthtime = info.Value;
+                        break;
+                    case "导演":
+                        videoInfo.director = info.Value;
+                        break;
+                    case "制作商":
+                        videoInfo.producer = info.Value;
+                        break;
+                    case "发行商":
+                        videoInfo.publisher = info.Value;
+                        break;
+                    case "系列":
+                        videoInfo.series = info.Value;
+                        break;
+                    case "类别":
+                        videoInfo.category = info.Value;
+                        break;
+                }
+            }
+
+            //演员
+            var ActorNodes = htmlDoc.DocumentNode.SelectNodes("//div[@id='avatar-waterfall']/a[@class='avatar-box']/span");
+            if (ActorNodes != null)
+                videoInfo.actor = string.Join(",", ActorNodes.Select(item => item.InnerText.Trim()).ToList());
+
+            //样品图片
+            List<string> sampleUrlList = new List<string>();
+            var sampleNodes = htmlDoc.DocumentNode.SelectNodes("//div[@id='sample-waterfall']/a[@class='sample-box']");
+
+            if (sampleNodes != null)
+            {
+                foreach (var sampleNode in sampleNodes)
+                {
+                    sampleUrlList.Add(sampleNode.GetAttributeValue("href", string.Empty));
+                }
+
+                videoInfo.sampleImageList = string.Join(",", sampleUrlList);
+            }
+
+            //下载图片
+            string filePath = Path.Combine(AppSettings.Image_SavePath, CID);
+            videoInfo.imageurl = CoverUrl;
+            videoInfo.imagepath = await downloadFile(CoverUrl, filePath, CID);
+
+            return videoInfo;
+        }
+
+        /// <summary>
+        /// 从AvSox中搜索影片信息
+        /// </summary>
+        /// <param name="CID"></param>
+        /// <returns></returns>
+        public async Task<VideoInfo> SearchInfoFromAvSox(string CID)
+        {
+            string SavePath = AppSettings.Image_SavePath;
+            CID = CID.ToUpper();
+
+            var detail_url = await GetDetailUrlFromAvSoxResult(CID);
+
+            //搜索无果，退出
+            if (detail_url == null) return null;
+
+            string strResult = await RequestHelper.RequestHtml(Client, detail_url);
+            if (string.IsNullOrEmpty(strResult)) return null;
+
+            VideoInfo videoInfo = new VideoInfo();
+            videoInfo.busurl = detail_url;
+            videoInfo.truename = CID;
+
+            videoInfo = await AnalysisInfoFromAvSoxOrAvMoo(strResult, videoInfo);
+
+            //如果失败，videoInfo可能会变成null
+
+            return videoInfo;
+        }
+
+        /// <summary>
+        /// 向AvSox发送搜索请求
+        /// </summary>
+        /// <param name="CID"></param>
+        /// <returns></returns>
+        private async Task<string> GetDetailUrlFromAvSoxResult(string CID)
+        {
+            string result;
+            string url = UrlCombine(AppSettings.AvSox_BaseUrl, $"cn/search/{CID}");
+
+            // 访问
+            string strResult = await RequestHelper.RequestHtml(Client, url);
+
+            HtmlDocument htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(strResult);
+
+            result = GetDetailUrlFromAvSoxSearchResult(htmlDoc, CID);
+
+            return result;
+        }
+
+        /// <summary>
+        /// 从AvSox众多搜索结果中搜索出符合条件的
+        /// </summary>
+        /// <returns></returns>
+        private string GetDetailUrlFromAvSoxSearchResult(HtmlDocument htmlDoc, string CID)
+        {
+            string result = null;
+
+            //是否提示搜索失败
+            var alertNode = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class,'alert-danger')]");
+            if (alertNode != null) return null;
+
+            var SearchResultNodes = htmlDoc.DocumentNode.SelectNodes("//div[@id='waterfall']/div[@class='item']");
+            //搜索无果，退出
+            if (SearchResultNodes == null) return null;
+
+            //分割通过正则匹配得到的CID
+            var spliteResult = SpliteLocalCID(CID);
+            if (spliteResult == null) return null;
+
+            string left_cid = spliteResult.Item1;
+            string right_cid = spliteResult.Item2;
+
+            string search_left_cid;
+            string search_right_cid;
+            for (var i = 0; i < SearchResultNodes.Count; i++)
+            {
+                var movie_list = SearchResultNodes[i];
+                var title_search = movie_list.SelectSingleNode(".//div[@class='photo-info']/span/date").InnerText;
+                string title = title_search.ToUpper();
+
+                var split_result = title.Split(new char[] { '-', '_' });
+                //没有分隔符，尝试正则匹配（n167）
+                if (split_result.Length == 1)
+                {
+                    var match_result = Regex.Match(CID, @"^([a-z]+)(\d+)$");
+                    if (match_result == null) continue;
+                    search_left_cid = match_result.Groups[1].Value;
+                    search_right_cid = match_result.Groups[2].Value;
+                }
+                //有且只有两个分隔符（HEYZO-2934）
+                else if (split_result.Length == 2)
+                {
+                    search_left_cid = split_result[0];
+                    search_right_cid = split_result[1];
+                }
+                //有且有三个分隔符（FC2-PPV-3143749）
+                else if (split_result.Length == 3)
+                {
+                    if (CID.Contains("FC2"))
+                    {
+                        search_left_cid = "FC2";
+                        search_right_cid = split_result[2];
+                    }
+                    else
+                        return null;
+                }
+                //超过三个，预料之外的情况
+                else
+                    return null;
+
+                int currentNum;
+                int searchNum;
+
+                if (search_left_cid == left_cid
+                         && (search_right_cid == right_cid
+                                || (Int32.TryParse(right_cid, out currentNum)
+                                        && Int32.TryParse(right_cid, out searchNum)
+                                            && currentNum.Equals(searchNum))))
+                {
+                    var detail_url = SearchResultNodes[i].SelectSingleNode(".//a[contains(@class,'movie-box')]").Attributes["href"].Value;
+
+                    //只有“//”没有“http(s)://”，补充上
+                    if (!detail_url.Contains("http") && detail_url.Contains("//"))
+                    {
+                        detail_url = $"https:{detail_url}";
+                    }
+
+                    result = detail_url;
+                    break;
+                }
+                else
+                    continue;
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -422,7 +983,6 @@ namespace Data
         /// <returns></returns>
         public async Task<VideoInfo> SearchInfoFromJavDB(string CID)
         {
-            VideoInfo videoInfo = new VideoInfo();
 
             string JavDBUrl = AppSettings.JavDB_BaseUrl;
             string SavePath = AppSettings.Image_SavePath;
@@ -432,9 +992,6 @@ namespace Data
             var detail_url = await GetDetailUrlFromJavDBSearchResult(CID);
             //搜索无果，退出
             if (detail_url == null) return null;
-
-            //两次访问间隔不能太短
-            await RandomTimeDelay(3, 6);
 
             string strResult;
 
@@ -459,15 +1016,10 @@ namespace Data
             }
             else
             {
-                if (Client == null)
-                {
-                    Client = CreateClient(new Dictionary<string, string>() {
-                        {"user-agent" ,BrowserUserAgent}
-                    });
-                }
-
                 strResult = await RequestHelper.RequestHtml(Client, detail_url);
             }
+
+            if (string.IsNullOrEmpty(strResult)) return null;
 
             HtmlDocument htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(strResult);
@@ -475,6 +1027,8 @@ namespace Data
             var video_meta_panelNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='video-meta-panel']");
             //搜索无果，退出
             if (video_meta_panelNode == null) return null;
+
+            VideoInfo videoInfo = new VideoInfo();
 
             videoInfo.busurl = detail_url;
 
@@ -552,7 +1106,6 @@ namespace Data
 
             ////下载封面
             string filePath = Path.Combine(SavePath, CID);
-
             videoInfo.imageurl = ImageUrl;
             videoInfo.imagepath = await downloadFile(ImageUrl, filePath, CID);
 
@@ -579,13 +1132,15 @@ namespace Data
             return videoInfo;
         }
 
+        /// <summary>
+        /// 向javdb发送搜索请求
+        /// </summary>
+        /// <param name="CID"></param>
+        /// <returns></returns>
         private async Task<string> GetDetailUrlFromJavDBSearchResult(string CID)
         {
             string JavDBUrl = AppSettings.JavDB_BaseUrl;
             string result;
-
-            //if (Client == null)
-            //    Client = new HttpClient();
 
             string url = $"{JavDBUrl}/search?q={CID}&f=all";
 
@@ -599,7 +1154,7 @@ namespace Data
             //FailItems.Add(strResult.Length.ToString());
             //FailItems.Add(strResult.Replace("\n", ""));
 
-            result = GetDetailUrlFromSearchResult(htmlDoc, CID);
+            result = GetDetailUrlFromJavDBSearchResult(htmlDoc, CID);
 
             return result;
         }
@@ -608,7 +1163,7 @@ namespace Data
         /// 从JavDB众多搜索结果中搜索出符合条件的
         /// </summary>
         /// <returns></returns>
-        private string GetDetailUrlFromSearchResult(HtmlDocument htmlDoc, string CID)
+        private string GetDetailUrlFromJavDBSearchResult(HtmlDocument htmlDoc, string CID)
         {
             string result = null;
 
@@ -617,43 +1172,22 @@ namespace Data
             //搜索无果，退出
             if (SearchResultNodes == null) return null;
 
-            string left_cid = null;
-            string right_cid = null;
+            //分割通过正则匹配得到的CID
+            var spliteResult = SpliteLocalCID(CID);
+            if(spliteResult == null) return null;
 
-            var split_result = CID.Split(new char[] { '-', '_' });
-            if (split_result.Length == 1)
-            {
-                var match_result = Regex.Match(CID, @"([A-Z]+)(\d+)");
-                if (match_result == null) return null;
+            string left_cid = spliteResult.Item1;
+            string right_cid = spliteResult.Item2;
 
-                left_cid = match_result.Groups[1].Value;
-                right_cid = match_result.Groups[2].Value;
-            }
-            else if (split_result.Length == 2)
-            {
-                left_cid = split_result[0];
-                right_cid = split_result[1];
-            }
-            else if (split_result.Length == 3)
-            {
-                if (CID.Contains("HEYDOUGA"))
-                {
-                    left_cid = split_result[1];
-                    right_cid = split_result[2];
-                }
-            }
-            else
-                return null;
-
-            string search_left_cid = null;
-            string search_right_cid = null;
+            string search_left_cid;
+            string search_right_cid;
             for (var i = 0; i < SearchResultNodes.Count; i++)
             {
                 var movie_list = SearchResultNodes[i];
                 var title_search = movie_list.SelectSingleNode(".//div[@class='video-title']/strong").InnerText;
                 string title = title_search.ToUpper();
 
-                split_result = title.Split(new char[] { '-', '_' });
+                var split_result = title.Split(new char[] { '-', '_' });
                 if (split_result.Length == 1)
                 {
                     var match_result = Regex.Match(title, @"([A-Z]+)(\d+)");
@@ -673,7 +1207,11 @@ namespace Data
                         search_left_cid = split_result[1];
                         search_right_cid = split_result[2];
                     }
+                    else
+                        return null;
                 }
+                else
+                    return null;
 
                 int currentNum;
                 int searchNum;
@@ -696,6 +1234,41 @@ namespace Data
             }
 
             return result;
+        }
+
+        private Tuple<string,string> SpliteLocalCID(string CID)
+        {
+            string left_cid;
+            string right_cid;
+
+            var split_result = CID.Split(new char[] { '-', '_' });
+            if (split_result.Length == 1)
+            {
+                var match_result = Regex.Match(CID, @"([A-Z]+)(\d+)");
+                if (match_result == null) return null;
+
+                left_cid = match_result.Groups[1].Value;
+                right_cid = match_result.Groups[2].Value;
+            }
+            else if (split_result.Length == 2)
+            {
+                left_cid = split_result[0];
+                right_cid = split_result[1];
+            }
+            else if (split_result.Length == 3)
+            {
+                if (CID.Contains("HEYDOUGA"))
+                {
+                    left_cid = split_result[1];
+                    right_cid = split_result[2];
+                }
+                else
+                    return null;
+            }
+            else
+                return null;
+
+            return new Tuple<string,string>(left_cid,right_cid);
         }
 
         /// <summary>

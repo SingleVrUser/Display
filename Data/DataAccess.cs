@@ -151,11 +151,19 @@ namespace Data
                 createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteReader();
 
+                //删除表（添加了搜刮源，需要重新添加）
+                tableCommand = "DROP TABLE IF EXISTS SpiderTask";
+                createTable = new SqliteCommand(tableCommand, db);
+                createTable.ExecuteReader();
+
                 //搜刮任务
                 tableCommand = "CREATE TABLE IF NOT " +
                     $"EXISTS SpiderTask ( " +
                       "name text," +
                       "bus text," +
+                      "jav321 text," +
+                      "avmoo text," +
+                      "avsox text," +
                       "libre text," +
                       "fc text," +
                       "db text," +
@@ -313,8 +321,6 @@ namespace Data
             }
 
         }
-
-
 
         #endregion
 
@@ -513,7 +519,6 @@ namespace Data
         /// <param name="data"></param>
         public static void AddSpiderTask(string name, long task_id)
         {
-            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
               new SqliteConnection($"Filename={dbpath}"))
             {
@@ -523,13 +528,19 @@ namespace Data
                 insertCommand.Connection = db;
 
                 //添加信息，如果已经存在则替换
-                insertCommand.CommandText = $"INSERT OR REPLACE INTO SpiderTask VALUES (@name,@bus,@libre,@fc,@db,@done,@task_id);";
+                insertCommand.CommandText = $"INSERT OR REPLACE INTO SpiderTask VALUES (@name,@bus,@jav321,@avmoo,@avsox,@libre,@fc,@db,@done,@task_id);";
 
                 //fc只有javdb，fc2club能刮
-                bool isFc = name.Contains("FC2");
+                bool isFc = FileMatch.IsFC2(name);
+
+                //是否是特殊番号（针对AvMoo和AvSox）
+                bool isSpecialCid = FileMatch.IsSpecialCid(name);
 
                 insertCommand.Parameters.AddWithValue("@name", name);
                 insertCommand.Parameters.AddWithValue("@bus", !isFc && AppSettings.isUseJavBus?"ready": "done");
+                insertCommand.Parameters.AddWithValue("@jav321", !isFc && AppSettings.isUseJav321?"ready": "done");
+                insertCommand.Parameters.AddWithValue("@avmoo", !isSpecialCid && AppSettings.isUseAvMoo?"ready": "done");
+                insertCommand.Parameters.AddWithValue("@avsox", isSpecialCid && AppSettings.isUseAvSox?"ready": "done");
                 insertCommand.Parameters.AddWithValue("@libre", !isFc && AppSettings.isUseLibreDmm ? "ready" : "done");
                 insertCommand.Parameters.AddWithValue("@fc", isFc && AppSettings.isUseFc2Hub ? "ready" : "done");
                 insertCommand.Parameters.AddWithValue("@db", AppSettings.isUseFc2Hub ? "ready" : "done");
@@ -943,6 +954,7 @@ namespace Data
             return imagePath;
         }
 
+
         /// <summary>
         /// 获取可用搜刮任务的一个name
         /// </summary>
@@ -958,7 +970,9 @@ namespace Data
                 db.Open();
 
                 SqliteCommand selectCommand = new SqliteCommand
-                    ($"SELECT name from SpiderTask WHERE Done == 0 AND (libre != 'doing' AND bus != 'doing' AND fc != 'doing' AND db != 'doing' AND fc != 'doing') AND {spiderSource.name} == 'ready' LIMIT 1", db);
+                    ($"SELECT name from SpiderTask WHERE Done == 0 AND " +
+                        $"(libre != 'doing' AND bus != 'doing' AND jav321 != 'doing' AND avmoo != 'doing' AND avsox != 'doing' AND fc != 'doing' AND db != 'doing' AND fc != 'doing') AND " +
+                        $"{spiderSource.name} == 'ready' LIMIT 1", db);
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
                 while (query.Read())
@@ -969,6 +983,36 @@ namespace Data
             }
 
             return name;
+        }
+
+        /// <summary>
+        /// 获取该番号搜刮未完成且该搜刮源的状态为ready的数量
+        /// </summary>
+        /// <param name="spiderSource"></param>
+        /// <returns></returns>
+        public static int GetWaitSpiderTaskCount(SpiderSource spiderSource)
+        {
+            int count = 0;
+
+            using (SqliteConnection db =
+            new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+
+                //TODO 分类讨论，考虑FC2的搜刮源
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"SELECT count(name) from SpiderTask WHERE Done == 0 AND {spiderSource.name} == 'ready'", db);
+
+                SqliteDataReader query = selectCommand.ExecuteReader();
+
+                query.Read();
+                count = query.GetInt32(0);
+                query.Close();
+                db.Close();
+            }
+
+            return count;
         }
 
         /// <summary>
@@ -986,7 +1030,9 @@ namespace Data
                 db.Open();
 
                 SqliteCommand selectCommand = new SqliteCommand
-                    ($"SELECT name FROM SpiderTask WHERE name == '{QueryName}' AND libre == 'done' AND bus == 'done' AND fc == 'done' AND db == 'done' AND done == 0", db);
+                    ($"SELECT name FROM SpiderTask WHERE name == '{QueryName}' AND " +
+                    $"libre == 'done' AND bus == 'done' AND jav321 == 'done' AND avmoo == 'done' AND avsox == 'done' AND fc == 'done' AND db == 'done' " +
+                    $"AND done == 0", db);
 
                 string name = (string)selectCommand.ExecuteScalar();
 

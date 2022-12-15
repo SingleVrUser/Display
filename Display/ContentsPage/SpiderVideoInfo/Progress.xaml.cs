@@ -57,7 +57,11 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             await ShowMatchResult();
 
+            if (s_cts.IsCancellationRequested) return;
+
             await SpliderVideoInfo(matchVideoResults);
+
+            if (s_cts.IsCancellationRequested) return;
 
             currentWindow.Closed -= CurrentWindow_Closed;
 
@@ -106,7 +110,13 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
         private void ShowSpiderInfoList()
         {
-            SpiderInfos= new List<SpiderInfo>() { new(SpiderSourceName.javbus, AppSettings.isUseJavBus) ,
+            CartesianChart.Visibility = Visibility.Visible;
+
+            SpiderInfos = new List<SpiderInfo>() { 
+                new(SpiderSourceName.javbus, AppSettings.isUseJavBus) ,
+                new(SpiderSourceName.jav321, AppSettings.isUseJav321),
+                new(SpiderSourceName.avmoo, AppSettings.isUseAvMoo),
+                new(SpiderSourceName.avsox, AppSettings.isUseAvSox),
                 new(SpiderSourceName.libredmm, AppSettings.isUseLibreDmm),
                 new(SpiderSourceName.fc2club, AppSettings.isUseFc2Hub),
                 new(SpiderSourceName.javdb, AppSettings.isUseJavDB),
@@ -270,6 +280,9 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// </summary>
         private async Task SpliderVideoInfo(List<MatchVideoResult> matchVideoResults)
         {
+            if (matchVideoResults== null)
+                return;
+
             if(network ==null)
                 network = new();
 
@@ -326,6 +339,8 @@ namespace Display.ContentsPage.SpiderVideoInfo
             int successCount = 0;
             List<string> successVIdeoNameList = new();
 
+            int failCount = 0;
+
             int i = 0;
             var SpiderSourceProgress = new Progress<SpiderInfo>(progressPercent =>
             {
@@ -333,11 +348,6 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 //更新信息
                 GridViewItem.State = progressPercent.State;
                 GridViewItem.Message = progressPercent.Message;
-
-                if(progressPercent.State == SpiderStates.awaiting)
-                {
-                    UpdateSpiderCartesianChart(progressPercent.SpiderSource);
-                }
 
                 //更新柱状图
                 //请求成功 (搜刮源或数据库)
@@ -352,11 +362,18 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 //请求失败(搜刮源)
                 else if (progressPercent.RequestStates == RequestStates.fail)
                 {
+                    failCount++;
                     FailVideoNameList.Add(progressPercent.Name);
+                    FailCount_Run.Text = failCount.ToString();
                     UpdateSpiderCartesianChart(SpiderSourceName.local);
 
                     //番号搜刮成功率
                     CidSuccessRate_Run.Text = $"{(totalCount - FailVideoNameList.Count) * 100 / totalCount}%";
+                }
+                //搜刮源尝试搜刮
+                else if (progressPercent.State == SpiderStates.awaiting)
+                {
+                    UpdateSpiderCartesianChart(progressPercent.SpiderSource);
                 }
 
                 i++;
@@ -382,6 +399,11 @@ namespace Display.ContentsPage.SpiderVideoInfo
             AllCount_Run.Text = matchVideoResults.Count.ToString();
             VideoCount_Run.Text = videoCount.ToString();
             FailCount_Run.Text = FailVideoNameList.Count.ToString();
+
+            if (!GetInfoFromNetwork.IsJavDbCookieVisiable)
+            {
+                JavDbCookieVisiable_TeachingTip.IsOpen= true;
+            }
 
             //显示总耗时
             SearchMessage_TextBlock.Text = $"⏱总耗时：{FileMatch.ConvertInt32ToDateStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime)}";
@@ -432,7 +454,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// <returns></returns>
         private async Task CreadSpiderTask(SpiderSourceName spiderSourceName, IProgress<SpiderInfo> progress)
         {
-            string name;
+            string name = null;
             VideoInfo resultInfo = null;
             SpiderSource spiderSource = new(spiderSourceName);
 
@@ -446,13 +468,60 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     //查询待搜刮的name
                     name = DataAccess.GetOneSpiderTask(spiderSource);
 
-                    if (string.IsNullOrEmpty(name))
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        System.Diagnostics.Debug.WriteLine($"{spiderSourceName}查询到的{name}");
+
+                        //记录为正在进行
+                        DataAccess.UpdataSpiderTask(name, spiderSource, SpiderStates.doing);
+                    }
+                }
+
+                if (string.IsNullOrEmpty(name))
+                {
+                    currentSpiderInfo = new(spiderSourceName, name);
+                    currentSpiderInfo.State = SpiderStates.doing;
+                    currentSpiderInfo.Message = "等待分配任务";
+                    progress.Report(currentSpiderInfo);
+
+                    bool isExistCurrentSpiderTask = true;
+
+                    //循环查询，最多100次
+                    for (int i = 0; i < 100; i++)
+                    {
+                        //确认正在进行搜刮的番号已经被搜刮源搜刮过，避免发生只有该搜刮源能搜刮到的情况
+                        var leftWaitCount = DataAccess.GetWaitSpiderTaskCount(spiderSource);
+
+                        if (leftWaitCount == 0)
+                        {
+                            //退出该搜刮任务
+                            break;
+                        }
+                        else
+                        {
+                            await Task.Delay(5000);
+
+                            lock (myLock)
+                            {
+                                //再次查询待搜刮的name
+                                name = DataAccess.GetOneSpiderTask(spiderSource);
+                            }
+
+                            //查询到了，退出循环，开始任务
+                            if (!string.IsNullOrEmpty(name))
+                            {
+                                isExistCurrentSpiderTask = false;
+                                break;
+                            }
+
+                            //查询不到，下一循环继续查询
+                        }
+
+                    }
+
+                    //退出整个任务
+                    if (isExistCurrentSpiderTask)
                         break;
-
-                    System.Diagnostics.Debug.WriteLine($"{spiderSourceName}查询到的{name}");
-
-                    //记录为正在进行
-                    DataAccess.UpdataSpiderTask(name, spiderSource, SpiderStates.doing);
                 }
 
                 var result = DataAccess.SelectTrueName(name);
@@ -494,6 +563,42 @@ namespace Display.ContentsPage.SpiderVideoInfo
                             await GetInfoFromNetwork.RandomTimeDelay(1, 3);
                             System.Diagnostics.Debug.WriteLine("JavBus等待时间到");
                             break;
+                        case SpiderSourceName.jav321:
+                            System.Diagnostics.Debug.WriteLine("访问Jav321");
+                            resultInfo = await network.SearchInfoFromJav321(name);
+                            System.Diagnostics.Debug.WriteLine("Jav321等待 1~2 s");
+
+                            currentSpiderInfo.State = SpiderStates.awaiting;
+                            currentSpiderInfo.Message = "等待 1~2 s";
+                            progress.Report(currentSpiderInfo);
+
+                            await GetInfoFromNetwork.RandomTimeDelay(1, 2);
+                            System.Diagnostics.Debug.WriteLine("Jav321等待时间到");
+                            break;
+                        case SpiderSourceName.avmoo:
+                            System.Diagnostics.Debug.WriteLine("访问AvMoo");
+                            resultInfo = await network.SearchInfoFromAvMoo(name);
+                            System.Diagnostics.Debug.WriteLine("AvMoo等待 1~2 s");
+
+                            currentSpiderInfo.State = SpiderStates.awaiting;
+                            currentSpiderInfo.Message = "等待 1~2 s";
+                            progress.Report(currentSpiderInfo);
+
+                            await GetInfoFromNetwork.RandomTimeDelay(1, 2);
+                            System.Diagnostics.Debug.WriteLine("AvMoo等待时间到");
+                            break;
+                        case SpiderSourceName.avsox:
+                            System.Diagnostics.Debug.WriteLine("访问AvSox");
+                            resultInfo = await network.SearchInfoFromAvSox(name);
+                            System.Diagnostics.Debug.WriteLine("AvSox等待 1~2 s");
+
+                            currentSpiderInfo.State = SpiderStates.awaiting;
+                            currentSpiderInfo.Message = "等待 1~2 s";
+                            progress.Report(currentSpiderInfo);
+
+                            await GetInfoFromNetwork.RandomTimeDelay(1, 2);
+                            System.Diagnostics.Debug.WriteLine("AvSox等待时间到");
+                            break;
                         case SpiderSourceName.libredmm:
                             System.Diagnostics.Debug.WriteLine("访问LibreDmm");
                             resultInfo = await network.SearchInfoFromLibreDmm(name);
@@ -520,6 +625,12 @@ namespace Display.ContentsPage.SpiderVideoInfo
                             break;
                         case SpiderSourceName.javdb:
                             System.Diagnostics.Debug.WriteLine("访问JavDB");
+                            //FC2且cookie异常（如未登录）
+                            if (name.Contains("FC2") && !GetInfoFromNetwork.IsJavDbCookieVisiable)
+                            {
+                                break;
+                            }
+
                             resultInfo = await network.SearchInfoFromJavDB(name);
                             System.Diagnostics.Debug.WriteLine("JavDB等待 3~6 s");
 
@@ -533,7 +644,6 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     }
 
                 }
-
 
                 //检查一下是否需要标记为全部完成
                 //搜刮成功
@@ -847,7 +957,6 @@ namespace Display.ContentsPage.SpiderVideoInfo
         {
             FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
         }
-
 
         public void CreateWindow()
         {
