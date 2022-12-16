@@ -290,7 +290,6 @@ namespace Display.ContentsPage.SpiderVideoInfo
             ShowSpiderCartesianChart();
 
             CountInfo_Grid.Visibility = Visibility.Visible;
-            //VideoInfo_Grid.Visibility = Visibility.Visible;
             TopProgressRing.IsActive = true;
 
             FailVideoNameList = new();
@@ -365,6 +364,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     failCount++;
                     FailVideoNameList.Add(progressPercent.Name);
                     FailCount_Run.Text = failCount.ToString();
+                    ProgressMore_TextBlock.Text = $"失败数：{failCount}";
                     UpdateSpiderCartesianChart(SpiderSourceName.local);
 
                     //番号搜刮成功率
@@ -455,12 +455,13 @@ namespace Display.ContentsPage.SpiderVideoInfo
         private async Task CreadSpiderTask(SpiderSourceName spiderSourceName, IProgress<SpiderInfo> progress)
         {
             string name = null;
-            VideoInfo resultInfo = null;
+            VideoInfo resultInfo;
             SpiderSource spiderSource = new(spiderSourceName);
 
             SpiderInfo currentSpiderInfo;
             while (true)
             {
+                resultInfo = null;
                 if (s_cts.IsCancellationRequested) return;
 
                 lock (myLock)
@@ -627,9 +628,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                             System.Diagnostics.Debug.WriteLine("访问JavDB");
                             //FC2且cookie异常（如未登录）
                             if (name.Contains("FC2") && !GetInfoFromNetwork.IsJavDbCookieVisiable)
-                            {
                                 break;
-                            }
 
                             resultInfo = await network.SearchInfoFromJavDB(name);
                             System.Diagnostics.Debug.WriteLine("JavDB等待 3~6 s");
@@ -640,6 +639,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
                             await GetInfoFromNetwork.RandomTimeDelay(3, 6);
                             System.Diagnostics.Debug.WriteLine("JavDB等待时间到");
+
                             break;
                     }
 

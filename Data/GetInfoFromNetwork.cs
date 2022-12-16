@@ -142,8 +142,8 @@ namespace Data
                 videoInfo.title = titleNode.InnerText.Trim();
 
             var keyNodes = htmlDoc.DocumentNode.SelectNodes("//div[@class='col-md-4']/dl/dt");
+            if (keyNodes == null) return null;
             var valueNodes = htmlDoc.DocumentNode.SelectNodes("//div[@class='col-md-4']/dl/dd");
-
             //其他信息
             for (var i = 0; i < keyNodes.Count; i++)
             {

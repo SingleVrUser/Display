@@ -107,7 +107,7 @@
 
                     <GridView.ItemTemplate>
                         <DataTemplate x:DataType="data:SpiderInfo">
-                            <Grid Width="100" Height="80">
+                            <Grid Width="100" Height="50">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="auto" />
                                     <RowDefinition Height="*" />
@@ -378,8 +378,7 @@
                                  Click="ProgressMore_Click">
                     <FlyoutBase.AttachedFlyout>
                         <Flyout>
-                            <TextBlock x:Name="ProgressMore_TextBlock"
-                                       Text="{x:Bind FailCount_Run.Text,Mode=OneWay}"/>
+                            <TextBlock x:Name="ProgressMore_TextBlock"/>
                         </Flyout>
                     </FlyoutBase.AttachedFlyout>
                 </HyperlinkButton>

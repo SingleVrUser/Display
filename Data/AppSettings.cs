@@ -10,6 +10,23 @@ public class AppSettings
     public static ApplicationDataContainer localSettings { get { return ApplicationData.Current.LocalSettings; } }
 
     /// <summary>
+    /// 是否动态调整图片大小
+    /// </summary>
+    public static bool IsAutoAdjustImageSize
+    {
+        get
+        {
+            bool check = true;
+            if (localSettings.Values["IsAutoAdjustImageSize"] is bool value)
+            {
+                check = value;
+            }
+            return check;
+        }
+        set => localSettings.Values["IsAutoAdjustImageSize"] = value;
+    }
+
+    /// <summary>
     /// 是否检查更新
     /// </summary>
     public static bool IsCheckUpdate

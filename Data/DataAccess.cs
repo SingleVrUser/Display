@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -427,9 +428,6 @@ namespace Data
                 List<string> keyList = new List<string>();
                 foreach (var item in data.GetType().GetProperties())
                 {
-                    ////fl为数组，应添加进新表中，一对多。目前暂不考虑，故跳过
-                    //if (item.Name == "fl") continue;
-
                     keyList.Add($"@{item.Name}");
                 }
 
@@ -438,9 +436,6 @@ namespace Data
 
                 foreach (var item in data.GetType().GetProperties())
                 {
-                    ////fl为数组，应添加进新表中，一对多。目前暂不考虑，故跳过
-                    //if (item.Name == "fl") continue;
-
                     insertCommand.Parameters.AddWithValue("@" + item.Name, $"{item.GetValue(data)}");
                 }
 
@@ -543,7 +538,7 @@ namespace Data
                 insertCommand.Parameters.AddWithValue("@avsox", isSpecialCid && AppSettings.isUseAvSox?"ready": "done");
                 insertCommand.Parameters.AddWithValue("@libre", !isFc && AppSettings.isUseLibreDmm ? "ready" : "done");
                 insertCommand.Parameters.AddWithValue("@fc", isFc && AppSettings.isUseFc2Hub ? "ready" : "done");
-                insertCommand.Parameters.AddWithValue("@db", AppSettings.isUseFc2Hub ? "ready" : "done");
+                insertCommand.Parameters.AddWithValue("@db", AppSettings.isUseJavDB ? "ready" : "done");
                 insertCommand.Parameters.AddWithValue("@done", false);
                 insertCommand.Parameters.AddWithValue("@task_id", task_id);
 
@@ -588,7 +583,7 @@ namespace Data
         }
 
         /// <summary>
-        /// 更新数据信息
+        /// 更新数据信息，VideoInfo的单个字段
         /// </summary>
         /// <param name="truename"></param>
         /// <returns></returns>
@@ -611,6 +606,49 @@ namespace Data
             }
 
             //return data;
+        }
+
+        /// <summary>
+        /// 更新VideoInfo数据（不包括个性化的内容（喜欢，稍后观看，评分））
+        /// </summary>
+        /// <param name="videoInfo"></param>
+        public static void UpdateDataFromVideoInfo(VideoInfo videoInfo)
+        {
+            using (SqliteConnection db =
+              new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand insertCommand = new SqliteCommand();
+                insertCommand.Connection = db;
+
+                //UPDATE VideoInfo SET title = 'SKY-251', title = 'SKY-251' WHERE WHERE truename == 'SKY-251'
+
+                Dictionary<string,Tuple<string,string>> Dict = new();
+                foreach (var item in videoInfo.GetType().GetProperties())
+                {
+                    var name = item.Name;
+
+                    //忽略自定义数据
+                    if (name == "look_later" || name == "score" || name == "is_like")
+                        continue;
+
+                    Dict.Add($"@{name}", new Tuple<string,string>($"{name} = @{name}", $"{item.GetValue(videoInfo)}"));
+                }
+
+                //添加信息，如果已经存在则跳过
+                insertCommand.CommandText = $"UPDATE VideoInfo SET {string.Join(",", Dict.Values.ToList().Select(item => item.Item1))} WHERE truename == @truename";
+
+                foreach (var item in Dict)
+                {
+                    insertCommand.Parameters.AddWithValue(item.Key, item.Value.Item2 );
+                }
+
+
+                insertCommand.ExecuteReader();
+
+                db.Close();
+            }
         }
 
         /// <summary>

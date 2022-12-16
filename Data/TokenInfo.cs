@@ -612,26 +612,31 @@ namespace Data
             //是否显示右上角的标签
             string category = videoinfo.category;
             Visibility isShowLabel = Visibility.Collapsed;
-            string ShowLabel = "";
-            if (category.IndexOf("VR") > 0 || videoinfo.series.IndexOf("VR") > 0)
-            {
-                isShowLabel = Visibility.Visible;
-                ShowLabel = "VR";
-            }
-            else if (category.IndexOf("4K") > 0)
-            {
-                isShowLabel = Visibility.Visible;
-                ShowLabel = "4K";
-            }
 
-            if (videoinfo.releasetime.Contains("/"))
+            string ShowLabel = string.Empty;
+            if (!string.IsNullOrEmpty(category))
             {
-                this.realeaseYear = videoinfo.releasetime.Split('/')[0];
+                if (category.IndexOf("VR") > 0 || videoinfo.series.IndexOf("VR") > 0)
+                {
+                    isShowLabel = Visibility.Visible;
+                    ShowLabel = "VR";
+                }
+                else if (category.IndexOf("4K") > 0)
+                {
+                    isShowLabel = Visibility.Visible;
+                    ShowLabel = "4K";
+                }
+
+                if (videoinfo.releasetime.Contains("/"))
+                {
+                    this.realeaseYear = videoinfo.releasetime.Split('/')[0];
+                }
+                else
+                {
+                    this.realeaseYear = videoinfo.releasetime.Split('-')[0];
+                }
             }
-            else
-            {
-                this.realeaseYear = videoinfo.releasetime.Split('-')[0];
-            }
+            
             this.isShowLabel = isShowLabel;
             this.ShowLabel = ShowLabel;
             this.score = videoinfo.score;
@@ -674,8 +679,8 @@ namespace Data
         //    }
         //}
 
-        private int _imagewidth = 300;
-        public int imagewidth
+        private double _imagewidth = 300;
+        public double imagewidth
         {
             get
             {
@@ -688,8 +693,8 @@ namespace Data
             }
         }
 
-        private int _imageheight = 200;
-        public int imageheight
+        private double _imageheight = 200;
+        public double imageheight
         {
             get
             {

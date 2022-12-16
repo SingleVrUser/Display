@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,16 +21,15 @@ namespace Display.Control;
 
 public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChanged
 {
+    //显示的是匹配成功的还是失败的
     public static readonly DependencyProperty IsShowFailListViewProperty =
     DependencyProperty.Register("IsShowFailListView", typeof(bool), typeof(VideoCoverDisplay), null);
     public static readonly DependencyProperty IsShowFailListButtonProperty =
     DependencyProperty.Register("IsShowFailListButton", typeof(bool), typeof(VideoCoverDisplay), null);
-
     public bool IsShowSuccessListView
     {
         get => !IsShowFailListView;
     }
-
     public bool IsShowFailListView
     {
         get { return (bool)GetValue(IsShowFailListViewProperty); }
@@ -45,10 +45,12 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         set { SetValue(IsShowFailListButtonProperty, value); }
     }
 
+    //本地默认设置
     ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
     ObservableCollection<AccountContentInPage> AccountInPage;
     ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)ApplicationData.Current.LocalSettings.Values["DisplaySettings"];
 
+    //全部数据（匹配成功或失败）
     private List<VideoCoverDisplayClass> _FileGrid;
     public List<VideoCoverDisplayClass> FileGrid
     {
@@ -69,8 +71,16 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         }
     }
 
+    /// <summary>
+    /// 显示的数据（数量小于或等于全部数据）
+    /// 用于分页显示
+    /// </summary>
     public ObservableCollection<VideoCoverDisplayClass> FileGrid_part;
 
+    /// <summary>
+    /// 显示的数据
+    /// 用于增量显示，成功列表
+    /// </summary>
     private Model.IncrementalLoadingdVideoFileCollection _incrementalFileGrid;
     public Model.IncrementalLoadingdVideoFileCollection IncrementalFileGrid
     {
@@ -83,12 +93,10 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         }
     }
 
-    public void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        // Raise the PropertyChanged event, passing the name of the property whose value has changed.
-        this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
+    /// <summary>
+    /// 显示的数据
+    /// 用于增量显示，失败列表
+    /// </summary>
     private Model.IncrementalLoadingdFileCollection _failFileGrid_part;
     public Model.IncrementalLoadingdFileCollection FailFileGrid_part
     {
@@ -102,6 +110,12 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
 
             OnPropertyChanged();
         }
+    }
+
+    public void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        // Raise the PropertyChanged event, passing the name of the property whose value has changed.
+        this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     //item开始Index
@@ -139,10 +153,14 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     //总页数
     private int totalPageCount = 1;
 
+    //图片的最小值
+    private double SliderMinValue = 200;
+    //图片的最大值
+    private double SliderMaxValue = 900;
+
     public VideoCoverDisplay()
     {
         this.InitializeComponent();
-
     }
 
     /// <summary>
@@ -177,8 +195,6 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     /// </summary>
     private void tryDisplayInfo(int newStartValue)
     {
-        //loadData();
-
         //加载全部
         if(LoadAll_ToggleButton.IsChecked == true)
         {
@@ -191,7 +207,6 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
                 {
                     IncrementalFileGrid.Add(item);
                 }
-
             }
             else if (FileGrid.Count != 0)
             {
@@ -286,14 +301,15 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     /// </summary>
     private void LoadDefaultSettings()
     {
+        // 默认值
         // 图片大小，每页显示的最大数量
-        int ImageSize = 350;
+        double ImageSize = 350;
         int CountPerPage = 10;
 
         // 加载应用设置，有则使用，没有则添加
         if (composite != null)
         {
-            ImageSize = composite.ContainsKey("ImageSize") ? (int)composite["ImageSize"] : ImageSize;
+            ImageSize = composite.ContainsKey("ImageSize") ? (double)composite["ImageSize"] : ImageSize;
             CountPerPage = composite.ContainsKey("CountPerPage") ? (int)composite["CountPerPage"] : CountPerPage;
         }
         else
@@ -368,6 +384,8 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         }
     }
 
+    double HorizontalPadding = 6;
+    double markSliderValue;
     /// <summary>
     /// Slider值改变后，调整图片大小
     /// </summary>
@@ -375,23 +393,64 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     /// <param name="e"></param>
     private void Slider_valueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
-        //ObservableCollection<VideoCoverDisplayClass> tmpGrid = new ObservableCollection<VideoCoverDisplayClass>();
-        if (FileGrid == null)
+        markSliderValue = e.NewValue;
+
+        if (IsAutoAdjustImageSize_ToggleButton.IsChecked == true)
         {
-            return;
+            AutoAdjustImageSize();
         }
+        else
+        {
+            AdjustImageSize(e.NewValue);
+        }
+    }
+
+    private void AutoAdjustImageSize(double GridWidth = -1,bool AdjustSliderValue = false)
+    {
+        if(GridWidth == -1)
+            GridWidth = BasicGridView.ActualWidth;
+
+        var ImageCountPerRow = Math.Floor(GridWidth / (markSliderValue + HorizontalPadding));
+        if (ImageCountPerRow <= 0) ImageCountPerRow = 1;
+        System.Diagnostics.Debug.WriteLine($"每行图片数量：{ImageCountPerRow}");
+
+        double newImageWidth = GridWidth / ImageCountPerRow - HorizontalPadding - 2;
+        System.Diagnostics.Debug.WriteLine($"推算出的图片宽度应为：{newImageWidth}");
+
+        //必须要在一定范围内
+
+        if (SliderMinValue <= newImageWidth && newImageWidth <= SliderMaxValue)
+        {
+            if (markSliderValue * 0.5 <= newImageWidth && newImageWidth <= markSliderValue * 1.5)
+            {
+                AdjustImageSize(newImageWidth);
+
+                if(AdjustSliderValue) AdjustSliderValueOnly(newImageWidth);
+            }
+
+            //每行图片最大为1的话，可以缩小到最小值
+            else if (ImageCountPerRow == 1)
+            {
+                AdjustImageSize(newImageWidth);
+
+                if (AdjustSliderValue) AdjustSliderValueOnly(newImageWidth);
+            }
+        }
+    }
+
+    private void AdjustImageSize(double width)
+    {
+        if (FileGrid == null) return;
 
         for (int i = 0; i < FileGrid.Count; i++)
         {
-            FileGrid[i].imagewidth = (int)e.NewValue;
-            FileGrid[i].imageheight = (int)e.NewValue / 3 * 2;
+            FileGrid[i].imagewidth = width;
+            FileGrid[i].imageheight = width / 3 * 2;
         }
 
-        //刷新应用设置
-        //var composite = (ApplicationDataCompositeValue)localSettings.Values["DisplaySettings"];
-        composite["ImageSize"] = (int)e.NewValue;
+        //更改应用设置
+        composite["ImageSize"] = width;
         localSettings.Values["DisplaySettings"] = composite;
-
     }
 
     public event RoutedEventHandler Click;
@@ -456,8 +515,8 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
 
         // 重新显示（按照新的显示数量）
         tryDisplayInfo(startValue);
-
     }
+
 
     /// <summary>
     /// 显示上一页内容
@@ -502,8 +561,8 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     /// <param name="e"></param>
     private void Grid_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        var item = sender as Grid;
-        item.Children[1].Visibility = Visibility.Visible;
+        if(!(sender is Grid grid)) return;
+        grid.Children[1].Visibility = Visibility.Visible;
     }
 
     /// <summary>
@@ -513,8 +572,9 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     /// <param name="e"></param>
     private void Grid_PointerExited(object sender, PointerRoutedEventArgs e)
     {
-        var item = sender as Grid;
-        var CollapsedGrid = item.Children[1] as Grid;
+        if (!(sender is Grid grid)) return;
+        var CollapsedGrid = grid.Children[1] as Grid;
+
         var CommandBarControl = CollapsedGrid.Children.Where(x => x is CommandBar).FirstOrDefault() as CommandBar;
         if (CommandBarControl.IsOpen == false)
         {
@@ -815,15 +875,30 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
 
                 lists.ForEach(datum => FailFileGrid_part.Add(datum));
             }
+            CloseListeningSizeChanged();
         }
         //匹配成功
         else
         {
+            //显示
             IsShowFailListView = false;
+
+            //是否需要动态调整图片大小
+            tryStartListeningSizeChanged();
+
+            //添加数据
             if (FileGrid == null)
             {
                 List<VideoInfo> VideoInfoList = DataAccess.LoadAllVideoInfo(-1);
                 FileGrid = FileMatch.getFileGrid(VideoInfoList);
+
+                //增量加载
+                if (LoadAll_ToggleButton.IsChecked == true)
+                    ShowCount_Control.Visibility = Visibility.Visible;
+                //每页固定加载数
+                else
+                    ShowCount_Control.Visibility = Visibility.Collapsed;
+
             }
             else
             {
@@ -923,6 +998,74 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         if (BasicGridView.ItemsSource is Model.IncrementalLoadingdFileCollection failCollection)
             BasicGridView.ScrollIntoView(failCollection.First());
 
+    }
+
+    /// <summary>
+    /// 打开对Grid大小的监听，以动态调整图片大小
+    /// </summary>
+    public void tryStartListeningSizeChanged()
+    {
+        if(IsAutoAdjustImageSize_ToggleButton.IsChecked == true)
+        {
+            //ImageSizeChangeSlider.IsEnabled= false;
+            BasicGridView.SizeChanged += BasicGridView_SizeChanged;
+        }
+    }
+
+    /// <summary>
+    /// 关闭对Grid大小的监听
+    /// </summary>
+    private void CloseListeningSizeChanged()
+    {
+        //ImageSizeChangeSlider.IsEnabled = true;
+        BasicGridView.SizeChanged -= BasicGridView_SizeChanged;
+    }
+
+    /// <summary>
+    /// 图片模式下根据Grid调整大小
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void BasicGridView_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        double newGridWidth = e.NewSize.Width;
+
+        AutoAdjustImageSize(newGridWidth,true);
+
+    }
+
+    /// <summary>
+    /// 仅仅调整Slider的数值
+    /// </summary>
+    /// <param name="newImageWidth"></param>
+    private void AdjustSliderValueOnly(double newImageWidth)
+    {
+        //更改Slider数值
+        ImageSizeChangeSlider.ValueChanged -= Slider_valueChanged;
+        ImageSizeChangeSlider.Value = newImageWidth;
+        ImageSizeChangeSlider.ValueChanged += Slider_valueChanged;
+    }
+
+    /// <summary>
+    /// 启用图片大小的动态调整
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void AutoAdjustImageSize_ToggleButton_Checked(object sender, RoutedEventArgs e)
+    {
+        tryStartListeningSizeChanged();
+        System.Diagnostics.Debug.WriteLine("启用图片大小的动态调整");
+    }
+
+    /// <summary>
+    /// 关闭图片大小的动态调整
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void AutoAdjustImageSize_ToggleButton_UnChecked(object sender, RoutedEventArgs e)
+    {
+        CloseListeningSizeChanged();
+        System.Diagnostics.Debug.WriteLine("关闭图片大小的动态调整");
     }
 
 }

@@ -1,12 +1,12 @@
-﻿<Window
-    x:Class="Display.MainWindow"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Display"
-    xmlns:customControl="using:Display.Control"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:data="using:Data"
-    mc:Ignorable="d">
+﻿<Window x:Class="Display.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:Display"
+        xmlns:customControl="using:Display.Control"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:data="using:Data"
+        mc:Ignorable="d">
 
     <Grid x:Name="RootGrid">
         <!--标题-->
@@ -17,12 +17,13 @@
               Margin="0,2,0,0">
 
             <Image Source="/Assets/pokeball.png"
-                HorizontalAlignment="Left" 
-                Width="16" Height="16"/>
+                   HorizontalAlignment="Left"
+                   Width="16"
+                   Height="16" />
             <TextBlock  x:Name="AppTitleTextBlock"
                         Text="Display"
                         TextWrapping="NoWrap"
-                        Style="{StaticResource CaptionTextBlockStyle}" 
+                        Style="{StaticResource CaptionTextBlockStyle}"
                         VerticalAlignment="Center"
                         Margin="25,0,0,0" />
         </Grid>
@@ -59,19 +60,32 @@
                 <DataTemplate>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition/>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <TextBlock x:Name="appTitle" Style="{StaticResource TitleTextBlockStyle}"
-                            FontSize="28"
-                            VerticalAlignment="Center"
-                            Text="{Binding}"/>
+                        <TextBlock x:Name="appTitle"
+                                   Style="{StaticResource TitleTextBlockStyle}"
+                                   FontSize="28"
+                                   VerticalAlignment="Center"
+                                   Text="{Binding}" />
 
-                        <HyperlinkButton Margin="10,0" Grid.Column="1" Click="fullScrenWindowButton_Click" Opacity="0.2" PointerEntered="FullScreenButton_PointerEntered" PointerExited="FullScreenButton_PointerExited">
-                            <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE9A6;"/>
+                        <HyperlinkButton Margin="10,0"
+                                         Grid.Column="1"
+                                         Click="fullScrenWindowButton_Click"
+                                         Opacity="0.2"
+                                         PointerEntered="FullScreenButton_PointerEntered"
+                                         PointerExited="FullScreenButton_PointerExited">
+                            <FontIcon
+                                x:Name="FullScreen_FontIcon"
+                                FontFamily="Segoe Fluent Icons"
+                                Foreground="LightGray"
+                                Glyph="&#xE9A6;" />
                         </HyperlinkButton>
-                        <customControl:CustomAutoSuggestBox Grid.Column="2" HorizontalAlignment="Right" SuggestionChosen="SuggestionChosen" QuerySubmitted="CustomAutoSuggestBox_QuerySubmitted"/>
+                        <customControl:CustomAutoSuggestBox Grid.Column="2"
+                                                            HorizontalAlignment="Right"
+                                                            SuggestionChosen="SuggestionChosen"
+                                                            QuerySubmitted="CustomAutoSuggestBox_QuerySubmitted" />
                     </Grid>
                 </DataTemplate>
             </NavigationView.HeaderTemplate>
@@ -79,26 +93,26 @@
             <!--菜单-->
             <NavigationView.MenuItems>
                 <NavigationViewItem Tag="home"
-                                Icon="Home"
-                                Content="主页"/>
-                <NavigationViewItemSeparator/>
-                
+                                    Icon="Home"
+                                    Content="主页" />
+                <NavigationViewItemSeparator />
+
                 <NavigationViewItem Content="展示"
-                                Tag="videoView">
+                                    Tag="videoView">
                     <NavigationViewItem.Icon>
                         <SymbolIcon Symbol="Caption" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
                 <NavigationViewItem Content="演员一览"
-                                Tag="actorsview">
+                                    Tag="actorsview">
                     <NavigationViewItem.Icon>
                         <SymbolIcon Symbol="Contact" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                
+
                 <NavigationViewItem Content="其他"
-                                Tag="more">
+                                    Tag="more">
                     <NavigationViewItem.Icon>
                         <SymbolIcon Symbol="More" />
                     </NavigationViewItem.Icon>
@@ -115,18 +129,34 @@
                 </NavigationViewItem>
             </NavigationView.FooterMenuItems>-->
 
-            <Frame x:Name="ContentFrame" NavigationFailed="ContentFrame_NavigationFailed" Navigated="ContentFrame_Navigated" KeyboardAcceleratorPlacementMode="Hidden">
+            <Frame x:Name="ContentFrame"
+                   NavigationFailed="ContentFrame_NavigationFailed"
+                   Navigated="ContentFrame_Navigated"
+                   KeyboardAcceleratorPlacementMode="Hidden">
                 <Frame.KeyboardAccelerators>
-                    <KeyboardAccelerator Key="Left" Modifiers="Control" Invoked="GoBack_KeyboardAccelerator_Invoked"/>
-                    <KeyboardAccelerator Key="Right" Modifiers="Control" Invoked="GoForward_KeyboardAccelerator_Invoked"/>
+                    <KeyboardAccelerator Key="Left"
+                                         Modifiers="Control"
+                                         Invoked="GoBack_KeyboardAccelerator_Invoked" />
+                    <KeyboardAccelerator Key="Right"
+                                         Modifiers="Control"
+                                         Invoked="GoForward_KeyboardAccelerator_Invoked" />
                 </Frame.KeyboardAccelerators>
             </Frame>
 
         </NavigationView>
 
-        <StackPanel x:Name="DBFileMiss_StackPanel" Canvas.ZIndex="1" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed">
-            <TextBlock FontSize="30" CharacterSpacing="100">数据文件缺失，请以下文件是否存在</TextBlock>
-            <HyperlinkButton FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{x:Bind data:DataAccess.dbpath}" Click="HyperlinkButton_Click"/>
+        <StackPanel x:Name="DBFileMiss_StackPanel"
+                    Canvas.ZIndex="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Visibility="Collapsed">
+            <TextBlock FontSize="30"
+                       CharacterSpacing="100">数据文件缺失，请以下文件是否存在</TextBlock>
+            <HyperlinkButton FontSize="20"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             Content="{x:Bind data:DataAccess.dbpath}"
+                             Click="HyperlinkButton_Click" />
         </StackPanel>
     </Grid>
 </Window>

@@ -1,5 +1,6 @@
 ﻿using Data;
 using Display.ContentsPage;
+using Display.ContentsPage.DetailInfo;
 using Microsoft.UI.Input;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
@@ -7,12 +8,14 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Windows.Foundation.Metadata;
+using static Display.ContentsPage.SpiderVideoInfo.FileStatistics;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -45,7 +48,10 @@ namespace Display.Control
             //标题
             Title_TextBlock.Text = resultinfo.title;
 
+
             //演员
+            //之前有数据，清空
+            if (ActorSatckPanel.Children.Count != 0) ActorSatckPanel.Children.Clear();
             var actorList = resultinfo.actor.Split(',');
             for (var i = 0; i < actorList.Length; i++)
             {
@@ -57,8 +63,10 @@ namespace Display.Control
             }
 
             //标签
-            var categoryList = resultinfo.category.Split(",");
-            for (var i = 0; i < categoryList.Length; i++)
+            //之前有数据，清空
+            if ( CategorySatckPanel.Children.Count != 0) CategorySatckPanel.Children.Clear();
+            var categoryList = resultinfo.category?.Split(",");
+            for (var i = 0; i < categoryList?.Length; i++)
             {
                 // 定义button
                 var hyperButton = new HyperlinkButton() { FontFamily= new FontFamily("霞鹜文楷"),FontWeight = FontWeights.Light };
@@ -102,7 +110,6 @@ namespace Display.Control
                 {
                     ThumbnailList = sampleImageListStr.Split(",").ToList();
                 }
-
             }
 
             if(ThumbnailList.Count > 0)
@@ -117,7 +124,6 @@ namespace Display.Control
         private void GridlLoaded(object sender, RoutedEventArgs e)
         {
             loadData();
-
         }
 
         // 点击了演员更多页
@@ -276,15 +282,75 @@ namespace Display.Control
         ContentsPage.DetailInfo.FindInfoAgainSmoke FindInfoAgainSmoke;
         private void FindAppBarButton_Click(object sender, RoutedEventArgs e)
         {
+            //第一次启动FindInfoAgainSmoke
+            if(FindInfoAgainSmoke == null)
+            {
+
+                FindInfoAgainSmoke = new(resultinfo.truename);
+
+                FindInfoAgainSmoke.ConfirmClick += FindInfoAgainSmoke_ConfirmClick;
+            }
+
+            if (!SmokeGrid.Children.Contains(FindInfoAgainSmoke))
+            {
+                SmokeGrid.Children.Add(FindInfoAgainSmoke);
+                SmokeCancelGrid.Tapped += FindInfoAgainSmokeCancelGrid_Tapped;
+            }
+
             SmokeGrid.Visibility = Visibility.Visible;
+        }
 
-            FindInfoAgainSmoke = new(resultinfo.truename);
-            SmokeGrid.Children.Add(FindInfoAgainSmoke);
+        /// <summary>
+        /// 重新搜刮后选择了选项，并按下了确认键
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FindInfoAgainSmoke_ConfirmClick(object sender, RoutedEventArgs e)
+        {
+            if (!(sender is Button button)) return;
 
-            SmokeCancelGrid.Tapped += FindInfoAgainSmokeCancelGrid_Tapped;
+            //获取最新的信息
+            if(!(button.DataContext is VideoInfo videoInfo)) return;
+
+            //更新数据库
+            DataAccess.UpdateDataFromVideoInfo(videoInfo);
+
+            var newInfo = new VideoCoverDisplayClass(videoInfo);
+
+            ////获取到的videoinfo不含这些（is_like,look_after,socre），用老数据覆盖就行
+            //videoInfo.is_like = resultinfo.is_like;
+            //videoInfo.look_later = resultinfo.look_later;
+            //videoInfo.score = resultinfo.score;
+
+            //更新ResultInfo数据
+            foreach (var item in newInfo.GetType().GetProperties())
+            {
+                var name = item.Name;
+                //忽略自定义数据
+                if (name == "look_later" || name == "score" || name == "is_like")
+                    continue;
+
+                var value = item.GetValue(newInfo);
+
+                var newItem = resultinfo.GetType().GetProperty(name);
+                newItem.SetValue(resultinfo, value);
+            }
+
+            //重新加载数据
+            loadData();
+
+            //退出Smoke
+            FindInfoAgainSmokeCancel();
         }
 
         private void FindInfoAgainSmokeCancelGrid_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            FindInfoAgainSmokeCancel();
+
+            SmokeCancelGrid.Tapped -= FindInfoAgainSmokeCancelGrid_Tapped;
+        }
+
+        private void FindInfoAgainSmokeCancel()
         {
             SmokeGrid.Visibility = Visibility.Collapsed;
 
@@ -292,8 +358,6 @@ namespace Display.Control
             {
                 SmokeGrid.Children.Remove(FindInfoAgainSmoke);
             }
-
-            SmokeCancelGrid.Tapped -= FindInfoAgainSmokeCancelGrid_Tapped;
         }
 
         private async void SmokeGridCancel()

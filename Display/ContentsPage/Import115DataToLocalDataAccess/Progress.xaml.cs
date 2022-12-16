@@ -247,7 +247,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
         private void tryToast(string title, string content)
         {
-            if (!IsToastAfterDone_ToggleSwitch.IsOn) return;
+            if (!AppSettings.ProgressOfImportDataAccess_IsStartSpiderAfterTask) return;
 
             new ToastContentBuilder()
                 .AddArgument("action", "viewConversation")
