@@ -64,10 +64,11 @@
 
         <ListView Grid.Row="2"
                   ItemsSource="{x:Bind VideoInfos}"
-                  CharacterSpacing="5">
+                  x:Name="NewInfo_ListView"
+                  SelectionChanged="NewInfo_ListView_SelectionChanged">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="data:VideoInfo">
-                    <Grid ColumnSpacing="3">
+                    <Grid ColumnSpacing="3" Padding="0,2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="150" />
                             <ColumnDefinition Width="*" />
@@ -126,14 +127,11 @@
                                        Grid.Row="2"
                                        Text="{x:Bind category}"
                                        TextTrimming="CharacterEllipsis"/>
-                            
+
                             <TextBlock Grid.Column="1"
                                        Grid.Row="3"
                                        Text="{x:Bind releasetime}" />
-
                         </Grid>
-
-
 
                     </Grid>
                 </DataTemplate>
@@ -143,6 +141,6 @@
 
         <ProgressRing Grid.Row="2" x:Name="ReCheckProgressRing" Visibility="Collapsed"/>
 
-        <Button Grid.Row="3" Content="确定" HorizontalAlignment="Center" IsEnabled="False"/>
+        <Button x:Name="Confirm_Button" Grid.Row="3" Content="确定" Click="Confirm_Button_Click" HorizontalAlignment="Center" IsEnabled="False"/>
     </Grid>
 </Page>

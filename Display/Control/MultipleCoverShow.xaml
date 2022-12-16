@@ -1,30 +1,34 @@
-﻿<UserControl
-    x:Class="Display.Control.MultipleCoverShow"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Display.Control"
-    xmlns:data="using:Data"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
-    
+﻿<UserControl x:Class="Display.Control.MultipleCoverShow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:Display.Control"
+             xmlns:data="using:Data"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+
     <UserControl.Resources>
-        <Style TargetType="Image" x:Key="newAddCoverResources">
-            <Setter Property="MaxHeight" Value="210"/>
-            <Setter Property="MaxWidth" Value="300"/>
-            <Setter Property="MinHeight" Value="200"/>
-            <Setter Property="MinWidth" Value="300"/>
+        <Style TargetType="Image"
+               x:Key="newAddCoverResources">
+            <Setter Property="MaxHeight"
+                    Value="210" />
+            <Setter Property="MaxWidth"
+                    Value="300" />
+            <Setter Property="MinHeight"
+                    Value="200" />
+            <Setter Property="MinWidth"
+                    Value="300" />
             <Setter Property="Stretch"
-                    Value="UniformToFill"/>
+                    Value="UniformToFill" />
         </Style>
     </UserControl.Resources>
-    
+
     <StackPanel Padding="5">
         <RelativePanel>
             <TextBlock Text="{x:Bind ShowName}"
                        FontSize="18"
                        FontWeight="Bold"
-                       RelativePanel.AlignBottomWithPanel="True"/>
+                       RelativePanel.AlignBottomWithPanel="True" />
 
             <HyperlinkButton RelativePanel.AlignRightWithPanel="True"
                              RelativePanel.AlignVerticalCenterWithPanel="True"
@@ -35,8 +39,15 @@
             </HyperlinkButton>
         </RelativePanel>
         <Grid>
-            <StackPanel x:Name="NewAddStackPanel" BorderBrush="{ThemeResource AppBarBorderThemeBrush}" BorderThickness="1" CornerRadius="5" Margin="5" SizeChanged="NewAddStackPanel_SizeChanged">
-                <FlipView Height="250" ItemsSource="{x:Bind NewAddFlipItems, Mode=OneWay}"  Background="{ThemeResource BreadcrumbBarBackgroundBrush}">
+            <Grid x:Name="NewAddGrid"
+                  BorderBrush="{ThemeResource AppBarBorderThemeBrush}"
+                  BorderThickness="1"
+                  CornerRadius="5"
+                  Margin="5"
+                  SizeChanged="NewAddGrid_SizeChanged">
+                <FlipView Height="250"
+                          ItemsSource="{x:Bind NewAddFlipItems, Mode=OneWay}"
+                          Background="{ThemeResource BreadcrumbBarBackgroundBrush}">
                     <FlipView.ItemTemplate>
                         <DataTemplate x:DataType="data:CoverFlipItems">
                             <GridView ItemsSource="{x:Bind CoverItems,Mode=OneWay}"
@@ -48,7 +59,6 @@
                                 <GridView.ItemTemplate>
                                     <DataTemplate x:DataType="data:VideoCoverDisplayClass">
                                         <Image Height="200"
-                                               
                                                x:Name="showImage"
                                                Style="{StaticResource newAddCoverResources}"
                                                Source="{x:Bind imagepath}"
@@ -57,9 +67,10 @@
                                             <Image.ContextFlyout>
                                                 <!--右键操作-->
                                                 <MenuFlyout>
-                                                    <MenuFlyoutItem Text="移出" IsEnabled="False">
+                                                    <MenuFlyoutItem Text="移出"
+                                                                    IsEnabled="False">
                                                         <MenuFlyoutItem.Icon>
-                                                            <FontIcon Glyph="&#xEE4A;"/>
+                                                            <FontIcon Glyph="&#xEE4A;" />
                                                         </MenuFlyoutItem.Icon>
                                                     </MenuFlyoutItem>
                                                 </MenuFlyout>
@@ -71,13 +82,18 @@
                         </DataTemplate>
                     </FlipView.ItemTemplate>
                 </FlipView>
-            </StackPanel>
-            
+            </Grid>
+
             <!--无内容显示时显示该控件-->
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{x:Bind isContentNull(CoverList.Count),Mode=OneWay}" Opacity="0.2">
-                <TextBlock Text="暂无内容显示" FontSize="40" Opacity="0.5"/>
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Visibility="{x:Bind isContentNull(CoverList.Count),Mode=OneWay}"
+                        Opacity="0.2">
+                <TextBlock Text="暂无内容显示"
+                           FontSize="40"
+                           Opacity="0.5" />
             </StackPanel>
         </Grid>
-        
+
     </StackPanel>
 </UserControl>

@@ -50,8 +50,10 @@ namespace Data
 
             //FC2 / 无分隔符 / HEY / HEYZO / 无字母 / 字母+数字+字母 / 有分隔符但是是特殊字母
             return IsFC2(CID) || !CID.Contains('-') || CID.Contains("HEY") || !Regex.Match(CID, "[A-Z]").Success
-                || Regex.Match(CID, @"[A-Z]\d[A-z]").Success || (CID.Contains('-') && (CID.Contains("SKYHUD-") || CID.Contains("SKY-") || CID.Contains("RED-")));
+                || Regex.Match(CID, @"[A-Z]\d[A-z]").Success || (CID.Contains('-') && Regex.Match(CID, "^SKYHUD-").Success || Regex.Match(CID, "^RED-").Success || Regex.Match(CID, "^SKY-").Success);
         }
+        
+        
 
         /// <summary>
         /// 从文件名中匹配CID名字

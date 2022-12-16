@@ -35,15 +35,14 @@ namespace Display.Views
         /// </summary>
         private void LoadSqlData()
         {
-
+            //显示是本地数据库的
             if (!AppSettings.IsShowFailListInDisplay)
             {
                 List<VideoInfo> VideoInfoList = DataAccess.LoadAllVideoInfo(-1);
                 videoControl.FileGrid = FileMatch.getFileGrid(VideoInfoList);
+                videoControl.tryStartListeningSizeChanged();
             }
-
         }
-
 
         private void SingleVideoPlay_Click(object sender, RoutedEventArgs e)
         {

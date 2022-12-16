@@ -41,7 +41,7 @@ namespace Display.Control
             this.InitializeComponent();
         }
 
-        private void NewAddStackPanel_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void NewAddGrid_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             tryUpdateCoverFlipItems();
         }
@@ -51,11 +51,10 @@ namespace Display.Control
         {
             if (CoverList == null) return;
 
-
             //最大的显示数量
-            int count = ((int)NewAddStackPanel.RenderSize.Width - 20 - 3 * showCount) / 300;
+            int count = ((int)NewAddGrid.RenderSize.Width - 20 - 3 * showCount) / 300;
             //修正item间距
-            count = ((int)NewAddStackPanel.RenderSize.Width - 20 - 3 * count) / 300;
+            count = ((int)NewAddGrid.RenderSize.Width - 20 - 3 * count) / 300;
 
             //什么时候更新封面
             // CoverList增减 / 最适宜显示数量发生改变

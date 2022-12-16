@@ -10,7 +10,7 @@ namespace Display.ContentsPage.DetailInfo
     {
         private string cidName { get; set; }
 
-        private ObservableCollection<VideoInfo> VideoInfos = new();
+        public ObservableCollection<VideoInfo> VideoInfos = new();
 
         public FindInfoAgainSmoke(string cidName)
         {
@@ -24,6 +24,8 @@ namespace Display.ContentsPage.DetailInfo
         private void PageLoaded(object sender, RoutedEventArgs e)
         {
             FindInfos();
+
+            this.Loaded -= PageLoaded;
         }
 
         private GetInfoFromNetwork _searchNetwork;
@@ -45,6 +47,8 @@ namespace Display.ContentsPage.DetailInfo
 
             ReCheckProgressRing.Visibility = Visibility.Visible;
 
+            bool isUseAvSox = FileMatch.IsSpecialCid(cidName);
+
             if (!cidName.ToLower().Contains("fc") && JavBus_CheckBox.IsChecked == true)
             {
                 var info = await SearchNetwork.SearchInfoFromJavBus(cidName);
@@ -57,9 +61,15 @@ namespace Display.ContentsPage.DetailInfo
                 if(info!=null)
                     infos.Add(info);
             }
-            if (!cidName.ToLower().Contains("fc") && AvMoo_CheckBox.IsChecked == true)
+            if (!isUseAvSox && AvMoo_CheckBox.IsChecked == true)
             {
                 var info = await SearchNetwork.SearchInfoFromAvMoo(cidName);
+                if(info!=null)
+                    infos.Add(info);
+            }
+            if (isUseAvSox && AvSox_CheckBox.IsChecked == true)
+            {
+                var info = await SearchNetwork.SearchInfoFromAvSox(cidName);
                 if(info!=null)
                     infos.Add(info);
             }
@@ -72,12 +82,6 @@ namespace Display.ContentsPage.DetailInfo
             if (cidName.ToLower().Contains("fc") && Fc2Hub_CheckBox.IsChecked == true)
             {
                 var info = await SearchNetwork.SearchInfoFromFc2Hub(cidName);
-                if (info != null)
-                    infos.Add(info);
-            }
-            if (AvSox_CheckBox.IsChecked == true)
-            {
-                var info = await SearchNetwork.SearchInfoFromAvSox(cidName);
                 if (info != null)
                     infos.Add(info);
             }
@@ -101,6 +105,42 @@ namespace Display.ContentsPage.DetailInfo
         private void RefreshButtonClicked(object sender, RoutedEventArgs e)
         {
             FindInfos();
+        }
+
+        /// <summary>
+        /// 只有选中了才能按确认键
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NewInfo_ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!(sender is ListView listView))
+                return;
+
+            if(listView.SelectedIndex== -1)
+                Confirm_Button.IsEnabled = false;
+            else
+            {
+                Confirm_Button.IsEnabled = true;
+            }
+        }
+
+        public event RoutedEventHandler ConfirmClick;
+
+        /// <summary>
+        /// 点击确认键替换该番号信息
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Confirm_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(NewInfo_ListView.SelectedItem is VideoInfo videoInfo)) return;
+            if (!(sender is Button button)) return;
+
+            //修改一下
+            button.DataContext= videoInfo;
+
+            ConfirmClick?.Invoke(button, e);
         }
     }
 }

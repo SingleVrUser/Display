@@ -2,15 +2,15 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converter="using:Display.Converter"
+             xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
              xmlns:data="using:Data"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d">
     <UserControl.Resources>
-        <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter"/>
+        <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter" />
     </UserControl.Resources>
-    
-    
+
     <Grid BorderThickness="0,1,0,0"
           Loaded="GridlLoaded"
           RowSpacing="10">
@@ -48,7 +48,7 @@
                        IsTextSelectionEnabled="True"
                        FontFamily="霞鹜文楷"
                        FontWeight="Bold" />
-            
+
             <CommandBar Grid.Column="1"
                         HorizontalAlignment="Right"
                         IsOpen="False"
@@ -92,7 +92,7 @@
                             <FontIcon Glyph="&#xE13B;" />
                         </AppBarToggleButton.Icon>
                     </AppBarToggleButton>
-                    
+
                 </CommandBar.PrimaryCommands>
 
                 <CommandBar.SecondaryCommands>
@@ -104,7 +104,7 @@
                                                  Key="D" />
                         </AppBarButton.KeyboardAccelerators>
                     </AppBarButton>
-                    
+
                     <AppBarButton Icon="Find"
                                   Label="重新搜刮"
                                   Click="FindAppBarButton_Click">
@@ -114,7 +114,7 @@
                         </AppBarButton.KeyboardAccelerators>
                     </AppBarButton>
 
-                    
+
                     <AppBarButton Icon="OpenFile"
                                   Label="文件信息"
                                   Click="MoreInfoAppBarButton_Click">
@@ -178,24 +178,26 @@
                     <!--封面图-->
                     <Grid CornerRadius="4"
                           x:Name="Cover_Grid">
-                        
+
                         <Image x:FieldModifier="public"
                                x:Name="Cover_Image"
                                Source="{x:Bind resultinfo.imagepath,Converter={StaticResource NotExistsImagePathConverter}}"
                                HorizontalAlignment="Left"
                                VerticalAlignment="Center"
                                MaxHeight="780">
-                            
+
                         </Image>
 
-                        <Grid x:Name="VideoPlayIconInCover" Visibility="Collapsed">
+                        <Grid x:Name="VideoPlayIconInCover"
+                              Visibility="Collapsed">
                             <Grid.Background>
-                                <SolidColorBrush Color="Gray" Opacity="0.1"/>
+                                <SolidColorBrush Color="Gray"
+                                                 Opacity="0.1" />
                             </Grid.Background>
                             <FontIcon FontFamily="Segoe Fluent Icons"
                                       Glyph="&#xF5B0;"
                                       Foreground="CornflowerBlue"
-                                      FontSize="50"/>
+                                      FontSize="50" />
                             <Grid.ContextFlyout>
                                 <!--右键操作-->
                                 <MenuFlyout>
@@ -227,31 +229,31 @@
                         <StackPanel Grid.Row="1"
                                     Orientation="Horizontal"
                                     Spacing="10">
-                            <TextBlock Text="{x:Bind resultinfo.truename}"
+                            <TextBlock Text="{x:Bind resultinfo.truename,Mode=OneWay}"
                                        IsTextSelectionEnabled="True"
                                        FontFamily="JetBrains Mono"
                                        FontSize="24"
                                        FontWeight="Bold" />
-                            
-                            <HyperlinkButton NavigateUri="{x:Bind resultinfo.busurl}"
+
+                            <HyperlinkButton NavigateUri="{x:Bind resultinfo.busurl,Mode=OneWay}"
                                              Opacity="1"
                                              CornerRadius="10"
                                              Padding="5">
                                 <FontIcon FontFamily="Segoe Fluent Icons"
                                           Glyph="&#xF6FA;"
                                           Foreground="LightGray"
-                                          Opacity="0.3"/>
+                                          Opacity="0.3" />
                             </HyperlinkButton>
                         </StackPanel>
 
                         <!--发行时间，视频时长-->
                         <StackPanel Grid.Row="2"
                                     Orientation="Horizontal">
-                            <TextBlock Text="{x:Bind resultinfo.releasetime}"
+                            <TextBlock Text="{x:Bind resultinfo.releasetime,Mode=OneWay}"
                                        IsTextSelectionEnabled="True"
                                        FontFamily="霞鹜文楷"
                                        FontWeight="Bold" />
-                            <TextBlock Text="{x:Bind resultinfo.lengthtime}"
+                            <TextBlock Text="{x:Bind resultinfo.lengthtime,Mode=OneWay}"
                                        IsTextSelectionEnabled="True" />
                         </StackPanel>
 
@@ -260,14 +262,7 @@
                                        Value="{x:Bind resultinfo.score,Mode=TwoWay}"
                                        ValueChanged="RatingControl_ValueChanged"
                                        HorizontalAlignment="Left"
-                                       Margin="10,0,0,0">
-                            <RatingControl.Resources>
-                                <SolidColorBrush x:Key="RatingControlSelectedForeground"
-                                                 Color="#f7ba36" />
-                                <SolidColorBrush x:Key="RatingControlUnselectedForeground"
-                                                 Color="#ecf0f1" />
-                            </RatingControl.Resources>
-                        </RatingControl>
+                                       Margin="10,0,0,0" />
 
                         <!--其他信息-->
                         <Grid Grid.Row="4"
@@ -287,7 +282,7 @@
                                     <TextBlock Text="导演"
                                                Style="{StaticResource leftTitle}" />
 
-                                    <TextBlock Text="{x:Bind resultinfo.director}"
+                                    <TextBlock Text="{x:Bind resultinfo.director,Mode=OneWay}"
                                                Padding="50,0,0,0" />
                                 </Grid>
 
@@ -295,7 +290,7 @@
                                     <TextBlock Text="系列"
                                                Style="{StaticResource leftTitle}" />
 
-                                    <TextBlock Text="{x:Bind resultinfo.series}"
+                                    <TextBlock Text="{x:Bind resultinfo.series,Mode=OneWay}"
                                                Padding="50,0,0,0" />
                                 </Grid>
 
@@ -306,7 +301,7 @@
                                     <TextBlock Text="制作商"
                                                Style="{StaticResource leftTitle}" />
 
-                                    <TextBlock Text="{x:Bind resultinfo.producer}"
+                                    <TextBlock Text="{x:Bind resultinfo.producer,Mode=OneWay}"
                                                Padding="60,0,0,0" />
                                 </Grid>
 
@@ -314,7 +309,7 @@
                                     <TextBlock Text="发行商"
                                                Style="{StaticResource leftTitle}" />
 
-                                    <TextBlock Text="{x:Bind resultinfo.publisher}"
+                                    <TextBlock Text="{x:Bind resultinfo.publisher,Mode=OneWay}"
                                                Padding="60,0,0,0" />
                                 </Grid>
 
@@ -372,20 +367,21 @@
                                   ItemClick="ThumbnailGridView_ItemClick">
                             <GridView.ItemTemplate>
                                 <DataTemplate x:DataType="x:String">
-                                    <Image x:Name="Thumbnail_Image"
-                                           Source="{x:Bind Mode=OneWay}"
-                                           Height="120"
-                                           Width="180"
-                                           Stretch="UniformToFill"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"
-                                           PointerEntered="Thumbnail_Image_PointerEntered"
-                                           PointerExited="Thumbnail_Image_PointerExited" />
+                                    <controls:ImageEx x:Name="Thumbnail_Image"
+                                                      Source="{x:Bind Mode=OneWay}"
+                                                      Height="120"
+                                                      Width="180"
+                                                      Stretch="UniformToFill"
+                                                      PlaceholderSource="/Assets/NoPicture.jpg"
+                                                      PlaceholderStretch="Uniform"
+                                                      HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"
+                                                      PointerEntered="Thumbnail_Image_PointerEntered"
+                                                      PointerExited="Thumbnail_Image_PointerExited" />
                                 </DataTemplate>
                             </GridView.ItemTemplate>
                         </GridView>
                     </StackPanel>
-
                 </Grid>
             </ScrollViewer>
 
@@ -397,7 +393,7 @@
                   HorizontalAlignment="Stretch"
                   VerticalAlignment="Stretch"
                   Visibility="Collapsed">
-                
+
                 <Grid x:Name="SmokeCancelGrid">
                     <Grid.Background>
                         <SolidColorBrush Color="{ThemeResource SystemChromeAltHighColor}"
@@ -466,12 +462,9 @@
 
                     </Grid>
                 </Grid>
-                
-                
-                
+
             </Grid>
-            
-            
+
         </Grid>
 
         <TeachingTip x:Name="LightDismissTeachingTip"

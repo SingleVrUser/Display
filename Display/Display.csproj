@@ -54,6 +54,7 @@
     <None Remove="Assets\icons8-circled-play-96.png" />
     <None Remove="Assets\icons8-image-96.png" />
     <None Remove="Assets\icons8-page-96.png" />
+    <None Remove="Assets\ImageExPlaceholder.jpg" />
     <None Remove="Assets\NoPicture.jpg" />
     <None Remove="Assets\SmallTile.scale-100.png" />
     <None Remove="Assets\Svg\accounting_banking_business_calculate_calculator_icon.svg" />

@@ -52,13 +52,15 @@
                                      FontSize="20"
                                      HorizontalContentAlignment="Center"
                                      FontFamily="Segoe Fluent Icons"
-                                     Style="{StaticResource RadioButtonCustomizeStyle}"/>
+                                     Style="{StaticResource RadioButtonCustomizeStyle}"
+                                     ToolTipService.ToolTip="本地数据库"/>
                         <RadioButton x:Name="matchFail_RadioButton"
                                      Content="&#xF45E;"
                                      FontSize="20"
                                      FontFamily="Segoe Fluent Icons"
                                      HorizontalContentAlignment="Center"
-                                     Style="{StaticResource RadioButtonCustomizeStyle}"/>
+                                     Style="{StaticResource RadioButtonCustomizeStyle}"
+                                     ToolTipService.ToolTip="匹配失败"/>
 
                     </RadioButtons>
 
