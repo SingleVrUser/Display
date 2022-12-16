@@ -87,7 +87,7 @@
                                             PlaceholderStretch="UniformToFill"
                                             IsCacheEnabled="True"
                                             EnableLazyLoading="True"
-                                            LazyLoadingThreshold="30"
+                                            LazyLoadingThreshold="300"
                                             Source="{x:Bind imagepath,Converter={StaticResource NotExistsImagePathConverter}}"
                                             Width="{x:Bind imagewidth,Mode=OneWay}"
                                             Height="{x:Bind imageheight,Mode=OneWay}" />
