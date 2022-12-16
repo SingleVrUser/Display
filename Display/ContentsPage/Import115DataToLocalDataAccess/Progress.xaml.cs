@@ -218,6 +218,8 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             // 2.获取数据，获取所有文件的全部信息（大小和数量）
             await webapi.GetAllFileInfoToDataAccess(cidWithoutRootList, new GetFilesProgressInfo(), s_cts.Token, progress);
 
+            if (s_cts.Token.IsCancellationRequested) return;
+
             //搜刮完成,是否自动搜刮
             if (AppSettings.ProgressOfImportDataAccess_IsStartSpiderAfterTask)
             {
