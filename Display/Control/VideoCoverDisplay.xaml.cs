@@ -309,7 +309,16 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         // 加载应用设置，有则使用，没有则添加
         if (composite != null)
         {
-            ImageSize = composite.ContainsKey("ImageSize") ? (double)composite["ImageSize"] : ImageSize;
+            if (composite.ContainsKey("ImageSize"))
+            {
+                var ImageSizeValue = composite["ImageSize"];
+
+                if (ImageSizeValue is int i)
+                    ImageSize = Convert.ToDouble(i);
+                else if (ImageSizeValue is double d)
+                    ImageSize = d;
+            }
+            //ImageSize = composite.ContainsKey("ImageSize") ? (double)composite["ImageSize"] : ImageSize;
             CountPerPage = composite.ContainsKey("CountPerPage") ? (int)composite["CountPerPage"] : CountPerPage;
         }
         else
