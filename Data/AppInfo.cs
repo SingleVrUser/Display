@@ -19,7 +19,7 @@ public static class AppInfo
     public static string GetPackageVersion()
     {
         var appVersion = Package.Current.Id.Version;
-        return $"{appVersion.Major}.{appVersion.Minor}.{appVersion.Build}";
+        return $"{appVersion.Major}.{appVersion.Minor}.{appVersion.Build}.{appVersion.Revision}";
     }
 
     /// <summary>
@@ -44,20 +44,20 @@ public static class AppInfo
         //设置超时时间（5s）
         var option = new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token;
 
-        var req = await Client.GetAsync(LatestReleaseUrl, option);
-
-        if(req.StatusCode == System.Net.HttpStatusCode.OK)
+        try
         {
-            var content = await req.Content.ReadAsStringAsync();
-            try
+            var req = await Client.GetAsync(LatestReleaseUrl, option);
+            if (req.StatusCode == System.Net.HttpStatusCode.OK)
             {
+                var content = await req.Content.ReadAsStringAsync();
                 result = JsonConvert.DeserializeObject<GitHubInfo.ReleaseInfo>(content);
             }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"获取github上最新release时发生错误：{ex.Message}");
-            }
         }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"获取github上最新release时发生错误：{ex.Message}");
+        }
+
 
         return result;
     }

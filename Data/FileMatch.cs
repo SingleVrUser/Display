@@ -225,27 +225,53 @@ namespace Data
         }
 
         //根据类别搜索结果
-        public static List<VideoInfo> getVideoInfoFromType(string type, string keywords)
+        public static List<VideoInfo> getVideoInfoFromType(List<string> types, string keywords)
         {
+            if (types == null) return null;
+
             string trueType;
-            switch (type)
+            //避免重复
+            Dictionary<string,VideoInfo> dicts = new();
+
+            foreach (var type in types)
             {
-                case "番号" or "truename":
-                    trueType = "truename";
-                    break;
-                case "演员" or "actor":
-                    trueType = "actor";
-                    break;
-                case "标签" or "category":
-                    trueType = "category";
-                    break;
-                default:
-                    trueType = "truename";
-                    break;
+                switch (type)
+                {
+                    case "番号" or "truename":
+                        trueType = "truename";
+                        break;
+                    case "演员" or "actor":
+                        trueType = "actor";
+                        break;
+                    case "标签" or "category":
+                        trueType = "category";
+                        break;
+                    case "标题" or "title":
+                        trueType = "title";
+                        break;
+                    case "片商" or "producer":
+                        trueType = "producer";
+                        break;
+                    case "导演" or "director":
+                        trueType = "director";
+                        break;
+                    //失败比较特殊
+                    //从另外的表中查找
+                    case "失败" or "fail":
+                        var failItems = DataAccess.LoadFailFileInfo(n: keywords);
+                        failItems.ForEach(item => dicts.TryAdd(item.n,new(item)));
+                        continue;
+                    default:
+                        trueType = "truename";
+                        break;
+                }
+
+                var newItems = DataAccess.loadVideoInfoBySomeType(trueType, keywords);
+
+                newItems.ForEach(item => dicts.TryAdd(item.truename, item));
             }
 
-            List<VideoInfo> item = DataAccess.loadVideoInfoBySomeType(trueType, keywords);
-            return item;
+            return dicts.Values.ToList();
         }
 
         public static string getVideoPlayUrl(string pickCode)

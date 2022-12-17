@@ -162,7 +162,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 FailListTotalCount_Run.Text = $"/{failCount}";
 
                 //当前显示的
-                var list = await DataAccess.LoadFailFileInfo(0,30);
+                var list = DataAccess.LoadFailFileInfo(0,30);
                 list.ForEach(item => FailList.Add(item));
             }
         }

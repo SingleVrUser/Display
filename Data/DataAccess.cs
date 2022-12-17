@@ -870,11 +870,9 @@ namespace Data
         /// 查询失败列表
         /// </summary>
         /// <returns></returns>
-        public static async Task<List<Datum>> LoadFailFileInfo(int offset = 0, int limit = -1, string n = "")
+        public static List<Datum> LoadFailFileInfo(int offset = 0, int limit = -1, string n = "")
         {
-
             List<Datum> data = new List<Datum>();
-
 
             if (n.Contains("'"))
             {
@@ -893,7 +891,7 @@ namespace Data
                 SqliteCommand selectCommand = new SqliteCommand
                     ($"SELECT * FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{queryStr} LIMIT {limit} offset {offset}", db);
 
-                SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
+                SqliteDataReader query = selectCommand.ExecuteReader();
 
                 while (query.Read())
                 {

@@ -10,6 +10,7 @@ using Org.BouncyCastle.Bcpg.OpenPgp;
 using Windows.ApplicationModel;
 using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
+using Newtonsoft.Json.Linq;
 
 namespace Data
 {
@@ -411,15 +412,33 @@ namespace Data
         public bool session { get; set; } = false;
         public string storeId { get; set; } = null;
         public string value { get; set; }
-
     }
-
 
     /// <summary>
     /// 视频详细信息
     /// </summary>
     public class VideoInfo : INotifyPropertyChanged
     {
+        public VideoInfo()
+        {
+
+        }
+
+        //失败的文件信息（Datum）到VideoInfo
+        //魔改
+        public VideoInfo(Datum failDatum)
+        {
+            this.truename = failDatum.n;
+            this.imagepath = "ms-appx:///Assets/Fail.jpg";
+            this.series = "fail";
+            this.releasetime = failDatum.t;
+            this.imageurl = failDatum.pc;
+            this.look_later = failDatum.s;
+            this.busurl = failDatum.pc;
+            this.category = failDatum.ico;
+        }
+
+
         private string _truename;
         public string truename
         {
@@ -540,7 +559,6 @@ namespace Data
 
         public string busurl { get; set; }
 
-        //public long look_later { get; set; } = 0;
         private long _look_later = 0;
         public long look_later
         {
@@ -616,17 +634,20 @@ namespace Data
             string ShowLabel = string.Empty;
             if (!string.IsNullOrEmpty(category))
             {
-                if (category.IndexOf("VR") > 0 || videoinfo.series.IndexOf("VR") > 0)
+                if (category.Contains("VR") || (!string.IsNullOrEmpty(videoinfo.series) && videoinfo.series.Contains("VR")))
                 {
                     isShowLabel = Visibility.Visible;
                     ShowLabel = "VR";
                 }
-                else if (category.IndexOf("4K") > 0)
+                else if (category.Contains("4K"))
                 {
                     isShowLabel = Visibility.Visible;
                     ShowLabel = "4K";
                 }
+            }
 
+            if (!string.IsNullOrEmpty(releasetime))
+            {
                 if (videoinfo.releasetime.Contains("/"))
                 {
                     this.realeaseYear = videoinfo.releasetime.Split('/')[0];
@@ -636,7 +657,7 @@ namespace Data
                     this.realeaseYear = videoinfo.releasetime.Split('-')[0];
                 }
             }
-            
+
             this.isShowLabel = isShowLabel;
             this.ShowLabel = ShowLabel;
             this.score = videoinfo.score;
@@ -659,25 +680,6 @@ namespace Data
                 OnPropertyChanged();
             }
         }
-
-        ////是否显示已删除
-        //public Visibility isShowDeletedGrid(bool isDeleted)
-        //{
-        //    return isDeleted ? Visibility.Visible : Visibility.Collapsed;
-        //}
-        //private bool _islike;
-        //public bool isLike
-        //{
-        //    get
-        //    {
-        //        return _islike;
-        //    }
-        //    set
-        //    {
-        //        _islike = value;
-        //        OnPropertyChanged();
-        //    }
-        //}
 
         private double _imagewidth = 300;
         public double imagewidth

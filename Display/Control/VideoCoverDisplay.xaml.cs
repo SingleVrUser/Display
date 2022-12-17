@@ -1,5 +1,6 @@
 ﻿using Data;
 using Display.Model;
+using Display.Views;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -21,6 +22,23 @@ namespace Display.Control;
 
 public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChanged
 {
+    //标题
+    public static readonly DependencyProperty TitleProperty =
+    DependencyProperty.Register("Title", typeof(string), typeof(VideoCoverDisplay), null);
+    public string Title
+    {
+        get { return (string)GetValue(TitleProperty); }
+        set { SetValue(TitleProperty, value); }
+    }
+    
+    public static readonly DependencyProperty TitleVisibilityProperty =
+            DependencyProperty.Register("TitleVisibility", typeof(Visibility), typeof(ActorInfoPage), PropertyMetadata.Create(() => Visibility.Collapsed));
+    public Visibility TitleVisibility
+    {
+        get { return (Visibility)GetValue(TitleVisibilityProperty); }
+        set { SetValue(TitleVisibilityProperty, value); }
+    }
+
     //显示的是匹配成功的还是失败的
     public static readonly DependencyProperty IsShowFailListViewProperty =
     DependencyProperty.Register("IsShowFailListView", typeof(bool), typeof(VideoCoverDisplay), null);
@@ -64,6 +82,9 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
                 return;
 
             _FileGrid = value;
+
+            //调整图片大小
+            AutoAdjustImageSize();
 
             tryDisplayInfo(0);
 
@@ -393,7 +414,9 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         }
     }
 
-    double HorizontalPadding = 6;
+    //经验（(padding + 4 或 5)*2）
+    //( 4 + 5 )*2
+    double HorizontalPadding = 18;
     double markSliderValue;
     /// <summary>
     /// Slider值改变后，调整图片大小
@@ -414,8 +437,16 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         }
     }
 
+    /// <summary>
+    /// 动态调整图片大小
+    /// </summary>
+    /// <param name="GridWidth"></param>
+    /// <param name="AdjustSliderValue"></param>
     private void AutoAdjustImageSize(double GridWidth = -1,bool AdjustSliderValue = false)
     {
+        //失败列表不调整
+        if (IsShowFailListView) return;
+
         if(GridWidth == -1)
             GridWidth = BasicGridView.ActualWidth;
 
@@ -423,7 +454,7 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         if (ImageCountPerRow <= 0) ImageCountPerRow = 1;
         System.Diagnostics.Debug.WriteLine($"每行图片数量：{ImageCountPerRow}");
 
-        double newImageWidth = GridWidth / ImageCountPerRow - HorizontalPadding - 2;
+        double newImageWidth = GridWidth / ImageCountPerRow - HorizontalPadding;
         System.Diagnostics.Debug.WriteLine($"推算出的图片宽度应为：{newImageWidth}");
 
         //必须要在一定范围内
@@ -584,11 +615,13 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         if (!(sender is Grid grid)) return;
         var CollapsedGrid = grid.Children[1] as Grid;
 
-        var CommandBarControl = CollapsedGrid.Children.Where(x => x is CommandBar).FirstOrDefault() as CommandBar;
-        if (CommandBarControl.IsOpen == false)
-        {
-            CollapsedGrid.Visibility = Visibility.Collapsed;
-        }
+        CollapsedGrid.Visibility = Visibility.Collapsed;
+
+        //var CommandBarControl = CollapsedGrid.Children.Where(x => x is CommandBar).FirstOrDefault() as CommandBar;
+        //if (CommandBarControl !=null &&  !CommandBarControl.IsOpen)
+        //{
+        //    CollapsedGrid.Visibility = Visibility.Collapsed;
+        //}
     }
 
     private void button_OnPointerEntered(object sender, PointerRoutedEventArgs e)
@@ -753,23 +786,22 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
             case "名称":
                 newGlyph = "\xE185";
                 FileGrid = isUpSort ? new List<VideoCoverDisplayClass>(FileGrid.OrderBy(item => item.truename)) : new List<VideoCoverDisplayClass>(FileGrid.OrderByDescending(item => item.truename));
-                //tryDisplayInfo(0);
+
                 break;
             case "演员":
                 newGlyph = "\xE13D";
                 FileGrid = isUpSort ? new List<VideoCoverDisplayClass>(FileGrid.OrderBy(item => item.actor)) : new List<VideoCoverDisplayClass>(FileGrid.OrderByDescending(item => item.actor));
-                //tryDisplayInfo(0);
+
                 break;
             case "年份":
                 newGlyph = "\xEC92";
                 FileGrid = isUpSort ? new List<VideoCoverDisplayClass>(FileGrid.OrderBy(item => item.realeaseYear)) : new List<VideoCoverDisplayClass>(FileGrid.OrderByDescending(item => item.realeaseYear));
-                //tryDisplayInfo(0);
+
                 break;
             case "随机":
                 newGlyph = "\xF463";
                 Random rnd = new Random();
                 FileGrid = new List<VideoCoverDisplayClass>(FileGrid.OrderByDescending(item => rnd.Next()));
-                //tryDisplayInfo(0);
                 break;
         }
 
@@ -779,6 +811,7 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         {
             orderButton.Content = new FontIcon() { FontFamily = new FontFamily("Segoe Fluent Icons"), Glyph = newGlyph };
         }
+
 
     }
 
@@ -880,7 +913,7 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
 
             if (FailFileGrid_part.Count == 0)
             {
-                var lists = await DataAccess.LoadFailFileInfo(0, 30);
+                var lists = DataAccess.LoadFailFileInfo(0, 30);
 
                 lists.ForEach(datum => FailFileGrid_part.Add(datum));
             }
@@ -956,7 +989,7 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         var checkTest = suggestBox.Text;
 
         FailFileGrid_part = new() { filterName= checkTest};
-        var lists = await DataAccess.LoadFailFileInfo(0,30,checkTest);
+        var lists = DataAccess.LoadFailFileInfo(0, 30, checkTest);
         FailShowCountControl.AllCount = await DataAccess.CheckFailFilesCount(checkTest);
         BasicGridView.ItemsSource = FailFileGrid_part;
         lists.ForEach(datum => FailFileGrid_part.Add(datum));
@@ -1062,7 +1095,11 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     /// <param name="e"></param>
     private void AutoAdjustImageSize_ToggleButton_Checked(object sender, RoutedEventArgs e)
     {
+        //开始监听
         tryStartListeningSizeChanged();
+
+        //初次调整大小
+        AutoAdjustImageSize();
         System.Diagnostics.Debug.WriteLine("启用图片大小的动态调整");
     }
 
@@ -1085,18 +1122,26 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
 /// </summary>
 public class CoverItemTemplateSelector : DataTemplateSelector
 {
-public DataTemplate ImageTemplate { get; set; }
-public DataTemplate WithoutImageTemplate { get; set; }
+    public DataTemplate ImageTemplate { get; set; }
+    public DataTemplate FailCoverTemplate { get; set; }
+    public DataTemplate WithoutImageTemplate { get; set; }
 
-protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
-{
-    if(item is VideoCoverDisplayClass)
+    protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
     {
-        return ImageTemplate;
+        if(item is VideoCoverDisplayClass info)
+        {
+            if(info.series == "fail")
+            {
+                return FailCoverTemplate;
+            }
+            else
+            {
+                return ImageTemplate;
+            }
+        }
+        else
+        {
+            return WithoutImageTemplate;
+        }
     }
-    else
-    {
-        return WithoutImageTemplate;
-    }
-}
 }

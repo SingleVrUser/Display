@@ -48,6 +48,7 @@
     <None Remove="Assets\115\mountain.svg" />
     <None Remove="Assets\115\pic_left_det.svg" />
     <None Remove="Assets\115\QRCode.png" />
+    <None Remove="Assets\Fail.jpg" />
     <None Remove="Assets\FileType\file.png" />
     <None Remove="Assets\FileType\folder.png" />
     <None Remove="Assets\icons8-archive-folder-96.png" />
@@ -127,6 +128,7 @@
 
   <ItemGroup>
     <PackageReference Include="ByteSize" Version="2.1.1" />
+    <PackageReference Include="CommunityToolkit.WinUI.UI.Behaviors" Version="7.1.2" />
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WinUI" Version="2.0.0-beta.330" />

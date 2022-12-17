@@ -39,6 +39,7 @@ namespace Display.Views
             this.InitializeComponent();
         }
 
+
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -60,8 +61,7 @@ namespace Display.Views
                 ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("ForwardConnectedAnimation");
                 if (animation != null)
                 {
-                    animation.TryStart(showNameTextBlock);
-
+                    animation.TryStart(videoControl.showNameTextBlock);
                 }
             }
         }
@@ -71,13 +71,13 @@ namespace Display.Views
             if (item == null) return;
 
             //需要显示的是搜索结果
-            if (item is string[] typeAndName)
+            if (item is Tuple<List<string>,string> typeAndName)
             {
-                string type = typeAndName[0];
-                ShowName = typeAndName[1];
+                List<string> types = typeAndName.Item1;
+                ShowName = typeAndName.Item2;
 
                 //显示的是演员还是标签
-                List<VideoInfo> VideoInfoList = FileMatch.getVideoInfoFromType(type, ShowName);
+                List<VideoInfo> VideoInfoList = FileMatch.getVideoInfoFromType(types, ShowName);
 
                 var newFileGrid = FileMatch.getFileGrid(VideoInfoList);
 
@@ -117,6 +117,14 @@ namespace Display.Views
 
             var VideoPlayButton = (Button)sender;
             var videoInfo = VideoPlayButton.DataContext as VideoCoverDisplayClass;
+
+            //播放失败列表（imgUrl就是pc）
+            if(videoInfo.series == "fail")
+            {
+                Views.DetailInfoPage.PlayeVideo(videoInfo.imageurl, this.XamlRoot);
+                return;
+            }
+
 
             List<Datum> videoInfoList = DataAccess.loadVideoInfoByTruename(videoInfo.truename);
 
