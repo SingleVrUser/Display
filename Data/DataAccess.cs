@@ -870,26 +870,39 @@ namespace Data
         /// 查询失败列表
         /// </summary>
         /// <returns></returns>
-        public static List<Datum> LoadFailFileInfo(int offset = 0, int limit = -1, string n = "")
+        public static List<Datum> LoadFailFileInfo(int offset = 0, int limit = -1, string n = null, string orderBy = null, bool isDesc = false)
         {
             List<Datum> data = new List<Datum>();
 
-            if (n.Contains("'"))
-            {
-                n = n.Replace("'", "%");
-            }
-
-            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
                new SqliteConnection($"Filename={dbpath}"))
             {
                 db.Open();
 
+                string orderStr = string.Empty;
+                if (!string.IsNullOrEmpty(orderBy))
+                {
+                    if(orderBy == "random")
+                    {
+                        orderStr = " ORDER BY RANDOM()";
+                    }
+                    else
+                    {
+                        if (isDesc)
+                        {
+                            orderStr = $" ORDER BY {orderBy} DESC";
+                        }
+                        else
+                        {
+                            orderStr = $" ORDER BY {orderBy}";
+                        }
+                    }
+                }
 
-                string queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n}%'";
+                string queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n.Replace("'", "%")}%'";
 
                 SqliteCommand selectCommand = new SqliteCommand
-                    ($"SELECT * FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{queryStr} LIMIT {limit} offset {offset}", db);
+                    ($"SELECT * FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{queryStr}{orderStr} LIMIT {limit} offset {offset} ", db);
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
 

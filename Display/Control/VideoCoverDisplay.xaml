@@ -28,6 +28,150 @@
                          Color="#70a1ff"
                          Opacity="0.8" />
 
+        <!--成功排序-->
+        <Flyout x:Key="SuccessOrderFlyout" Placement="Bottom">
+            <Flyout.FlyoutPresenterStyle>
+                <Style TargetType="FlyoutPresenter">
+                    <Setter Property="Padding"
+                                            Value="2" />
+                    <Setter Property="CornerRadius"
+                                            Value="5" />
+                </Style>
+            </Flyout.FlyoutPresenterStyle>
+
+            <ListView IsItemClickEnabled="True"
+                                      ItemClick="OrderSuccessListView_ItemClick">
+                <ListView.Resources>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Orientation"
+                                                Value="Horizontal" />
+                        <Setter Property="Spacing"
+                                                Value="5" />
+                    </Style>
+                    <Style x:Key="UpOrDownSortStyle"
+                                           TargetType="FontIcon">
+                        <Setter Property="Foreground"
+                                                Value="Gray" />
+                        <Setter Property="FontWeight"
+                                                Value="ExtraLight" />
+                        <Setter Property="Opacity"
+                                                Value="0.5" />
+                    </Style>
+                </ListView.Resources>
+                <ListView.Items>
+                    <StackPanel>
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xE185;" />
+                        <TextBlock Text="名称" />
+                        <FontIcon Style="{StaticResource UpOrDownSortStyle}"
+                                                  FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xE015;" />
+                    </StackPanel>
+
+                    <StackPanel>
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xE13D;" />
+                        <TextBlock Text="演员" />
+                        <FontIcon Style="{StaticResource UpOrDownSortStyle}"
+                                                  FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xE015;" />
+                    </StackPanel>
+                    
+                    <StackPanel>
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xEC92;" />
+                        <TextBlock Text="年份" />
+                        <FontIcon Style="{StaticResource UpOrDownSortStyle}"
+                                                  FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xE015;" />
+                    </StackPanel>
+
+                    <StackPanel>
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xF463;" />
+                        <TextBlock Text="随机" />
+                        <FontIcon Style="{StaticResource UpOrDownSortStyle}"
+                                                  FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xF143;" />
+                    </StackPanel>
+
+                </ListView.Items>
+            </ListView>
+        </Flyout>
+
+        <!--失败排序-->
+        <Flyout x:Key="FailOrderFlyout" Placement="Bottom">
+            <Flyout.FlyoutPresenterStyle>
+                <Style TargetType="FlyoutPresenter">
+                    <Setter Property="Padding"
+                                            Value="2" />
+                    <Setter Property="CornerRadius"
+                                            Value="5" />
+                </Style>
+            </Flyout.FlyoutPresenterStyle>
+
+            <ListView IsItemClickEnabled="True"
+                                      ItemClick="OrderFailListView_ItemClick">
+                <ListView.Resources>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Orientation"
+                                                Value="Horizontal" />
+                        <Setter Property="Spacing"
+                                                Value="5" />
+                    </Style>
+                    <Style x:Key="UpOrDownSortStyle"
+                                           TargetType="FontIcon">
+                        <Setter Property="Foreground"
+                                                Value="Gray" />
+                        <Setter Property="FontWeight"
+                                                Value="ExtraLight" />
+                        <Setter Property="Opacity"
+                                                Value="0.5" />
+                    </Style>
+                </ListView.Resources>
+                <ListView.Items>
+                    <StackPanel>
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xE185;" />
+                        <TextBlock Text="名称" />
+                        <FontIcon Style="{StaticResource UpOrDownSortStyle}"
+                                                  FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xE015;" />
+                    </StackPanel>
+                    
+                    <StackPanel>
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xE2AD;" />
+                        <TextBlock Text="时间" />
+                        <FontIcon Style="{StaticResource UpOrDownSortStyle}"
+                                                  FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xE015;" />
+                    </StackPanel>
+
+                    <StackPanel>
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xEB05;" />
+                        <TextBlock Text="大小" />
+                        <FontIcon Style="{StaticResource UpOrDownSortStyle}"
+                                                  FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xE015;" />
+                    </StackPanel>
+
+
+                    <StackPanel>
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xF463;" />
+                        <TextBlock Text="随机" />
+                        <FontIcon Style="{StaticResource UpOrDownSortStyle}"
+                                                  FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xF143;" />
+                    </StackPanel>
+
+                </ListView.Items>
+            </ListView>
+        </Flyout>
+
+
         <converter:BytesToSizeStrConverter x:Key="BytesToSizeStrConverter" />
         <converter:BoolToVisiableConverter x:Key="BoolToVisiableConverter" />
         <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter" />
@@ -470,8 +614,6 @@
             </Grid>
         </DataTemplate>
 
-
-
         <local:CoverItemTemplateSelector x:Key="CoverItemTemplateSelector"
                                          ImageTemplate="{StaticResource ImageTemplate}"
                                          FailCoverTemplate="{StaticResource FailCoverTemplate}"
@@ -597,7 +739,7 @@
             <StackPanel Margin="0,0,0,-20"
                         Orientation="Horizontal">
 
-                <AppBarButton x:Name="orderButton"
+                <AppBarButton x:Name="OrderButton"
                               IsCompact="True">
 
                     <ToolTipService.ToolTip>
@@ -607,76 +749,7 @@
                         <FontIcon FontFamily="Segoe Fluent Icons"
                                   Glyph="&#xE174;" />
                     </AppBarButton.Content>
-                    <AppBarButton.Flyout>
-                        <Flyout Placement="Bottom">
-                            <Flyout.FlyoutPresenterStyle>
-                                <Style TargetType="FlyoutPresenter">
-                                    <Setter Property="Padding"
-                                            Value="2" />
-                                    <Setter Property="CornerRadius"
-                                            Value="5" />
-                                </Style>
-                            </Flyout.FlyoutPresenterStyle>
-                            <ListView IsItemClickEnabled="True"
-                                      ItemClick="orderListView_ItemClick">
-                                <ListView.Resources>
-                                    <Style TargetType="StackPanel">
-                                        <Setter Property="Orientation"
-                                                Value="Horizontal" />
-                                        <Setter Property="Spacing"
-                                                Value="5" />
-                                    </Style>
-                                    <Style x:Key="UpOrDownSortStyle"
-                                           TargetType="FontIcon">
-                                        <Setter Property="Foreground"
-                                                Value="Gray" />
-                                        <Setter Property="FontWeight"
-                                                Value="ExtraLight" />
-                                        <Setter Property="Opacity"
-                                                Value="0.5" />
-                                    </Style>
-                                </ListView.Resources>
-                                <ListView.Items>
-                                    <StackPanel>
-                                        <FontIcon FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xE185;" />
-                                        <TextBlock Text="名称" />
-                                        <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                                  FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xE015;" />
-                                    </StackPanel>
 
-                                    <StackPanel>
-                                        <FontIcon FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xE13D;" />
-                                        <TextBlock Text="演员" />
-                                        <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                                  FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xE015;" />
-                                    </StackPanel>
-
-                                    <StackPanel>
-                                        <FontIcon FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xEC92;" />
-                                        <TextBlock Text="年份" />
-                                        <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                                  FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xE015;" />
-                                    </StackPanel>
-
-                                    <StackPanel>
-                                        <FontIcon FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xF463;" />
-                                        <TextBlock Text="随机" />
-                                        <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                                  FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xF143;" />
-                                    </StackPanel>
-
-                                </ListView.Items>
-                            </ListView>
-                        </Flyout>
-                    </AppBarButton.Flyout>
                 </AppBarButton>
 
                 <ToggleSwitch x:Name="ShowType_ToggleSwitch"

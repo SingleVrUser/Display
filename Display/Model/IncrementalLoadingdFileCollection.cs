@@ -21,9 +21,12 @@ public class IncrementalLoadingdFileCollection : ObservableCollection<Datum>, IS
         return InnerLoadMoreItemsAsync(count).AsAsyncOperation();
     }
 
+    public string OrderBy { get; set; }
+    public bool IsDesc { get; set; }
+
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        var failLists = DataAccess.LoadFailFileInfo(Items.Count, (int)count, filterName);
+        var failLists = DataAccess.LoadFailFileInfo(Items.Count, (int)count, filterName, OrderBy, IsDesc);
         
         if (failLists.Count < count)
         {

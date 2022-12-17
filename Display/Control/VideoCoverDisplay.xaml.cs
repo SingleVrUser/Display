@@ -48,15 +48,36 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     {
         get => !IsShowFailListView;
     }
+
+    /// <summary>
+    /// 当前显示失败列表
+    /// </summary>
     public bool IsShowFailListView
     {
         get { return (bool)GetValue(IsShowFailListViewProperty); }
         set
         {
+            if (IsShowFailListView == value) return;
+
             SetValue(IsShowFailListViewProperty, value);
+
             OnPropertyChanged(nameof(IsShowSuccessListView));
+
+            //显示失败的排序
+            if (IsShowFailListView)
+            {
+                OrderButton.Flyout = this.Resources["FailOrderFlyout"] as Flyout;
+            }
+            //显示成功的排序
+            else
+            {
+                OrderButton.Flyout = this.Resources["SuccessOrderFlyout"] as Flyout;
+            }
         }
     }
+    /// <summary>
+    /// 当前显示成功列表
+    /// </summary>
     public bool IsShowFailListButton
     {
         get { return (bool)GetValue(IsShowFailListButtonProperty); }
@@ -68,7 +89,7 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     ObservableCollection<AccountContentInPage> AccountInPage;
     ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)ApplicationData.Current.LocalSettings.Values["DisplaySettings"];
 
-    //全部数据（匹配成功或失败）
+    //全部数据（只有匹配成功的）
     private List<VideoCoverDisplayClass> _FileGrid;
     public List<VideoCoverDisplayClass> FileGrid
     {
@@ -216,30 +237,40 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     /// </summary>
     private void tryDisplayInfo(int newStartValue)
     {
-        //加载全部
+        //加载全部（成功列表/失败列表）
         if(LoadAll_ToggleButton.IsChecked == true)
         {
-            if (IncrementalFileGrid != null)
+            //失败列表（不应该出现在这里）
+            if (IsShowFailListView)
             {
-                IncrementalFileGrid = new(FileGrid);
-                BasicGridView.ItemsSource = IncrementalFileGrid;
-
-                foreach (var item in FileGrid.Skip(0).Take(30))
-                {
-                    IncrementalFileGrid.Add(item);
-                }
+                return;
             }
-            else if (FileGrid.Count != 0)
+            //成功列表
+            else
             {
-                IncrementalFileGrid = new(FileGrid);
-
-                foreach (var item in FileGrid.Skip(0).Take(30))
+                if (IncrementalFileGrid != null)
                 {
-                    IncrementalFileGrid.Add(item);
+                    IncrementalFileGrid = new(FileGrid);
+                    BasicGridView.ItemsSource = IncrementalFileGrid;
+
+                    foreach (var item in FileGrid.Skip(0).Take(30))
+                    {
+                        IncrementalFileGrid.Add(item);
+                    }
                 }
-                BasicGridView.ItemsSource = IncrementalFileGrid;
+                else if (FileGrid.Count != 0)
+                {
+                    IncrementalFileGrid = new(FileGrid);
+
+                    foreach (var item in FileGrid.Skip(0).Take(30))
+                    {
+                        IncrementalFileGrid.Add(item);
+                    }
+                    BasicGridView.ItemsSource = IncrementalFileGrid;
+                }
             }
         }
+        //分页加载（仅成功列表）
         else
         {
             if (ContentAcountListView.SelectedItem == null)
@@ -254,7 +285,6 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
             totalPageCount = (int)Math.Ceiling((double)FileGrid.Count / showCountInPage);
             DisplayInfoPerPage(newStartValue);
         }
-
     }
 
     private void DisplayInfoPerPage(int newStartValue)
@@ -751,11 +781,11 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
     }
 
     /// <summary>
-    /// 选择当前页的最大显示数量
+    /// 按类型排序（用于成功列表）
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void orderListView_ItemClick(object sender, ItemClickEventArgs e)
+    private void OrderSuccessListView_ItemClick(object sender, ItemClickEventArgs e)
     {
         ListView selectListView = (ListView)sender;
         var clickStackPanel = (e.ClickedItem as StackPanel);
@@ -806,12 +836,90 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         }
 
         //更新首图标
-        FontIcon orderFontIcon = orderButton.Content as FontIcon;
+        FontIcon orderFontIcon = OrderButton.Content as FontIcon;
         if (orderFontIcon.Glyph != newGlyph)
         {
-            orderButton.Content = new FontIcon() { FontFamily = new FontFamily("Segoe Fluent Icons"), Glyph = newGlyph };
+            OrderButton.Content = new FontIcon() { FontFamily = new FontFamily("Segoe Fluent Icons"), Glyph = newGlyph };
         }
 
+
+    }
+
+
+    private string FailListOrderBy;
+    private bool FailListIsDesc;
+
+    /// <summary>
+    /// 按类型排序（用于失败列表）
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void OrderFailListView_ItemClick(object sender, ItemClickEventArgs e)
+    {
+        ListView selectListView = (ListView)sender;
+        var clickStackPanel = (e.ClickedItem as StackPanel);
+        var selectTextBlock = clickStackPanel.Children.Where(x => x is TextBlock).First() as TextBlock;
+        string selectOrderText = selectTextBlock.Text;
+        FontIcon lastFontIcon = clickStackPanel.Children.Where(x => x is FontIcon).Last() as FontIcon;
+
+        string upGlyph = "\xE014";
+        string downGlyph = "\xE015";
+        string newGlyph;
+
+        //是否是升序
+        bool isUpSort = lastFontIcon.Glyph == upGlyph;
+        FailListIsDesc = !isUpSort;
+
+        //更新降序或升序图标
+        //注意：随机 无需升/降序
+        if (selectListView.SelectedItem == e.ClickedItem && selectOrderText != "随机")
+        {
+            lastFontIcon.Glyph = isUpSort ? downGlyph : upGlyph;
+        }
+
+        //现图标
+        isUpSort = lastFontIcon.Glyph == upGlyph;
+
+        switch (selectOrderText)
+        {
+            case "名称":
+                newGlyph = "\xE185";
+                FailListOrderBy = "n";
+                break;
+            case "大小":
+                newGlyph = "\xEB05";
+                FailListOrderBy = "s";
+                break;
+            case "时间":
+                newGlyph = "\xE2AD";
+                FailListOrderBy = "tp";
+                break;
+            case "随机":
+                newGlyph = "\xF463";
+                FailListOrderBy = "random";
+                break;
+            default:
+                newGlyph = "\xE185";
+                FailListOrderBy = "n";
+                break;
+        }
+        //更新首图标
+        FontIcon orderFontIcon = OrderButton.Content as FontIcon;
+        if (orderFontIcon.Glyph != newGlyph)
+        {
+            OrderButton.Content = new FontIcon() { FontFamily = new FontFamily("Segoe Fluent Icons"), Glyph = newGlyph };
+        }
+
+        //更新数据
+        FailFileGrid_part.Clear();
+
+        //考虑当前是不是搜索过的
+        if (!string.IsNullOrEmpty(localCheckText))
+            FailFileGrid_part.filterName = localCheckText;
+        FailFileGrid_part.OrderBy = FailListOrderBy;
+        FailFileGrid_part.IsDesc = FailListIsDesc;
+        List<Datum> lists = DataAccess.LoadFailFileInfo(0, 30, localCheckText, orderBy: FailListOrderBy, isDesc: FailListIsDesc);
+        lists.ForEach(datum => FailFileGrid_part.Add(datum));
 
     }
 
@@ -928,7 +1036,7 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
             //是否需要动态调整图片大小
             tryStartListeningSizeChanged();
 
-            //添加数据
+            //之前没有数据
             if (FileGrid == null)
             {
                 List<VideoInfo> VideoInfoList = DataAccess.LoadAllVideoInfo(-1);
@@ -942,6 +1050,7 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
                     ShowCount_Control.Visibility = Visibility.Collapsed;
 
             }
+            //之前有数据
             else
             {
                 //增量加载
@@ -981,16 +1090,18 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         grid.Scale = new System.Numerics.Vector3(1.0f);
     }
 
+
+    private string localCheckText;
     private async void FileAutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
         if (!(sender is AutoSuggestBox suggestBox))
             return;
 
-        var checkTest = suggestBox.Text;
+        localCheckText = suggestBox.Text;
 
-        FailFileGrid_part = new() { filterName= checkTest};
-        var lists = DataAccess.LoadFailFileInfo(0, 30, checkTest);
-        FailShowCountControl.AllCount = await DataAccess.CheckFailFilesCount(checkTest);
+        FailFileGrid_part = new() { filterName= localCheckText ,OrderBy = FailListOrderBy, IsDesc = FailListIsDesc };
+        var lists = DataAccess.LoadFailFileInfo(0, 30, localCheckText,FailListOrderBy,FailListIsDesc);
+        FailShowCountControl.AllCount = await DataAccess.CheckFailFilesCount(localCheckText);
         BasicGridView.ItemsSource = FailFileGrid_part;
         lists.ForEach(datum => FailFileGrid_part.Add(datum));
 
@@ -1011,7 +1122,6 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
 
         BasicGridView.ItemsSource = IncrementalFileGrid;
         tryDisplayInfo(0);
-
 
     }
 
@@ -1113,7 +1223,6 @@ public sealed partial class VideoCoverDisplay : UserControl,INotifyPropertyChang
         CloseListeningSizeChanged();
         System.Diagnostics.Debug.WriteLine("关闭图片大小的动态调整");
     }
-
 }
 
 
