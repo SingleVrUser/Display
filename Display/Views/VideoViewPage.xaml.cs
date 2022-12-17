@@ -35,6 +35,7 @@ namespace Display.Views
         /// </summary>
         private void LoadSqlData()
         {
+            //显示成功列表
             //显示是本地数据库的
             if (!AppSettings.IsShowFailListInDisplay)
             {
