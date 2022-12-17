@@ -62,7 +62,6 @@
                         <ToolTipService.ToolTip>
                             <ToolTip x:Uid="playToolTip" />
                         </ToolTipService.ToolTip>
-
                     </AppBarButton>
 
                     <!--下载-->

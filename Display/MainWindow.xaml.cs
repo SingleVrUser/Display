@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using Windows.Storage;
 using Windows.System;
+using static QRCoder.PayloadGenerator;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -269,11 +270,20 @@ namespace Display
         {
             var nowItem = args.SelectedItem as VideoInfo;
 
-            //点击了 “未找到”
+            //点击了某个选项
             if (nowItem != null)
             {
-                var newItem = new VideoCoverDisplayClass(nowItem);
-                ContentFrame.Navigate(typeof(DetailInfoPage), newItem, new SuppressNavigationTransitionInfo());
+                //选中的是失败项
+                if(nowItem.series == "fail")
+                {
+                    Views.DetailInfoPage.PlayeVideo(nowItem.busurl, ((Page)ContentFrame.Content).XamlRoot);
+                }
+                //正常点击
+                else
+                {
+                    var newItem = new VideoCoverDisplayClass(nowItem);
+                    ContentFrame.Navigate(typeof(DetailInfoPage), newItem, new SuppressNavigationTransitionInfo());
+                }
             }
         }
 
@@ -284,9 +294,9 @@ namespace Display
         /// <param name="args"></param>
         private void CustomAutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
-            string type = sender.DataContext as string;
+            var types = sender.DataContext as List<string>;
 
-            ContentFrame.Navigate(typeof(ActorInfoPage), new string[] { type, sender.Text }, new SuppressNavigationTransitionInfo());
+            ContentFrame.Navigate(typeof(ActorInfoPage), new Tuple<List<string>, string>(types, sender.Text), new SuppressNavigationTransitionInfo());
         }
 
         /// <summary>

@@ -22,6 +22,5 @@ namespace Display.WindowView
             appwindow.SetIcon(Path.Combine(Package.Current.InstalledLocation.Path, "Assets/pokeball.ico"));
         }
 
-
     }
 }

@@ -8,27 +8,13 @@
       mc:Ignorable="d">
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-
-        <StackPanel HorizontalAlignment="Center"
-                    Margin="10">
-            <TextBlock x:Name="showNameTextBlock"
-                       Text="{x:Bind ShowName,Mode=OneWay}"
-                       FontSize="25"
-                       IsTextSelectionEnabled="True"
-                       Style="{ThemeResource FlyoutPickerTitleTextBlockStyle}"
-                       FontFamily="霞鹜文楷"
-                       FontWeight="Bold" />
-        </StackPanel>
-
         <control:VideoCoverDisplay Grid.Row="1"
                                    x:Name="videoControl"
                                    Click="{x:Bind OnClicked}"
                                    VideoPlayClick="{x:Bind VideoPlay_Click}"
-                                   IsShowFailListView="False"/>
+                                   IsShowFailListView="False"
+                                   Title="{x:Bind ShowName,Mode=OneWay}"
+                                   TitleVisibility="Visible"/>
 
     </Grid>
 </Page>

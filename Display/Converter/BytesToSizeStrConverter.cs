@@ -17,7 +17,19 @@ public class BytesToSizeStrConverter : IValueConverter
             return string.Empty;
         }
 
-        var size = ByteSize.FromBytes((long)value);
+        ByteSize size;
+        if (value is double doubleValue)
+        {
+            size = ByteSize.FromBytes(doubleValue);
+        }
+        else if (value is long longValue)
+        {
+            size = ByteSize.FromBytes(longValue);
+        }
+        else
+        {
+            size = new(0);
+        }
 
         return size.ToString("#.#");
     }

@@ -23,7 +23,7 @@ public class IncrementalLoadingdFileCollection : ObservableCollection<Datum>, IS
 
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        var failLists = await DataAccess.LoadFailFileInfo(Items.Count, (int)count, filterName);
+        var failLists = DataAccess.LoadFailFileInfo(Items.Count, (int)count, filterName);
         
         if (failLists.Count < count)
         {
