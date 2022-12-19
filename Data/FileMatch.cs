@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using Windows.Storage;
 using Windows.System;
@@ -191,14 +192,15 @@ namespace Data
         /// </summary>
         /// <param name="VideoInfoList"></param>
         /// <returns></returns>
-        public static List<VideoCoverDisplayClass> getFileGrid(List<VideoInfo> VideoInfoList)
+        public static List<VideoCoverDisplayClass> getFileGrid(List<VideoInfo> VideoInfoList, double imgwidth, double imgheight)
         {
             List<VideoCoverDisplayClass> FileGrid = new();
 
             // VR 和 4K 类别在右上角显示标签
+            // 初始化为图片大小
             for (var i = 0; i < VideoInfoList.Count; i++)
             {
-                VideoCoverDisplayClass info = new(VideoInfoList[i]);
+                VideoCoverDisplayClass info = new(VideoInfoList[i], imgwidth,imgheight);
                 FileGrid.Add(info);
             }
 
@@ -225,7 +227,7 @@ namespace Data
         }
 
         //根据类别搜索结果
-        public static List<VideoInfo> getVideoInfoFromType(List<string> types, string keywords)
+        public static async Task<List<VideoInfo>> getVideoInfoFromType(List<string> types, string keywords)
         {
             if (types == null) return null;
 
@@ -258,7 +260,7 @@ namespace Data
                     //失败比较特殊
                     //从另外的表中查找
                     case "失败" or "fail":
-                        var failItems = DataAccess.LoadFailFileInfo(n: keywords);
+                        var failItems = await DataAccess.LoadFailFileInfo(n: keywords);
                         failItems.ForEach(item => dicts.TryAdd(item.n,new(item)));
                         continue;
                     default:

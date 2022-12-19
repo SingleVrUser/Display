@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:Display.Control"
              xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+             xmlns:customcontrols="using:Display.Control"
             xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
             xmlns:behaviors="using:CommunityToolkit.WinUI.UI.Behaviors"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -28,17 +29,18 @@
                          Color="#70a1ff"
                          Opacity="0.8" />
 
-        <!--成功排序-->
-        <Flyout x:Key="SuccessOrderFlyout" Placement="Bottom">
-            <Flyout.FlyoutPresenterStyle>
-                <Style TargetType="FlyoutPresenter">
-                    <Setter Property="Padding"
-                                            Value="2" />
-                    <Setter Property="CornerRadius"
-                                            Value="5" />
-                </Style>
-            </Flyout.FlyoutPresenterStyle>
 
+
+        <!--排列Flyout的样式-->
+        <Style TargetType="FlyoutPresenter" x:Key="OrderFlyoutPresenterStyle">
+            <Setter Property="Padding"
+                                            Value="2" />
+            <Setter Property="CornerRadius"
+                                            Value="5" />
+        </Style>
+
+        <!--成功排序-->
+        <Flyout x:Key="SuccessOrderFlyout" Placement="Bottom" FlyoutPresenterStyle="{StaticResource OrderFlyoutPresenterStyle}">
             <ListView IsItemClickEnabled="True"
                                       ItemClick="OrderSuccessListView_ItemClick">
                 <ListView.Resources>
@@ -76,7 +78,7 @@
                                                   FontFamily="Segoe Fluent Icons"
                                                   Glyph="&#xE015;" />
                     </StackPanel>
-                    
+
                     <StackPanel>
                         <FontIcon FontFamily="Segoe Fluent Icons"
                                                   Glyph="&#xEC92;" />
@@ -100,15 +102,7 @@
         </Flyout>
 
         <!--失败排序-->
-        <Flyout x:Key="FailOrderFlyout" Placement="Bottom">
-            <Flyout.FlyoutPresenterStyle>
-                <Style TargetType="FlyoutPresenter">
-                    <Setter Property="Padding"
-                                            Value="2" />
-                    <Setter Property="CornerRadius"
-                                            Value="5" />
-                </Style>
-            </Flyout.FlyoutPresenterStyle>
+        <Flyout x:Key="FailOrderFlyout" Placement="Bottom" FlyoutPresenterStyle="{StaticResource OrderFlyoutPresenterStyle}">
 
             <ListView IsItemClickEnabled="True"
                                       ItemClick="OrderFailListView_ItemClick">
@@ -138,7 +132,7 @@
                                                   FontFamily="Segoe Fluent Icons"
                                                   Glyph="&#xE015;" />
                     </StackPanel>
-                    
+
                     <StackPanel>
                         <FontIcon FontFamily="Segoe Fluent Icons"
                                                   Glyph="&#xE2AD;" />
@@ -170,7 +164,6 @@
                 </ListView.Items>
             </ListView>
         </Flyout>
-
 
         <converter:BytesToSizeStrConverter x:Key="BytesToSizeStrConverter" />
         <converter:BoolToVisiableConverter x:Key="BoolToVisiableConverter" />
@@ -232,7 +225,7 @@
                                             IsCacheEnabled="True"
                                             EnableLazyLoading="True"
                                             LazyLoadingThreshold="300"
-                                            Source="{x:Bind imagepath,Converter={StaticResource NotExistsImagePathConverter}}"
+                                            Source="{x:Bind imagepath}"
                                             Width="{x:Bind imagewidth,Mode=OneWay}"
                                             Height="{x:Bind imageheight,Mode=OneWay}" />
 
@@ -500,13 +493,11 @@
                                MinHeight="{x:Bind imageheight,Mode=OneWay}">
 
                         </Image>
-                        <TextBlock Text="{x:Bind truename}" TextWrapping="Wrap"/>
+                        <TextBlock Text="{x:Bind truename}" TextWrapping="Wrap" MaxWidth="{x:Bind imagewidth,Mode=OneWay}"/>
                     </Grid>
 
                     <!--可操作按钮-->
-                    <Grid Visibility="Collapsed"
-                          Width="{x:Bind imagewidth,Mode=OneWay}"
-                          Height="{x:Bind imageheight,Mode=OneWay}">
+                    <Grid Visibility="Collapsed">
                         <Grid.Background>
                             <SolidColorBrush Color="Gray"
                                              Opacity="0.1" />
@@ -618,50 +609,6 @@
                                          ImageTemplate="{StaticResource ImageTemplate}"
                                          FailCoverTemplate="{StaticResource FailCoverTemplate}"
                                          WithoutImageTemplate="{StaticResource ListTemplate}" />
-
-        <!--每页显示数量-->
-        <Flyout x:Name="PageFlyout">
-            <Flyout.FlyoutPresenterStyle>
-                <Style TargetType="FlyoutPresenter">
-                    <Setter Property="Padding"
-                            Value="0" />
-                    <Setter Property="CornerRadius"
-                            Value="5" />
-                </Style>
-            </Flyout.FlyoutPresenterStyle>
-            <StackPanel>
-                <ListView x:Name="ContentAcountListView"
-                          SelectionMode="Single">
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="data:AccountContentInPage">
-                            <RelativePanel>
-                                <TextBlock Text="{x:Bind ContentAcount}"
-                                           RelativePanel.AlignLeftWithPanel="True" />
-                                <Button Click="DeleteButton_Click"
-                                        RelativePanel.AlignRightWithPanel="True"
-                                        Style="{StaticResource ButtonRevealStyle}">
-                                    <Button.Background>
-                                        <SolidColorBrush Opacity="0" />
-                                    </Button.Background>
-                                    <FontIcon FontFamily="Segoe Fluent Icons"
-                                              Glyph="&#xE106;"
-                                              FontSize="10"
-                                              Margin="0" />
-                                </Button>
-                            </RelativePanel>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-                <NumberBox x:Name="AddAccountPage_NumberBox"
-                           PlaceholderText="500"
-                           ValueChanged="AddAccountPage_NumberBox_ValueChanged"
-                           ValidationMode="InvalidInputOverwritten"
-                           SpinButtonPlacementMode="Compact"
-                           LargeChange="50"
-                           SmallChange="50" />
-            </StackPanel>
-        </Flyout>
-
     </Control.Resources>
 
     <Grid>
@@ -669,6 +616,7 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
@@ -683,6 +631,7 @@
         <!--搜索框（匹配失败列表显示时显示）-->
         <local:FileAutoSuggestBox Grid.Row="1"
                                   Margin="10,2"
+                                  x:Name="FailInfoSuggestBox"
                                   TextChanged="FileAutoSuggestBox_TextChanged"
                                   Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}" />
 
@@ -696,7 +645,7 @@
             </interactivity:Interaction.Behaviors>
 
             <GridView.Header>
-                <Grid Visibility="{x:Bind TitleVisibility}" MinHeight="40" Background="{StaticResource FocusVisualWhiteStrokeThemeBrush}">
+                <Grid Visibility="{x:Bind IsShowSearchListView}" MinHeight="40" Background="{StaticResource FocusVisualWhiteStrokeThemeBrush}">
                     <TextBlock
                         x:FieldModifier="public"
                         x:Name="showNameTextBlock"
@@ -714,7 +663,7 @@
             <GridView.ItemContainerStyle>
                 <Style TargetType="GridViewItem">
                     <Setter Property="Margin"
-                            Value="5,0" />
+                            Value="5,2" />
 
                     <!--取消GridView悬停效果-->
                     <Setter Property="Template">
@@ -732,15 +681,19 @@
 
         </GridView>
 
+        <!--筛选栏，默认隐藏-->
+        <customcontrols:InfoListFilter Grid.Row="3" Visibility="{x:Bind Filter_ToggleButton.IsChecked,Mode=OneWay}" Height="35" Padding="5,2,0,0"/>
+
         <!--页面跳转栏-->
-        <RelativePanel Grid.Row="3"
+        <RelativePanel Grid.Row="4"
                        Margin="0,0,10,0">
 
             <StackPanel Margin="0,0,0,-20"
                         Orientation="Horizontal">
 
                 <AppBarButton x:Name="OrderButton"
-                              IsCompact="True">
+                              IsCompact="True"
+                              Flyout="{StaticResource SuccessOrderFlyout}">
 
                     <ToolTipService.ToolTip>
                         <ToolTip x:Uid="sortToolTip" />
@@ -752,104 +705,75 @@
 
                 </AppBarButton>
 
+                <ToggleButton x:Name="Filter_ToggleButton" Margin="0,0,0,15" IsEnabled="True" BorderThickness="0"
+                              FontFamily="Segoe Fluent Icons" Content="&#xE16E;" FontSize="18" Foreground="Gray"
+                              Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay}"/>
+
                 <ToggleSwitch x:Name="ShowType_ToggleSwitch"
                               VerticalAlignment="Center"
-                              Margin="0,0,0,15"
-                              Toggled="ShowType_ToggleSwitch_Toggled"
+                              Margin="4,0,0,15"
                               OnContent="匹配失败"
                               OffContent="匹配成功"
                               Opacity="0.3"
                               PointerEntered="ShowType_ToggleSwitch_PointerEntered"
                               PointerExited="ShowType_ToggleSwitch_PointerExited"
                               IsOn="{x:Bind IsShowFailListView,Mode=TwoWay}"
-                              Visibility="{x:Bind IsShowFailListButton}">
+                              Visibility="{x:Bind IsShowSucAndFailSwitchButton}">
                 </ToggleSwitch>
 
             </StackPanel>
 
-            <StackPanel RelativePanel.AlignRightWithPanel="True"
+            <Grid RelativePanel.AlignRightWithPanel="True"
+                        RelativePanel.AlignVerticalCenterWithPanel="True">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="140"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid ColumnSpacing="8"
                         Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}"
-                        Orientation="Horizontal"
-                        RelativePanel.AlignVerticalCenterWithPanel="True"
-                        ContextFlyout="{StaticResource PageFlyout}"
-                        Spacing="2">
-
-                <StackPanel Orientation="Horizontal"
-                            Margin="20,0">
-                    <TextBlock x:Name="result_textblock" />
-
+                      BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                      BorderThickness="1" Padding="8,0,3,0" CornerRadius="14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
                     <Slider x:Name="ImageSizeChangeSlider"
                             Grid.Row="0"
                             Minimum="{x:Bind SliderMinValue}"
                             Maximum="{x:Bind SliderMaxValue}"
-                            ValueChanged="Slider_valueChanged"
-                            AutomationProperties.Name="simple slider"
-                            Width="200" />
-                </StackPanel>
+                            Width="200"/>
 
-                <ToggleButton x:Name="IsAutoAdjustImageSize_ToggleButton"
+                    <ToggleButton x:Name="IsAutoAdjustImageSize_ToggleButton"
+                                  Grid.Column="1"
                               Content="&#xE167;"
                               FontFamily="Segoe Fluent Icons"
                               IsChecked="{x:Bind data:AppSettings.IsAutoAdjustImageSize,Mode=TwoWay}"
                               Checked="AutoAdjustImageSize_ToggleButton_Checked"
                               Unchecked="AutoAdjustImageSize_ToggleButton_UnChecked"
-                              ToolTipService.ToolTip="动态调整图片大小" />
-
-                <!--加载全部-->
-                <ToggleButton x:Name="LoadAll_ToggleButton"
-                              Content="&#xE10C;"
-                              FontFamily="Segoe Fluent Icons"
-                              IsChecked="{x:Bind data:AppSettings.IsIncrementalShowInDisplay,Mode=TwoWay}"
-                              Checked="LoadAll_ToggleButton_Checked"
-                              Unchecked="LoadAll_ToggleButton_UnChecked"
-                              ToolTipService.ToolTip="加载全部" />
-
-                <Grid Width="150">
-                    <StackPanel x:Name="PageControl_StackPanel"
-                                Visibility="Collapsed"
-                                Orientation="Horizontal"
-                                HorizontalAlignment="Center"
-                                Spacing="2">
-                        <!--上一页-->
-                        <Button Click="PreviousPageButton"
-                                CornerRadius="6"
-                                Padding="5">
-                            <FontIcon FontFamily="Segoe Fluent Icons"
-                                      Glyph="&#xE096;" />
-                        </Button>
-                        <TextBox x:FieldModifier="public"
-                                 x:Name="nowPageTextBox"
-                                 Text="1"
-                                 KeyDown="nowPageTextBox_KeyDown"
-                                 ContextFlyout="{StaticResource PageFlyout}" />
-
-                        <!--下一页-->
-                        <Button Click="NextPageButton"
-                                CornerRadius="6"
-                                Padding="5">
-                            <FontIcon FontFamily="Segoe Fluent Icons"
-                                      Glyph="&#xE097;" />
-                        </Button>
-                    </StackPanel>
-
-                    <local:ShowCountControl x:Name="ShowCount_Control"
-                                            CurrentCount="{x:Bind IncrementalFileGrid.Count,Mode=OneWay}"
-                                            AllCount="{x:Bind  FileGrid.Count,Mode=OneWay}"
-                                            Clicked="ToTopButton_Click"
-                                            Visibility="Collapsed" />
-
+                              ToolTipService.ToolTip="动态调整图片大小"
+                                  CornerRadius="11"/>
                 </Grid>
 
-            </StackPanel>
+                <Grid Width="140" Grid.Column="1" x:FieldModifier="public" x:Name="PageShow_Grid">
+                    <local:ShowCountControl x:Name="SuccesShowCount_Control"
+                                            CurrentCount="{x:Bind SuccessInfoCollection.Count,Mode=OneWay}"
+                                            AllCount="{x:Bind SuccessInfoCollection.AllCount,Mode=OneWay}"
+                                            Clicked="ToTopButton_Click"
+                                            Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay}"
+                                            HorizontalAlignment="Right"/>
 
-            <Grid Width="150"
-                  RelativePanel.AlignRightWithPanel="True"
-                  RelativePanel.AlignVerticalCenterWithPanel="True"
-                  Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}">
-                <local:ShowCountControl x:Name="FailShowCountControl"
-                                        CurrentCount="{x:Bind FailFileGrid_part.Count,Mode=OneWay}"
-                                        Clicked="ToTopButton_Click" />
+                    <local:ShowCountControl x:Name="FailShowCountControl"
+                                        CurrentCount="{x:Bind FailInfoCollection.Count,Mode=OneWay}"
+                                        AllCount="{x:Bind FailInfoCollection.AllCount,Mode=OneWay}"
+                                        Visibility="{x:Bind IsShowFailListView,Mode=OneWay}"
+                                        Clicked="ToTopButton_Click"
+                                        HorizontalAlignment="Right"/>
+                </Grid>
+
             </Grid>
+
         </RelativePanel>
     </Grid>
 </UserControl>

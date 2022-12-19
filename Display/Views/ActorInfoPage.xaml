@@ -13,8 +13,7 @@
                                    Click="{x:Bind OnClicked}"
                                    VideoPlayClick="{x:Bind VideoPlay_Click}"
                                    IsShowFailListView="False"
-                                   Title="{x:Bind ShowName,Mode=OneWay}"
-                                   TitleVisibility="Visible"/>
+                                   IsShowSearchListView="True"/>
 
     </Grid>
 </Page>

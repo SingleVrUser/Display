@@ -315,22 +315,15 @@ namespace Display.Control
             //更新数据库
             DataAccess.UpdateDataFromVideoInfo(videoInfo);
 
-            var newInfo = new VideoCoverDisplayClass(videoInfo);
-
-            ////获取到的videoinfo不含这些（is_like,look_after,socre），用老数据覆盖就行
-            //videoInfo.is_like = resultinfo.is_like;
-            //videoInfo.look_later = resultinfo.look_later;
-            //videoInfo.score = resultinfo.score;
-
             //更新ResultInfo数据
-            foreach (var item in newInfo.GetType().GetProperties())
+            foreach (var item in videoInfo.GetType().GetProperties())
             {
                 var name = item.Name;
                 //忽略自定义数据
                 if (name == "look_later" || name == "score" || name == "is_like")
                     continue;
 
-                var value = item.GetValue(newInfo);
+                var value = item.GetValue(videoInfo);
 
                 var newItem = resultinfo.GetType().GetProperty(name);
                 newItem.SetValue(resultinfo, value);

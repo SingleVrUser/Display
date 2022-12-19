@@ -25,25 +25,8 @@ namespace Display.Views
             //启动缓存（为了返回无需过长等待，也为了返回动画）
             NavigationCacheMode = Microsoft.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
 
-            //加载数据
-            LoadSqlData();
-
         }
 
-        /// <summary>
-        /// 从数据库中加载数据
-        /// </summary>
-        private void LoadSqlData()
-        {
-            //显示成功列表
-            //显示是本地数据库的
-            if (!AppSettings.IsShowFailListInDisplay)
-            {
-                List<VideoInfo> VideoInfoList = DataAccess.LoadAllVideoInfo(-1);
-                videoControl.FileGrid = FileMatch.getFileGrid(VideoInfoList);
-                videoControl.tryStartListeningSizeChanged();
-            }
-        }
 
         private void SingleVideoPlay_Click(object sender, RoutedEventArgs e)
         {
@@ -132,7 +115,7 @@ namespace Display.Views
                 }
                 else
                 {
-                    animation.TryStart(videoControl.nowPageTextBox);
+                    animation.TryStart(videoControl.PageShow_Grid);
                 }
             }
         }

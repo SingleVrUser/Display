@@ -49,7 +49,7 @@ namespace Display.Views
             }
             else if(e.Parameter is VideoInfo videoinfo)
             {
-                DetailInfo = new(videoinfo);
+                DetailInfo = new(videoinfo,500,300);
             }
 
             var anim = ConnectedAnimationService.GetForCurrentView().GetAnimation("ForwardConnectedAnimation");
@@ -94,12 +94,12 @@ namespace Display.Views
         {
             var clickButton = (sender as Grid);
             string actorName = clickButton.DataContext as string;
-            string[] TypeAndName = { "actor", actorName };
+            Tuple<List<string>, string> TypesAndName = new(new() { "actor" }, actorName);
 
             //准备动画
             ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", clickButton);
             animation.Configuration = new BasicConnectedAnimationConfiguration();
-            Frame.Navigate(typeof(ActorInfoPage), TypeAndName);
+            Frame.Navigate(typeof(ActorInfoPage), TypesAndName);
         }
 
         /// <summary>
@@ -111,11 +111,11 @@ namespace Display.Views
         {
             var clickButton = sender as HyperlinkButton;
             string LabelName = clickButton.Content as string;
-            string[] TypeAndName = { "category", LabelName };
+            Tuple<List<string>, string> TypesAndName = new(new() { "category" }, LabelName);
 
             ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", clickButton);
             animation.Configuration = new BasicConnectedAnimationConfiguration();
-            Frame.Navigate(typeof(ActorInfoPage), TypeAndName);
+            Frame.Navigate(typeof(ActorInfoPage), TypesAndName);
         }
 
         /// <summary>

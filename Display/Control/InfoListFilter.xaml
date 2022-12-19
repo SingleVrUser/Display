@@ -1,0 +1,78 @@
+﻿<!-- Copyright (c) Microsoft Corporation and Contributors. -->
+<!-- Licensed under the MIT License. -->
+
+<UserControl
+    x:Class="Display.Control.InfoListFilter"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Display.Control"
+    xmlns:sys="using:System"
+    xmlns:datahelper="using:Data.Helper"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+
+        <!--筛选Flyout的样式-->
+        <Style TargetType="FlyoutPresenter" x:Key="FilterFlyoutPresenterStyle">
+            <Setter Property="Padding" Value="10,-3,10,3" />
+            <Setter Property="CornerRadius" Value="5" />
+        </Style>
+    </UserControl.Resources>
+    
+    <Grid ColumnSpacing="5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+
+        <ToggleSplitButton Content="年份" Grid.Column="0">
+            <ToggleSplitButton.Flyout>
+                <Flyout FlyoutPresenterStyle="{StaticResource FilterFlyoutPresenterStyle}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+
+                        <RadioButtons>
+                            <RadioButton Content="{x:Bind sys:DateTime.Now.Year}"/>
+                            <RadioButton Content="{x:Bind datahelper:MatchHelper.Int32Subtract(sys:DateTime.Now.Year,1)}"/>
+                            <RadioButton Content="{x:Bind datahelper:MatchHelper.Int32Subtract(sys:DateTime.Now.Year,2)}"/>
+                            <RadioButton x:Name="customTimeRange_RadioButton" Content="自定义年份"/>
+                        </RadioButtons>
+
+                        <TextBox Grid.Row="1" Visibility="{x:Bind customTimeRange_RadioButton.IsChecked,Mode=OneWay}" PlaceholderText="{x:Bind datahelper:MatchHelper.Int32Subtract(sys:DateTime.Now.Year,3)}"/>
+                    </Grid>
+                </Flyout>
+            </ToggleSplitButton.Flyout>
+        </ToggleSplitButton>
+        <ToggleSplitButton Content="评分" Grid.Column="1">
+            <ToggleSplitButton.Flyout>
+                <Flyout FlyoutPresenterStyle="{StaticResource FilterFlyoutPresenterStyle}">
+                    <RadioButtons>
+                        <RadioButton Content="5星" IsChecked="False"/>
+                        <RadioButton Content="4星" IsChecked="False"/>
+                        <RadioButton Content="3星" IsChecked="False"/>
+                        <RadioButton Content="2星" IsChecked="False"/>
+                        <RadioButton Content="1星" IsChecked="False"/>
+                        <RadioButton Content="未评分" IsChecked="False"/>
+                    </RadioButtons>
+                </Flyout>
+            </ToggleSplitButton.Flyout>
+        </ToggleSplitButton>
+
+        <ToggleSplitButton Content="类别" Grid.Column="2">
+            <ToggleSplitButton.Flyout>
+                <Flyout FlyoutPresenterStyle="{StaticResource FilterFlyoutPresenterStyle}">
+                    <RadioButtons>
+                        <RadioButton Content="骑兵" IsChecked="False"/>
+                        <RadioButton Content="步兵" IsChecked="False"/>
+                    </RadioButtons>
+                </Flyout>
+            </ToggleSplitButton.Flyout>
+        </ToggleSplitButton>
+    </Grid>
+</UserControl>

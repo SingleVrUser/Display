@@ -19,7 +19,7 @@ namespace Display.Control
         }
 
         //输入的Text改变
-        private void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        private async void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput && sender.Text != "")
             {
@@ -30,7 +30,7 @@ namespace Display.Control
 
                 var Selectedtypes = GetSelectedTypes();
 
-                List<VideoInfo> item = FileMatch.getVideoInfoFromType(Selectedtypes, searchText);
+                List<VideoInfo> item = await FileMatch.getVideoInfoFromType(Selectedtypes, searchText);
 
                 if (item.Count == 0)
                 {
@@ -53,8 +53,9 @@ namespace Display.Control
         private List<string> GetSelectedTypes()
         {
             var AllSelectedButtons = GetAllSelectedMethodButton();
-            var Selectedtypes = AllSelectedButtons.Where(item => item.IsChecked).ToList().Select(item => item.Text).ToList();
+            var Selectedtypes = AllSelectedButtons.Where(item => item.IsChecked).ToList().Select(item => item.Tag.ToString() ).ToList();
 
+            
             return Selectedtypes;
         }
 
@@ -67,8 +68,10 @@ namespace Display.Control
                 sender.DataContext = GetSelectedTypes();
 
                 //只有查询到才跳转
-                if (sender.ItemsSource is List<VideoInfo> videoInfos && videoInfos.Count > 0 )
+                if (sender.ItemsSource is List<VideoInfo> videoInfos && videoInfos.Count > 0)
+                {
                     QuerySubmitted?.Invoke(sender, args);
+                }
             }
 
             //初始化搜索框
@@ -171,11 +174,6 @@ namespace Display.Control
 
         }
 
-        private void ChangedToFailFindMethod_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         /// <summary>
         /// 切换搜索范围
         /// 右键多选
@@ -193,7 +191,7 @@ namespace Display.Control
             //加上或减去当前选中或取消项
             int selectedCount = item.IsChecked ? selectedList.Count - 1 : selectedList.Count + 1;
 
-            System.Diagnostics.Debug.WriteLine($"当前选中的数量：{selectedCount}");
+            //System.Diagnostics.Debug.WriteLine($"当前选中的数量：{selectedCount}");
 
             //不能不选，不做任何改变
             if (selectedCount == 0)

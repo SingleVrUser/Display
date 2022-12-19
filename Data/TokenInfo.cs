@@ -613,7 +613,7 @@ namespace Data
             OnPropertyChanged();
         }
 
-        public VideoCoverDisplayClass(VideoInfo videoinfo)
+        public VideoCoverDisplayClass(VideoInfo videoinfo,double imgwidth,double imgheight)
         {
             foreach (var VideoInfoItem in videoinfo.GetType().GetProperties())
             {
@@ -661,6 +661,10 @@ namespace Data
             this.isShowLabel = isShowLabel;
             this.ShowLabel = ShowLabel;
             this.score = videoinfo.score;
+
+            //图片大小
+            this.imageheight = imgheight;
+            this.imagewidth = imgwidth;
         }
 
         public string realeaseYear { get; set; }
@@ -681,7 +685,7 @@ namespace Data
             }
         }
 
-        private double _imagewidth = 300;
+        private double _imagewidth;
         public double imagewidth
         {
             get
@@ -695,7 +699,7 @@ namespace Data
             }
         }
 
-        private double _imageheight = 200;
+        private double _imageheight;
         public double imageheight
         {
             get

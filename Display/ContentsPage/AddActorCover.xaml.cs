@@ -48,7 +48,7 @@ namespace Display.ContentsPage
 
         private async void Grid_Loaded(object sender, RoutedEventArgs e)
         {
-            List<VideoInfo> VideoInfoList = await Task.Run(() => DataAccess.LoadAllVideoInfo(-1));
+            List<VideoInfo> VideoInfoList = await Task.Run(() => DataAccess.LoadVideoInfo(-1));
 
             foreach (var VideoInfo in VideoInfoList)
             {

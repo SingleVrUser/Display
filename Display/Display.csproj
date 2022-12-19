@@ -84,6 +84,7 @@
     <None Remove="Control\CustomAutoSuggestBox.xaml" />
     <None Remove="Control\Explorer.xaml" />
     <None Remove="Control\FileAutoSuggestBox.xaml" />
+    <None Remove="Control\InfoListFilter.xaml" />
     <None Remove="Control\MultipleCoverShow.xaml" />
     <None Remove="Control\ShowCountControl.xaml" />
     <None Remove="Control\StatusShow.xaml" />
@@ -311,6 +312,9 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="Control\InfoListFilter.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="ContentsPage\UpdateAppPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

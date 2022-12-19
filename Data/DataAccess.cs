@@ -870,7 +870,7 @@ namespace Data
         /// 查询失败列表
         /// </summary>
         /// <returns></returns>
-        public static List<Datum> LoadFailFileInfo(int offset = 0, int limit = -1, string n = null, string orderBy = null, bool isDesc = false)
+        public static async Task<List<Datum>> LoadFailFileInfo(int offset = 0, int limit = -1, string n = null, string orderBy = null, bool isDesc = false)
         {
             List<Datum> data = new List<Datum>();
 
@@ -904,7 +904,7 @@ namespace Data
                 SqliteCommand selectCommand = new SqliteCommand
                     ($"SELECT * FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{queryStr}{orderStr} LIMIT {limit} offset {offset} ", db);
 
-                SqliteDataReader query = selectCommand.ExecuteReader();
+                SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
 
                 while (query.Read())
                 {
@@ -921,9 +921,9 @@ namespace Data
         /// </summary>
         /// <param name="n"></param>
         /// <returns></returns>
-        public static async Task<int> CheckFailFilesCount(string n = "")
+        public static int CheckFailFilesCount(string n = "")
         {
-            if (n.Contains("'"))
+            if (!string.IsNullOrEmpty(n) && n.Contains("'"))
             {
                 n = n.Replace("'", "%");
             }
@@ -939,7 +939,7 @@ namespace Data
                 SqliteCommand selectCommand = new SqliteCommand
                     ($"SELECT COUNT(n) FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{queryStr}", db);
 
-                SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
+                SqliteDataReader query = selectCommand.ExecuteReader();
 
                 query.Read();
                 count = query.GetInt32(0);
@@ -949,6 +949,96 @@ namespace Data
 
             return count;
         }
+
+
+        /// <summary>
+        /// 检查VideoInfo表的数量
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        public static int CheckVideoInfoCount(string orderBy = null, bool isDesc = false, List<string> filterConditionList = null, string filterKeywords = null)
+        {
+            int count = 0;
+            using (SqliteConnection db =
+               new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                //排序
+                string orderStr = string.Empty;
+                if (!string.IsNullOrEmpty(orderBy))
+                {
+                    if (orderBy == "random")
+                    {
+                        orderStr = " ORDER BY RANDOM() ";
+                    }
+                    else
+                    {
+                        if (isDesc)
+                        {
+                            orderStr = $" ORDER BY {orderBy} DESC ";
+                        }
+                        else
+                        {
+                            orderStr = $" ORDER BY {orderBy} ";
+                        }
+                    }
+                }
+
+                //筛选
+                string filterStr = string.Empty;
+                if (filterConditionList != null)
+                {
+                    List<string> filterList = new();
+                    foreach (var item in filterConditionList)
+                    {
+                        switch (item)
+                        {
+                            case "look_after":
+                                filterList.Add($"{item} != 0");
+                                break;
+                            case "fail":
+                                var failCount = CheckFailFilesCount(n: filterKeywords);
+                                count += failCount;
+                                break;
+                            default:
+                                filterList.Add($"{item} LIKE '%{filterKeywords}%'");
+                                break;
+                        }
+                    }
+
+                    if (filterList.Count > 0)
+                    {
+                        filterStr = $" WHERE {string.Join(" OR ", filterList)} ";
+
+                        SqliteCommand selectCommand = new SqliteCommand
+                            ($"SELECT COUNT(truename) from VideoInfo{filterStr}{orderStr}", db);
+
+                        SqliteDataReader query = selectCommand.ExecuteReader();
+
+                        query.Read();
+                        count += query.GetInt32(0);
+                        query.Close();
+                    }
+                }
+                else
+                {
+                    SqliteCommand selectCommand = new SqliteCommand
+                        ($"SELECT COUNT(truename) from VideoInfo{orderStr}", db);
+
+                    SqliteDataReader query = selectCommand.ExecuteReader();
+
+                    query.Read();
+                    count = query.GetInt32(0);
+                    query.Close();
+                }
+
+                db.Close();
+            }
+
+            return count;
+        }
+
 
         /// <summary>
         /// 查询最近一次的未完成搜刮记录
@@ -1099,7 +1189,7 @@ namespace Data
         /// </summary>
         /// <param name="limit"></param>
         /// <returns></returns>
-        public static List<VideoInfo> LoadAllVideoInfo(int limit = 1, int offset = 0)
+        public static async Task<List<VideoInfo>> LoadVideoInfo(int limit = 1, int offset = 0, string orderBy = null, bool isDesc = false, List<string> filterConditionList = null,string filterKeywords = null)
         {
             List<VideoInfo> data = new List<VideoInfo>();
 
@@ -1109,10 +1199,63 @@ namespace Data
             {
                 db.Open();
 
-                SqliteCommand selectCommand = new SqliteCommand
-                    ($"SELECT * from VideoInfo LIMIT {limit} offset {offset}", db);
+                //排序
+                string orderStr = string.Empty;
+                if (!string.IsNullOrEmpty(orderBy))
+                {
+                    if (orderBy == "random")
+                    {
+                        orderStr = " ORDER BY RANDOM() ";
+                    }
+                    else
+                    {
+                        if (isDesc)
+                        {
+                            orderStr = $" ORDER BY {orderBy} DESC ";
+                        }
+                        else
+                        {
+                            orderStr = $" ORDER BY {orderBy} ";
+                        }
+                    }
+                }
 
-                SqliteDataReader query = selectCommand.ExecuteReader();
+                //筛选
+                string filterStr = string.Empty;
+                if(filterConditionList!= null)
+                {
+                    List<string> filterList = new();
+                    foreach (var item in filterConditionList)
+                    {
+                        switch (item)
+                        {
+                            case "look_after":
+                                filterList.Add($"{item} != 0");
+                                break;
+                            case "fail":
+                                //不操作
+                                break;
+                            default:
+                                filterList.Add($"{item} LIKE '%{filterKeywords}%'");
+                                break;
+                        }
+                    }
+
+                    if (filterList.Count > 0)
+                        filterStr = $" WHERE {string.Join(" OR ", filterList)} ";
+                    else
+                    {
+                        db.Close();
+                        return data;
+                    }
+
+
+                }
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"SELECT * from VideoInfo{filterStr}{orderStr} LIMIT {limit} offset {offset}", db);
+
+                SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
 
                 while (query.Read())
                 {

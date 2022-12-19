@@ -39,7 +39,6 @@ namespace Display.Views
             this.InitializeComponent();
         }
 
-
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -71,24 +70,9 @@ namespace Display.Views
             if (item == null) return;
 
             //需要显示的是搜索结果
-            if (item is Tuple<List<string>,string> typeAndName)
+            if (item is Tuple<List<string>,string> typesAndName)
             {
-                List<string> types = typeAndName.Item1;
-                ShowName = typeAndName.Item2;
-
-                //显示的是演员还是标签
-                List<VideoInfo> VideoInfoList = FileMatch.getVideoInfoFromType(types, ShowName);
-
-                var newFileGrid = FileMatch.getFileGrid(VideoInfoList);
-
-                videoControl.FileGrid = newFileGrid;
-            }
-            //需要显示的是更多信息
-            else if(item is Tuple<string, List<VideoCoverDisplayClass>> moreVideos)
-            {
-                ShowName = moreVideos.Item1;
-
-                videoControl.FileGrid = moreVideos.Item2;
+                videoControl.ReLoadSearchResult(typesAndName.Item1, typesAndName.Item2);
             }
 
         }
