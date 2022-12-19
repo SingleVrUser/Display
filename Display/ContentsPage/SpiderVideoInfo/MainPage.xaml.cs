@@ -16,8 +16,8 @@ namespace Display.ContentsPage.SpiderVideoInfo
     /// </summary>
     public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
-        private Model.IncrementalLoadingdFileCollection _failList;
-        Model.IncrementalLoadingdFileCollection FailList
+        private Model.IncrementalLoadFailInfoCollection _failList;
+        Model.IncrementalLoadFailInfoCollection FailList
         {
             get => _failList;
             set
@@ -158,11 +158,11 @@ namespace Display.ContentsPage.SpiderVideoInfo
             if (FailList.Count == 0)
             {
                 //失败总数
-                var failCount = await DataAccess.CheckFailFilesCount();
+                var failCount = DataAccess.CheckFailFilesCount();
                 FailListTotalCount_Run.Text = $"/{failCount}";
 
                 //当前显示的
-                var list = DataAccess.LoadFailFileInfo(0,30);
+                var list = await DataAccess.LoadFailFileInfo(0,30);
                 list.ForEach(item => FailList.Add(item));
             }
         }

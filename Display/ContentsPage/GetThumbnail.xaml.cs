@@ -43,54 +43,12 @@ namespace Display.ContentsPage
 
         private async void LoadedData()
         {
-            List<VideoInfo> VideoInfoList = await Task.Run(() => DataAccess.LoadAllVideoInfo(-1));
-
-            //TotalProgressBar.Maximum = VideoInfoList.Count;
-            //TotalProgressBar.Value = 0;
-            //TotalProgressBar.Visibility = Visibility.Visible;
-
-            //加载时间过长，弃用
-            //Dictionary<string, List<Datum>> ThumnailInfoDict = await Task.Run(() =>
-            //{
-            //    Dictionary<string, List<Datum>> ThumnailInfoDict = new();
-            //    foreach (var VideoInfo in VideoInfoList)
-            //    {
-            //        string videoName = VideoInfo.truename;
-
-            //        //List<Datum> videoInfoList = DataAccess.loadVideoInfoByTruename(videoName);
-
-            //        //var actor_list = actor_str.Split(",");
-            //        //foreach (var actor in actor_list)
-            //        //{
-            //        //    //名字为空
-            //        //    if (actor == String.Empty) continue;
-
-            //        //    //当前名称不存在
-            //        //    if (!ActorsInfoDict.ContainsKey(actor))
-            //        //    {
-            //        //        ActorsInfoDict.Add(actor, new List<string>());
-            //        //    }
-            //        //    ActorsInfoDict[actor].Add(VideoInfo.truename);
-            //        //}
-            //        //thumbnailInfo.Add(new ThumbnailInfo() { name= videoName });
-
-            //        ////当前名称不存在
-            //        //if (!ThumnailInfoDict.ContainsKey(videoName))
-            //        //{
-            //        //    ThumnailInfoDict.Add(videoName, videoInfoList);
-            //        //}
-            //    }
-
-            //    return ThumnailInfoDict;
-            //});
+            List<VideoInfo> VideoInfoList = await Task.Run(() => DataAccess.LoadVideoInfo(-1));
 
             foreach (var item in VideoInfoList)
             {
                 thumbnailInfo.Add(new(item));
-                //TotalProgressBar.Value++;
             }
-
-            //TotalProgressBar.Visibility = Visibility.Collapsed;
         }
 
         private void BasicGridView_Loaded(object sender, RoutedEventArgs e)

@@ -41,7 +41,7 @@ namespace Display.Views
         private async void Page_Loaded()
         {
             ProgressRing.IsActive = true;
-            List<VideoInfo> VideoInfoList = await Task.Run(() => DataAccess.LoadAllVideoInfo(-1));
+            List<VideoInfo> VideoInfoList = await Task.Run(() => DataAccess.LoadVideoInfo(-1));
 
             foreach (var VideoInfo in VideoInfoList)
             {

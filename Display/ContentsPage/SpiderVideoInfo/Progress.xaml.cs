@@ -377,7 +377,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 }
 
                 i++;
-                System.Diagnostics.Debug.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>接受:{i} - {progressPercent.Name} - {progressPercent.SpiderSource} - {progressPercent.RequestStates} - {progressPercent.Message}");
+                //System.Diagnostics.Debug.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>接受:{i} - {progressPercent.Name} - {progressPercent.SpiderSource} - {progressPercent.RequestStates} - {progressPercent.Message}");
                 
                 //更新整体进度
                 var currentCount = successVIdeoNameList.Count + FailVideoNameList.Count;
@@ -471,7 +471,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
                     if (!string.IsNullOrEmpty(name))
                     {
-                        System.Diagnostics.Debug.WriteLine($"{spiderSourceName}查询到的{name}");
+                        //System.Diagnostics.Debug.WriteLine($"{spiderSourceName}查询到的{name}");
 
                         //记录为正在进行
                         DataAccess.UpdataSpiderTask(name, spiderSource, SpiderStates.doing);
@@ -553,92 +553,92 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     switch (spiderSourceName)
                     {
                         case SpiderSourceName.javbus:
-                            System.Diagnostics.Debug.WriteLine("访问JavBus");
+                            //System.Diagnostics.Debug.WriteLine("访问JavBus");
                             resultInfo = await network.SearchInfoFromJavBus(name);
-                            System.Diagnostics.Debug.WriteLine("JavBus等待 1~3 s");
+                            //System.Diagnostics.Debug.WriteLine("JavBus等待 1~3 s");
 
                             currentSpiderInfo.State = SpiderStates.awaiting;
                             currentSpiderInfo.Message = "等待 1~3 s";
                             progress.Report(currentSpiderInfo);
 
                             await GetInfoFromNetwork.RandomTimeDelay(1, 3);
-                            System.Diagnostics.Debug.WriteLine("JavBus等待时间到");
+                            //System.Diagnostics.Debug.WriteLine("JavBus等待时间到");
                             break;
                         case SpiderSourceName.jav321:
-                            System.Diagnostics.Debug.WriteLine("访问Jav321");
+                            //System.Diagnostics.Debug.WriteLine("访问Jav321");
                             resultInfo = await network.SearchInfoFromJav321(name);
-                            System.Diagnostics.Debug.WriteLine("Jav321等待 1~2 s");
+                            //System.Diagnostics.Debug.WriteLine("Jav321等待 1~2 s");
 
                             currentSpiderInfo.State = SpiderStates.awaiting;
                             currentSpiderInfo.Message = "等待 1~2 s";
                             progress.Report(currentSpiderInfo);
 
                             await GetInfoFromNetwork.RandomTimeDelay(1, 2);
-                            System.Diagnostics.Debug.WriteLine("Jav321等待时间到");
+                            //System.Diagnostics.Debug.WriteLine("Jav321等待时间到");
                             break;
                         case SpiderSourceName.avmoo:
-                            System.Diagnostics.Debug.WriteLine("访问AvMoo");
+                            //System.Diagnostics.Debug.WriteLine("访问AvMoo");
                             resultInfo = await network.SearchInfoFromAvMoo(name);
-                            System.Diagnostics.Debug.WriteLine("AvMoo等待 1~2 s");
+                            //System.Diagnostics.Debug.WriteLine("AvMoo等待 1~2 s");
 
                             currentSpiderInfo.State = SpiderStates.awaiting;
                             currentSpiderInfo.Message = "等待 1~2 s";
                             progress.Report(currentSpiderInfo);
 
                             await GetInfoFromNetwork.RandomTimeDelay(1, 2);
-                            System.Diagnostics.Debug.WriteLine("AvMoo等待时间到");
+                            //System.Diagnostics.Debug.WriteLine("AvMoo等待时间到");
                             break;
                         case SpiderSourceName.avsox:
-                            System.Diagnostics.Debug.WriteLine("访问AvSox");
+                            //System.Diagnostics.Debug.WriteLine("访问AvSox");
                             resultInfo = await network.SearchInfoFromAvSox(name);
-                            System.Diagnostics.Debug.WriteLine("AvSox等待 1~2 s");
+                            //System.Diagnostics.Debug.WriteLine("AvSox等待 1~2 s");
 
                             currentSpiderInfo.State = SpiderStates.awaiting;
                             currentSpiderInfo.Message = "等待 1~2 s";
                             progress.Report(currentSpiderInfo);
 
                             await GetInfoFromNetwork.RandomTimeDelay(1, 2);
-                            System.Diagnostics.Debug.WriteLine("AvSox等待时间到");
+                            //System.Diagnostics.Debug.WriteLine("AvSox等待时间到");
                             break;
                         case SpiderSourceName.libredmm:
-                            System.Diagnostics.Debug.WriteLine("访问LibreDmm");
+                            //System.Diagnostics.Debug.WriteLine("访问LibreDmm");
                             resultInfo = await network.SearchInfoFromLibreDmm(name);
-                            System.Diagnostics.Debug.WriteLine("LibreDmm等待 1~2 s");
+                            //System.Diagnostics.Debug.WriteLine("LibreDmm等待 1~2 s");
 
                             currentSpiderInfo.State = SpiderStates.awaiting;
                             currentSpiderInfo.Message = "等待 1~2 s";
                             progress.Report(currentSpiderInfo);
 
                             await GetInfoFromNetwork.RandomTimeDelay(1, 2);
-                            System.Diagnostics.Debug.WriteLine("LibreDmm等待时间到");
+                            //System.Diagnostics.Debug.WriteLine("LibreDmm等待时间到");
                             break;
                         case SpiderSourceName.fc2club:
-                            System.Diagnostics.Debug.WriteLine("访问Fc2Hub");
+                            //System.Diagnostics.Debug.WriteLine("访问Fc2Hub");
                             resultInfo = await network.SearchInfoFromFc2Hub(name);
-                            System.Diagnostics.Debug.WriteLine("Fc2Hub等待 1~2 s");
+                            //System.Diagnostics.Debug.WriteLine("Fc2Hub等待 1~2 s");
 
                             currentSpiderInfo.State = SpiderStates.awaiting;
                             currentSpiderInfo.Message = "等待 1~2 s";
                             progress.Report(currentSpiderInfo);
 
                             await GetInfoFromNetwork.RandomTimeDelay(1, 2);
-                            System.Diagnostics.Debug.WriteLine("Fc2Hub等待时间到");
+                            //System.Diagnostics.Debug.WriteLine("Fc2Hub等待时间到");
                             break;
                         case SpiderSourceName.javdb:
-                            System.Diagnostics.Debug.WriteLine("访问JavDB");
+                            //System.Diagnostics.Debug.WriteLine("访问JavDB");
                             //FC2且cookie异常（如未登录）
                             if (name.Contains("FC2") && !GetInfoFromNetwork.IsJavDbCookieVisiable)
                                 break;
 
                             resultInfo = await network.SearchInfoFromJavDB(name);
-                            System.Diagnostics.Debug.WriteLine("JavDB等待 3~6 s");
+                            //System.Diagnostics.Debug.WriteLine("JavDB等待 3~6 s");
 
                             currentSpiderInfo.State = SpiderStates.awaiting;
                             currentSpiderInfo.Message = "等待 3~6 s";
                             progress.Report(currentSpiderInfo);
 
                             await GetInfoFromNetwork.RandomTimeDelay(3, 6);
-                            System.Diagnostics.Debug.WriteLine("JavDB等待时间到");
+                            //System.Diagnostics.Debug.WriteLine("JavDB等待时间到");
 
                             break;
                     }

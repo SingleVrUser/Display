@@ -51,7 +51,7 @@ namespace Display.Views
             //随机获取20个视频，每次启动自动获取一遍
             foreach (var item in DataAccess.getNameAndIamgeRandom())
             {
-                Items.Add(new VideoCoverDisplayClass(item));
+                Items.Add(new VideoCoverDisplayClass(item,500,300));
             }
 
         }
@@ -111,7 +111,7 @@ namespace Display.Views
             //随机获取20个视频
             foreach (var item in DataAccess.getNameAndIamgeRandom())
             {
-                Items.Add(new VideoCoverDisplayClass(item));
+                Items.Add(new VideoCoverDisplayClass(item,500,300));
             }
 
             RefreshHyperlinkButton.IsEnabled = true;
@@ -208,22 +208,22 @@ namespace Display.Views
             }
             foreach (var item in addList)
             {
-                videoList.Add(new VideoCoverDisplayClass(item));
+                videoList.Add(new VideoCoverDisplayClass(item, 500, 300));
             }
         }
 
         private void MoreLikeVideoClick(object sender, RoutedEventArgs e)
         {
-            Tuple<string, List<VideoCoverDisplayClass>> tuple = new("喜欢", LoveCoverList.ToList());
+            Tuple<List<string>, string> TypesAndName = new(new() { "is_like" }, "1");
 
-            Frame.Navigate(typeof(ActorInfoPage), tuple);
+            Frame.Navigate(typeof(ActorInfoPage), TypesAndName);
         }
 
         private void MoreLookLaterVideoClick(object sender, RoutedEventArgs e)
         {
-            Tuple<string, List<VideoCoverDisplayClass>> tuple = new("稍后观看", lookLaterList.ToList());
+            Tuple<List<string>, string> TypesAndName = new(new() { "look_later" }, "1");
 
-            Frame.Navigate(typeof(ActorInfoPage), tuple);
+            Frame.Navigate(typeof(ActorInfoPage), TypesAndName);
         }
     }
 

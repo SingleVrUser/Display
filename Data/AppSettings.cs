@@ -9,6 +9,41 @@ public class AppSettings
 {
     public static ApplicationDataContainer localSettings { get { return ApplicationData.Current.LocalSettings; } }
 
+    
+    /// <summary>
+    /// 展示页的图片大小
+    /// </summary>
+    public static Tuple<double,double> ImageSize
+    {
+        get
+        {
+            var composite = (ApplicationDataCompositeValue)localSettings.Values["ImageSize"];
+
+            double width;
+            double height;
+
+            if (composite.ContainsKey("ImageWidth") && composite["ImageWidth"] is double tmp)
+                width = tmp;
+            else
+                width = 500;
+
+            if (composite.ContainsKey("ImageHeight") && composite["ImageHeight"] is double tmp2)
+                height = tmp2;
+            else
+                height = 300;
+
+
+            return new Tuple<double, double>(width, height);
+        }
+        set
+        {
+            var composite = new ApplicationDataCompositeValue();
+            composite["ImageWidth"] = value.Item1;
+            composite["ImageHeight"] = value.Item2;
+            localSettings.Values["ImageSize"] = composite;
+        }
+    }
+
     /// <summary>
     /// 是否动态调整图片大小
     /// </summary>
