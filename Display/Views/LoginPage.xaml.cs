@@ -234,18 +234,18 @@ namespace Display.Views
                 webFileInfoList = new List<Datum>();
             }
             var limit = 40;
-            var WebFileInfo = webapi.GetFile(cid, limit);
+            var WebFileInfo = await webapi.GetFileAsync(cid, limit);
 
             if (WebFileInfo.errNo == 20130827)
             {
-                WebFileInfo = webapi.GetFile(cid);
+                WebFileInfo = await webapi.GetFileAsync(cid);
             }
 
             //实际count 大于设置的limit
             if (WebFileInfo.count > limit)
             {
                 limit = WebFileInfo.count;
-                WebFileInfo = webapi.GetFile(cid, limit);
+                WebFileInfo = await webapi.GetFileAsync(cid, limit);
             }
 
             if (WebFileInfo.state)
@@ -256,8 +256,7 @@ namespace Display.Views
                     ResultBox.Text = (Int32.Parse(ResultBox.Text) + 1).ToString();
                     webFileInfoList.Add(item);
 
-                    DataAccess.AddFilesInfo(item);
-
+                    await DataAccess.AddFilesInfoAsync(item);
 
                     //文件夹
                     if (item.fid == null)

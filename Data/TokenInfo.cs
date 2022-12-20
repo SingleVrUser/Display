@@ -581,6 +581,8 @@ namespace Data
             }
         }
 
+        public int is_wm { get; set; }= -1;
+
         //public int is_like { get; set; } = 0;
         private int _is_like = 0;
         public int is_like

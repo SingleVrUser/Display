@@ -137,6 +137,9 @@ namespace Data
             videoInfo.busurl = url;
             videoInfo.truename = CID;
 
+            //dmm肯定没有步兵
+            videoInfo.is_wm = 0;
+
             var titleNode = htmlDoc.DocumentNode.SelectSingleNode("//h1");
             if (titleNode != null)
                 videoInfo.title = titleNode.InnerText.Trim();
@@ -207,12 +210,10 @@ namespace Data
             string busurl = UrlCombine(JavBusUrl, CID);
 
             videoInfo.busurl = busurl;
-
             string strResult = await RequestHelper.RequestHtml(Client, busurl);
 
             HtmlDocument htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(strResult);
-
 
             //搜索封面
             var ImageUrlNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='col-md-9 screencap']//a//img");
@@ -224,14 +225,26 @@ namespace Data
                 ImageUrl = UrlCombine(JavBusUrl, ImageUrl);
             }
 
-            //标题（不可或缺）
+            //标题
             var title = ImageUrlNode.Attributes["title"].Value;
             videoInfo.title = title;
 
+            //是否步兵
+            var activeNavbarNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@id='navbar']/ul[@class='nav navbar-nav']/li[@class='active']/a");
+            if (activeNavbarNode != null)
+            {
+                switch(activeNavbarNode.InnerText)
+                {
+                    case "有碼":
+                        videoInfo.is_wm = 0;
+                        break;
+                    case "無碼":
+                        videoInfo.is_wm = 1;
+                        break;
+                }
+            }
             var AttributeNodes = htmlDoc.DocumentNode.SelectNodes("//div[@class='col-md-3 info']//p");
-
             videoInfo.truename = CID;
-
             //信息
             for (var i = 0; i < AttributeNodes.Count; i++)
             {
@@ -357,8 +370,9 @@ namespace Data
 
                 string imgSrc = ImageNode.GetAttributeValue("src", string.Empty);
 
-                if(!imgSrc.EndsWith("webp"))
-                    ImageUrl = imgSrc;
+                ImageUrl = imgSrc;
+                //if(!imgSrc.EndsWith("webp"))
+                //    ImageUrl = imgSrc;
             }
             //有样图
             else
@@ -370,7 +384,7 @@ namespace Data
                     var imageNode = ImageNodes[i];
                     string imageUrl = imageNode.GetAttributeValue("src", string.Empty);
 
-                    if (imageUrl.EndsWith("webp")) continue;
+                    //if (imageUrl.EndsWith("webp")) continue;
 
                     if (i == 0)
                     {
@@ -496,6 +510,9 @@ namespace Data
 
             videoInfo.busurl = url;
 
+            //默认是步兵
+            videoInfo.is_wm = 1;
+
             string strResult = await RequestHelper.RequestHtml(Client, url);
 
             HtmlDocument htmlDoc = new HtmlDocument();
@@ -571,6 +588,9 @@ namespace Data
             VideoInfo videoInfo = new VideoInfo();
             videoInfo.busurl = detail_url;
             videoInfo.truename = CID;
+
+            //AvMoo肯定不是步兵
+            videoInfo.is_wm = 0;
 
             videoInfo = await AnalysisInfoFromAvSoxOrAvMoo(strResult, videoInfo);
 
@@ -859,6 +879,9 @@ namespace Data
             VideoInfo videoInfo = new VideoInfo();
             videoInfo.busurl = detail_url;
             videoInfo.truename = CID;
+
+            //AvSox肯定是步兵
+            videoInfo.is_wm = 1;
 
             videoInfo = await AnalysisInfoFromAvSoxOrAvMoo(strResult, videoInfo);
 

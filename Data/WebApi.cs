@@ -209,7 +209,7 @@ namespace Data
                     //如果修改时间未变，但移动了位置
                     if (pid == cidCategory.paths.Last().file_id)
                     {
-                        DataAccess.AddFilesInfo(FolderCategory.ConvertFolderToDatum(cidCategory, cid));
+                        await DataAccess.AddFilesInfoAsync(FolderCategory.ConvertFolderToDatum(cidCategory, cid));
                     }
 
                     //统计上下级文件夹所含文件的数量
@@ -241,14 +241,14 @@ namespace Data
                         //需要添加进数据库的Datum
                         foreach (var item in addToDataAccessList)
                         {
-                            DataAccess.AddFilesInfo(item);
+                            await DataAccess.AddFilesInfoAsync(item);
                         }
                     }
 
                     //不添加有错误的目录进数据库（添加数据库时会跳过已经添加过的目录，对于出现错误的目录不添加方便后续重新添加）
                     if (getFilesProgressInfo.FailCid.Count == 0)
                     {
-                        DataAccess.AddFilesInfo(FolderCategory.ConvertFolderToDatum(cidCategory, cid));
+                        await DataAccess.AddFilesInfoAsync(FolderCategory.ConvertFolderToDatum(cidCategory, cid));
                     }
                 }
             }
@@ -274,10 +274,7 @@ namespace Data
         public async Task<GetFilesProgressInfo> TraverseAllFileInfo(string cid, GetFilesProgressInfo getFilesProgressInfo, CancellationToken token, IProgress<GetFileProgessIProgress> progress = null)
         {
             //var webFileInfoList = fileProgressInfo.datumList;
-            if (token.IsCancellationRequested)
-            {
-                return null;
-            }
+            if (token.IsCancellationRequested) return null;
 
             //统计请求速度
             int sendCount = 0;
@@ -287,7 +284,7 @@ namespace Data
             await Task.Delay(1000);
 
             //查询下一级文件信息
-            var WebFileInfo = GetFile(cid);
+            var WebFileInfo = await GetFileAsync(cid);
             sendCount++;
 
             if (WebFileInfo.state)
@@ -355,7 +352,7 @@ namespace Data
         /// <param name="cid"></param>
         /// <param name="limit"></param>
         /// <returns></returns>
-        public WebFileInfo GetFile(string cid, int limit = 40, bool userApi2 = false)
+        public async Task<WebFileInfo> GetFileAsync(string cid, int limit = 40, bool userApi2 = false)
         {
             WebFileInfo WebFileInfoResult = new();
 
@@ -373,7 +370,7 @@ namespace Data
             HttpResponseMessage response;
             try
             {
-                response = Client.GetAsync(url).Result;
+                response = await Client.GetAsync(url);
             }
             catch (AggregateException e)
             {
@@ -385,7 +382,7 @@ namespace Data
             {
                 return WebFileInfoResult;
             }
-            var strResult = response.Content.ReadAsStringAsync().Result;
+            var strResult = await response.Content.ReadAsStringAsync();
 
             WebFileInfoResult = JsonConvert.DeserializeObject<WebFileInfo>(strResult);
 
@@ -442,12 +439,12 @@ namespace Data
             //接口1出错，使用接口2
             if (WebFileInfoResult.errNo == 20130827 && userApi2 == false)
             {
-                WebFileInfoResult = GetFile(cid, limit, true);
+                WebFileInfoResult = await GetFileAsync(cid, limit, true);
             }
             //未加载全部
             else if (WebFileInfoResult.count > limit)
             {
-                WebFileInfoResult = GetFile(cid, WebFileInfoResult.count, userApi2);
+                WebFileInfoResult = await GetFileAsync(cid, WebFileInfoResult.count, userApi2);
             }
 
             return WebFileInfoResult;
@@ -792,7 +789,7 @@ namespace Data
                 if (string.IsNullOrEmpty(datum.fid) || (!string.IsNullOrEmpty(datum.fid) && datum.fid == "0"))
                 {
                     //获取该文件夹下的文件和文件夹
-                    WebFileInfo webFileInfo = GetFile(datum.cid);
+                    WebFileInfo webFileInfo = await GetFileAsync(datum.cid);
                     if (webFileInfo.count == 0)
                     {
                         success = false;
@@ -919,7 +916,7 @@ namespace Data
         public async void GetAllFilesTraverseAndDownByBitComet(HttpClient client, string baseUrl, Datum datum, string ua, string save_path)
         {
             //获取该文件夹下的文件和文件夹
-            WebFileInfo webFileInfo = GetFile(datum.cid);
+            WebFileInfo webFileInfo = await GetFileAsync(datum.cid);
 
             foreach (var data in webFileInfo.data)
             {

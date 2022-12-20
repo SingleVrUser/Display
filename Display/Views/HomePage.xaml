@@ -5,7 +5,8 @@
     xmlns:local="using:Display.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:data="using:Data"
-    xmlns:control="using:Display.Control"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:customecontrol="using:Display.Control"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     mc:Ignorable="d">
@@ -92,7 +93,7 @@
                                             PointerExited="Image_PointerExited"
                                             CornerRadius="2"
                                             BorderThickness="1">
-                                            <Image Source="{x:Bind imagepath}" Tapped="Image_Tapped"/>
+                                            <controls:ImageEx Source="{x:Bind imagepath}" Tapped="Image_Tapped"/>
                                         </Grid>
 
                                     </DataTemplate>
@@ -115,14 +116,13 @@
                                         </Grid.ColumnDefinitions>
                                         
                                         <Grid CornerRadius="2" Grid.Row="1">
-                                            <Image Source="{x:Bind imagepath}"
-                                                   Width="120" />
+                                            <controls:ImageEx Source="{x:Bind imagepath}" Width="120"/>
                                         </Grid>
                                         
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="5">
                                             <TextBlock Text="{x:Bind truename}" FontFamily="JetBrains Mono"/>
-                                            <control:TextBlockWithLongText Grid.Row="1" StringValue="{x:Bind actor}" IsFirstTextSelectionEnabled="False"/>
-                                            <control:TextBlockWithLongText Grid.Row="1" StringValue="{x:Bind category}" IsFirstTextSelectionEnabled="False"/>
+                                            <customecontrol:TextBlockWithLongText Grid.Row="1" StringValue="{x:Bind actor}" IsFirstTextSelectionEnabled="False"/>
+                                            <customecontrol:TextBlockWithLongText Grid.Row="1" StringValue="{x:Bind category}" IsFirstTextSelectionEnabled="False"/>
                                         </StackPanel>
                                     </Grid>
                                 </DataTemplate>
@@ -135,16 +135,16 @@
             </Grid>
             
 
-            <control:MultipleCoverShow Grid.Row="1" ShowName="最新视频" CoverList="{x:Bind recentCoverList}" ItemClick="MultipleCoverShow_ItemClick"/>
+            <customecontrol:MultipleCoverShow Grid.Row="1" ShowName="最新视频" CoverList="{x:Bind recentCoverList}" ItemClick="MultipleCoverShow_ItemClick"/>
 
-            <control:MultipleCoverShow Grid.Row="2"
+            <customecontrol:MultipleCoverShow Grid.Row="2"
                                        ShowName="喜欢视频"
                                        CoverList="{x:Bind LoveCoverList}"
                                        ItemClick="MultipleCoverShow_ItemClick"
                                        MoreClick="MoreLikeVideoClick"
                                        MoreButtonVisibility="Visible"/>
 
-            <control:MultipleCoverShow Grid.Row="3"
+            <customecontrol:MultipleCoverShow Grid.Row="3"
                                        ShowName="稍后观看"
                                        CoverList="{x:Bind lookLaterList}"
                                        ItemClick="MultipleCoverShow_ItemClick"
