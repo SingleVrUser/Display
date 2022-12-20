@@ -220,12 +220,10 @@
                     <!--图片-->
                     <Grid x:Name="showImage">
                         <controls:ImageEx Stretch="UniformToFill"
-                                            PlaceholderSource="/Assets/ImageExPlaceholder.jpg"
-                                            PlaceholderStretch="UniformToFill"
                                             IsCacheEnabled="True"
                                             EnableLazyLoading="True"
                                             LazyLoadingThreshold="300"
-                                            Source="{x:Bind imagepath}"
+                                            Source="{x:Bind imagepath,Mode=OneWay}"
                                             Width="{x:Bind imagewidth,Mode=OneWay}"
                                             Height="{x:Bind imageheight,Mode=OneWay}" />
 
@@ -682,34 +680,38 @@
         </GridView>
 
         <!--筛选栏，默认隐藏-->
-        <customcontrols:InfoListFilter Grid.Row="3" Visibility="{x:Bind Filter_ToggleButton.IsChecked,Mode=OneWay}" Height="35" Padding="5,2,0,0"/>
+        <customcontrols:InfoListFilter x:Name="InfosFilter" Grid.Row="3" Visibility="{x:Bind Filter_ToggleButton.IsChecked,Mode=OneWay}" Height="35" Margin="5,2,0,0"
+                                        SplitButton_Click="InfoListFilter_SplitButton_Click"
+                                       SelectionChanged="InfoListFilter_SelectionChanged"
+                                       TextChanged="InfoListFilter_TextChanged"/>
 
         <!--页面跳转栏-->
-        <RelativePanel Grid.Row="4"
+            <RelativePanel Grid.Row="4"
                        Margin="0,0,10,0">
 
-            <StackPanel Margin="0,0,0,-20"
+                <StackPanel Margin="0,0,0,-20"
                         Orientation="Horizontal">
 
-                <AppBarButton x:Name="OrderButton"
+                    <AppBarButton x:Name="OrderButton"
                               IsCompact="True"
                               Flyout="{StaticResource SuccessOrderFlyout}">
 
-                    <ToolTipService.ToolTip>
-                        <ToolTip x:Uid="sortToolTip" />
-                    </ToolTipService.ToolTip>
-                    <AppBarButton.Content>
-                        <FontIcon FontFamily="Segoe Fluent Icons"
+                        <ToolTipService.ToolTip>
+                            <ToolTip x:Uid="sortToolTip" />
+                        </ToolTipService.ToolTip>
+                        <AppBarButton.Content>
+                            <FontIcon FontFamily="Segoe Fluent Icons"
                                   Glyph="&#xE174;" />
-                    </AppBarButton.Content>
+                        </AppBarButton.Content>
 
-                </AppBarButton>
+                    </AppBarButton>
 
-                <ToggleButton x:Name="Filter_ToggleButton" Margin="0,0,0,15" IsEnabled="True" BorderThickness="0"
+                    <ToggleButton x:Name="Filter_ToggleButton" Margin="0,0,0,15" IsEnabled="True" BorderThickness="0"
                               FontFamily="Segoe Fluent Icons" Content="&#xE16E;" FontSize="18" Foreground="Gray"
-                              Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay}"/>
+                              Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay}"
+                                Unchecked="Filter_ToggleButton_Unchecked"/>
 
-                <ToggleSwitch x:Name="ShowType_ToggleSwitch"
+                    <ToggleSwitch x:Name="ShowType_ToggleSwitch"
                               VerticalAlignment="Center"
                               Margin="4,0,0,15"
                               OnContent="匹配失败"
@@ -719,33 +721,33 @@
                               PointerExited="ShowType_ToggleSwitch_PointerExited"
                               IsOn="{x:Bind IsShowFailListView,Mode=TwoWay}"
                               Visibility="{x:Bind IsShowSucAndFailSwitchButton}">
-                </ToggleSwitch>
+                    </ToggleSwitch>
 
-            </StackPanel>
+                </StackPanel>
 
-            <Grid RelativePanel.AlignRightWithPanel="True"
+                <Grid RelativePanel.AlignRightWithPanel="True"
                         RelativePanel.AlignVerticalCenterWithPanel="True">
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="140"/>
-                </Grid.ColumnDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="140"/>
+                    </Grid.ColumnDefinitions>
 
-                <Grid ColumnSpacing="8"
+                    <Grid ColumnSpacing="8"
                         Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}"
                       BorderBrush="{ThemeResource ControlElevationBorderBrush}"
                       BorderThickness="1" Padding="8,0,3,0" CornerRadius="14">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Slider x:Name="ImageSizeChangeSlider"
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Slider x:Name="ImageSizeChangeSlider"
                             Grid.Row="0"
                             Minimum="{x:Bind SliderMinValue}"
                             Maximum="{x:Bind SliderMaxValue}"
                             Width="200"/>
 
-                    <ToggleButton x:Name="IsAutoAdjustImageSize_ToggleButton"
+                        <ToggleButton x:Name="IsAutoAdjustImageSize_ToggleButton"
                                   Grid.Column="1"
                               Content="&#xE167;"
                               FontFamily="Segoe Fluent Icons"
@@ -754,26 +756,26 @@
                               Unchecked="AutoAdjustImageSize_ToggleButton_UnChecked"
                               ToolTipService.ToolTip="动态调整图片大小"
                                   CornerRadius="11"/>
-                </Grid>
+                    </Grid>
 
-                <Grid Width="140" Grid.Column="1" x:FieldModifier="public" x:Name="PageShow_Grid">
-                    <local:ShowCountControl x:Name="SuccesShowCount_Control"
+                    <Grid Width="140" Grid.Column="1" x:FieldModifier="public" x:Name="PageShow_Grid">
+                        <local:ShowCountControl x:Name="SuccesShowCount_Control"
                                             CurrentCount="{x:Bind SuccessInfoCollection.Count,Mode=OneWay}"
                                             AllCount="{x:Bind SuccessInfoCollection.AllCount,Mode=OneWay}"
                                             Clicked="ToTopButton_Click"
                                             Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay}"
                                             HorizontalAlignment="Right"/>
 
-                    <local:ShowCountControl x:Name="FailShowCountControl"
+                        <local:ShowCountControl x:Name="FailShowCountControl"
                                         CurrentCount="{x:Bind FailInfoCollection.Count,Mode=OneWay}"
                                         AllCount="{x:Bind FailInfoCollection.AllCount,Mode=OneWay}"
                                         Visibility="{x:Bind IsShowFailListView,Mode=OneWay}"
                                         Clicked="ToTopButton_Click"
                                         HorizontalAlignment="Right"/>
+                    </Grid>
+
                 </Grid>
 
-            </Grid>
-
-        </RelativePanel>
+            </RelativePanel>
     </Grid>
 </UserControl>

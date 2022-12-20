@@ -2,13 +2,14 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:Display.Control"
+             xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
              xmlns:data="using:Data"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d">
 
     <UserControl.Resources>
-        <Style TargetType="Image"
+        <Style TargetType="controls:ImageEx"
                x:Key="newAddCoverResources">
             <Setter Property="MaxHeight"
                     Value="210" />
@@ -58,13 +59,13 @@
                                       IsItemClickEnabled="True">
                                 <GridView.ItemTemplate>
                                     <DataTemplate x:DataType="data:VideoCoverDisplayClass">
-                                        <Image Height="200"
+                                        <controls:ImageEx Height="200"
                                                x:Name="showImage"
                                                Style="{StaticResource newAddCoverResources}"
                                                Source="{x:Bind imagepath}"
                                                PointerEntered="Image_PointerEntered"
                                                PointerExited="Image_PointerExited">
-                                            <Image.ContextFlyout>
+                                            <controls:ImageEx.ContextFlyout>
                                                 <!--右键操作-->
                                                 <MenuFlyout>
                                                     <MenuFlyoutItem Text="移出"
@@ -74,8 +75,8 @@
                                                         </MenuFlyoutItem.Icon>
                                                     </MenuFlyoutItem>
                                                 </MenuFlyout>
-                                            </Image.ContextFlyout>
-                                        </Image>
+                                            </controls:ImageEx.ContextFlyout>
+                                        </controls:ImageEx>
                                     </DataTemplate>
                                 </GridView.ItemTemplate>
                             </GridView>

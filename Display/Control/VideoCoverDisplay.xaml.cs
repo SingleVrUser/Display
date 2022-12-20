@@ -156,6 +156,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     private double SliderMaxValue = 900;
 
     List<string> filterConditionList;
+    Dictionary<string,string> filterRanges;
     string filterKeywords;
 
     public VideoCoverDisplay()
@@ -212,6 +213,9 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
                     FailInfoSuggestBox.Visibility = Visibility.Collapsed;
                     trySwitchToFailView();
                     return;
+                default:
+                    Title = ShowName;
+                    break;
             }
         }
         else
@@ -340,6 +344,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         }
         set
         {
+            this._imagewidth = value.Item1;
+            this._imageheight = value.Item2;
             Data.AppSettings.ImageSize = value;
         }
     }
@@ -457,7 +463,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private async void OrderSuccessListView_ItemClick(object sender, ItemClickEventArgs e)
+    private void OrderSuccessListView_ItemClick(object sender, ItemClickEventArgs e)
     {
         ListView selectListView = (ListView)sender;
         var clickStackPanel = (e.ClickedItem as StackPanel);
@@ -523,12 +529,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             OrderButton.Content = new FontIcon() { FontFamily = new FontFamily("Segoe Fluent Icons"), Glyph = newGlyph };
         }
 
-        var imgSize = this.ImageSize;
-        SuccessInfoCollection = new(imgSize.Item1, imgSize.Item2);
-        SuccessInfoCollection.SetOrder(SuccessListOrderBy, SuccessListIsDesc);
-        SuccessInfoCollection.SetFilter(filterConditionList, filterKeywords);
-        await SuccessInfoCollection.LoadData();
-        BasicGridView.ItemsSource = SuccessInfoCollection;
+        LoadDstSuccessInfoCollection();
     }
 
 
@@ -913,6 +914,90 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         //System.Diagnostics.Debug.WriteLine("关闭图片大小的动态调整");
     }
 
+    private void InfoListFilter_SplitButton_Click(SplitButton sender, SplitButtonClickEventArgs args)
+    {
+        System.Diagnostics.Debug.WriteLine(InfosFilter.Year);
+
+        if (!(sender is ToggleSplitButton button)) return;
+
+        //选中
+        if (button.IsChecked)
+        {
+            switch (sender.Tag)
+            {
+                case "Year":
+                    if (filterRanges == null)
+                        filterRanges = new();
+                    filterRanges["Year"]= InfosFilter.Year;
+                    break;
+                case "Score":
+                    if (filterRanges == null)
+                        filterRanges = new();
+                    filterRanges["Score"]= InfosFilter.Score.ToString();
+                    break;
+                case "Type":
+                    if (filterRanges == null)
+                        filterRanges = new();
+                    filterRanges["Type"] = InfosFilter.Type;
+                    break;
+            }
+        }
+        //取消选中
+        else
+        {
+            filterRanges.Remove(sender.Tag.ToString());
+        }
+
+        LoadDstSuccessInfoCollection();
+    }   
+
+    private void InfoListFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!(sender is RadioButtons radioButtons)) return;
+        if (!(radioButtons.SelectedItem is RadioButton radioButton)) return;
+
+        var Key = radioButtons.Tag.ToString();
+        var Value = radioButton.Tag != null ? radioButton.Tag.ToString() : radioButton.Content.ToString();
+        if (filterRanges == null)
+            filterRanges = new();
+
+        filterRanges[Key] =Value;
+
+        LoadDstSuccessInfoCollection();
+    }
+
+    private void InfoListFilter_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        var Key = "Year";
+        var Value = InfosFilter.Year;
+        if (filterRanges == null)
+            filterRanges = new();
+
+        filterRanges[Key] = Value;
+        LoadDstSuccessInfoCollection();
+    }
+
+    private async void LoadDstSuccessInfoCollection()
+    {
+        var imgSize = this.ImageSize;
+        SuccessInfoCollection = new(imgSize.Item1, imgSize.Item2);
+        BasicGridView.ItemsSource = SuccessInfoCollection;
+
+        SuccessInfoCollection.SetOrder(SuccessListOrderBy, SuccessListIsDesc);
+        SuccessInfoCollection.SetRange(filterRanges);
+        SuccessInfoCollection.SetFilter(filterConditionList, filterKeywords);
+        await SuccessInfoCollection.LoadData();
+    }
+
+    private void Filter_ToggleButton_Unchecked(object sender, RoutedEventArgs e)
+    {
+        if (filterRanges == null) return;
+        else
+            filterRanges = null;
+
+        InfosFilter.UncheckAllToggleSplitButton();
+        LoadDstSuccessInfoCollection();
+    }
 }
 
 /// <summary>

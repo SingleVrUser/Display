@@ -28,7 +28,7 @@
             <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
 
-        <ToggleSplitButton Content="年份" Grid.Column="0">
+        <ToggleSplitButton x:Name="Year_ToggleSplitButton" Content="年份" Grid.Column="0" Click="Year_ToggleSplitButton_Click" Tag="Year">
             <ToggleSplitButton.Flyout>
                 <Flyout FlyoutPresenterStyle="{StaticResource FilterFlyoutPresenterStyle}">
                     <Grid>
@@ -37,39 +37,42 @@
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
 
-                        <RadioButtons>
-                            <RadioButton Content="{x:Bind sys:DateTime.Now.Year}"/>
-                            <RadioButton Content="{x:Bind datahelper:MatchHelper.Int32Subtract(sys:DateTime.Now.Year,1)}"/>
-                            <RadioButton Content="{x:Bind datahelper:MatchHelper.Int32Subtract(sys:DateTime.Now.Year,2)}"/>
-                            <RadioButton x:Name="customTimeRange_RadioButton" Content="自定义年份"/>
+                        <RadioButtons x:Name="Year_RadioButtons" SelectedIndex="0" SelectionChanged="Year_RadioButtons_SelectionChanged" Tag="Year">
+                            <RadioButton GroupName="Year" Content="{x:Bind sys:DateTime.Now.Year}" IsChecked="True"/>
+                            <RadioButton GroupName="Year" Content="{x:Bind datahelper:MatchHelper.Int32Subtract(sys:DateTime.Now.Year,1)}"/>
+                            <RadioButton GroupName="Year" Content="{x:Bind datahelper:MatchHelper.Int32Subtract(sys:DateTime.Now.Year,2)}"/>
+                            <RadioButton GroupName="Year" x:Name="customTimeRange_RadioButton" Content="自定义"/>
                         </RadioButtons>
 
-                        <TextBox Grid.Row="1" Visibility="{x:Bind customTimeRange_RadioButton.IsChecked,Mode=OneWay}" PlaceholderText="{x:Bind datahelper:MatchHelper.Int32Subtract(sys:DateTime.Now.Year,3)}"/>
+                        <TextBox x:Name="Year_CustomeTextBox" Grid.Row="1"
+                                 Visibility="{x:Bind customTimeRange_RadioButton.IsChecked,Mode=OneWay}"
+                                 Text="{x:Bind datahelper:MatchHelper.Int32Subtract(sys:DateTime.Now.Year,3)}"
+                                 TextChanged="Year_CustomeTextBox_TextChanged"/>
                     </Grid>
                 </Flyout>
             </ToggleSplitButton.Flyout>
         </ToggleSplitButton>
-        <ToggleSplitButton Content="评分" Grid.Column="1">
+        <ToggleSplitButton x:Name="Score_ToggleSplitButton" Content="评分" Grid.Column="1" Click="Score_ToggleSplitButton_Click" Tag="Score">
             <ToggleSplitButton.Flyout>
                 <Flyout FlyoutPresenterStyle="{StaticResource FilterFlyoutPresenterStyle}">
-                    <RadioButtons>
-                        <RadioButton Content="5星" IsChecked="False"/>
-                        <RadioButton Content="4星" IsChecked="False"/>
-                        <RadioButton Content="3星" IsChecked="False"/>
-                        <RadioButton Content="2星" IsChecked="False"/>
-                        <RadioButton Content="1星" IsChecked="False"/>
-                        <RadioButton Content="未评分" IsChecked="False"/>
+                    <RadioButtons x:Name="Score_RadioButtons" SelectedIndex="0" SelectionChanged="Score_RadioButtons_SelectionChanged" Tag="Score">
+                        <RadioButton Content="5星" Tag="5"/>
+                        <RadioButton Content="4星" Tag="4"/>
+                        <RadioButton Content="3星" Tag="3"/>
+                        <RadioButton Content="2星" Tag="2"/>
+                        <RadioButton Content="1星" Tag="1"/>
+                        <RadioButton Content="未评分" Tag="-1"/>
                     </RadioButtons>
                 </Flyout>
             </ToggleSplitButton.Flyout>
         </ToggleSplitButton>
 
-        <ToggleSplitButton Content="类别" Grid.Column="2">
+        <ToggleSplitButton x:Name="Type_ToggleSplitButton" Content="类别" Grid.Column="2" Click="Type_ToggleSplitButton_Click" Tag="Type">
             <ToggleSplitButton.Flyout>
                 <Flyout FlyoutPresenterStyle="{StaticResource FilterFlyoutPresenterStyle}">
-                    <RadioButtons>
-                        <RadioButton Content="骑兵" IsChecked="False"/>
-                        <RadioButton Content="步兵" IsChecked="False"/>
+                    <RadioButtons x:Name="Type_RadioButtons" SelectedIndex="0" SelectionChanged="Type_RadioButtons_SelectionChanged" Tag="Type">
+                        <RadioButton GroupName="Type" Content="骑兵" IsChecked="True"/>
+                        <RadioButton GroupName="Type" Content="步兵"/>
                     </RadioButtons>
                 </Flyout>
             </ToggleSplitButton.Flyout>

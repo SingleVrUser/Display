@@ -12,6 +12,7 @@ using System;
 using System.Linq;
 using OpenCvSharp.Flann;
 using System.ComponentModel;
+using CommunityToolkit.WinUI.UI.Controls;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -34,7 +35,7 @@ namespace Display.Views
         private navigationAnimationType _navigationType;
         private VideoCoverDisplayClass _storeditem;
         private GridView _stroedgridview;
-        private Image _storedimage;
+        private ImageEx _storedimage;
 
         public HomePage()
         {
@@ -72,7 +73,9 @@ namespace Display.Views
 
         private void Image_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
-            _storedimage = (Image)sender;
+            if (!(sender is ImageEx image)) return;
+
+            _storedimage = image;
 
             VideoCoverDisplayClass coverInfo = _storedimage.DataContext as VideoCoverDisplayClass;
 

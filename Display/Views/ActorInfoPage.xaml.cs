@@ -21,15 +21,15 @@ namespace Display.Views
         //为返回动画做准备（需启动缓存）
         VideoCoverDisplayClass _storeditem;
 
-        private static readonly DependencyProperty ShowNameProperty =
-            DependencyProperty.Register("ShowName", typeof(string), typeof(ActorInfoPage), null);
+        //private static readonly DependencyProperty ShowNameProperty =
+        //    DependencyProperty.Register("ShowName", typeof(string), typeof(ActorInfoPage), null);
 
-        //ShowName需要实时更新
-        private string ShowName
-        {
-            get { return (string)GetValue(ShowNameProperty); }
-            set { SetValue(ShowNameProperty, value); }
-        }
+        ////ShowName需要实时更新
+        //private string ShowName
+        //{
+        //    get { return (string)GetValue(ShowNameProperty); }
+        //    set { SetValue(ShowNameProperty, value); }
+        //}
 
         public ActorInfoPage()
         {

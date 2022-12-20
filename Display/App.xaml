@@ -1,6 +1,7 @@
 ﻿<Application x:Class="Display.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
              xmlns:local="using:Display">
     <Application.Resources>
         <ResourceDictionary>
@@ -23,6 +24,11 @@
                     <Style TargetType="TextBlock">
                         <Setter Property="FontFamily"
                                 Value="霞鹜文楷" />
+                    </Style>
+
+                    <Style TargetType="controls:ImageEx">
+                        <Setter Property="PlaceholderSource" Value="/Assets/ImageExPlaceholder.jpg"/>
+                        <Setter Property="PlaceholderStretch" Value="UniformToFill"/>
                     </Style>
 
                     <!--单选按钮-->

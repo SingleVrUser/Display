@@ -24,6 +24,8 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
     private string orderBy { get; set; }
     private bool isDesc { get; set; }
 
+    private Dictionary<string, string> ranges { get; set; }
+
     private List<string> filterConditionList { get; set; }
 
     private string filterKeywords { get; set; }
@@ -35,10 +37,10 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
 
     public async Task LoadData(int startShowCount = 20)
     {
-        var newItems = await DataAccess.LoadVideoInfo(startShowCount, 0,orderBy,isDesc, filterConditionList, filterKeywords);
+        var newItems = await DataAccess.LoadVideoInfo(startShowCount, 0,orderBy,isDesc, filterConditionList, filterKeywords, ranges);
 
         if (Count == 0)
-            this.AllCount = DataAccess.CheckVideoInfoCount(orderBy, isDesc, filterConditionList, filterKeywords);
+            this.AllCount = DataAccess.CheckVideoInfoCount(orderBy, isDesc, filterConditionList, filterKeywords,ranges);
         else
             Clear();
 
@@ -57,6 +59,11 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
         this.filterKeywords = filterKeywords;
     }
 
+    public void SetRange(Dictionary<string, string> ranges)
+    {
+        this.ranges = ranges;
+    }
+
     public void SetOrder(string orderBy, bool isDesc)
     {
         this.orderBy = orderBy;
@@ -72,7 +79,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
 
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        var lists = await DataAccess.LoadVideoInfo(defaultCount, Count, orderBy, isDesc, filterConditionList, filterKeywords);
+        var lists = await DataAccess.LoadVideoInfo(defaultCount, Count, orderBy, isDesc, filterConditionList, filterKeywords, ranges);
 
         //在最后的时候加载匹配失败的
         //用于展示搜索结果
@@ -82,7 +89,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
 
             //最后显示匹配失败，如果需要显示的话
             //无筛选功能
-            if (filterConditionList.Contains("fail"))
+            if (filterConditionList!=null && filterConditionList.Contains("fail"))
             {
                 var failList = await DataAccess.LoadFailFileInfo(0,-1,filterKeywords);
                 failList.ForEach(item => Add(new(new(item), imageWidth, imageHeight)));
