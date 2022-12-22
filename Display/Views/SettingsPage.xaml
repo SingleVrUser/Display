@@ -195,7 +195,7 @@
                                                RelativePanel.AlignVerticalCenterWithPanel="True" />
 
                                     <TextBlock x:Name="OverdueTime_TextBlock"
-                                               Text="{x:Bind data:FileMatch.ConvertInt32ToDateStr(OverdueTime_NumberBox.Value) ,Mode=OneWay}"
+                                               Text="{x:Bind data:FileMatch.ConvertDoubleToDateStr(OverdueTime_NumberBox.Value) ,Mode=OneWay}"
                                                RelativePanel.LeftOf="OverdueTime_NumberBox"
                                                RelativePanel.AlignVerticalCenterWithPanel="True"
                                                Margin="10,0"

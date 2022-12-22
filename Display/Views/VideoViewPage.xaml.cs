@@ -1,4 +1,5 @@
 ﻿using Data;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -28,12 +29,15 @@ namespace Display.Views
         }
 
 
-        private void SingleVideoPlay_Click(object sender, RoutedEventArgs e)
+        private async void SingleVideoPlay_Click(object sender, RoutedEventArgs e)
         {
             var VideoPlayButton = (Button)sender;
             var datum = VideoPlayButton.DataContext as Datum;
 
-            Views.DetailInfoPage.PlayeVideo(datum.pc, this.XamlRoot);
+
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
+            await Views.DetailInfoPage.PlayeVideo(datum.pc, this.XamlRoot);
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
 
         /// <summary>
@@ -54,7 +58,7 @@ namespace Display.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void VideoPlay_Click(object sender, RoutedEventArgs e)
+        private async void VideoPlay_Click(object sender, RoutedEventArgs e)
         {
             var VideoPlayButton = (Button)sender;
             var videoInfo = VideoPlayButton.DataContext as VideoCoverDisplayClass;
@@ -70,7 +74,10 @@ namespace Display.Views
             }
             else if (videoInfoList.Count == 1)
             {
-                Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
+
+                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
+                await Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
+                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             }
 
             //有多集
@@ -94,11 +101,13 @@ namespace Display.Views
             }
         }
 
-        private void ContentListView_ItemClick(object sender, ItemClickEventArgs e)
+        private async void ContentListView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var SingleVideoInfo = e.ClickedItem as Data.Datum;
 
-            Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc, this.XamlRoot);
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
+            await Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc, this.XamlRoot);
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)

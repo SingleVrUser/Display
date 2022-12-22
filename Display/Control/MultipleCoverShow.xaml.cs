@@ -65,7 +65,6 @@ namespace Display.Control
                 UpdateCoverFlipItems(showCount);
             }
 
-
             _CoverCount = CoverList.Count;
         }
 

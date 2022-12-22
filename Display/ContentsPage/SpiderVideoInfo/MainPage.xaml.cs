@@ -1,8 +1,10 @@
 ﻿using Data;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using WinUIEx;
 
@@ -16,8 +18,8 @@ namespace Display.ContentsPage.SpiderVideoInfo
     /// </summary>
     public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
-        private Model.IncrementalLoadFailInfoCollection _failList;
-        Model.IncrementalLoadFailInfoCollection FailList
+        private Model.IncrementalLoadFailSpiderInfoCollection _failList;
+        Model.IncrementalLoadFailSpiderInfoCollection FailList
         {
             get => _failList;
             set
@@ -95,6 +97,48 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// <param name="e"></param>
         private void StartMatchName_ButtonClick(object sender, RoutedEventArgs e)
         {
+            //从本地数据库中搜刮
+            if(localData_RadioButton.IsChecked== true)
+            {
+                SpiderFromLocalData();
+            }
+            //从失败列表中搜刮（带匹配名称）
+            else
+            {
+                SpiderFromFailList();
+            }
+        }
+
+        /// <summary>
+        /// 从失败列表中搜刮（带匹配名称）
+        /// </summary>
+        private void SpiderFromFailList()
+        {
+            //检查是否有选中文件
+            if (FailList==null || FailList.Count==0)
+            {
+                SelectNull_TeachintTip.IsOpen = true;
+                return;
+            }
+
+            List<FailDatum> failDatums = FailList.Where(item => !string.IsNullOrEmpty(item.MatchName)).ToList();
+
+            if (failDatums.Count == 0)
+            {
+                SelectNull_TeachintTip.IsOpen = true;
+                return;
+            }
+
+            //创建进度窗口
+            var page = new ContentsPage.SpiderVideoInfo.Progress(failDatums);
+            page.CreateWindow();
+        }
+
+        /// <summary>
+        /// 从本地数据库中搜刮
+        /// </summary>
+        private void SpiderFromLocalData()
+        {
             //检查是否有选中文件
             if (Explorer.FolderTreeView.SelectedNodes.Count == 0)
             {
@@ -123,7 +167,6 @@ namespace Display.ContentsPage.SpiderVideoInfo
             //创建进度窗口
             var page = new ContentsPage.SpiderVideoInfo.Progress(folderNameList, datumList);
             page.CreateWindow();
-
         }
 
         /// <summary>
@@ -133,39 +176,16 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// <param name="e"></param>
         private void RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (e.AddedItems.Count == 0) return;
+            //if (e.AddedItems.Count == 0) return;
 
-            if (e.AddedItems[0] is RadioButton radioButton)
-            {
-                if (radioButton.Name == nameof(matchFail_RadioButton))
-                {
-                    tryShowFailList();
-                }
-            }
+            //if (e.AddedItems[0] is RadioButton radioButton)
+            //{
+            //    if (radioButton.Name == nameof(matchFail_RadioButton))
+            //    {
+            //    }
+            //}
         }
 
-        /// <summary>
-        /// 显示失败列表
-        /// </summary>
-        private async void tryShowFailList()
-        {
-            if (FailListView.ItemsSource == null)
-            {
-                FailList = new();
-                FailListView.ItemsSource = FailList;
-            }
-
-            if (FailList.Count == 0)
-            {
-                //失败总数
-                var failCount = DataAccess.CheckFailFilesCount();
-                FailListTotalCount_Run.Text = $"/{failCount}";
-
-                //当前显示的
-                var list = await DataAccess.LoadFailFileInfo(0,30);
-                list.ForEach(item => FailList.Add(item));
-            }
-        }
 
         /// <summary>
         /// 点击显示文件信息
@@ -204,7 +224,8 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 return;
 
             if (FileInfoShow_Grid.Visibility == Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
-            SelectedDatum = e.AddedItems[0] as Datum;
+
+            SelectedDatum = (e.AddedItems[0] as FailDatum).Datum;
         }
 
         /// <summary>
@@ -212,13 +233,49 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void VideoPlayButton_Click(object sender, RoutedEventArgs e)
+        private async void VideoPlayButton_Click(object sender, RoutedEventArgs e)
         {
             if(SelectedDatum== null) return;
 
-            Views.DetailInfoPage.PlayeVideo(SelectedDatum.pc, this.XamlRoot);
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
+            await Views.DetailInfoPage.PlayeVideo(SelectedDatum.pc, this.XamlRoot);
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
 
+        private async void FailTypeRadionButtonChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems[0] is RadioButton radioButton)
+            {
+                if (FailListView.ItemsSource == null)
+                {
+                    FailList = new();
+                }
+                else if(FailList.Count != 0)
+                {
+                    FailList.Clear();
+                }
+
+                switch (radioButton.Name)
+                {
+                    //正则匹配失败
+                    case nameof(ShowMatcFail_RadionButton):
+                        FailList.SetShowType(FailType.MatchFail);
+                        await FailList.LoadData();
+                        break;
+                    //搜刮失败
+                    case nameof(ShowSpiderFail_RadionButton):
+                        FailList.SetShowType(FailType.SpiderFail);
+                        await FailList.LoadData();
+                        break;
+                    //所有
+                    default:
+                        FailList.SetShowType(FailType.All);
+                        await FailList.LoadData();
+                        break;
+                }
+
+            }
+        }
     }
     public class SpliderInfoProgress
     {

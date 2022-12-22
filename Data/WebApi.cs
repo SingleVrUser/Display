@@ -1428,7 +1428,7 @@ namespace Data
         /// 原画播放
         /// </summary>
         /// <param name="pickcode"></param>
-        public async void PlayVideoWithOriginUrl(string pickcode, playMethod playMethod, XamlRoot xamlRoot, SubInfo subInfo = null)
+        public async Task PlayVideoWithOriginUrl(string pickcode, playMethod playMethod, XamlRoot xamlRoot, SubInfo subInfo = null)
         {
             //播放路径检查选择
             string savePath = string.Empty;

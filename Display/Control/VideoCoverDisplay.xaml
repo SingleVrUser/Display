@@ -30,7 +30,6 @@
                          Opacity="0.8" />
 
 
-
         <!--排列Flyout的样式-->
         <Style TargetType="FlyoutPresenter" x:Key="OrderFlyoutPresenterStyle">
             <Setter Property="Padding"
@@ -643,17 +642,27 @@
             </interactivity:Interaction.Behaviors>
 
             <GridView.Header>
-                <Grid Visibility="{x:Bind IsShowSearchListView}" MinHeight="40" Background="{StaticResource FocusVisualWhiteStrokeThemeBrush}">
+                <Grid x:Name="HeaderGrid" Visibility="{x:Bind IsShowSearchListView}" MinHeight="40" Background="{StaticResource FocusVisualWhiteStrokeThemeBrush}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+
                     <TextBlock
                         x:FieldModifier="public"
                         x:Name="showNameTextBlock"
+                        
                         Text="{x:Bind Title,Mode=OneWay}"
                         FontSize="25"
                         IsTextSelectionEnabled="True"
                         Style="{ThemeResource FlyoutPickerTitleTextBlockStyle}"
                         FontFamily="霞鹜文楷"
                         FontWeight="Bold"
-                        HorizontalAlignment="Center"/>
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"/>
+                    <Grid Grid.Column="1" x:Name="HeaderCover_Grid" Height="130" CornerRadius="5" Margin="3,5,10,0">
+                        <Image x:FieldModifier="public" x:Name="HeaderCover"/>
+                    </Grid>
                 </Grid>
 
             </GridView.Header>

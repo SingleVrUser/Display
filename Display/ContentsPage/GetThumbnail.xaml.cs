@@ -149,7 +149,7 @@ namespace Display.ContentsPage
                 //完成
                 if (item.Status != Status.doing && thumbnailInfo.Count == info.index + 1)
                 {
-                    progress_TextBlock.Text = $"任务已完成，耗时{FileMatch.ConvertInt32ToDateStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
+                    progress_TextBlock.Text = $"任务已完成，耗时{FileMatch.ConvertDoubleToDateStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
                 }
             });
 
@@ -193,7 +193,7 @@ namespace Display.ContentsPage
                 //完成
                 if (item.Status != Status.doing && thumbnailInfo.Count == info.index + 1)
                 {
-                    progress_TextBlock.Text = $"任务已完成，耗时{FileMatch.ConvertInt32ToDateStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
+                    progress_TextBlock.Text = $"任务已完成，耗时{FileMatch.ConvertDoubleToDateStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
                 }
 
             });

@@ -1,5 +1,6 @@
 ﻿using Data;
 using Display.Views;
+using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -266,7 +267,7 @@ namespace Display
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        private void SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        private async void SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
             var nowItem = args.SelectedItem as VideoInfo;
 
@@ -276,7 +277,7 @@ namespace Display
                 //选中的是失败项
                 if(nowItem.series == "fail")
                 {
-                    Views.DetailInfoPage.PlayeVideo(nowItem.busurl, ((Page)ContentFrame.Content).XamlRoot);
+                    await Views.DetailInfoPage.PlayeVideo(nowItem.busurl, ((Page)ContentFrame.Content).XamlRoot);
                 }
                 //正常点击
                 else

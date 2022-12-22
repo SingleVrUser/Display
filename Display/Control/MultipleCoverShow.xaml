@@ -59,13 +59,14 @@
                                       IsItemClickEnabled="True">
                                 <GridView.ItemTemplate>
                                     <DataTemplate x:DataType="data:VideoCoverDisplayClass">
-                                        <controls:ImageEx Height="200"
+                                        <Image Height="200"
+                                               MaxWidth="300"
                                                x:Name="showImage"
                                                Style="{StaticResource newAddCoverResources}"
                                                Source="{x:Bind imagepath}"
                                                PointerEntered="Image_PointerEntered"
                                                PointerExited="Image_PointerExited">
-                                            <controls:ImageEx.ContextFlyout>
+                                            <Image.ContextFlyout>
                                                 <!--右键操作-->
                                                 <MenuFlyout>
                                                     <MenuFlyoutItem Text="移出"
@@ -75,8 +76,8 @@
                                                         </MenuFlyoutItem.Icon>
                                                     </MenuFlyoutItem>
                                                 </MenuFlyout>
-                                            </controls:ImageEx.ContextFlyout>
-                                        </controls:ImageEx>
+                                            </Image.ContextFlyout>
+                                        </Image>
                                     </DataTemplate>
                                 </GridView.ItemTemplate>
                             </GridView>

@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Media;
 using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -38,6 +39,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
         VideoInfo videoInfo = new VideoInfo();
         List<string> folderNameList = new();
         List<Datum> datumList = new();
+        List<FailDatum> failDatumList = new();
         GetInfoFromNetwork network;
         List<SpiderInfo> SpiderInfos;
         List<string> FailVideoNameList;
@@ -49,6 +51,41 @@ namespace Display.ContentsPage.SpiderVideoInfo
             this.folderNameList = folderNameList;
             this.datumList = datumList;
             this.Loaded += PageLoaded;
+        }
+
+        public Progress(List<FailDatum> failDatums)
+        {
+            this.InitializeComponent();
+            this.failDatumList= failDatums;
+            this.Loaded += ReSpiderPageLoaded;
+        }
+
+        private async void ReSpiderPageLoaded(object sender, RoutedEventArgs e)
+        {
+            if (failDatumList == null || failDatumList.Count == 0) return;
+
+            currentWindow.Closed += CurrentWindow_Closed;
+            if (matchVideoResults == null) matchVideoResults = new();
+            foreach (var item in failDatumList)
+            {
+                matchVideoResults.Add(new MatchVideoResult() { status = true, OriginalName = item.Datum.n, message = "匹配成功", statusCode = 1, MatchName = item.MatchName });
+
+                //替换数据库的数据
+                DataAccess.AddFileToInfo(item.Datum.pc, item.MatchName, isReplace: true);
+            }
+
+            //显示进度环
+            ShowProgress(matchVideoResults.Count);
+
+            if (s_cts.IsCancellationRequested) return;
+            await SpliderVideoInfo(matchVideoResults);
+            if (s_cts.IsCancellationRequested) return;
+
+
+            currentWindow.Closed -= CurrentWindow_Closed;
+
+            TopProgressRing.IsActive = false;
+            TotalProgress_TextBlock.Text = "完成";
         }
 
         private async void PageLoaded(object sender, RoutedEventArgs e)
@@ -92,6 +129,15 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             int totalCount = matchVideoResults.Where(item => !string.IsNullOrEmpty(item.MatchName)).ToList().Count;
 
+            //显示进度环
+            ShowProgress(totalCount);
+
+
+            TopProgressRing.IsActive = false;
+        }
+
+        private void ShowProgress(int totalCount)
+        {
             //初始化进度环
             ProgressRing_Grid.Visibility = Visibility.Visible;
             overallProgress.Maximum = totalCount;
@@ -104,8 +150,6 @@ namespace Display.ContentsPage.SpiderVideoInfo
             ProgressRing_StackPanel.SetValue(Grid.ColumnSpanProperty, 2);
 
             if (s_cts.IsCancellationRequested) return;
-
-            TopProgressRing.IsActive = false;
         }
 
         private void ShowSpiderInfoList()
@@ -406,7 +450,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             }
 
             //显示总耗时
-            SearchMessage_TextBlock.Text = $"⏱总耗时：{FileMatch.ConvertInt32ToDateStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime)}";
+            SearchMessage_TextBlock.Text = $"⏱总耗时：{FileMatch.ConvertDoubleToDateStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime)}";
 
             TopProgressRing.IsActive = false;
         }
@@ -643,6 +687,10 @@ namespace Display.ContentsPage.SpiderVideoInfo
                             break;
                     }
 
+                    // 添加搜刮信息到数据库（只有从搜刮源查找到的才添加）
+                    if (resultInfo!=null)
+                        DataAccess.AddVideoInfo(resultInfo);
+
                 }
 
                 //检查一下是否需要标记为全部完成
@@ -660,9 +708,6 @@ namespace Display.ContentsPage.SpiderVideoInfo
                         //记录为已完成且已全部完成
                         DataAccess.UpdataSpiderTask(name, spiderSource, SpiderStates.done, true);
                     }
-
-                    // 添加搜刮信息到数据库
-                    DataAccess.AddVideoInfo(resultInfo);
 
                     //更新FileToInfo表
                     DataAccess.UpdataFileToInfo(name, true);

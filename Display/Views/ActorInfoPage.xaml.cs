@@ -1,4 +1,5 @@
 ﻿using Data;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -21,22 +22,31 @@ namespace Display.Views
         //为返回动画做准备（需启动缓存）
         VideoCoverDisplayClass _storeditem;
 
-        //private static readonly DependencyProperty ShowNameProperty =
-        //    DependencyProperty.Register("ShowName", typeof(string), typeof(ActorInfoPage), null);
-
-        ////ShowName需要实时更新
-        //private string ShowName
-        //{
-        //    get { return (string)GetValue(ShowNameProperty); }
-        //    set { SetValue(ShowNameProperty, value); }
-        //}
-
         public ActorInfoPage()
         {
             //启动缓存（为了返回无需过长等待，也为了返回动画）
             NavigationCacheMode = NavigationCacheMode.Enabled;
 
             this.InitializeComponent();
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
+
+            //准备动画
+            //限定为 返回操作
+            if (e.NavigationMode == NavigationMode.Back)
+            {
+                //指定页面
+                if (e.SourcePageType == typeof(ActorsPage))
+                {
+                    var animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("BackConnectedAnimation",videoControl.HeaderCover);
+
+                    //返回动画应迅速
+                    animation.Configuration = new DirectConnectedAnimationConfiguration();
+                }
+            }
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -55,26 +65,36 @@ namespace Display.Views
             else if (e.NavigationMode == NavigationMode.New)
             {
                 var item = e.Parameter;
-                LoadShowInfo(item);
+                if (item == null) return;
+                //需要显示的是搜索结果
+                if (item is Tuple<List<string>, string> typesAndName)
+                {
+                    LoadShowInfo(typesAndName);
+                }
+                else
+                {
+                    return;
+                }
 
                 ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("ForwardConnectedAnimation");
                 if (animation != null)
                 {
-                    animation.TryStart(videoControl.showNameTextBlock);
+                    if(typesAndName.Item1.Count==1 && typesAndName.Item1.FirstOrDefault() == "actor")
+                    {
+                        animation.TryStart(videoControl.HeaderCover);
+                    }
+                    else
+                    {
+                        animation.TryStart(videoControl.showNameTextBlock);
+                    }
                 }
             }
         }
 
-        private void LoadShowInfo(object item)
+        private void LoadShowInfo(Tuple<List<string>, string> typesAndName)
         {
-            if (item == null) return;
 
-            //需要显示的是搜索结果
-            if (item is Tuple<List<string>,string> typesAndName)
-            {
-                videoControl.ReLoadSearchResult(typesAndName.Item1, typesAndName.Item2);
-            }
-
+            videoControl.ReLoadSearchResult(typesAndName.Item1, typesAndName.Item2);
         }
 
         /// <summary>
@@ -95,7 +115,7 @@ namespace Display.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void VideoPlay_Click(object sender, RoutedEventArgs e)
+        private async void VideoPlay_Click(object sender, RoutedEventArgs e)
         {
             var item = videoControl;
 
@@ -105,7 +125,10 @@ namespace Display.Views
             //播放失败列表（imgUrl就是pc）
             if(videoInfo.series == "fail")
             {
-                Views.DetailInfoPage.PlayeVideo(videoInfo.imageurl, this.XamlRoot);
+
+                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
+                await Views.DetailInfoPage.PlayeVideo(videoInfo.imageurl, this.XamlRoot);
+                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
                 return;
             }
 
@@ -122,7 +145,10 @@ namespace Display.Views
             }
             else if (videoInfoList.Count == 1)
             {
-                Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
+
+                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
+                await Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
+                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             }
 
             //有多集
@@ -146,11 +172,13 @@ namespace Display.Views
             }
         }
 
-        private void ContentListView_ItemClick(object sender, ItemClickEventArgs e)
+        private async void ContentListView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var SingleVideoInfo = e.ClickedItem as Data.Datum;
 
-            Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc, this.XamlRoot);
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
+            await Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc, this.XamlRoot);
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
 
 

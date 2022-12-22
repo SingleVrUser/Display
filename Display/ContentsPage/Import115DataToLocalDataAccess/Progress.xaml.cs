@@ -86,10 +86,6 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             }
         }
 
-        //protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
-        //{
-        //    base.OnNavigatingFrom(e);
-        //}
 
         private async void loadData()
         {
@@ -164,7 +160,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                     successCount = progressPercent.getFilesProgressInfo.AllCount;
                     updataProgress();
                     cps_TextBlock.Text = $"{progressPercent.sendCountPerMinutes} 次/分钟";
-                    leftTime_Run.Text = FileMatch.ConvertInt32ToDateStr(1.5* (folderCount- progressPercent.getFilesProgressInfo.FolderCount));
+                    leftTime_Run.Text = FileMatch.ConvertDoubleToDateStr(1.5* (folderCount- progressPercent.getFilesProgressInfo.FolderCount));
                     //updateSendSpeed(progressPercent.sendCountPerSecond);
 
                 }
@@ -194,7 +190,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
                     //剩余时间改总耗时
                     leftTimeTitle_Run.Text = "总耗时：";
-                    leftTime_Run.Text = FileMatch.ConvertInt32ToDateStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime);
+                    leftTime_Run.Text = FileMatch.ConvertDoubleToDateStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime);
 
                     cps_TextBlock.Visibility = Visibility.Collapsed;
                     GetFolderCategory_Expander.IsExpanded = true;
