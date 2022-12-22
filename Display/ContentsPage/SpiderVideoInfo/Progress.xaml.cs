@@ -62,6 +62,8 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
         private async void ReSpiderPageLoaded(object sender, RoutedEventArgs e)
         {
+            this.Loaded -= ReSpiderPageLoaded;
+
             if (failDatumList == null || failDatumList.Count == 0) return;
 
             currentWindow.Closed += CurrentWindow_Closed;
@@ -90,6 +92,8 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
         private async void PageLoaded(object sender, RoutedEventArgs e)
         {
+            this.Loaded -= PageLoaded;
+
             currentWindow.Closed += CurrentWindow_Closed;
 
             await ShowMatchResult();
@@ -112,15 +116,21 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// <returns></returns>
         private async Task ShowMatchResult()
         {
+            if (datumList == null) return;
+
             TopProgressRing.IsActive= true;
 
             //目前datumList仅有一级目录文件
             //遍历获取文件列表中所有的文件
+            await Task.Run(() => datumList = DataAccess.GetAllFilesInFolderList(datumList));
 
+            //除去文件夹
+            datumList = datumList.Where(item => !string.IsNullOrEmpty(item.fid)).ToList();
+
+            //去除重复文件
             Dictionary<string, Datum> newDictList = new();
             datumList.ForEach(item => newDictList.TryAdd(item.pc, item));
 
-            await Task.Run(() => newDictList = DataAccess.GetAllFilesInFolderList(newDictList));
             datumList = newDictList.Values.ToList();
 
             //显示饼状图

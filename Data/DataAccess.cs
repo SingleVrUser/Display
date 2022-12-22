@@ -2027,31 +2027,26 @@ namespace Data
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static Dictionary<string, Datum> GetAllFilesInFolderList(Dictionary<string, Datum> dataList)
+        public static List<Datum> GetAllFilesInFolderList(List<Datum> dataList)
         {
             List<Datum>  newData = new();
-
-            Dictionary<string, Datum> newDict = new();
 
             foreach (var currentFile in dataList)
             {
                 //文件夹
-                if (string.IsNullOrEmpty(currentFile.Value.fid))
+                if (string.IsNullOrEmpty(currentFile.fid))
                 {
-                    List<Datum> newDataList = GetListByCid(currentFile.Value.cid);
-                    Dictionary<string, Datum> newDictList = new();
-                    newDataList.ForEach(item => newDictList.TryAdd(item.pc, item));
-                    var fileInFolderList = GetAllFilesInFolderList(newDictList);
+                    List<Datum> newDataList = GetListByCid(currentFile.cid);
 
-                    fileInFolderList.Values.ToList().ForEach(item => newDict.TryAdd(item.pc, item));
-                    //newData.AddRange(GetAllFilesInFolderList(newDataList));
+                    var fileInFolderList = GetAllFilesInFolderList(newDataList);
+
+                    newData.AddRange(fileInFolderList);
                 }
             }
 
-            dataList.Values.ToList().ForEach(item => newDict.TryAdd(item.pc, item));
-            //newData.AddRange(dataList);
+            newData.AddRange(dataList);
 
-            return newDict;
+            return newData;
         }
 
         /// <summary>

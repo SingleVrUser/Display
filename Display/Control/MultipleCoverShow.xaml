@@ -39,52 +39,56 @@
                             Opacity="0.5" />
             </HyperlinkButton>
         </RelativePanel>
-        <Grid>
-            <Grid x:Name="NewAddGrid"
-                  BorderBrush="{ThemeResource AppBarBorderThemeBrush}"
-                  BorderThickness="1"
-                  CornerRadius="5"
-                  Margin="5"
-                  SizeChanged="NewAddGrid_SizeChanged">
-                <FlipView Height="250"
-                          ItemsSource="{x:Bind NewAddFlipItems, Mode=OneWay}"
-                          Background="{ThemeResource BreadcrumbBarBackgroundBrush}">
-                    <FlipView.ItemTemplate>
-                        <DataTemplate x:DataType="data:CoverFlipItems">
-                            <GridView ItemsSource="{x:Bind CoverItems,Mode=OneWay}"
-                                      HorizontalAlignment="Center"
-                                      VerticalAlignment="Center"
-                                      ItemClick="GridView_ItemClick"
-                                      SelectionMode="None"
-                                      IsItemClickEnabled="True">
-                                <GridView.ItemTemplate>
-                                    <DataTemplate x:DataType="data:VideoCoverDisplayClass">
-                                        <Image Height="200"
-                                               MaxWidth="300"
-                                               x:Name="showImage"
-                                               Style="{StaticResource newAddCoverResources}"
-                                               Source="{x:Bind imagepath}"
-                                               PointerEntered="Image_PointerEntered"
-                                               PointerExited="Image_PointerExited">
-                                            <Image.ContextFlyout>
-                                                <!--右键操作-->
-                                                <MenuFlyout>
-                                                    <MenuFlyoutItem Text="移出"
-                                                                    IsEnabled="False">
-                                                        <MenuFlyoutItem.Icon>
-                                                            <FontIcon Glyph="&#xEE4A;" />
-                                                        </MenuFlyoutItem.Icon>
-                                                    </MenuFlyoutItem>
-                                                </MenuFlyout>
-                                            </Image.ContextFlyout>
-                                        </Image>
-                                    </DataTemplate>
-                                </GridView.ItemTemplate>
-                            </GridView>
-                        </DataTemplate>
-                    </FlipView.ItemTemplate>
-                </FlipView>
-            </Grid>
+
+        <Grid
+            BorderThickness="1"
+            BorderBrush="{StaticResource ControlElevationBorderBrush}"
+            CornerRadius="8"
+            Margin="0,5"
+            MinHeight="280">
+            <controls:AdaptiveGridView
+                    Grid.Row="1"
+                    StretchContentForSingleRow="True"
+                    OneRowModeEnabled="True"
+                    ItemHeight="250"
+                    DesiredWidth="300"
+                    SelectionMode="None"
+                    ItemClick="GridView_ItemClick"
+                    IsItemClickEnabled="True"
+                    VerticalContentAlignment="Center"
+                    VerticalAlignment="Center"
+                    ItemsSource="{x:Bind CoverList}"
+                    ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                    ScrollViewer.HorizontalScrollMode="Enabled">
+
+                <controls:AdaptiveGridView.ItemTemplate>
+                    <DataTemplate x:DataType="data:VideoCoverDisplayClass">
+                        <Grid
+                            PointerEntered="Image_PointerEntered"
+                            PointerExited="Image_PointerExited"
+                            CornerRadius="2">
+                            <Image
+                                    x:Name="showImage"
+                                  VerticalAlignment="Center"
+                                  Source="{Binding imagepath}"
+                                  Stretch="Uniform">
+                                <Image.ContextFlyout>
+                                    <!--右键操作-->
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem Text="移出" IsEnabled="False">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xEE4A;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                    </MenuFlyout>
+                                </Image.ContextFlyout>
+                            </Image>
+                        </Grid>
+
+                    </DataTemplate>
+                </controls:AdaptiveGridView.ItemTemplate>
+
+            </controls:AdaptiveGridView>
 
             <!--无内容显示时显示该控件-->
             <StackPanel HorizontalAlignment="Center"

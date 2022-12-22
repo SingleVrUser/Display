@@ -206,7 +206,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
                 case "is_like":
                     Title = "喜欢";
                     break;
-                case "look_after":
+                case "look_later":
                     Title = "稍后观看";
                     break;
                 case "fail":

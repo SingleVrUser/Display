@@ -224,6 +224,8 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
                 await Task.Delay(3000);
 
+                WillStartSpiderTaskTip.IsOpen = false;
+
                 List<string> folderList = FolderCategory.Select(item=>item.file_name).ToList();
 
                 //datum只用到其中的cid,所以只赋值cid (fid默认为空,不用理)
@@ -233,6 +235,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                 var page = new ContentsPage.SpiderVideoInfo.Progress(folderList, datumList);
                 //创建搜刮进度窗口
                 page.CreateWindow();
+
             }
 
             currentWindow.Closed -= CurrentWindow_Closed;
