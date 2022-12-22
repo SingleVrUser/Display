@@ -315,7 +315,12 @@ namespace Data
             return true;
         }
 
-        public static string ConvertInt32ToDateStr(double Second)
+        public static string ConvertInt32ToDateStr(int Second)
+        {
+            return ConvertDoubleToDateStr(Convert.ToDouble(Second));
+        }
+
+        public static string ConvertDoubleToDateStr(double Second)
         {
             if (Second is double.NaN)
                 return Second.ToString();
@@ -397,7 +402,6 @@ namespace Data
                         resultList.Add(new MatchVideoResult() { status = false, OriginalName = file_info.n, statusCode = -1, message = "匹配失败"});
                         continue;
                     }
-
 
                     //匹配后，查询是否重复匹配
                     var existsResult = resultList.Where(x => x.MatchName == VideoName).FirstOrDefault();

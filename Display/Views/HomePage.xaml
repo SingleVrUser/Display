@@ -84,7 +84,7 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="auto"/>
                             </Grid.RowDefinitions>
-                            <FlipView x:Name="randomIamgeFlipView" ItemsSource="{x:Bind Items, Mode=OneWay}">
+                            <FlipView x:Name="randomIamgeFlipView" ItemsSource="{x:Bind Items, Mode=OneWay}" Background="Transparent">
                                 <FlipView.ItemTemplate>
                                     <DataTemplate x:DataType="data:VideoInfo">
                                         <Grid
@@ -93,7 +93,7 @@
                                             PointerExited="Image_PointerExited"
                                             CornerRadius="2"
                                             BorderThickness="1">
-                                            <controls:ImageEx Source="{x:Bind imagepath}" Tapped="Image_Tapped"/>
+                                            <Image Source="{x:Bind imagepath}" Tapped="Image_Tapped"/>
                                         </Grid>
 
                                     </DataTemplate>

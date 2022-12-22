@@ -35,7 +35,6 @@ namespace Display.Control
                     IsExpanded = item.IsExpanded
                 };
                 FolderTreeView.RootNodes.Add(Node);
-                //FillTreeNode(Node);
             }
 
             FileInSelectFolder = new ObservableCollection<FilesInfo>();

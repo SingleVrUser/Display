@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Newtonsoft.Json.Linq;
 using OpenCvSharp.XImgProc;
 using System;
@@ -196,6 +197,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// </summary>
     public void ReLoadSearchResult(List<string> types, string ShowName)
     {
+        bool isShowHeaderCover = false;
+
         if (types.Count == 1)
         {
             switch (types.FirstOrDefault())
@@ -213,15 +216,29 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
                     FailInfoSuggestBox.Visibility = Visibility.Collapsed;
                     trySwitchToFailView();
                     return;
+                case "actor":
+                    Title = ShowName;
+                    ActorsInfo actorInfo = new(ShowName);
+                    HeaderCover.Source = new BitmapImage(new Uri(actorInfo.prifilePhotoPath));
+                    isShowHeaderCover = true;
+                    break;
                 default:
                     Title = ShowName;
                     break;
             }
+
+
         }
         else
         {
             Title = ShowName;
         }
+
+        if (isShowHeaderCover && HeaderCover_Grid.Visibility != Visibility.Visible)
+            HeaderCover_Grid.Visibility = Visibility.Visible;
+        else if (!isShowHeaderCover && HeaderCover_Grid.Visibility != Visibility.Collapsed)
+            HeaderCover_Grid.Visibility = Visibility.Collapsed;
+
 
         filterConditionList = types;
         filterKeywords = ShowName;
@@ -992,6 +1009,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     private void Filter_ToggleButton_Unchecked(object sender, RoutedEventArgs e)
     {
         if (filterRanges == null) return;
+        else if (filterRanges.Count == 0) return;
         else
             filterRanges = null;
 

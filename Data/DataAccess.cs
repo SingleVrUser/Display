@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -89,10 +90,10 @@ namespace Data
                       "PRIMARY KEY('pc')) ";
 
                 SqliteCommand createTable = new SqliteCommand(tableCommand, db);
-                createTable.ExecuteReader();
+                createTable.ExecuteNonQuery();
 
                 //番号详情
-                tableCommand = "CREATE TABLE IF NOT " +
+                createTable.CommandText = "CREATE TABLE IF NOT " +
                     $"EXISTS VideoInfo ( " +
                       "truename TEXT NOT NULL," +
                       "title TEXT," +
@@ -114,43 +115,35 @@ namespace Data
                       "addtime integer," +
                       "PRIMARY KEY('truename')) ";
 
-                createTable = new SqliteCommand(tableCommand, db);
-                createTable.ExecuteReader();
+                //createTable = new SqliteCommand(tableCommand, db);
+                createTable.ExecuteNonQuery();
 
                 //是否步兵
-                tableCommand = "CREATE TABLE IF NOT " +
+                createTable.CommandText = "CREATE TABLE IF NOT " +
                     $"EXISTS Is_Wm ( " +
                       "truename text," +
                       "is_wm integer," +
                       "PRIMARY KEY('truename')" +
                       ") ";
-                createTable = new SqliteCommand(tableCommand, db);
-                createTable.ExecuteReader();
+                //createTable = new SqliteCommand(tableCommand, db);
+                createTable.ExecuteNonQuery();
 
-                //厂商信息
-                tableCommand = "CREATE TABLE IF NOT " +
-                    $"EXISTS ProducerInfo ( " +
-                      "name text," +
-                      "is_wm is_wm," +
-                      "PRIMARY KEY('name')" +
-                      ") ";
-
-                createTable = new SqliteCommand(tableCommand, db);
-                createTable.ExecuteReader();
+                //厂商信息，如果没有则初始化并添加常用的
+                InittializeProducerInfo(createTable);
 
                 //番号匹配
-                tableCommand = "CREATE TABLE IF NOT " +
+                createTable.CommandText = "CREATE TABLE IF NOT " +
                     $"EXISTS FileToInfo ( " +
                       "file_pickcode text," +
                       "truename text," +
                       "issuccess integer," +
                       "PRIMARY KEY('file_pickcode')" +
                       ") ";
-                createTable = new SqliteCommand(tableCommand, db);
-                createTable.ExecuteReader();
+                //createTable = new SqliteCommand(tableCommand, db);
+                createTable.ExecuteNonQuery();
 
                 //下载历史
-                tableCommand = "CREATE TABLE IF NOT " +
+                createTable.CommandText = "CREATE TABLE IF NOT " +
                     $"EXISTS DownHistory ( " +
                       "file_pickcode text," +
                       "file_name text," +
@@ -159,27 +152,27 @@ namespace Data
                       "add_time integer," +
                       "PRIMARY KEY('file_pickcode')" +
                       ") ";
-                createTable = new SqliteCommand(tableCommand, db);
-                createTable.ExecuteReader();
+                //createTable = new SqliteCommand(tableCommand, db);
+                createTable.ExecuteNonQuery();
 
                 //搜刮记录
-                tableCommand = "CREATE TABLE IF NOT " +
+                createTable.CommandText = "CREATE TABLE IF NOT " +
                     $"EXISTS SpiderLog ( " +
                       "task_id INTEGER," +
                       "time text," +
                       "done text," +
                       "PRIMARY KEY('task_id')" +
                       ") ";
-                createTable = new SqliteCommand(tableCommand, db);
-                createTable.ExecuteReader();
+                //createTable = new SqliteCommand(tableCommand, db);
+                createTable.ExecuteNonQuery();
 
                 //删除表（添加了搜刮源，需要重新添加）
-                tableCommand = "DROP TABLE IF EXISTS SpiderTask";
-                createTable = new SqliteCommand(tableCommand, db);
-                createTable.ExecuteReader();
+                createTable.CommandText = "DROP TABLE IF EXISTS SpiderTask";
+                //createTable = new SqliteCommand(tableCommand, db);
+                createTable.ExecuteNonQuery();
 
                 //搜刮任务
-                tableCommand = "CREATE TABLE IF NOT " +
+                createTable.CommandText = "CREATE TABLE IF NOT " +
                     $"EXISTS SpiderTask ( " +
                       "name text," +
                       "bus text," +
@@ -193,9 +186,54 @@ namespace Data
                       "tadk_id integer," +
                       "PRIMARY KEY('name')" +
                       ") ";
-                createTable = new SqliteCommand(tableCommand, db);
-                createTable.ExecuteReader();
+                //createTable = new SqliteCommand(tableCommand, db);
+                createTable.ExecuteNonQuery();
             }
+        }
+
+
+        /// <summary>
+        /// 初始化厂商信息
+        /// </summary>
+        /// <param name="db"></param>
+        public static void InittializeProducerInfo(SqliteCommand createTable)
+        {
+            createTable.CommandText = "SELECT name FROM sqlite_schema WHERE type='table' AND name='ProducerInfo';";
+
+            var result = createTable.ExecuteScalar();
+            //存在
+            if (result != null)
+            {
+                return;
+            }
+            //不存在
+            else
+            {
+                //创建
+                createTable.CommandText = "CREATE TABLE IF NOT " +
+                    $"EXISTS ProducerInfo ( " +
+                        "name text," +
+                        "is_wm is_wm," +
+                        "PRIMARY KEY('name')" +
+                        ") ";
+
+                createTable.ExecuteNonQuery();
+
+                string[] wm_producer = new string[] { "CATCHEYE", "東京熱", "スカイハイエンターテインメント", "HEYZO", "FC2-PPV", "カリビアンコム( Caribbeancom )", "天然むすめ( 10musume )", "一本道( 1pondo )", "ピンクパンチャー", "トラトラトラ", "スーパーモデルメディア", "キャットウォーク", "Gachinco", "スタジオテリヤキ", "フェアリー", "カリビアンコム", "ClimaxZipang", "パコパコママ", "Tokyo-Hot", "SkyHigh", "ファンタドリーム", "一本道", "天然むすめ" };
+
+                //插入常见的
+                foreach (var name in wm_producer)
+                {
+                    createTable.CommandText = "INSERT OR IGNORE INTO ProducerInfo VALUES (@name,1)";
+                    createTable.Parameters.Clear();
+                    createTable.Parameters.AddWithValue("@name",name);
+
+                    createTable.ExecuteNonQuery();
+                }
+
+
+            }
+
         }
 
         public static string NewDBPath(string newPath)
@@ -461,8 +499,11 @@ namespace Data
                 {
                     insertCommand.Parameters.AddWithValue(item.Key, item.Value);
                 }
-                insertCommand.ExecuteReader();
+                var result = insertCommand.ExecuteReader();
 
+                Debug.WriteLine(result);
+
+                Debug.WriteLine($"添加信息{data.truename},{data.producer},{data.is_wm}");
 
                 //添加是否步兵
                 AddOrReplaceIs_Wm(data.truename,data.producer, data.is_wm);
@@ -503,7 +544,6 @@ namespace Data
 
         /// <summary>
         /// 插入或替换是否Is_Wm的表数据
-        /// 如果是步兵，添加厂商
         /// </summary>
         /// <param name="truename"></param>
         /// <param name="is_wm"></param>
@@ -520,9 +560,9 @@ namespace Data
 
                 //添加信息，如果已经存在则替换
                 insertCommand.CommandText = $"INSERT OR REPLACE INTO Is_Wm VALUES (@truename,@is_wm)";
-
                 insertCommand.Parameters.AddWithValue("@truename", truename);
                 insertCommand.Parameters.AddWithValue("@is_wm", is_wm);
+
                 insertCommand.ExecuteNonQuery();
 
                 //添加厂商信息
@@ -539,6 +579,8 @@ namespace Data
         /// <param name="name"></param>
         public static void AddOrIgnoreWm_Producer(string name,int is_wm)
         {
+            if (string.IsNullOrEmpty(name)) return;
+
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
               new SqliteConnection($"Filename={dbpath}"))
@@ -550,7 +592,6 @@ namespace Data
 
                 //添加信息，如果已经存在则替换
                 insertCommand.CommandText = $"INSERT OR IGNORE INTO ProducerInfo VALUES (@name,@is_wm)";
-
                 insertCommand.Parameters.AddWithValue("@name", name);
                 insertCommand.Parameters.AddWithValue("@is_wm", is_wm);
                 insertCommand.ExecuteNonQuery();
@@ -731,8 +772,10 @@ namespace Data
                     insertCommand.Parameters.AddWithValue(item.Key, item.Value.Item2 );
                 }
 
+                Debug.WriteLine($"添加信息{videoInfo.truename},{videoInfo.producer},{videoInfo.is_wm}");
+
                 //更新是否步兵
-                AddOrReplaceIs_Wm(videoInfo.truename, videoInfo.category, videoInfo.is_wm);
+                AddOrReplaceIs_Wm(videoInfo.truename, videoInfo.producer, videoInfo.is_wm);
 
                 insertCommand.ExecuteReader();
 
@@ -956,7 +999,7 @@ namespace Data
         /// 查询失败列表
         /// </summary>
         /// <returns></returns>
-        public static async Task<List<Datum>> LoadFailFileInfo(int offset = 0, int limit = -1, string n = null, string orderBy = null, bool isDesc = false)
+        public static async Task<List<Datum>> LoadFailFileInfo(int offset = 0, int limit = -1, string n = null, string orderBy = null, bool isDesc = false, FailType showType=FailType.All)
         {
             List<Datum> data = new List<Datum>();
 
@@ -987,8 +1030,22 @@ namespace Data
 
                 string queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n.Replace("'", "%")}%'";
 
+                string showTypeStr;
+                switch (showType)
+                {
+                    case FailType.MatchFail:
+                        showTypeStr = " AND FileToInfo.truename == ''";
+                        break;
+                    case FailType.SpiderFail:
+                        showTypeStr = " AND FileToInfo.truename != ''";
+                        break;
+                    default:
+                        showTypeStr = string.Empty;
+                        break;
+                }
+
                 SqliteCommand selectCommand = new SqliteCommand
-                    ($"SELECT * FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{queryStr}{orderStr} LIMIT {limit} offset {offset} ", db);
+                    ($"SELECT * FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{showTypeStr}{queryStr}{orderStr} LIMIT {limit} offset {offset} ", db);
 
                 SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
 
@@ -1007,7 +1064,7 @@ namespace Data
         /// </summary>
         /// <param name="n"></param>
         /// <returns></returns>
-        public static int CheckFailFilesCount(string n = "")
+        public static int CheckFailFilesCount(string n = "",FailType showType= FailType.All)
         {
             if (!string.IsNullOrEmpty(n) && n.Contains("'"))
             {
@@ -1020,10 +1077,24 @@ namespace Data
             {
                 db.Open();
 
-                string queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n}%'";
+                string queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n.Replace("'", "%")}%'";
+
+                string showTypeStr;
+                switch (showType)
+                {
+                    case FailType.MatchFail:
+                        showTypeStr = " AND FileToInfo.truename == ''";
+                        break;
+                    case FailType.SpiderFail:
+                        showTypeStr = " AND FileToInfo.truename != ''";
+                        break;
+                    default:
+                        showTypeStr = string.Empty;
+                        break;
+                }
 
                 SqliteCommand selectCommand = new SqliteCommand
-                    ($"SELECT COUNT(n) FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{queryStr}", db);
+                    ($"SELECT COUNT(n) FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{showTypeStr}{queryStr}", db);
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
 
@@ -1084,14 +1155,13 @@ namespace Data
                             switch (item)
                             {
                                 case "look_after":
-                                    filterList.Add($"{item} != 0");
+                                    filterList.Add($"VideoInfo.{item} != 0");
                                     break;
                                 case "fail":
-                                    var failCount = CheckFailFilesCount(n: filterKeywords);
-                                    count += failCount;
+                                    //不操作
                                     break;
                                 default:
-                                    filterList.Add($"({item} LIKE '%{filterKeywords}%')");
+                                    filterList.Add($"(VideoInfo.{item} LIKE '%{filterKeywords}%')");
                                     break;
                             }
                         }
@@ -1108,10 +1178,22 @@ namespace Data
                             switch (range.Key)
                             {
                                 case "Year":
-                                    ranges.Add($"releasetime LIKE '{range.Value}-%'");
+                                    ranges.Add($"(VideoInfo.releasetime LIKE '{range.Value}-%' OR (releasetime LIKE '{range.Value}/%'))");
                                     break;
                                 case "Score":
-                                    ranges.Add($"score == {range.Value}");
+                                    ranges.Add($"(VideoInfo.score == {range.Value})");
+                                    break;
+                                case "Type":
+                                    switch (range.Value)
+                                    {
+                                        case "步兵":
+                                            ranges.Add("(is_wm.is_wm == 1 OR (is_wm.is_wm IS NULL AND ProducerInfo.is_wm == 1))");
+                                            break;
+                                        case "骑兵":
+                                            ranges.Add("(is_wm.is_wm == 0 OR (is_wm.is_wm IS NULL AND ProducerInfo.is_wm == 0))");
+                                            break;
+                                    }
+
                                     break;
                             }
                         }
@@ -1120,16 +1202,26 @@ namespace Data
                     }
 
                     if (!string.IsNullOrEmpty(filterStr_tmp) && !string.IsNullOrEmpty(filterStr_tmp2))
-                        filterStr = $" WHERE {filterStr_tmp}{filterStr_tmp2}";
+                        filterStr = $" WHERE ({filterStr_tmp}) AND ({filterStr_tmp2})";
                     else if (!string.IsNullOrEmpty(filterStr_tmp2))
                         filterStr = $" WHERE {filterStr_tmp2}";
-                    //两个都有
                     else if (!string.IsNullOrEmpty(filterStr_tmp))
                         filterStr = $" WHERE {filterStr_tmp}";
                 }
 
-                SqliteCommand selectCommand = new SqliteCommand
-                    ($"SELECT COUNT(truename) from VideoInfo{filterStr}{orderStr}", db);
+                SqliteCommand selectCommand;
+
+                //多表查询
+                if (rangesDicts != null && rangesDicts.ContainsKey("Type"))
+                {
+                    selectCommand = new SqliteCommand($"SELECT COUNT(VideoInfo.truename) FROM VideoInfo LEFT JOIN Is_Wm ON VideoInfo.truename = Is_Wm.truename LEFT JOIN ProducerInfo ON VideoInfo.producer = ProducerInfo.name{filterStr}{orderStr}", db);
+                }
+                //普通查询
+                else
+                {
+                    selectCommand = new SqliteCommand
+                        ($"SELECT COUNT(VideoInfo.truename) from VideoInfo{filterStr}{orderStr}", db);
+                }
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
 
@@ -1389,13 +1481,13 @@ namespace Data
                             switch (item)
                             {
                                 case "look_after":
-                                    filterList.Add($"{item} != 0");
+                                    filterList.Add($"VideoInfo.{item} != 0");
                                     break;
                                 case "fail":
                                     //不操作
                                     break;
                                 default:
-                                    filterList.Add($"({item} LIKE '%{filterKeywords}%')");
+                                    filterList.Add($"(VideoInfo.{item} LIKE '%{filterKeywords}%')");
                                     break;
                             }
                         }
@@ -1412,19 +1504,19 @@ namespace Data
                             switch (range.Key)
                             {
                                 case "Year":
-                                    ranges.Add($"(releasetime LIKE '{range.Value}-%' OR (releasetime LIKE '{range.Value}/%'))");
+                                    ranges.Add($"(VideoInfo.releasetime LIKE '{range.Value}-%' OR (releasetime LIKE '{range.Value}/%'))");
                                     break;
                                 case "Score":
-                                    ranges.Add($"(score == {range.Value})");
+                                    ranges.Add($"(VideoInfo.score == {range.Value})");
                                     break;
                                 case "Type":
                                     switch (range.Value)
                                     {
                                         case "步兵":
-                                            ranges.Add("(producer LIKE '一本道%' OR truename LIKE 'FC2-%' OR producer IN ('HEYZO','パコパコママ','Tokyo-Hot','SkyHigh') OR producer LIKE '%カリビアンコム%')");
+                                            ranges.Add("(is_wm.is_wm == 1 OR (is_wm.is_wm IS NULL AND ProducerInfo.is_wm == 1))");
                                             break;
                                         case "骑兵":
-                                            ranges.Add("(truename NOT LIKE 'FC2-%' AND producer NOT LIKE '一本道%' AND producer NOT LIKE 'カリビアンコム%' AND producer NOT LIKE '天然むすめ%' AND producer NOT IN ( 'HEYZO', 'Tokyo-Hot','Heydouga', 'パコパコママ','サムライポルノ','SkyHigh','スーパーモデルメディア','ファンタドリーム','スタジオテリヤキ' ))");
+                                            ranges.Add("(is_wm.is_wm == 0 OR (is_wm.is_wm IS NULL AND ProducerInfo.is_wm == 0))");
                                             break;
                                     }
 
@@ -1443,8 +1535,19 @@ namespace Data
                         filterStr = $" WHERE {filterStr_tmp}";
                 }
 
-                SqliteCommand selectCommand = new SqliteCommand
-                    ($"SELECT * from VideoInfo{filterStr}{orderStr} LIMIT {limit} offset {offset}", db);
+                SqliteCommand selectCommand;
+
+                //多表查询
+                if (rangesDicts!=null && rangesDicts.ContainsKey("Type"))
+                {
+                    selectCommand = new SqliteCommand($"SELECT VideoInfo.* FROM VideoInfo LEFT JOIN Is_Wm ON VideoInfo.truename = Is_Wm.truename LEFT JOIN ProducerInfo ON VideoInfo.producer = ProducerInfo.name{filterStr}{orderStr} LIMIT {limit} offset {offset}",db); 
+                }
+                //普通查询
+                else
+                {
+                    selectCommand = new SqliteCommand
+                        ($"SELECT * from VideoInfo{filterStr}{orderStr} LIMIT {limit} offset {offset}", db);
+                }
 
                 SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
 
@@ -2205,6 +2308,8 @@ namespace Data
             dataInfo.score = Convert.ToSingle(query["score"]);
             dataInfo.is_like = Convert.ToInt32(query["is_like"]);
 
+            dataInfo.addtime = Convert.ToInt32(query["addtime"]);
+
             return dataInfo;
         }
 
@@ -2249,7 +2354,7 @@ namespace Data
             dataInfo.played_end = Convert.ToInt32(query["played_end"]);
             dataInfo.last_time = query["last_time"] as string;
             dataInfo.vdi = Convert.ToInt32(query["vdi"]);
-            dataInfo.play_long = Convert.ToSingle(query["play_long"]);
+            dataInfo.play_long = Convert.ToInt32(query["play_long"]);
 
             return dataInfo;
 

@@ -1,7 +1,9 @@
-﻿using Data;
+﻿using CommunityToolkit.WinUI.UI.Animations;
+using Data;
 using Display.ContentsPage;
 using Display.Control;
 using LiveChartsCore.Drawing;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -16,6 +18,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using static Data.WebApi;
@@ -114,7 +117,6 @@ namespace Display.Views
             Tuple<List<string>, string> TypesAndName = new(new() { "category" }, LabelName);
 
             ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", clickButton);
-            animation.Configuration = new BasicConnectedAnimationConfiguration();
             Frame.Navigate(typeof(ActorInfoPage), TypesAndName);
         }
 
@@ -123,7 +125,7 @@ namespace Display.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void VideoPlay_Click(object sender, RoutedEventArgs e)
+        private async void VideoPlay_Click(object sender, RoutedEventArgs e)
         {
             if (!(sender is Button VideoPlayButton))
                 return;
@@ -142,7 +144,10 @@ namespace Display.Views
             //一集
             else if (videoInfoList.Count == 1)
             {
-                PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
+
+                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
+                await PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
+                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             }
 
             //有多集
@@ -166,20 +171,25 @@ namespace Display.Views
             }
         }
 
-        private void VideoInfoListView_ItemClick(object sender, ItemClickEventArgs e)
+        private async void VideoInfoListView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var SingleVideoInfo = e.ClickedItem as Data.Datum;
-            PlayeVideo(SingleVideoInfo.pc,this.XamlRoot);
+            //var SingleVideoInfo = e.ClickedItem as Data.Datum;
+
+            if (!(e.ClickedItem is Data.Datum SingleVideoInfo)) return;
+
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
+            await PlayeVideo(SingleVideoInfo.pc,this.XamlRoot);
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
 
-        private static void SubInfoListView_ItemClick(object sender, ItemClickEventArgs e)
+        private async static void SubInfoListView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var SingleVideoInfo = e.ClickedItem as Data.SubInfo;
 
-            PlayeVideo(SingleVideoInfo.fileBelongPickcode, subInfo:SingleVideoInfo);
+            await PlayeVideo(SingleVideoInfo.fileBelongPickcode, subInfo:SingleVideoInfo);
         }
 
-        public async static void PlayeVideo(string pickCode,XamlRoot xamlRoot=null, SubInfo subInfo=null)
+        public async static Task PlayeVideo(string pickCode,XamlRoot xamlRoot=null, SubInfo subInfo=null)
         {
             //115Cookie未空
             if (string.IsNullOrEmpty(AppSettings._115_Cookie) && xamlRoot!=null)
@@ -254,20 +264,22 @@ namespace Display.Views
                 //PotPlayer播放
                 case 1:
                     WebApi webapi = new();
-                    webapi.PlayVideoWithOriginUrl(pickCode, playMethod.pot, xamlRoot,subInfo);
+                    await webapi.PlayVideoWithOriginUrl(pickCode, playMethod.pot, xamlRoot,subInfo);
                     break;
                 //mpv播放
                 case 2:
                     webapi = new();
-                    webapi.PlayVideoWithOriginUrl(pickCode,playMethod.mpv, xamlRoot, subInfo);
+                    await webapi.PlayVideoWithOriginUrl(pickCode,playMethod.mpv, xamlRoot, subInfo);
                     break;
                 //vlc播放
                 case 3:
                     webapi = new();
-                    webapi.PlayVideoWithOriginUrl(pickCode, playMethod.vlc, xamlRoot, subInfo);
+                    await webapi.PlayVideoWithOriginUrl(pickCode, playMethod.vlc, xamlRoot, subInfo);
                     break;
 
             }
+        
+            
         }
 
 
@@ -337,7 +349,7 @@ namespace Display.Views
             //一集
             else if (videoInfoList.Count == 1)
             {
-                PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
+                await PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
             }
 
             //有多集

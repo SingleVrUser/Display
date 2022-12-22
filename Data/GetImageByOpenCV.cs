@@ -158,12 +158,12 @@ namespace Data
                 //Progress_TextBlock.Text = $"{AllProgressBar.Value}/{Task_Count}";
 
                 ////计算剩余时间
-                //leftTime_TextBlock.Text = $"预计剩余：{ConvertInt32ToDateStr((Task_Count - AllProgressBar.Value) * ((DateTimeOffset.Now - startTime) / AllProgressBar.Value).TotalSeconds)}";
+                //leftTime_TextBlock.Text = $"预计剩余：{ConvertDoubleToDateStr((Task_Count - AllProgressBar.Value) * ((DateTimeOffset.Now - startTime) / AllProgressBar.Value).TotalSeconds)}";
 
             }
 
             ////结束
-            //leftTime_TextBlock.Text = $"总耗时：{FileMatch.ConvertInt32ToDateStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
+            //leftTime_TextBlock.Text = $"总耗时：{FileMatch.ConvertDoubleToDateStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
         }
 
         public bool Task_GetThumbnailByVideoPath(string videoPath, double start_frame, bool isShowWindow, IProgress<progressInfo> progress, string SavePath, string imageName = "", bool isNeeddetectFaces = true, double length = -1)

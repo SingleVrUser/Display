@@ -152,7 +152,7 @@ namespace Data
         public int played_end { get; set; }
         public string last_time { get; set; }
         public int vdi { get; set; }
-        public float play_long { get; set; }
+        public int play_long { get; set; }
 
         public override string ToString() => n;
     }
@@ -1326,6 +1326,18 @@ namespace Data
             }
         }
 
+
+        public ActorsInfo()
+        {
+
+        }
+
+        public ActorsInfo(string name)
+        {
+            this.name = name;
+        }
+
+
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
@@ -1843,5 +1855,29 @@ namespace Data
         }
 
     }
+
+    public class FailDatum
+    {
+        public FailDatum(Datum Datum)
+        {
+            this.Datum = Datum;
+        }
+
+        public Datum Datum { get;private set; }
+
+        public string MatchName{get;set;}
+
+        /// <summary>
+        /// 是否是匹配失败
+        /// </summary>
+        public bool IsMatchFail { get;set;}
+
+        /// <summary>
+        /// 是否是搜刮失败
+        /// </summary>
+        public bool IsSpiderFail { get;set;}
+    }
+
+    public enum FailType { All, MatchFail, SpiderFail}
 
 }

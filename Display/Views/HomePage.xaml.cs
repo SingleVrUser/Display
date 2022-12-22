@@ -35,7 +35,7 @@ namespace Display.Views
         private navigationAnimationType _navigationType;
         private VideoCoverDisplayClass _storeditem;
         private GridView _stroedgridview;
-        private ImageEx _storedimage;
+        private Image _storedimage;
 
         public HomePage()
         {
@@ -73,7 +73,7 @@ namespace Display.Views
 
         private void Image_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
-            if (!(sender is ImageEx image)) return;
+            if (!(sender is Image image)) return;
 
             _storedimage = image;
 
@@ -81,8 +81,8 @@ namespace Display.Views
 
             _navigationType = navigationAnimationType.image;
 
-            ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", _storedimage);
-
+            var animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", _storedimage);
+            animation.Configuration = new BasicConnectedAnimationConfiguration();
             Frame.Navigate(typeof(DetailInfoPage), coverInfo, new SuppressNavigationTransitionInfo());
         }
 

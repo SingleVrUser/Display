@@ -383,17 +383,11 @@ namespace Display.Control
         {
             ConnectedAnimation animation = null;
 
-            // Get the collection item corresponding to the clicked item.
             if (ThumbnailGridView.ContainerFromItem(e.ClickedItem) is GridViewItem container)
             {
-                // Stash the clicked item for use later. We'll need it when we connect back from the detailpage.
                 _storedItem = container.Content as string;
 
-                // Prepare the connected animation.
-                // Notice that the stored item is passed in, as well as the name of the connected element. 
-                // The animation will actually start on the Detailed info page.
                 animation = ThumbnailGridView.PrepareConnectedAnimation("forwardAnimation", _storedItem, "Thumbnail_Image");
-
             }
 
             string iamgePath = e.ClickedItem as string;
