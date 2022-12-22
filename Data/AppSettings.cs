@@ -22,12 +22,12 @@ public class AppSettings
             double width;
             double height;
 
-            if (composite.ContainsKey("ImageWidth") && composite["ImageWidth"] is double tmp)
+            if (composite!=null && composite.ContainsKey("ImageWidth") && composite["ImageWidth"] is double tmp)
                 width = tmp;
             else
                 width = 500;
 
-            if (composite.ContainsKey("ImageHeight") && composite["ImageHeight"] is double tmp2)
+            if (composite != null && composite.ContainsKey("ImageHeight") && composite["ImageHeight"] is double tmp2)
                 height = tmp2;
             else
                 height = 300;
