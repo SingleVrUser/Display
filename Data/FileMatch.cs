@@ -40,22 +40,22 @@ namespace Data
             return cid.Contains("FC2");
         }
 
-        /// <summary>
-        /// 是否是特殊番号(用于区分AvMoo和AvSox)
-        /// </summary>
-        /// <param name="cid"></param>
-        /// <returns></returns>
-        public static bool IsSpecialCid(string cid)
-        {
-            string CID = cid.ToUpper();
+        ///// <summary>
+        ///// 是否是特殊番号(用于区分AvMoo和AvSox)
+        ///// </summary>
+        ///// <param name="cid"></param>
+        ///// <returns></returns>
+        //public static bool IsSpecialCid(string cid)
+        //{
+        //    string CID = cid.ToUpper();
 
-            //FC2 / 无分隔符 / HEY / HEYZO / 无字母 / 字母+数字+字母 / 有分隔符但是是特殊字母
-            return IsFC2(CID) || !CID.Contains('-') || CID.Contains("HEY") || !Regex.Match(CID, "[A-Z]").Success
-                || Regex.Match(CID, @"[A-Z]\d[A-z]").Success || (CID.Contains('-') && Regex.Match(CID, "^SKYHUD-").Success || Regex.Match(CID, "^RED-").Success || Regex.Match(CID, "^SKY-").Success);
-        }
+        //    //FC2 / 无分隔符 / HEY / HEYZO / 无字母 / 字母+数字+字母 / 有分隔符但是是特殊字母
+        //    return IsFC2(CID) || !CID.Contains('-') || CID.Contains("HEY") || !Regex.Match(CID, "[A-Z]").Success
+        //        || Regex.Match(CID, @"[A-Z]\d[A-z]").Success
+        //        || (CID.Contains('-') && Regex.Match(CID, "^SKYHUD-").Success || Regex.Match(CID, "^RED-").Success || Regex.Match(CID, "^SKY-").Success)
+        //        || Regex.Match(CID, "^SE-").Success || Regex.Match(CID, "^DSAMBD-").Success;
+        //}
         
-        
-
         /// <summary>
         /// 从文件名中匹配CID名字
         /// </summary>
