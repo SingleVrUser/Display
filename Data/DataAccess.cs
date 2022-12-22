@@ -655,14 +655,11 @@ namespace Data
                 //fc只有javdb，fc2club能刮
                 bool isFc = FileMatch.IsFC2(name);
 
-                //是否是特殊番号（针对AvMoo和AvSox）
-                bool isSpecialCid = FileMatch.IsSpecialCid(name);
-
                 insertCommand.Parameters.AddWithValue("@name", name);
                 insertCommand.Parameters.AddWithValue("@bus", !isFc && AppSettings.isUseJavBus?"ready": "done");
                 insertCommand.Parameters.AddWithValue("@jav321", !isFc && AppSettings.isUseJav321?"ready": "done");
-                insertCommand.Parameters.AddWithValue("@avmoo", !isSpecialCid && AppSettings.isUseAvMoo?"ready": "done");
-                insertCommand.Parameters.AddWithValue("@avsox", isSpecialCid && AppSettings.isUseAvSox?"ready": "done");
+                insertCommand.Parameters.AddWithValue("@avmoo", !isFc && AppSettings.isUseAvMoo?"ready": "done");
+                insertCommand.Parameters.AddWithValue("@avsox", AppSettings.isUseAvSox?"ready": "done");
                 insertCommand.Parameters.AddWithValue("@libre", !isFc && AppSettings.isUseLibreDmm ? "ready" : "done");
                 insertCommand.Parameters.AddWithValue("@fc", isFc && AppSettings.isUseFc2Hub ? "ready" : "done");
                 insertCommand.Parameters.AddWithValue("@db", AppSettings.isUseJavDB ? "ready" : "done");
@@ -2030,23 +2027,31 @@ namespace Data
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static List<Datum> GetAllFilesInFolderList(List<Datum> dataList)
+        public static Dictionary<string, Datum> GetAllFilesInFolderList(Dictionary<string, Datum> dataList)
         {
-            var newData = new List<Datum>();
+            List<Datum>  newData = new();
+
+            Dictionary<string, Datum> newDict = new();
 
             foreach (var currentFile in dataList)
             {
                 //文件夹
-                if (string.IsNullOrEmpty(currentFile.fid))
+                if (string.IsNullOrEmpty(currentFile.Value.fid))
                 {
-                    List<Datum> newDataList = GetListByCid(currentFile.cid);
-                    newData.AddRange(GetAllFilesInFolderList(newDataList));
+                    List<Datum> newDataList = GetListByCid(currentFile.Value.cid);
+                    Dictionary<string, Datum> newDictList = new();
+                    newDataList.ForEach(item => newDictList.TryAdd(item.pc, item));
+                    var fileInFolderList = GetAllFilesInFolderList(newDictList);
+
+                    fileInFolderList.Values.ToList().ForEach(item => newDict.TryAdd(item.pc, item));
+                    //newData.AddRange(GetAllFilesInFolderList(newDataList));
                 }
             }
 
-            newData.AddRange(dataList);
+            dataList.Values.ToList().ForEach(item => newDict.TryAdd(item.pc, item));
+            //newData.AddRange(dataList);
 
-            return newData;
+            return newDict;
         }
 
         /// <summary>
@@ -2354,7 +2359,7 @@ namespace Data
             dataInfo.played_end = Convert.ToInt32(query["played_end"]);
             dataInfo.last_time = query["last_time"] as string;
             dataInfo.vdi = Convert.ToInt32(query["vdi"]);
-            dataInfo.play_long = Convert.ToInt32(query["play_long"]);
+            dataInfo.play_long = Convert.ToSingle(query["play_long"]);
 
             return dataInfo;
 

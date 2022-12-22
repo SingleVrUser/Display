@@ -116,7 +116,12 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             //目前datumList仅有一级目录文件
             //遍历获取文件列表中所有的文件
-            datumList = await Task.Run(() => datumList = DataAccess.GetAllFilesInFolderList(datumList));
+
+            Dictionary<string, Datum> newDictList = new();
+            datumList.ForEach(item => newDictList.TryAdd(item.pc, item));
+
+            await Task.Run(() => newDictList = DataAccess.GetAllFilesInFolderList(newDictList));
+            datumList = newDictList.Values.ToList();
 
             //显示饼状图
             ShowFilesPieCharts(datumList);

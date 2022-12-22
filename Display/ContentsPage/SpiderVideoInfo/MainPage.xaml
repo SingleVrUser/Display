@@ -376,7 +376,7 @@
                                                                StringValue="{x:Bind SelectedDatum.vdi,Mode=OneWay}" />
                                 <control:TextBlockWithLongText Grid.Column="1"
                                                                Grid.Row="31"
-                                                               StringValue="{x:Bind data:FileMatch.ConvertInt32ToDateStr(SelectedDatum.play_long),Mode=OneWay}" />
+                                                               StringValue="{x:Bind data:FileMatch.ConvertDoubleToDateStr(SelectedDatum.play_long),Mode=OneWay}" />
                             </Grid>
                         </ScrollViewer>
 

@@ -207,7 +207,26 @@ namespace Data
 
             CID = CID.ToUpper();
 
-            string busurl = UrlCombine(JavBusUrl, CID);
+            var spliteCid = CID.Split("-");
+            if (spliteCid.Count() != 2) return null;
+
+            string searchCID;
+
+            switch (spliteCid[0])
+            {
+                case "MIUM" or "MAAN":
+                    searchCID = $"300{CID}";
+                    break;
+                case "JAC":
+                    searchCID = $"390{CID}";
+                    break;
+                default:
+                    searchCID = CID;
+                    break;
+            }
+
+
+            string busurl = UrlCombine(JavBusUrl, searchCID);
 
             videoInfo.busurl = busurl;
             string strResult = await RequestHelper.RequestHtml(Client, busurl);
@@ -939,14 +958,16 @@ namespace Data
             for (var i = 0; i < SearchResultNodes.Count; i++)
             {
                 var movie_list = SearchResultNodes[i];
-                var title_search = movie_list.SelectSingleNode(".//div[@class='photo-info']/span/date").InnerText;
+                var title_search = movie_list.SelectSingleNode(".//div[@class='photo-info']/span/date")?.InnerText;
+                if (title_search == null) continue;
+
                 string title = title_search.ToUpper();
 
                 var split_result = title.Split(new char[] { '-', '_' });
                 //没有分隔符，尝试正则匹配（n167）
                 if (split_result.Length == 1)
                 {
-                    var match_result = Regex.Match(CID, @"^([a-z]+)(\d+)$");
+                    var match_result = Regex.Match(title, @"^([A-Z]+)(\d+)$");
                     if (match_result == null) continue;
                     search_left_cid = match_result.Groups[1].Value;
                     search_right_cid = match_result.Groups[2].Value;

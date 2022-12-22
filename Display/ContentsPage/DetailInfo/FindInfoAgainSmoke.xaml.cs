@@ -47,39 +47,39 @@ namespace Display.ContentsPage.DetailInfo
 
             ReCheckProgressRing.Visibility = Visibility.Visible;
 
-            bool isUseAvSox = FileMatch.IsSpecialCid(cidName);
+            bool isFc2 = FileMatch.IsFC2(cidName);
 
-            if (!cidName.ToLower().Contains("fc") && JavBus_CheckBox.IsChecked == true)
+            if (!isFc2 && JavBus_CheckBox.IsChecked == true)
             {
                 var info = await SearchNetwork.SearchInfoFromJavBus(cidName);
                 if(info!=null)
                     infos.Add(info);
             }
-            if (!cidName.ToLower().Contains("fc") && Jav321_CheckBox.IsChecked == true)
+            if (!isFc2 && Jav321_CheckBox.IsChecked == true)
             {
                 var info = await SearchNetwork.SearchInfoFromJav321(cidName);
                 if(info!=null)
                     infos.Add(info);
             }
-            if (!isUseAvSox && AvMoo_CheckBox.IsChecked == true)
+            if (!isFc2 && AvMoo_CheckBox.IsChecked == true)
             {
                 var info = await SearchNetwork.SearchInfoFromAvMoo(cidName);
                 if(info!=null)
                     infos.Add(info);
             }
-            if (isUseAvSox && AvSox_CheckBox.IsChecked == true)
+            if (AvSox_CheckBox.IsChecked == true)
             {
                 var info = await SearchNetwork.SearchInfoFromAvSox(cidName);
                 if(info!=null)
                     infos.Add(info);
             }
-            if (!cidName.ToLower().Contains("fc") && LibreDmm_CheckBox.IsChecked == true)
+            if (!isFc2 && LibreDmm_CheckBox.IsChecked == true)
             {
                 var info = await SearchNetwork.SearchInfoFromLibreDmm(cidName);
                 if(info!=null)
                     infos.Add(info);
             }
-            if (cidName.ToLower().Contains("fc") && Fc2Hub_CheckBox.IsChecked == true)
+            if (isFc2 && Fc2Hub_CheckBox.IsChecked == true)
             {
                 var info = await SearchNetwork.SearchInfoFromFc2Hub(cidName);
                 if (info != null)

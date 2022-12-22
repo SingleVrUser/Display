@@ -152,7 +152,7 @@ namespace Data
         public int played_end { get; set; }
         public string last_time { get; set; }
         public int vdi { get; set; }
-        public int play_long { get; set; }
+        public double play_long { get; set; }
 
         public override string ToString() => n;
     }
