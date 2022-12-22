@@ -122,7 +122,6 @@ namespace Display
                 ContentDialog dialog = new ContentDialog();
 
                 // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
-                dialog.XamlRoot = ((Page)ContentFrame.Content).XamlRoot;
                 dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
                 dialog.Title = "有新版本可升级";
                 dialog.PrimaryButtonText = "下载";
@@ -130,7 +129,7 @@ namespace Display
                 dialog.CloseButtonText = "取消";
                 dialog.DefaultButton = ContentDialogButton.Primary;
                 dialog.Content = new ContentsPage.UpdateAppPage(ReleaseCheck);
-
+                dialog.XamlRoot = ((Page)ContentFrame.Content).XamlRoot;
                 var result = await dialog.ShowAsync();
 
                 switch(result)
