@@ -25,10 +25,10 @@ namespace Display.Views
     public sealed partial class HomePage : Page
     {
         public ObservableCollection<VideoCoverDisplayClass> Items = new();
-        public ObservableCollection<VideoCoverDisplayClass> NewAddItems = new();
-        private ObservableCollection<VideoCoverDisplayClass> lookLaterList = new();
-        private ObservableCollection<VideoCoverDisplayClass> recentCoverList = new();
-        private ObservableCollection<VideoCoverDisplayClass> LoveCoverList = new();
+        public List<VideoCoverDisplayClass> NewAddItems = new();
+        private List<VideoCoverDisplayClass> lookLaterList = new();
+        private List<VideoCoverDisplayClass> recentCoverList = new();
+        private List<VideoCoverDisplayClass> LoveCoverList = new();
 
         //过渡动画用
         private enum navigationAnimationType { image, gridView};
@@ -89,7 +89,7 @@ namespace Display.Views
         private void Image_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
             Grid grid = sender as Grid;
-            grid.BorderBrush = new SolidColorBrush(Microsoft.UI.Colors.LightGray);
+            //grid.BorderBrush = new SolidColorBrush(Microsoft.UI.Colors.LightGray);
             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
 
         }
@@ -97,7 +97,7 @@ namespace Display.Views
         private void Image_PointerExited(object sender, PointerRoutedEventArgs e)
         {
             Grid grid = sender as Grid;
-            grid.BorderBrush = null;
+            //grid.BorderBrush = null;
             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
 
@@ -164,7 +164,7 @@ namespace Display.Views
 
         }
 
-        private void tryUpdateVideoCoverDisplayClass(List<VideoInfo> videoInfos, ObservableCollection<VideoCoverDisplayClass> videoList)
+        private void tryUpdateVideoCoverDisplayClass(List<VideoInfo> videoInfos, List<VideoCoverDisplayClass> videoList)
         {
             //添加
             var addList = new List<VideoInfo>();
@@ -227,6 +227,11 @@ namespace Display.Views
             Tuple<List<string>, string> TypesAndName = new(new() { "look_later" }, "1");
 
             Frame.Navigate(typeof(ActorInfoPage), TypesAndName);
+        }
+
+        private void AdaptiveGridView_ItemClick(object sender, ItemClickEventArgs e)
+        {
+
         }
     }
 
