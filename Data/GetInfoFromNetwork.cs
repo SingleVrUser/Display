@@ -220,6 +220,9 @@ namespace Data
                 case "JAC":
                     searchCID = $"390{CID}";
                     break;
+                case "DSVR":
+                    searchCID = $"3{CID}";
+                    break;
                 default:
                     searchCID = CID;
                     break;
