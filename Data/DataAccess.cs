@@ -198,7 +198,7 @@ namespace Data
         /// <param name="db"></param>
         public static void InittializeProducerInfo(SqliteCommand createTable)
         {
-            createTable.CommandText = "SELECT name FROM sqlite_schema WHERE type='table' AND name='ProducerInfo';";
+            createTable.CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name='ProducerInfo';";
 
             var result = createTable.ExecuteScalar();
             //存在
@@ -1119,92 +1119,10 @@ namespace Data
                 db.Open();
 
                 //排序
-                string orderStr = string.Empty;
-                if (!string.IsNullOrEmpty(orderBy))
-                {
-                    if (orderBy == "random")
-                    {
-                        orderStr = " ORDER BY RANDOM() ";
-                    }
-                    else
-                    {
-                        if (isDesc)
-                        {
-                            orderStr = $" ORDER BY {orderBy} DESC";
-                        }
-                        else
-                        {
-                            orderStr = $" ORDER BY {orderBy}";
-                        }
-                    }
-                }
+                string orderStr = GetVideoInfoOrderStr(orderBy, isDesc);
 
                 //筛选
-                string filterStr = string.Empty;
-                if (filterConditionList != null || rangesDicts != null)
-                {
-                    string filterStr_tmp = string.Empty;
-                    if (filterConditionList != null)
-                    {
-                        List<string> filterList = new();
-                        foreach (var item in filterConditionList)
-                        {
-                            switch (item)
-                            {
-                                case "look_after":
-                                    filterList.Add($"VideoInfo.{item} != 0");
-                                    break;
-                                case "fail":
-                                    //不操作
-                                    break;
-                                default:
-                                    filterList.Add($"(VideoInfo.{item} LIKE '%{filterKeywords}%')");
-                                    break;
-                            }
-                        }
-
-                        filterStr_tmp = string.Join(" OR ", filterList);
-                    }
-
-                    string filterStr_tmp2 = string.Empty;
-                    if (rangesDicts != null)
-                    {
-                        List<string> ranges = new();
-                        foreach (var range in rangesDicts)
-                        {
-                            switch (range.Key)
-                            {
-                                case "Year":
-                                    ranges.Add($"(VideoInfo.releasetime LIKE '{range.Value}-%' OR (releasetime LIKE '{range.Value}/%'))");
-                                    break;
-                                case "Score":
-                                    ranges.Add($"(VideoInfo.score == {range.Value})");
-                                    break;
-                                case "Type":
-                                    switch (range.Value)
-                                    {
-                                        case "步兵":
-                                            ranges.Add("(is_wm.is_wm == 1 OR (is_wm.is_wm IS NULL AND ProducerInfo.is_wm == 1))");
-                                            break;
-                                        case "骑兵":
-                                            ranges.Add("(is_wm.is_wm == 0 OR (is_wm.is_wm IS NULL AND ProducerInfo.is_wm == 0))");
-                                            break;
-                                    }
-
-                                    break;
-                            }
-                        }
-
-                        filterStr_tmp2 = string.Join(" AND ", ranges);
-                    }
-
-                    if (!string.IsNullOrEmpty(filterStr_tmp) && !string.IsNullOrEmpty(filterStr_tmp2))
-                        filterStr = $" WHERE ({filterStr_tmp}) AND ({filterStr_tmp2})";
-                    else if (!string.IsNullOrEmpty(filterStr_tmp2))
-                        filterStr = $" WHERE {filterStr_tmp2}";
-                    else if (!string.IsNullOrEmpty(filterStr_tmp))
-                        filterStr = $" WHERE {filterStr_tmp}";
-                }
+                string filterStr = GetVideoInfoFilterStr(filterConditionList, filterKeywords, rangesDicts);
 
                 SqliteCommand selectCommand;
 
@@ -1429,6 +1347,102 @@ namespace Data
             return isDone;
         }
 
+        private static string GetVideoInfoOrderStr(string orderBy,bool isDesc)
+        {
+            string orderStr = string.Empty;
+            if (!string.IsNullOrEmpty(orderBy))
+            {
+                if (orderBy == "random")
+                {
+                    orderStr = " ORDER BY RANDOM() ";
+                }
+                else
+                {
+                    if (isDesc)
+                    {
+                        orderStr = $" ORDER BY {orderBy} DESC";
+                    }
+                    else
+                    {
+                        orderStr = $" ORDER BY {orderBy}";
+                    }
+                }
+            }
+
+            return orderStr;
+        }
+
+        private static string GetVideoInfoFilterStr(List<string> filterConditionList = null, string filterKeywords = null, Dictionary<string, string> rangesDicts = null)
+        {
+            string filterStr = string.Empty;
+            if (filterConditionList != null || rangesDicts != null)
+            {
+                string filterStr_tmp = string.Empty;
+                if (filterConditionList != null)
+                {
+                    List<string> filterList = new();
+                    foreach (var item in filterConditionList)
+                    {
+                        switch (item)
+                        {
+                            case "look_later":
+                                filterList.Add($"VideoInfo.{item} != 0");
+                                break;
+                            case "fail":
+                                //不操作
+                                break;
+                            default:
+                                filterList.Add($"(VideoInfo.{item} LIKE '%{filterKeywords}%')");
+                                break;
+                        }
+                    }
+
+                    filterStr_tmp = string.Join(" OR ", filterList);
+                }
+
+                string filterStr_tmp2 = string.Empty;
+                if (rangesDicts != null)
+                {
+                    List<string> ranges = new();
+                    foreach (var range in rangesDicts)
+                    {
+                        switch (range.Key)
+                        {
+                            case "Year":
+                                ranges.Add($"(VideoInfo.releasetime LIKE '{range.Value}-%' OR (releasetime LIKE '{range.Value}/%'))");
+                                break;
+                            case "Score":
+                                ranges.Add($"(VideoInfo.score == {range.Value})");
+                                break;
+                            case "Type":
+                                switch (range.Value)
+                                {
+                                    case "步兵":
+                                        ranges.Add("(is_wm.is_wm == 1 OR (is_wm.is_wm IS NULL AND ProducerInfo.is_wm == 1))");
+                                        break;
+                                    case "骑兵":
+                                        ranges.Add("(is_wm.is_wm == 0 OR (is_wm.is_wm IS NULL AND ProducerInfo.is_wm IS NOT 1 ))");
+                                        break;
+                                }
+
+                                break;
+                        }
+                    }
+
+                    filterStr_tmp2 = string.Join(" AND ", ranges);
+                }
+
+                if (!string.IsNullOrEmpty(filterStr_tmp) && !string.IsNullOrEmpty(filterStr_tmp2))
+                    filterStr = $" WHERE ({filterStr_tmp}) AND ({filterStr_tmp2})";
+                else if (!string.IsNullOrEmpty(filterStr_tmp2))
+                    filterStr = $" WHERE {filterStr_tmp2}";
+                else if (!string.IsNullOrEmpty(filterStr_tmp))
+                    filterStr = $" WHERE {filterStr_tmp}";
+            }
+
+            return filterStr;
+        }
+
         /// <summary>
         /// 加载已存在的videoInfo数据
         /// </summary>
@@ -1445,93 +1459,10 @@ namespace Data
                 db.Open();
 
                 //排序
-                string orderStr = string.Empty;
-                if (!string.IsNullOrEmpty(orderBy))
-                {
-                    if (orderBy == "random")
-                    {
-                        orderStr = " ORDER BY RANDOM() ";
-                    }
-                    else
-                    {
-                        if (isDesc)
-                        {
-                            orderStr = $" ORDER BY {orderBy} DESC";
-                        }
-                        else
-                        {
-                            orderStr = $" ORDER BY {orderBy}";
-                        }
-                    }
-                }
+                string orderStr = GetVideoInfoOrderStr(orderBy, isDesc);
 
                 //筛选
-                string filterStr = string.Empty;
-                if(filterConditionList!= null || rangesDicts != null)
-                {
-                    string filterStr_tmp = string.Empty;
-                    if (filterConditionList != null)
-                    {
-                        List<string> filterList = new();
-                        foreach (var item in filterConditionList)
-                        {
-                            switch (item)
-                            {
-                                case "look_after":
-                                    filterList.Add($"VideoInfo.{item} != 0");
-                                    break;
-                                case "fail":
-                                    //不操作
-                                    break;
-                                default:
-                                    filterList.Add($"(VideoInfo.{item} LIKE '%{filterKeywords}%')");
-                                    break;
-                            }
-                        }
-
-                        filterStr_tmp = string.Join(" OR ", filterList);
-                    }
-
-                    string filterStr_tmp2 = string.Empty;
-                    if (rangesDicts != null)
-                    {
-                        List<string> ranges = new();
-                        foreach (var range in rangesDicts)
-                        {
-                            switch (range.Key)
-                            {
-                                case "Year":
-                                    ranges.Add($"(VideoInfo.releasetime LIKE '{range.Value}-%' OR (releasetime LIKE '{range.Value}/%'))");
-                                    break;
-                                case "Score":
-                                    ranges.Add($"(VideoInfo.score == {range.Value})");
-                                    break;
-                                case "Type":
-                                    switch (range.Value)
-                                    {
-                                        case "步兵":
-                                            ranges.Add("(is_wm.is_wm == 1 OR (is_wm.is_wm IS NULL AND ProducerInfo.is_wm == 1))");
-                                            break;
-                                        case "骑兵":
-                                            ranges.Add("(is_wm.is_wm == 0 OR (is_wm.is_wm IS NULL AND ProducerInfo.is_wm == 0))");
-                                            break;
-                                    }
-
-                                    break;
-                            }
-                        }
-
-                        filterStr_tmp2 = string.Join(" AND ", ranges);
-                    }
-
-                    if(!string.IsNullOrEmpty(filterStr_tmp) && !string.IsNullOrEmpty(filterStr_tmp2))
-                        filterStr = $" WHERE ({filterStr_tmp}) AND ({filterStr_tmp2})";
-                    else if (!string.IsNullOrEmpty(filterStr_tmp2))
-                        filterStr = $" WHERE {filterStr_tmp2}";
-                    else if(!string.IsNullOrEmpty(filterStr_tmp))
-                        filterStr = $" WHERE {filterStr_tmp}";
-                }
-
+                string filterStr = GetVideoInfoFilterStr(filterConditionList, filterKeywords, rangesDicts);
                 SqliteCommand selectCommand;
 
                 //多表查询
