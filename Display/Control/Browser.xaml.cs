@@ -80,7 +80,13 @@ namespace Display.Control
         private async void HiddenAdvertising()
         {
             await webview.ExecuteScriptAsync(
-                @"document.getElementById('mini-dialog').remove()");
+                "document.getElementById('mini-dialog').remove()");
+            
+            await webview.ExecuteScriptAsync(
+                "document.getElementById('js_common_mini-dialog').remove()");
+
+            await webview.ExecuteScriptAsync(
+                "document.getElementById('js_common_act-enter').remove()");
         }
 
 
