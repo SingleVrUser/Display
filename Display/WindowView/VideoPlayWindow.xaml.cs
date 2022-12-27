@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System;
 using Windows.Storage;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -110,6 +111,28 @@ namespace Display
         private void webview_NavigationCompleted(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs args)
         {
             NavigationProgressBar.Visibility = Visibility.Collapsed;
+
+            HiddenWaterMark();
+            HiddenAdvertising();
+        }
+
+
+        private async void HiddenWaterMark()
+        {
+            await webview.ExecuteScriptAsync(
+                @"var tag = document.getElementsByTagName('div');for(var i=0;i<tag.length;i++){if(tag[i].className.indexOf('fp-') != -1){tag[i].remove();console.log(""删除水印"")}};");
+        }
+
+        private async void HiddenAdvertising()
+        {
+            await webview.ExecuteScriptAsync(
+                "document.getElementById('mini-dialog').remove()");
+
+            await webview.ExecuteScriptAsync(
+                "document.getElementById('js_common_mini-dialog').remove()");
+
+            await webview.ExecuteScriptAsync(
+                "document.getElementById('js_common_act-enter').remove()");
         }
     }
 }
