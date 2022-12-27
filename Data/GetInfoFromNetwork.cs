@@ -478,22 +478,22 @@ namespace Data
                 switch (info.Key)
                 {
                     case "出演者":
-                        videoInfo.actor= info.Value;
+                        videoInfo.actor= info.Value.Trim();
                         break;
                     case "メーカー":
-                        videoInfo.producer = info.Value;
+                        videoInfo.producer = info.Value.Trim();
                         break;
                     case "シリーズ":
-                        videoInfo.series = info.Value;
+                        videoInfo.series = info.Value.Trim();
                         break;
                     case "ジャンル":
-                        videoInfo.category = info.Value;
+                        videoInfo.category = info.Value.Trim();
                         break;
                     case "配信開始日":
-                        videoInfo.releasetime = info.Value;
+                        videoInfo.releasetime = info.Value.Trim();
                         break;
                     case "収録時間":
-                        videoInfo.lengthtime = info.Value.Replace(" minutes", "分钟");
+                        videoInfo.lengthtime = info.Value.Trim().Replace(" minutes", "分钟");
                         break;
                 }
             }
