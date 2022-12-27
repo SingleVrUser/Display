@@ -421,7 +421,7 @@
         <TeachingTip x:Name="SelectNull_TeachintTip"
                      Target="{x:Bind StartMatchName_Button}"
                      PreferredPlacement="BottomLeft"
-                     IsLightDismissEnabled="True">没有选择文件夹，请选择后继续</TeachingTip>
+                     IsLightDismissEnabled="True"/>
     </Grid>
 
 </Page>
