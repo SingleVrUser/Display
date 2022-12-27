@@ -114,9 +114,9 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// </summary>
         private void SpiderFromFailList()
         {
-            //检查是否有选中文件
             if (FailList==null || FailList.Count==0)
             {
+                SelectNull_TeachintTip.Subtitle = "当前没有需要搜刮的内容";
                 SelectNull_TeachintTip.IsOpen = true;
                 return;
             }
@@ -125,6 +125,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             if (failDatums.Count == 0)
             {
+                SelectNull_TeachintTip.Subtitle = "未填写任何番号，请填写后继续";
                 SelectNull_TeachintTip.IsOpen = true;
                 return;
             }
@@ -142,6 +143,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             //检查是否有选中文件
             if (Explorer.FolderTreeView.SelectedNodes.Count == 0)
             {
+                SelectNull_TeachintTip.Subtitle = "没有选择文件夹，请选择后继续";
                 SelectNull_TeachintTip.IsOpen = true;
                 return;
             }
