@@ -35,6 +35,8 @@ namespace Display.ContentsPage
 
         ObservableCollection<string> failList = new();
 
+        bool isCheckGit = true;
+
         CancellationTokenSource s_cts = new();
 
         ////绘制头像框
@@ -48,11 +50,13 @@ namespace Display.ContentsPage
 
         private async void Grid_Loaded(object sender, RoutedEventArgs e)
         {
+            this.Loaded -= Grid_Loaded;
+
             List<VideoInfo> VideoInfoList = await Task.Run(() => DataAccess.LoadVideoInfo(-1));
 
             foreach (var VideoInfo in VideoInfoList)
             {
-                string actor_str = VideoInfo.actor;
+                string actor_str = VideoInfo.actor.Trim();
 
                 var actor_list = actor_str.Split(",");
                 foreach (var actor in actor_list)
@@ -101,13 +105,18 @@ namespace Display.ContentsPage
 
             string filePath = AppSettings.ActorFileTree_SavePath;
 
-            progress_TextBlock.Text = "正在获取GFriend仓库信息……";
-            if (!await tryUpdateFileTree(filePath))
+            if (isCheckGit)
             {
-                progress_TextBlock.Text = "获取GFriend仓库信息失败!";
-                return;
+                progress_TextBlock.Text = "正在获取GFriend仓库信息……";
+                if (!await tryUpdateFileTree(filePath))
+                {
+                    progress_TextBlock.Text = "获取GFriend仓库信息失败!";
+                    return;
+                }
+                progress_TextBlock.Text = "获取仓库信息成功";
+
+                isCheckGit = false;
             }
-            progress_TextBlock.Text = "获取仓库信息成功";
 
             var ImageUrlList = GetImageUrlListFromFileTreeAsync(actorInfo.name,filePath:filePath);
 
@@ -210,7 +219,7 @@ namespace Display.ContentsPage
                 }
             });
 
-            await getActorCoverByGit(actorinfo.ToList(), progress, s_cts);
+            await Task.Run(()=> getActorCoverByGit(actorinfo.ToList(), progress, s_cts));
 
             BasicGridView.ItemClick += BasicGridView_ItemClick;
 
@@ -220,12 +229,17 @@ namespace Display.ContentsPage
         {
             string filePath = AppSettings.ActorFileTree_SavePath;
 
-            progress.Report(new progressClass() { text = "正在获取GFriend仓库信息……"});
-
-            if (!await tryUpdateFileTree(filePath))
+            if (isCheckGit)
             {
-                progress.Report(new progressClass() { text = "获取GFriend仓库信息失败!" });
-                return;
+                progress.Report(new progressClass() { text = "正在获取GFriend仓库信息……" });
+
+                if (!await tryUpdateFileTree(filePath))
+                {
+                    progress.Report(new progressClass() { text = "获取GFriend仓库信息失败!" });
+                    return;
+                }
+
+                isCheckGit = false;
             }
 
             for (int i = 0;i< actorinfos.Count;i++)
@@ -244,15 +258,17 @@ namespace Display.ContentsPage
                 //演员名
                 var actorName = item.name;
 
+                if (actorName.Contains("?")) continue;
+
                 string indexText = $"【{i + 1}/{actorinfo.Count}】 ";
 
                 progressinfo.text = $"{indexText}{actorName}";
 
                 progress.Report(progressinfo);
 
-                var iamgeSavePath = System.IO.Path.Combine(AppSettings.ActorInfo_SavePath, actorName, "face.jpg");
+                var imageSavePath = System.IO.Path.Combine(AppSettings.ActorInfo_SavePath, actorName, "face.jpg");
 
-                if (!File.Exists(iamgeSavePath))
+                if (!File.Exists(imageSavePath))
                 {
                     string ImageUrl = string.Empty;
                     var ImageUrlList = GetImageUrlListFromFileTreeAsync(actorName, 1);
@@ -265,7 +281,7 @@ namespace Display.ContentsPage
                         continue;
                     }
 
-                    var downResult = await DownFile(ImageUrl, iamgeSavePath);
+                    var downResult = await DownFile(ImageUrl, imageSavePath);
 
                     if (!downResult)
                     {
@@ -275,12 +291,11 @@ namespace Display.ContentsPage
                     }
                 }
 
-                progressinfo.imagePath = iamgeSavePath;
+                progressinfo.imagePath = imageSavePath;
                 progressinfo.status = Status.beforeStart;
 
                 progress.Report(progressinfo);
             }
-
 
         }
 
@@ -331,7 +346,7 @@ namespace Display.ContentsPage
                             string name = matchName.Groups[1].Value;
                             var url = matchName.Groups[2].Value;
 
-                            if (url.Contains(actorName))
+                            if (name.Contains(actorName))
                             {
                                 string imageUrl = $"https://raw.githubusercontent.com/gfriends/gfriends/master/{key}/{path}/{url}";
                                 if (!urlList.Contains(imageUrl))
@@ -429,14 +444,16 @@ namespace Display.ContentsPage
 
                 //仓库信息
                 var dateStr = await GetGitUpdateDateStr();
-                if (string.IsNullOrEmpty(dateStr))
-                    return false;
 
-                var gitUpdateDate = Convert.ToDateTime(dateStr);
-
-                if (gitUpdateDate > fileWriteTime)
+                //获取到最新时间
+                if (!string.IsNullOrEmpty(dateStr))
                 {
-                    isNeedDownFile = true;
+                    var gitUpdateDate = Convert.ToDateTime(dateStr);
+
+                    if (gitUpdateDate > fileWriteTime)
+                    {
+                        isNeedDownFile = true;
+                    }
                 }
             }
 
@@ -491,10 +508,10 @@ namespace Display.ContentsPage
             //Client = new HttpClient(handler);
             //Client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0");
 
-            var directoryNaem = Path.GetDirectoryName(filePath);
-            if (!File.Exists(directoryNaem))
+            var directoryName = Path.GetDirectoryName(filePath);
+            if (!File.Exists(directoryName))
             {
-                Directory.CreateDirectory(directoryNaem);
+                Directory.CreateDirectory(directoryName);
             }
 
             if (!File.Exists(filePath) || isNeedReplace)
