@@ -38,6 +38,7 @@
             <Setter Property="IsExpanded"
                     Value="False" />
         </Style>
+        
         <Style TargetType="Pivot">
             <Setter Property="Margin"
                     Value="-15,-20,0,0" />
@@ -51,8 +52,6 @@
             </Setter>
 
         </Style>
-        <DataTemplate x:Key="PivotHeaderTemplate">
-        </DataTemplate>
 
         <converter:BoolToVisiableConverter x:Key="BoolToVisiableConverter" />
 

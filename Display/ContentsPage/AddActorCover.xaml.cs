@@ -1,4 +1,5 @@
 ﻿using Data;
+using Display.Model;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -28,8 +29,7 @@ namespace Display.ContentsPage
     /// </summary>
     public sealed partial class AddActorCover : Page
     {
-        ObservableCollection<ActorsInfo> actorinfo = new();
-        Dictionary<string, List<string>> ActorsInfoDict = new();
+        IncrementallLoadActorInfoCollection actorinfo;
 
         ObservableCollection<string> ShowImageList = new();
 
@@ -39,69 +39,34 @@ namespace Display.ContentsPage
 
         CancellationTokenSource s_cts = new();
 
-        ////绘制头像框
-        //CanvasControl canv = new CanvasControl();
-
         public AddActorCover()
         {
             this.InitializeComponent();
-
         }
 
         private async void Grid_Loaded(object sender, RoutedEventArgs e)
         {
             this.Loaded -= Grid_Loaded;
 
-            List<VideoInfo> VideoInfoList = await Task.Run(() => DataAccess.LoadVideoInfo(-1));
-
-            foreach (var VideoInfo in VideoInfoList)
-            {
-                string actor_str = VideoInfo.actor.Trim();
-
-                var actor_list = actor_str.Split(",");
-                foreach (var actor in actor_list)
-                {
-                    //名字为空
-                    if (actor == String.Empty) continue;
-
-                    //当前名称不存在
-                    if (!ActorsInfoDict.ContainsKey(actor))
-                    {
-                        ActorsInfoDict.Add(actor, new List<string>());
-                    }
-                    ActorsInfoDict[actor].Add(VideoInfo.truename);
-                }
-
-            }
-
-            //先排序
-            List< ActorsInfo> tmpInfos = new();
-            foreach (var item in ActorsInfoDict)
-            {
-                tmpInfos.Add(new ActorsInfo
-                {
-                    name = item.Key,
-                    count = item.Value.Count,
-                });
-            }
-            tmpInfos = tmpInfos.OrderByDescending(x => x.prifilePhotoPath).ToList();
-
-            tmpInfos.ForEach(x => actorinfo.Add(x));
+            actorinfo = new(new() { { "prifile_path", false } });
+            actorinfo.SetFilter(new() { "name != ''" });
+            await actorinfo.LoadData();
+            BasicGridView.ItemsSource = actorinfo;
 
         }
 
-        ActorsInfo _storedItem;
+        ActorInfo _storedItem;
         private async void BasicGridView_ItemClick(object sender, ItemClickEventArgs e)
         {
             ConnectedAnimation animation = null;
 
             if (BasicGridView.ContainerFromItem(e.ClickedItem) is GridViewItem container)
             {
-                _storedItem = container.Content as ActorsInfo;
+                _storedItem = container.Content as ActorInfo;
                 animation = BasicGridView.PrepareConnectedAnimation("forwardAnimation", _storedItem, "connectedElement");
 
             }
-            var actorInfo = e.ClickedItem as ActorsInfo;
+            var actorInfo = e.ClickedItem as ActorInfo;
 
             string filePath = AppSettings.ActorFileTree_SavePath;
 
@@ -127,7 +92,7 @@ namespace Display.ContentsPage
                 ShowImageList.Add(imagePath);
             }
 
-            ShoeActorName.Text = (e.ClickedItem as ActorsInfo).name;
+            ShoeActorName.Text = (e.ClickedItem as ActorInfo).name;
             SmokeGrid.Visibility = Visibility.Visible;
 
             animation.Completed += Animation_Completed1;
@@ -178,6 +143,8 @@ namespace Display.ContentsPage
         {
             if (BasicGridView.SelectedItems.Count == 0) return;
 
+            actorinfo.HasMoreItems = false;
+
             updateGridViewShow();
 
             var startTime = DateTimeOffset.Now;
@@ -209,7 +176,7 @@ namespace Display.ContentsPage
 
                 if (!string.IsNullOrEmpty(info.imagePath))
                 {
-                    item.prifilePhotoPath = info.imagePath;
+                    item.prifile_path = info.imagePath;
                 }
 
                 //完成
@@ -225,7 +192,7 @@ namespace Display.ContentsPage
 
         }
 
-        private async Task getActorCoverByGit(List<ActorsInfo> actorinfos,IProgress<progressClass> progress, CancellationTokenSource s_cts)
+        private async Task getActorCoverByGit(List<ActorInfo> actorinfos,IProgress<progressClass> progress, CancellationTokenSource s_cts)
         {
             string filePath = AppSettings.ActorFileTree_SavePath;
 
@@ -293,8 +260,10 @@ namespace Display.ContentsPage
 
                 progressinfo.imagePath = imageSavePath;
                 progressinfo.status = Status.beforeStart;
-
                 progress.Report(progressinfo);
+
+                //更新数据库
+                DataAccess.UpdateActorInfoPrifilePath(actorName, imageSavePath);
             }
 
         }
@@ -545,11 +514,11 @@ namespace Display.ContentsPage
         /// </summary>
         private void updateGridViewShow()
         {
-            List<ActorsInfo> actorList = new();
+            List<ActorInfo> actorList = new();
 
             foreach (var item in BasicGridView.SelectedItems)
             {
-                actorList.Add(item as ActorsInfo);
+                actorList.Add(item as ActorInfo);
             }
 
             actorinfo.Clear();
@@ -664,7 +633,7 @@ namespace Display.ContentsPage
                 string imagePath = Path.Combine(SavePath, $"{imageName}.jpg");
                 if (File.Exists(imagePath))
                 {
-                    item.prifilePhotoPath = imagePath;
+                    item.prifile_path = imagePath;
                     progress_TextBlock.Text = $"{actorName} - 头像已存在，跳过";
 
                 }
@@ -676,7 +645,7 @@ namespace Display.ContentsPage
 
                     if(!string.IsNullOrEmpty(progressInfo.imagePath))
                     {
-                        item.prifilePhotoPath = progressInfo.imagePath;
+                        item.prifile_path = progressInfo.imagePath;
 
                         //最后一次report的就是目标信息
                         var face = progressInfo.faceList[progressInfo.faceList.Count - 1];
@@ -883,19 +852,19 @@ namespace Display.ContentsPage
             CancelSmokeGrid();
         }
 
-        private void ModifyActorImage_Click(object sender, RoutedEventArgs e)
+        private async void ModifyActorImage_Click(object sender, RoutedEventArgs e)
         {
             var imageUrl = (sender as HyperlinkButton).DataContext as string;
             string actorName = ShoeActorName.Text;
+
             string savePath = Path.Combine(AppSettings.ActorInfo_SavePath, actorName);
+            await GetInfoFromNetwork.downloadFile(imageUrl, savePath, "face", true);
 
-            //string imageFullPath =  await GetInfoFromNetwork.downloadFile(imageUrl, savePath, "face",true);
-
-            foreach(var item in actorinfo)
+            foreach (var item in actorinfo)
             {
                 if(item.name == actorName)
                 {
-                    item.prifilePhotoPath = imageUrl;
+                    item.prifile_path = imageUrl;
                     break;
                 }
             }

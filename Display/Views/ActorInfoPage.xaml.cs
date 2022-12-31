@@ -145,7 +145,6 @@ namespace Display.Views
             }
             else if (videoInfoList.Count == 1)
             {
-
                 ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
                 await Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
                 ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);

@@ -63,6 +63,13 @@ namespace Display.Views
             });
             DataSource.Add(new FunctionModule()
             {
+                Name = "文件列表",
+                IconPath = "/Assets/Svg/file_alt_icon.svg",
+                Description = "115中的文件列表",
+                Label = "测试中"
+            });
+            DataSource.Add(new FunctionModule()
+            {
                 Name = "浏览器",
                 IconPath = "/Assets/Svg/explorer_internet_logo_logos_icon.svg",
                 Description = "115网页版，并附加下载选项"
@@ -101,6 +108,11 @@ namespace Display.Views
                     CommonWindow window4 = new CommonWindow();
                     window4.Content = new BrowserPage(window4);
                     window4.Activate();
+                    break;
+                case "文件列表":
+                    CommonWindow window5 = new CommonWindow();
+                    window5.Content = new ContentsPage.DatumList.FileListPage();
+                    window5.Activate();
                     break;
                 case "演员头像":
                     CommonWindow window6 = new CommonWindow();

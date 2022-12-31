@@ -234,18 +234,18 @@ namespace Display.Views
                 webFileInfoList = new List<Datum>();
             }
             var limit = 40;
-            var WebFileInfo = await webapi.GetFileAsync(cid, limit);
+            var WebFileInfo = await webapi.GetFileAsync(cid, limit, LoadAll: true);
 
             if (WebFileInfo.errNo == 20130827)
             {
-                WebFileInfo = await webapi.GetFileAsync(cid);
+                WebFileInfo = await webapi.GetFileAsync(cid, LoadAll: true);
             }
 
             //实际count 大于设置的limit
             if (WebFileInfo.count > limit)
             {
                 limit = WebFileInfo.count;
-                WebFileInfo = await webapi.GetFileAsync(cid, limit);
+                WebFileInfo = await webapi.GetFileAsync(cid, limit, LoadAll: true);
             }
 
             if (WebFileInfo.state)

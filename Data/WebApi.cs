@@ -161,9 +161,10 @@ namespace Data
                 isEnterHiddenMode = false;
             }
 
-
             return result;
         }
+
+
 
         /// <summary>
         /// 导入CidList获取到的所有信息到数据库
@@ -284,7 +285,7 @@ namespace Data
             await Task.Delay(1000);
 
             //查询下一级文件信息
-            var WebFileInfo = await GetFileAsync(cid);
+            var WebFileInfo = await GetFileAsync(cid,LoadAll:true);
             sendCount++;
 
             if (WebFileInfo.state)
@@ -346,25 +347,61 @@ namespace Data
             return getFilesProgressInfo;
         }
 
+
+        /// <summary>
+        /// 检查是否为隐藏模式
+        /// </summary>
+        /// <returns></returns>
+        public async Task ChangedShowType(string cid, OrderBy orderBy = OrderBy.user_ptime, int asc = 0)
+        {
+            var values = new Dictionary<string, string>
+                {
+                    { "user_order", orderBy.ToString()},
+                    {"file_id", cid },
+                    {"user_asc",asc.ToString() },
+                    {"fc_mix","0" },
+                };
+            var content = new FormUrlEncodedContent(values);
+
+            HttpResponseMessage response;
+            try
+            {
+                response = await Client.PostAsync("https://webapi.115.com/files/order", content);
+            }
+            catch (AggregateException e)
+            {
+                FileMatch.tryToast("网络异常", "改变115排序顺序时发生异常：", e.Message);
+            }
+
+        }
+
+
+        public enum OrderBy { file_name, file_size, user_ptime }
+
         /// <summary>
         /// 获取文件信息
         /// </summary>
         /// <param name="cid"></param>
         /// <param name="limit"></param>
+        /// <param name="offset"></param>
+        /// <param name="useApi2"></param>
+        /// <param name="LoadAll"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="asc"></param>
         /// <returns></returns>
-        public async Task<WebFileInfo> GetFileAsync(string cid, int limit = 40, bool userApi2 = false)
+        public async Task<WebFileInfo> GetFileAsync(string cid, int limit = 40, int offset = 0, bool useApi2 = false, bool LoadAll = false, OrderBy orderBy = OrderBy.user_ptime,int asc=0)
         {
             WebFileInfo WebFileInfoResult = new();
 
             string url;
-            if (!userApi2)
+            if (!useApi2)
             {
-                url = $"https://webapi.115.com/files?aid=1&cid={cid}&o=user_ptime&asc=0&offset=0&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json";
+                url = $"https://webapi.115.com/files?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json";
             }
             else
             {
                 //旧接口只有t，没有修改时间（te），创建时间（tp）
-                url = $"https://aps.115.com/natsort/files.php?aid=1&cid={cid}&o=file_name&asc=1&offset=0&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json&fc_mix=0&type=&star=&is_share=&suffix=&custom_order=";
+                url = $"https://aps.115.com/natsort/files.php?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json&fc_mix=0&type=&star=&is_share=&suffix=&custom_order=";
             }
 
             HttpResponseMessage response;
@@ -387,7 +424,7 @@ namespace Data
             WebFileInfoResult = JsonConvert.DeserializeObject<WebFileInfo>(strResult);
 
             //te，tp简单用t替换，接口2没有te,tp
-            if (userApi2)
+            if (useApi2)
             {
                 foreach (var item in WebFileInfoResult.data)
                 {
@@ -412,7 +449,7 @@ namespace Data
             {
                 foreach (var item in WebFileInfoResult.data)
                 {
-                    int dateInt = 0;
+                    int dateInt;
                     //item.t 可能是 "1658999027" 也可能是 "2022-07-28 17:03"
 
                     //"1658999027"
@@ -428,7 +465,7 @@ namespace Data
                         dateInt = FileMatch.ConvertDateTimeToInt32(item.t);
                     }
 
-                    if (userApi2)
+                    if (useApi2)
                     {
                         item.te = item.tp = dateInt;
                     }
@@ -437,14 +474,14 @@ namespace Data
             }
 
             //接口1出错，使用接口2
-            if (WebFileInfoResult.errNo == 20130827 && userApi2 == false)
+            if (WebFileInfoResult.errNo == 20130827 && useApi2 == false)
             {
-                WebFileInfoResult = await GetFileAsync(cid, limit, true);
+                WebFileInfoResult = await GetFileAsync(cid, limit, offset, true, LoadAll, orderBy, asc);
             }
-            //未加载全部
-            else if (WebFileInfoResult.count > limit)
+            //需要加载全部，但未加载全部
+            else if (LoadAll && WebFileInfoResult.count > limit)
             {
-                WebFileInfoResult = await GetFileAsync(cid, WebFileInfoResult.count, userApi2);
+                WebFileInfoResult = await GetFileAsync(cid, WebFileInfoResult.count, offset,useApi2,LoadAll, orderBy, asc);
             }
 
             return WebFileInfoResult;
@@ -789,7 +826,7 @@ namespace Data
                 if (string.IsNullOrEmpty(datum.fid) || (!string.IsNullOrEmpty(datum.fid) && datum.fid == "0"))
                 {
                     //获取该文件夹下的文件和文件夹
-                    WebFileInfo webFileInfo = await GetFileAsync(datum.cid);
+                    WebFileInfo webFileInfo = await GetFileAsync(datum.cid,LoadAll:true);
                     if (webFileInfo.count == 0)
                     {
                         success = false;
@@ -916,7 +953,7 @@ namespace Data
         public async void GetAllFilesTraverseAndDownByBitComet(HttpClient client, string baseUrl, Datum datum, string ua, string save_path)
         {
             //获取该文件夹下的文件和文件夹
-            WebFileInfo webFileInfo = await GetFileAsync(datum.cid);
+            WebFileInfo webFileInfo = await GetFileAsync(datum.cid,LoadAll:true);
 
             foreach (var data in webFileInfo.data)
             {
@@ -1384,11 +1421,11 @@ namespace Data
             {
                 var matchTitle = Regex.Match(HttpUtility.UrlDecode(playUrl), @"/([-@.\w]+?\.\w+)\?t=");
                 if (matchTitle.Success)
-                    addTitle = $" :meta-title={matchTitle.Groups[1].Value}";
+                    addTitle = @$" :meta-title=""{matchTitle.Groups[1].Value}""";
             }
             else
             {
-                addTitle = $" :meta-title={title}";
+                addTitle = @$" :meta-title=""{title}""";
             }
 
             string addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty : @$" :sub-file=""{subFile}""";

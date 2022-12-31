@@ -87,13 +87,13 @@
                             <FlipView x:Name="randomIamgeFlipView" ItemsSource="{x:Bind Items, Mode=OneWay}" Background="Transparent">
                                 <FlipView.ItemTemplate>
                                     <DataTemplate x:DataType="data:VideoInfo">
-                                        <Grid
+                                        <Border
                                             x:Name="Image_Grid"
                                             PointerEntered="Image_PointerEntered"
                                             PointerExited="Image_PointerExited"
-                                            CornerRadius="2">
+                                            CornerRadius="3">
                                             <Image Source="{x:Bind imagepath}" Tapped="Image_Tapped"/>
-                                        </Grid>
+                                        </Border>
 
                                     </DataTemplate>
                                 </FlipView.ItemTemplate>

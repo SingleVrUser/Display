@@ -19,8 +19,12 @@
                     <SolidColorBrush x:Key="RatingControlUnselectedForeground" Color="#ecf0f1" />
 
                 </ResourceDictionary>
+                
+                
 
                 <ResourceDictionary>
+
+
                     <Style TargetType="TextBlock">
                         <Setter Property="FontFamily"
                                 Value="霞鹜文楷" />
