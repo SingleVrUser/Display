@@ -103,7 +103,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             {
                 if(cid == "0")
                 {
-                    var RootFileInfo = await webapi.GetFileAsync(cid);
+                    var RootFileInfo = await webapi.GetFileAsync(cid, LoadAll: true);
 
                     var FoldersInfoInRoot = RootFileInfo.data;
 

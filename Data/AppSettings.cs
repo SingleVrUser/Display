@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.UI.Composition;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 using Windows.Storage;
@@ -59,6 +60,23 @@ public class AppSettings
             return check;
         }
         set => localSettings.Values["IsAutoAdjustImageSize"] = value;
+    }
+
+    /// <summary>
+    /// 是否已经升级了数据库
+    /// </summary>
+    public static bool IsUpdatedDataAccessFrom014
+    {
+        get
+        {
+            bool isUpdated = false;
+            if (localSettings.Values["IsUpdatedDataAccessFrom014"] is bool value)
+            {
+                isUpdated = value;
+            }
+            return isUpdated;
+        }
+        set => localSettings.Values["IsUpdatedDataAccessFrom014"] = value;
     }
 
     /// <summary>

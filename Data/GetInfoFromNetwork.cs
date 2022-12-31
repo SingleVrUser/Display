@@ -1338,6 +1338,11 @@ namespace Data
             else
             {
                 localFilename = $"{fileName}{Path.GetExtension(url)}";
+
+                if (localFilename.Contains("?"))
+                {
+                    localFilename = localFilename.Split("?")[0];
+                }
             }
 
             string localPath = Path.Combine(filePath, localFilename);

@@ -17,7 +17,7 @@
                 DesiredWidth="140"
                 IsItemClickEnabled="True"
                 ItemClick="BasicGridView_ItemClick"
-                Margin="10,0,0,0">
+                Padding="10,0">
             <controls:AdaptiveGridView.Header>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -40,7 +40,7 @@
                             <Button Content="苗条"/>-->
                             <ProgressRing x:Name="ProgressRing"/>
                         </StackPanel>
-                        <TextBlock Text="{x:Bind actorinfo.Count}"
+                        <TextBlock Text="{x:Bind actorinfo.AllCount}"
                            RelativePanel.AlignLeftWithPanel="True"
                            RelativePanel.AlignVerticalCenterWithPanel="True"
                            Margin="0,0,10,0"
@@ -74,11 +74,11 @@
                             <CubicEase EasingMode="EaseOut" />
                         </controls:Carousel.EasingFunction>
                         <controls:Carousel.ItemTemplate>
-                            <DataTemplate x:DataType="data:ActorsInfo">
+                            <DataTemplate x:DataType="data:ActorInfo">
                                 <Image
                                     Width="300"
                                     Height="240"
-                                    Source="{x:Bind prifilePhotoPath}"
+                                    Source="{x:Bind prifile_path}"
                                     Stretch="Uniform"
                                     Tapped="Image_Tapped"
                                     PointerEntered="Img_PointerEntered"
@@ -93,7 +93,7 @@
             </controls:AdaptiveGridView.Header>
 
             <controls:AdaptiveGridView.ItemTemplate>
-                <DataTemplate x:DataType="data:ActorsInfo">
+                <DataTemplate x:DataType="data:ActorInfo">
                     <Grid
                         Padding="10,0"
                         CornerRadius="5"
@@ -106,12 +106,12 @@
                         </Grid.RowDefinitions>
 
                         <Grid CornerRadius="5">
-                            <Image x:Name="ActorImage" Source="{x:Bind prifilePhotoPath}"/>
+                            <controls:ImageEx x:Name="ActorImage" Source="{x:Bind prifile_path}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
                         </Grid>
 
-                        <RelativePanel Margin="5,0" Grid.Row="1">
+                        <RelativePanel Grid.Row="1">
                             <TextBlock Text="{x:Bind name}" RelativePanel.AlignVerticalCenterWithPanel="True" IsTextSelectionEnabled="True" TextWrapping="Wrap" FontFamily="霞鹜文楷"/>
-                            <TextBlock Text="{x:Bind count}" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignBottomWithPanel="True" FontFamily="JetBrains Mono" FontSize="10" Opacity="0.4"/>
+                            <!--<TextBlock Text="{x:Bind count}" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignBottomWithPanel="True" FontFamily="JetBrains Mono" FontSize="10" Opacity="0.4"/>-->
                         </RelativePanel>
                     </Grid>
                 </DataTemplate>

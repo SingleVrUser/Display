@@ -1,4 +1,5 @@
 ﻿using Data;
+using Display.Model;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -21,72 +22,45 @@ namespace Display.Views
     /// </summary>
     public sealed partial class ActorsPage : Page
     {
-        public ObservableCollection<ActorsInfo> actorinfo = new();
+        //public ObservableCollection<ActorsInfo> actorinfo = new();
 
-        List<ActorsInfo> actorinfoList;
-        ObservableCollection<ActorsInfo> actorPartInfo = new();
+        //List<ActorsInfo> actorinfoList;
+
+        IncrementallLoadActorInfoCollection actorinfo;
+        List<ActorInfo> actorPartInfo;
 
         //过渡动画用
         private enum navigationAnimationType { image, gridView };
         private navigationAnimationType _navigationType;
-        private ActorsInfo _storeditem;
+        private ActorInfo _storeditem;
         private Image _storedimage;
 
         public ActorsPage()
         {
             this.InitializeComponent();
 
-            BasicGridView.ItemsSource = actorinfo;
-            CarouselControl.ItemsSource = actorPartInfo;
             Page_Loaded();
         }
 
         private async void Page_Loaded()
         {
             ProgressRing.IsActive = true;
-            Dictionary<string, List<string>> ActorsInfoDict = new();
-            List<VideoInfo> VideoInfoList = await DataAccess.LoadVideoInfo(-1);
 
-            foreach (var VideoInfo in VideoInfoList)
-            {
-                string actor_str = VideoInfo.actor;
+            actorinfo = new(new() { { "prifile_path", true } });
 
-                var actor_list = actor_str.Split(",");
-                foreach (var actor in actor_list)
-                {
-                    //当前名称不存在
-                    if (!ActorsInfoDict.ContainsKey(actor))
-                    {
-                        ActorsInfoDict.Add(actor, new List<string>());
-                    }
-                    ActorsInfoDict[actor].Add(VideoInfo.truename);
-                }
-            }
-
-            List<ActorsInfo> tmpInfos = new();
-            foreach (var item in ActorsInfoDict)
-            {
-                tmpInfos.Add(new ActorsInfo
-                {
-                    name = item.Key,
-                    count = item.Value.Count,
-                });
-            }
-
-            actorinfoList = tmpInfos.OrderByDescending(x => x.name == "").ThenBy(x => x.prifilePhotoPath).ToList();
-            actorinfoList.ForEach(x => actorinfo.Add(x));
+            await actorinfo.LoadData();
+            BasicGridView.ItemsSource = actorinfo;
 
             LoadActorPartInfo();
 
             ProgressRing.IsActive = false;
         }
 
-        private void LoadActorPartInfo(int count = 30)
+        private async void LoadActorPartInfo(int count = 30)
         {
-            if (actorinfoList == null) return;
-
-            Random rnd = new Random();
-            actorinfoList.Where(item=>item.prifilePhotoPath!= "ms-appx:///Assets/NoPicture.jpg").OrderByDescending(item => rnd.Next()).Take(count).ToList().ForEach(item=>actorPartInfo.Add(item));
+            actorPartInfo = await DataAccess.LoadActorInfo(count,0,orderByList: new (){ { "RANDOM()", false } },
+                                                                filterList: new (){ "prifile_path != ''" });
+            CarouselControl.ItemsSource = actorPartInfo;
 
         }
 
@@ -99,7 +73,7 @@ namespace Display.Views
         {
             if (BasicGridView.ContainerFromItem(e.ClickedItem) is GridViewItem container)
             {
-                var actorinfo = container.Content as ActorsInfo;
+                var actorinfo = container.Content as ActorInfo;
 
                 _navigationType = navigationAnimationType.gridView;
                 _storeditem = actorinfo;
@@ -109,7 +83,7 @@ namespace Display.Views
             }
         }
 
-        private void GoToActorInfo(ActorsInfo actorinfo)
+        private void GoToActorInfo(ActorInfo actorinfo)
         {
             Tuple<List<string>, string> TypeAndName = new(new() { "actor" }, actorinfo.name);
             Frame.Navigate(typeof(ActorInfoPage), TypeAndName);
@@ -141,7 +115,7 @@ namespace Display.Views
             _storedimage = image;
             ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", _storedimage);
 
-            if (image.DataContext is ActorsInfo actorinfo)
+            if (image.DataContext is ActorInfo actorinfo)
             {
                 if (isActorInfoCurrentSelected(actorinfo))
                     GoToActorInfo(actorinfo);
@@ -179,7 +153,7 @@ namespace Display.Views
         {
             if (!(sender is Image image)) return;
 
-            if (image.DataContext is ActorsInfo actorinfo)
+            if (image.DataContext is ActorInfo actorinfo)
             {
                 if (isActorInfoCurrentSelected(actorinfo))
                     ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
@@ -190,14 +164,14 @@ namespace Display.Views
         {
             if (!(sender is Image image)) return;
 
-            if (image.DataContext is ActorsInfo actorinfo)
+            if (image.DataContext is ActorInfo actorinfo)
             {
                 if (isActorInfoCurrentSelected(actorinfo))
                     ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             }
         }
 
-        private bool isActorInfoCurrentSelected(ActorsInfo actorinfo)
+        private bool isActorInfoCurrentSelected(ActorInfo actorinfo)
         {
             if ((CarouselControl.SelectedItem == null && CarouselControl.SelectedIndex == 8) || CarouselControl.SelectedItem != null && CarouselControl.SelectedItem == actorinfo)
                 return true;

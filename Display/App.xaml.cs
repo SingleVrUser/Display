@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -22,6 +23,7 @@ using Windows.Foundation.Collections;
 using Windows.Storage;
 using Windows.UI.ViewManagement;
 using WinRT.Interop;
+using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -33,10 +35,10 @@ namespace Display
     /// </summary>
     public partial class App : Application
     {
-        /// <summary>
-        /// 应用窗口对象.
-        /// </summary>
-        public static AppWindow AppWindow { get; private set; }
+        ///// <summary>
+        ///// 应用窗口对象.
+        ///// </summary>
+        //public static AppWindow AppWindow { get; private set; }
 
         /// <summary>
         /// 主窗口.
@@ -68,13 +70,24 @@ namespace Display
             //初始化数据库
             await DataAccess.InitializeDatabase();
 
+            //没有升级过数据库
+            if (!AppSettings.IsUpdatedDataAccessFrom014)
+            {
+                var startWindow = new StartWindow();
+                startWindow.Activate();
+            }
+            else
+            {
+                CreateActivateMainWindow();
+            }
+        }
+
+        public static void CreateActivateMainWindow()
+        {
             AppMainWindow = new MainWindow();
             AppMainWindow.Activate();
-
-            //// 获取应用窗口对象
-            //AppWindow = getAppWindow(AppMainWindow);
-
         }
+
 
         private bool checkErrorBeforeActivateMainWindow()
         {

@@ -88,7 +88,7 @@ namespace Display.Views
 
         private void Image_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            Grid grid = sender as Grid;
+            //Grid grid = sender as Grid;
             //grid.BorderBrush = new SolidColorBrush(Microsoft.UI.Colors.LightGray);
             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
 
@@ -96,7 +96,7 @@ namespace Display.Views
 
         private void Image_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            Grid grid = sender as Grid;
+            //Grid grid = sender as Grid;
             //grid.BorderBrush = null;
             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }

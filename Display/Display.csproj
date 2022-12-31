@@ -65,6 +65,8 @@
     <None Remove="ContentsPage\AddActorCover.xaml" />
     <None Remove="ContentsPage\CalculateLocalFileSha1.xaml" />
     <None Remove="ContentsPage\CheckCookie.xaml" />
+    <None Remove="ContentsPage\DatumList\FileListPage.xaml" />
+    <None Remove="ContentsPage\DatumList\VideoDisplay\MainPage.xaml" />
     <None Remove="ContentsPage\FileInfoInCidSmoke.xaml" />
     <None Remove="ContentsPage\FindInfoAgainSmoke.xaml" />
     <None Remove="ContentsPage\GetThumbnail.xaml" />
@@ -100,6 +102,7 @@
     <None Remove="WindowView\CommonWindow.xaml" />
     <None Remove="WindowView\LoginWindow.xaml" />
     <None Remove="WindowView\SingleFrameWindow.xaml" />
+    <None Remove="WindowView\StartWindow.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -129,6 +132,7 @@
 
   <ItemGroup>
     <PackageReference Include="ByteSize" Version="2.1.1" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
     <PackageReference Include="CommunityToolkit.WinUI.UI.Behaviors" Version="7.1.2" />
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
@@ -312,6 +316,15 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="WindowView\StartWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="ContentsPage\DatumList\VideoDisplay\MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="ContentsPage\DatumList\FileListPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Control\InfoListFilter.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

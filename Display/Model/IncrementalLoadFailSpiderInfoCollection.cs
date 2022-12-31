@@ -33,7 +33,6 @@ public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<Fail
 
     public FailType ShowType { get; set; } = FailType.All;
 
-
     public int AllCount { get; private set; }
 
     public bool HasMoreItems { get; set; } = true;

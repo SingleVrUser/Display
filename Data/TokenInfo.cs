@@ -310,19 +310,6 @@ namespace Data
         public string token { get; set; }
     }
 
-    public class DisplayInfo
-    {
-        public string name { get; set; }
-        public string size { get; set; }
-        public string modifyTime { get; set; }
-        public string coverImage { get; set; }
-    }
-
-    public class AccountContentInPage
-    {
-        public int ContentAcount { get; set; }
-        //public bool IsSelected { get; set; } = false;
-    }
 
     public class _115Setting
     {
@@ -413,6 +400,89 @@ namespace Data
         public string storeId { get; set; } = null;
         public string value { get; set; }
     }
+
+    public class ActorInfo : INotifyPropertyChanged
+    {
+        public int id { get; set; }
+
+        public string name { set; get; }
+
+        public int is_woman { set; get; } = 1;
+
+        public string birthday { set; get; } = string.Empty;
+        public string bwh { set; get; } = string.Empty;
+        public string height { set; get; } = string.Empty;
+        public int works_count { set; get; }
+        public string work_time { set; get; } = string.Empty;
+
+        private string _prifile_path = string.Empty;
+        public string prifile_path
+        {
+            get => _prifile_path;
+            set
+            {
+                if (_prifile_path == value) return;
+
+                _prifile_path = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string blog_url { set; get; } = string.Empty;
+        public int is_like { set; get; } = 0;
+        public long addtime { set; get; } =  DateTimeOffset.Now.ToUnixTimeSeconds();
+
+
+
+        private Status _status = Status.beforeStart;
+        public Status Status
+        {
+            get
+            {
+                return _status;
+            }
+            set
+            {
+                _status = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _genderInfo;
+        public string genderInfo
+        {
+            get
+            {
+                return _genderInfo;
+            }
+            set
+            {
+                _genderInfo = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _ageInfo;
+        public string ageInfo
+        {
+            get
+            {
+                return _ageInfo;
+            }
+            set
+            {
+                _ageInfo = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
 
     /// <summary>
     /// 视频详细信息
@@ -1257,7 +1327,7 @@ namespace Data
         public int count;
 
         private string _prifilePhotoPath;
-        //private string _prifilePhotoPath;
+
         public string prifilePhotoPath
         {
             get

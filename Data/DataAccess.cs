@@ -36,7 +36,6 @@ namespace Data
             }
 
             tryCreateDBFile(DataAccess_SavePath);
-            //dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
 
             string newDBPath = Path.Combine(DataAccess_SavePath, DBNAME);
 
@@ -44,8 +43,6 @@ namespace Data
             StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(AppSettings.DataAccess_SavePath);
             //获取数据库文件，没有则创建
             await folder.CreateFileAsync(DBNAME, CreationCollisionOption.OpenIfExists);
-
-            //dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
 
             using (SqliteConnection db =
                new SqliteConnection($"Filename={newDBPath}"))
@@ -115,7 +112,6 @@ namespace Data
                       "addtime integer," +
                       "PRIMARY KEY('truename')) ";
 
-                //createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteNonQuery();
 
                 //是否步兵
@@ -125,7 +121,6 @@ namespace Data
                       "is_wm integer," +
                       "PRIMARY KEY('truename')" +
                       ") ";
-                //createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteNonQuery();
 
                 //厂商信息，如果没有则初始化并添加常用的
@@ -139,7 +134,6 @@ namespace Data
                       "issuccess integer," +
                       "PRIMARY KEY('file_pickcode')" +
                       ") ";
-                //createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteNonQuery();
 
                 //下载历史
@@ -152,7 +146,43 @@ namespace Data
                       "add_time integer," +
                       "PRIMARY KEY('file_pickcode')" +
                       ") ";
-                //createTable = new SqliteCommand(tableCommand, db);
+                createTable.ExecuteNonQuery();
+
+                //演员信息
+                createTable.CommandText = "CREATE TABLE IF NOT " +
+                    $"EXISTS ActorInfo ( " +
+                        "id INTEGER NOT NULL,"+
+                        "name TEXT NOT NULL,"+
+                        "is_woman integer,"+
+                        "birthday text,"+
+                        "bwh text,"+
+                        "height integer,"+
+                        "works_count integer,"+
+                        "work_time text," +
+                        "prifile_path text," +
+                        "blog_url text," +
+                        "is_like integer," +
+                        "addtime integer," +
+                        "PRIMARY KEY (id)" +
+                      ") ";
+                createTable.ExecuteNonQuery();
+
+                //演员别名
+                createTable.CommandText = "CREATE TABLE IF NOT " +
+                    $"EXISTS Actor_Names ( " +
+                    "id INTEGER NOT NULL," +
+                    "name TEXT NOT NULL," +
+                    "PRIMARY KEY('id','name')" +
+                        ") ";
+                createTable.ExecuteNonQuery();
+
+                //演员视频中间表
+                createTable.CommandText = "CREATE TABLE IF NOT " +
+                    $"EXISTS Actor_Video ( " +
+                    "actor_id INTEGER NOT NULL," +
+                    "video_name TEXT NOT NULL," +
+                    "PRIMARY KEY('actor_id','video_name')" +
+                        ") ";
                 createTable.ExecuteNonQuery();
 
                 //搜刮记录
@@ -163,12 +193,10 @@ namespace Data
                       "done text," +
                       "PRIMARY KEY('task_id')" +
                       ") ";
-                //createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteNonQuery();
 
                 //删除表（添加了搜刮源，需要重新添加）
                 createTable.CommandText = "DROP TABLE IF EXISTS SpiderTask";
-                //createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteNonQuery();
 
                 //搜刮任务
@@ -186,11 +214,92 @@ namespace Data
                       "tadk_id integer," +
                       "PRIMARY KEY('name')" +
                       ") ";
-                //createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteNonQuery();
             }
         }
 
+        public static async Task UpdateDatabaseFrom14()
+        {
+            //更新演员数据
+            Dictionary<string, List<string>> ActorsInfoDict = new();
+
+            //加载全部数据
+            List<VideoInfo> VideoInfoList = await DataAccess.LoadVideoInfo(-1);
+            foreach (var VideoInfo in VideoInfoList)
+            {
+                string actor_str = VideoInfo.actor;
+
+                var actor_list = actor_str.Split(",");
+                foreach (var actor in actor_list)
+                {
+                    //当前名称不存在
+                    if (!ActorsInfoDict.ContainsKey(actor))
+                    {
+                        ActorsInfoDict.Add(actor, new List<string>());
+                    }
+                    ActorsInfoDict[actor].Add(VideoInfo.truename);
+                }
+            }
+
+            foreach (var item in ActorsInfoDict)
+            {
+                AddActorInfo(item.Key, item.Value);
+            }
+        }
+
+        public static void AddActorInfo(string actor_name,List<string> video_nameList)
+        {
+            string singleActorName;
+            string[] otherNames = null;
+
+            //针对演员的别名，添加到Actor_Names
+            var match_result = Regex.Match(actor_name, "(.*)[（（](.*)[)）]");
+            if (match_result.Success)
+            {
+                singleActorName = match_result.Groups[1].Value;
+
+                otherNames = match_result.Groups[2].Value.Split("、");
+            }
+            else
+            {
+                singleActorName = actor_name;
+            }
+
+            //插入演员信息（不存在时才插入）
+            var actor_id = GetActorIdByName(singleActorName);
+            //数据库中不存在该名称
+            if (actor_id == -1)
+            {
+                ActorInfo actorInfo = new() { name=singleActorName };
+
+                //检查演员图片是否存在
+                string imagePath = Path.Combine(AppSettings.ActorInfo_SavePath, singleActorName, "face.jpg");
+                if (File.Exists(imagePath))
+                {
+                    actorInfo.prifile_path = imagePath;
+                }
+
+                actor_id = InsertActorInfo(actorInfo);
+            }
+
+            //添加Actor_Names
+            //主名称
+            AddOrIgnoreActor_Names(actor_id, singleActorName);
+            //别名
+            if (otherNames != null)
+            {
+                foreach (var name in otherNames)
+                {
+                    AddOrIgnoreActor_Names(actor_id, name);
+                }
+            }
+
+            //添加演员和作品的信息
+            foreach (var video_name in video_nameList)
+            {
+                AddOrIgnoreActor_Video(actor_id, video_name);
+            }
+        }
 
         /// <summary>
         /// 初始化厂商信息
@@ -499,11 +608,14 @@ namespace Data
                 {
                     insertCommand.Parameters.AddWithValue(item.Key, item.Value);
                 }
-                var result = insertCommand.ExecuteReader();
+                insertCommand.ExecuteNonQuery();
 
-                Debug.WriteLine(result);
+                //var result = insertCommand.ExecuteReader();
+                //Debug.WriteLine(result);
+                //Debug.WriteLine($"添加信息{data.truename},{data.producer},{data.is_wm}");
 
-                Debug.WriteLine($"添加信息{data.truename},{data.producer},{data.is_wm}");
+                //添加演员信息
+                AddActorInfo(data.actor, new() { data.truename });
 
                 //添加是否步兵
                 AddOrReplaceIs_Wm(data.truename,data.producer, data.is_wm);
@@ -572,6 +684,48 @@ namespace Data
             }
         }
 
+        public static void AddOrIgnoreActor_Video(long actor_id,string video_name)
+        {
+            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
+            using (SqliteConnection db =
+              new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand insertCommand = new SqliteCommand();
+                insertCommand.Connection = db;
+
+                //添加信息，如果已经存在则忽略
+                insertCommand.CommandText = $"INSERT OR IGNORE INTO Actor_Video VALUES (@actor_id,@video_name)";
+                insertCommand.Parameters.AddWithValue("@actor_id", actor_id);
+                insertCommand.Parameters.AddWithValue("@video_name", video_name);
+                insertCommand.ExecuteNonQuery();
+
+                db.Close();
+            }
+        }
+
+        public static void AddOrIgnoreActor_Names(long id,string name)
+        {
+            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
+            using (SqliteConnection db =
+              new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand insertCommand = new SqliteCommand();
+                insertCommand.Connection = db;
+
+                //添加信息，如果已经存在则忽略
+                insertCommand.CommandText = $"INSERT OR IGNORE INTO Actor_Names VALUES (@id,@name)";
+                insertCommand.Parameters.AddWithValue("@id", id);
+                insertCommand.Parameters.AddWithValue("@name", name);
+                insertCommand.ExecuteNonQuery();
+
+                db.Close();
+            }
+        }
+
 
         /// <summary>
         /// 添加或忽略步兵的生厂商
@@ -598,6 +752,50 @@ namespace Data
 
                 db.Close();
             }
+        }
+
+        /// <summary>
+        /// 插入演员信息并返回actor_id
+        /// </summary>
+        /// <param name="data"></param>
+        public static long InsertActorInfo(ActorInfo actorInfo)
+        {
+            long actor_id = 0;
+
+            using (SqliteConnection db =
+              new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand Command = new SqliteCommand();
+                Command.Connection = db;
+
+                long addTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+
+                //插入新记录
+                Command.CommandText = $"INSERT INTO ActorInfo VALUES (NULL,@name,@is_woman,@birthday,@bwh,@height,@works_count,@work_time,@prifile_path,@blog_url,@is_like,@addtime);";
+                Command.Parameters.AddWithValue("@name", actorInfo.name);
+                Command.Parameters.AddWithValue("@is_woman", actorInfo.is_woman);
+                Command.Parameters.AddWithValue("@birthday", actorInfo.birthday);
+                Command.Parameters.AddWithValue("@bwh", actorInfo.bwh);
+                Command.Parameters.AddWithValue("@height", actorInfo.height);
+                Command.Parameters.AddWithValue("@works_count", actorInfo.works_count);
+                Command.Parameters.AddWithValue("@work_time", actorInfo.work_time);
+                Command.Parameters.AddWithValue("@prifile_path", actorInfo.prifile_path);
+                Command.Parameters.AddWithValue("@blog_url", actorInfo.blog_url);
+                Command.Parameters.AddWithValue("@is_like", actorInfo.is_like);
+                Command.Parameters.AddWithValue("@addtime", actorInfo.addtime);
+
+                Command.ExecuteReader();
+
+                //查询Task_ID
+                Command = new($"SELECT id FROM ActorInfo WHERE name == '{actorInfo.name}'", db);
+                actor_id = (long)Command.ExecuteScalar();
+
+                db.Close();
+            }
+
+            return actor_id;
         }
 
 
@@ -705,6 +903,31 @@ namespace Data
                 db.Close();
             }
         }
+
+        /// <summary>
+        /// 更新演员头像地址
+        /// </summary>
+        /// <param name="truename"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public static void UpdateActorInfoPrifilePath(string name,string prifile_path)
+        {
+            using (SqliteConnection db =
+               new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"UPDATE ActorInfo SET prifile_path = '{prifile_path}' WHERE name = '{name}'", db);
+
+                selectCommand.ExecuteNonQuery();
+
+                db.Close();
+            }
+
+            //return data;
+        }
+
 
         /// <summary>
         /// 更新数据信息，VideoInfo的单个字段
@@ -1005,25 +1228,7 @@ namespace Data
             {
                 db.Open();
 
-                string orderStr = string.Empty;
-                if (!string.IsNullOrEmpty(orderBy))
-                {
-                    if(orderBy == "random")
-                    {
-                        orderStr = " ORDER BY RANDOM()";
-                    }
-                    else
-                    {
-                        if (isDesc)
-                        {
-                            orderStr = $" ORDER BY {orderBy} DESC";
-                        }
-                        else
-                        {
-                            orderStr = $" ORDER BY {orderBy}";
-                        }
-                    }
-                }
+                string orderStr = GetOrderStr(orderBy, isDesc);
 
                 string queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n.Replace("'", "%")}%'";
 
@@ -1057,10 +1262,41 @@ namespace Data
         }
 
         /// <summary>
-        /// 检查失败列表数量
+        /// 检查演员列表数量
         /// </summary>
         /// <param name="n"></param>
         /// <returns></returns>
+        public static int CheckActorInfoCount(List<string> filterList=null)
+        {
+            int count = 0;
+            using (SqliteConnection db =
+               new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                string filterStr = string.Empty;
+                if (filterList != null)
+                {
+                    filterStr = $" WHERE {string.Join(",", filterList)}";
+                }
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"SELECT COUNT(id) FROM ActorInfo{filterStr}", db);
+
+
+                SqliteDataReader query = selectCommand.ExecuteReader();
+
+                query.Read();
+                count = query.GetInt32(0);
+                query.Close();
+
+                db.Close();
+            }
+
+            return count;
+        }
+
+
         public static int CheckFailFilesCount(string n = "",FailType showType= FailType.All)
         {
             if (!string.IsNullOrEmpty(n) && n.Contains("'"))
@@ -1119,7 +1355,7 @@ namespace Data
                 db.Open();
 
                 //排序
-                string orderStr = GetVideoInfoOrderStr(orderBy, isDesc);
+                string orderStr = GetOrderStr(orderBy, isDesc);
 
                 //筛选
                 string filterStr = GetVideoInfoFilterStr(filterConditionList, filterKeywords, rangesDicts);
@@ -1143,58 +1379,6 @@ namespace Data
                 query.Read();
                 count += query.GetInt32(0);
                 query.Close();
-
-
-                ////筛选
-                //string filterStr = string.Empty;
-                //if (filterConditionList != null)
-                //{
-                //    List<string> filterList = new();
-                //    foreach (var item in filterConditionList)
-                //    {
-                //        switch (item)
-                //        {
-                //            case "look_after":
-                //                filterList.Add($"{item} != 0");
-                //                break;
-                //            case "Year":
-                //                filterList.Add($"releasetime LIKE '{filterKeywords}-%'");
-                //                break;
-                //            case "fail":
-                //                var failCount = CheckFailFilesCount(n: filterKeywords);
-                //                count += failCount;
-                //                break;
-                //            default:
-                //                filterList.Add($"{item} LIKE '%{filterKeywords}%'");
-                //                break;
-                //        }
-                //    }
-
-                //    if (filterList.Count > 0)
-                //    {
-                //        filterStr = $" WHERE {string.Join(" OR ", filterList)} ";
-
-                //        SqliteCommand selectCommand = new SqliteCommand
-                //            ($"SELECT COUNT(truename) from VideoInfo{filterStr}{orderStr}", db);
-
-                //        SqliteDataReader query = selectCommand.ExecuteReader();
-
-                //        query.Read();
-                //        count += query.GetInt32(0);
-                //        query.Close();
-                //    }
-                //}
-                //else
-                //{
-                //    SqliteCommand selectCommand = new SqliteCommand
-                //        ($"SELECT COUNT(truename) from VideoInfo{orderStr}", db);
-
-                //    SqliteDataReader query = selectCommand.ExecuteReader();
-
-                //    query.Read();
-                //    count = query.GetInt32(0);
-                //    query.Close();
-                //}
 
                 db.Close();
             }
@@ -1256,6 +1440,32 @@ namespace Data
             return imagePath;
         }
 
+        /// <summary>
+        /// 查询当前是否存入该演员
+        /// </summary>
+        /// <param name="spiderSource"></param>
+        /// <returns></returns>
+        public static long GetActorIdByName(string actor_name)
+        {
+            long actor_id = -1;
+
+            using (SqliteConnection db =
+            new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                //查询Actor_ID
+                SqliteCommand Command = new($"SELECT id FROM Actor_Names WHERE name == '{actor_name}'", db);
+                var tmp = Command.ExecuteScalar();
+
+                if (tmp != null)
+                    actor_id = (long)tmp;
+
+                db.Close();
+            }
+
+            return actor_id;
+        }
 
         /// <summary>
         /// 获取可用搜刮任务的一个name
@@ -1347,7 +1557,7 @@ namespace Data
             return isDone;
         }
 
-        private static string GetVideoInfoOrderStr(string orderBy,bool isDesc)
+        private static string GetOrderStr(string orderBy,bool isDesc)
         {
             string orderStr = string.Empty;
             if (!string.IsNullOrEmpty(orderBy))
@@ -1371,7 +1581,7 @@ namespace Data
 
             return orderStr;
         }
-
+        
         private static string GetVideoInfoFilterStr(List<string> filterConditionList = null, string filterKeywords = null, Dictionary<string, string> rangesDicts = null)
         {
             string filterStr = string.Empty;
@@ -1452,14 +1662,13 @@ namespace Data
         {
             List<VideoInfo> data = new List<VideoInfo>();
 
-            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
                new SqliteConnection($"Filename={dbpath}"))
             {
                 db.Open();
 
                 //排序
-                string orderStr = GetVideoInfoOrderStr(orderBy, isDesc);
+                string orderStr = GetOrderStr(orderBy, isDesc);
 
                 //筛选
                 string filterStr = GetVideoInfoFilterStr(filterConditionList, filterKeywords, rangesDicts);
@@ -1489,6 +1698,52 @@ namespace Data
 
             return data;
         }
+
+        public static async Task<List<ActorInfo>> LoadActorInfo(int limit = 1, int offset = 0, Dictionary<string, bool> orderByList = null, List<string> filterList = null)
+        {
+            List<ActorInfo> data = new ();
+
+            using (SqliteConnection db =
+               new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                string orderStr = string.Empty;
+                if (orderByList != null)
+                {
+                    List<string> orderStrList = new();
+                    foreach (var item in orderByList)
+                    {
+                        string dscStr = item.Value ? " DESC" : string.Empty;
+
+                        orderStrList.Add($"{item.Key}{dscStr}");
+                    }
+
+                    orderStr = $" ORDER BY {string.Join(",", orderStrList)}";
+                }
+
+                string filterStr = string.Empty;
+                if(filterList != null)
+                {
+                    filterStr = $" WHERE {string.Join(",", filterList)}";
+                }
+
+                SqliteCommand Command = new SqliteCommand
+                    ($"SELECT * from ActorInfo{filterStr}{orderStr} LIMIT {limit} offset {offset}", db);
+
+                SqliteDataReader query = await Command.ExecuteReaderAsync();
+
+                while (query.Read())
+                {
+                    data.Add(ConvertQueryToActorInfo(query));
+                }
+
+                db.Close();
+            }
+
+            return data;
+        }
+
 
         /// <summary>
         /// 通过PickCode以及TimeEdit判断文件夹是否存在且未更新。
@@ -2214,7 +2469,7 @@ namespace Data
         #region 格式转换
 
         /// <summary>
-        /// 添加数据库查询结果到VideoInfo格式
+        /// 转换数据库查询结果到VideoInfo格式
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -2238,14 +2493,37 @@ namespace Data
             dataInfo.look_later = Convert.ToInt32(query["look_later"]);
             dataInfo.score = Convert.ToSingle(query["score"]);
             dataInfo.is_like = Convert.ToInt32(query["is_like"]);
-
-            dataInfo.addtime = Convert.ToInt32(query["addtime"]);
+            dataInfo.addtime = Convert.ToInt64(query["addtime"]);
 
             return dataInfo;
         }
 
         /// <summary>
-        /// 添加数据库查询结果到Datum格式
+        /// 转换数据库查询结果到VideoInfo格式
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        private static ActorInfo ConvertQueryToActorInfo(SqliteDataReader query)
+        {
+            ActorInfo dataInfo = new ();
+            dataInfo.id = Convert.ToInt32(query["id"]);
+            dataInfo.name = query["name"] as string;
+            dataInfo.is_woman = Convert.ToInt32(query["is_woman"]);
+            dataInfo.birthday = query["birthday"] as string;
+            dataInfo.bwh = query["bwh"] as string;
+            dataInfo.height = query["height"] as string;
+            dataInfo.works_count = Convert.ToInt32(query["works_count"]);
+            dataInfo.work_time = query["work_time"] as string;
+            dataInfo.prifile_path = query["prifile_path"] as string;
+            dataInfo.blog_url = query["blog_url"] as string;
+            dataInfo.is_like = Convert.ToInt32(query["is_like"]);
+            dataInfo.addtime = Convert.ToInt64(query["addtime"]);
+
+            return dataInfo;
+        }
+
+        /// <summary>
+        /// 转换数据库查询结果到Datum格式
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>

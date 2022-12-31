@@ -7,46 +7,41 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:data="using:Data"
     xmlns:controls="using:Display.Control"
+    xmlns:control="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d">
     <Page.Resources>
-        <DataTemplate x:DataType="data:ActorsInfo" x:Key="GirdViewTemplate">
+        <!--<converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter"/>-->
+
+        <DataTemplate x:DataType="data:ActorInfo" x:Key="GirdViewTemplate">
+            
             <Grid
                 x:Name="connectedElement"
-                Width="140"
-                Height="140"
                 BorderThickness="1"
                 BorderBrush="{ThemeResource SystemControlTransientBorderBrush}"
                 CornerRadius="5"
                 PointerEntered="connectedElement_PointerEntered"
                 PointerExited="connectedElement_PointerExited">
-                <Grid Visibility="{x:Bind data:FileMatch.showIfImageNull(prifilePhotoPath),Mode=OneWay}">
-                    <Image Source="{x:Bind prifilePhotoPath,Mode=OneWay}" Width="140"/>
+                <Grid Visibility="{x:Bind data:FileMatch.showIfImageNull(prifile_path),Mode=OneWay}">
+                    <control:ImageEx Source="{x:Bind prifile_path,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
 
                     <TextBlock Text="{x:Bind name}" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" TextWrapping="Wrap" Margin="5"/>
-                    <TextBlock Text="{x:Bind count}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6"/>
 
                     <controls:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
-                    <!--<ProgressRing IsActive="{x:Bind isProgressRingActive, Mode=OneWay}"/>-->
                 </Grid>
 
-                <Grid Visibility="{x:Bind data:FileMatch.showIfImageENotNull(prifilePhotoPath),Mode=OneWay}">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="auto"/>
-                    </Grid.RowDefinitions>
-                    <Image x:Name="ActorImage" Source="{x:Bind prifilePhotoPath,Mode=OneWay}" Width="150"/>
+                <Grid Visibility="{x:Bind data:FileMatch.showIfImageENotNull(prifile_path),Mode=OneWay}">
+                    <control:ImageEx Margin="0,0,0,20" x:Name="ActorImage" Source="{x:Bind prifile_path,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
 
-                    <StackPanel Grid.Row="1">
+                    <StackPanel VerticalAlignment="Bottom">
                         <RelativePanel Margin="5,0">
                             <TextBlock Text="{x:Bind name}" RelativePanel.AlignVerticalCenterWithPanel="True" IsTextSelectionEnabled="True" TextWrapping="Wrap"/>
-                            <TextBlock Text="{x:Bind count}" RelativePanel.AlignHorizontalCenterWithPanel="True" RelativePanel.AlignRightWithPanel="True" VerticalAlignment="Bottom"/>
                         </RelativePanel>
+                        
                         <TextBlock Text="{x:Bind genderInfo,Mode=OneWay}" Visibility="Collapsed"/>
                         <TextBlock Text="{x:Bind ageInfo,Mode=OneWay}" Visibility="Collapsed"/>
                     </StackPanel>
                     
                     <controls:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
-                    <!--<ProgressRing IsActive="{x:Bind isProgressRingActive, Mode=OneWay}"/>-->
                 </Grid>
 
             </Grid>
@@ -80,15 +75,16 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
-        <GridView Grid.Row="1"
+        <control:AdaptiveGridView Grid.Row="1"
                 x:Name="BasicGridView"
                 IsItemClickEnabled="True"
-                Margin="10,0,0,0"
+                Padding="10,0"
+                ItemHeight="140"
+                DesiredWidth="140"
                 SelectionMode="Multiple"
                 SelectionChanged="BasicGridView_SelectionChanged"
-                ItemsSource="{x:Bind actorinfo}"
                 ItemTemplate="{StaticResource GirdViewTemplate}">
-        </GridView>
+        </control:AdaptiveGridView>
 
         <Grid x:Name="SmokeGrid" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Collapsed" >
 

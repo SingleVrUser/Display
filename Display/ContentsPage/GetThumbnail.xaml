@@ -7,12 +7,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:data="using:Data"
     xmlns:controls="using:Display.Control"
+    xmlns:control="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d">
     <Page.Resources>
         <DataTemplate x:DataType="data:ThumbnailInfo" x:Key="ThumbnialInfoDataTemplate">
-            <Grid
-                Width="180"
-                Height="120">
+            <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="auto"/>
@@ -102,21 +101,21 @@
         
         <RelativePanel Margin="10,2,10,10" Grid.Row="1">
             <CheckBox x:Name="selectedCheckBox" Content="共选 0 项" CornerRadius="10" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
-
-
         </RelativePanel>
 
-        <GridView
+        <control:AdaptiveGridView
             Loaded="BasicGridView_Loaded"
             Grid.Row="2"
             x:Name="BasicGridView"
             IsItemClickEnabled="True"
-            Margin="10,0,0,0"
+            Padding="10,0"
+            ItemHeight="140"
+            DesiredWidth="140"
             SelectionMode="Multiple"
             SelectionChanged="BasicGridView_SelectionChanged"
             ItemsSource="{x:Bind thumbnailInfo}"
             ItemTemplate="{StaticResource ThumbnialInfoDataTemplate}">
-        </GridView>
+        </control:AdaptiveGridView>
 
         <!--<ProgressBar x:Name="TotalProgressBar" VerticalAlignment="Top" Visibility="Collapsed"/>-->
     </Grid>

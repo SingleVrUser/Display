@@ -213,15 +213,5 @@
 
         </Grid>
     </Grid>
-
-    <!--<SplitView Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}" IsPaneOpen="True" OpenPaneLength="256" CompactPaneLength="48" DisplayMode="Inline">
-        <SplitView.Pane>
-
-
-        </SplitView.Pane>
-        
-        
-
-    </SplitView>-->
     
 </UserControl>
