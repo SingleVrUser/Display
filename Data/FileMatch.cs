@@ -120,6 +120,18 @@ namespace Data
 
                 return $"{match.Groups[1].Value}-{number}";
             }
+
+            //然后再将影片视作缺失了 - 分隔符来匹配
+            match = Regex.Match(no_domain, @"([a-z]{2,})0*(\d{2,5})", RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                string number = match.Groups[2].Value;
+                //不满三位数，填充0
+                number = number.PadLeft(3, '0');
+
+                return $"{match.Groups[1].Value}-{number}";
+            }
+
             //普通番号，运行到这里时表明无法匹配到带分隔符的番号
             //先尝试匹配东热的red, sky, ex三个不带 - 分隔符的系列
             //（这三个系列已停止更新，因此根据其作品编号将数字范围限制得小一些以降低误匹配概率）
@@ -134,16 +146,6 @@ namespace Data
                 }
 
                 return matchName;
-            }
-            //然后再将影片视作缺失了 - 分隔符来匹配
-            match = Regex.Match(no_domain, @"([a-z]{2,})0*(\d{2,5})", RegexOptions.IgnoreCase);
-            if (match.Success)
-            {
-                string number = match.Groups[2].Value;
-                //不满三位数，填充0
-                number = number.PadLeft(3, '0');
-
-                return $"{match.Groups[1].Value}-{number}";
             }
 
             //尝试匹配TMA制作的影片（如'T28-557'，他家的番号很乱）

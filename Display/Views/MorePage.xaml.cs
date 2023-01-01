@@ -39,9 +39,9 @@ namespace Display.Views
         {
             DataSource.Add(new FunctionModule()
             {
-                Name = "导入115数据",
-                IconPath = "/Assets/Svg/import_icon.svg",
-                Description = "导入115数据到本地数据库"
+                Name = "文件列表",
+                IconPath = "/Assets/Svg/file_alt_icon.svg",
+                Description = "115中的文件列表"
             });
             DataSource.Add(new FunctionModule()
             {
@@ -63,16 +63,16 @@ namespace Display.Views
             });
             DataSource.Add(new FunctionModule()
             {
-                Name = "文件列表",
-                IconPath = "/Assets/Svg/file_alt_icon.svg",
-                Description = "115中的文件列表",
-                Label = "测试中"
-            });
-            DataSource.Add(new FunctionModule()
-            {
                 Name = "浏览器",
                 IconPath = "/Assets/Svg/explorer_internet_logo_logos_icon.svg",
                 Description = "115网页版，并附加下载选项"
+            });
+            DataSource.Add(new FunctionModule()
+            {
+                Name = "导入115数据",
+                IconPath = "/Assets/Svg/import_icon.svg",
+                Description = "导入115数据到本地数据库",
+                Label = "即将弃用"
             });
             DataSource.Add(new FunctionModule()
             {

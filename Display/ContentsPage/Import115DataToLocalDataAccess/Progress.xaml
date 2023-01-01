@@ -7,8 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:data="using:Data"
     mc:Ignorable="d"
     xmlns:control="using:Display.Control"
-    xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
-    Background="White">
+    xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals">
     <Page.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -55,12 +54,12 @@
         </TextBlock>
 
         <!--获取数量-->
-        <Expander   x:Name="GetFolderCategory_Expander"
-                    Visibility="Collapsed"
+        <Expander  x:Name="GetFolderCategory_Expander"
                     HorizontalAlignment="Center"
                     MinWidth="300"
                     ExpandDirection="Down"
-                    VerticalContentAlignment="Top">
+                    VerticalContentAlignment="Top"
+                   Loaded="GetFolderCategory_Expander_Loaded">
             <Expander.Header>
                 <RelativePanel MinWidth="200">
                     <TextBlock Text="获取数量" RelativePanel.AlignVerticalCenterWithPanel="True"/>
@@ -198,8 +197,6 @@
             </ListView>
 
         </Expander>
-        
-        
         
         <!--提示-->
         <!--出错-->

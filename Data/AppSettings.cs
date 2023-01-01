@@ -80,6 +80,24 @@ public class AppSettings
     }
 
     /// <summary>
+    /// 视频默认播放单视频
+    /// </summary>
+    public static bool IsDefaultPlaySingleVideo
+    {
+        get
+        {
+            bool isUpdated = false;
+            if (localSettings.Values["IsDefaultPlaySingleVideo"] is bool value)
+            {
+                isUpdated = value;
+            }
+            return isUpdated;
+        }
+        set => localSettings.Values["IsDefaultPlaySingleVideo"] = value;
+    }
+
+
+    /// <summary>
     /// 是否检查更新
     /// </summary>
     public static bool IsCheckUpdate
