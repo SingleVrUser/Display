@@ -19,7 +19,7 @@ public class IncrementallLoadDatumCollection : ObservableCollection<FilesInfo>, 
 
     public int asc { get;private set; }
 
-    private string cid { get; set; }
+    public string cid { get; set; }
 
     public IncrementallLoadDatumCollection(string cid)
     {
@@ -69,11 +69,15 @@ public class IncrementallLoadDatumCollection : ObservableCollection<FilesInfo>, 
     }
 
     
-    public void SetCid(string cid)
+    public async Task SetCid(string cid)
     {
+        bool isNeedLoad = Count == 0?true:false;
+
         this.cid = cid;
         Clear();
         HasMoreItems = true;
+
+        if (isNeedLoad) await LoadData();
     }
 
     public async Task SetOrder(WebApi.OrderBy orderBy,int asc)
@@ -81,7 +85,7 @@ public class IncrementallLoadDatumCollection : ObservableCollection<FilesInfo>, 
         this.orderby= orderBy;
         this.asc = asc;
         await webApi.ChangedShowType(cid,orderBy, asc);
-        SetCid(cid);
+        await SetCid(cid);
     }
 
     public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)

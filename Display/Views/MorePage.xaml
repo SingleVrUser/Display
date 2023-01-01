@@ -39,15 +39,13 @@
 
                         </StackPanel>
 
-                        <StackPanel
-                                    HorizontalAlignment="Right"
+                        <StackPanel HorizontalAlignment="Right"
                                     VerticalAlignment="Top"
-                                    Margin="5" CornerRadius="8"
+                                    Margin="5"
+                                    CornerRadius="8"
                                     Padding="8,3"
-                                    Visibility="{x:Bind IsRightTopLabelShow}">
-                            <StackPanel.Background>
-                                <AcrylicBrush TintOpacity="0.4" TintColor="CornflowerBlue" FallbackColor="White" />
-                            </StackPanel.Background>
+                                    Visibility="{x:Bind IsRightTopLabelShow}"
+                                    Background="#b7c2d0">
                             <TextBlock Text="{x:Bind Label}" Foreground="White"/>
                         </StackPanel>
                     </Grid>

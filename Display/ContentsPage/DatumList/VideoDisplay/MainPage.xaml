@@ -1,19 +1,19 @@
 ﻿<!-- Copyright (c) Microsoft Corporation and Contributors. -->
 <!-- Licensed under the MIT License. -->
 
-<Page
-    x:Class="Display.ContentsPage.DatumList.VideoDisplay.MainPage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Display.ContentsPage.DatumList.VideoDisplay"
-    xmlns:data="using:Data"
-    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+<Page x:Class="Display.ContentsPage.DatumList.VideoDisplay.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="using:Display.ContentsPage.DatumList.VideoDisplay"
+      xmlns:data="using:Data"
+      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d">
 
     <Page.Resources>
-        <SolidColorBrush x:Key="MediaTransportControlsPanelBackground" Color="#80ffffff" />
+        <SolidColorBrush x:Key="MediaTransportControlsPanelBackground"
+                         Color="#80ffffff" />
 
         <Style TargetType="Pivot">
             <Setter Property="HeaderTemplate">
@@ -27,71 +27,105 @@
         </Style>
 
         <Style TargetType="MediaPlayerElement">
-            <Setter Property="AreTransportControlsEnabled" Value="True"/>
+            <Setter Property="AreTransportControlsEnabled"
+                    Value="True" />
         </Style>
 
-        <Style TargetType="MediaTransportControls" BasedOn="{StaticResource DefaultMediaTransportControlsStyle}">
-            <Setter Property="IsCompact" Value="True"/>
-            <Setter Property="BackgroundSizing" Value="InnerBorderEdge"/>
-            <Setter Property="IsPlaybackRateButtonVisible" Value="True"/>
-            <Setter Property="IsPlaybackRateEnabled" Value="True"/>
+        <Style TargetType="MediaTransportControls"
+               BasedOn="{StaticResource DefaultMediaTransportControlsStyle}">
+            <Setter Property="IsCompact"
+                    Value="True" />
+            <Setter Property="BackgroundSizing"
+                    Value="InnerBorderEdge" />
+            <Setter Property="IsPlaybackRateButtonVisible"
+                    Value="True" />
+            <Setter Property="IsPlaybackRateEnabled"
+                    Value="True" />
         </Style>
     </Page.Resources>
 
-    <Grid>
+    <Grid AllowDrop="True"
+          x:Name="MainGrid"
+          Drop="VideoGrid_Drop"
+          DragOver="Link_DragOver">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
-        <controls:UniformGrid
-            x:Name="Video_UniformGrid"
-            FirstColumn="0"
-            Orientation="Horizontal"
-            Rows="2"
-            Columns="1">
+        <controls:UniformGrid x:Name="Video_UniformGrid"
+                              FirstColumn="0"
+                              Orientation="Horizontal"
+                              Rows="2"
+                              Columns="1">
 
         </controls:UniformGrid>
 
-        <HyperlinkButton x:Name="InfoGridVisiableButton" FontFamily="Segoe Fluent Icons" Content="&#xF745;" HorizontalAlignment="Right"
-                         Click="InfoGridVisiableButton_Click" FontSize="20" HorizontalContentAlignment="Center" Width="40" Height="50"
+        <HyperlinkButton x:Name="InfoGridVisiableButton"
+                         FontFamily="Segoe Fluent Icons"
+                         Content="&#xF745;"
+                         HorizontalAlignment="Right"
+                         Click="InfoGridVisiableButton_Click"
+                         FontSize="20"
+                         HorizontalContentAlignment="Center"
+                         Width="40"
+                         Height="50"
                          Opacity="0.1">
 
         </HyperlinkButton>
 
-        <Grid x:Name="InfoGrid" Grid.Column="1" Width="380">
+        <Grid x:Name="InfoGrid"
+              Grid.Column="1"
+              Width="380">
             <Pivot x:Name="VideoPlay_Pivot">
                 <PivotItem Header="文件">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <TextBlock Text="最多播放四个" Foreground="Gray" VerticalAlignment="Center" FontSize="12"/>
+                        <TextBlock Text="最多播放四个"
+                                   Foreground="Gray"
+                                   VerticalAlignment="Center"
+                                   FontSize="12" />
 
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="5">
-                            <Button Content="播放" Click="PlayVideoButton_Click"/>
-                            <Button Content="删除文件" Click="DeleteFiles_Click"/>
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    Spacing="5">
+                            <Button Content="播放"
+                                    Click="PlayVideoButton_Click" />
+                            <!--<Button Content="删除" Click="DeleteFiles_Click"/>-->
+                            <Button Content="清空"
+                                    Click="EmptyList_Click" />
                         </StackPanel>
 
-                        <controls:MetadataControl x:Name="metadataControl" Grid.Row="1" Separator=" > "/>
+                        <controls:MetadataControl x:Name="metadataControl"
+                                                  Grid.Row="1"
+                                                  Separator=" > " />
 
-                        <ListView x:Name="VideoShow_ListView" Grid.Row="2" SelectionMode="Multiple" ItemsSource="{x:Bind FilesInfos}"
-                                  AllowDrop="True" DragOver="Target_DragOver" Drop="Target_Drop" DragEnter="Target_DragEnter">
+                        <ListView x:Name="VideoShow_ListView"
+                                  Grid.Row="2"
+                                  SelectionMode="Multiple"
+                                  ItemsSource="{x:Bind FilesInfos}"
+                                  AllowDrop="True"
+                                  DragOver="Target_DragOver"
+                                  Drop="Target_Drop"
+                                  DragEnter="Target_DragEnter">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="data:FilesInfo">
-                                    <Grid ColumnSpacing="5" DoubleTapped="OpenFolder_Tapped">
+                                    <Grid ColumnSpacing="5"
+                                          DoubleTapped="OpenFolder_Tapped">
                                         <Grid.ContextFlyout>
                                             <!--右键操作-->
                                             <MenuFlyout>
                                                 <MenuFlyoutItem Text="移除"
-                                                     Click="RemoveFileFromListButton_Click">
+                                                                Click="RemoveFileFromListButton_Click">
                                                     <MenuFlyoutItem.Icon>
                                                         <FontIcon Glyph="&#xE107;" />
                                                     </MenuFlyoutItem.Icon>
@@ -99,55 +133,86 @@
                                             </MenuFlyout>
                                         </Grid.ContextFlyout>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="auto"/>
-                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="auto" />
+                                            <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
 
-                                        <Image Height="30" Width="30">
+                                        <Image Height="30"
+                                               Width="30">
                                             <Image.Source>
-                                                <SvgImageSource UriSource="{x:Bind IconPath}" RasterizePixelWidth="35" RasterizePixelHeight="30"/>
+                                                <SvgImageSource UriSource="{x:Bind IconPath}"
+                                                                RasterizePixelWidth="35"
+                                                                RasterizePixelHeight="30" />
                                             </Image.Source>
                                         </Image>
-                                        <TextBlock Grid.Column="1" Text="{x:Bind Name}" VerticalAlignment="Center"
-                                                    Tapped="TextBlock_Tapped" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{x:Bind Name}"
+                                                   VerticalAlignment="Center"
+                                                   Tapped="TextBlock_Tapped"
+                                                   TextTrimming="CharacterEllipsis" />
                                     </Grid>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
                     </Grid>
                 </PivotItem>
-                <PivotItem Header="播放" Padding="0,5,0,0">
-                    <Grid RowSpacing="10" Padding="0,0,0,5">
+                <PivotItem Header="播放"
+                           Padding="0,5,0,0">
+                    <Grid RowSpacing="10"
+                          Padding="0,0,0,5">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
 
-                        <FlipView ItemsSource="{x:Bind CidInfos}" Height="300">
+                        <FlipView ItemsSource="{x:Bind CidInfos}"
+                                  Height="300"
+                                  SelectedIndex="{x:Bind VideoPlay_ListView.SelectedIndex,Mode=TwoWay}">
                             <FlipView.ItemTemplate>
                                 <DataTemplate x:DataType="data:VideoInfo">
                                     <Grid RowSpacing="10">
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="auto"/>
-                                            <RowDefinition Height="auto"/>
-                                            <RowDefinition Height="auto"/>
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
+                                            <RowDefinition Height="auto" />
                                         </Grid.RowDefinitions>
 
-                                        <Border HorizontalAlignment="Center" CornerRadius="5">
-                                            <Image Source="{x:Bind imagepath}" Width="300"/>
-                                        </Border>
 
-                                        <StackPanel Grid.Row="1" HorizontalAlignment="Center">
-                                            <TextBlock Text="{x:Bind truename}" IsTextSelectionEnabled="True"/>
-                                            <TextBlock Text="{x:Bind releasetime}"/>
-                                            <TextBlock Text="{x:Bind actor}"/>
+                                        <Grid CornerRadius="5"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center">
+                                            <Image Source="{x:Bind imagepath}"
+                                                   Height="230" />
+
+                                            <Button x:Name="EnlargeButton"
+                                                    HorizontalAlignment="Right"
+                                                    VerticalAlignment="Bottom"
+                                                    PointerEntered="EnlargeButton_PointerEntered"
+                                                    PointerExited="EnlargeButton_PointerExited"
+                                                    Background="Transparent">
+                                                <SymbolIcon Symbol="Find" />
+                                            </Button>
+                                        </Grid>
+                                        <!--<Border HorizontalAlignment="Center">
+                                        </Border>-->
+
+                                        <StackPanel Grid.Row="1"
+                                                    HorizontalAlignment="Center">
+                                            <TextBlock Text="{x:Bind truename}"
+                                                       IsTextSelectionEnabled="True" />
+                                            <TextBlock Text="{x:Bind releasetime}" />
+                                            <TextBlock Text="{x:Bind actor}" />
                                         </StackPanel>
 
-                                        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Center" Spacing="5" Visibility="Collapsed">
-                                            <Button Content="刷新"/>
+                                        <StackPanel Orientation="Horizontal"
+                                                    Grid.Row="2"
+                                                    HorizontalAlignment="Center"
+                                                    Spacing="5"
+                                                    Visibility="Collapsed">
+                                            <Button Content="刷新" />
                                         </StackPanel>
                                     </Grid>
                                 </DataTemplate>
@@ -155,43 +220,78 @@
                         </FlipView>
 
 
-                        <ListView x:Name="VideoPlay_ListView" Grid.Row="1" SelectionMode="Multiple" ItemsSource="{x:Bind PlayingVideoInfos}">
+                        <ListView x:Name="VideoPlay_ListView"
+                                  Grid.Row="1"
+                                  SelectionMode="Single"
+                                  ItemsSource="{x:Bind PlayingVideoInfos}">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="data:FilesInfo">
                                     <Grid ColumnSpacing="5">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="auto"/>
-                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="auto" />
+                                            <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-                                        
-                                        <Image Height="30" Width="30">
+
+                                        <Image Height="30"
+                                               Width="30">
                                             <Image.Source>
-                                                <SvgImageSource UriSource="{x:Bind IconPath}" RasterizePixelWidth="35" RasterizePixelHeight="30"/>
+                                                <SvgImageSource UriSource="{x:Bind IconPath}"
+                                                                RasterizePixelWidth="35"
+                                                                RasterizePixelHeight="30" />
                                             </Image.Source>
                                         </Image>
-                                        <TextBlock Grid.Column="1" Text="{x:Bind Name}" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{x:Bind Name}"
+                                                   VerticalAlignment="Center" />
                                     </Grid>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
 
-                        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Center" Spacing="5">
-                            <Button Content="删除文件" Click="DeletedFileButton_Click"/>
+                        <StackPanel Orientation="Horizontal"
+                                    Grid.Row="2"
+                                    HorizontalAlignment="Center"
+                                    Spacing="5">
+                            <!--<Button Content="删除文件" Click="DeletedFileButton_Click" IsEnabled="False"/>-->
                         </StackPanel>
 
-                        <Slider Grid.Row="3" ValueChanged="Slider_ValueChanged"/>
+                        <Slider Grid.Row="3"
+                                ValueChanged="Slider_ValueChanged" />
 
-                        <StackPanel Orientation="Horizontal" Grid.Row="4" HorizontalAlignment="Center" Spacing="5">
-                            <Button Content="播放" Click="DoubleVideoPlayButton_Click"/>
-                            <Button Content="暂停" Click="DoubleVideoPauseButton_Click"/>
-                            <ToggleButton Content="静音" Checked="IsMuteButton_Checked" Unchecked="IsMuteButton_Unchecked"/>
+                        <StackPanel Orientation="Horizontal"
+                                    Grid.Row="4"
+                                    HorizontalAlignment="Center"
+                                    Spacing="5">
+                            <Button Content="播放"
+                                    Click="DoubleVideoPlayButton_Click" />
+                            <Button Content="暂停"
+                                    Click="DoubleVideoPauseButton_Click" />
+                            <ToggleButton Content="静音"
+                                          Checked="IsMuteButton_Checked"
+                                          Unchecked="IsMuteButton_Unchecked" />
                         </StackPanel>
                     </Grid>
                 </PivotItem>
-                <PivotItem Header="详情" IsEnabled="False">
-                    <TextBlock Text="当前播放x个文件"/>
+                <PivotItem Header="设置">
+                    <Grid Padding="0,10">
+                        <ToggleSwitch VerticalAlignment="Top"
+                                      Header="默认单视频播放"
+                                      IsOn="{x:Bind data:AppSettings.IsDefaultPlaySingleVideo,Mode=TwoWay}" />
+                    </Grid>
                 </PivotItem>
             </Pivot>
         </Grid>
+
+        <Grid x:Name="SmokeGrid"
+              Grid.ColumnSpan="2"
+              Visibility="Collapsed"
+              Margin="65,20"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              CornerRadius="10">
+            <Image x:Name="EnlargeImage"
+                   MaxWidth="800" />
+        </Grid>
+
     </Grid>
 </Page>

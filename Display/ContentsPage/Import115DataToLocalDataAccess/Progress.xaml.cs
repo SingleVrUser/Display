@@ -37,8 +37,26 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
         public Progress()
         {
             this.InitializeComponent();
+        }
+
+        public Progress(List<string> cidList)
+        {
+            this.InitializeComponent();
+
+            this.cidList = cidList;
+        }
+
+        public void CreateWindow()
+        {
+            CommonWindow window = new CommonWindow("导入数据");
+
+            this.currentWindow = window;
+
+            window.Content = this;
+            window.Activate();
 
         }
+
 
         /// <summary>
         /// 从其他页面Navigate来
@@ -53,11 +71,6 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             cidList = content.cidList;
 
             currentWindow = content.window;
-
-            if (cidList != null)
-            {
-                loadData();
-            }
 
         }
 
@@ -91,7 +104,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
         {
             currentWindow.Closed += CurrentWindow_Closed;
 
-            GetFolderCategory_Expander.Visibility = Visibility.Visible;
+            //GetFolderCategory_Expander.Visibility = Visibility.Visible;
             GetFolderCategory_Progress.status = Status.doing;
 
             // 1.预准备，获取所有文件的全部信息（大小和数量）
@@ -131,11 +144,11 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                 FolderCategory.Add(item);
             }
 
-            if (overallCount == 0)
-            {
-                GetFolderCategory_Progress.status = Status.error;
-                return;
-            }
+            //if (overallCount == 0)
+            //{
+            //    GetFolderCategory_Progress.status = Status.error;
+            //    return;
+            //}
 
             //1-2.显示进度
             overallProgress.Maximum = overallCount;
@@ -217,8 +230,13 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             if (s_cts.Token.IsCancellationRequested) return;
 
             //搜刮完成,是否自动搜刮
-            if (AppSettings.ProgressOfImportDataAccess_IsStartSpiderAfterTask)
+            if (AppSettings.ProgressOfImportDataAccess_IsStartSpiderAfterTask && overallCount != 0)
             {
+                //datum只用到其中的cid,所以只赋值cid (fid默认为空,不用理)
+                List<Datum> datumList = new();
+                cidWithoutRootList.ForEach(item => datumList.Add(new() { cid = item }));
+
+
                 //提示将会开始搜刮
                 WillStartSpiderTaskTip.IsOpen = true;
 
@@ -226,16 +244,11 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
                 WillStartSpiderTaskTip.IsOpen = false;
 
-                List<string> folderList = FolderCategory.Select(item=>item.file_name).ToList();
-
-                //datum只用到其中的cid,所以只赋值cid (fid默认为空,不用理)
-                List<Datum> datumList = new();
-                cidWithoutRootList.ForEach(item => datumList.Add(new() { cid = item }));
+                List<string> folderList = FolderCategory.Select(item => item.file_name).ToList();
 
                 var page = new ContentsPage.SpiderVideoInfo.Progress(folderList, datumList);
                 //创建搜刮进度窗口
                 page.CreateWindow();
-
             }
 
             currentWindow.Closed -= CurrentWindow_Closed;
@@ -264,7 +277,14 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
         //更新进度环信息
         private void updataProgress()
         {
-            int percentProgress = (successCount * 100) / overallCount;
+            int percentProgress;
+            if (overallCount == 0)
+            {
+                percentProgress = 100;
+            }
+            else
+                percentProgress = (successCount * 100) / overallCount;
+
             percent_TextBlock.Text = $"{percentProgress}%";
             countProgress_TextBlock.Text = $"{successCount}/{overallCount}";
             overallProgress.Value = successCount;
@@ -310,6 +330,14 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             {
                 Frame.GoBack();
                 s_cts.Cancel();
+            }
+        }
+
+        private void GetFolderCategory_Expander_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (cidList != null)
+            {
+                loadData();
             }
         }
     }

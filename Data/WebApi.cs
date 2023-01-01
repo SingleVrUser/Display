@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -18,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Windows.Storage;
+using static Data.WebApi;
 
 namespace Data
 {
@@ -347,10 +349,12 @@ namespace Data
             return getFilesProgressInfo;
         }
 
-
         /// <summary>
-        /// 检查是否为隐藏模式
+        /// 修改文件列表的排列顺序
         /// </summary>
+        /// <param name="cid"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="asc"></param>
         /// <returns></returns>
         public async Task ChangedShowType(string cid, OrderBy orderBy = OrderBy.user_ptime, int asc = 0)
         {
@@ -372,9 +376,101 @@ namespace Data
             {
                 FileMatch.tryToast("网络异常", "改变115排序顺序时发生异常：", e.Message);
             }
-
         }
 
+        /// <summary>
+        /// 删除115文件
+        /// </summary>
+        /// <param name="pid"></param>
+        /// <param name="fids"></param>
+        /// <param name="ignore_warn"></param>
+        /// <returns></returns>
+        public async Task DeleteFiles(string pid,List<string> fids,int ignore_warn = 1)
+        {
+            var values = new Dictionary<string, string>
+            {
+                { "pid", pid},
+            };
+
+            for(int i = 0;i < fids.Count;i++)
+            {
+                values.Add($"fid[{i}]", fids[i]);
+            }
+
+            values.Add("ignore_warn", ignore_warn.ToString());
+
+            var content = new FormUrlEncodedContent(values);
+
+            HttpResponseMessage response;
+            try
+            {
+                response = await Client.PostAsync("https://webapi.115.com/rb/delete", content);
+            }
+            catch (AggregateException e)
+            {
+                FileMatch.tryToast("网络异常", "删除115文件时发生异常：", e.Message);
+            }
+        }
+
+        /// <summary>
+        /// 从115回收站恢复文件
+        /// </summary>
+        /// <param name="rids"></param>
+        /// <returns></returns>
+        public async Task RevertFiles(List<string> rids)
+        {
+            Dictionary<string, string> values = new();
+
+            for (int i = 0; i < rids.Count; i++)
+            {
+                values.Add($"rid[{i}]", rids[i]);
+            }
+
+            var content = new FormUrlEncodedContent(values);
+
+            HttpResponseMessage response;
+            try
+            {
+                response = await Client.PostAsync("https://webapi.115.com/rb/revert", content);
+            }
+            catch (AggregateException e)
+            {
+                FileMatch.tryToast("网络异常", "从115回收站恢复文件时发生异常：", e.Message);
+            }
+        }
+
+        /// <summary>
+        /// 移动文件
+        /// </summary>
+        /// <param name="pid"></param>
+        /// <param name="fids"></param>
+        /// <returns></returns>
+        public async Task MoveFiles(string pid, List<string> fids)
+        {
+            var values = new Dictionary<string, string>
+            {
+                { "pid", pid},
+                { "move_proid", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}_-{new Random().Next(1,99)}_0"},
+
+            };
+
+            for (int i = 0; i < fids.Count; i++)
+            {
+                values.Add($"fid[{i}]", fids[i]);
+            }
+
+            var content = new FormUrlEncodedContent(values);
+
+            HttpResponseMessage response;
+            try
+            {
+                response = await Client.PostAsync("https://webapi.115.com/files/move", content);
+            }
+            catch (AggregateException e)
+            {
+                FileMatch.tryToast("网络异常", "移动115文件时发生异常：", e.Message);
+            }
+        }
 
         public enum OrderBy { file_name, file_size, user_ptime }
 

@@ -75,23 +75,23 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             webview.Close();
         }
 
-        /// <summary>
-        /// 进入隐藏系统后，即使有隐藏文件也能全部显示，弃用
-        /// </summary>
-        /// <returns></returns>
-        private async Task<bool> IsAllShow()
-        {
-            bool isHiddenModel = false;
-            string inputElementsIdAndValueAsJsonString = await webview.ExecuteScriptAsync(
-            "(()=>{const length = document.getElementById('js_center_main_box').getElementsByTagName('iframe')[0].contentDocument.getElementsByClassName('visible-model').length ; return length})();");
+        ///// <summary>
+        ///// 进入隐藏系统后，即使有隐藏文件也能全部显示，弃用
+        ///// </summary>
+        ///// <returns></returns>
+        //private async Task<bool> IsAllShow()
+        //{
+        //    bool isHiddenModel = false;
+        //    string inputElementsIdAndValueAsJsonString = await webview.ExecuteScriptAsync(
+        //    "(()=>{const length = document.getElementById('js_center_main_box').getElementsByTagName('iframe')[0].contentDocument.getElementsByClassName('visible-model').length ; return length})();");
 
-            if (inputElementsIdAndValueAsJsonString == "2")
-            {
-                isHiddenModel = true;
-            }
+        //    if (inputElementsIdAndValueAsJsonString == "2")
+        //    {
+        //        isHiddenModel = true;
+        //    }
 
-            return isHiddenModel;
-        }
+        //    return isHiddenModel;
+        //}
 
         ///// <summary>
         ///// file_count,folder_count,hasHiddenFile,size可能获取不到（选中数超过两个），所以只使用name和id
@@ -207,7 +207,6 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                     window = currentWindow
                 };
                 Frame.Navigate(typeof(Progress), content);
-
             }
         }
 

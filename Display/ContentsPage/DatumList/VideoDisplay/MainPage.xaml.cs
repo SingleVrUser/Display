@@ -6,10 +6,13 @@ using CommunityToolkit.WinUI.UI.Controls;
 using Data;
 using Display.Model;
 using Display.WindowView;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -62,18 +65,28 @@ public sealed partial class MainPage : Page
 
     private void PageLoaded(object sender, RoutedEventArgs e)
     {
-        var videoList = FilesInfos.Where(item => item.Type == FilesInfo.FileType.File && item.datum.iv == 1).Take(1).ToList();
+        int MaxPlayCount;
+        if (AppSettings.IsDefaultPlaySingleVideo)
+        {
+            MaxPlayCount = 1;
+        }
+        else
+        {
+            MaxPlayCount = 4;
+        }
+
+        var videoList = FilesInfos.Where(item => item.Type == FilesInfo.FileType.File && item.datum.iv == 1).Take(MaxPlayCount).ToList();
 
         if (videoList.Count > 0)
         {
-            PlayVideos(videoList);
+            tryPlayVideos(videoList);
         }
     }
 
     private RelayCommand<string> _openFolderCommand;
     private RelayCommand<string> OpenFolderCommand =>
         _openFolderCommand ??= new RelayCommand<string>(OpenFolder);
-    private void OpenFolder(string cid)
+    private async void OpenFolder(string cid)
     {
         var currentItem = _units.FirstOrDefault(item => item.CommandParameter.ToString() == cid);
 
@@ -99,7 +112,7 @@ public sealed partial class MainPage : Page
         }
         else
         {
-            FilesInfosCollection.SetCid(cid);
+            await FilesInfosCollection.SetCid(cid);
             VideoShow_ListView.ItemsSource = FilesInfosCollection;
         }
 
@@ -189,10 +202,10 @@ public sealed partial class MainPage : Page
                 filesInfo.Add(info);
         }
 
-        PlayVideos(filesInfo);
+        tryPlayVideos(filesInfo);
     }
 
-    private async void PlayVideos(List<FilesInfo> filesInfo)
+    private async void tryPlayVideos(List<FilesInfo> filesInfo)
     {
         switch (filesInfo.Count)
         {
@@ -394,6 +407,8 @@ public sealed partial class MainPage : Page
             System.Diagnostics.Debug.WriteLine("É¾³ý");
 
             filesInfo.ForEach(item => filesInfos.Remove(item));
+
+            await webApi.DeleteFiles(filesInfo.FirstOrDefault().datum.pid, filesInfo.Select(item=>item.Fid).ToList());
         }
     }
 
@@ -418,18 +433,12 @@ public sealed partial class MainPage : Page
                 InfoGrid.Visibility = Visibility.Visible;
                 InfoGridVisiableButton.Content = "\uF745";
                 break;
-
         }
     }
 
     private void Target_DragOver(object sender, DragEventArgs e)
     {
         e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy;
-    }
-
-    private void Target_DropCompleted(UIElement sender, DropCompletedEventArgs args)
-    {
-
     }
 
     private void Target_DragEnter(object sender, DragEventArgs e)
@@ -450,5 +459,51 @@ public sealed partial class MainPage : Page
         {
             FilesInfos.Add(fileInfo);
         }
+    }
+
+    private void EmptyList_Click(object sender, RoutedEventArgs e)
+    {
+        FilesInfos.Clear();
+    }
+
+    private void VideoGrid_Drop(object sender, DragEventArgs e)
+    {
+        if (sender is not Grid) return;
+
+        if (e.DataView.Properties.Values.FirstOrDefault() is not List<Data.FilesInfo> filesInfos) return;
+
+        List<FilesInfo> filesInfo = new();
+        foreach (var info in filesInfos)
+        {
+            if (info.Type == FilesInfo.FileType.File && info.datum.iv == 1)
+                filesInfo.Add(info);
+        }
+
+        tryPlayVideos(filesInfo);
+
+    }
+
+    private void Link_DragOver(object sender, DragEventArgs e)
+    {
+        e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Link;
+    }
+
+    private void EnlargeButton_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        if(sender is not Button button) return;
+        if (button.DataContext is not VideoInfo videoInfo) return;
+        ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
+
+        SmokeGrid.Visibility = Visibility.Visible;
+
+        EnlargeImage.Source = new BitmapImage(new Uri(videoInfo.imagepath));
+
+    }
+
+    private void EnlargeButton_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
+
+        SmokeGrid.Visibility = Visibility.Collapsed;
     }
 }
