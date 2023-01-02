@@ -177,7 +177,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
             filesInfo.Add((FilesInfo)item);
         }
 
-        var page = new VideoDisplay.MainPage(filesInfo);
+        var page = new VideoDisplay.MainPage(filesInfo, BaseExample);
         page.CreateWindow();
     }
 
@@ -411,7 +411,19 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
     private async Task Move115Files(string pid, List<FilesInfo> files)
     {
         if (webApi == null) webApi = new();
-        await webApi.MoveFiles(pid, files.Select(item => item.Fid).ToList());
+        await webApi.MoveFiles(pid, files.Select(item =>
+        {
+            //文件夹
+            if(item.Type == FilesInfo.FileType.Folder)
+            {
+                return item.Cid;
+            }
+            //文件
+            else
+            {
+                return item.Fid;
+            }
+        }).ToList());
 
         //删除列表文件
         foreach(var item in files)

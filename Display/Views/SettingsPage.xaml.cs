@@ -516,9 +516,14 @@ namespace Display.Views
                 {
                     case "WebView":
                         Resolution_RelativePanel.Visibility = Visibility.Collapsed;
+                        PlayerExePath_RelativePanel.Visibility = Visibility.Collapsed;
                         FindSubFile_ToggleSwitch.IsEnabled = false;
                         break;
-
+                    case "MediaElement":
+                        Resolution_RelativePanel.Visibility = Visibility.Collapsed;
+                        PlayerExePath_RelativePanel.Visibility = Visibility.Collapsed;
+                        FindSubFile_ToggleSwitch.IsEnabled = true;
+                        break;
                     case "PotPlayer":
                         resolutionSelectionCollection.Clear();
                         resolutionSelectionCollection.Add("原画");

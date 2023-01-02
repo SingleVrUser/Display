@@ -2,6 +2,7 @@
 using Data;
 using Display.ContentsPage;
 using Display.Control;
+using Display.WindowView;
 using LiveChartsCore.Drawing;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -217,7 +218,6 @@ namespace Display.Views
                     string subFileName = subDict.First().Value.ToString();
                     subInfo = new(subFilePickCode,subFileName,pickCode);
                 }
-                //TODO 多字幕文件选择
                 else if(subDict.Count > 1 && xamlRoot!=null)
                 {
                     List<SubInfo> subInfos = new();
@@ -275,6 +275,10 @@ namespace Display.Views
                 case 3:
                     webapi = new();
                     await webapi.PlayVideoWithOriginUrl(pickCode, playMethod.vlc, xamlRoot, subInfo);
+                    break;
+                //MediaElement播放
+                case 4:
+                    MediaPlayWindow.CreateNewWindow(pickCode);
                     break;
 
             }

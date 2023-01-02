@@ -26,13 +26,24 @@
             </Setter>
         </Style>
 
+        <MenuFlyout x:Key="MediaContentFlyout">
+            <MenuFlyoutItem  x:Name="DeletedFileItem" Text="删除文件"
+                            Click="DeletedFileButton_Click">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE107;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+        </MenuFlyout>
+
+
         <Style TargetType="MediaPlayerElement">
             <Setter Property="AreTransportControlsEnabled"
                     Value="True" />
         </Style>
 
         <Style TargetType="MediaTransportControls"
-               BasedOn="{StaticResource DefaultMediaTransportControlsStyle}">
+               BasedOn="{StaticResource DefaultMediaTransportControlsStyle}"
+               x:Key="MediaTransportControls">
             <Setter Property="IsCompact"
                     Value="True" />
             <Setter Property="BackgroundSizing"

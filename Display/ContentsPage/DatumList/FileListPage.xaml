@@ -150,8 +150,6 @@
                              IsLightDismissEnabled="True"
                              Foreground="{ThemeResource TextBoxButtonForegroundThemeBrush}"
                              Subtitle="当前未选中文件夹，请选中后继续" />
-                <Button Content="查重"
-                        IsEnabled="False" />
 
             </StackPanel>
             <Button Style="{StaticResource DateTimePickerFlyoutLoopingSelectorNavigationButtonStyle}"

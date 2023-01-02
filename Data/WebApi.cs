@@ -1426,7 +1426,7 @@ namespace Data
 
         public async Task<List<m3u8Info>> Getm3u8InfoByPickCode(string pickCode)
         {
-            List<m3u8Info> m3U8Infos = new List<m3u8Info>();
+            List<m3u8Info> m3U8Infos = new();
 
             HttpResponseMessage response;
             string strResult;
@@ -1437,7 +1437,7 @@ namespace Data
             }
             catch
             {
-                return m3U8Infos;
+                return null;
                 //Debug.WriteLine("获取m3u8链接失败");
             }
 
@@ -1605,7 +1605,7 @@ namespace Data
             }
 
             if (AppSettings.IsFindSub && subInfo != null)
-                subFile = await TryDownSubFile(subInfo);
+                subFile = await TryDownSubFile(subInfo.name,subInfo.pickcode);
 
             switch (playMethod)
             {
@@ -1635,10 +1635,10 @@ namespace Data
             }
         }
 
-        private async Task<string> TryDownSubFile(SubInfo subInfo)
+        public async Task<string> TryDownSubFile(string fileName, string pickCode)
         {
-            string pickCode = subInfo.pickcode;
-            string fileName = subInfo.name;
+            //string pickCode = subInfo.pickcode;
+            //string fileName = subInfo.name;
 
             //为预防字幕文件没有具体名称，只有数字，更改字幕文件名为 pickCode+字幕文件名
             fileName = $"{pickCode}_{fileName}";

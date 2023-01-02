@@ -17,12 +17,15 @@
             <ListViewItem>
                 <Grid ColumnSpacing="10">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="32"/>
+                        <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Image Height="32">
+                    <Image Width="32"
+                           Height="40">
                         <Image.Source>
-                            <SvgImageSource UriSource="{x:Bind IconPath}" RasterizePixelHeight="32"/>
+                            <SvgImageSource UriSource="{x:Bind IconPath}"
+                                            RasterizePixelWidth="32"
+                                            RasterizePixelHeight="30" />
                         </Image.Source>
                     </Image>
                     <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{x:Bind Name}" TextTrimming="CharacterEllipsis"
@@ -83,7 +86,15 @@
                         <TextBlock  Text="{x:Bind ((data:ExplorerItem)Content).Name}"/>
                     </ToolTipService.ToolTip>
 
-                    <Image Width="20" Source="/Assets/115/file_type/folder/folder.svg"/>
+                    <Image Width="30"
+                           Height="30">
+                        <Image.Source>
+                            <SvgImageSource UriSource="/Assets/115/file_type/folder/folder.svg"
+                                            RasterizePixelWidth="35"
+                                            RasterizePixelHeight="30" />
+                        </Image.Source>
+                    </Image>
+                    
                     <TextBlock Grid.Column="1" Text="{x:Bind ((data:ExplorerItem)Content).Name}"
                                TextTrimming="CharacterEllipsis"
                                VerticalAlignment="Center"

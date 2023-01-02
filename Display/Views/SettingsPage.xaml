@@ -229,6 +229,7 @@
                                         <x:String>PotPlayer</x:String>
                                         <x:String>mpv</x:String>
                                         <x:String>vlc</x:String>
+                                        <x:String>MediaElement</x:String>
                                     </ComboBox>
                                 </RelativePanel>
 

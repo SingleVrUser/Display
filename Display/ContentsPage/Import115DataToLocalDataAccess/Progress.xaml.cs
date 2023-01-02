@@ -72,6 +72,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
             currentWindow = content.window;
 
+            BackButton.Visibility= Visibility.Visible;
         }
 
         private async void CurrentWindow_Closed(object sender, WindowEventArgs args)

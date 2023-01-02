@@ -16,7 +16,7 @@
     
     <StackPanel Spacing="10">
         <RelativePanel>
-            <HyperlinkButton Width="45" Height="45" Click="BackButton_Click">
+            <HyperlinkButton x:Name="BackButton" Width="45" Height="45" Click="BackButton_Click" Visibility="Collapsed">
                 <AnimatedIcon x:Name="SearchAnimatedIcon">
                     <AnimatedIcon.Source>
                         <animatedvisuals:AnimatedBackVisualSource/>
