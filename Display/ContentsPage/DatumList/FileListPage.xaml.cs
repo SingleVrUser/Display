@@ -137,12 +137,12 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
         ChangedFolder(filesInfo);
     }
 
-    private void ChangedFolder(FilesInfo filesInfo)
+    private async void ChangedFolder(FilesInfo filesInfo)
     {
         //Ìø¹ýÎÄ¼þ
         if (filesInfo.Type == FilesInfo.FileType.File) return;
 
-        filesInfos.SetCid(filesInfo.Cid);
+        await filesInfos.SetCid(filesInfo.Cid);
 
         _units.Add(new MetadataItem
         {
@@ -307,10 +307,6 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
         if (e.DataView.Properties.Values.FirstOrDefault() is not List<Data.FilesInfo> sourceFilesInfos) return;
 
-        //if (RecyFiles == null) RecyFiles = new();
-
-        //RecyFiles = sourceFilesInfos;
-
         //115É¾³ý
         ContentDialog dialog = new ContentDialog()
         {
@@ -326,8 +322,6 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
         if (result == ContentDialogResult.Primary)
         {
-            //System.Diagnostics.Debug.WriteLine("É¾³ý");
-
             sourceFilesInfos.ForEach(item => filesInfos.Remove(item));
 
             if(webApi==null) webApi = new();
