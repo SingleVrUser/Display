@@ -10,6 +10,7 @@ using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
@@ -209,9 +210,9 @@ public sealed partial class MainPage : Page
         tryPlayVideos(filesInfo);
     }
 
-    private async void tryPlayVideos(List<FilesInfo> filesInfo)
+    private void ChangedVideo_UniformGrid(int videoCount)
     {
-        switch (filesInfo.Count)
+        switch (videoCount)
         {
             case 0:
                 return;
@@ -228,6 +229,11 @@ public sealed partial class MainPage : Page
                 Video_UniformGrid.Columns = 2;
                 break;
         }
+    }
+
+    private async void tryPlayVideos(List<FilesInfo> filesInfo)
+    {
+        ChangedVideo_UniformGrid(filesInfo.Count);
 
         PlayingVideoInfos.Clear();
         RemoveMediaControl();
@@ -248,14 +254,22 @@ public sealed partial class MainPage : Page
 
             if (videoUrl == null) continue;
 
-            MenuFlyout menuFlyout = this.Resources["MediaContentFlyout"] as MenuFlyout;
+            //MenuFlyout menuFlyout = this.Resources["MediaContentFlyout"] as MenuFlyout;
 
+            MenuFlyout menuFlyout = new();
+
+            var MenuFlyoutItem = new MenuFlyoutItem() { Text = "删除文件",Icon = new FontIcon() { FontFamily = new FontFamily("Segoe Fluent Icons"), Glyph= "\uE107" } };
+            MenuFlyoutItem.Click += DeletedFileButton_Click;
             //为删除键添加DataContent
-            var DeletedFileItem = menuFlyout.Items.Where(item => item.Name == "DeletedFileItem").FirstOrDefault();
-            if(DeletedFileItem != null)
-            {
-                DeletedFileItem.DataContext = file;
-            }
+            MenuFlyoutItem.DataContext = file;
+
+            menuFlyout.Items.Add(MenuFlyoutItem);
+
+            //var DeletedFileItem = menuFlyout.Items.Where(item => item.Name == "DeletedFileItem").FirstOrDefault();
+            //if(DeletedFileItem != null)
+            //{
+            //    DeletedFileItem.DataContext = file;
+            //}
 
             Video_UniformGrid.Children.Add(
                 new MediaPlayerElement()
@@ -400,12 +414,22 @@ public sealed partial class MainPage : Page
             //移除正在播放列表
             if (PlayingVideoInfos.Contains(fileInfo)) PlayingVideoInfos.Remove(fileInfo);
 
+            //移除cid信息
+            var cid = CidInfos.Where(item => item.truename == FileMatch.MatchName(fileInfo.Name).ToUpper()).FirstOrDefault();
+            if (cid != null)
+            {
+                CidInfos.Remove(cid);
+            }
+
             //移除正在播放的视频
             var media = Video_UniformGrid.Children.Where(item => (item as MediaPlayerElement).Tag.ToString() == fileInfo.datum.pc).FirstOrDefault();
             if (media != null)
             {
                 Video_UniformGrid.Children.Remove(media);
             }
+
+            //修改布局
+            ChangedVideo_UniformGrid(Video_UniformGrid.Children.Count);
 
             //删除资源管理器的文件，如果存在（有可能已经关掉了）
             if (LastFilesListView.IsLoaded && LastFilesListView.ItemsSource is IncrementallLoadDatumCollection filesInfos && filesInfos.Contains(fileInfo))
