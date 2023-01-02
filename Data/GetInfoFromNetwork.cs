@@ -37,6 +37,8 @@ namespace Data
 
         public static string BrowserUserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36 115Browser/8.3.0";
         public static string DesktopUserAgent = "Mozilla/5.0; Windows NT/10.0.19044; 115Desktop/2.0.1.7";
+        public static string MediaElementUserAgent = "NSPlayer/12.00.22621.0963 WMFSDK/12.00.22621.0963";
+
 
         public GetInfoFromNetwork()
         {

@@ -11,7 +11,7 @@
   <Identity
     Name="250cd7ac-8a28-4638-98ab-35d20736c13e"
     Publisher="CN=Display"
-    Version="0.1.14.0" />
+    Version="0.1.15.0" />
 
   <Properties>
     <DisplayName>Display</DisplayName>

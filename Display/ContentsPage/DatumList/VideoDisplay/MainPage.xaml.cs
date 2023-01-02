@@ -47,11 +47,15 @@ public sealed partial class MainPage : Page
 
     GetInfoFromNetwork network;
 
+    ListView LastFilesListView;
+
     WebApi webApi;
 
-    public MainPage(List<FilesInfo> filesInfos)
+    public MainPage(List<FilesInfo> filesInfos, ListView lastFilesListView)
     {
         this.InitializeComponent();
+
+        this.LastFilesListView = lastFilesListView;
 
         FilesInfos = new();
         filesInfos.ForEach(item => FilesInfos.Add(item));
@@ -160,7 +164,7 @@ public sealed partial class MainPage : Page
         ChangedFolder(filesInfo);
     }
 
-    private void ChangedFolder(FilesInfo filesInfo)
+    private async void ChangedFolder(FilesInfo filesInfo)
     {
         //跳过文件
         if (filesInfo.Type == FilesInfo.FileType.File) return;
@@ -171,7 +175,7 @@ public sealed partial class MainPage : Page
         }
         else
         {
-            FilesInfosCollection.SetCid(filesInfo.Cid);
+            await FilesInfosCollection.SetCid(filesInfo.Cid);
         }
 
         if (VideoShow_ListView.ItemsSource != FilesInfosCollection)
@@ -244,10 +248,20 @@ public sealed partial class MainPage : Page
 
             if (videoUrl == null) continue;
 
+            MenuFlyout menuFlyout = this.Resources["MediaContentFlyout"] as MenuFlyout;
+
+            //为删除键添加DataContent
+            var DeletedFileItem = menuFlyout.Items.Where(item => item.Name == "DeletedFileItem").FirstOrDefault();
+            if(DeletedFileItem != null)
+            {
+                DeletedFileItem.DataContext = file;
+            }
+
             Video_UniformGrid.Children.Add(
                 new MediaPlayerElement()
                 {
                     Source = MediaSource.CreateFromUri(new Uri(videoUrl)),
+                    ContextFlyout = menuFlyout,
                     Tag = file.datum.pc
                 }); 
 
@@ -256,16 +270,16 @@ public sealed partial class MainPage : Page
 
         VideoPlay_Pivot.SelectedIndex = 1;
 
-        var cidInfoDicts = await FindInfosFromInternet(PlayingVideoInfos);
-
         CidInfos.Clear();
+        var cidInfoDicts = await FindInfosFromInternet(PlayingVideoInfos.ToList());
+
         foreach (var info in cidInfoDicts)
         {
             CidInfos.Add(info.Value);
         }
     }
 
-    private async Task<Dictionary<string, VideoInfo>> FindInfosFromInternet(ObservableCollection<FilesInfo> filesInfos)
+    private async Task<Dictionary<string, VideoInfo>> FindInfosFromInternet(List<FilesInfo> filesInfos)
     {
         Dictionary<string, VideoInfo> cidInfoDicts = new();
 
@@ -369,12 +383,52 @@ public sealed partial class MainPage : Page
 
     private async void DeletedFileButton_Click(object sender, RoutedEventArgs e)
     {
-        await DeletedFilesFromListView(VideoPlay_ListView, PlayingVideoInfos);
+        if (sender is not MenuFlyoutItem item) return;
+
+        if (item.DataContext is not FilesInfo fileInfo) return;
+
+        var result = await TipDeletedFiles();
+
+        if (result == ContentDialogResult.Primary)
+        {
+            //删除115文件
+            await webApi.DeleteFiles(fileInfo.Cid, new() { fileInfo.Fid });
+
+            //移除播放列表
+            if (FilesInfos.Contains(fileInfo)) FilesInfos.Remove(fileInfo);
+
+            //移除正在播放列表
+            if (PlayingVideoInfos.Contains(fileInfo)) PlayingVideoInfos.Remove(fileInfo);
+
+            //移除正在播放的视频
+            var media = Video_UniformGrid.Children.Where(item => (item as MediaPlayerElement).Tag.ToString() == fileInfo.datum.pc).FirstOrDefault();
+            if (media != null)
+            {
+                Video_UniformGrid.Children.Remove(media);
+            }
+
+            //删除资源管理器的文件，如果存在（有可能已经关掉了）
+            if (LastFilesListView.IsLoaded && LastFilesListView.ItemsSource is IncrementallLoadDatumCollection filesInfos && filesInfos.Contains(fileInfo))
+            {
+                filesInfos.Remove(fileInfo);
+            }
+        }
+
     }
 
-    private async void DeleteFiles_Click(object sender, RoutedEventArgs e)
+    private async Task<ContentDialogResult> TipDeletedFiles()
     {
-        await DeletedFilesFromListView(VideoShow_ListView, FilesInfos);
+        ContentDialog dialog = new ContentDialog()
+        {
+            XamlRoot = this.XamlRoot,
+            Title = "确认",
+            PrimaryButtonText = "删除",
+            CloseButtonText = "返回",
+            DefaultButton = ContentDialogButton.Close,
+            Content = "该操作将删除115网盘中的文件，确认删除？"
+        };
+
+        return await dialog.ShowAsync();
     }
 
     private async Task DeletedFilesFromListView(ListView listView, ObservableCollection<FilesInfo> filesInfos)
@@ -390,17 +444,7 @@ public sealed partial class MainPage : Page
 
         if (filesInfo.Count == 0) return;
 
-        ContentDialog dialog = new ContentDialog()
-        {
-            XamlRoot = this.XamlRoot,
-            Title = "确认",
-            PrimaryButtonText = "删除",
-            CloseButtonText = "返回",
-            DefaultButton = ContentDialogButton.Close,
-            Content = "该操作将删除115网盘中的文件，确认删除？"
-        };
-
-        var result = await dialog.ShowAsync();
+        var result = await TipDeletedFiles();
 
         if (result == ContentDialogResult.Primary)
         {
@@ -506,4 +550,5 @@ public sealed partial class MainPage : Page
 
         SmokeGrid.Visibility = Visibility.Collapsed;
     }
+
 }
