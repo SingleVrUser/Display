@@ -55,6 +55,12 @@ public class IncrementallLoadDatumCollection : ObservableCollection<FilesInfo>, 
 
         if (AllCount!= FilesInfo.count) AllCount = FilesInfo.count;
 
+        if(FilesInfo.data == null)
+        {
+            HasMoreItems = false;
+            return 0;
+        }
+
         foreach (var datum in FilesInfo.data)
         {
             Add(new(datum));
