@@ -676,7 +676,7 @@
                           Visibility="{x:Bind isShowHeaderCover,Mode=OneWay}">
                         <Image x:FieldModifier="public"
                                x:Name="HeaderCover"
-                               Source="{x:Bind actorInfo.prifile_path,Mode=OneWay}"/>
+                               Source="{x:Bind actorInfo.prifile_path,Converter={StaticResource NotExistsImagePathConverter},Mode=OneWay}"/>
                     </Grid>
                 </Grid>
 

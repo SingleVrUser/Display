@@ -252,7 +252,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
                     {
                         actorInfo = actorinfos.FirstOrDefault();
 
-                        isShowHeaderCover = true;
+                    isShowHeaderCover = true;
                     }
 
                     break;
@@ -796,12 +796,17 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     {
         //更新GridView的来源
         var imgSize = ImageSize;
-        if (SuccessInfoCollection == null || !string.IsNullOrEmpty(filterKeywords))
-        {
-            SuccessInfoCollection = new(imgSize.Item1, imgSize.Item2);
-            SuccessInfoCollection.SetFilter(filterConditionList, filterKeywords);
-            await SuccessInfoCollection.LoadData();
-        }
+
+        //if (SuccessInfoCollection == null || !string.IsNullOrEmpty(filterKeywords) ||)
+        //{
+        //    SuccessInfoCollection = new(imgSize.Item1, imgSize.Item2);
+        //    SuccessInfoCollection.SetFilter(filterConditionList, filterKeywords);
+        //    await SuccessInfoCollection.LoadData();
+        //}
+
+        SuccessInfoCollection = new(imgSize.Item1, imgSize.Item2);
+        SuccessInfoCollection.SetFilter(filterConditionList, filterKeywords);
+        await SuccessInfoCollection.LoadData();
 
         BasicGridView.ItemsSource = SuccessInfoCollection;
 
