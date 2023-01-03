@@ -45,9 +45,11 @@ public sealed partial class MediaPlayWindow : Window
 
     private void MediaPlayWindow_Closed(object sender, WindowEventArgs args)
     {
-        if (MediaControl.IsLoaded && VideoPlayGrid.Children.Contains(MediaControl))
+        if (mediaControl.IsLoaded && VideoPlayGrid.Children.Contains(mediaControl))
         {
-            VideoPlayGrid.Children.Remove(MediaControl);
+            mediaControl.StopMediaPlayer();
+            VideoPlayGrid.Children.Remove(mediaControl);
+
         }
     }
 

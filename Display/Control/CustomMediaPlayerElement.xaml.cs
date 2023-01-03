@@ -23,6 +23,7 @@ using Windows.Storage;
 using Data;
 using SkiaSharp;
 using static System.Net.WebRequestMethods;
+using Windows.Media;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -95,6 +96,12 @@ namespace Display.Control
             }
 
             await SetMediaPlayer(url, subDicts);
+        }
+
+        public void StopMediaPlayer()
+        {
+            MediaControl.MediaPlayer.Pause();
+            MediaControl.Source = null;
         }
 
         private async Task SetMediaPlayer(string url, Dictionary<string,string> subDicts = null)

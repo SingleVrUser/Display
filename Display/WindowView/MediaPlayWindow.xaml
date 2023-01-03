@@ -40,7 +40,7 @@
         </Grid>
 
         <Grid Grid.Row="1" x:Name="VideoPlayGrid">
-            <control:CustomMediaPlayerElement x:Name="MediaControl" PickCode="{x:Bind PickCode}"/>
+            <control:CustomMediaPlayerElement x:Name="mediaControl" PickCode="{x:Bind PickCode}"/>
 
             <!--无链接传入-->
             <StackPanel HorizontalAlignment="Center"
