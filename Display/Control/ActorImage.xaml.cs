@@ -23,6 +23,12 @@ namespace Display.Control
 {
     public sealed partial class ActorImage : UserControl
     {
+        private static readonly string noPictruePath = "ms-appx:///Assets/NoPicture.jpg";
+
+        private string actorName;
+
+        private int actorId;
+
         public ActorImage(string actorName)
         {
             this.InitializeComponent();
@@ -31,12 +37,38 @@ namespace Display.Control
             string imagePath = Path.Combine(AppSettings.ActorInfo_SavePath, actorName, "face.jpg");
             if (!File.Exists(imagePath))
             {
-                imagePath = $"ms-appx:///Assets/NoPicture.jpg";
+                imagePath = noPictruePath;
             }
 
             ShowImage.Source = new BitmapImage(new Uri(imagePath));
 
-            ShowText.Text = actorName;
+            this.actorName = actorName;
+        }
+
+        public ActorImage(ActorInfo actorInfo)
+        {
+            this.InitializeComponent();
+
+            string imagePath;
+            if (string.IsNullOrEmpty(actorInfo.prifile_path))
+            {
+                imagePath = noPictruePath;
+            }
+            else
+            {
+                imagePath = actorInfo.prifile_path;
+            }
+            ShowImage.Source = new BitmapImage(new Uri(imagePath));
+
+            //是否喜欢
+            if (actorInfo.is_like == 1)
+            {
+                LikeFontIcon.Visibility = Visibility.Visible;
+            }
+
+            this.actorName = actorInfo.name;
+            this.actorId = actorInfo.id;
+            //ShowText.Text = actorInfo.name;
         }
 
 
@@ -53,8 +85,26 @@ namespace Display.Control
 
         private void Grid_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-
             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
+        }
+
+        private void LikeMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
+        {
+            int is_like = 0;
+
+            //通过当前状态判断将要设置的值
+            switch (LikeFontIcon.Visibility)
+            {
+                case Visibility.Visible:
+                    LikeFontIcon.Visibility = Visibility.Collapsed;
+                    break;
+                case Visibility.Collapsed:
+                    LikeFontIcon.Visibility = Visibility.Visible;
+                    is_like = 1;
+                    break;
+            }
+
+            DataAccess.UpdateSingleDataFromActorInfo(actorId.ToString(), "is_like", is_like.ToString());
         }
     }
 }

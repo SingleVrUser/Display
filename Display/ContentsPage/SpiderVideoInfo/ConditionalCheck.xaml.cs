@@ -60,55 +60,39 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             ConditionCheckItems.Add(ImageItem);
 
-            if (AppSettings.isUseJavBus)
-            {
-                var CheckItem = new ConditionCheck()
-                {
-                    Condition = "访问 JavBus",
-                    CheckUrl = AppSettings.JavBus_BaseUrl,
-                };
+            AddSpiderMethod(AppSettings.isUseJavBus, "访问 JavBus", AppSettings.JavBus_BaseUrl);
 
-                ConditionCheckItems.Add(CheckItem);
-            }
-            if (AppSettings.isUseLibreDmm)
-            {
-                var CheckItem = new ConditionCheck()
-                {
-                    Condition = "访问 LibreDmm",
-                    CheckUrl = AppSettings.LibreDmm_BaseUrl,
-                };
+            AddSpiderMethod(AppSettings.isUseJav321, "访问 Jav321", AppSettings.Jav321_BaseUrl);
 
-                ConditionCheckItems.Add(CheckItem);
-            }
-            if (AppSettings.isUseFc2Hub)
-            {
-                var CheckItem = new ConditionCheck()
-                {
-                    Condition = "访问 Fc2hub",
-                    CheckUrl = AppSettings.Fc2hub_BaseUrl,
-                };
+            AddSpiderMethod(AppSettings.isUseAvMoo, "访问 AvMoo", AppSettings.AvMoo_BaseUrl);
 
-                ConditionCheckItems.Add(CheckItem);
-            }
+            AddSpiderMethod(AppSettings.isUseAvSox, "访问 AvSox", AppSettings.AvSox_BaseUrl);
 
-            if (AppSettings.isUseJavDB)
-            {
-                var CheckItem = new ConditionCheck()
-                {
-                    Condition = "访问 JavDB",
-                    CheckUrl = AppSettings.JavDB_BaseUrl,
-                };
+            AddSpiderMethod(AppSettings.isUseLibreDmm, "访问 LibreDmm", AppSettings.LibreDmm_BaseUrl);
 
-                ConditionCheckItems.Add(CheckItem);
-            }
+            AddSpiderMethod(AppSettings.isUseFc2Hub, "访问 Fc2hub", AppSettings.Fc2hub_BaseUrl);
+
+            AddSpiderMethod(AppSettings.isUseJavDB, "访问 JavDB", AppSettings.JavDB_BaseUrl);
 
             //至少选择一个搜刮源
-            if(!(AppSettings.isUseJavBus || AppSettings.isUseLibreDmm || AppSettings.isUseFc2Hub || AppSettings.isUseJavDB))
+            if (!(AppSettings.isUseJavBus || AppSettings.isUseLibreDmm || AppSettings.isUseFc2Hub || AppSettings.isUseJavDB))
             {
                 spiderOrigin_TextBlock.Visibility = Visibility.Visible;
             }
 
             Check_Condition();
+        }
+
+        private void AddSpiderMethod(bool isAdd,string tip,string url)
+        {
+            if (isAdd)
+            {
+                ConditionCheckItems.Add(new ConditionCheck()
+                {
+                    Condition = tip,
+                    CheckUrl = url,
+                });
+            }
         }
 
         private async void ImageCheckButton_Click(object sender, RoutedEventArgs e)

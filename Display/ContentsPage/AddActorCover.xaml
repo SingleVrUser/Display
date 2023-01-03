@@ -34,7 +34,15 @@
 
                     <StackPanel VerticalAlignment="Bottom">
                         <RelativePanel Margin="5,0">
-                            <TextBlock Text="{x:Bind name}" RelativePanel.AlignVerticalCenterWithPanel="True" IsTextSelectionEnabled="True" TextWrapping="Wrap"/>
+                            <TextBlock Text="{x:Bind name}"
+                                       RelativePanel.AlignVerticalCenterWithPanel="True"
+                                       IsTextSelectionEnabled="True"
+                                       TextWrapping="Wrap" />
+                            <TextBlock Text="{x:Bind video_count}"
+                                       RelativePanel.AlignRightWithPanel="True"
+                                       RelativePanel.AlignBottomWithPanel="True"
+                                       FontFamily="JetBrains Mono"
+                                       Opacity="0.4" />
                         </RelativePanel>
                         
                         <TextBlock Text="{x:Bind genderInfo,Mode=OneWay}" Visibility="Collapsed"/>

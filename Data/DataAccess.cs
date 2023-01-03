@@ -936,9 +936,6 @@ namespace Data
         /// <returns></returns>
         public static void UpdateSingleDataFromVideoInfo(string truename, string key, string value)
         {
-            //VideoInfo data = new VideoInfo();
-
-            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
                new SqliteConnection($"Filename={dbpath}"))
             {
@@ -951,8 +948,28 @@ namespace Data
 
                 db.Close();
             }
+        }
 
-            //return data;
+
+        /// <summary>
+        /// 更新演员信息，ActorInfo的单个字段
+        /// </summary>
+        /// <param name="truename"></param>
+        /// <returns></returns>
+        public static void UpdateSingleDataFromActorInfo(string id, string key, string value)
+        {
+            using (SqliteConnection db =
+               new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"UPDATE ActorInfo SET {key} = '{value}' WHERE id = '{id}'", db);
+
+                SqliteDataReader query = selectCommand.ExecuteReader();
+
+                db.Close();
+            }
         }
 
         /// <summary>
@@ -1729,7 +1746,7 @@ namespace Data
                 }
 
                 SqliteCommand Command = new SqliteCommand
-                    ($"SELECT * from ActorInfo{filterStr}{orderStr} LIMIT {limit} offset {offset}", db);
+                    ($"SELECT ActorInfo.*,COUNT(id) FROM ActorInfo LEFT JOIN Actor_Video ON Actor_Video.actor_id = ActorInfo.id{filterStr} GROUP BY id{orderStr} LIMIT {limit} offset {offset}", db);
 
                 SqliteDataReader query = await Command.ExecuteReaderAsync();
 
@@ -1743,6 +1760,33 @@ namespace Data
 
             return data;
         }
+        
+        
+        public static async Task<List<ActorInfo>> LoadActorInfoByVideoName(string videoName)
+        {
+            List<ActorInfo> data = new();
+
+            using (SqliteConnection db =
+               new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand Command = new SqliteCommand
+                    ($"SELECT actors.*, COUNT(id)  FROM ( SELECT ActorInfo.* FROM ActorInfo, VideoInfo, Actor_Video WHERE VideoInfo.truename == '{videoName}' AND VideoInfo.truename == Actor_Video.video_name AND Actor_Video.actor_id == ActorInfo.id ) AS actors LEFT JOIN Actor_Video ON Actor_Video.actor_id = actors.id GROUP BY id", db);
+
+                SqliteDataReader query = await Command.ExecuteReaderAsync();
+
+                while (query.Read())
+                {
+                    data.Add(ConvertQueryToActorInfo(query));
+                }
+
+                db.Close();
+            }
+
+            return data;
+        }
+
 
 
         /// <summary>
@@ -2518,6 +2562,8 @@ namespace Data
             dataInfo.blog_url = query["blog_url"] as string;
             dataInfo.is_like = Convert.ToInt32(query["is_like"]);
             dataInfo.addtime = Convert.ToInt64(query["addtime"]);
+            dataInfo.addtime = Convert.ToInt64(query["addtime"]);
+            dataInfo.video_count = Convert.ToInt32(query["COUNT(id)"]);
 
             return dataInfo;
         }

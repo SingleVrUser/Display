@@ -230,6 +230,7 @@
                             </FlipView.ItemTemplate>
                         </FlipView>
 
+                        <ProgressRing x:Name="FindCidInfo_ProgressRing" Visibility="Collapsed"/>
 
                         <ListView x:Name="VideoPlay_ListView"
                                   Grid.Row="1"

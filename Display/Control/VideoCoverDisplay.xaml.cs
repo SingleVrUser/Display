@@ -41,6 +41,33 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         get => !IsShowSearchListView;
     }
 
+    private ActorInfo _actorInfo;
+    public ActorInfo actorInfo
+    {
+        get=> _actorInfo;
+        set
+        {
+            if(_actorInfo == value) return;
+
+            _actorInfo = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private bool _isShowHeaderCover = false;
+    public bool isShowHeaderCover
+    {
+        get => _isShowHeaderCover;
+        set
+        {
+            if (_isShowHeaderCover == value) return;
+
+            _isShowHeaderCover = value;
+
+            OnPropertyChanged();
+        }
+    }
+
     /// <summary>
     /// 显示的标题
     /// </summary>
@@ -195,7 +222,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 加载搜索结果
     /// </summary>
-    public void ReLoadSearchResult(List<string> types, string ShowName)
+    public async void ReLoadSearchResult(List<string> types, string ShowName)
     {
         bool isShowHeaderCover = false;
 
@@ -218,9 +245,16 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
                     return;
                 case "actor":
                     Title = ShowName;
-                    ActorsInfo actorInfo = new(ShowName);
-                    HeaderCover.Source = new BitmapImage(new Uri(actorInfo.prifilePhotoPath));
-                    isShowHeaderCover = true;
+                    //查询演员信息
+                    var actorinfos = await DataAccess.LoadActorInfo(filterList: new() { $"name == '{ShowName}'" });
+
+                    if (actorinfos.Count!=0)
+                    {
+                        actorInfo = actorinfos.FirstOrDefault();
+
+                        isShowHeaderCover = true;
+                    }
+
                     break;
                 default:
                     Title = ShowName;
@@ -234,10 +268,12 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             Title = ShowName;
         }
 
-        if (isShowHeaderCover && HeaderCover_Grid.Visibility != Visibility.Visible)
-            HeaderCover_Grid.Visibility = Visibility.Visible;
-        else if (!isShowHeaderCover && HeaderCover_Grid.Visibility != Visibility.Collapsed)
-            HeaderCover_Grid.Visibility = Visibility.Collapsed;
+        this.isShowHeaderCover = isShowHeaderCover;
+
+        //if (isShowHeaderCover && HeaderCover_Grid.Visibility != Visibility.Visible)
+        //    HeaderCover_Grid.Visibility = Visibility.Visible;
+        //else if (!isShowHeaderCover && HeaderCover_Grid.Visibility != Visibility.Collapsed)
+        //    HeaderCover_Grid.Visibility = Visibility.Collapsed;
 
 
         filterConditionList = types;
@@ -1015,6 +1051,17 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         InfosFilter.UncheckAllToggleSplitButton();
         LoadDstSuccessInfoCollection();
+    }
+
+    private void LikeButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not ToggleButton isLikeButton) return;
+
+        if (isLikeButton.Tag is not int actorId) return;
+
+        var is_like = (bool)isLikeButton.IsChecked ? 1 : 0;
+
+        DataAccess.UpdateSingleDataFromActorInfo(actorId.ToString(), "is_like", is_like.ToString());
     }
 }
 

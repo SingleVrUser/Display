@@ -284,6 +284,7 @@ public sealed partial class MainPage : Page
 
         VideoPlay_Pivot.SelectedIndex = 1;
 
+        FindCidInfo_ProgressRing.Visibility = Visibility.Visible;
         CidInfos.Clear();
         var cidInfoDicts = await FindInfosFromInternet(PlayingVideoInfos.ToList());
 
@@ -291,6 +292,7 @@ public sealed partial class MainPage : Page
         {
             CidInfos.Add(info.Value);
         }
+        FindCidInfo_ProgressRing.Visibility = Visibility.Collapsed;
     }
 
     private async Task<Dictionary<string, VideoInfo>> FindInfosFromInternet(List<FilesInfo> filesInfos)

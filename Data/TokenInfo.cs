@@ -432,7 +432,7 @@ namespace Data
         public int is_like { set; get; } = 0;
         public long addtime { set; get; } =  DateTimeOffset.Now.ToUnixTimeSeconds();
 
-
+        public int video_count { get; set; }
 
         private Status _status = Status.beforeStart;
         public Status Status
@@ -1406,6 +1406,7 @@ namespace Data
         {
             this.name = name;
         }
+
 
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -144,6 +144,16 @@
                 <Button x:Name="ImportDataButton"
                         Content="导入"
                         Click="ImportDataButton_Click" />
+                <Button Content="下载"
+                        Click="DownButton_Click"
+                        ToolTipService.ToolTip="点击使用比特彗星下载，右键选择更多下载方式">
+                    <Button.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="Aria2下载"
+                                            Click="Aria2Down_Click" />
+                        </MenuFlyout>
+                    </Button.ContextFlyout>
+                </Button>
 
                 <TeachingTip x:Name="SelectedNull_TeachingTip"
                              Target="{x:Bind ImportDataButton}"

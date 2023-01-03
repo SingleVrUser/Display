@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI.Controls;
 using Data;
 using Display.ContentsPage.Import115DataToLocalDataAccess;
+using Display.Control;
 using Display.Model;
 using Microsoft.UI;
 using Microsoft.UI.Text;
@@ -614,6 +615,63 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
             DataAccess.DeleteFilesInfoTable();
         }
     }
+
+    private async void DownButton_Click(object sender, RoutedEventArgs e)
+    {
+        await DownFiles(Data.WebApi.downType.bc);
+    }
+
+    private async void Aria2Down_Click(object sender, RoutedEventArgs e)
+    {
+        await DownFiles(Data.WebApi.downType.bc);
+    }
+
+    private async Task DownFiles(Data.WebApi.downType downtype)
+    {
+        if (BaseExample.SelectedItems is null)
+        {
+            ShowTeachingTip("当前未选中要下载的文件或文件夹");
+            return;
+        }
+        else
+        {
+            if (BaseExample.SelectedItems.FirstOrDefault() is not FilesInfo) return;
+
+            if (webApi == null)
+                webApi = new();
+
+            List<Datum> videoinfos = new();
+
+            foreach (var item in BaseExample.SelectedItems)
+            {
+                if (item is not FilesInfo fileinfo) continue;
+
+                Datum datum = new();
+                datum.cid = fileinfo.Cid;
+                datum.n = fileinfo.Name;
+                datum.pc = fileinfo.datum.pc;
+                datum.fid = fileinfo.Fid;
+                videoinfos.Add(datum);
+            }
+
+            //BitComet只需要cid,n,pc三个值
+            bool isSuccess = await webApi.RequestDown(videoinfos, downtype);
+
+            if (!isSuccess)
+                ShowTeachingTip("请求下载失败");
+        }
+    }
+
+    private void ShowTeachingTip(string subtitle, string content = null)
+    {
+        TeachingTip LightDismissTeachingTip = new() { IsLightDismissEnabled = true };
+        LightDismissTeachingTip.Subtitle = subtitle;
+        if (content != null)
+            LightDismissTeachingTip.Content = content;
+
+        LightDismissTeachingTip.IsOpen = true;
+    }
+
 }
 
 class TransferStationFiles
