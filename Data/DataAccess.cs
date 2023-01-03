@@ -1619,7 +1619,14 @@ namespace Data
                                 //不操作
                                 break;
                             default:
-                                filterList.Add($"(VideoInfo.{item} LIKE '%{filterKeywords}%')");
+                                if(filterKeywords == "")
+                                {
+                                    filterList.Add($"(VideoInfo.{item} == '{filterKeywords}')");
+                                }
+                                else
+                                {
+                                    filterList.Add($"(VideoInfo.{item} LIKE '%{filterKeywords}%')");
+                                }
                                 break;
                         }
                     }
