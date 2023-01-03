@@ -651,7 +651,6 @@
                     <TextBlock
                         x:FieldModifier="public"
                         x:Name="showNameTextBlock"
-                        
                         Text="{x:Bind Title,Mode=OneWay}"
                         FontSize="25"
                         IsTextSelectionEnabled="True"
@@ -661,10 +660,23 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"/>
 
-                    <ToggleButton Content="喜欢" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    <ToggleButton Content="喜欢"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center"
+                                  IsChecked="{x:Bind data:FileMatch.isLike(actorInfo.is_like),Mode=OneWay}"
+                                  Click="LikeButton_Click"
+                                  Tag="{x:Bind actorInfo.id}"
+                                  Visibility="{x:Bind isShowHeaderCover,Mode=OneWay}" />
 
-                    <Grid Grid.Column="1" x:Name="HeaderCover_Grid" Height="130" CornerRadius="5" Margin="3,5,10,0">
-                        <Image x:FieldModifier="public" x:Name="HeaderCover"/>
+                    <Grid Grid.Column="1"
+                          x:Name="HeaderCover_Grid"
+                          Height="130"
+                          CornerRadius="5"
+                          Margin="3,5,10,0"
+                          Visibility="{x:Bind isShowHeaderCover,Mode=OneWay}">
+                        <Image x:FieldModifier="public"
+                               x:Name="HeaderCover"
+                               Source="{x:Bind actorInfo.prifile_path,Mode=OneWay}"/>
                     </Grid>
                 </Grid>
 

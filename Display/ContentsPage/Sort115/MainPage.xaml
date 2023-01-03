@@ -1,0 +1,203 @@
+﻿<!-- Copyright (c) Microsoft Corporation and Contributors. -->
+<!-- Licensed under the MIT License. -->
+
+<Page x:Class="Display.ContentsPage.Sort115.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="using:Display.ContentsPage.Sort115"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d"
+      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <Style TargetType="Grid"
+               x:Key="BaseGrid">
+            <Setter Property="Width"
+                    Value="150" />
+            <Setter Property="Height"
+                    Value="100" />
+            <Setter Property="BorderBrush"
+                    Value="{StaticResource CircleElevationBorderBrush}" />
+            <Setter Property="BorderThickness"
+                    Value="1" />
+            <Setter Property="CornerRadius"
+                    Value="5" />
+            <Setter Property="Padding"
+                    Value="5" />
+        </Style>
+
+        <Style TargetType="StackPanel"
+               x:Key="BaseStackPanel">
+
+            <Setter Property="BorderBrush"
+                    Value="{StaticResource CircleElevationBorderBrush}" />
+            <Setter Property="BorderThickness"
+                    Value="1" />
+            <Setter Property="CornerRadius"
+                    Value="5" />
+            <Setter Property="Padding"
+                    Value="5" />
+            <Setter Property="Spacing"
+                    Value="20" />
+            
+            
+        </Style>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Center" />
+            <Setter Property="TextWrapping"
+                    Value="Wrap" />
+        </Style>
+    </Page.Resources>
+
+    <Grid Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        
+        <StackPanel Spacing="10"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Center">
+            <Grid Style="{StaticResource BaseGrid}">
+                <TextBlock Text="需要归档整理的文件夹或文件" />
+            </Grid>
+
+            <StackPanel Style="{StaticResource BaseStackPanel}">
+
+                <StackPanel Style="{StaticResource BaseStackPanel}">
+
+                    <TextBlock Text="多视频文件" HorizontalAlignment="Left" Margin="0,0,0,-15"/>
+                    <StackPanel Style="{StaticResource BaseStackPanel}" Spacing="5">
+                        <TextBox PlaceholderText="重命名文件格式"
+                                 Text="【演员】 【番号】_【标题】"
+                                 Width="350"
+                                 Header="文件夹" />
+                        <TextBlock Text="实例：xxxxx" />
+
+                        <TextBox PlaceholderText="重命名文件格式"
+                                 Text="【演员】 【番号】_【标题】【多文件标记】"
+                                 Width="350"
+                                 Header="文件" />
+                        <TextBlock Text="实例：xxxxx" />
+                    </StackPanel>
+
+
+                    <TextBlock Text="单视频文件"
+                               HorizontalAlignment="Left"
+                               Margin="0,0,0,-15" />
+
+                    <StackPanel Style="{StaticResource BaseStackPanel}"
+                                Spacing="5">
+                        <TextBox PlaceholderText="重命名文件格式"
+                                 Text="【演员】 【番号】_【标题】【多文件标记】"
+                                 Width="350"
+                                 Header="文件" />
+                        <TextBlock Text="实例：xxxxx" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+
+                        <TextBlock>
+                            <Run>关键词:</Run>
+                            <LineBreak />
+                            <Run>【演员名】</Run>
+                            <LineBreak />
+                            <Run>【番号】</Run>
+                            <LineBreak />
+                            <Run>【标题】</Run>
+                            <LineBreak />
+                            <Run>【多文件标记】</Run>
+                            <LineBreak />
+                        </TextBlock>
+
+                        <TextBlock>
+                            <Run>设置:</Run>
+                            <LineBreak />
+                            <Run>最多两个</Run>
+                            <LineBreak />
+                            <Run>大写</Run>
+                            <LineBreak />
+                            <Run>限定30个字符以内</Run>
+                            <LineBreak />
+                            <Run>-1/-A/-part1</Run>
+                            <LineBreak />
+                        </TextBlock>
+                    </StackPanel>
+                </StackPanel>
+
+
+                <StackPanel Style="{StaticResource BaseStackPanel}">
+                    <TextBlock>
+                        <Run>规则</Run>
+                        <LineBreak />
+                        <Run>[*] 保留字幕，存放位置同视频 / 位置共存一个文件夹</Run>
+                        <LineBreak />
+                        <Run>[*] 保留图片，存放位置同视频 / 位置共存一个文件夹</Run>
+                        <LineBreak />
+                        <Run>[*] 保留文本，存放位置同视频 / 位置共存一个文件夹</Run>
+                        <LineBreak />
+                        <Run>[*] 单视频文件存放文件夹</Run>
+                    </TextBlock>
+                </StackPanel>
+
+            </StackPanel>
+
+
+            <StackPanel Style="{StaticResource BaseStackPanel}">
+                <TextBlock Text="输出"/>
+
+                <Grid Style="{StaticResource BaseGrid}" Padding="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock>
+                        <Run>文件夹1</Run>
+                        <LineBreak />
+                        <Run>（存放整理后的视频/图片/字幕）</Run>
+                    </TextBlock>
+                    
+                    <ComboBox SelectedIndex="0" Grid.Row="1">
+                        <ComboBoxItem  Content="按类别分类" />
+                        <ComboBoxItem  Content="按厂商分类" />
+                        <ComboBoxItem  Content="按演员分类" />
+                        <ComboBoxItem  Content="按年份分类" />
+                    </ComboBox>
+                </Grid>
+
+                <Grid Style="{StaticResource BaseGrid}"
+                      Opacity="0.2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock>
+                        <Run>文件夹2</Run>
+                        <LineBreak />
+                        <Run>（识别/搜刮失败的视频/图片/字幕）</Run>
+                    </TextBlock>
+
+                    <StackPanel Grid.Row="1"
+                                Style="{StaticResource BaseStackPanel}">
+                        <TextBlock Text="原样"/>
+
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+            
+        </StackPanel>
+
+        <StackPanel Grid.Row="1">
+            <TextBlock Text="结果"/>
+        </StackPanel>
+
+    </Grid>
+</Page>

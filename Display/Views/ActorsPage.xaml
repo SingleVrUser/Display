@@ -95,8 +95,8 @@
             <controls:AdaptiveGridView.ItemTemplate>
                 <DataTemplate x:DataType="data:ActorInfo">
                     <Grid
-                        Padding="10,0"
                         CornerRadius="5"
+                        Padding="5,0"
                         PointerEntered="Grid_PointerEntered"
                         PointerExited="Grid_PointerExited">
 
@@ -105,13 +105,20 @@
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
 
-                        <Grid CornerRadius="5">
-                            <controls:ImageEx x:Name="ActorImage" Source="{x:Bind prifile_path}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
-                        </Grid>
+                        <controls:ImageEx x:Name="ActorImage" Source="{x:Bind prifile_path}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform" CornerRadius="5"/>
 
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                  Glyph="&#xE00B;"
+                                  Foreground="OrangeRed"
+                                  Opacity="1"
+                                  FontSize="30" 
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Top"
+                                  Visibility="{x:Bind data:FileMatch.isShowLikeIcon(is_like),Mode=OneWay}" />
+                        
                         <RelativePanel Grid.Row="1">
                             <TextBlock Text="{x:Bind name}" RelativePanel.AlignVerticalCenterWithPanel="True" IsTextSelectionEnabled="True" TextWrapping="Wrap" FontFamily="霞鹜文楷"/>
-                            <!--<TextBlock Text="{x:Bind count}" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignBottomWithPanel="True" FontFamily="JetBrains Mono" FontSize="10" Opacity="0.4"/>-->
+                            <TextBlock Text="{x:Bind video_count}" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignBottomWithPanel="True" FontFamily="JetBrains Mono" FontSize="10" Opacity="0.4"/>
                         </RelativePanel>
                     </Grid>
                 </DataTemplate>

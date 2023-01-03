@@ -96,8 +96,20 @@ namespace Display.Views
         /// <param name="e"></param>
         private void Actor_Click(object sender, RoutedEventArgs e)
         {
-            var clickButton = (sender as Grid);
-            string actorName = clickButton.DataContext as string;
+            if (sender is not Grid clickButton) return;
+
+            string actorName = null;
+            if (clickButton.DataContext is string actorNameStr)
+            {
+                actorName = actorNameStr;
+            }
+            else if(clickButton.DataContext is ActorInfo actorInfo)
+            {
+                actorName = actorInfo.name;
+            }
+
+            if (string.IsNullOrEmpty(actorName)) return;
+
             Tuple<List<string>, string> TypesAndName = new(new() { "actor" }, actorName);
 
             //准备动画

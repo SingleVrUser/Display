@@ -60,16 +60,32 @@ namespace Display.Control
             //m3u8UrlList
             if (webApi == null) webApi = new();
 
-            var m3u8InfoList = await webApi.Getm3u8InfoByPickCode(PickCode);
-
-            //没有找到m3u8，退出
-            if(m3u8InfoList == null) return;
 
             //先原画
             List<Quality> QualityItemsSource = new() { new("原画", pickCode: PickCode) };
 
-            //后m3u8
-            m3u8InfoList.ForEach(item => QualityItemsSource.Add(new(item.Name,item.Url)));
+            var m3u8InfoList = await webApi.Getm3u8InfoByPickCode(PickCode);
+
+            string url = null;
+
+            //有m3u8
+            if (m3u8InfoList != null && m3u8InfoList.Count > 0)
+            {
+                //后m3u8
+                m3u8InfoList.ForEach(item => QualityItemsSource.Add(new(item.Name, item.Url)));
+
+                url = m3u8InfoList.FirstOrDefault()?.Url;
+            }
+            //没有m3u8，获取下载链接播放
+            else
+            {
+                var downUrlList = webApi.GetDownUrl(PickCode,GetInfoFromNetwork.MediaElementUserAgent);
+
+                if (downUrlList.Count>0)
+                {
+                    url = downUrlList.FirstOrDefault().Value;
+                }
+            }
 
             mediaTransportControls.SetQuality(QualityItemsSource, this.Resources["QualityDataTemplate"] as DataTemplate);
 
@@ -78,11 +94,13 @@ namespace Display.Control
                 subDicts = DataAccess.FindSubFile(PickCode);
             }
 
-            await SetMediaPlayer(m3u8InfoList.FirstOrDefault()?.Url, subDicts);
+            await SetMediaPlayer(url, subDicts);
         }
 
         private async Task SetMediaPlayer(string url, Dictionary<string,string> subDicts = null)
         {
+            if (string.IsNullOrEmpty(url)) return;
+
             //添加播放链接
             MediaSource ms = MediaSource.CreateFromUri(new Uri(url));
 

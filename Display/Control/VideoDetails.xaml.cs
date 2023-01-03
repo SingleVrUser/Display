@@ -41,24 +41,25 @@ namespace Display.Control
 
         ObservableCollection<string> ShowImageList = new();
 
-        private void loadData()
+        private async void loadData()
         {
             if (resultinfo == null) return;
 
             //标题
             Title_TextBlock.Text = resultinfo.title;
 
-
             //演员
             //之前有数据，清空
             if (ActorSatckPanel.Children.Count != 0) ActorSatckPanel.Children.Clear();
-            var actorList = resultinfo.actor.Split(',');
-            for (var i = 0; i < actorList.Length; i++)
-            {
 
+            ////查询该视频对应的演员列表
+            var actorList = await DataAccess.LoadActorInfoByVideoName(resultinfo.truename);
+
+            //var actorList = resultinfo.actor.Split(',');
+            for (var i = 0; i < actorList.Count; i++)
+            {
                 var actorImageControl = new Control.ActorImage(actorList[i]);
                 actorImageControl.Click += ActorButtonOnClick;
-
                 ActorSatckPanel.Children.Insert(i, actorImageControl);
             }
 
