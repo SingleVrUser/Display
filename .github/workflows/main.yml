@@ -59,7 +59,7 @@ jobs:
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
 
     env:
-      Solution_Name: Display                       # Replace with your solution name, i.e. MyWpfApp.sln.
+      Solution_Name: Display
       Project_Directory: Display
       Version: '0.${{ github.run_number }}.${{ github.run_attempt }}.0'
 
@@ -138,17 +138,16 @@ jobs:
 #        path: "Display-unpackaged-${{ matrix.Version }}.zip"
  
     - name: Create ZIP of x64 app
-      run: Compress-Archive Display/Packages/x64/*_Test 'Display_$env:Version_x64.zip'
-
+      run: Compress-Archive Display/Packages/Display*_x64_Test 'Display_$env:Version_x64.zip'
+      
     - name: Upload ZIP of x64 app
       uses: actions/upload-artifact@v2
       with:
         name: 'Display_$env:Version_x64.zip'
         path: 'Display_$env:Version_x64.zip'
 
-
     - name: Create ZIP of x86 app
-      run: Compress-Archive Display/Packages/x86/*_Test 'Display_$env:Version_x86.zip'
+      run: Compress-Archive Display/Packages/Display*_x86_Test 'Display_$env:Version_x86.zip'
 
     - name: Upload ZIP of x86 app
       uses: actions/upload-artifact@v2
