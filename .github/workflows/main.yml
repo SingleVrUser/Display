@@ -40,9 +40,9 @@ name: .NET Core Desktop
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
   workflow_dispatch:
 
 jobs:
@@ -52,6 +52,7 @@ jobs:
     strategy:
       matrix:
         configuration: [Release]
+        platform: [x64, x86]
 
     runs-on: windows-latest  # For a list of available runner types, refer to
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
@@ -100,14 +101,14 @@ jobs:
 
     # Create the app package by building and packaging the Windows Application Packaging project
     - name: Create the app package
-      run: msbuild $env:Solution_Name /p:AppxBundlePlatforms="$env:Appx_Bundle_Platforms" /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=Display_TemporaryKey.pfx /p:AppxPackageDir="$env:Appx_Package_Dir" /p:GenerateAppxPackageOnBuild=true /p:Platforms=x64 /p:RuntimeIdentifier=$env:RuntimeIdentifier
+      run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration /p:Platform=$env:Platform /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=Display_TemporaryKey.pfx /p:AppxPackageDir="$env:Appx_Package_Dir" /p:GenerateAppxPackageOnBuild=true /p:Platforms=x64 /p:RuntimeIdentifier=$env:RuntimeIdentifier
       env:
         Appx_Bundle: Never
-        Appx_Bundle_Platforms: x64
         Appx_Package_Build_Mode: SideloadOnly
-        RuntimeIdentifier: win10-x64
         Appx_Package_Dir: Packages\
+        RuntimeIdentifier: win10-x64
         Configuration: ${{ matrix.configuration }}
+        Platform: ${{ matrix.platform }}
 
     # Remove the pfx
  #   - name: Remove the pfx
