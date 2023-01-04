@@ -27,7 +27,7 @@ namespace Display.Views
         //List<ActorsInfo> actorinfoList;
 
         IncrementallLoadActorInfoCollection actorinfo;
-        List<ActorInfo> actorPartInfo;
+        ObservableCollection<ActorInfo> actorPartInfo = new();
 
         //过渡动画用
         private enum navigationAnimationType { image, gridView };
@@ -39,14 +39,13 @@ namespace Display.Views
         {
             this.InitializeComponent();
 
-            Page_Loaded();
         }
 
         private async void Page_Loaded()
         {
             ProgressRing.IsActive = true;
 
-            actorinfo = new(new() {  { "is_like", true }, { "prifile_path", true } });
+            actorinfo = new(new() { { "is_like", true }, { "prifile_path", true } });
 
             await actorinfo.LoadData();
             BasicGridView.ItemsSource = actorinfo;
@@ -56,12 +55,17 @@ namespace Display.Views
             ProgressRing.IsActive = false;
         }
 
+        private void CarouselControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            Page_Loaded();
+        }
+
         private async void LoadActorPartInfo(int count = 30)
         {
-            actorPartInfo = await DataAccess.LoadActorInfo(count,0,orderByList: new (){ { "RANDOM()", false } },
+            var infos = await DataAccess.LoadActorInfo(count,0,orderByList: new (){ { "RANDOM()", false } },
                                                                 filterList: new (){ "prifile_path != ''" });
-            CarouselControl.ItemsSource = actorPartInfo;
 
+            infos.ForEach(info => actorPartInfo.Add(info));
         }
 
         /// <summary>
@@ -178,6 +182,7 @@ namespace Display.Views
             else
                 return false;
         }
+
     }
 
 
