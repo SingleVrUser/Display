@@ -14,7 +14,7 @@ changelog:
       labels:
         - Semver-Major
         - breaking-change
-    - title: 新功能 🎉
+    - title: 更新 🎉
       labels:
         - Semver-Minor
         - enhancement
