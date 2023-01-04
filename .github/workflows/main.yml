@@ -46,7 +46,7 @@ on:
   workflow_dispatch:
    inputs:
       version: 
-        description: '�汾��'
+        description: '版本号'
         required: true
         default: '0.0.0.0'
 
