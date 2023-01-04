@@ -10,7 +10,7 @@ changelog:
     - title: BUG修复 🐛
       labels:
         - bug
-    - title: 重大改变 🛠
+    - title: 重大变化 🛠
       labels:
         - Semver-Major
         - breaking-change
@@ -18,6 +18,6 @@ changelog:
       labels:
         - Semver-Minor
         - enhancement
-    - title: Other Changes
+    - title: 其他变化
       labels:
         - "*"
