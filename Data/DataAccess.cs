@@ -252,18 +252,26 @@ namespace Data
             string singleActorName;
             string[] otherNames = null;
 
-            //针对演员的别名，添加到Actor_Names
-            var match_result = Regex.Match(actor_name, "(.*)[（（](.*)[)）]");
-            if (match_result.Success)
+            if(actor_name != null)
             {
-                singleActorName = match_result.Groups[1].Value;
+                //针对演员的别名，添加到Actor_Names
+                var match_result = Regex.Match(actor_name, "(.*)[（（](.*)[)）]");
+                if (match_result.Success)
+                {
+                    singleActorName = match_result.Groups[1].Value;
 
-                otherNames = match_result.Groups[2].Value.Split("、");
+                    otherNames = match_result.Groups[2].Value.Split("、");
+                }
+                else
+                {
+                    singleActorName = actor_name;
+                }
             }
             else
             {
-                singleActorName = actor_name;
+                singleActorName = string.Empty;
             }
+
 
             //插入演员信息（不存在时才插入）
             var actor_id = GetActorIdByName(singleActorName);
