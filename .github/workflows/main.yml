@@ -168,7 +168,7 @@ jobs:
         prerelease: true
         name: 'v${{ env.version }}'
         tag_name: 'v${{ env.version }}'
-        body: '初次安装请下载对应框架的zip压缩包（含安装证书、安装脚本），升级或重装仅需下载对应框架的msix包'
+        body: '\n> 初次安装请下载对应框架的zip压缩包（含安装证书、安装脚本），升级或重装仅需下载对应框架的msix包'
         files: |
           Display/Packages/**/Display*.msix
           Display_*.zip
