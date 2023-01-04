@@ -2154,12 +2154,23 @@ namespace Data
                 //selectCommand = new SqliteCommand ($"SELECT * from FilesInfo WHERE uid != 0 AND vdi != 0 AND n LIKE '%{leftName}%{rightNumber}%'", db);
                 selectCommand = new SqliteCommand($"SELECT * from FilesInfo WHERE uid != 0 AND iv = 1 AND n LIKE '%{leftName}%{rightNumber}%'", db);
 
-
                 SqliteDataReader query = selectCommand.ExecuteReader();
 
+                List<Datum> tmpList = new();
                 while (query.Read())
                 {
-                    data.Add(tryCovertQueryToDatum(query));
+                    tmpList.Add(tryCovertQueryToDatum(query));
+                }
+
+                //进一步筛选，通过右侧数字
+                // '%xxx%57%' 会选出 057、157、257之类的
+                foreach (var datum in tmpList)
+                {
+                    var match_result = Regex.Match(datum.n, @"([A-Za-z]+)[-_]?0?(\d+)");
+                    if (match_result.Success && match_result.Groups[2].Value == rightNumber)
+                        data.Add(datum);
+                    //其他的情况筛选掉
+
                 }
 
                 db.Close();
