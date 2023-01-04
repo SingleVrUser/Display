@@ -2169,7 +2169,6 @@ namespace Data
                     var match_result = Regex.Match(datum.n, @"([A-Za-z]+)[-_]?0?(\d+)");
                     if (match_result.Success && match_result.Groups[2].Value == rightNumber)
                         data.Add(datum);
-                    //其他的情况筛选掉
 
                 }
 
