@@ -118,7 +118,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: MSIX Package
-        path: WindowsAppSDKGallery/Packages/**/WindowsAppSDKGallery*.msix
+        path: Display/Packages/**/Display*.msix
         
         
         
@@ -129,13 +129,13 @@ jobs:
         Configuration: ${{ matrix.configuration }}
         
     - name: Create ZIP of unpackaged app
-      run: Compress-Archive WindowsAppSDKGallery/bin/x64/Release/net5.0-windows10.0.19041.0/publish/* 'WindowsAppSDKGallery-unpackaged-0.${{ github.run_number }}.${{ github.run_attempt }}.0.zip'
+      run: Compress-Archive Display/bin/x64/Release/net5.0-windows10.0.19041.0/publish/* 'Display-unpackaged-0.${{ github.run_number }}.${{ github.run_attempt }}.0.zip'
         
     - name: Upload unpackaged app
       uses: actions/upload-artifact@v2
       with:
         name: 'Unpackaged app'
-        path: 'WindowsAppSDKGallery-unpackaged-0.${{ github.run_number }}.${{ github.run_attempt }}.0.zip'
+        path: 'Display-unpackaged-0.${{ github.run_number }}.${{ github.run_attempt }}.0.zip'
         
 
     - name: Create GH release
@@ -148,6 +148,6 @@ jobs:
         tag_name: 'v0.${{ github.run_number }}.${{ github.run_attempt }}.0'
         body: 'To install the MSIX version, you first have to add the certificate included in the MSIX (only need to do that once). To install the unpackaged version, you need to install the x64 WinAppRuntime Installer.'
         files: |
-          WindowsAppSDKGallery/Packages/**/WindowsAppSDKGallery*.msix
-          WindowsAppSDKGallery-unpackaged-*.zip
+          Display/Packages/**/Display*.msix
+          Display-unpackaged-*.zip
         fail_on_unmatched_files: true
