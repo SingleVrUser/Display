@@ -142,8 +142,6 @@ namespace Display
                     case ContentDialogResult.Secondary:
                         AppSettings.IgnoreUpdateAppVersion = ReleaseCheck.LatestVersion;
                         break;
-
-
                     default:
                         return;
                 }
