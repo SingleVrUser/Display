@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation and Contributors.
+ï»¿// Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
 using CommunityToolkit.Mvvm.Input;
@@ -56,12 +56,12 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
 
     /// <summary>
-    /// ÖĞ×ªÕ¾ÎÄ¼ş
+    /// ä¸­è½¬ç«™æ–‡ä»¶
     /// </summary>
     ObservableCollection<TransferStationFiles> transferStationFiles;
 
     ///// <summary>
-    ///// »ØÊÕÕ¾³·ÏúÎÄ¼ş
+    ///// å›æ”¶ç«™æ’¤é”€æ–‡ä»¶
     ///// </summary>
     //List<FilesInfo> RecyFiles;
 
@@ -69,7 +69,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
     {
         this.InitializeComponent();
 
-        _units = new ObservableCollection<MetadataItem>() { new MetadataItem { Label = "¸ùÄ¿Â¼", Command = OpenFolderCommand, CommandParameter = "0" } };
+        _units = new ObservableCollection<MetadataItem>() { new MetadataItem { Label = "æ ¹ç›®å½•", Command = OpenFolderCommand, CommandParameter = "0" } };
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -81,7 +81,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Grid¼ÓÔØÊ±µ÷ÓÃ
+    /// GridåŠ è½½æ—¶è°ƒç”¨
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -112,13 +112,13 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
     {
         var currentItem = _units.FirstOrDefault(item => item.CommandParameter.ToString() == cid);
 
-        //²»´æÔÚ£¬·µ»Ø
+        //ä¸å­˜åœ¨ï¼Œè¿”å›
         if (currentItem.CommandParameter == null) return;
 
-        //É¾³ıÑ¡ÖĞÂ·¾¶ºóÃæµÄÂ·¾¶
+        //åˆ é™¤é€‰ä¸­è·¯å¾„åé¢çš„è·¯å¾„
         var index = _units.IndexOf(currentItem);
 
-        //²»´æÔÚ£¬·µ»Ø
+        //ä¸å­˜åœ¨ï¼Œè¿”å›
         if(index <0 ) return;
 
         for(int i= _units.Count-1; i> index; i--)
@@ -140,7 +140,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
     private async void ChangedFolder(FilesInfo filesInfo)
     {
-        //Ìø¹ıÎÄ¼ş
+        //è·³è¿‡æ–‡ä»¶
         if (filesInfo.Type == FilesInfo.FileType.File) return;
 
         await filesInfos.SetCid(filesInfo.Cid);
@@ -169,7 +169,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
     private void PlayButton_Click(object sender, RoutedEventArgs e)
     {
-        //¼ì²éÑ¡ÖĞµÄÎÄ¼ş»òÎÄ¼ş¼Ğ
+        //æ£€æŸ¥é€‰ä¸­çš„æ–‡ä»¶æˆ–æ–‡ä»¶å¤¹
         if (BaseExample.SelectedItems.FirstOrDefault() is not FilesInfo) return;
 
         List<FilesInfo> filesInfo = new();
@@ -192,13 +192,13 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
         switch (run.Text)
         {
-            case "Ãû³Æ":
+            case "åç§°":
                 ChangedOrder(WebApi.OrderBy.file_name, Name_Run);
                 break;
-            case "ĞŞ¸ÄÊ±¼ä":
+            case "ä¿®æ”¹æ—¶é—´":
                 ChangedOrder(WebApi.OrderBy.user_ptime, Time_Run);
                 break;
-            case "´óĞ¡":
+            case "å¤§å°":
                 ChangedOrder(WebApi.OrderBy.file_size, Size_Run);
                 break;
         }
@@ -308,15 +308,15 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
         if (e.DataView.Properties.Values.FirstOrDefault() is not List<Data.FilesInfo> sourceFilesInfos) return;
 
-        //115É¾³ı
+        //115åˆ é™¤
         ContentDialog dialog = new ContentDialog()
         {
             XamlRoot = this.XamlRoot,
-            Title = "È·ÈÏ",
-            PrimaryButtonText = "É¾³ı",
-            CloseButtonText = "·µ»Ø",
+            Title = "ç¡®è®¤",
+            PrimaryButtonText = "åˆ é™¤",
+            CloseButtonText = "è¿”å›",
             DefaultButton = ContentDialogButton.Close,
-            Content = "¸Ã²Ù×÷½«É¾³ı115ÍøÅÌÖĞµÄÎÄ¼ş£¬È·ÈÏÉ¾³ı£¿"
+            Content = "è¯¥æ“ä½œå°†åˆ é™¤115ç½‘ç›˜ä¸­çš„æ–‡ä»¶ï¼Œç¡®è®¤åˆ é™¤ï¼Ÿ"
         };
 
         var result = await dialog.ShowAsync();
@@ -328,10 +328,10 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
             if(webApi==null) webApi = new();
             await webApi.DeleteFiles(sourceFilesInfos.FirstOrDefault().datum.pid, sourceFilesInfos.Select(item =>
             {
-                //ÎÄ¼ş
+                //æ–‡ä»¶
                 if (item.Fid != null)
                     return item.Fid;
-                //ÎÄ¼ş¼Ğ
+                //æ–‡ä»¶å¤¹
                 else
                 {
                     return item.Cid;
@@ -363,17 +363,17 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
         int index = GetInsertIndex(target, e);
 
-        //ÔÚ·¶Î§Ö®Íâ£¬ÍË³ö
+        //åœ¨èŒƒå›´ä¹‹å¤–ï¼Œé€€å‡º
         if (index == -1)
         {
-            System.Diagnostics.Debug.WriteLine("ÔÚ·¶Î§Ö®Íâ£¬ÍË³ö");
+            System.Diagnostics.Debug.WriteLine("åœ¨èŒƒå›´ä¹‹å¤–ï¼Œé€€å‡º");
 
-            //ÎÄ¼şÁĞ±íÖĞµÄ
+            //æ–‡ä»¶åˆ—è¡¨ä¸­çš„
             if (filesInfos.Contains(sourceFilesInfos.FirstOrDefault()))
             {
 
             }
-            //ÖĞ×ªÕ¾µÄ
+            //ä¸­è½¬ç«™çš„
             else
             {
                 await Move115Files(filesInfos.cid, sourceFilesInfos);
@@ -386,11 +386,11 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
         }
         else
         {
-            //Ä¿±êÓëÒÆ¶¯ÎÄ¼şÓĞÖØºÏ£¬ÍË³ö
+            //ç›®æ ‡ä¸ç§»åŠ¨æ–‡ä»¶æœ‰é‡åˆï¼Œé€€å‡º
             var item = filesInfos[index];
             if (sourceFilesInfos.Contains(item))
             {
-                System.Diagnostics.Debug.WriteLine("Ä¿±êÓëÒÆ¶¯ÎÄ¼şÓĞÖØºÏ£¬ÍË³ö");
+                System.Diagnostics.Debug.WriteLine("ç›®æ ‡ä¸ç§»åŠ¨æ–‡ä»¶æœ‰é‡åˆï¼Œé€€å‡º");
                 return;
             }
 
@@ -400,7 +400,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
     }
 
     /// <summary>
-    /// ÒÆ¶¯115ÎÄ¼ş
+    /// ç§»åŠ¨115æ–‡ä»¶
     /// </summary>
     /// <returns></returns>
     private async Task Move115Files(string pid, List<FilesInfo> files)
@@ -408,29 +408,29 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
         if (webApi == null) webApi = new();
         await webApi.MoveFiles(pid, files.Select(item =>
         {
-            //ÎÄ¼ş¼Ğ
+            //æ–‡ä»¶å¤¹
             if(item.Type == FilesInfo.FileType.Folder)
             {
                 return item.Cid;
             }
-            //ÎÄ¼ş
+            //æ–‡ä»¶
             else
             {
                 return item.Fid;
             }
         }).ToList());
 
-        //É¾³ıÁĞ±íÎÄ¼ş
+        //åˆ é™¤åˆ—è¡¨æ–‡ä»¶
         foreach(var item in files)
         {
-            //ÎÄ¼şÁĞ±íÖĞµÄ
+            //æ–‡ä»¶åˆ—è¡¨ä¸­çš„
             if (filesInfos.Contains(item))
             {
                 filesInfos.Remove(item);
             }
         }
 
-        // É¾³ıÖĞ×ªÕ¾ÁĞ±í
+        // åˆ é™¤ä¸­è½¬ç«™åˆ—è¡¨
         if (transferStationFiles != null)
         {
             var transferFiles = transferStationFiles.Where(item =>
@@ -526,7 +526,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
             return;
         }
 
-        //È·ÈÏ¶Ô»°¿ò
+        //ç¡®è®¤å¯¹è¯æ¡†
         var receiveResult = await ShowContentDialog(nameList);
         if (receiveResult == ContentDialogResult.Primary)
         {
@@ -537,7 +537,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
     }
 
     /// <summary>
-    /// ÏÔÊ¾È·ÈÏÌáÊ¾¿ò
+    /// æ˜¾ç¤ºç¡®è®¤æç¤ºæ¡†
     /// </summary>
     /// <param name="selectedItemList"></param>
     /// <returns></returns>
@@ -545,7 +545,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
     {
         StackPanel readyStackPanel = new StackPanel();
 
-        readyStackPanel.Children.Add(new TextBlock() { Text = "Ñ¡ÖĞÎÄ¼ş¼Ğ£º" });
+        readyStackPanel.Children.Add(new TextBlock() { Text = "é€‰ä¸­æ–‡ä»¶å¤¹ï¼š" });
         int index = 0;
 
         foreach (var name in NameList)
@@ -564,7 +564,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
         readyStackPanel.Children.Add(
             new TextBlock()
             {
-                Text = "Î´½øÈëÒş²ØÏµÍ³µÄÇé¿öÏÂ£¬Òş²ØµÄÎÄ¼ş½«±»Ìø¹ı£¬ÇëÖªÏş",
+                Text = "æœªè¿›å…¥éšè—ç³»ç»Ÿçš„æƒ…å†µä¸‹ï¼Œéšè—çš„æ–‡ä»¶å°†è¢«è·³è¿‡ï¼Œè¯·çŸ¥æ™“",
                 TextWrapping = TextWrapping.Wrap,
                 Foreground = new SolidColorBrush(Colors.LightGray),
                 MaxWidth = 300,
@@ -574,9 +574,9 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
         ContentDialog dialog = new ContentDialog();
 
         dialog.XamlRoot = this.XamlRoot;
-        dialog.Title = "È·ÈÏºó¼ÌĞø";
-        dialog.PrimaryButtonText = "¼ÌĞø";
-        dialog.CloseButtonText = "È¡Ïû";
+        dialog.Title = "ç¡®è®¤åç»§ç»­";
+        dialog.PrimaryButtonText = "ç»§ç»­";
+        dialog.CloseButtonText = "å–æ¶ˆ";
         dialog.DefaultButton = ContentDialogButton.Primary;
         dialog.Content = readyStackPanel;
 
@@ -590,19 +590,19 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
         ContentDialog dialog = new ContentDialog();
 
         dialog.XamlRoot = this.XamlRoot;
-        dialog.Title = "È·ÈÏºó¼ÌĞø";
-        dialog.PrimaryButtonText = "¼ÌĞø";
-        dialog.CloseButtonText = "È¡Ïû";
+        dialog.Title = "ç¡®è®¤åç»§ç»­";
+        dialog.PrimaryButtonText = "ç»§ç»­";
+        dialog.CloseButtonText = "å–æ¶ˆ";
         dialog.DefaultButton = ContentDialogButton.Close;
 
         RichTextBlock TextHighlightingRichTextBlock = new();
 
         Paragraph paragraph = new();
-        paragraph.Inlines.Add(new Run() { Text = "¸Ã²Ù×÷½«" });
-        paragraph.Inlines.Add(new Run() { Text = "É¾³ı", Foreground = new SolidColorBrush(Colors.OrangeRed), FontWeight = FontWeights.Bold, FontSize = 15 });
-        paragraph.Inlines.Add(new Run() { Text = "Ö®Ç°µ¼ÈëµÄ" });
-        paragraph.Inlines.Add(new Run() { Text = "ËùÓĞ", Foreground = new SolidColorBrush(Colors.OrangeRed) });
-        paragraph.Inlines.Add(new Run() { Text = "115Êı¾İ" });
+        paragraph.Inlines.Add(new Run() { Text = "è¯¥æ“ä½œå°†" });
+        paragraph.Inlines.Add(new Run() { Text = "åˆ é™¤", Foreground = new SolidColorBrush(Colors.OrangeRed), FontWeight = FontWeights.Bold, FontSize = 15 });
+        paragraph.Inlines.Add(new Run() { Text = "ä¹‹å‰å¯¼å…¥çš„" });
+        paragraph.Inlines.Add(new Run() { Text = "æ‰€æœ‰", Foreground = new SolidColorBrush(Colors.OrangeRed) });
+        paragraph.Inlines.Add(new Run() { Text = "115æ•°æ®" });
 
         TextHighlightingRichTextBlock.Blocks.Add(paragraph);
 
@@ -630,7 +630,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
     {
         if (BaseExample.SelectedItems is null)
         {
-            ShowTeachingTip("µ±Ç°Î´Ñ¡ÖĞÒªÏÂÔØµÄÎÄ¼ş»òÎÄ¼ş¼Ğ");
+            ShowTeachingTip("å½“å‰æœªé€‰ä¸­è¦ä¸‹è½½çš„æ–‡ä»¶æˆ–æ–‡ä»¶å¤¹");
             return;
         }
         else
@@ -654,11 +654,11 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
                 videoinfos.Add(datum);
             }
 
-            //BitCometÖ»ĞèÒªcid,n,pcÈı¸öÖµ
+            //BitCometåªéœ€è¦cid,n,pcä¸‰ä¸ªå€¼
             bool isSuccess = await webApi.RequestDown(videoinfos, downtype);
 
             if (!isSuccess)
-                ShowTeachingTip("ÇëÇóÏÂÔØÊ§°Ü");
+                ShowTeachingTip("è¯·æ±‚ä¸‹è½½å¤±è´¥");
         }
     }
 
@@ -687,7 +687,7 @@ class TransferStationFiles
         }
         else if(transferFiles.Count > 1)
         {
-            this.Name = $"{transferFiles.FirstOrDefault().Name} µÈ{transferFiles.Count}¸öÎÄ¼ş";
+            this.Name = $"{transferFiles.FirstOrDefault().Name} ç­‰{transferFiles.Count}ä¸ªæ–‡ä»¶";
         }
 
         this.TransferFiles = transferFiles;

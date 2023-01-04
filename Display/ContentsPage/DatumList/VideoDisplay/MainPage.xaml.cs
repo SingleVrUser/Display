@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation and Contributors.
+ï»¿// Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
 using CommunityToolkit.Mvvm.Input;
@@ -61,7 +61,7 @@ public sealed partial class MainPage : Page
         FilesInfos = new();
         filesInfos.ForEach(item => FilesInfos.Add(item));
 
-        _units = new ObservableCollection<MetadataItem>() { new MetadataItem { Label = "²¥·ÅÁĞ±í", Command = OpenFolderCommand, CommandParameter = "0" } };
+        _units = new ObservableCollection<MetadataItem>() { new MetadataItem { Label = "æ’­æ”¾åˆ—è¡¨", Command = OpenFolderCommand, CommandParameter = "0" } };
         metadataControl.Items = _units;
         network = new();
         webApi = new();
@@ -95,13 +95,13 @@ public sealed partial class MainPage : Page
     {
         var currentItem = _units.FirstOrDefault(item => item.CommandParameter.ToString() == cid);
 
-        //²»´æÔÚ£¬·µ»Ø
+        //ä¸å­˜åœ¨ï¼Œè¿”å›
         if (currentItem.CommandParameter == null) return;
 
-        //É¾³ıÑ¡ÖĞÂ·¾¶ºóÃæµÄÂ·¾¶
+        //åˆ é™¤é€‰ä¸­è·¯å¾„åé¢çš„è·¯å¾„
         var index = _units.IndexOf(currentItem);
 
-        //²»´æÔÚ£¬·µ»Ø
+        //ä¸å­˜åœ¨ï¼Œè¿”å›
         if (index < 0) return;
 
         for (int i = _units.Count - 1; i > index; i--)
@@ -109,7 +109,7 @@ public sealed partial class MainPage : Page
             _units.RemoveAt(i);
         }
 
-        //Ñ¡ÖĞµÄÊÇµÚÒ»Ïî
+        //é€‰ä¸­çš„æ˜¯ç¬¬ä¸€é¡¹
         if (index == 0)
         {
             VideoShow_ListView.ItemsSource = FilesInfos;
@@ -125,7 +125,7 @@ public sealed partial class MainPage : Page
 
     public void CreateWindow()
     {
-        CommonWindow window = new CommonWindow("²¥·Å");
+        CommonWindow window = new CommonWindow("æ’­æ”¾");
 
         window.Closed += Window_Closed;
         window.Content = this;
@@ -167,7 +167,7 @@ public sealed partial class MainPage : Page
 
     private async void ChangedFolder(FilesInfo filesInfo)
     {
-        //Ìø¹ıÎÄ¼ş
+        //è·³è¿‡æ–‡ä»¶
         if (filesInfo.Type == FilesInfo.FileType.File) return;
 
         if (FilesInfosCollection == null)
@@ -195,7 +195,7 @@ public sealed partial class MainPage : Page
 
     private void PlayVideoButton_Click(object sender, RoutedEventArgs e)
     {
-        //¼ì²éÑ¡ÖĞµÄÎÄ¼ş»òÎÄ¼ş¼Ğ
+        //æ£€æŸ¥é€‰ä¸­çš„æ–‡ä»¶æˆ–æ–‡ä»¶å¤¹
         if (!(VideoShow_ListView.SelectedItems.FirstOrDefault() is FilesInfo)) return;
 
         List<FilesInfo> filesInfo = new();
@@ -240,14 +240,14 @@ public sealed partial class MainPage : Page
         foreach (var file in filesInfo.Take(4))
         {
             string videoUrl = null;
-            //×ªÂë³É¹¦£¬¿ÉÒÔÓÃm3u8
+            //è½¬ç æˆåŠŸï¼Œå¯ä»¥ç”¨m3u8
             if (file.datum.vdi != 0)
             {
                 var m3u8Infos = await webApi.Getm3u8InfoByPickCode(file.datum.pc);
 
                 if (m3u8Infos.Count > 0)
                 {
-                    //Ñ¡Ôñ×î¸ß·Ö±æÂÊµÄ²¥·Å
+                    //é€‰æ‹©æœ€é«˜åˆ†è¾¨ç‡çš„æ’­æ”¾
                     videoUrl = m3u8Infos[0].Url;
                 }
             }
@@ -258,9 +258,9 @@ public sealed partial class MainPage : Page
 
             MenuFlyout menuFlyout = new();
 
-            var MenuFlyoutItem = new MenuFlyoutItem() { Text = "É¾³ıÎÄ¼ş",Icon = new FontIcon() { FontFamily = new FontFamily("Segoe Fluent Icons"), Glyph= "\uE107" } };
+            var MenuFlyoutItem = new MenuFlyoutItem() { Text = "åˆ é™¤æ–‡ä»¶",Icon = new FontIcon() { FontFamily = new FontFamily("Segoe Fluent Icons"), Glyph= "\uE107" } };
             MenuFlyoutItem.Click += DeletedFileButton_Click;
-            //ÎªÉ¾³ı¼üÌí¼ÓDataContent
+            //ä¸ºåˆ é™¤é”®æ·»åŠ DataContent
             MenuFlyoutItem.DataContext = file;
 
             menuFlyout.Items.Add(MenuFlyoutItem);
@@ -299,26 +299,26 @@ public sealed partial class MainPage : Page
     {
         Dictionary<string, VideoInfo> cidInfoDicts = new();
 
-        //ËÑ¹Î
+        //æœåˆ®
         foreach (var video in filesInfos)
         {
             var name = video.Name;
             var cid = FileMatch.MatchName(name);
             if (cid == null) continue;
 
-            //ÒÑ´æÔÚ£¬Ìø¹ı
+            //å·²å­˜åœ¨ï¼Œè·³è¿‡
             if (cidInfoDicts.ContainsKey(cid) == true) continue;
 
             var result = DataAccess.SelectTrueName(name);
 
             VideoInfo cidInfo = null;
-            //Êı¾İ¿âÖĞÓĞ
+            //æ•°æ®åº“ä¸­æœ‰
             if (result.Count != 0)
             {
-                //Ê¹ÓÃµÚÒ»¸ö·ûºÏÌõ¼şµÄName
+                //ä½¿ç”¨ç¬¬ä¸€ä¸ªç¬¦åˆæ¡ä»¶çš„Name
                 cidInfo = DataAccess.LoadOneVideoInfoByCID(result[0]);
             }
-            //ÍøÂçÖĞ²éÑ¯
+            //ç½‘ç»œä¸­æŸ¥è¯¢
             else
             {
                 bool isFc = FileMatch.IsFC2(cid);
@@ -407,33 +407,33 @@ public sealed partial class MainPage : Page
 
         if (result == ContentDialogResult.Primary)
         {
-            //É¾³ı115ÎÄ¼ş
+            //åˆ é™¤115æ–‡ä»¶
             await webApi.DeleteFiles(fileInfo.Cid, new() { fileInfo.Fid });
 
-            //ÒÆ³ı²¥·ÅÁĞ±í
+            //ç§»é™¤æ’­æ”¾åˆ—è¡¨
             if (FilesInfos.Contains(fileInfo)) FilesInfos.Remove(fileInfo);
 
-            //ÒÆ³ıÕıÔÚ²¥·ÅÁĞ±í
+            //ç§»é™¤æ­£åœ¨æ’­æ”¾åˆ—è¡¨
             if (PlayingVideoInfos.Contains(fileInfo)) PlayingVideoInfos.Remove(fileInfo);
 
-            //ÒÆ³ıcidĞÅÏ¢
+            //ç§»é™¤cidä¿¡æ¯
             var cid = CidInfos.Where(item => item.truename == FileMatch.MatchName(fileInfo.Name).ToUpper()).FirstOrDefault();
             if (cid != null)
             {
                 CidInfos.Remove(cid);
             }
 
-            //ÒÆ³ıÕıÔÚ²¥·ÅµÄÊÓÆµ
+            //ç§»é™¤æ­£åœ¨æ’­æ”¾çš„è§†é¢‘
             var media = Video_UniformGrid.Children.Where(item => (item as MediaPlayerElement).Tag.ToString() == fileInfo.datum.pc).FirstOrDefault();
             if (media != null)
             {
                 Video_UniformGrid.Children.Remove(media);
             }
 
-            //ĞŞ¸Ä²¼¾Ö
+            //ä¿®æ”¹å¸ƒå±€
             ChangedVideo_UniformGrid(Video_UniformGrid.Children.Count);
 
-            //É¾³ı×ÊÔ´¹ÜÀíÆ÷µÄÎÄ¼ş£¬Èç¹û´æÔÚ£¨ÓĞ¿ÉÄÜÒÑ¾­¹ØµôÁË£©
+            //åˆ é™¤èµ„æºç®¡ç†å™¨çš„æ–‡ä»¶ï¼Œå¦‚æœå­˜åœ¨ï¼ˆæœ‰å¯èƒ½å·²ç»å…³æ‰äº†ï¼‰
             if (LastFilesListView.IsLoaded && LastFilesListView.ItemsSource is IncrementallLoadDatumCollection filesInfos && filesInfos.Contains(fileInfo))
             {
                 filesInfos.Remove(fileInfo);
@@ -447,11 +447,11 @@ public sealed partial class MainPage : Page
         ContentDialog dialog = new ContentDialog()
         {
             XamlRoot = this.XamlRoot,
-            Title = "È·ÈÏ",
-            PrimaryButtonText = "É¾³ı",
-            CloseButtonText = "·µ»Ø",
+            Title = "ç¡®è®¤",
+            PrimaryButtonText = "åˆ é™¤",
+            CloseButtonText = "è¿”å›",
             DefaultButton = ContentDialogButton.Close,
-            Content = "¸Ã²Ù×÷½«É¾³ı115ÍøÅÌÖĞµÄÎÄ¼ş£¬È·ÈÏÉ¾³ı£¿"
+            Content = "è¯¥æ“ä½œå°†åˆ é™¤115ç½‘ç›˜ä¸­çš„æ–‡ä»¶ï¼Œç¡®è®¤åˆ é™¤ï¼Ÿ"
         };
 
         return await dialog.ShowAsync();
@@ -459,7 +459,7 @@ public sealed partial class MainPage : Page
 
     private async Task DeletedFilesFromListView(ListView listView, ObservableCollection<FilesInfo> filesInfos)
     {
-        //¼ì²éÑ¡ÖĞµÄÎÄ¼ş»òÎÄ¼ş¼Ğ
+        //æ£€æŸ¥é€‰ä¸­çš„æ–‡ä»¶æˆ–æ–‡ä»¶å¤¹
         if (!(listView.SelectedItems.FirstOrDefault() is FilesInfo)) return;
 
         List<FilesInfo> filesInfo = new();
@@ -474,7 +474,7 @@ public sealed partial class MainPage : Page
 
         if (result == ContentDialogResult.Primary)
         {
-            System.Diagnostics.Debug.WriteLine("É¾³ı");
+            System.Diagnostics.Debug.WriteLine("åˆ é™¤");
 
             filesInfo.ForEach(item => filesInfos.Remove(item));
 
