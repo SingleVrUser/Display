@@ -72,7 +72,7 @@ jobs:
       uses: mingjun97/file-regex-replace@v1
       with:
         regex: 'Version="([0-9\.]*)"'
-        replacement: 'Version="$env:Version"'
+        replacement: 'Version="${env:Version}"'
         include: Package.appxmanifest
 
 
