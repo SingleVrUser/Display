@@ -34,7 +34,7 @@ public sealed partial class MainPage : Page
 
     public void CreateWindow()
     {
-        CommonWindow window = new CommonWindow("¹éµµÕûÀí");
+        CommonWindow window = new CommonWindow("å½’æ¡£æ•´ç†");
         window.Content = this;
         window.Activate();
     }
