@@ -52,7 +52,7 @@ jobs:
     strategy:
       matrix:
         configuration: [Release]
-        platform: [x86]
+        platform: [x64,x86]
 
     runs-on: windows-latest  # For a list of available runner types, refer to
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
@@ -158,11 +158,11 @@ jobs:
       if: github.ref_name == 'main'
       uses: softprops/action-gh-release@v1
       with:
-        draft: false
+        draft: true
         prerelease: true
-        name: $env:version
+        name: 'v${{ env.version }}'
         tag_name: 'v${{ env.version }}'
-        body: 'To install the MSIX version, you first have to add the certificate included in the MSIX (only need to do that once). To install the unpackaged version, you need to install the x64 WinAppRuntime Installer.'
+        body: '初次安装请下载对应框架的zip压缩包（含安装证书、安装脚本），升级或重装仅需下载对应框架的msix包'
         files: |
           Display/Packages/**/Display*.msix
           Display_*.zip
