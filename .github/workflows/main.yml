@@ -122,7 +122,7 @@ jobs:
         name: MSIX Package
         path: Display/Packages/**/Display*.msix
         
-    # Create the unpackaged app
+#    # Create the unpackaged app
 #    - name: Build unpackaged app
 #      run: msbuild $env:Solution_Name /t:Publish /p:WindowsPackageType=None /p:Configuration=$env:Configuration /p:Platform=x64
 #      env:
