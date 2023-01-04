@@ -129,7 +129,7 @@ jobs:
         Configuration: ${{ matrix.configuration }}
         
     - name: Create ZIP of unpackaged app
-      run: Compress-Archive Display/bin/x64/Release/net5.0-windows10.0.19041.0/publish/* 'Display-unpackaged-0.${{ github.run_number }}.${{ github.run_attempt }}.0.zip'
+      run: Compress-Archive Display/bin/x64/Release/net6.0-windows10.0.19041.0/publish/* 'Display-unpackaged-0.${{ github.run_number }}.${{ github.run_attempt }}.0.zip'
         
     - name: Upload unpackaged app
       uses: actions/upload-artifact@v2
