@@ -19,4 +19,9 @@
       <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
       <PackageReference Include="RestSharp" Version="108.0.3" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Package\" />
+    <Folder Include="App.Package\" />
+  </ItemGroup>
 </Project>
