@@ -2408,7 +2408,6 @@ namespace Data
         {
             List<VideoInfo> data = new List<VideoInfo>();
 
-            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
             new SqliteConnection($"Filename={dbpath}"))
             {

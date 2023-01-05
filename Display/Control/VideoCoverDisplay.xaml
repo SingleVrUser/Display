@@ -665,7 +665,7 @@
                                   VerticalAlignment="Center"
                                   IsChecked="{x:Bind data:FileMatch.isLike(actorInfo.is_like),Mode=OneWay}"
                                   Click="LikeButton_Click"
-                                  Tag="{x:Bind actorInfo.id}"
+                                  Tag="{x:Bind actorInfo.id,Mode=OneWay}"
                                   Visibility="{x:Bind isShowHeaderCover,Mode=OneWay}" />
 
                     <Grid Grid.Column="1"

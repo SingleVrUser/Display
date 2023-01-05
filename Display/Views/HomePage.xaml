@@ -94,7 +94,7 @@
                                             CornerRadius="3">
                                             <Image Source="{x:Bind imagepath}" Tapped="Image_Tapped"/>
                                         </Border>
-
+ 
                                     </DataTemplate>
                                 </FlipView.ItemTemplate>
                             </FlipView>
