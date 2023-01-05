@@ -299,15 +299,21 @@ public sealed partial class MainPage : Page
     {
         Dictionary<string, VideoInfo> cidInfoDicts = new();
 
+        string noPicturePath = "ms-appx:///Assets/NoPicture.jpg";
+
         //搜刮
         foreach (var video in filesInfos)
         {
             var name = video.Name;
             var cid = FileMatch.MatchName(name);
-            if (cid == null) continue;
+            if (cid == null)
+            {
+                cidInfoDicts.Add(name, new() { truename = name ,imagepath= noPicturePath });
+                continue;
+            }
 
             //已存在，跳过
-            if (cidInfoDicts.ContainsKey(cid) == true) continue;
+            if (cidInfoDicts.ContainsKey(name) == true) continue;
 
             var result = DataAccess.SelectTrueName(name);
 
@@ -339,9 +345,10 @@ public sealed partial class MainPage : Page
                     cidInfo = await network.SearchInfoFromJavDB(cid);
             }
 
-            if (cidInfo == null) continue;
+            if (cidInfo == null) cidInfo = new() { truename = cid, imagepath = noPicturePath };
 
-            cidInfoDicts.Add(cid, cidInfo);
+            cidInfoDicts.Add(name, cidInfo);
+
         }
 
         return cidInfoDicts;
