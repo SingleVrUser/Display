@@ -16,6 +16,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.System;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -34,6 +35,14 @@ namespace Display.ContentsPage
             this.InitializeComponent();
 
             this.ReleaseInfo = releaseInfo;
+        }
+
+        private async void MarkdownTextBlock_LinkClicked(object sender, CommunityToolkit.WinUI.UI.Controls.LinkClickedEventArgs e)
+        {
+            if (Uri.TryCreate(e.Link, UriKind.Absolute, out Uri link))
+            {
+                await Launcher.LaunchUriAsync(link);
+            }
         }
     }
 }

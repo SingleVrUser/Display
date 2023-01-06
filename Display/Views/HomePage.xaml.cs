@@ -13,6 +13,8 @@ using System.Linq;
 using OpenCvSharp.Flann;
 using System.ComponentModel;
 using CommunityToolkit.WinUI.UI.Controls;
+using Microsoft.UI.Xaml.Data;
+using System.Xml.Linq;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -52,9 +54,14 @@ namespace Display.Views
             //随机获取20个视频，每次启动自动获取一遍
             foreach (var item in DataAccess.getNameAndIamgeRandom())
             {
-                Items.Add(new VideoCoverDisplayClass(item,500,300));
+                var info = new VideoCoverDisplayClass(item, 500, 300);
+                Items.Add(info);
             }
 
+
+            //ImagePipsPager.DataContext = randomIamgeFlipView;
+            Binding binding = new Binding() { Path = new PropertyPath("SelectedIndex"), Mode = BindingMode.TwoWay };
+            ImagePipsPager.SetBinding(PipsPager.SelectedPageIndexProperty, binding);
         }
 
         private void MultipleCoverShow_ItemClick(object sender, ItemClickEventArgs e)
@@ -103,12 +110,25 @@ namespace Display.Views
 
         private void videoInfoListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            videoInfoListView.ScrollIntoView((sender as ListView).SelectedItem);
+            if (sender is not ListView listView) return;
+
+            if (videoInfoListView.ItemsSource is not ObservableCollection<VideoCoverDisplayClass> items) return;
+
+            if (listView.SelectedItem is not VideoInfo videoInfo) return;
+
+            if (items.Contains(videoInfo))
+            {
+                videoInfoListView.ScrollIntoView(videoInfo);
+            }
         }
 
         private void UpdateRandomCover_Click(object sender, RoutedEventArgs e)
         {
             RefreshHyperlinkButton.IsEnabled = false;
+
+            ImagePipsPager.ClearValue(PipsPager.SelectedPageIndexProperty);
+            videoInfoListView.SelectionChanged -= videoInfoListView_SelectionChanged;
+
             Items.Clear();
 
             //随机获取20个视频
@@ -117,7 +137,15 @@ namespace Display.Views
                 Items.Add(new VideoCoverDisplayClass(item,500,300));
             }
 
+            videoInfoListView.SelectionChanged += videoInfoListView_SelectionChanged;
+
+            Binding binding = new Binding() { Path = new PropertyPath("SelectedIndex"), Mode = BindingMode.TwoWay };
+            ImagePipsPager.SetBinding(PipsPager.SelectedPageIndexProperty, binding);
+
+
+
             RefreshHyperlinkButton.IsEnabled = true;
+
         }
 
         protected async override void OnNavigatedTo(NavigationEventArgs e)
@@ -229,10 +257,6 @@ namespace Display.Views
             Frame.Navigate(typeof(ActorInfoPage), TypesAndName);
         }
 
-        private void AdaptiveGridView_ItemClick(object sender, ItemClickEventArgs e)
-        {
-
-        }
     }
 
 }
