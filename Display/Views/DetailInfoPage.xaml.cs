@@ -158,9 +158,7 @@ namespace Display.Views
             else if (videoInfoList.Count == 1)
             {
 
-                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
                 await PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
-                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             }
 
             //有多集
@@ -190,9 +188,7 @@ namespace Display.Views
 
             if (!(e.ClickedItem is Data.Datum SingleVideoInfo)) return;
 
-            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
             await PlayeVideo(SingleVideoInfo.pc,this.XamlRoot);
-            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
 
         private async static void SubInfoListView_ItemClick(object sender, ItemClickEventArgs e)

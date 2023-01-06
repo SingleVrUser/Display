@@ -40,7 +40,7 @@
                             <Button Content="苗条"/>-->
                             <ProgressRing x:Name="ProgressRing"/>
                         </StackPanel>
-                        <TextBlock Text="{x:Bind actorinfo.AllCount}"
+                        <TextBlock x:Name="TotalCount_TextBlock"
                            RelativePanel.AlignLeftWithPanel="True"
                            RelativePanel.AlignVerticalCenterWithPanel="True"
                            Margin="0,0,10,0"

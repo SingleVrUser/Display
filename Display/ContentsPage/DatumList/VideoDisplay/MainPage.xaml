@@ -12,9 +12,6 @@
       mc:Ignorable="d">
 
     <Page.Resources>
-        <SolidColorBrush x:Key="MediaTransportControlsPanelBackground"
-                         Color="#80ffffff" />
-
         <Style TargetType="Pivot">
             <Setter Property="HeaderTemplate">
                 <Setter.Value>

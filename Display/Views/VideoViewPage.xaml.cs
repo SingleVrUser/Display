@@ -25,19 +25,15 @@ namespace Display.Views
 
             //启动缓存（为了返回无需过长等待，也为了返回动画）
             NavigationCacheMode = Microsoft.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
-
         }
-
 
         private async void SingleVideoPlay_Click(object sender, RoutedEventArgs e)
         {
-            var VideoPlayButton = (Button)sender;
-            var datum = VideoPlayButton.DataContext as Datum;
+            if (sender is not Button VideoPlayButton) return;
 
+            if (VideoPlayButton.DataContext is not Datum datum) return;
 
-            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
             await Views.DetailInfoPage.PlayeVideo(datum.pc, this.XamlRoot);
-            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
 
         /// <summary>
@@ -75,7 +71,6 @@ namespace Display.Views
             else if (videoInfoList.Count == 1)
             {
 
-                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
                 await Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
                 ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             }
@@ -105,9 +100,7 @@ namespace Display.Views
         {
             var SingleVideoInfo = e.ClickedItem as Data.Datum;
 
-            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
             await Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc, this.XamlRoot);
-            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)

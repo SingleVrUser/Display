@@ -126,9 +126,7 @@ namespace Display.Views
             if(videoInfo.series == "fail")
             {
 
-                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
                 await Views.DetailInfoPage.PlayeVideo(videoInfo.imageurl, this.XamlRoot);
-                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
                 return;
             }
 
@@ -145,9 +143,7 @@ namespace Display.Views
             }
             else if (videoInfoList.Count == 1)
             {
-                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
                 await Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
-                ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             }
 
             //有多集
@@ -175,12 +171,18 @@ namespace Display.Views
         {
             var SingleVideoInfo = e.ClickedItem as Data.Datum;
 
-            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
             await Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc, this.XamlRoot);
-            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
 
 
+        private async void SingleVideoPlayClick(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button VideoPlayButton) return;
+
+            if (VideoPlayButton.DataContext is not Datum datum) return;
+
+            await Views.DetailInfoPage.PlayeVideo(datum.pc, this.XamlRoot);
+        }
     }
 
 }
