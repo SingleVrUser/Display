@@ -62,22 +62,22 @@ namespace Display.Control
             if (webApi == null) webApi = new();
 
 
-            //ÏÈÔ­»­
-            List<Quality> QualityItemsSource = new() { new("Ô­»­", pickCode: PickCode) };
+            //å…ˆåŸç”»
+            List<Quality> QualityItemsSource = new() { new("åŸç”»", pickCode: PickCode) };
 
             var m3u8InfoList = await webApi.Getm3u8InfoByPickCode(PickCode);
 
             string url = null;
 
-            //ÓĞm3u8
+            //æœ‰m3u8
             if (m3u8InfoList != null && m3u8InfoList.Count > 0)
             {
-                //ºóm3u8
+                //åm3u8
                 m3u8InfoList.ForEach(item => QualityItemsSource.Add(new(item.Name, item.Url)));
 
                 url = m3u8InfoList.FirstOrDefault()?.Url;
             }
-            //Ã»ÓĞm3u8£¬»ñÈ¡ÏÂÔØÁ´½Ó²¥·Å
+            //æ²¡æœ‰m3u8ï¼Œè·å–ä¸‹è½½é“¾æ¥æ’­æ”¾
             else
             {
                 var downUrlList = webApi.GetDownUrl(PickCode,GetInfoFromNetwork.MediaElementUserAgent);
@@ -108,12 +108,12 @@ namespace Display.Control
         {
             if (string.IsNullOrEmpty(url)) return;
 
-            //Ìí¼Ó²¥·ÅÁ´½Ó
+            //æ·»åŠ æ’­æ”¾é“¾æ¥
             MediaSource ms = MediaSource.CreateFromUri(new Uri(url));
 
             var media = new MediaPlayer();
 
-            //Ìí¼Ó×ÖÄ»ÎÄ¼ş
+            //æ·»åŠ å­—å¹•æ–‡ä»¶
             if (subDicts != null && subDicts.Count!=0)
             {
                 ms.ExternalTimedTextSources.Clear();
@@ -123,7 +123,7 @@ namespace Display.Control
                     string subPickCode = item.Key;
                     string subName = item.Value;
 
-                    //ÏÂÔØ×ÖÄ»
+                    //ä¸‹è½½å­—å¹•
                     string subPath = await webApi.TryDownSubFile(subName, subPickCode);
 
                     StorageFile srtfile = await StorageFile.GetFileFromPathAsync(subPath);
@@ -136,7 +136,7 @@ namespace Display.Control
 
                 var playbackItem = new MediaPlaybackItem(ms);
 
-                //Ñ¡ÔñÄ¬ÈÏ×ÖÄ»
+                //é€‰æ‹©é»˜è®¤å­—å¹•
                 media.BufferingStarted += (sender, e) =>
                 {
                     playbackItem.TimedMetadataTracks.SetPresentationMode(0, TimedMetadataTrackPresentationMode.PlatformPresented);
@@ -162,12 +162,12 @@ namespace Display.Control
             System.Diagnostics.Debug.WriteLine(quality.Url);
 
             string url = null;
-            //m3u8²¥·Å
+            //m3u8æ’­æ”¾
             if (quality.Url != null)
             {
                 url = quality.Url;
             }
-            //Ô­»­²¥·Å
+            //åŸç”»æ’­æ”¾
             else if (quality.Url == null && quality.PickCode != null)
             {
                 var downUrlList = webApi.GetDownUrl(PickCode, GetInfoFromNetwork.MediaElementUserAgent);
@@ -175,19 +175,19 @@ namespace Display.Control
                 if (downUrlList.Count == 0) return;
                 url = downUrlList.FirstOrDefault().Value;
 
-                //±ÜÃâÖØ¸´»ñÈ¡
+                //é¿å…é‡å¤è·å–
                 quality.Url = url;
             }
 
-            //²¥·Å
+            //æ’­æ”¾
             if (url != null)
             {
-                //¼ÇÂ¼µ±Ç°µÄÊ±¼ä
+                //è®°å½•å½“å‰çš„æ—¶é—´
                 var time = MediaControl.MediaPlayer.Position;
 
                 await SetMediaPlayer(url, subDicts);
 
-                //»Ö¸´Ö®Ç°µÄÊ±¼ä
+                //æ¢å¤ä¹‹å‰çš„æ—¶é—´
                 MediaControl.MediaPlayer.Position = time;
             }
         }

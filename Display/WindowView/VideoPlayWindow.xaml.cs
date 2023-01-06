@@ -68,7 +68,6 @@ namespace Display
             }
         }
 
-
         //WebView 进入后全屏 window也进入全屏
         private void CoreWebView2_ContainsFullScreenElementChanged(Microsoft.Web.WebView2.Core.CoreWebView2 sender, object args)
         {
@@ -76,10 +75,16 @@ namespace Display
             {
                 _markPresenterKindBeforeFullScreen = appwindow.Presenter.Kind;
                 appwindow.SetPresenter(AppWindowPresenterKind.FullScreen);
+
+                this.ExtendsContentIntoTitleBar= false;
+                TitleBarRowDefinition.Height = new(0);
             }
             else
             {
                 appwindow.SetPresenter(_markPresenterKindBeforeFullScreen);
+
+                this.ExtendsContentIntoTitleBar = true;
+                TitleBarRowDefinition.Height = new(28);
             }
         }
 
