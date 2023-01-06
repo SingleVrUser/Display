@@ -42,7 +42,8 @@
         <Grid Grid.Row="1" x:Name="VideoPlayGrid">
             <control:CustomMediaPlayerElement x:Name="mediaControl"
                                               PickCode="{x:Bind PickCode}"
-                                              FullWindow="mediaControls_FullWindow"/>
+                                              FullWindow="mediaControls_FullWindow"
+                                              MediaDoubleTapped="mediaControl_MediaDoubleTapped"/>
 
             <!--无链接传入-->
             <StackPanel HorizontalAlignment="Center"

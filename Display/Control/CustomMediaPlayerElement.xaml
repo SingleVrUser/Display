@@ -19,7 +19,8 @@
 
     <MediaPlayerElement x:Name="MediaControl"
                         AutoPlay="True"
-                        AreTransportControlsEnabled="True">
+                        AreTransportControlsEnabled="True"
+                        DoubleTapped="MediaControl_DoubleTapped">
         <MediaPlayerElement.TransportControls>
             <local:CustomMediaTransportControls x:Name="mediaTransportControls"
                                                 x:FieldModifier="public"
