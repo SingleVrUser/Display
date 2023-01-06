@@ -57,7 +57,7 @@ namespace Display.Control
         public event SelectionChangedEventHandler SelectionChanged;
 
         /// <summary>
-        /// È¡Ïû»òÑ¡ÔñTypeµÄÉ¸Ñ¡
+        /// å–æ¶ˆæˆ–é€‰æ‹©Typeçš„ç­›é€‰
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
@@ -73,22 +73,22 @@ namespace Display.Control
                 }
                 Type = radioButton.Content.ToString();
 
-                System.Diagnostics.Debug.WriteLine($"ÉèÖÃTypeÎª{Type}");
+                System.Diagnostics.Debug.WriteLine($"è®¾ç½®Typeä¸º{Type}");
 
                 Type_ToggleSplitButton.Content = Type;
             }
             else
             {
                 Type = string.Empty;
-                System.Diagnostics.Debug.WriteLine($"È¡ÏûType");
-                Type_ToggleSplitButton.Content = "Àà±ğ";
+                System.Diagnostics.Debug.WriteLine($"å–æ¶ˆType");
+                Type_ToggleSplitButton.Content = "ç±»åˆ«";
             }
 
             SplitButton_Click?.Invoke(sender, args);
         }
 
         /// <summary>
-        /// È¡Ïû»òÑ¡ÔñScoreµÄÉ¸Ñ¡
+        /// å–æ¶ˆæˆ–é€‰æ‹©Scoreçš„ç­›é€‰
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
@@ -110,20 +110,20 @@ namespace Display.Control
                 }
 
                 Score_ToggleSplitButton.Content = radioButton.Content;
-                System.Diagnostics.Debug.WriteLine($"ÉèÖÃScoreÎª{Score}");
+                System.Diagnostics.Debug.WriteLine($"è®¾ç½®Scoreä¸º{Score}");
             }
             else
             {
                 Score = 0;
-                System.Diagnostics.Debug.WriteLine($"È¡ÏûScore");
-                Score_ToggleSplitButton.Content = "ÆÀ·Ö";
+                System.Diagnostics.Debug.WriteLine($"å–æ¶ˆScore");
+                Score_ToggleSplitButton.Content = "è¯„åˆ†";
             }
 
             SplitButton_Click?.Invoke(sender, args);
         }
 
         /// <summary>
-        /// /È¡Ïû»òÑ¡ÔñYearµÄÉ¸Ñ¡
+        /// å–æ¶ˆæˆ–é€‰æ‹©Yearçš„ç­›é€‰
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
@@ -139,20 +139,20 @@ namespace Display.Control
                 }
                 var tmp = radioButton.Content.ToString();
 
-                if (tmp == "×Ô¶¨Òå")
+                if (tmp == "è‡ªå®šä¹‰")
                     Year = Year_CustomeTextBox.Text;
                 else
                     Year = tmp;
 
                 Year_ToggleSplitButton.Content = Year;
-                System.Diagnostics.Debug.WriteLine($"ÉèÖÃYearÎª{Year}");
+                System.Diagnostics.Debug.WriteLine($"è®¾ç½®Yearä¸º{Year}");
             }
             else
             {
                 Year = string.Empty;
-                System.Diagnostics.Debug.WriteLine($"È¡ÏûYear");
+                System.Diagnostics.Debug.WriteLine($"å–æ¶ˆYear");
 
-                Year_ToggleSplitButton.Content = "Äê·İ";
+                Year_ToggleSplitButton.Content = "å¹´ä»½";
             }
 
             SplitButton_Click?.Invoke(sender, args);
@@ -167,14 +167,14 @@ namespace Display.Control
 
         private void Type_RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //ÒÑ±»Ñ¡ÖĞ£¬Ìø¹ı
+            //å·²è¢«é€‰ä¸­ï¼Œè·³è¿‡
             if (Type_ToggleSplitButton.IsChecked == true && string.IsNullOrEmpty(Type)) return;
 
             if (!(e.AddedItems.FirstOrDefault() is RadioButton radioButton)) return;
 
             Type = radioButton.Content.ToString();
 
-            System.Diagnostics.Debug.WriteLine($"TypeĞŞ¸ÄÎª{Type}");
+            System.Diagnostics.Debug.WriteLine($"Typeä¿®æ”¹ä¸º{Type}");
 
             Type_ToggleSplitButton.Content = Type;
             Type_ToggleSplitButton.IsChecked = true;
@@ -184,7 +184,7 @@ namespace Display.Control
 
         private void Year_RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //ÒÑ±»Ñ¡ÖĞ£¬Ìø¹ı
+            //å·²è¢«é€‰ä¸­ï¼Œè·³è¿‡
             if (Year_ToggleSplitButton.IsChecked == true && string.IsNullOrEmpty(Year)) return;
 
             if (!(e.AddedItems.FirstOrDefault() is RadioButton radioButton)) return;
@@ -193,12 +193,12 @@ namespace Display.Control
 
             var tmp = radioButton.Content.ToString();
 
-            if (tmp == "×Ô¶¨Òå")
+            if (tmp == "è‡ªå®šä¹‰")
                 Year = Year_CustomeTextBox.Text;
             else
                 Year = tmp;
 
-            System.Diagnostics.Debug.WriteLine($"YearĞŞ¸ÄÎª{Year}");
+            System.Diagnostics.Debug.WriteLine($"Yearä¿®æ”¹ä¸º{Year}");
 
             Year_ToggleSplitButton.Content = Year;
             Year_ToggleSplitButton.IsChecked = true;
@@ -208,7 +208,7 @@ namespace Display.Control
 
         private void Score_RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //ÒÑ±»Ñ¡ÖĞ£¬Ìø¹ı
+            //å·²è¢«é€‰ä¸­ï¼Œè·³è¿‡
             if (Score_ToggleSplitButton.IsChecked == true && Score == 0) return;
 
             if (!(e.AddedItems.FirstOrDefault() is RadioButton radioButton)) return;
@@ -219,7 +219,7 @@ namespace Display.Control
                 Score = tmp;
             }
 
-            System.Diagnostics.Debug.WriteLine($"ScoreĞŞ¸ÄÎª{Score}");
+            System.Diagnostics.Debug.WriteLine($"Scoreä¿®æ”¹ä¸º{Score}");
             Score_ToggleSplitButton.Content = radioButton.Content;
             Score_ToggleSplitButton.IsChecked = true;
 

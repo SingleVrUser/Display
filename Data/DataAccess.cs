@@ -2137,8 +2137,15 @@ namespace Data
 
             string leftName = tuple.Item1.Replace("FC2", "FC");
             string rightNumber = tuple.Item2;
-            if(rightNumber.StartsWith("0"))
-                rightNumber = rightNumber.Substring(1);
+
+
+            if (rightNumber.StartsWith("0"))
+            {
+                var match_result = Regex.Match(rightNumber, @"0*(\d+)");
+
+                if (match_result.Success)
+                    rightNumber = match_result.Groups[1].Value;
+            }
 
             List<Datum> data = new List<Datum>();
 
@@ -2166,7 +2173,7 @@ namespace Data
                 // '%xxx%57%' 会选出 057、157、257之类的
                 foreach (var datum in tmpList)
                 {
-                    var match_result = Regex.Match(datum.n, @"([A-Za-z]+)[-_]?0?(\d+)");
+                    var match_result = Regex.Match(datum.n, @$"({leftName})[-_]?0*(\d+)", RegexOptions.IgnoreCase);
                     if (match_result.Success && match_result.Groups[2].Value == rightNumber)
                         data.Add(datum);
 

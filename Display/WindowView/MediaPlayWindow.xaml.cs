@@ -4,13 +4,6 @@
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
-using System.Threading.Tasks;
-using Windows.Media.Core;
-using Windows.Media.Playback;
-using Windows.Media;
-using Windows.Storage.Streams;
-using Windows.Storage;
-using System;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -23,9 +16,6 @@ namespace Display.WindowView;
 public sealed partial class MediaPlayWindow : Window
 {
     private AppWindow appwindow;
-
-    //È«ÆÁÇ°¼ÇÂ¼µ±Ç°×´Ì¬
-    private AppWindowPresenterKind _markPresenterKindBeforeFullScreen;
 
     private string PickCode;
 
@@ -66,7 +56,7 @@ public sealed partial class MediaPlayWindow : Window
         return PickCode == null ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    #region È«ÆÁÉèÖÃ
+    #region å…¨å±è®¾ç½®
 
     private void mediaControls_FullWindow(object sender, RoutedEventArgs e)
     {
@@ -81,22 +71,26 @@ public sealed partial class MediaPlayWindow : Window
     }
 
     /// <summary>
-    /// ½øÈëÈ«ÆÁ
+    /// è¿›å…¥å…¨å±
     /// </summary>
     private void enterlFullScreen()
     {
         if (appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
         {
-            _markPresenterKindBeforeFullScreen = appwindow.Presenter.Kind;
             appwindow.SetPresenter(AppWindowPresenterKind.FullScreen);
 
-            //¼àÌıESCÍË³ö
+            //ç›‘å¬ESCé€€å‡º
             RootGrid.KeyDown += RootGrid_KeyDown;
+
+            this.ExtendsContentIntoTitleBar = false;
+            TitleBarRowDefinition.Height = new(0);
+
+            VisualStateManager.GoToState(mediaControl.mediaTransportControls, "FullWindowState", true);
         }
     }
 
     /// <summary>
-    /// ÍË³öÈ«ÆÁ
+    /// é€€å‡ºå…¨å±
     /// </summary>
     private void cancelFullScreen()
     {
@@ -104,8 +98,13 @@ public sealed partial class MediaPlayWindow : Window
         {
             appwindow.SetPresenter(Microsoft.UI.Windowing.AppWindowPresenterKind.Default);
 
-            //È¡Ïû¼àÌı
+            //å–æ¶ˆç›‘å¬
             RootGrid.KeyDown -= RootGrid_KeyDown;
+
+            this.ExtendsContentIntoTitleBar = true;
+            TitleBarRowDefinition.Height = new(28);
+
+            VisualStateManager.GoToState(mediaControl.mediaTransportControls, "NoFullWindowState", true);
         }
     }
 
