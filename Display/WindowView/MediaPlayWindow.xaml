@@ -12,7 +12,7 @@
     mc:Ignorable="d">
     <Grid x:Name="RootGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="28" />
+            <RowDefinition x:Name="TitleBarRowDefinition" Height="28" />
             <RowDefinition />
         </Grid.RowDefinitions>
 
@@ -40,7 +40,9 @@
         </Grid>
 
         <Grid Grid.Row="1" x:Name="VideoPlayGrid">
-            <control:CustomMediaPlayerElement x:Name="mediaControl" PickCode="{x:Bind PickCode}"/>
+            <control:CustomMediaPlayerElement x:Name="mediaControl"
+                                              PickCode="{x:Bind PickCode}"
+                                              FullWindow="mediaControls_FullWindow"/>
 
             <!--无链接传入-->
             <StackPanel HorizontalAlignment="Center"

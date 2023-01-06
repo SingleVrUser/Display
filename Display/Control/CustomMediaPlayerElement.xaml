@@ -22,6 +22,7 @@
                         AreTransportControlsEnabled="True">
         <MediaPlayerElement.TransportControls>
             <local:CustomMediaTransportControls x:Name="mediaTransportControls"
+                                                x:FieldModifier="public"
                                                 IsCompact="False"
                                                 BackgroundSizing="InnerBorderEdge"
                                                 IsPlaybackRateButtonVisible="True"
