@@ -26,7 +26,7 @@ namespace Display.Control
             TextChanged?.Invoke(sender, args);
         }
 
-        //ÏÔÊ¾»òÒş²ØËÑË÷¿ò
+        //æ˜¾ç¤ºæˆ–éšè—æœç´¢æ¡†
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if(!(sender is Button button))
@@ -36,14 +36,14 @@ namespace Display.Control
 
             button.IsEnabled= false;
 
-            //¹Ø±Õ
+            //å…³é—­
             if (MyAutoSuggestBox.Visibility == Visibility.Visible && MyAutoSuggestBox.Width==300)
             {
                 CloseStoryborard.Begin();
 
             }
-            //ÉìÕ¹
-            else if(MyAutoSuggestBox.Visibility == Visibility.Collapsed)
+            //ä¼¸å±•
+            else if (MyAutoSuggestBox.Visibility == Visibility.Collapsed)
             {
                 OpenStoryborard.Begin();
 

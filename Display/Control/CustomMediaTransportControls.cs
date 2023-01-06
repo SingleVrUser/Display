@@ -20,8 +20,8 @@ public class CustomMediaTransportControls : MediaTransportControls
     {
         // This is where you would get your custom button and create an event handler for its click method.
         //全屏按钮
-        Button likeButton = GetTemplateChild("FullWindowButton") as Button;
-        likeButton.Click += FullWindowButton_Click;
+        Button fullWindowButton = GetTemplateChild("FullWindowButton") as Button;
+        fullWindowButton.Click += FullWindowButton_Click;
 
         base.OnApplyTemplate();
     }
@@ -57,7 +57,10 @@ public class CustomMediaTransportControls : MediaTransportControls
 
     private void FullWindowButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
+
+        VisualStateManager.GoToState(this, "NoDelete", true);
         FullWindow?.Invoke(sender, e);
+        VisualStateManager.GoToState(this, "NoDelete", true);
     }
 }
 

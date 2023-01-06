@@ -8,10 +8,10 @@
     mc:Ignorable="d">
     
     <!--纯浏览器窗口，播放视频方便全屏-->
-    <Grid >
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="28"/>
-            <RowDefinition/>
+            <RowDefinition x:Name="TitleBarRowDefinition" Height="28"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <Grid x:Name="AppTitleBar">

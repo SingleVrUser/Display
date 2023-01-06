@@ -287,14 +287,14 @@
                             </VisualStateGroup>
                             <!-- FullWindow states -->
                             <!-- TODO 39683362: Uncomment once Full Screen is supported -->
-                            <!-- <VisualStateGroup x:Name="FullWindowStates">
-                <VisualState x:Name="NonFullWindowState" />
-                <VisualState x:Name="FullWindowState">
-                  <VisualState.Setters>
-                    <Setter Target="FullWindowSymbol.Symbol" Value="BackToWindow" />
-                  </VisualState.Setters>
-                </VisualState>
-              </VisualStateGroup> -->
+                             <VisualStateGroup x:Name="FullWindowStates">
+                                <VisualState x:Name="NonFullWindowState" />
+                                <VisualState x:Name="FullWindowState">
+                                  <VisualState.Setters>
+                                    <Setter Target="FullWindowSymbol.Symbol" Value="BackToWindow" />
+                                  </VisualState.Setters>
+                                </VisualState>
+                              </VisualStateGroup> 
                             <!-- Repeat states -->
                             <VisualStateGroup x:Name="RepeatStates">
                                 <VisualState x:Name="RepeatNoneState" />
@@ -601,12 +601,22 @@
 
                                             <AppBarButton x:Name="FullWindowButton"
                                                           Style="{StaticResource AppBarButtonStyle}"
-                                                          MediaTransportControlsHelper.DropoutOrder="17">
+                                                          MediaTransportControlsHelper.DropoutOrder="12">
                                                 <AppBarButton.Icon>
                                                     <SymbolIcon x:Name="FullWindowSymbol"
                                                                 Symbol="FullScreen" />
                                                 </AppBarButton.Icon>
                                             </AppBarButton>
+
+                                            <AppBarButton x:Name="DummyButton"
+                                                          Style='{StaticResource AppBarButtonStyle}'
+                                                          Visibility="Collapsed"
+                                                          IsEnabled="False">
+                                                <AppBarButton.Icon>
+                                                    <SymbolIcon Symbol="FullScreen" />
+                                                </AppBarButton.Icon>
+                                            </AppBarButton>
+                                            
                                         </CommandBar.PrimaryCommands>
 
                                         <CommandBar.SecondaryCommands>
