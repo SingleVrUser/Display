@@ -197,5 +197,12 @@ namespace Display.Control
         {
             FullWindow?.Invoke(sender, e);
         }
+
+
+        public event DoubleTappedEventHandler MediaDoubleTapped;
+        private void MediaControl_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        {
+            MediaDoubleTapped?.Invoke(sender, e);
+        }
     }
 }

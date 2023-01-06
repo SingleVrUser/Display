@@ -116,4 +116,16 @@ public sealed partial class MediaPlayWindow : Window
         }
     }
     #endregion
+
+    private void mediaControl_MediaDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        if (appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
+        {
+            enterlFullScreen();
+        }
+        else
+        {
+            cancelFullScreen();
+        }
+    }
 }
