@@ -23,7 +23,10 @@
                 
 
                 <ResourceDictionary>
-
+                    
+                    <!--MediaTransportControl背景-->
+                    <SolidColorBrush x:Key="MediaTransportControlsPanelBackground"
+                                     Color="#60ffffff" />
 
                     <Style TargetType="TextBlock">
                         <Setter Property="FontFamily"
