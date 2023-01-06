@@ -48,6 +48,8 @@ namespace Display.Views
             actorinfo = new(new() { { "is_like", true }, { "prifile_path", true } });
 
             await actorinfo.LoadData();
+
+            TotalCount_TextBlock.Text = actorinfo.Count.ToString();
             BasicGridView.ItemsSource = actorinfo;
 
             LoadActorPartInfo();
@@ -66,6 +68,7 @@ namespace Display.Views
                                                                 filterList: new (){ "prifile_path != ''" });
 
             infos.ForEach(info => actorPartInfo.Add(info));
+
         }
 
         /// <summary>
@@ -108,7 +111,7 @@ namespace Display.Views
             actorPartInfo.Clear();
             LoadActorPartInfo();
 
-            CarouselControl.SelectedIndex = 8;
+            CarouselControl.SelectedIndex = actorPartInfo.Count/2;
         }
 
         private void Image_Tapped(object sender, TappedRoutedEventArgs e)

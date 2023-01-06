@@ -12,6 +12,7 @@
                                    x:Name="videoControl"
                                    Click="{x:Bind OnClicked}"
                                    VideoPlayClick="{x:Bind VideoPlay_Click}"
+                                   SingleVideoPlayClick="SingleVideoPlayClick"
                                    IsShowFailListView="False"
                                    IsShowSearchListView="True"/>
 

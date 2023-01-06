@@ -4,6 +4,8 @@ using Microsoft.UI.Xaml.Data;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using static Data.WebApi;
@@ -14,7 +16,7 @@ public class IncrementallLoadActorInfoCollection : ObservableCollection<ActorInf
 {
     public bool HasMoreItems { get; set; } = true;
 
-    public int AllCount { get;private set; }
+    public int AllCount { get; private set; }
 
     public Dictionary<string,bool> orderByList { get;private set; }
 
@@ -72,6 +74,5 @@ public class IncrementallLoadActorInfoCollection : ObservableCollection<ActorInf
             Count = (uint)getCount
         };
     }
-
 }
 
