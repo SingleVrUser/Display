@@ -11,8 +11,25 @@
     NavigationCacheMode="Enabled">
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Margin="10,2">
+            <Button x:Name="GetActorInfoButton"
+                    Content="获取演员信息"
+                    Click="GetActorInfoButton_Click"
+                    Visibility="Collapsed" />
+            <Button x:Name="ContinueGetActorInfoTaskButton"
+                    Content="继续获取演员信息"
+                    Click="ContinueGetActorInfoTaskButton_Click"
+                    Visibility="Collapsed"/>
+        </StackPanel>
+        
         <controls:AdaptiveGridView
                 x:Name="BasicGridView"
+                Grid.Row="1"
                 ItemHeight="140"
                 DesiredWidth="140"
                 IsItemClickEnabled="True"

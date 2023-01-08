@@ -1,25 +1,20 @@
 ﻿using Data;
-using Display.Converter;
 using Display.Model;
-using Display.Views;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
-using Microsoft.UI.Xaml.Media.Imaging;
-using Newtonsoft.Json.Linq;
-using OpenCvSharp.XImgProc;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Windows.Storage;
+using Windows.System;
 
 namespace Display.Control;
 
@@ -50,6 +45,9 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             if(_actorInfo == value) return;
 
             _actorInfo = value;
+
+            ChangedHyperlink();
+
             OnPropertyChanged();
         }
     }
@@ -764,19 +762,10 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 切换到失败视图
     /// </summary>
-    private async void trySwitchToFailView()
+    private void trySwitchToFailView()
     {
-        //更新GridView的来源
-        if (FailInfoCollection == null || !string.IsNullOrEmpty(localCheckText))
-        {
-            FailInfoCollection = new();
-            FailInfoCollection.SetOrder(FailListOrderBy, FailListIsDesc);
-            FailInfoCollection.SetFilter(localCheckText);
-            await FailInfoCollection.LoadData();
-        }
-
-
-        BasicGridView.ItemsSource = FailInfoCollection;
+        //更新GridView的来源（全部/喜欢/稍后观看）
+        InitFailCollection();
 
         //停止监听调整图片大小的Slider
         CloseListeningSliderValueChanged();
@@ -786,6 +775,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         //更改排序的Flyout
         ChangedOrderButtonFlyout(false);
+
 
     }
 
@@ -863,8 +853,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         localCheckText = suggestBox.Text;
 
         FailInfoCollection = new() { filterName = localCheckText, OrderBy = FailListOrderBy, IsDesc = FailListIsDesc };
-        var lists = await DataAccess.LoadFailFileInfo(0, 30, localCheckText, FailListOrderBy, FailListIsDesc);
-        lists.ForEach(datum => FailInfoCollection.Add(datum));
+
+        await FailInfoCollection.LoadData();
         BasicGridView.ItemsSource = FailInfoCollection;
 
     }
@@ -1068,6 +1058,56 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         DataAccess.UpdateSingleDataFromActorInfo(actorId.ToString(), "is_like", is_like.ToString());
     }
+
+    private void ChangedHyperlink()
+    {
+        if (!string.IsNullOrEmpty(actorInfo.blog_url))
+        {
+            blog_HyperLink.NavigateUri = new Uri(actorInfo.blog_url);
+        }
+
+        if (!string.IsNullOrEmpty(actorInfo.info_url))
+        {
+            info_HyperLink.NavigateUri = new Uri(actorInfo.info_url);
+        }
+    }
+
+
+    private void ShowData_RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems[0] is RadioButton)
+            InitFailCollection();
+    }
+
+    private async void InitFailCollection()
+    {
+        if (FailShowChanged_RadioButtons.SelectedItem is not RadioButton radioButton) return;
+
+        //更新GridView的来源
+        switch (radioButton.Name)
+        {
+            //喜欢
+            case nameof(FailLike_RadioButton):
+                break;
+            //稍后观看
+            case nameof(FailLookLater_RadioButton):
+                break;
+            //默认全部
+            default:
+                if (FailInfoCollection == null || !string.IsNullOrEmpty(localCheckText))
+                {
+                    FailInfoCollection = new();
+                    FailInfoCollection.SetOrder(FailListOrderBy, FailListIsDesc);
+                    FailInfoCollection.SetFilter(localCheckText);
+                    await FailInfoCollection.LoadData();
+                }
+                BasicGridView.ItemsSource = FailInfoCollection;
+
+                break;
+        }
+
+    }
+
 }
 
 /// <summary>

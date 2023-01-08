@@ -1,9 +1,11 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using Display.Control;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
+using static Display.Control.CustomMediaPlayerElement;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -16,10 +18,10 @@ namespace Display.WindowView;
 public sealed partial class MediaPlayWindow : Window
 {
     private AppWindow appwindow;
-
     private string PickCode;
+    private PlayType PlayType;
 
-    public MediaPlayWindow(string pickCode)
+    public MediaPlayWindow(string pickCode, PlayType playType)
     {
         this.InitializeComponent();
 
@@ -27,6 +29,7 @@ public sealed partial class MediaPlayWindow : Window
         this.SetTitleBar(AppTitleBar);
 
         this.PickCode = pickCode;
+        this.PlayType = playType;
         appwindow = App.getAppWindow(this);
 
         this.Closed += MediaPlayWindow_Closed;
@@ -43,9 +46,9 @@ public sealed partial class MediaPlayWindow : Window
         }
     }
 
-    public static MediaPlayWindow CreateNewWindow(string pickCode)
+    public static MediaPlayWindow CreateNewWindow(string pickCode, PlayType playType)
     {
-        MediaPlayWindow newWindow = new(pickCode);
+        MediaPlayWindow newWindow = new(pickCode, playType);
         newWindow.Activate();
 
         return newWindow;
