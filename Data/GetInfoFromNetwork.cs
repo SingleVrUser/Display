@@ -25,7 +25,7 @@ namespace Data
             {
                 if (_client == null)
                 {
-                    _client = CreateClient(new() { { "user-agent", BrowserUserAgent } });
+                    _client = CreateClient(new() { { "user-agent", DesktopUserAgent } });
                 }
 
                 return _client;
@@ -56,7 +56,7 @@ namespace Data
 
             foreach (var header in headers)
             {
-                Client.DefaultRequestHeaders.Add(header.Key, header.Value);
+                Client.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
             }
 
             return Client;
@@ -122,10 +122,13 @@ namespace Data
             CID = CID.ToUpper();
             string url = UrlCombine(BusUrl, $"movies/{CID}");
 
-            string strResult = await RequestHelper.RequestHtml(Client, url);
+            Tuple<string, string> result = await RequestHelper.RequestHtml(Client, url);
+            if (result == null) return null;
+
+            string htmlString = result.Item2;
 
             HtmlDocument htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(strResult);
+            htmlDoc.LoadHtml(htmlString);
 
             //搜索封面
             string ImageUrl = null;
@@ -234,10 +237,14 @@ namespace Data
             string busurl = UrlCombine(JavBusUrl, searchCID);
 
             videoInfo.busurl = busurl;
-            string strResult = await RequestHelper.RequestHtml(Client, busurl);
+            
+            Tuple<string, string> result = await RequestHelper.RequestHtml(Client, busurl);
+            if (result == null) return null;
+
+            string htmlString = result.Item2;
 
             HtmlDocument htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(strResult);
+            htmlDoc.LoadHtml(htmlString);
 
             //搜索封面
             var ImageUrlNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='col-md-9 screencap']//a//img");
@@ -537,10 +544,13 @@ namespace Data
             //默认是步兵
             videoInfo.is_wm = 1;
 
-            string strResult = await RequestHelper.RequestHtml(Client, url);
+            Tuple<string, string> result = await RequestHelper.RequestHtml(Client, url);
+            if (result == null) return null;
+
+            string htmlString = result.Item2;
 
             HtmlDocument htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(strResult);
+            htmlDoc.LoadHtml(htmlString);
 
             var jsons = htmlDoc.DocumentNode.SelectNodes("//script[@type='application/ld+json']");
 
@@ -606,8 +616,12 @@ namespace Data
             //搜索无果，退出
             if (detail_url == null) return null;
 
-            string strResult = await RequestHelper.RequestHtml(Client, detail_url);
-            if(string.IsNullOrEmpty(strResult)) return null;
+            Tuple<string, string> result = await RequestHelper.RequestHtml(Client, detail_url);
+            if (result == null) return null;
+
+            string strResult = result.Item2;
+
+            if (string.IsNullOrEmpty(strResult)) return null;
 
             VideoInfo videoInfo = new VideoInfo();
             videoInfo.busurl = detail_url;
@@ -630,18 +644,20 @@ namespace Data
         /// <returns></returns>
         private async Task<string> GetDetailUrlFromAvMooResult(string CID)
         {
-            string result;
             string url = UrlCombine(AppSettings.AvMoo_BaseUrl, $"cn/search/{CID}");
 
             // 访问
-            string strResult = await RequestHelper.RequestHtml(Client, url);
+            Tuple<string, string> result = await RequestHelper.RequestHtml(Client, url);
+            if (result == null) return null;
+
+            string htmlString = result.Item2;
 
             HtmlDocument htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(strResult);
+            htmlDoc.LoadHtml(htmlString);
 
-            result = GetDetailUrlFromAvMooSearchResult(htmlDoc, CID);
+            htmlString = GetDetailUrlFromAvMooSearchResult(htmlDoc, CID);
 
-            return result;
+            return htmlString;
         }
 
         /// <summary>
@@ -889,7 +905,6 @@ namespace Data
         /// <returns></returns>
         public async Task<VideoInfo> SearchInfoFromAvSox(string CID)
         {
-            string SavePath = AppSettings.Image_SavePath;
             CID = CID.ToUpper();
 
             var detail_url = await GetDetailUrlFromAvSoxResult(CID);
@@ -897,7 +912,11 @@ namespace Data
             //搜索无果，退出
             if (detail_url == null) return null;
 
-            string strResult = await RequestHelper.RequestHtml(Client, detail_url);
+            Tuple<string, string> result = await RequestHelper.RequestHtml(Client, detail_url);
+            if (result == null) return null;
+
+            string strResult = result.Item2;
+
             if (string.IsNullOrEmpty(strResult)) return null;
 
             VideoInfo videoInfo = new VideoInfo();
@@ -925,7 +944,10 @@ namespace Data
             string url = UrlCombine(AppSettings.AvSox_BaseUrl, $"cn/search/{CID}");
 
             // 访问
-            string strResult = await RequestHelper.RequestHtml(Client, url);
+            Tuple<string, string> tuple = await RequestHelper.RequestHtml(Client, url);
+            if (tuple == null) return null;
+
+            string strResult = tuple.Item2;
 
             HtmlDocument htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(strResult);
@@ -1061,11 +1083,13 @@ namespace Data
                     });
                 }
 
-                strResult = await RequestHelper.RequestHtml(ClientWithJavDBCookie, detail_url);
+                var tuple = await RequestHelper.RequestHtml(ClientWithJavDBCookie, detail_url);
+                strResult = tuple.Item2;
             }
             else
             {
-                strResult = await RequestHelper.RequestHtml(Client, detail_url);
+                var tuple = await RequestHelper.RequestHtml(Client, detail_url);
+                strResult = tuple.Item2;
             }
 
             if (string.IsNullOrEmpty(strResult)) return null;
@@ -1194,7 +1218,10 @@ namespace Data
             string url = $"{JavDBUrl}/search?q={CID}&f=all";
 
             // 访问
-            string strResult = await RequestHelper.RequestHtml(Client, url);
+            var tuple = await RequestHelper.RequestHtml(Client, url);
+            if (tuple == null) return null;
+
+            string strResult = tuple.Item2;
 
             HtmlDocument htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(strResult);
@@ -1331,7 +1358,6 @@ namespace Data
         /// <returns>下载后的文件路径</returns>
         public static async Task<string> downloadFile(string url, string filePath, string fileName, bool isReplaceExistsImage = false, Dictionary<string, string> headers = null)
         {
-
             string localFilename;
             if (fileName.Contains("."))
             {
@@ -1359,9 +1385,18 @@ namespace Data
             //不存在
             if (!File.Exists(localPath) || isReplaceExistsImage)
             {
-                //HttpClient Client = CreateClient(headers);
-
                 int maxTryCount = 3;
+
+                if(headers!= null)
+                {
+                    foreach(var header in headers)
+                    {
+                        if (Client.DefaultRequestHeaders.Contains(header.Key))
+                            Client.DefaultRequestHeaders.Remove(header.Key);
+
+                        Client.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
+                    }
+                }
 
                 for (int i = 0; i < maxTryCount; i++)
                 {

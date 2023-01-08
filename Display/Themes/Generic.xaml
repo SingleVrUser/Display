@@ -481,6 +481,9 @@
                                                     <FontIcon Glyph="&#xED1E;" />
                                                 </AppBarButton.Icon>
                                             </AppBarButton>
+                                            
+                                            
+                                            
                                             <AppBarButton x:Name='AudioTracksSelectionButton'
                                                           Style='{StaticResource AppBarButtonStyle}'
                                                           MediaTransportControlsHelper.DropoutOrder='13'

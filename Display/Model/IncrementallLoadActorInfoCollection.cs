@@ -1,14 +1,10 @@
-﻿using CommunityToolkit.WinUI.UI.Controls.TextToolbarSymbols;
-using Data;
+﻿using Data;
 using Microsoft.UI.Xaml.Data;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using static Data.WebApi;
 
 namespace Display.Model;
 
@@ -66,8 +62,6 @@ public class IncrementallLoadActorInfoCollection : ObservableCollection<ActorInf
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
         int getCount = await LoadData(defaultCount, Count);
-
-        System.Diagnostics.Debug.WriteLine(getCount);
 
         return new LoadMoreItemsResult
         {

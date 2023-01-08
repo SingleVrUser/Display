@@ -149,7 +149,7 @@
                                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="myGrid"
                                                                                        Storyboard.TargetProperty="Background">
                                                             <DiscreteObjectKeyFrame KeyTime="0"
-                                                                                    Value="SkyBlue" />
+                                                                                    Value="{StaticResource CustomAcrylicInAppLuminosity}" />
                                                         </ObjectAnimationUsingKeyFrames>
                                                     </Storyboard>
                                                 </VisualState>
@@ -182,9 +182,10 @@
 
             <x:Double x:Key="ContentDialogMaxWidth">900</x:Double>
 
-
-
-            <!--<AcrylicBrush x:Key="CustomAcrylicInAppLuminosity" TintOpacity="0.8" TintLuminosityOpacity="0.5" TintColor="SkyBlue" FallbackColor="SkyBlue" />-->
+            <AcrylicBrush x:Key="CustomAcrylicInAppLuminosity"
+                          TintOpacity="0.8"
+                          TintLuminosityOpacity="0.5"
+                          TintColor="#0593ff" FallbackColor="SkyBlue" />
 
 
 
