@@ -393,6 +393,7 @@ public class AppSettings
             }
             else if(localSettings.Values["GetActorInfoLastIndex"] is int index)
             {
+                _getActorInfoLastIndex = index;
                 return index;
             }
             else
@@ -403,6 +404,7 @@ public class AppSettings
         set
         {
             localSettings.Values["GetActorInfoLastIndex"] = value;
+            _getActorInfoLastIndex = value;
         }
     }
 

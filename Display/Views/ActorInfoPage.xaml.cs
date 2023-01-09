@@ -1,4 +1,5 @@
 ﻿using Data;
+using Display.Control;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -174,14 +175,13 @@ namespace Display.Views
             await Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc, this.XamlRoot);
         }
 
-
         private async void SingleVideoPlayClick(object sender, RoutedEventArgs e)
         {
-            if (sender is not Button VideoPlayButton) return;
+            if (sender is not Grid VideoPlayButton) return;
 
             if (VideoPlayButton.DataContext is not Datum datum) return;
 
-            await Views.DetailInfoPage.PlayeVideo(datum.pc, this.XamlRoot);
+            await Views.DetailInfoPage.PlayeVideo(datum.pc, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.fail);
         }
     }
 
