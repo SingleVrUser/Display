@@ -30,6 +30,19 @@
                          Color="#70a1ff"
                          Opacity="0.8" />
 
+        <LinearGradientBrush x:Key="OperableGridBackground" StartPoint="0.5,0"
+                             EndPoint="0.5,1"
+                             Opacity="0.7">
+            <GradientStop Color="#70a1ff"
+                          Offset="0" />
+            <GradientStop Color="#00000050"
+                          Offset="0.3" />
+            <GradientStop Color="#00000050"
+                          Offset="0.7" />
+            <GradientStop Color="#70a1ff"
+                          Offset="1" />
+        </LinearGradientBrush>
+
 
         <!--排列Flyout的样式-->
         <Style TargetType="FlyoutPresenter"
@@ -262,6 +275,7 @@
 
                     <!--可操作按钮-->
                     <Grid Visibility="Collapsed"
+                          Background="{StaticResource OperableGridBackground}"
                           Width="{x:Bind imagewidth,Mode=OneWay}"
                           Height="{x:Bind imageheight,Mode=OneWay}">
                         <Grid.RowDefinitions>
@@ -269,20 +283,6 @@
                             <RowDefinition Height="*" />
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
-                        <Grid.Background>
-                            <LinearGradientBrush StartPoint="0.5,0"
-                                                 EndPoint="0.5,1"
-                                                 Opacity="0.7">
-                                <GradientStop Color="#70a1ff"
-                                              Offset="0" />
-                                <GradientStop Color="#00000050"
-                                              Offset="0.3" />
-                                <GradientStop Color="#00000050"
-                                              Offset="0.7" />
-                                <GradientStop Color="#70a1ff"
-                                              Offset="1" />
-                            </LinearGradientBrush>
-                        </Grid.Background>
 
                         <RelativePanel>
                             <AppBarToggleButton IsCompact="True"
@@ -308,7 +308,7 @@
                                 Background="Black"
                                 BorderThickness="0"
                                 Click="MoreButton_Click"
-                                PointerEntered="button_OnPointerEntered"
+                                PointerEntered="Button_OnPointerEntered"
                                 PointerExited="Button_PointerExited"
                                 ToolTipService.ToolTip="更多">
                             <Button.Resources>
@@ -515,7 +515,7 @@
                                 VerticalAlignment="Stretch"
                                 BorderThickness="0"
                                 Click="PlayButton_Click"
-                                PointerEntered="button_OnPointerEntered"
+                                PointerEntered="Button_OnPointerEntered"
                                 PointerExited="Button_PointerExited"
                                 ToolTipService.ToolTip="播放">
 
@@ -567,57 +567,196 @@
             </Grid>
         </DataTemplate>
 
+
+        <!--匹配失败中的喜欢或稍后观看的展示样式-->
+        <DataTemplate x:Key="LikeOrLookLaterInFail_CoverTemplate"
+                      x:DataType="data:FailInfo">
+
+            <Grid Padding="3,0"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+
+                <Grid x:Name="FailImage_Grid"
+                      PointerEntered="Grid_PointerEntered"
+                      PointerExited="Grid_PointerExited"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      CornerRadius="5">
+
+                    <!--图片-->
+                    <Border x:Name="showImage"
+                            CornerRadius="5"
+                            HorizontalAlignment="Center">
+                        <Image Source="{x:Bind image_path}"
+                               MaxHeight="300"/>
+                    </Border>
+
+                    <!--可操作按钮-->
+                    <Grid Visibility="Collapsed"
+                          Background="{StaticResource OperableGridBackground}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+
+                        <RelativePanel>
+                            <AppBarToggleButton IsCompact="True"
+                                                ToolTipService.ToolTip="稍后观看"
+                                                RelativePanel.AlignRightWithPanel="True"
+                                                IsChecked="{x:Bind data:FileMatch.isLookLater(look_later)}"
+                                                Click="FailLookLaterToggleButton_Click">
+                                <AppBarToggleButton.Resources>
+
+                                </AppBarToggleButton.Resources>
+                                <AppBarToggleButton.Icon>
+                                    <FontIcon Glyph="&#xE13B;"
+                                              Foreground="White" />
+                                </AppBarToggleButton.Icon>
+                            </AppBarToggleButton>
+                        </RelativePanel>
+
+                        <!--点击跳转查看更多信息-->
+                        <Grid Grid.Row="1"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                Background="Transparent"
+                                Tapped="FailGrid_Tapped"
+                                PointerEntered="Button_OnPointerEntered"
+                                PointerExited="Button_PointerExited"
+                                ToolTipService.ToolTip="播放">
+                        </Grid>
+
+                        <CommandBar Grid.Row="2"
+                                    IsOpen="False"
+                                    DefaultLabelPosition="Collapsed"
+                                    OverflowButtonVisibility="Collapsed">
+                            <CommandBar.Resources>
+                                <Style TargetType="FontIcon">
+                                    <Setter Property="Foreground"
+                                            Value="White" />
+                                </Style>
+                                <SolidColorBrush x:Key="CommandBarBackgroundOpen"
+                                                 Color="#bdc3c7"
+                                                 Opacity="0.5" />
+                                <SolidColorBrush x:Key="CommandBarBorderBrushOpen"
+                                                 Color="#ecf0f1"
+                                                 Opacity="0.5" />
+                            </CommandBar.Resources>
+
+                            <CommandBar.PrimaryCommands>
+                                <!--修改评分-->
+                                <AppBarButton ToolTipService.ToolTip="评分"
+                                              IsCompact="True">
+                                    <AppBarButton.Flyout>
+                                        <Flyout>
+                                            <RatingControl Caption="评分"
+                                                           Value="{x:Bind score}"
+                                                           ValueChanged="FailRatingControl_ValueChanged">
+                                                <RatingControl.Resources>
+                                                    <SolidColorBrush x:Key="RatingControlSelectedForeground"
+                                                                     Color="#f7ba36" />
+                                                </RatingControl.Resources>
+                                            </RatingControl>
+                                        </Flyout>
+                                    </AppBarButton.Flyout>
+                                    <FontIcon Glyph="&#xE1CE;" />
+                                </AppBarButton>
+
+                                <AppBarSeparator />
+
+                                <!--标记为喜欢-->
+                                <AppBarToggleButton ToolTipService.ToolTip="喜欢"
+                                                    IsCompact="True"
+                                                    IsChecked="{x:Bind data:FileMatch.isLike(is_like)}"
+                                                    Click="FailLikeToggleButton_Click">
+                                    <FontIcon Glyph="&#xE006;" />
+                                </AppBarToggleButton>
+
+                                <AppBarSeparator />
+
+                            </CommandBar.PrimaryCommands>
+
+                        </CommandBar>
+                    </Grid>
+
+                </Grid>
+
+                <!--文字信息-->
+                <Grid HorizontalAlignment="Center"
+                      Margin="0,5,0,0"
+                      Grid.Row="1">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               Text="{x:Bind datum.n}"
+                               TextTrimming="CharacterEllipsis"/>
+
+                    <!--评分-->
+                    <RatingControl Grid.ColumnSpan="3"
+                                   IsClearEnabled="True"
+                                   Grid.Row="1"/>
+                    
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
         <!--匹配失败的列表展示样式-->
-        <DataTemplate x:Key="ListTemplate"
+        <DataTemplate x:Key="FailListTemplate"
                       x:DataType="data:Datum">
             <Grid x:Name="FailGrid"
-                  Padding="2"
+                  Padding="{StaticResource ButtonPadding}"
+                  BorderBrush="{StaticResource ButtonBorderBrush}"
+                  CornerRadius="{StaticResource ControlCornerRadius}"
+                  BorderThickness="{StaticResource ButtonBorderThemeThickness}"
+                  Tapped="FailGrid_Tapped"
                   PointerEntered="FailGrid_PointerEntered"
                   PointerExited="FailGrid_PointerExited"
-                  Background="Transparent"
                   Margin="5,0">
+
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Button HorizontalAlignment="Stretch"
-                        Click="SingleVideoButton_Click">
-                    <Grid HorizontalAlignment="Stretch"
-                          Width="300">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
 
-                        <Grid.Resources>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="HorizontalAlignment"
-                                        Value="Left" />
-                            </Style>
-                        </Grid.Resources>
-                        <TextBlock Text="{x:Bind n}"
-                                   MaxWidth="300"
-                                   TextTrimming="CharacterEllipsis" />
+                <TextBlock Text="{x:Bind n}"
+                           Grid.ColumnSpan="2"
+                           TextTrimming="CharacterEllipsis" />
 
-                        <TextBlock Grid.Row="1"
-                                   Text="{x:Bind s,Converter={StaticResource BytesToSizeStrConverter}}"
-                                   HorizontalAlignment="Right"
-                                   Opacity="0.5" />
+                <TextBlock Grid.Row="1"
+                           Grid.Column="1"
+                           Text="{x:Bind s,Converter={StaticResource BytesToSizeStrConverter}}"
+                           Opacity="0.5" />
 
-                        <TextBlock Grid.Row="1"
-                                   Text="{x:Bind t}"
-                                   TextTrimming="CharacterEllipsis"
-                                   Opacity="0.5" />
-                    </Grid>
-                </Button>
+                <TextBlock Grid.Row="1"
+                           Grid.Column="0"
+                           Text="{x:Bind t}"
+                           TextTrimming="CharacterEllipsis"
+                           Opacity="0.5" />
+
             </Grid>
         </DataTemplate>
 
-        <local:CoverItemTemplateSelector x:Key="CoverItemTemplateSelector"
+        <local:CoverItemTemplateSelector x:Key="FailItemTemplateSelector"
+                                         WithoutImageTemplate="{StaticResource FailListTemplate}"
+                                         LikeOrLookLaterInFailCoverTemplate="{StaticResource LikeOrLookLaterInFail_CoverTemplate}"/>
+        
+        <local:CoverItemTemplateSelector x:Key="SuccessOrSearchResult_ItemTemplateSelector"
                                          ImageTemplate="{StaticResource ImageTemplate}"
-                                         FailCoverTemplate="{StaticResource FailCoverTemplate}"
-                                         WithoutImageTemplate="{StaticResource ListTemplate}" />
+                                         FailCoverTemplate="{StaticResource FailCoverTemplate}"/>
     </Control.Resources>
 
     <Grid>
@@ -626,7 +765,7 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
+            <RowDefinition Height="47" />
         </Grid.RowDefinitions>
 
         <!--提示信息-->
@@ -677,18 +816,17 @@
             </RadioButtons>
         </RelativePanel>
 
-
         <!--封面预览-->
         <GridView Grid.Row="2"
                   Margin="4,0,0,0"
                   x:Name="BasicGridView"
-                  ItemTemplateSelector="{StaticResource CoverItemTemplateSelector}">
+                  ItemTemplateSelector="{StaticResource SuccessOrSearchResult_ItemTemplateSelector}"
+                  Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay}">
             <interactivity:Interaction.Behaviors>
                 <behaviors:QuickReturnHeaderBehavior />
             </interactivity:Interaction.Behaviors>
 
             <GridView.Header>
-
                 <Grid x:Name="HeaderGrid"
                       Visibility="{x:Bind IsShowSearchListView}"
                       MinHeight="40"
@@ -824,8 +962,16 @@
                     </Setter>
                 </Style>
             </GridView.ItemContainerStyle>
-
         </GridView>
+
+        <!--匹配失败的预览-->
+        <controls:AdaptiveGridView x:Name="FailGridView"
+                                   Grid.Row="2"
+                                   ItemTemplateSelector="{StaticResource FailItemTemplateSelector}"
+                                   SelectionMode="None"
+                                   DesiredWidth="400"
+                                   StretchContentForSingleRow="True"
+                                   Visibility="{x:Bind IsShowFailListView,Mode=OneWay}" />
 
         <!--筛选栏，默认隐藏-->
         <customcontrols:InfoListFilter x:Name="InfosFilter"
@@ -841,12 +987,48 @@
         <RelativePanel Grid.Row="4"
                        Margin="0,0,10,0">
 
-            <StackPanel Margin="0,0,0,-20"
-                        Orientation="Horizontal">
+            <StackPanel Margin="5,0"
+                        Orientation="Horizontal"
+                        Spacing="5"
+                        RelativePanel.AlignVerticalCenterWithPanel="True">
+                
+                <!--<ToggleSwitch x:Name="ShowType_ToggleSwitch"
+                              VerticalAlignment="Center"
+                              MinWidth="120"
+                              OnContent="匹配失败"
+                              OffContent="匹配成功"
+                              Opacity="0.3"
+                              PointerEntered="ShowType_ToggleSwitch_PointerEntered"
+                              PointerExited="ShowType_ToggleSwitch_PointerExited"
+                              IsOn="{x:Bind IsShowFailListView,Mode=TwoWay}">
+                </ToggleSwitch>-->
+
+                <RadioButtons x:Name="ShowType_RadioButtons"
+                              SelectedIndex="0"
+                              Grid.Column="2"
+                              MaxColumns="2"
+                              CharacterSpacing="30"
+                              SelectionChanged="ShowType_RadioButtons_SelectionChanged"
+                              Visibility="{x:Bind IsShowSucAndFailSwitchButton}">
+                    <RadioButton x:Name="SuccessData_RadioButton"
+                                 Content="&#xEC61;"
+                                 FontSize="20"
+                                 HorizontalContentAlignment="Center"
+                                 FontFamily="Segoe Fluent Icons"
+                                 Style="{StaticResource RadioButtonCustomizeStyle}"
+                                 ToolTipService.ToolTip="匹配成功" />
+                    <RadioButton x:Name="FailData_RadioButton"
+                                 Content="&#xEB90;"
+                                 FontSize="20"
+                                 FontFamily="Segoe Fluent Icons"
+                                 HorizontalContentAlignment="Center"
+                                 Style="{StaticResource RadioButtonCustomizeStyle}"
+                                 ToolTipService.ToolTip="匹配失败" />
+                </RadioButtons>
 
                 <AppBarButton x:Name="OrderButton"
-                              IsCompact="True"
-                              Flyout="{StaticResource SuccessOrderFlyout}">
+                              Margin="0,0,0,-16"
+                              IsCompact="True">
 
                     <ToolTipService.ToolTip>
                         <ToolTip x:Uid="sortToolTip" />
@@ -859,7 +1041,7 @@
                 </AppBarButton>
 
                 <ToggleButton x:Name="Filter_ToggleButton"
-                              Margin="0,0,0,15"
+                              Style="{StaticResource DefaultToggleButtonStyle}"
                               IsEnabled="True"
                               BorderThickness="0"
                               FontFamily="Segoe Fluent Icons"
@@ -867,19 +1049,12 @@
                               FontSize="18"
                               Foreground="Gray"
                               Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay}"
-                              Unchecked="Filter_ToggleButton_Unchecked" />
-
-                <ToggleSwitch x:Name="ShowType_ToggleSwitch"
-                              VerticalAlignment="Center"
-                              Margin="4,0,0,15"
-                              OnContent="匹配失败"
-                              OffContent="匹配成功"
-                              Opacity="0.3"
-                              PointerEntered="ShowType_ToggleSwitch_PointerEntered"
-                              PointerExited="ShowType_ToggleSwitch_PointerExited"
-                              IsOn="{x:Bind IsShowFailListView,Mode=TwoWay}"
-                              Visibility="{x:Bind IsShowSucAndFailSwitchButton}">
-                </ToggleSwitch>
+                              Unchecked="Filter_ToggleButton_Unchecked">
+                    <ToggleButton.Resources>
+                        <SolidColorBrush x:Key="ToggleButtonBackgroundPointerOver"
+                                         Color="{StaticResource ColorChecked}"/>
+                    </ToggleButton.Resources>
+                </ToggleButton>
 
             </StackPanel>
 
@@ -922,23 +1097,32 @@
                       Grid.Column="1"
                       x:FieldModifier="public"
                       x:Name="PageShow_Grid">
-                    <local:ShowCountControl x:Name="SuccesShowCount_Control"
-                                            CurrentCount="{x:Bind SuccessInfoCollection.Count,Mode=OneWay}"
+                    <local:ShowCountControl CurrentCount="{x:Bind SuccessInfoCollection.Count,Mode=OneWay}"
                                             AllCount="{x:Bind SuccessInfoCollection.AllCount,Mode=OneWay}"
                                             Clicked="ToTopButton_Click"
                                             Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay}"
                                             HorizontalAlignment="Right" />
 
-                    <local:ShowCountControl x:Name="FailShowCountControl"
-                                            CurrentCount="{x:Bind FailInfoCollection.Count,Mode=OneWay}"
-                                            AllCount="{x:Bind FailInfoCollection.AllCount,Mode=OneWay}"
-                                            Visibility="{x:Bind IsShowFailListView,Mode=OneWay}"
-                                            Clicked="ToTopButton_Click"
-                                            HorizontalAlignment="Right" />
+                    <Grid Visibility="{x:Bind IsShowFailListView,Mode=OneWay}">
+                        <local:ShowCountControl x:Name="AllFailShowCountControl"
+                                                CurrentCount="{x:Bind AllFailInfoCollection.Count,Mode=OneWay}"
+                                                AllCount="{x:Bind AllFailInfoCollection.AllCount,Mode=OneWay}"
+                                                Clicked="ToTopButton_Click"
+                                                HorizontalAlignment="Right" />
+                        
+                        <local:ShowCountControl x:Name="LikeOrLookLaterFailShowCountControl"
+                                                CurrentCount="{x:Bind LikeOrLookLater_failInfocollection.Count,Mode=OneWay}"
+                                                AllCount="{x:Bind LikeOrLookLater_failInfocollection.AllCount,Mode=OneWay}"
+                                                Clicked="ToTopButton_Click"
+                                                HorizontalAlignment="Right" />
+                        
+                        
+                    </Grid>
                 </Grid>
 
             </Grid>
 
         </RelativePanel>
+        
     </Grid>
 </UserControl>

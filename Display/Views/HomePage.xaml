@@ -97,7 +97,9 @@
                                             x:Name="Image_Grid"
                                             PointerEntered="Image_PointerEntered"
                                             PointerExited="Image_PointerExited"
-                                            CornerRadius="3">
+                                            HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                CornerRadius="3">
                                             <Image Source="{x:Bind imagepath}" Tapped="Image_Tapped"/>
                                         </Border>
  

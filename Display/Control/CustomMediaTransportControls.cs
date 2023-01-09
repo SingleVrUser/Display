@@ -2,12 +2,18 @@
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
+using Windows.Media.Capture.Core;
+using WinRT;
+using static Display.Control.CustomMediaPlayerElement;
 
 namespace Display.Control;
 
 public class CustomMediaTransportControls : MediaTransportControls
 {
     public event EventHandler<RoutedEventArgs> FullWindow;
+    public event EventHandler<RoutedEventArgs> LikeButtonClick;
+    public event EventHandler<RoutedEventArgs> LookLaterButtonClick;
+    public event EventHandler<RoutedEventArgs> ScreenshotButtonClick;
 
     public event SelectionChangedEventHandler QualityChanged;
 
@@ -25,6 +31,27 @@ public class CustomMediaTransportControls : MediaTransportControls
 
         base.OnApplyTemplate();
     }
+
+
+    public void SetFailPlayType(bool islike, bool look_later)
+    {
+        //显示喜欢/稍后观看
+        AppBarToggleButton likeButton = GetTemplateChild("IsLikeButton") as AppBarToggleButton;
+        likeButton.Click += LikeButton_Click;
+        likeButton.IsEnabled= true;
+        likeButton.IsChecked= islike;
+
+        AppBarToggleButton lookLaterButton = GetTemplateChild("LookLaterButton") as AppBarToggleButton;
+        lookLaterButton.Click += LookLaterButton_Click;
+        lookLaterButton.IsEnabled = true;
+        lookLaterButton.IsChecked = look_later;
+
+        Button screenshotButton = GetTemplateChild("ScreenshotButton") as Button;
+        screenshotButton.Click += ScreenshotButton_Click; ;
+        screenshotButton.Visibility = Visibility.Visible;
+
+    }
+
 
     public void SetQuality(List<Quality> QualityItemsSource, DataTemplate QualityDataTemplate)
     {
@@ -57,11 +84,22 @@ public class CustomMediaTransportControls : MediaTransportControls
 
     private void FullWindowButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-
-        VisualStateManager.GoToState(this, "NoDelete", true);
         FullWindow?.Invoke(sender, e);
-        VisualStateManager.GoToState(this, "NoDelete", true);
     }
+
+    private void LikeButton_Click(object sender, RoutedEventArgs e)
+    {
+        LikeButtonClick?.Invoke(sender, e);
+    }
+    private void LookLaterButton_Click(object sender, RoutedEventArgs e)
+    {
+        LookLaterButtonClick?.Invoke(sender, e);
+    }
+    private void ScreenshotButton_Click(object sender, RoutedEventArgs e)
+    {
+        ScreenshotButtonClick?.Invoke(sender, e);
+    }
+
 }
 
 public class Quality
