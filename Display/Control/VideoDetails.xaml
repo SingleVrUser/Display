@@ -354,18 +354,7 @@
                     <StackPanel Grid.Row="1"
                                 Grid.ColumnSpan="2">
                         <TextBlock Text="演员表"
-                                   Style="{StaticResource leftTitle}">
-                            <TextBlock.ContextFlyout>
-                                <MenuFlyout>
-                                    <MenuFlyoutItem Text="搜刮演员信息" Click="GetActorInfoButton_Click">
-                                        <MenuFlyoutItem.Icon>
-                                            <FontIcon FontFamily="Segoe Fluent Icons"
-                                                      Glyph="&#xE11A;"/>
-                                        </MenuFlyoutItem.Icon>
-                                    </MenuFlyoutItem>
-                                </MenuFlyout>
-                            </TextBlock.ContextFlyout>
-                        </TextBlock>
+                                   Style="{StaticResource leftTitle}" />
 
                         <ScrollViewer Grid.Column="1"
                                       Grid.Row="8"

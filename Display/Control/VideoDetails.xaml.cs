@@ -502,7 +502,6 @@ namespace Display.Control
             if (result == ContentDialogResult.Primary)
             {
                 //确定修改
-
                 var VideoCoverDisplayClassInfo = EditPage.GetInfoAfterEdit();
 
                 VideoInfo newInfo = new();
@@ -622,9 +621,6 @@ namespace Display.Control
 
         }
 
-        private void GetActorInfoButton_Click(object sender, RoutedEventArgs e)
-        {
 
-        }
     }
 }
