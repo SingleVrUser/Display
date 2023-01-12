@@ -132,7 +132,7 @@ namespace Display.ContentsPage
         /// <summary>
         /// 展示二维码
         /// </summary>
-        /// <param name="Text"></param>
+        /// <param Name="Text"></param>
         private async void QRCodeShow(string Text)
         {
             QRCodeGenerator qrGenerator = new QRCodeGenerator();
@@ -178,8 +178,8 @@ namespace Display.ContentsPage
         /// <summary>
         /// 监听二维码请求结果
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private async void OnQRTimerTickAsync(object sender, object e)
         {
             var result = await webapi.NetworkVerifyTokenAsync();

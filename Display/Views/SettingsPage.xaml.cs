@@ -96,8 +96,8 @@ namespace Display.Views
         /// <summary>
         /// 登录窗口关闭后刷新登录状态
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="args"></param>
         /// <exception cref="NotImplementedException"></exception>
         private void LoginWindow_Closed(object sender, Microsoft.UI.Xaml.WindowEventArgs args)
         {
@@ -170,7 +170,7 @@ namespace Display.Views
         /// <summary>
         /// 尝试更新图片保存目录
         /// </summary>
-        /// <param name="folderPath"></param>
+        /// <param Name="folderPath"></param>
         private async void tryUpdateImagePath(string folderPath)
         {
             //原来的地址
@@ -259,8 +259,8 @@ namespace Display.Views
         /// <summary>
         /// 打开字幕文件的存放路径
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void SubOpenPath_Click(object sender, RoutedEventArgs e)
         {
             FileMatch.LaunchFolder(AppSettings.Sub_SavePath);
@@ -269,8 +269,8 @@ namespace Display.Views
         /// <summary>
         /// 打开演员信息存放路径
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void ActorInfoOpenPath_Click(object sender, RoutedEventArgs e)
         {
             FileMatch.LaunchFolder(AppSettings.ActorInfo_SavePath);
@@ -279,8 +279,8 @@ namespace Display.Views
         /// <summary>
         /// 打开图片存放目录
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void ImageOpenPath_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             FileMatch.LaunchFolder(AppSettings.Image_SavePath);
@@ -289,8 +289,8 @@ namespace Display.Views
         /// <summary>
         /// 打开数据库目录
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void DataAccessOpenPath_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             FileMatch.LaunchFolder(AppSettings.DataAccess_SavePath);
@@ -464,8 +464,8 @@ namespace Display.Views
         /// <summary>
         /// 如果选中的搜刮源少于一个，则提示
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void ToggleButton_Unchecked(object sender, RoutedEventArgs e)
         {
             var toggleButton = sender as Microsoft.UI.Xaml.Controls.Primitives.ToggleButton;

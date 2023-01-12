@@ -38,7 +38,7 @@
                       x:DataType="local:TransferStationFiles">
             <Grid Padding="5">
                 <TextBlock Text="{x:Bind Name}"
-                           MaxWidth="60"
+                           MaxWidth="120"
                            TextWrapping="Wrap" />
             </Grid>
         </DataTemplate>
@@ -138,7 +138,7 @@
         <RelativePanel>
             <StackPanel Orientation="Horizontal"
                         Margin="3"
-                        Spacing="3">
+                        Spacing="5">
                 <Button Content="播放"
                         Click="PlayButton_Click" />
                 <Button x:Name="ImportDataButton"
@@ -191,9 +191,6 @@
         <Grid Grid.Row="2"
               BorderThickness="0,1,0,0"
               BorderBrush="{StaticResource CircleElevationBorderBrush}">
-
-
-
             <ListView x:Name="BaseExample"
                       Grid.Row="1"
                       Grid.ColumnSpan="4"

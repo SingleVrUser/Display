@@ -67,8 +67,8 @@ namespace Display.Views
         /// <summary>
         /// 视频播放页面跳转
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private async void VideoPlay_Click(object sender, RoutedEventArgs e)
         {
             var VideoPlayButton = (Button)sender;

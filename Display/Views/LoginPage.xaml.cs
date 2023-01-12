@@ -134,7 +134,7 @@ namespace Display.Views
         /// <summary>
         /// 展示二维码
         /// </summary>
-        /// <param name="Text"></param>
+        /// <param Name="Text"></param>
         private async void QRCodeShow(string Text)
         {
             QRCodeGenerator qrGenerator = new QRCodeGenerator();
@@ -180,8 +180,8 @@ namespace Display.Views
         /// <summary>
         /// 开始监听任务
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private async void OnQRTimerTickAsync(object sender, object e)
         {
             var result = await webapi.NetworkVerifyTokenAsync();
@@ -224,8 +224,8 @@ namespace Display.Views
         /// <summary>
         /// 获取所有文件信息
         /// </summary>
-        /// <param name="cid"></param>
-        /// <param name="webFileInfoList"></param>
+        /// <param Name="cid"></param>
+        /// <param Name="webFileInfoList"></param>
         /// <returns></returns>
         private async Task<List<Datum>> GetAllFileInfo(string cid = "0", List<Datum> webFileInfoList = null)
         {
@@ -274,8 +274,8 @@ namespace Display.Views
         /// <summary>
         /// 登录按钮
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             QRLoadingRing.IsActive = true;
@@ -292,8 +292,8 @@ namespace Display.Views
         /// <summary>
         /// 按下开始按钮
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private async void ImportButton_Click(object sender, RoutedEventArgs e)
         {
             var AllFileInfo = await GetAllFileInfo();

@@ -11,6 +11,7 @@ using Windows.ApplicationModel;
 using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
 using Newtonsoft.Json.Linq;
+using static Data.Spider.Manager;
 
 namespace Data
 {
@@ -405,6 +406,8 @@ namespace Data
     {
         public int id { get; set; }
 
+        public string initials => string.Empty + name.FirstOrDefault();
+
         public string name { set; get; }
 
         public List<string> otherNames { get; set; }
@@ -430,7 +433,7 @@ namespace Data
             {
                 string path = value;
 
-                path = !string.IsNullOrEmpty(path) ? path : "ms-appx:///Assets/NoPicture.jpg";
+                path = !string.IsNullOrEmpty(path) ? path : Data.Const.NoPictruePath;
 
                 if (_prifile_path == path) return;
 
@@ -616,7 +619,7 @@ namespace Data
             }
         }
 
-        private string _actor;
+        private string _actor { get; set; } = string.Empty;
         public string actor
         {
             get => _actor;
@@ -627,8 +630,18 @@ namespace Data
             }
 
         }
-
-        public string imageurl { get; set; }
+        
+        private string _imageurl;
+        public string imageurl
+        {
+            get => _imageurl;
+            set
+            {
+                if(_imageurl == value) return;
+                _imageurl = value;
+                OnPropertyChanged();
+            }
+        }
 
         public string sampleImageList { get; set; }
 
@@ -638,8 +651,10 @@ namespace Data
             get => _imagepath;
             set
             {
+                if(_imagepath == value) return;
+
                 string path = value;
-                _imagepath = !string.IsNullOrEmpty(path) ? path : "ms-appx:///Assets/NoPicture.jpg";
+                _imagepath = !string.IsNullOrEmpty(path) ? path : Data.Const.NoPictruePath;
                 OnPropertyChanged();
             }
         }
@@ -760,9 +775,6 @@ namespace Data
         public Visibility isShowLabel { get; set; } = Visibility.Collapsed;
         public string ShowLabel { get; set; }
 
-        //public bool isLookLater { get; set; }
-
-        //public double score { get; set; }
         private Visibility _isDeleted = Visibility.Collapsed;
         public Visibility isDeleted
         {
@@ -803,11 +815,11 @@ namespace Data
         }
 
         //public event PropertyChangedEventHandler PropertyChanged;
-        //protected void RaisePropertyChanged([CallerMemberName] string name = "")
+        //protected void RaisePropertyChanged([CallerMemberName] string Name = "")
         //{
         //    if (PropertyChanged != null)
         //    {
-        //        PropertyChanged(this, new PropertyChangedEventArgs(name));
+        //        PropertyChanged(this, new PropertyChangedEventArgs(Name));
         //    }
         //}
 
@@ -1352,7 +1364,7 @@ namespace Data
                 if (string.IsNullOrEmpty(_prifilePhotoPath))
                 {
                     //初始化
-                    _prifilePhotoPath = "ms-appx:///Assets/NoPicture.jpg";
+                    _prifilePhotoPath = Data.Const.NoPictruePath;
 
                     //检查演员图片是否存在
                     string imagePath = Path.Combine(AppSettings.ActorInfo_SavePath, name, "face.jpg");
@@ -1801,43 +1813,6 @@ namespace Data
         }
     }
 
-
-    public enum SpiderSourceName { javbus, jav321, avmoo, avsox, libredmm, fc2club, javdb, local }
-    public class SpiderSource
-    {
-        public string name { get; }
-
-        public SpiderSource(SpiderSourceName source)
-        {
-            string name = string.Empty;
-            switch (source)
-            {
-                case SpiderSourceName.javbus:
-                    name = "bus";
-                    break;
-                case SpiderSourceName.jav321:
-                    name = "jav321";
-                    break;
-                case SpiderSourceName.avmoo:
-                    name = "avmoo";
-                    break;
-                case SpiderSourceName.avsox:
-                    name = "avsox";
-                    break;
-                case SpiderSourceName.libredmm:
-                    name = "libre";
-                    break;
-                case SpiderSourceName.fc2club:
-                    name = "fc";
-                    break;
-                case SpiderSourceName.javdb:
-                    name = "db";
-                    break;
-            }
-
-            this.name = name;
-        }
-    }
 
 
     public enum RequestStates { none, fail, success };

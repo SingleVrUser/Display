@@ -112,7 +112,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 切换排序Flyout(成功或失败)
     /// </summary>
-    /// <param name="IsShowSuccessFlyout"></param>
+    /// <param Name="IsShowSuccessFlyout"></param>
     private void ChangedOrderButtonFlyout(bool IsShowSuccessFlyout)
     {
         //显示成功的排序
@@ -185,7 +185,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
     public void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
-        // Raise the PropertyChanged event, passing the name of the property whose value has changed.
+        // Raise the PropertyChanged event, passing the Name of the property whose value has changed.
         this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
@@ -265,7 +265,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
                 case "actor":
                     Title = ShowName;
                     //查询演员信息
-                    var actorinfos = await DataAccess.LoadActorInfo(filterList: new() { $"name == '{ShowName}'" });
+                    var actorinfos = await DataAccess.LoadActorInfo(filterList: new() { $"Name == '{ShowName}'" });
 
                     if (actorinfos.Count!=0)
                     {
@@ -311,8 +311,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// Slider值改变后，调整图片大小
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private void Slider_valueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
         markSliderValue = e.NewValue;
@@ -332,8 +332,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 动态调整图片大小
     /// </summary>
-    /// <param name="GridWidth"></param>
-    /// <param name="AdjustSliderValue"></param>
+    /// <param Name="GridWidth"></param>
+    /// <param Name="AdjustSliderValue"></param>
     private void AutoAdjustImageSize(double GridWidth = -1, bool AdjustSliderValue = false)
     {
         //失败列表不调整
@@ -367,7 +367,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 固定值调整图片大小
     /// </summary>
-    /// <param name="width"></param>
+    /// <param Name="width"></param>
     private void AdjustImageSize(double width)
     {
         if (SuccessInfoCollection == null) return;
@@ -425,8 +425,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 鼠标悬停在Grid，显示可操作按钮
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private void Grid_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
         if (!(sender is Grid grid)) return;
@@ -436,8 +436,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 鼠标移出在Grid，隐藏可操作按钮
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private void Grid_PointerExited(object sender, PointerRoutedEventArgs e)
     {
         if (!(sender is Grid grid)) return;
@@ -483,8 +483,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 点击了喜欢按钮
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private void LikeToggleButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not AppBarToggleButton Button) return;
@@ -510,8 +510,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 点击了稍后观看
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private void LookLaterToggleButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not AppBarToggleButton Button) return;
@@ -537,8 +537,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 修改评分
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="args"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="args"></param>
     private void RatingControl_ValueChanged(RatingControl sender, object args)
     {
         if (sender.DataContext is not VideoCoverDisplayClass videoInfo) return;
@@ -582,8 +582,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 按类型排序（用于成功列表）
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private void OrderSuccessListView_ItemClick(object sender, ItemClickEventArgs e)
     {
         ListView selectListView = (ListView)sender;
@@ -660,8 +660,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 按类型排序（用于失败列表）
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private async void OrderFailListView_ItemClick(object sender, ItemClickEventArgs e)
     {
         ListView selectListView = (ListView)sender;
@@ -735,8 +735,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 点击了删除按钮
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private async void deleteAppBarButton_Click(object sender, RoutedEventArgs e)
     {
         ContentDialog dialog = new ContentDialog()
@@ -811,8 +811,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// Toggle按钮改变时，切换匹配成功或失败列表
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private void ShowType_ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
     {
         var toggleswitch = sender as ToggleSwitch;
@@ -935,8 +935,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 失败列表输入框的值发生改变
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="args"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="args"></param>
     private async void FileAutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
         if (!(sender is AutoSuggestBox suggestBox))
@@ -954,8 +954,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 移至顶部
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private void ToTopButton_Click(object sender, RoutedEventArgs e)
     {
         if (IsShowFailListView)
@@ -1015,8 +1015,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 图片模式下根据Grid调整大小
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private void BasicGridView_SizeChanged(object sender, SizeChangedEventArgs e)
     {
         double newGridWidth = e.NewSize.Width;
@@ -1028,7 +1028,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 仅仅调整Slider的数值
     /// </summary>
-    /// <param name="newImageWidth"></param>
+    /// <param Name="newImageWidth"></param>
     private void AdjustSliderValueOnly(double newImageWidth)
     {
         //更改Slider数值
@@ -1040,8 +1040,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 启用图片大小的动态调整
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private void AutoAdjustImageSize_ToggleButton_Checked(object sender, RoutedEventArgs e)
     {
         //开始监听
@@ -1054,8 +1054,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 关闭图片大小的动态调整
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private void AutoAdjustImageSize_ToggleButton_UnChecked(object sender, RoutedEventArgs e)
     {
         CloseListeningGridSizeChanged();

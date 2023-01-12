@@ -115,7 +115,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
         //            ").map(" +
         //                "li_selected => {  " +
         //                    "return {'id': li_selected.getAttribute('cate_id'), " +
-        //                        "'name': li_selected.getAttribute('title') || li_selected.getAttribute('cate_id'), " +
+        //                        "'Name': li_selected.getAttribute('title') || li_selected.getAttribute('cate_id'), " +
         //                        "'file_count': li_selected.getAttribute('category_file_count'), " +
         //                        "'folder_count': li_selected.getAttribute('cate_folder_count')," +
         //                        "'hasHiddenFile': li_selected.getAttribute('hdf')," +
@@ -131,7 +131,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
         //    //        ").map(" +
         //    //            "li_selected => {  " +
         //    //                "return {'id': li_selected.getAttribute('cate_id'), " +
-        //    //                    "'name': li_selected.getAttribute('title') || li_selected.getAttribute('cate_id'), " +
+        //    //                    "'Name': li_selected.getAttribute('title') || li_selected.getAttribute('cate_id'), " +
         //    //                    "'file_count': li_selected.getAttribute('category_file_count'), " +
         //    //                    "'folder_count': li_selected.getAttribute('cate_folder_count')," +
         //    //                    "'hasHiddenFile': li_selected.getAttribute('hdf')," +
@@ -214,7 +214,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
         /// <summary>
         /// 显示确认提示框
         /// </summary>
-        /// <param name="selectedItemList"></param>
+        /// <param Name="selectedItemList"></param>
         /// <returns></returns>
         private async Task<ContentDialogResult> ShowContentDialog(List<string> NameList)
         {

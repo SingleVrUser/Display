@@ -121,7 +121,7 @@ namespace Display.Control
                     ").map(" +
                         "li_selected => {  " +
                             "return {'id': li_selected.getAttribute('cate_id'), " +
-                                "'name': li_selected.getAttribute('title') || li_selected.getAttribute('cate_id'), " +
+                                "'Name': li_selected.getAttribute('title') || li_selected.getAttribute('cate_id'), " +
                                 "'file_count': li_selected.getAttribute('category_file_count'), " +
                                 "'folder_count': li_selected.getAttribute('cate_folder_count')," +
                                 "'hasHiddenFile': li_selected.getAttribute('hdf')," +

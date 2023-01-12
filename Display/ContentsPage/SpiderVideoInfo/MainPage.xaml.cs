@@ -62,8 +62,8 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     /// <summary>
     /// 展开Expander初始化检查图片路径和网络
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="args"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="args"></param>
     private void Expander_Expanding(Expander sender, ExpanderExpandingEventArgs args)
     {
         if (!(sender is Expander expander)) return;
@@ -81,8 +81,8 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     /// <summary>
     /// 关闭Expander
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="args"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="args"></param>
     private void Expander_Collapsed(Expander sender, ExpanderCollapsedEventArgs args)
     {
         if (!(sender is Expander expander)) return;
@@ -94,8 +94,8 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     /// <summary>
     /// 点击匹配按钮开始匹配
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private void StartMatchName_ButtonClick(object sender, RoutedEventArgs e)
     {
         //从本地数据库中搜刮
@@ -175,8 +175,8 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     /// <summary>
     /// 切换“本地数据库”或“匹配失败”显示
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private void RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         //if (e.AddedItems.Count == 0) return;
@@ -193,8 +193,8 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     /// <summary>
     /// 点击显示文件信息
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private void ExplorerItemClick(object sender, ItemClickEventArgs e)
     {
         var itemInfo = e.ClickedItem as FilesInfo;
@@ -206,8 +206,8 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     /// <summary>
     /// 点击TreeView的Item显示文件信息
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="args"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="args"></param>
     private void TreeView_ItemInvoked(TreeView sender, TreeViewItemInvokedEventArgs args)
     {
         var content = ((args.InvokedItem as TreeViewNode).Content as ExplorerItem);
@@ -219,8 +219,8 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     /// <summary>
     /// 点击失败列表显示文件信息
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private void FailListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (e.AddedItems.Count != 1)
@@ -234,8 +234,8 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     /// <summary>
     /// 点击视频按钮播放
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private async void VideoPlayButton_Click(object sender, RoutedEventArgs e)
     {
         if (SelectedDatum == null) return;
