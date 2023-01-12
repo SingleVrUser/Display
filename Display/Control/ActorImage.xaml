@@ -10,6 +10,14 @@
 
     <UserControl.Resources>
         <MenuFlyout x:Key="LikeMenuFlyout">
+            <MenuFlyoutItem Text="获取信息"
+                            Click="GetInfoMenuFlyoutItem_Click">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon FontFamily="Segoe Fluent Icons"
+                              Glyph="&#xE11A;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            
             <MenuFlyoutItem Text="喜欢"
                             Click="LikeMenuFlyoutItem_Click">
                 <MenuFlyoutItem.Icon>
@@ -18,6 +26,7 @@
                               Foreground="OrangeRed" />
                 </MenuFlyoutItem.Icon>
             </MenuFlyoutItem>
+            
         </MenuFlyout>
     </UserControl.Resources>
 
@@ -32,7 +41,7 @@
                Stretch="UniformToFill"
                HorizontalAlignment="Center"
                VerticalAlignment="Center"
-               Source="{x:Bind ActorInfo.prifile_path}"/>
+               Source="{x:Bind ActorInfo.prifile_path,Mode=OneWay}"/>
 
         <FontIcon 
             x:Name="LikeFontIcon"

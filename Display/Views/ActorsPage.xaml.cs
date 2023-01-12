@@ -1,5 +1,4 @@
-﻿using crypto;
-using Data;
+﻿using Data;
 using Display.Model;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -220,7 +219,7 @@ namespace Display.Views
             StorageFile sampleFile = await storageFolder.CreateFileAsync("getting.json", CreationCollisionOption.ReplaceExisting);
             await FileIO.WriteTextAsync(sampleFile, JsonSerializer.Serialize(infos));
 
-            await GetActorInfo(infos);
+            await GetActorsInfo(infos);
 
             button.IsEnabled = true;
         }
@@ -234,7 +233,7 @@ namespace Display.Views
             string jsonString = await File.ReadAllTextAsync(filePath);
             List<ActorInfo> infos = JsonSerializer.Deserialize<List<ActorInfo>>(jsonString);
 
-            await GetActorInfo(infos, AppSettings.GetActorInfoLastIndex);
+            await GetActorsInfo(infos, AppSettings.GetActorInfoLastIndex);
 
             //获取完成，初始化续传索引
             AppSettings.GetActorInfoLastIndex = -1;
@@ -246,7 +245,7 @@ namespace Display.Views
             GetActorInfoButton.Visibility = Visibility.Visible;
         }
 
-        private async Task GetActorInfo(List<ActorInfo> infos,int startIndex = 0)
+        private static async Task GetActorsInfo(List<ActorInfo> infos,int startIndex = 0)
         {
             int allCount = infos.Count;
             if (allCount == 0) return;
@@ -266,73 +265,99 @@ namespace Display.Views
                 AppSettings.GetActorInfoLastIndex = i;
 
                 var info = infos[i];
-                var actorName = info.name;
-
-                //跳过无效名称
-                if (string.IsNullOrEmpty(actorName)) continue;
-
-                //含有数字的一般搜索不到，跳过
-                if (Regex.Match(actorName, @"\d+").Success) continue;
 
                 //有数据说明已经搜索过了
                 if (!string.IsNullOrEmpty(info.bwh))
                 {
-                    await Notifications.ToastGetActorInfoWithProgressBar.AddValue(i+1, allCount);
+                    await Notifications.ToastGetActorInfoWithProgressBar.AddValue(i + 1, allCount);
                     continue;
                 }
 
-                //从网站中获取信息
-                var actorinfo = await GetActorInfoFromNetwork.SearchInfoFromMinnanoAv(actorName);
-                if (actorinfo == null) continue;
-
-                var actorId = DataAccess.GetActorIdByName(actorName);
-                if (actorId == -1) continue;
-
-                DataAccess.UpdateActorInfo(actorId, actorinfo);
-
-                string baseUrl = AppSettings.MinnanoAv_BaseUrl;
-
-                //获取到的信息有头像
-                if (!string.IsNullOrEmpty(actorinfo.image_url))
-                {
-                    var actorInfos = await DataAccess.LoadActorInfo(1, filterList: new() { $"id == '{actorId}'" });
-
-                    //数据库中无头像
-                    if (actorInfos != null && actorInfos.Count != 0 && string.IsNullOrEmpty(actorInfos.FirstOrDefault().prifile_path))
-                    {
-                        string filePath = Path.Combine(AppSettings.ActorInfo_SavePath, actorName);
-                        var prifilePath = await GetInfoFromNetwork.downloadFile(actorinfo.image_url, filePath, "face",headers: new()
-                        {
-                            {"Referer", baseUrl },
-                            {"Host",actorinfo.info_url }
-                        });
-
-                        //更新头像
-                        DataAccess.UpdateActorInfoPrifilePath(actorId, prifilePath);
-                    }
-                }
-
-                //更新别名
-                //别名
-                if (actorinfo.otherNames != null && actorinfo.otherNames.Count > 0)
-                {
-                    foreach (var otherName in actorinfo.otherNames)
-                    {
-                        DataAccess.AddOrIgnoreActor_Names(actorId, otherName);
-                    }
-                }
-
-                //更新bwh
-                if (!string.IsNullOrEmpty(actorinfo.bwh))
-                {
-                    DataAccess.AddOrIgnoreBwh(actorinfo.bwh, actorinfo.bust, actorinfo.waist, actorinfo.hips);
-                }
+                await GetActorInfo(info);
 
                 await Notifications.ToastGetActorInfoWithProgressBar.AddValue(i+1, allCount);
 
                 //等待1~2秒
                 await GetInfoFromNetwork.RandomTimeDelay(1, 2);
             }
+        }
+
+        public static async Task<ActorInfo> GetActorInfo(ActorInfo info)
+        {
+            var actorName = info.name;
+
+            //跳过无效名称
+            if (string.IsNullOrEmpty(actorName)) return null;
+
+            //含有数字的一般搜索不到，跳过
+            if (Regex.Match(actorName, @"\d+").Success) return null;
+
+            //从网站中获取信息
+            var actorinfo = await GetActorInfoFromNetwork.SearchInfoFromMinnanoAv(actorName);
+            if (actorinfo == null) return null;
+
+            var actorId = DataAccess.GetActorIdByName(actorName);
+            if (actorId == -1) return null;
+
+            DataAccess.UpdateActorInfo(actorId, actorinfo);
+
+            string baseUrl = AppSettings.MinnanoAv_BaseUrl;
+
+            //获取到的信息有头像
+            if (!string.IsNullOrEmpty(actorinfo.image_url))
+            {
+                //查询本地数据库中的数据
+                var actorInfos = await DataAccess.LoadActorInfo(1, filterList: new() { $"id == '{actorId}'" });
+
+                if (actorInfos != null && actorInfos.Count != 0)
+                {
+                    var oldActorInfo = actorInfos.FirstOrDefault();
+
+                    //数据库中无头像
+                    if (oldActorInfo.prifile_path == Data.Const.NoPictruePath)
+                    {
+                        string filePath = Path.Combine(AppSettings.ActorInfo_SavePath, actorName);
+
+                        Uri infoUri = new(actorinfo.info_url);
+
+                        var prifilePath = await GetInfoFromNetwork.downloadFile(actorinfo.image_url, filePath, "face", headers: new()
+                        {
+                            {"Host",infoUri.Host },
+                            {"Referer", actorinfo.info_url }
+                        });
+
+                        //更新头像
+                        DataAccess.UpdateActorInfoPrifilePath(actorId, prifilePath);
+
+                        actorinfo.prifile_path = prifilePath;
+                    }
+                    //数据库中有头像
+                    else
+                    {
+                        actorinfo.prifile_path = oldActorInfo.prifile_path;
+                    }
+
+                }
+
+            }
+
+            //更新别名
+            //别名
+            if (actorinfo.otherNames != null && actorinfo.otherNames.Count > 0)
+            {
+                foreach (var otherName in actorinfo.otherNames)
+                {
+                    DataAccess.AddOrIgnoreActor_Names(actorId, otherName);
+                }
+            }
+
+            //更新bwh
+            if (!string.IsNullOrEmpty(actorinfo.bwh))
+            {
+                DataAccess.AddOrIgnoreBwh(actorinfo.bwh, actorinfo.bust, actorinfo.waist, actorinfo.hips);
+            }
+
+            return actorinfo;
         }
 
         public void ShowButtonWithShowToastAgain()
