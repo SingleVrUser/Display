@@ -259,7 +259,7 @@
                             <!--标签（4K/VR）-->
                             <StackPanel Margin="5"
                                         Padding="5,2"
-                                        Background="CornflowerBlue"
+                                        Background="{StaticResource AngleMarkBackground}"
                                         RelativePanel.AlignRightWithPanel="True"
                                         VerticalAlignment="Top"
                                         CornerRadius="5"
@@ -863,7 +863,7 @@
 
                             <TextBlock Visibility="{x:Bind actorInfo.birthday,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
                                 <Run Foreground="Gray">出生日期：</Run>
-                                <Run Text="{x:Bind actorInfo.birthday,Mode=OneWay}" />
+                                <Run Text="{x:Bind actorInfo.birthday,Mode=OneWay}"/>
                             </TextBlock>
 
                             <TextBlock Visibility="{x:Bind actorInfo.bwh,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">

@@ -134,7 +134,7 @@ namespace Display.Control
         /// <summary>
         /// 根据cid更新右侧的信息（显示目录 和 文件详情）
         /// </summary>
-        /// <param name="folderCid"></param>
+        /// <param Name="folderCid"></param>
         private void tryUpdataFolderInfo(string folderCid)
         {
             var items = GetFilesFromItems(folderCid, FilesInfo.FileType.File);
@@ -151,7 +151,7 @@ namespace Display.Control
         /// <summary>
         /// 更新详细信息的目录
         /// </summary>
-        /// <param name="folderCid"></param>
+        /// <param Name="folderCid"></param>
         private void tryUpdateFolder(string folderCid)
         {
             if (folderCid == "0")
@@ -209,8 +209,8 @@ namespace Display.Control
         /// <summary>
         /// 通过文件Cid获取根目录的Node
         /// </summary>
-        /// <param name="rootNodes"></param>
-        /// <param name="folderCid"></param>
+        /// <param Name="rootNodes"></param>
+        /// <param Name="folderCid"></param>
         /// <returns></returns>
         private TreeViewNode getNodeByRootNodeWithCid(List<TreeViewNode> rootNodes, string folderCid)
         {
@@ -251,7 +251,7 @@ namespace Display.Control
         /// <summary>
         /// 更新所选文件夹的文件列表
         /// </summary>
-        /// <param name="items"></param>
+        /// <param Name="items"></param>
         private void tryUpdateFileInSelectFolder(List<Datum> items)
         {
             FileInSelectFolder.Clear();
@@ -270,8 +270,8 @@ namespace Display.Control
         /// <summary>
         /// TreeView 展开
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="args"></param>
         private void TreeView_Expanding(TreeView sender, TreeViewExpandingEventArgs args)
         {
             //标记为 内含未加载项
@@ -311,8 +311,8 @@ namespace Display.Control
         /// <summary>
         /// 填充之前TreeView未加载的子节点
         /// </summary>
-        /// <param name="node"></param>
-        /// <param name="MaxNum"></param>
+        /// <param Name="node"></param>
+        /// <param Name="MaxNum"></param>
         private void FillTreeNode(TreeViewNode node, int MaxNum = 30, bool isInsertLeft = false)
         {
             // Get the contents of the folder represented by the current tree node.
@@ -439,8 +439,8 @@ namespace Display.Control
         /// <summary>
         /// 放入 花时 较长的 查询目录是否有下级目录的操作
         /// </summary>
-        /// <param name="itemsList"></param>
-        /// <param name="progress"></param>
+        /// <param Name="itemsList"></param>
+        /// <param Name="progress"></param>
         /// <returns></returns>
         private Dictionary<Datum, bool> getNewNode(List<Datum> itemsList, IProgress<int> progress)
         {
@@ -478,8 +478,8 @@ namespace Display.Control
         /// <summary>
         /// 全选
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             FolderTreeView.SelectAll();
@@ -488,8 +488,8 @@ namespace Display.Control
         /// <summary>
         /// 清空选项
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
 
@@ -499,8 +499,8 @@ namespace Display.Control
         /// <summary>
         /// 点击显示目录跳转指定位置
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="args"></param>
         private void FolderBreadcrumbBar_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
         {
             // Don't process last index (current location)

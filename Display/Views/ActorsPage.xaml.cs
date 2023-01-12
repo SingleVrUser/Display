@@ -89,8 +89,8 @@ namespace Display.Views
         /// <summary>
         /// 跳转至演员详情页
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void BasicGridView_ItemClick(object sender, ItemClickEventArgs e)
         {
             if (BasicGridView.ContainerFromItem(e.ClickedItem) is GridViewItem container)
@@ -228,7 +228,6 @@ namespace Display.Views
         {
             if (sender is not Button button) return;
             button.IsEnabled = false;
-
 
             //反序列化
             string filePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "ActorInfo","getting.json");

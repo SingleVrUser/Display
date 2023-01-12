@@ -1,8 +1,16 @@
 using Data;
+using Data.Helper;
+using Data.Spider;
+using HtmlAgilityPack;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Animation;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using Windows.Media.Protection.PlayReady;
 
 namespace Display.ContentsPage.DetailInfo
 {
@@ -10,22 +18,17 @@ namespace Display.ContentsPage.DetailInfo
     {
         private string cidName { get; set; }
 
-        public ObservableCollection<VideoInfo> VideoInfos = new();
+        private ObservableCollection<VideoInfo> VideoInfos = new();
+
+        private VideoInfo VideoInfo;
 
         public FindInfoAgainSmoke(string cidName)
         {
             this.InitializeComponent();
 
+            VideoInfo = new();
+
             this.cidName = cidName;
-
-            this.Loaded += PageLoaded;
-        }
-
-        private void PageLoaded(object sender, RoutedEventArgs e)
-        {
-            FindInfos();
-
-            this.Loaded -= PageLoaded;
         }
 
         private GetInfoFromNetwork _searchNetwork;
@@ -43,54 +46,9 @@ namespace Display.ContentsPage.DetailInfo
 
         async void FindInfos()
         {
-            List<VideoInfo> infos = new();
-
             ReCheckProgressRing.Visibility = Visibility.Visible;
 
-            bool isFc2 = FileMatch.IsFC2(cidName);
-
-            if (!isFc2 && JavBus_CheckBox.IsChecked == true)
-            {
-                var info = await SearchNetwork.SearchInfoFromJavBus(cidName);
-                if(info!=null)
-                    infos.Add(info);
-            }
-            if (!isFc2 && Jav321_CheckBox.IsChecked == true)
-            {
-                var info = await SearchNetwork.SearchInfoFromJav321(cidName);
-                if(info!=null)
-                    infos.Add(info);
-            }
-            if (!isFc2 && AvMoo_CheckBox.IsChecked == true)
-            {
-                var info = await SearchNetwork.SearchInfoFromAvMoo(cidName);
-                if(info!=null)
-                    infos.Add(info);
-            }
-            if (AvSox_CheckBox.IsChecked == true)
-            {
-                var info = await SearchNetwork.SearchInfoFromAvSox(cidName);
-                if(info!=null)
-                    infos.Add(info);
-            }
-            if (!isFc2 && LibreDmm_CheckBox.IsChecked == true)
-            {
-                var info = await SearchNetwork.SearchInfoFromLibreDmm(cidName);
-                if(info!=null)
-                    infos.Add(info);
-            }
-            if (isFc2 && Fc2Hub_CheckBox.IsChecked == true)
-            {
-                var info = await SearchNetwork.SearchInfoFromFc2Hub(cidName);
-                if (info != null)
-                    infos.Add(info);
-            }
-            if (JavDB_CheckBox.IsChecked == true)
-            {
-                var info = await SearchNetwork.SearchInfoFromJavDB(cidName);
-                if (info != null)
-                    infos.Add(info);
-            }
+            List<VideoInfo> infos = await Manager.Current.DispatchSpiderInfosByCIDInOrder(cidName);
 
             if (infos.Count > 0)
             {
@@ -108,10 +66,10 @@ namespace Display.ContentsPage.DetailInfo
         }
 
         /// <summary>
-        /// ÷ª”–—°÷–¡À≤≈ƒ‹∞¥»∑»œº¸
+        /// Âè™ÊúâÈÄâ‰∏≠‰∫ÜÊâçËÉΩÊåâÁ°ÆËÆ§ÈîÆ
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void NewInfo_ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (!(sender is ListView listView))
@@ -126,19 +84,65 @@ namespace Display.ContentsPage.DetailInfo
         }
 
         public event RoutedEventHandler ConfirmClick;
+        //public event NotifyCollectionChangedEventHandler CollectionChanged;
 
         /// <summary>
-        /// µ„ª˜»∑»œº¸ÃÊªª∏√∑¨∫≈–≈œ¢
+        /// ÁÇπÂáªÁ°ÆËÆ§ÈîÆÊõøÊç¢ËØ•Áï™Âè∑‰ø°ÊÅØ
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void Confirm_Button_Click(object sender, RoutedEventArgs e)
         {
             if (!(NewInfo_ListView.SelectedItem is VideoInfo videoInfo)) return;
             if (!(sender is Button button)) return;
 
-            //–ﬁ∏ƒ“ªœ¬
+            //‰øÆÊîπ‰∏Ä‰∏ã
             button.DataContext= videoInfo;
+
+            ConfirmClick?.Invoke(button, e);
+        }
+
+        private void SpecificSearchSourceGrid_loaded(object sender, RoutedEventArgs e)
+        {
+            FindInfos();
+
+            SpecificSearchSourceGrid.Loaded -= SpecificSearchSourceGrid_loaded;
+        }
+
+        private async void SearchInfoBySpecificUrlButton_Click(object sender, RoutedEventArgs e)
+        {
+            string url = SepcificUrl_TextBlock.Text;
+
+            ReCheckProgressRing.Visibility = Visibility.Visible;
+            ConfirmSpecificUrlButton.IsEnabled = false;
+
+            var info =  await Data.Spider.Manager.Current.DispatchSpiderInfoByDetailUrl(cidName, url);
+
+            ReCheckProgressRing.Visibility = Visibility.Collapsed;
+
+            if (info == null) return;
+
+            //Êõ¥Êñ∞ResultInfoÊï∞ÊçÆ
+            foreach (var item in info.GetType().GetProperties())
+            {
+                var name = item.Name;
+                var value = item.GetValue(info);
+
+                var newItem = VideoInfo.GetType().GetProperty(name);
+                newItem.SetValue(VideoInfo, value);
+            }
+
+            ConfirmSpecificUrlButton.IsEnabled = true;
+
+        }
+
+        private void ConfirmSpecificUrlButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(sender is Button button)) return;
+            if (VideoInfo == null) return;
+
+            //‰øÆÊîπ‰∏Ä‰∏ã
+            button.DataContext = VideoInfo;
 
             ConfirmClick?.Invoke(button, e);
         }

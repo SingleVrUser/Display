@@ -4,6 +4,7 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI.Controls;
 using Data;
+using Data.Spider;
 using Display.Model;
 using Display.WindowView;
 using Microsoft.UI.Input;
@@ -299,7 +300,7 @@ public sealed partial class MainPage : Page
     {
         Dictionary<string, VideoInfo> cidInfoDicts = new();
 
-        string noPicturePath = "ms-appx:///Assets/NoPicture.jpg";
+        string noPicturePath = Data.Const.NoPictruePath;
 
         //搜刮
         foreach (var video in filesInfos)
@@ -327,22 +328,9 @@ public sealed partial class MainPage : Page
             //网络中查询
             else
             {
-                bool isFc = FileMatch.IsFC2(cid);
+                var spiderManager = Data.Spider.Manager.Current;
 
-                if (!isFc && AppSettings.isUseJavBus)
-                    cidInfo = await network.SearchInfoFromJavBus(cid);
-                if (cidInfo == null && !isFc && AppSettings.isUseJav321)
-                    cidInfo = await network.SearchInfoFromJav321(cid);
-                if (cidInfo == null && !isFc && AppSettings.isUseAvMoo)
-                    cidInfo = await network.SearchInfoFromAvMoo(cid);
-                if (cidInfo == null && AppSettings.isUseAvSox)
-                    cidInfo = await network.SearchInfoFromAvSox(cid);
-                if (cidInfo == null && !isFc && AppSettings.isUseLibreDmm)
-                    cidInfo = await network.SearchInfoFromLibreDmm(cid);
-                if (cidInfo == null && isFc && AppSettings.isUseFc2Hub)
-                    cidInfo = await network.SearchInfoFromFc2Hub(cid);
-                if (cidInfo == null && AppSettings.isUseJavDB)
-                    cidInfo = await network.SearchInfoFromJavDB(cid);
+                cidInfo = await spiderManager.DispatchSpiderInfoByCIDInOrder(cid);
             }
 
             if (cidInfo == null) cidInfo = new() { truename = cid, imagepath = noPicturePath };
@@ -543,7 +531,7 @@ public sealed partial class MainPage : Page
         FilesInfos.Clear();
     }
 
-    private void VideoGrid_Drop(object sender, DragEventArgs e)
+    private void VideoUniformGrid_Drop(object sender, DragEventArgs e)
     {
         if (sender is not Grid) return;
 

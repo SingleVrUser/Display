@@ -67,6 +67,7 @@
     <None Remove="ContentsPage\CheckCookie.xaml" />
     <None Remove="ContentsPage\DatumList\FileListPage.xaml" />
     <None Remove="ContentsPage\DatumList\VideoDisplay\MainPage.xaml" />
+    <None Remove="ContentsPage\DetailInfo\EditInfo.xaml" />
     <None Remove="ContentsPage\FileInfoInCidSmoke.xaml" />
     <None Remove="ContentsPage\FindInfoAgainSmoke.xaml" />
     <None Remove="ContentsPage\GetThumbnail.xaml" />
@@ -90,6 +91,7 @@
     <None Remove="Control\FileAutoSuggestBox.xaml" />
     <None Remove="Control\InfoListFilter.xaml" />
     <None Remove="Control\MultipleCoverShow.xaml" />
+    <None Remove="Control\RangeSlider.xaml" />
     <None Remove="Control\ShowCountControl.xaml" />
     <None Remove="Control\StatusShow.xaml" />
     <None Remove="Control\TextBlockWithLongText.xaml" />
@@ -312,13 +314,15 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Assets\115\file_type\" />
-    <Folder Include="ContentsPage\DetailInfo\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Assets\SmallTile.scale-125.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="Control\RangeSlider.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="ContentsPage\Sort115\MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -418,5 +422,11 @@
   </ItemGroup>
   <ItemGroup>
     <PRIResource Remove="Assets\Models\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomAdditionalCompileInputs Remove="ContentsPage\DetailInfo\EditInfo.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Remove="ContentsPage\DetailInfo\EditInfo.xaml" />
   </ItemGroup>
 </Project>

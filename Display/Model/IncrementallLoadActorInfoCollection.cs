@@ -20,23 +20,33 @@ public class IncrementallLoadActorInfoCollection : ObservableCollection<ActorInf
 
     public bool isDsc { get;private set; }
 
-    public IncrementallLoadActorInfoCollection(Dictionary<string, bool> orderByList)
+    public IncrementallLoadActorInfoCollection(Dictionary<string, bool> orderByList,int defaultAddCount=40)
     {
+        this.defaultAddCount = defaultAddCount;
+
         SetOrder(orderByList);
     }
 
     public async Task<int> LoadData(int limit = 40,int offset=0)
     {
+        System.Diagnostics.Debug.WriteLine($"加载{offset}-{offset+limit} 中……");
+
         var ActorInfos = await DataAccess.LoadActorInfo(limit, offset, orderByList, filterList);
 
         if (Count == 0)
+        {
             this.AllCount = DataAccess.CheckActorInfoCount(filterList);
+            System.Diagnostics.Debug.WriteLine($"总数量:{this.AllCount}");
+
+            System.Diagnostics.Debug.WriteLine($"HasMoreItems:{HasMoreItems}");
+        }
 
         ActorInfos.ForEach(item => Add(item));
 
         if (AllCount <= Count)
         {
             HasMoreItems = false;
+            System.Diagnostics.Debug.WriteLine("记载完毕");
         }
 
         return ActorInfos.Count;
@@ -46,6 +56,7 @@ public class IncrementallLoadActorInfoCollection : ObservableCollection<ActorInf
     {
         this.filterList = filterList;
         Clear();
+        if(!HasMoreItems) HasMoreItems = true;
     }
 
     public void SetOrder(Dictionary<string, bool> orderBy)
@@ -58,10 +69,12 @@ public class IncrementallLoadActorInfoCollection : ObservableCollection<ActorInf
         return InnerLoadMoreItemsAsync(count).AsAsyncOperation();
     }
 
-    private int defaultCount = 40;
+    private int defaultAddCount = 40;
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        int getCount = await LoadData(defaultCount, Count);
+        System.Diagnostics.Debug.WriteLine($">>>>>>>>>>>增量加载{Count}-{Count + defaultAddCount}");
+        int getCount = await LoadData(defaultAddCount, Count);
+
 
         return new LoadMoreItemsResult
         {

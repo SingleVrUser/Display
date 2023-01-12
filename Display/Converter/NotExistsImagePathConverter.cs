@@ -19,7 +19,7 @@ public class NotExistsImagePathConverter : IValueConverter
         }
 
 
-        imageSource = new BitmapImage(new Uri("ms-appx:///Assets/NoPicture.jpg"));
+        imageSource = new BitmapImage(new Uri(Data.Const.NoPictruePath));
 
         return imageSource;
     }

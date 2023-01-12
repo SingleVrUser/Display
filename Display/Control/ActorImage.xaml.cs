@@ -23,42 +23,18 @@ namespace Display.Control
 {
     public sealed partial class ActorImage : UserControl
     {
-        private static readonly string noPictruePath = "ms-appx:///Assets/NoPicture.jpg";
+        public ActorInfo ActorInfo;
 
-        private string actorName;
-
-        private int actorId;
-
-        public ActorImage(string actorName)
+        public ActorImage(ActorInfo actorInfo, string releaseTime)
         {
             this.InitializeComponent();
 
-            //检查演员图片是否存在
-            string imagePath = Path.Combine(AppSettings.ActorInfo_SavePath, actorName, "face.jpg");
-            if (!File.Exists(imagePath))
-            {
-                imagePath = noPictruePath;
-            }
+            ActorInfo = new();
 
-            ShowImage.Source = new BitmapImage(new Uri(imagePath));
+            ActorInfo = actorInfo;
 
-            this.actorName = actorName;
-        }
-
-        public ActorImage(ActorInfo actorInfo)
-        {
-            this.InitializeComponent();
-
-            string imagePath;
-            if (string.IsNullOrEmpty(actorInfo.prifile_path))
-            {
-                imagePath = noPictruePath;
-            }
-            else
-            {
-                imagePath = actorInfo.prifile_path;
-            }
-            ShowImage.Source = new BitmapImage(new Uri(imagePath));
+            //是否可点击
+            if (string.IsNullOrEmpty(actorInfo.name)) return;
 
             //是否喜欢
             if (actorInfo.is_like == 1)
@@ -66,9 +42,24 @@ namespace Display.Control
                 LikeFontIcon.Visibility = Visibility.Visible;
             }
 
-            this.actorName = actorInfo.name;
-            this.actorId = actorInfo.id;
-            //ShowText.Text = actorInfo.name;
+            //右键菜单
+            RootGrid.ContextFlyout = this.Resources["LikeMenuFlyout"] as MenuFlyout;
+
+
+            //监听Pointer后改变鼠标
+            RootGrid.PointerEntered += Grid_PointerEntered;
+            RootGrid.PointerExited += Grid_PointerExited;
+
+            //显示作品时年龄
+            if (FileMatch.CalculatTimeStrDiff(actorInfo.birthday, releaseTime) is TimeSpan dtDif)
+            {
+                if(dtDif != TimeSpan.Zero)
+                {
+                    WorkYearDiff_TextBlock.Text = ((int)dtDif.TotalDays / 365).ToString();
+                    WorkYearDiff_TextBlock.Visibility = Visibility.Visible;
+                }
+            }
+
         }
 
 
@@ -104,7 +95,7 @@ namespace Display.Control
                     break;
             }
 
-            DataAccess.UpdateSingleDataFromActorInfo(actorId.ToString(), "is_like", is_like.ToString());
+            DataAccess.UpdateSingleDataFromActorInfo(ActorInfo.id.ToString(), "is_like", is_like.ToString());
         }
     }
 }
