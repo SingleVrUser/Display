@@ -17,6 +17,7 @@ namespace Display.Control
 
         private string releaseTime;
 
+
         public ActorImage(ActorInfo actorInfo, string releaseTime)
         {
             this.InitializeComponent();
@@ -95,8 +96,14 @@ namespace Display.Control
 
         private async void GetInfoMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
+            GetActorInfoProgressRing.Visibility = Visibility.Visible;
+
             var newInfo = await ActorsPage.GetActorInfo(ActorInfo);
-            if (newInfo == null) return;
+            if (newInfo == null)
+            {
+                GetActorInfoProgressRing.Visibility = Visibility.Collapsed;
+                return;
+            }
 
             //更新头像
             if (!string.IsNullOrEmpty(newInfo.prifile_path))
@@ -106,6 +113,8 @@ namespace Display.Control
 
             //更新年龄
             tryShowActorAge(newInfo.birthday);
+
+            GetActorInfoProgressRing.Visibility = Visibility.Collapsed;
         }
     }
 }

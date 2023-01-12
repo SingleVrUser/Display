@@ -651,7 +651,7 @@ namespace Data
             get => _imagepath;
             set
             {
-                if(_imagepath == value) return;
+                if (_imagepath == value) return;
 
                 string path = value;
                 _imagepath = !string.IsNullOrEmpty(path) ? path : Data.Const.NoPictruePath;

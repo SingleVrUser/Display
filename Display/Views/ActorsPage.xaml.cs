@@ -205,6 +205,25 @@ namespace Display.Views
             if (sender is not Button button) return;
             button.IsEnabled = false;
 
+            string baseUrl = AppSettings.MinnanoAv_BaseUrl;
+
+            //检查搜刮页是否可用
+            bool canUse = await GetInfoFromNetwork.CheckUrlUseful(baseUrl);
+
+            if (!canUse)
+            {
+                button.IsEnabled = true;
+                ContentDialog dialog = new ContentDialog()
+                {
+                    XamlRoot = this.XamlRoot,
+                    Title = "访问出错",
+                    Content = $"{baseUrl} 不可访问，请检查网络设置",
+                    CloseButtonText = "返回"
+                };
+                await dialog.ShowAsync();
+                return;
+            }
+
             var infos = await DataAccess.LoadActorInfo(-1);
 
             int allCount = infos.Count;
@@ -300,8 +319,6 @@ namespace Display.Views
             if (actorId == -1) return null;
 
             DataAccess.UpdateActorInfo(actorId, actorinfo);
-
-            string baseUrl = AppSettings.MinnanoAv_BaseUrl;
 
             //获取到的信息有头像
             if (!string.IsNullOrEmpty(actorinfo.image_url))
