@@ -75,5 +75,7 @@
                 Margin="0,0,0,2"
                 ToolTipService.ToolTip="出演时的年龄"/>
         </Border>
+
+        <ProgressRing x:Name="GetActorInfoProgressRing" Visibility="Collapsed"/>
     </Grid>
 </UserControl>

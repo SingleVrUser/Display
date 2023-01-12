@@ -971,7 +971,8 @@
                                    SelectionMode="None"
                                    DesiredWidth="400"
                                    StretchContentForSingleRow="True"
-                                   Visibility="{x:Bind IsShowFailListView,Mode=OneWay}" />
+                                   Visibility="{x:Bind IsShowFailListView,Mode=OneWay}"
+                                   Padding="10,0"/>
 
         <!--筛选栏，默认隐藏-->
         <customcontrols:InfoListFilter x:Name="InfosFilter"

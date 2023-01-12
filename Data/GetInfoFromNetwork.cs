@@ -56,7 +56,6 @@ namespace Data
         public static string DesktopUserAgent = "Mozilla/5.0; Windows NT/10.0.19044; 115Desktop/2.0.1.7";
         public static string MediaElementUserAgent = "NSPlayer/12.00.22621.0963 WMFSDK/12.00.22621.0963";
 
-
         public GetInfoFromNetwork()
         {
         }
@@ -92,7 +91,7 @@ namespace Data
         /// </summary>
         /// <param Name="checkUrl"></param>
         /// <returns></returns>
-        public async Task<bool> CheckUrlUseful(string checkUrl)
+        public static async Task<bool> CheckUrlUseful(string checkUrl)
         {
             bool isUseful = true;
             HttpResponseMessage resp;

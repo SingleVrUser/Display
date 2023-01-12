@@ -194,7 +194,7 @@
 
                         <Image x:FieldModifier="public"
                                x:Name="Cover_Image"
-                               Source="{x:Bind resultinfo.imagepath,Converter={StaticResource NotExistsImagePathConverter},Mode=OneWay}"
+                               Source="{x:Bind resultinfo.imagepath,Converter={StaticResource NotExistsImagePathConverter}}"
                                HorizontalAlignment="Left"
                                VerticalAlignment="Center"
                                MaxHeight="500" />
@@ -315,6 +315,7 @@
 
                                     <TextBlock Text="{x:Bind resultinfo.producer,Mode=OneWay}"
                                                Padding="60,0,0,0"
+                                               TextTrimming="CharacterEllipsis"
                                                IsTextSelectionEnabled="True"/>
                                 </Grid>
 

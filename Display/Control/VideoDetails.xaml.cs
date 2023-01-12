@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation.Metadata;
+using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.System.Profile;
 using static Display.ContentsPage.SpiderVideoInfo.FileStatistics;
 
@@ -348,15 +351,24 @@ namespace Display.Control
                 newItem.SetValue(resultinfo, value);
             }
 
-            ////图片地址不变，但内容变了
-            ////为了图片显示能够变化
-            //string tmp = resultinfo.imagepath;
+            //图片地址不变，但内容变了
+            //为了图片显示能够变化
+            string oldPath = resultinfo.imagepath;
+            string newPath = videoInfo.imagepath;
             //string NoPictruePath = "ms-appx:///Assets/NoPicture.jpg";
-            //if (!tmp.Contains("ms-appx:"))
-            //{
-            //    resultinfo.imagepath = NoPictruePath;
-            //    resultinfo.imagepath = tmp;
-            //}
+            if (!oldPath.Contains("ms-appx:") && File.Exists(newPath))
+            {
+                StorageFile file = await StorageFile.GetFileFromPathAsync(newPath);
+
+                using (IRandomAccessStream fileStream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read))
+                {
+                    // Set the image source to the selected bitmap
+                    BitmapImage bitmapImage = new BitmapImage();
+
+                    await bitmapImage.SetSourceAsync(fileStream);
+                    Cover_Image.Source = bitmapImage;
+                }
+            }
 
 
             //重新加载数据
