@@ -11,7 +11,7 @@
   <Identity
     Name="250cd7ac-8a28-4638-98ab-35d20736c13e"
     Publisher="CN=Display"
-    Version="0.1.15.8" />
+    Version="0.1.16.0" />
 
   <Properties>
     <DisplayName>Display</DisplayName>
@@ -46,14 +46,14 @@
       <Extensions>
         <!--Specify which CLSID to activate when toast clicked-->
         <desktop:Extension Category="windows.toastNotificationActivation">
-          <desktop:ToastNotificationActivation ToastActivatorCLSID="bc0fba78-756a-4c2c-9fea-21f83e66b3c4" />
+          <desktop:ToastNotificationActivation ToastActivatorCLSID="250cd7ac-8a28-4638-98ab-35d20736c13e" />
         </desktop:Extension>
 
         <!--Register COM CLSID LocalServer32 registry key-->
         <com:Extension Category="windows.comServer">
           <com:ComServer>
             <com:ExeServer Executable="Display\Display.exe" Arguments="----AppNotificationActivated:" DisplayName="Toast activator">
-              <com:Class Id="bc0fba78-756a-4c2c-9fea-21f83e66b3c4" DisplayName="Toast activator"/>
+              <com:Class Id="250cd7ac-8a28-4638-98ab-35d20736c13e" DisplayName="Toast activator"/>
             </com:ExeServer>
           </com:ComServer>
         </com:Extension>
