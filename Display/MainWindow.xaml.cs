@@ -274,14 +274,13 @@ namespace Display
                 //选中的是失败项
                 if(nowItem.series == "fail")
                 {
-                    await Views.DetailInfoPage.PlayeVideo(nowItem.busurl, ((Page)ContentFrame.Content).XamlRoot);
+                    await DetailInfoPage.PlayeVideo(nowItem.busurl, ((Page)ContentFrame.Content).XamlRoot);
                 }
                 //正常点击
                 else
                 {
                     //加载应用记录的图片默认大小
-                    //TODO 以后这个默认匹配
-                    var imageSize = Data.AppSettings.ImageSize;
+                    var imageSize = AppSettings.ImageSize;
                     var newItem = new VideoCoverDisplayClass(nowItem, imageSize.Item1, imageSize.Item2);
                     ContentFrame.Navigate(typeof(DetailInfoPage), newItem, new SuppressNavigationTransitionInfo());
                 }

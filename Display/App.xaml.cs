@@ -5,27 +5,11 @@ using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Xaml.Shapes;
-using Microsoft.Windows.AppNotifications;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using System.Runtime.InteropServices;
 using Windows.Storage;
-using Windows.UI.ViewManagement;
 using WinRT.Interop;
-using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -37,16 +21,12 @@ namespace Display
     /// </summary>
     public partial class App : Application
     {
-        ///// <summary>
-        ///// 应用窗口对象.
-        ///// </summary>
-        //public static AppWindow AppWindow { get; private set; }
-
         /// <summary>
         /// 主窗口.
         /// </summary>
-        public static Window AppMainWindow { get; private set; }
+        public static Window AppMainWindow;
 
+        private static NotificationManager notificationManager;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -56,6 +36,8 @@ namespace Display
         {
             this.InitializeComponent();
 
+            notificationManager = new NotificationManager();
+
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 
         }
@@ -64,6 +46,8 @@ namespace Display
         {
             //删除获取演员信息的进度通知
             NotificationManager.RemoveGetActorInfoProgessToast();
+
+            notificationManager.Unregister();
         }
 
         /// <summary>
@@ -90,11 +74,15 @@ namespace Display
             {
                 CreateActivateMainWindow();
             }
+
         }
 
         public static void CreateActivateMainWindow()
         {
             AppMainWindow = new MainWindow();
+
+            notificationManager.Init();
+
             AppMainWindow.Activate();
         }
 
@@ -144,5 +132,35 @@ namespace Display
             return AppWindow.GetFromWindowId(windowId);
         }
 
+        public static void ToForeground()
+        {
+            if (AppMainWindow != null)
+            {
+                WindowHelper.ShowWindow(AppMainWindow);
+            }
+        }
+
+
+        private static class WindowHelper
+        {
+            [DllImport("user32.dll")]
+            private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+            [DllImport("user32.dll")]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+            public static void ShowWindow(Window window)
+            {
+                // Bring the window to the foreground... first get the window handle...
+                var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+
+                // Restore window if minimized... requires DLL import above
+                ShowWindow(hwnd, 0x00000009);
+
+                // And call SetForegroundWindow... requires DLL import above
+                SetForegroundWindow(hwnd);
+            }
+        }
     }
 }

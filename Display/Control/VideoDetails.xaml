@@ -176,16 +176,15 @@
 
                     <!--封面图-->
                     <Grid CornerRadius="4"
-                          x:Name="Cover_Grid">
+                          x:Name="Cover_Grid"
+                          HorizontalAlignment="Center">
 
                         <Image x:FieldModifier="public"
                                x:Name="Cover_Image"
                                Source="{x:Bind resultinfo.imagepath,Converter={StaticResource NotExistsImagePathConverter},Mode=OneWay}"
                                HorizontalAlignment="Left"
                                VerticalAlignment="Center"
-                               MaxHeight="780">
-
-                        </Image>
+                               MaxHeight="780" />
 
                         <Grid x:Name="VideoPlayIconInCover"
                               Visibility="Collapsed">

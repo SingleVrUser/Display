@@ -17,17 +17,16 @@
                     <SolidColorBrush x:Key="WindowCaptionForegroundDisabled">#abd5ff</SolidColorBrush>
                     <SolidColorBrush x:Key="RatingControlSelectedForeground" Color="#f7ba36" />
                     <SolidColorBrush x:Key="RatingControlUnselectedForeground" Color="#ecf0f1" />
-
                 </ResourceDictionary>
-                
-                
+
+                <!--控件颜色-->
+                <ResourceDictionary>
+                    <Color x:Key="ColorChecked">#8cb3ff</Color>
+                    <SolidColorBrush x:Key="CustomToggleButtonBackgroundChecked" Color="{StaticResource ColorChecked}" />
+                </ResourceDictionary>
 
                 <ResourceDictionary>
                     
-                    <!--MediaTransportControl背景-->
-                    <SolidColorBrush x:Key="MediaTransportControlsPanelBackground"
-                                     Color="#60ffffff" />
-
                     <Style TargetType="TextBlock">
                         <Setter Property="FontFamily"
                                 Value="霞鹜文楷" />
@@ -83,7 +82,7 @@
                                             <VisualStateGroup x:Name="CommonStates">
                                                 <VisualState x:Name="Normal" />
                                                 <VisualState x:Name="PointerOver">
-                                                    <Storyboard>
+                                                    <!--<Storyboard>
                                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
                                                                                        Storyboard.TargetProperty="Foreground">
                                                             <DiscreteObjectKeyFrame KeyTime="0"
@@ -100,10 +99,10 @@
                                                                                     Value="{ThemeResource RadioButtonBorderBrushPointerOver}" />
                                                         </ObjectAnimationUsingKeyFrames>
 
-                                                    </Storyboard>
+                                                    </Storyboard>-->
                                                 </VisualState>
                                                 <VisualState x:Name="Pressed">
-                                                    <Storyboard>
+                                                    <!--<Storyboard>
                                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
                                                                                        Storyboard.TargetProperty="Foreground">
                                                             <DiscreteObjectKeyFrame KeyTime="0"
@@ -120,7 +119,7 @@
                                                                                     Value="{ThemeResource RadioButtonBorderBrushPressed}" />
                                                         </ObjectAnimationUsingKeyFrames>
 
-                                                    </Storyboard>
+                                                    </Storyboard>-->
                                                 </VisualState>
                                                 <VisualState x:Name="Disabled">
                                                     <Storyboard>
@@ -129,11 +128,13 @@
                                                             <DiscreteObjectKeyFrame KeyTime="0"
                                                                                     Value="{ThemeResource RadioButtonForegroundDisabled}" />
                                                         </ObjectAnimationUsingKeyFrames>
+                                                        
                                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootGrid"
                                                                                        Storyboard.TargetProperty="Background">
                                                             <DiscreteObjectKeyFrame KeyTime="0"
                                                                                     Value="{ThemeResource RadioButtonBackgroundDisabled}" />
                                                         </ObjectAnimationUsingKeyFrames>
+                                                        
                                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootGrid"
                                                                                        Storyboard.TargetProperty="BorderBrush">
                                                             <DiscreteObjectKeyFrame KeyTime="0"
@@ -149,8 +150,14 @@
                                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="myGrid"
                                                                                        Storyboard.TargetProperty="Background">
                                                             <DiscreteObjectKeyFrame KeyTime="0"
-                                                                                    Value="{StaticResource CustomAcrylicInAppLuminosity}" />
+                                                                                    Value="{StaticResource CustomToggleButtonBackgroundChecked}" />
                                                         </ObjectAnimationUsingKeyFrames>
+
+                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
+                                                                                       Storyboard.TargetProperty="Foreground">
+                                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                                    Value="{ThemeResource ToggleButtonForegroundChecked}" />
+                                                        </ObjectAnimationUsingKeyFrames> 
                                                     </Storyboard>
                                                 </VisualState>
                                                 <VisualState x:Name="Unchecked" />
@@ -182,10 +189,12 @@
 
             <x:Double x:Key="ContentDialogMaxWidth">900</x:Double>
 
-            <AcrylicBrush x:Key="CustomAcrylicInAppLuminosity"
+            <!--<AcrylicBrush x:Key="CustomAcrylicInAppLuminosity"
                           TintOpacity="0.8"
                           TintLuminosityOpacity="0.5"
-                          TintColor="#0593ff" FallbackColor="SkyBlue" />
+                          TintColor="#0593ff" FallbackColor="SkyBlue" />-->
+            
+            
 
 
 

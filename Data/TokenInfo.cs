@@ -422,18 +422,24 @@ namespace Data
         public int works_count { set; get; }
         public string work_time { set; get; } = string.Empty;
 
-        private string _prifile_path = string.Empty;
+        private string _prifile_path { set; get; } = string.Empty;
         public string prifile_path
         {
             get => _prifile_path;
             set
             {
-                if (_prifile_path == value) return;
+                string path = value;
 
-                _prifile_path = value;
+                path = !string.IsNullOrEmpty(path) ? path : "ms-appx:///Assets/NoPicture.jpg";
+
+                if (_prifile_path == path) return;
+
+                _prifile_path = path;
+
                 OnPropertyChanged();
             }
         }
+
 
         public string image_url { get; set; }
 
@@ -1960,6 +1966,23 @@ namespace Data
         public bool IsSpiderFail { get;set;}
     }
 
+    
     public enum FailType { All, MatchFail, SpiderFail}
 
+    public class FailInfo
+    {
+        public string pc { get; set; }
+
+        public Datum datum { get; set; }
+
+        public int is_like { get; set; } = 0;
+
+        public double score { get; set; } = -1;
+
+        public long look_later { get; set; } = 0;
+
+        public string image_path { get; set; }
+    }
+
+    public enum FailInfoShowType { like,look_later}
 }

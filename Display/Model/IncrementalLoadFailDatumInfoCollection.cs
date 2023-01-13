@@ -10,21 +10,21 @@ using Windows.Foundation;
 
 namespace Display.Model;
 
-public class IncrementalLoadFailInfoCollection : ObservableCollection<Datum>, ISupportIncrementalLoading
+public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum>, ISupportIncrementalLoading
 {
-    public IncrementalLoadFailInfoCollection()
+    public IncrementalLoadFailDatumInfoCollection()
     {
 
     }
 
     public async Task LoadData(int startShowCount = 20)
     {
-        var newItems = await DataAccess.LoadFailFileInfo(0, startShowCount, filterName, OrderBy, IsDesc, ShowType);
+        var newItems = await DataAccess.LoadFailFileInfoWithDatum(0, startShowCount, filterName, OrderBy, IsDesc, ShowType);
 
         if (Count == 0)
         {
             HasMoreItems = true;
-            this.AllCount = DataAccess.CheckFailFilesCount(filterName, ShowType);
+            this.AllCount = DataAccess.CheckFailDatumFilesCount(filterName, ShowType);
         }
         else
             Clear();
@@ -65,7 +65,7 @@ public class IncrementalLoadFailInfoCollection : ObservableCollection<Datum>, IS
 
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        var failLists = await DataAccess.LoadFailFileInfo(Items.Count, (int)count, filterName, OrderBy, IsDesc, ShowType);
+        var failLists = await DataAccess.LoadFailFileInfoWithDatum(Items.Count, (int)count, filterName, OrderBy, IsDesc, ShowType);
         
         if (failLists.Count < count)
         {

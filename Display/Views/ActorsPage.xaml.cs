@@ -1,4 +1,5 @@
-﻿using Data;
+﻿using crypto;
+using Data;
 using Display.Model;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -29,6 +30,8 @@ namespace Display.Views
         IncrementallLoadActorInfoCollection actorinfo;
         ObservableCollection<ActorInfo> actorPartInfo = new();
 
+        public static ActorsPage Current;
+
         //过渡动画用
         private enum navigationAnimationType { image, gridView };
         private navigationAnimationType _navigationType;
@@ -38,6 +41,8 @@ namespace Display.Views
         public ActorsPage()
         {
             this.InitializeComponent();
+
+            Current = this;
 
         }
 
@@ -49,7 +54,7 @@ namespace Display.Views
 
             await actorinfo.LoadData();
 
-            TotalCount_TextBlock.Text = actorinfo.Count.ToString();
+            TotalCount_TextBlock.Text = actorinfo.AllCount.ToString();
             BasicGridView.ItemsSource = actorinfo;
 
             LoadActorPartInfo();
@@ -238,7 +243,6 @@ namespace Display.Views
             //删除文件
             File.Delete(filePath);
 
-
             button.Visibility = Visibility.Collapsed;
             GetActorInfoButton.Visibility = Visibility.Visible;
         }
@@ -248,7 +252,7 @@ namespace Display.Views
             int allCount = infos.Count;
             if (allCount == 0) return;
 
-            if (!Notifications.ToastGetActorInfoWithProgressBar.SendToast(allCount)) return;
+            if (!Notifications.ToastGetActorInfoWithProgressBar.SendToast(startIndex, allCount)) return;
 
             bool isStart = false;
             for (int i = 0; i < allCount; i++)
@@ -330,10 +334,30 @@ namespace Display.Views
                 //等待1~2秒
                 await GetInfoFromNetwork.RandomTimeDelay(1, 2);
             }
-
         }
 
-    }
+        public void ShowButtonWithShowToastAgain()
+        {
+            if (DispatcherQueue.HasThreadAccess)
+            {
+                ShowProgressButton.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    ShowProgressButton.Visibility = Visibility.Visible;
+                });
+            }
+        }
 
+        private void ShowProgressButton_Click(object sender, RoutedEventArgs e)
+        {
+            Notifications.ToastGetActorInfoWithProgressBar.SendToast();
+
+            //点击后隐藏
+            ShowProgressButton.Visibility = Visibility.Collapsed;
+        }
+    }
 
 }

@@ -1,4 +1,5 @@
 ﻿using Data;
+using Display.Control;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -29,11 +30,25 @@ namespace Display.Views
 
         private async void SingleVideoPlay_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is not Button VideoPlayButton) return;
+            if (sender is not Grid VideoPlayGrid) return;
 
-            if (VideoPlayButton.DataContext is not Datum datum) return;
+            string pickCode;
+            if (VideoPlayGrid.DataContext is Datum datum)
+            {
+                pickCode = datum.pc;
+            }
+            else if (VideoPlayGrid.DataContext is FailInfo failInfo)
+            {
+                pickCode = failInfo.pc;
+            }
+            else
+            {
+                return;
+            }
 
-            await Views.DetailInfoPage.PlayeVideo(datum.pc, this.XamlRoot);
+            if (string.IsNullOrEmpty(pickCode)) return;
+
+            await Views.DetailInfoPage.PlayeVideo(pickCode, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.fail);
         }
 
         /// <summary>
@@ -57,7 +72,9 @@ namespace Display.Views
         private async void VideoPlay_Click(object sender, RoutedEventArgs e)
         {
             var VideoPlayButton = (Button)sender;
-            var videoInfo = VideoPlayButton.DataContext as VideoCoverDisplayClass;
+
+            if (VideoPlayButton.DataContext is not VideoCoverDisplayClass videoInfo) return;
+
             List<Datum> videoInfoList = DataAccess.loadVideoInfoByTruename(videoInfo.truename);
 
             //没有

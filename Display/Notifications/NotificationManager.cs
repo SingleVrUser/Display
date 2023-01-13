@@ -16,7 +16,7 @@ internal class NotificationManager
 
         // When adding new a scenario, be sure to add its notification handler here.
         c_notificationHandlers = new Dictionary<int, Action<AppNotificationActivatedEventArgs>>();
-
+        c_notificationHandlers.Add(ToastGetActorInfoWithProgressBar.NotifyId, ToastGetActorInfoWithProgressBar.NotificationReceived);
     }
 
     ~NotificationManager()
@@ -31,7 +31,7 @@ internal class NotificationManager
         // be launched to handle the notification.
         AppNotificationManager notificationManager = AppNotificationManager.Default;
 
-        //notificationManager.NotificationInvoked += OnNotificationInvoked;
+        notificationManager.NotificationInvoked += OnNotificationInvoked;
 
         notificationManager.Register();
         m_isRegistered = true;
@@ -53,7 +53,12 @@ internal class NotificationManager
 
     void OnNotificationInvoked(object sender, AppNotificationActivatedEventArgs notificationActivatedEventArgs)
     {
+        System.Diagnostics.Debug.WriteLine("接受消息");
 
+        if (!DispatchNotification(notificationActivatedEventArgs))
+        {
+            System.Diagnostics.Debug.WriteLine("接受消息失败");
+        }
     }
 
     public static async void RemoveGetActorInfoProgessToast()
