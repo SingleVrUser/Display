@@ -2,10 +2,11 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:Display.Control"
+             xmlns:sys="using:System"
              xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
              xmlns:customcontrols="using:Display.Control"
-            xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-            xmlns:behaviors="using:CommunityToolkit.WinUI.UI.Behaviors"
+             xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+             xmlns:behaviors="using:CommunityToolkit.WinUI.UI.Behaviors"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:data="using:Data"
@@ -31,69 +32,72 @@
 
 
         <!--排列Flyout的样式-->
-        <Style TargetType="FlyoutPresenter" x:Key="OrderFlyoutPresenterStyle">
+        <Style TargetType="FlyoutPresenter"
+               x:Key="OrderFlyoutPresenterStyle">
             <Setter Property="Padding"
-                                            Value="2" />
+                    Value="2" />
             <Setter Property="CornerRadius"
-                                            Value="5" />
+                    Value="5" />
         </Style>
 
         <!--成功排序-->
-        <Flyout x:Key="SuccessOrderFlyout" Placement="Bottom" FlyoutPresenterStyle="{StaticResource OrderFlyoutPresenterStyle}">
+        <Flyout x:Key="SuccessOrderFlyout"
+                Placement="Bottom"
+                FlyoutPresenterStyle="{StaticResource OrderFlyoutPresenterStyle}">
             <ListView IsItemClickEnabled="True"
-                                      ItemClick="OrderSuccessListView_ItemClick">
+                      ItemClick="OrderSuccessListView_ItemClick">
                 <ListView.Resources>
                     <Style TargetType="StackPanel">
                         <Setter Property="Orientation"
-                                                Value="Horizontal" />
+                                Value="Horizontal" />
                         <Setter Property="Spacing"
-                                                Value="5" />
+                                Value="5" />
                     </Style>
                     <Style x:Key="UpOrDownSortStyle"
-                                           TargetType="FontIcon">
+                           TargetType="FontIcon">
                         <Setter Property="Foreground"
-                                                Value="Gray" />
+                                Value="Gray" />
                         <Setter Property="FontWeight"
-                                                Value="ExtraLight" />
+                                Value="ExtraLight" />
                         <Setter Property="Opacity"
-                                                Value="0.5" />
+                                Value="0.5" />
                     </Style>
                 </ListView.Resources>
                 <ListView.Items>
                     <StackPanel>
                         <FontIcon FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xE185;" />
+                                  Glyph="&#xE185;" />
                         <TextBlock Text="名称" />
                         <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                                  FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xE015;" />
+                                  FontFamily="Segoe Fluent Icons"
+                                  Glyph="&#xE015;" />
                     </StackPanel>
 
                     <StackPanel>
                         <FontIcon FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xE13D;" />
+                                  Glyph="&#xE13D;" />
                         <TextBlock Text="演员" />
                         <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                                  FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xE015;" />
+                                  FontFamily="Segoe Fluent Icons"
+                                  Glyph="&#xE015;" />
                     </StackPanel>
 
                     <StackPanel>
                         <FontIcon FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xEC92;" />
+                                  Glyph="&#xEC92;" />
                         <TextBlock Text="年份" />
                         <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                                  FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xE015;" />
+                                  FontFamily="Segoe Fluent Icons"
+                                  Glyph="&#xE015;" />
                     </StackPanel>
 
                     <StackPanel>
                         <FontIcon FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xF463;" />
+                                  Glyph="&#xF463;" />
                         <TextBlock Text="随机" />
                         <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                                  FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xF143;" />
+                                  FontFamily="Segoe Fluent Icons"
+                                  Glyph="&#xF143;" />
                     </StackPanel>
 
                 </ListView.Items>
@@ -101,63 +105,65 @@
         </Flyout>
 
         <!--失败排序-->
-        <Flyout x:Key="FailOrderFlyout" Placement="Bottom" FlyoutPresenterStyle="{StaticResource OrderFlyoutPresenterStyle}">
+        <Flyout x:Key="FailOrderFlyout"
+                Placement="Bottom"
+                FlyoutPresenterStyle="{StaticResource OrderFlyoutPresenterStyle}">
 
             <ListView IsItemClickEnabled="True"
-                                      ItemClick="OrderFailListView_ItemClick">
+                      ItemClick="OrderFailListView_ItemClick">
                 <ListView.Resources>
                     <Style TargetType="StackPanel">
                         <Setter Property="Orientation"
-                                                Value="Horizontal" />
+                                Value="Horizontal" />
                         <Setter Property="Spacing"
-                                                Value="5" />
+                                Value="5" />
                     </Style>
                     <Style x:Key="UpOrDownSortStyle"
-                                           TargetType="FontIcon">
+                           TargetType="FontIcon">
                         <Setter Property="Foreground"
-                                                Value="Gray" />
+                                Value="Gray" />
                         <Setter Property="FontWeight"
-                                                Value="ExtraLight" />
+                                Value="ExtraLight" />
                         <Setter Property="Opacity"
-                                                Value="0.5" />
+                                Value="0.5" />
                     </Style>
                 </ListView.Resources>
                 <ListView.Items>
                     <StackPanel>
                         <FontIcon FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xE185;" />
+                                  Glyph="&#xE185;" />
                         <TextBlock Text="名称" />
                         <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                                  FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xE015;" />
+                                  FontFamily="Segoe Fluent Icons"
+                                  Glyph="&#xE015;" />
                     </StackPanel>
 
                     <StackPanel>
                         <FontIcon FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xE2AD;" />
+                                  Glyph="&#xE2AD;" />
                         <TextBlock Text="时间" />
                         <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                                  FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xE015;" />
+                                  FontFamily="Segoe Fluent Icons"
+                                  Glyph="&#xE015;" />
                     </StackPanel>
 
                     <StackPanel>
                         <FontIcon FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xEB05;" />
+                                  Glyph="&#xEB05;" />
                         <TextBlock Text="大小" />
                         <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                                  FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xE015;" />
+                                  FontFamily="Segoe Fluent Icons"
+                                  Glyph="&#xE015;" />
                     </StackPanel>
 
 
                     <StackPanel>
                         <FontIcon FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xF463;" />
+                                  Glyph="&#xF463;" />
                         <TextBlock Text="随机" />
                         <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                                  FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xF143;" />
+                                  FontFamily="Segoe Fluent Icons"
+                                  Glyph="&#xF143;" />
                     </StackPanel>
 
                 </ListView.Items>
@@ -167,6 +173,7 @@
         <converter:BytesToSizeStrConverter x:Key="BytesToSizeStrConverter" />
         <converter:BoolToVisiableConverter x:Key="BoolToVisiableConverter" />
         <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter" />
+        <converter:CollapsedWhenNullConverter x:Key="CollapsedWhenNullConverter" />
 
         <!--提示-->
         <TeachingTip x:Name="HintTeachingTip" />
@@ -213,28 +220,28 @@
 
                 <!--图-->
                 <Grid PointerEntered="Grid_PointerEntered"
-                        PointerExited="Grid_PointerExited"
-                        CornerRadius="5">
+                      PointerExited="Grid_PointerExited"
+                      CornerRadius="5">
 
                     <!--图片-->
                     <Grid x:Name="showImage">
                         <controls:ImageEx Stretch="UniformToFill"
-                                            IsCacheEnabled="True"
-                                            EnableLazyLoading="True"
-                                            LazyLoadingThreshold="300"
-                                            Source="{x:Bind imagepath,Mode=OneWay}"
-                                            Width="{x:Bind imagewidth,Mode=OneWay}"
-                                            Height="{x:Bind imageheight,Mode=OneWay}" />
+                                          IsCacheEnabled="True"
+                                          EnableLazyLoading="True"
+                                          LazyLoadingThreshold="300"
+                                          Source="{x:Bind imagepath,Mode=OneWay}"
+                                          Width="{x:Bind imagewidth,Mode=OneWay}"
+                                          Height="{x:Bind imageheight,Mode=OneWay}" />
 
                         <RelativePanel>
                             <!--喜欢就显示爱心-->
                             <FontIcon FontFamily="Segoe Fluent Icons"
-                                        Glyph="&#xE00B;"
-                                        Foreground="OrangeRed"
-                                        Opacity="1"
-                                        Margin="8"
-                                        FontSize="30"
-                                        Visibility="{x:Bind data:FileMatch.isShowLikeIcon(is_like),Mode=OneWay}" />
+                                      Glyph="&#xE00B;"
+                                      Foreground="OrangeRed"
+                                      Opacity="1"
+                                      Margin="8"
+                                      FontSize="30"
+                                      Visibility="{x:Bind data:FileMatch.isShowLikeIcon(is_like),Mode=OneWay}" />
 
                             <!--标签（4K/VR）-->
                             <StackPanel Margin="5"
@@ -246,9 +253,9 @@
                                         Opacity="0.9"
                                         Visibility="{x:Bind isShowLabel}">
                                 <TextBlock Text="{x:Bind ShowLabel}"
-                                            Foreground="AntiqueWhite"
-                                            FontFamily="Times New Roman"
-                                            FontSize="20" />
+                                           Foreground="AntiqueWhite"
+                                           FontFamily="Times New Roman"
+                                           FontSize="20" />
                             </StackPanel>
                         </RelativePanel>
                     </Grid>
@@ -264,16 +271,16 @@
                         </Grid.RowDefinitions>
                         <Grid.Background>
                             <LinearGradientBrush StartPoint="0.5,0"
-                                                    EndPoint="0.5,1"
-                                                    Opacity="0.7">
+                                                 EndPoint="0.5,1"
+                                                 Opacity="0.7">
                                 <GradientStop Color="#70a1ff"
-                                                Offset="0" />
+                                              Offset="0" />
                                 <GradientStop Color="#00000050"
-                                                Offset="0.3" />
+                                              Offset="0.3" />
                                 <GradientStop Color="#00000050"
-                                                Offset="0.7" />
+                                              Offset="0.7" />
                                 <GradientStop Color="#70a1ff"
-                                                Offset="1" />
+                                              Offset="1" />
                             </LinearGradientBrush>
                         </Grid.Background>
 
@@ -288,7 +295,7 @@
                                 </AppBarToggleButton.Resources>
                                 <AppBarToggleButton.Icon>
                                     <FontIcon Glyph="&#xE13B;"
-                                                Foreground="White" />
+                                              Foreground="White" />
                                 </AppBarToggleButton.Icon>
                             </AppBarToggleButton>
                         </RelativePanel>
@@ -321,18 +328,18 @@
                                             Value="White" />
                                 </Style>
                                 <SolidColorBrush x:Key="CommandBarBackgroundOpen"
-                                                    Color="#bdc3c7"
-                                                    Opacity="0.5" />
+                                                 Color="#bdc3c7"
+                                                 Opacity="0.5" />
                                 <SolidColorBrush x:Key="CommandBarBorderBrushOpen"
-                                                    Color="#ecf0f1"
-                                                    Opacity="0.5" />
+                                                 Color="#ecf0f1"
+                                                 Opacity="0.5" />
                             </CommandBar.Resources>
 
                             <CommandBar.PrimaryCommands>
                                 <!--播放-->
                                 <AppBarButton ToolTipService.ToolTip="播放"
-                                                IsCompact="True"
-                                                Click="PlayButton_Click">
+                                              IsCompact="True"
+                                              Click="PlayButton_Click">
                                     <FontIcon Glyph="&#xEE4A;" />
                                 </AppBarButton>
 
@@ -340,15 +347,15 @@
 
                                 <!--修改评分-->
                                 <AppBarButton ToolTipService.ToolTip="评分"
-                                                IsCompact="True">
+                                              IsCompact="True">
                                     <AppBarButton.Flyout>
                                         <Flyout>
                                             <RatingControl Caption="评分"
-                                                            Value="{x:Bind score, Mode=TwoWay}"
-                                                            ValueChanged="RatingControl_ValueChanged">
+                                                           Value="{x:Bind score, Mode=TwoWay}"
+                                                           ValueChanged="RatingControl_ValueChanged">
                                                 <RatingControl.Resources>
                                                     <SolidColorBrush x:Key="RatingControlSelectedForeground"
-                                                                        Color="#f7ba36" />
+                                                                     Color="#f7ba36" />
                                                 </RatingControl.Resources>
                                             </RatingControl>
                                         </Flyout>
@@ -384,20 +391,20 @@
                     <Grid Visibility="{x:Bind isDeleted,Mode=OneWay}">
                         <Grid.Background>
                             <SolidColorBrush Color="{ThemeResource SystemChromeAltHighColor}"
-                                                Opacity="0.8" />
+                                             Opacity="0.8" />
                         </Grid.Background>
 
                         <TextBlock Text="已删除"
-                                    FontSize="30"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center" />
+                                   FontSize="30"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
                     </Grid>
                 </Grid>
 
                 <!--文字信息-->
                 <Grid HorizontalAlignment="Center"
-                        Margin="0,5,0,0"
-                        Grid.Row="1"
+                      Margin="0,5,0,0"
+                      Grid.Row="1"
                       MaxWidth="{x:Bind imagewidth,Mode=OneWay}">
 
                     <Grid.RowDefinitions>
@@ -428,38 +435,38 @@
 
 
                         <TextBlock Text="{x:Bind truename}"
-                                    IsTextSelectionEnabled="True" />
+                                   IsTextSelectionEnabled="True" />
                         <AppBarSeparator Grid.Column="1" />
                         <TextBlock Grid.Column="2"
-                                    Text="|"
-                                    Foreground="Gray"
-                                    Opacity="0.5" />
+                                   Text="|"
+                                   Foreground="Gray"
+                                   Opacity="0.5" />
                         <AppBarSeparator Grid.Column="3" />
                         <TextBlock Grid.Column="4"
-                                    Text="{x:Bind realeaseYear}"
-                                    IsTextSelectionEnabled="True" />
+                                   Text="{x:Bind realeaseYear}"
+                                   IsTextSelectionEnabled="True" />
                         <AppBarSeparator Grid.Column="5" />
                         <TextBlock Grid.Column="6"
-                                    Text="|"
-                                    Foreground="Gray"
-                                    Opacity="0.5" />
+                                   Text="|"
+                                   Foreground="Gray"
+                                   Opacity="0.5" />
                         <AppBarSeparator Grid.Column="7" />
                         <local:TextBlockWithLongText Grid.Column="8"
-                                                        StringValue="{x:Bind actor}" />
+                                                     StringValue="{x:Bind actor}" />
 
                     </Grid>
 
 
                     <!--评分-->
                     <RatingControl IsClearEnabled="False"
-                                    Grid.Row="1"
-                                    IsReadOnly="True"
-                                    Value="{x:Bind score,Mode=OneWay}">
+                                   Grid.Row="1"
+                                   IsReadOnly="True"
+                                   Value="{x:Bind score,Mode=OneWay}">
                         <RatingControl.Resources>
                             <SolidColorBrush x:Key="RatingControlSelectedForeground"
-                                                Color="#f7ba36" />
+                                             Color="#f7ba36" />
                             <SolidColorBrush x:Key="RatingControlUnselectedForeground"
-                                                Color="#ecf0f1" />
+                                             Color="#ecf0f1" />
                         </RatingControl.Resources>
                     </RatingControl>
                 </Grid>
@@ -490,7 +497,9 @@
                                MinHeight="{x:Bind imageheight,Mode=OneWay}">
 
                         </Image>
-                        <TextBlock Text="{x:Bind truename}" TextWrapping="Wrap" MaxWidth="{x:Bind imagewidth,Mode=OneWay}"/>
+                        <TextBlock Text="{x:Bind truename}"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="{x:Bind imagewidth,Mode=OneWay}" />
                     </Grid>
 
                     <!--可操作按钮-->
@@ -538,17 +547,20 @@
 
                     <TextBlock Text="{x:Bind realeaseYear}"
                                IsTextSelectionEnabled="True"
-                               HorizontalAlignment="Right"/>
+                               HorizontalAlignment="Right" />
 
-                    <TextBlock Grid.Column="1" Text="|" Foreground="Gray" HorizontalAlignment="Center" Opacity="0.5"/>
+                    <TextBlock Grid.Column="1"
+                               Text="|"
+                               Foreground="Gray"
+                               HorizontalAlignment="Center"
+                               Opacity="0.5" />
 
                     <TextBlock Grid.Column="2"
-                               Text="{x:Bind look_later,Converter={StaticResource BytesToSizeStrConverter}}"/>
+                               Text="{x:Bind look_later,Converter={StaticResource BytesToSizeStrConverter}}" />
 
                     <!--评分-->
-                    <RatingControl
-                        Grid.ColumnSpan="3"
-                        IsClearEnabled="False"
+                    <RatingControl Grid.ColumnSpan="3"
+                                   IsClearEnabled="False"
                                    Grid.Row="1"
                                    IsEnabled="False" />
                 </Grid>
@@ -625,12 +637,46 @@
                  x:Name="InfoBar"
                  Message="Essential app message for your users to be informed of, acknowledge, or take action on." />
 
-        <!--搜索框（匹配失败列表显示时显示）-->
-        <local:FileAutoSuggestBox Grid.Row="1"
-                                  Margin="10,2"
-                                  x:Name="FailInfoSuggestBox"
-                                  TextChanged="FileAutoSuggestBox_TextChanged"
-                                  Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}" />
+        <RelativePanel Margin="10,2">
+            <!--搜索框（匹配失败列表显示时显示）-->
+            <local:FileAutoSuggestBox Grid.Row="1"
+                                      x:Name="FailInfoSuggestBox"
+                                      TextChanged="FileAutoSuggestBox_TextChanged"
+                                      Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}"
+                                      RelativePanel.AlignVerticalCenterWithPanel="True" />
+
+            <RadioButtons x:Name="FailShowChanged_RadioButtons"
+                          SelectedIndex="0"
+                          Grid.Column="2"
+                          MaxColumns="3"
+                          CharacterSpacing="30"
+                          RelativePanel.AlignRightWithPanel="True"
+                          Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}"
+                          SelectionChanged="ShowData_RadioButtons_SelectionChanged">
+                <RadioButton x:Name="AllFail_RadioButton"
+                             Content="&#xE0A2;"
+                             FontSize="20"
+                             HorizontalContentAlignment="Center"
+                             FontFamily="Segoe Fluent Icons"
+                             Style="{StaticResource RadioButtonCustomizeStyle}"
+                             ToolTipService.ToolTip="全部"/>
+                <RadioButton x:Name="FailLike_RadioButton"
+                             Content="&#xE006;"
+                             FontSize="20"
+                             HorizontalContentAlignment="Center"
+                             FontFamily="Segoe Fluent Icons"
+                             Style="{StaticResource RadioButtonCustomizeStyle}"
+                             ToolTipService.ToolTip="喜欢" />
+                <RadioButton x:Name="FailLookLater_RadioButton"
+                             Content="&#xE13B;"
+                             FontSize="20"
+                             FontFamily="Segoe Fluent Icons"
+                             HorizontalContentAlignment="Center"
+                             Style="{StaticResource RadioButtonCustomizeStyle}"
+                             ToolTipService.ToolTip="稍后观看" />
+            </RadioButtons>
+        </RelativePanel>
+
 
         <!--封面预览-->
         <GridView Grid.Row="2"
@@ -642,31 +688,109 @@
             </interactivity:Interaction.Behaviors>
 
             <GridView.Header>
-                <Grid x:Name="HeaderGrid" Visibility="{x:Bind IsShowSearchListView}" MinHeight="40" ColumnSpacing="10" Background="{StaticResource FocusVisualWhiteStrokeThemeBrush}">
+
+                <Grid x:Name="HeaderGrid"
+                      Visibility="{x:Bind IsShowSearchListView}"
+                      MinHeight="40"
+                      ColumnSpacing="5"
+                      Background="{StaticResource FocusVisualWhiteStrokeThemeBrush}">
+
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock
-                        x:FieldModifier="public"
-                        x:Name="showNameTextBlock"
-                        Text="{x:Bind Title,Mode=OneWay}"
-                        FontSize="25"
-                        IsTextSelectionEnabled="True"
-                        Style="{ThemeResource FlyoutPickerTitleTextBlockStyle}"
-                        FontFamily="霞鹜文楷"
-                        FontWeight="Bold"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"/>
 
-                    <ToggleButton Content="喜欢"
-                                  HorizontalAlignment="Right"
-                                  VerticalAlignment="Center"
-                                  IsChecked="{x:Bind data:FileMatch.isLike(actorInfo.is_like),Mode=OneWay}"
-                                  Click="LikeButton_Click"
-                                  Tag="{x:Bind actorInfo.id,Mode=OneWay}"
-                                  Visibility="{x:Bind isShowHeaderCover,Mode=OneWay}" />
+                    <TextBlock x:FieldModifier="public"
+                               x:Name="showNameTextBlock"
+                               Text="{x:Bind Title,Mode=OneWay}"
+                               FontSize="25"
+                               IsTextSelectionEnabled="True"
+                               Style="{ThemeResource FlyoutPickerTitleTextBlockStyle}"
+                               FontFamily="霞鹜文楷"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+
+                    <Grid Visibility="{x:Bind isShowHeaderCover,Mode=OneWay}">
+                        <StackPanel VerticalAlignment="Top"
+                                    HorizontalAlignment="Right"
+                                    CornerRadius="5"
+                                    Margin="5"
+                                    Padding="5"
+                                    BorderBrush="{StaticResource ControlElevationBorderBrush}"
+                                    Spacing="1"
+                                    BorderThickness="1"
+                                    Visibility="{x:Bind actorInfo.info_url,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
+
+                            <TextBlock Visibility="{x:Bind actorInfo.birthday,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
+                                <Run Foreground="Gray">出生日期：</Run>
+                                <Run Text="{x:Bind actorInfo.birthday,Mode=OneWay}" />
+                            </TextBlock>
+
+                            <TextBlock Visibility="{x:Bind actorInfo.bwh,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
+                                <Run Foreground="Gray">三围：</Run>
+                                <Run Text="{x:Bind actorInfo.bust,Mode=OneWay}" />
+                                <Run Text="/" />
+                                <Run Text="{x:Bind actorInfo.waist,Mode=OneWay}" />
+                                <Run Text="/" />
+                                <Run Text="{x:Bind actorInfo.hips,Mode=OneWay}" />
+                            </TextBlock>
+
+                            <TextBlock Visibility="{x:Bind actorInfo.height,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
+                                <Run Foreground="Gray">身高：</Run>
+                                <Run Text="{x:Bind actorInfo.height,Mode=OneWay}" />
+                            </TextBlock>
+
+                            <TextBlock Visibility="{x:Bind actorInfo.work_time,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
+                            <Run Foreground="Gray">工作时间：</Run>
+                            <Run Text="{x:Bind actorInfo.work_time,Mode=OneWay}" />
+                            </TextBlock>
+
+
+
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Bottom"
+                                Spacing="20"
+                                Margin="5,0"
+                                Visibility="{x:Bind isShowHeaderCover,Mode=OneWay}">
+
+
+                        <HyperlinkButton x:Name="blog_HyperLink"
+                                         Content="博客"
+                                         Visibility="{x:Bind actorInfo.blog_url,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}" />
+                        <HyperlinkButton x:Name="info_HyperLink"
+                                         Content="更多信息"
+                                         Visibility="{x:Bind actorInfo.info_url,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}" />
+
+                        <ToggleButton Content="喜欢"
+                                      HorizontalAlignment="Right"
+                                      VerticalAlignment="Top"
+                                      Margin="0,5"
+                                      IsChecked="{x:Bind data:FileMatch.isLike(actorInfo.is_like),Mode=OneWay}"
+                                      Click="LikeButton_Click"
+                                      Tag="{x:Bind actorInfo.id,Mode=OneWay}"
+                                      Visibility="{x:Bind isShowHeaderCover,Mode=OneWay}" />
+
+                        <!--<TextBlock Visibility="{x:Bind actorInfo.blog_url,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
+                            <Hyperlink x:Name="blog_HyperLink"
+                                       Click="blog_HyperLink_Click">
+                                博客
+                            </Hyperlink>
+                        </TextBlock>-->
+
+                        <!--<TextBlock Visibility="{x:Bind actorInfo.info_url,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
+                            <Hyperlink x:Name="info_HyperLink"
+                                       Click="info_HyperLink_Click">
+                                更多信息
+                            </Hyperlink>
+                        </TextBlock>-->
+
+                    </StackPanel>
 
                     <Grid Grid.Column="1"
                           x:Name="HeaderCover_Grid"
@@ -676,7 +800,7 @@
                           Visibility="{x:Bind isShowHeaderCover,Mode=OneWay}">
                         <Image x:FieldModifier="public"
                                x:Name="HeaderCover"
-                               Source="{x:Bind actorInfo.prifile_path,Converter={StaticResource NotExistsImagePathConverter},Mode=OneWay}"/>
+                               Source="{x:Bind actorInfo.prifile_path,Converter={StaticResource NotExistsImagePathConverter},Mode=OneWay}" />
                     </Grid>
                 </Grid>
 
@@ -704,38 +828,48 @@
         </GridView>
 
         <!--筛选栏，默认隐藏-->
-        <customcontrols:InfoListFilter x:Name="InfosFilter" Grid.Row="3" Visibility="{x:Bind Filter_ToggleButton.IsChecked,Mode=OneWay}" Height="35" Margin="5,2,0,0"
-                                        SplitButton_Click="InfoListFilter_SplitButton_Click"
+        <customcontrols:InfoListFilter x:Name="InfosFilter"
+                                       Grid.Row="3"
+                                       Visibility="{x:Bind Filter_ToggleButton.IsChecked,Mode=OneWay}"
+                                       Height="35"
+                                       Margin="5,2,0,0"
+                                       SplitButton_Click="InfoListFilter_SplitButton_Click"
                                        SelectionChanged="InfoListFilter_SelectionChanged"
-                                       TextChanged="InfoListFilter_TextChanged"/>
+                                       TextChanged="InfoListFilter_TextChanged" />
 
         <!--页面跳转栏-->
-            <RelativePanel Grid.Row="4"
+        <RelativePanel Grid.Row="4"
                        Margin="0,0,10,0">
 
-                <StackPanel Margin="0,0,0,-20"
+            <StackPanel Margin="0,0,0,-20"
                         Orientation="Horizontal">
 
-                    <AppBarButton x:Name="OrderButton"
+                <AppBarButton x:Name="OrderButton"
                               IsCompact="True"
                               Flyout="{StaticResource SuccessOrderFlyout}">
 
-                        <ToolTipService.ToolTip>
-                            <ToolTip x:Uid="sortToolTip" />
-                        </ToolTipService.ToolTip>
-                        <AppBarButton.Content>
-                            <FontIcon FontFamily="Segoe Fluent Icons"
+                    <ToolTipService.ToolTip>
+                        <ToolTip x:Uid="sortToolTip" />
+                    </ToolTipService.ToolTip>
+                    <AppBarButton.Content>
+                        <FontIcon FontFamily="Segoe Fluent Icons"
                                   Glyph="&#xE174;" />
-                        </AppBarButton.Content>
+                    </AppBarButton.Content>
 
-                    </AppBarButton>
+                </AppBarButton>
 
-                    <ToggleButton x:Name="Filter_ToggleButton" Margin="0,0,0,15" IsEnabled="True" BorderThickness="0"
-                              FontFamily="Segoe Fluent Icons" Content="&#xE16E;" FontSize="18" Foreground="Gray"
+                <ToggleButton x:Name="Filter_ToggleButton"
+                              Margin="0,0,0,15"
+                              IsEnabled="True"
+                              BorderThickness="0"
+                              FontFamily="Segoe Fluent Icons"
+                              Content="&#xE16E;"
+                              FontSize="18"
+                              Foreground="Gray"
                               Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay}"
-                                Unchecked="Filter_ToggleButton_Unchecked"/>
+                              Unchecked="Filter_ToggleButton_Unchecked" />
 
-                    <ToggleSwitch x:Name="ShowType_ToggleSwitch"
+                <ToggleSwitch x:Name="ShowType_ToggleSwitch"
                               VerticalAlignment="Center"
                               Margin="4,0,0,15"
                               OnContent="匹配失败"
@@ -745,61 +879,66 @@
                               PointerExited="ShowType_ToggleSwitch_PointerExited"
                               IsOn="{x:Bind IsShowFailListView,Mode=TwoWay}"
                               Visibility="{x:Bind IsShowSucAndFailSwitchButton}">
-                    </ToggleSwitch>
+                </ToggleSwitch>
 
-                </StackPanel>
+            </StackPanel>
 
-                <Grid RelativePanel.AlignRightWithPanel="True"
-                        RelativePanel.AlignVerticalCenterWithPanel="True">
+            <Grid RelativePanel.AlignRightWithPanel="True"
+                  RelativePanel.AlignVerticalCenterWithPanel="True">
 
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="140"/>
-                    </Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="140" />
+                </Grid.ColumnDefinitions>
 
-                    <Grid ColumnSpacing="8"
-                        Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}"
+                <Grid ColumnSpacing="8"
+                      Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}"
                       BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-                      BorderThickness="1" Padding="8,0,3,0" CornerRadius="14">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto"/>
-                            <ColumnDefinition Width="auto"/>
-                        </Grid.ColumnDefinitions>
-                        <Slider x:Name="ImageSizeChangeSlider"
+                      BorderThickness="1"
+                      Padding="8,0,3,0"
+                      CornerRadius="14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <Slider x:Name="ImageSizeChangeSlider"
                             Grid.Row="0"
                             Minimum="{x:Bind SliderMinValue}"
                             Maximum="{x:Bind SliderMaxValue}"
-                            Width="200"/>
+                            Width="200" />
 
-                        <ToggleButton x:Name="IsAutoAdjustImageSize_ToggleButton"
+                    <ToggleButton x:Name="IsAutoAdjustImageSize_ToggleButton"
                                   Grid.Column="1"
-                              Content="&#xE167;"
-                              FontFamily="Segoe Fluent Icons"
-                              IsChecked="{x:Bind data:AppSettings.IsAutoAdjustImageSize,Mode=TwoWay}"
-                              Checked="AutoAdjustImageSize_ToggleButton_Checked"
-                              Unchecked="AutoAdjustImageSize_ToggleButton_UnChecked"
-                              ToolTipService.ToolTip="动态调整图片大小"
-                                  CornerRadius="11"/>
-                    </Grid>
+                                  Content="&#xE167;"
+                                  FontFamily="Segoe Fluent Icons"
+                                  IsChecked="{x:Bind data:AppSettings.IsAutoAdjustImageSize,Mode=TwoWay}"
+                                  Checked="AutoAdjustImageSize_ToggleButton_Checked"
+                                  Unchecked="AutoAdjustImageSize_ToggleButton_UnChecked"
+                                  ToolTipService.ToolTip="动态调整图片大小"
+                                  CornerRadius="11" />
+                </Grid>
 
-                    <Grid Width="140" Grid.Column="1" x:FieldModifier="public" x:Name="PageShow_Grid">
-                        <local:ShowCountControl x:Name="SuccesShowCount_Control"
+                <Grid Width="140"
+                      Grid.Column="1"
+                      x:FieldModifier="public"
+                      x:Name="PageShow_Grid">
+                    <local:ShowCountControl x:Name="SuccesShowCount_Control"
                                             CurrentCount="{x:Bind SuccessInfoCollection.Count,Mode=OneWay}"
                                             AllCount="{x:Bind SuccessInfoCollection.AllCount,Mode=OneWay}"
                                             Clicked="ToTopButton_Click"
                                             Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay}"
-                                            HorizontalAlignment="Right"/>
+                                            HorizontalAlignment="Right" />
 
-                        <local:ShowCountControl x:Name="FailShowCountControl"
-                                        CurrentCount="{x:Bind FailInfoCollection.Count,Mode=OneWay}"
-                                        AllCount="{x:Bind FailInfoCollection.AllCount,Mode=OneWay}"
-                                        Visibility="{x:Bind IsShowFailListView,Mode=OneWay}"
-                                        Clicked="ToTopButton_Click"
-                                        HorizontalAlignment="Right"/>
-                    </Grid>
-
+                    <local:ShowCountControl x:Name="FailShowCountControl"
+                                            CurrentCount="{x:Bind FailInfoCollection.Count,Mode=OneWay}"
+                                            AllCount="{x:Bind FailInfoCollection.AllCount,Mode=OneWay}"
+                                            Visibility="{x:Bind IsShowFailListView,Mode=OneWay}"
+                                            Clicked="ToTopButton_Click"
+                                            HorizontalAlignment="Right" />
                 </Grid>
 
-            </RelativePanel>
+            </Grid>
+
+        </RelativePanel>
     </Grid>
 </UserControl>

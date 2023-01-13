@@ -407,11 +407,18 @@ namespace Data
 
         public string name { set; get; }
 
+        public List<string> otherNames { get; set; }
+
         public int is_woman { set; get; } = 1;
 
         public string birthday { set; get; } = string.Empty;
         public string bwh { set; get; } = string.Empty;
-        public string height { set; get; } = string.Empty;
+
+        public int bust { set; get; }
+        public int waist { set; get; }
+        public int hips { set; get; }
+
+        public int height { set; get; }
         public int works_count { set; get; }
         public string work_time { set; get; } = string.Empty;
 
@@ -428,9 +435,13 @@ namespace Data
             }
         }
 
+        public string image_url { get; set; }
+
         public string blog_url { set; get; } = string.Empty;
         public int is_like { set; get; } = 0;
         public long addtime { set; get; } =  DateTimeOffset.Now.ToUnixTimeSeconds();
+
+        public string info_url { get; set; } = string.Empty;
 
         public int video_count { get; set; }
 

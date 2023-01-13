@@ -14,7 +14,7 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <converter:AppUpdateContentConvert x:Key="AppUpdateContentConvert"/>
+        <converter:AppUpdateContentConverter x:Key="AppUpdateContentConvert"/>
     </Page.Resources>
 
     <Grid>

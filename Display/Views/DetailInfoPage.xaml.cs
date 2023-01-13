@@ -198,7 +198,7 @@ namespace Display.Views
             await PlayeVideo(SingleVideoInfo.fileBelongPickcode, subInfo:SingleVideoInfo);
         }
 
-        public async static Task PlayeVideo(string pickCode,XamlRoot xamlRoot=null, SubInfo subInfo=null)
+        public async static Task PlayeVideo(string pickCode,XamlRoot xamlRoot=null, SubInfo subInfo=null, CustomMediaPlayerElement.PlayType playType = CustomMediaPlayerElement.PlayType.success )
         {
             //115Cookie未空
             if (string.IsNullOrEmpty(AppSettings._115_Cookie) && xamlRoot!=null)
@@ -286,7 +286,7 @@ namespace Display.Views
                     break;
                 //MediaElement播放
                 case 4:
-                    MediaPlayWindow.CreateNewWindow(pickCode);
+                    MediaPlayWindow.CreateNewWindow(pickCode,playType);
                     break;
 
             }

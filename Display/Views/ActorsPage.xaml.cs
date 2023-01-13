@@ -9,8 +9,12 @@ using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
-using Windows.Services.Store;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Windows.Storage;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -22,10 +26,6 @@ namespace Display.Views
     /// </summary>
     public sealed partial class ActorsPage : Page
     {
-        //public ObservableCollection<ActorsInfo> actorinfo = new();
-
-        //List<ActorsInfo> actorinfoList;
-
         IncrementallLoadActorInfoCollection actorinfo;
         ObservableCollection<ActorInfo> actorPartInfo = new();
 
@@ -53,6 +53,16 @@ namespace Display.Views
             BasicGridView.ItemsSource = actorinfo;
 
             LoadActorPartInfo();
+
+            //上次获取信息是否已经完成
+            if(AppSettings.GetActorInfoLastIndex == -1)
+            {
+                GetActorInfoButton.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                ContinueGetActorInfoTaskButton.Visibility = Visibility.Visible;
+            }
 
             ProgressRing.IsActive = false;
         }
@@ -184,6 +194,143 @@ namespace Display.Views
                 return true;
             else
                 return false;
+        }
+
+        private async void GetActorInfoButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button button) return;
+            button.IsEnabled = false;
+
+            var infos = await DataAccess.LoadActorInfo(-1);
+
+            int allCount = infos.Count;
+            if(allCount == 0) return;
+
+            if (! Notifications.ToastGetActorInfoWithProgressBar.SendToast(allCount)) return;
+
+            //创建断点续传文件
+            string savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "ActorInfo");
+            if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
+            StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(savePath);
+            StorageFile sampleFile = await storageFolder.CreateFileAsync("getting.json", CreationCollisionOption.ReplaceExisting);
+            await FileIO.WriteTextAsync(sampleFile, JsonSerializer.Serialize(infos));
+
+            await GetActorInfo(infos);
+
+            button.IsEnabled = true;
+        }
+        private async void ContinueGetActorInfoTaskButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button button) return;
+            button.IsEnabled = false;
+
+
+            //反序列化
+            string filePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "ActorInfo","getting.json");
+            string jsonString = await File.ReadAllTextAsync(filePath);
+            List<ActorInfo> infos = JsonSerializer.Deserialize<List<ActorInfo>>(jsonString);
+
+            await GetActorInfo(infos, AppSettings.GetActorInfoLastIndex);
+
+            //获取完成，初始化续传索引
+            AppSettings.GetActorInfoLastIndex = -1;
+
+            //删除文件
+            File.Delete(filePath);
+
+
+            button.Visibility = Visibility.Collapsed;
+            GetActorInfoButton.Visibility = Visibility.Visible;
+        }
+
+        private async Task GetActorInfo(List<ActorInfo> infos,int startIndex = 0)
+        {
+            int allCount = infos.Count;
+            if (allCount == 0) return;
+
+            if (!Notifications.ToastGetActorInfoWithProgressBar.SendToast(allCount)) return;
+
+            bool isStart = false;
+            for (int i = 0; i < allCount; i++)
+            {
+                if(!isStart)
+                {
+                    if (i == startIndex) isStart = true;
+                    else continue;
+                }
+
+                //记录当前索引，用于续传
+                AppSettings.GetActorInfoLastIndex = i;
+
+                var info = infos[i];
+                var actorName = info.name;
+
+                //跳过无效名称
+                if (string.IsNullOrEmpty(actorName)) continue;
+
+                //含有数字的一般搜索不到，跳过
+                if (Regex.Match(actorName, @"\d+").Success) continue;
+
+                //有数据说明已经搜索过了
+                if (!string.IsNullOrEmpty(info.bwh))
+                {
+                    await Notifications.ToastGetActorInfoWithProgressBar.AddValue(i+1, allCount);
+                    continue;
+                }
+
+                //从网站中获取信息
+                var actorinfo = await GetActorInfoFromNetwork.SearchInfoFromMinnanoAv(actorName);
+                if (actorinfo == null) continue;
+
+                var actorId = DataAccess.GetActorIdByName(actorName);
+                if (actorId == -1) continue;
+
+                DataAccess.UpdateActorInfo(actorId, actorinfo);
+
+                string baseUrl = AppSettings.MinnanoAv_BaseUrl;
+
+                //获取到的信息有头像
+                if (!string.IsNullOrEmpty(actorinfo.image_url))
+                {
+                    var actorInfos = await DataAccess.LoadActorInfo(1, filterList: new() { $"id == '{actorId}'" });
+
+                    //数据库中无头像
+                    if (actorInfos != null && actorInfos.Count != 0 && string.IsNullOrEmpty(actorInfos.FirstOrDefault().prifile_path))
+                    {
+                        string filePath = Path.Combine(AppSettings.ActorInfo_SavePath, actorName);
+                        var prifilePath = await GetInfoFromNetwork.downloadFile(actorinfo.image_url, filePath, "face",headers: new()
+                        {
+                            {"Referer", baseUrl },
+                            {"Host",actorinfo.info_url }
+                        });
+
+                        //更新头像
+                        DataAccess.UpdateActorInfoPrifilePath(actorId, prifilePath);
+                    }
+                }
+
+                //更新别名
+                //别名
+                if (actorinfo.otherNames != null && actorinfo.otherNames.Count > 0)
+                {
+                    foreach (var otherName in actorinfo.otherNames)
+                    {
+                        DataAccess.AddOrIgnoreActor_Names(actorId, otherName);
+                    }
+                }
+
+                //更新bwh
+                if (!string.IsNullOrEmpty(actorinfo.bwh))
+                {
+                    DataAccess.AddOrIgnoreBwh(actorinfo.bwh, actorinfo.bust, actorinfo.waist, actorinfo.hips);
+                }
+
+                await Notifications.ToastGetActorInfoWithProgressBar.AddValue(i+1, allCount);
+
+                //等待1~2秒
+                await GetInfoFromNetwork.RandomTimeDelay(1, 2);
+            }
+
         }
 
     }
