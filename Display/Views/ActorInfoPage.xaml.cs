@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using static Display.Control.CustomMediaPlayerElement;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -21,7 +22,7 @@ namespace Display.Views
     public sealed partial class ActorInfoPage : Page
     {
         //为返回动画做准备（需启动缓存）
-        VideoCoverDisplayClass _storeditem;
+        public VideoCoverDisplayClass _storeditem;
 
         public ActorInfoPage()
         {
@@ -126,13 +127,13 @@ namespace Display.Views
             //播放失败列表（imgUrl就是pc）
             if(videoInfo.series == "fail")
             {
-
-                await Views.DetailInfoPage.PlayeVideo(videoInfo.imageurl, this.XamlRoot);
+                await Views.DetailInfoPage.PlayeVideo(videoInfo.imageurl, this.XamlRoot, playType:PlayType.fail);
                 return;
             }
 
+            List<Datum> videoInfoList = DataAccess.loadFileInfoByTruename(videoInfo.truename);
 
-            List<Datum> videoInfoList = DataAccess.loadVideoInfoByTruename(videoInfo.truename);
+            _storeditem = videoInfo;
 
             //没有
             if (videoInfoList.Count == 0)
@@ -144,7 +145,7 @@ namespace Display.Views
             }
             else if (videoInfoList.Count == 1)
             {
-                await Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
+                await Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc, this.XamlRoot, trueName: videoInfo.truename, lastPage: this);
             }
 
             //有多集
@@ -158,7 +159,7 @@ namespace Display.Views
 
                 multisetList = multisetList.OrderBy(item => item.n).ToList();
 
-                ContentsPage.DetailInfo.SelectSingleVideoToPlay newPage = new(multisetList);
+                ContentsPage.DetailInfo.SelectSingleVideoToPlay newPage = new(multisetList, videoInfo.truename);
                 newPage.ContentListView.ItemClick += ContentListView_ItemClick; ;
 
                 VideoPlayButton.Flyout = new Flyout()
@@ -172,7 +173,10 @@ namespace Display.Views
         {
             var SingleVideoInfo = e.ClickedItem as Data.Datum;
 
-            await Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc, this.XamlRoot);
+            if (sender is not ListView listView) return;
+            if (listView.DataContext is not string trueName) return;
+
+            await Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc, this.XamlRoot, trueName: trueName, lastPage: this);
         }
 
         private async void SingleVideoPlayClick(object sender, RoutedEventArgs e)

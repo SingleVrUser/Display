@@ -16,12 +16,13 @@
         <ListView x:FieldModifier="public"
                   x:Name="ContentListView"
                   SelectionMode="None"
+                  DataContext="{x:Bind trueName}"
                   ItemsSource="{x:Bind subInfoList}"
                   IsItemClickEnabled="True">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="data:SubInfo">
                     <TextBlock Text="{x:Bind name}"
-                               TextWrapping="Wrap" />
+                               TextWrapping="Wrap"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

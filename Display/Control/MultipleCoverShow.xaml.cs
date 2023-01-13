@@ -30,7 +30,7 @@ namespace Display.Control
 
         public string ShowName { get; set; }
 
-        public List<VideoCoverDisplayClass> CoverList { get; set; } = new();
+        public ObservableCollection<VideoCoverDisplayClass> CoverList { get; set; } = new();
 
         public MultipleCoverShow()
         {

@@ -158,7 +158,7 @@ namespace Display.Control
         private async void DownButton_Click(object sender, RoutedEventArgs e)
         {
             string name = resultinfo.truename;
-            var videoinfoList = DataAccess.loadVideoInfoByTruename(name);
+            var videoinfoList = DataAccess.loadFileInfoByTruename(name);
 
             ContentDialog dialog = new ContentDialog();
 

@@ -19,18 +19,23 @@ using static Data.WebApi;
 
 namespace Display.Views
 {
+
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class DetailInfoPage : Page
     {
-        private VideoCoverDisplayClass DetailInfo;
+        public VideoCoverDisplayClass DetailInfo;
+
+        public static DetailInfoPage Current;
 
         //public VideoInfo VideoInfo = new();
 
         public DetailInfoPage()
         {
             this.InitializeComponent();
+
+            Current = this;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -141,7 +146,7 @@ namespace Display.Views
                 return;
 
             string name = DetailInfo.truename;
-            var videoInfoList = DataAccess.loadVideoInfoByTruename(name);
+            var videoInfoList = DataAccess.loadFileInfoByTruename(name);
 
             //没有该数据
             if(videoInfoList.Count == 0)
@@ -155,7 +160,7 @@ namespace Display.Views
             else if (videoInfoList.Count == 1)
             {
 
-                await PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
+                await PlayeVideo(videoInfoList[0].pc, this.XamlRoot, trueName: name, lastPage: this);
             }
 
             //有多集
@@ -169,7 +174,7 @@ namespace Display.Views
 
                 multisetList = multisetList.OrderBy(item => item.n).ToList();
 
-                ContentsPage.DetailInfo.SelectSingleVideoToPlay newPage = new ContentsPage.DetailInfo.SelectSingleVideoToPlay(multisetList);
+                ContentsPage.DetailInfo.SelectSingleVideoToPlay newPage = new ContentsPage.DetailInfo.SelectSingleVideoToPlay(multisetList, name);
                 newPage.ContentListView.ItemClick += VideoInfoListView_ItemClick;
 
                 VideoPlayButton.Flyout = new Flyout()
@@ -185,17 +190,23 @@ namespace Display.Views
 
             if (!(e.ClickedItem is Data.Datum SingleVideoInfo)) return;
 
-            await PlayeVideo(SingleVideoInfo.pc,this.XamlRoot);
+            if (sender is not ListView listView) return;
+            if (listView.DataContext is not string trueName) return;
+
+            await PlayeVideo(SingleVideoInfo.pc,this.XamlRoot, trueName: trueName, lastPage: this);
         }
 
         private async static void SubInfoListView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var SingleVideoInfo = e.ClickedItem as Data.SubInfo;
 
-            await PlayeVideo(SingleVideoInfo.fileBelongPickcode, subInfo:SingleVideoInfo);
+            if (sender is not ListView listView) return;
+            if (listView.DataContext is not string trueName) return;
+
+            await PlayeVideo(SingleVideoInfo.fileBelongPickcode, subInfo:SingleVideoInfo, trueName: trueName, lastPage: Current);
         }
 
-        public async static Task PlayeVideo(string pickCode,XamlRoot xamlRoot=null, SubInfo subInfo=null, CustomMediaPlayerElement.PlayType playType = CustomMediaPlayerElement.PlayType.success )
+        public async static Task PlayeVideo(string pickCode,XamlRoot xamlRoot=null, SubInfo subInfo=null, CustomMediaPlayerElement.PlayType playType = CustomMediaPlayerElement.PlayType.success, string trueName="", Page lastPage=null)
         {
             //115Cookie未空
             if (string.IsNullOrEmpty(AppSettings._115_Cookie) && xamlRoot!=null)
@@ -221,18 +232,18 @@ namespace Display.Views
                 {
                     string subFilePickCode = subDict.First().Key.ToString();
                     string subFileName = subDict.First().Value.ToString();
-                    subInfo = new(subFilePickCode,subFileName,pickCode);
+                    subInfo = new(subFilePickCode,subFileName,pickCode, trueName);
                 }
                 else if(subDict.Count > 1 && xamlRoot!=null)
                 {
                     List<SubInfo> subInfos = new();
-                    subDict.ToList().ForEach(item => subInfos.Add(new(item.Key, item.Value, pickCode)));
+                    subDict.ToList().ForEach(item => subInfos.Add(new(item.Key, item.Value, pickCode, trueName)));
 
                     //按名称排序
                     subInfos = subInfos.OrderBy(item => item.name).ToList();
 
-                    ContentsPage.DetailInfo.SelectSingleSubFileToSelected newPage = new(subInfos);
-                    newPage.ContentListView.ItemClick += SubInfoListView_ItemClick; ;
+                    ContentsPage.DetailInfo.SelectSingleSubFileToSelected newPage = new(subInfos, trueName);
+                    newPage.ContentListView.ItemClick += SubInfoListView_ItemClick;
 
                     ContentDialog dialog = new();
                     dialog.XamlRoot = xamlRoot;
@@ -283,12 +294,9 @@ namespace Display.Views
                     break;
                 //MediaElement播放
                 case 4:
-                    MediaPlayWindow.CreateNewWindow(pickCode,playType);
+                    MediaPlayWindow.CreateNewWindow(pickCode, playType, trueName, lastPage);
                     break;
-
             }
-        
-            
         }
 
 
@@ -341,7 +349,7 @@ namespace Display.Views
                 return;
 
             string name = DetailInfo.truename;
-            var videoInfoList = DataAccess.loadVideoInfoByTruename(name);
+            var videoInfoList = DataAccess.loadFileInfoByTruename(name);
 
             //没有该数据
             if (videoInfoList.Count == 0)
@@ -358,7 +366,7 @@ namespace Display.Views
             //一集
             else if (videoInfoList.Count == 1)
             {
-                await PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
+                await PlayeVideo(videoInfoList[0].pc, this.XamlRoot, trueName: name, lastPage: this);
             }
 
             //有多集
@@ -372,7 +380,7 @@ namespace Display.Views
 
                 multisetList = multisetList.OrderBy(item => item.n).ToList();
 
-                ContentsPage.DetailInfo.SelectSingleVideoToPlay newPage = new ContentsPage.DetailInfo.SelectSingleVideoToPlay(multisetList);
+                ContentsPage.DetailInfo.SelectSingleVideoToPlay newPage = new ContentsPage.DetailInfo.SelectSingleVideoToPlay(multisetList, name);
                 newPage.ContentListView.ItemClick += VideoInfoListView_ItemClick;
 
                 ContentDialog dialog = new();

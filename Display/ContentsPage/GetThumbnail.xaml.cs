@@ -265,7 +265,7 @@ namespace Display.ContentsPage
                 }
 
                 //考虑多集视频
-                var videoInfoList = DataAccess.loadVideoInfoByTruename(name);
+                var videoInfoList = DataAccess.loadFileInfoByTruename(name);
 
                 //检查视频是否已转码
                 var videofileListAfterDecode = videoInfoList.Where(x => x.vdi != 0).ToList();

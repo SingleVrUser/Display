@@ -582,7 +582,7 @@ namespace Display.ContentsPage
                     progress_TextBlock.Text = $"{actorName} - {videoName} - 挑选单体作品 - {videoName}";
 
                     //获取视频列表
-                    var videoFileList = DataAccess.loadVideoInfoByTruename(videoName);
+                    var videoFileList = DataAccess.loadFileInfoByTruename(videoName);
 
                     progress_TextBlock.Text = $"{actorName} - {videoName} - 挑选单体作品中能在线看的";
 
