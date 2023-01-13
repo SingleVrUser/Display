@@ -15,27 +15,40 @@
                       x:DataType="local:Quality">
             <TextBlock Text="{x:Bind Name}" />
         </DataTemplate>
+        
+        <DataTemplate x:Key="PlayerDataTemplate"
+                      x:DataType="local:Player">
+            <TextBlock Text="{x:Bind Name}" />
+        </DataTemplate>
+        
     </UserControl.Resources>
 
-    <MediaPlayerElement x:Name="MediaControl"
-                        AutoPlay="True"
-                        AreTransportControlsEnabled="True"
-                        DoubleTapped="MediaControl_DoubleTapped">
-        <MediaPlayerElement.TransportControls>
-            <local:CustomMediaTransportControls x:Name="mediaTransportControls"
-                                                x:FieldModifier="public"
-                                                IsCompact="False"
-                                                BackgroundSizing="InnerBorderEdge"
-                                                IsPlaybackRateButtonVisible="True"
-                                                IsPlaybackRateEnabled="True"
-                                                FullWindow="mediaControls_FullWindow"
-                                                LikeButtonClick="LikeButtonClick"
-                                                LookLaterButtonClick="LookLaterButtonClick"
-                                                ScreenshotButtonClick="ScreenshotButtonClick"
-                                                QualityChanged="mediaControls_QualityChanged"
-                                                IsHitTestVisible="True"/>
-        </MediaPlayerElement.TransportControls>
-    </MediaPlayerElement>
+    <Grid>
+        <MediaPlayerElement x:Name="MediaControl"
+                            AutoPlay="True"
+                            AreTransportControlsEnabled="True"
+                            DoubleTapped="MediaControl_DoubleTapped">
+            <MediaPlayerElement.TransportControls>
+                <local:CustomMediaTransportControls x:Name="mediaTransportControls"
+                                                    x:FieldModifier="public"
+                                                    IsCompact="False"
+                                                    BackgroundSizing="InnerBorderEdge"
+                                                    IsPlaybackRateButtonVisible="True"
+                                                    IsPlaybackRateEnabled="True"
+                                                    FullWindow="mediaControls_FullWindow"
+                                                    LikeButtonClick="LikeButtonClick"
+                                                    LookLaterButtonClick="LookLaterButtonClick"
+                                                    ScreenshotButtonClick="ScreenshotButtonClick"
+                                                    QualityChanged="QualityChanged"
+                                                    PlayerChanged="PlayerChanged"
+                                                    IsHitTestVisible="True" />
+            </MediaPlayerElement.TransportControls>
+        </MediaPlayerElement>
+
+        <TeachingTip x:Name="Player_TeachingTip"
+                     IsLightDismissEnabled="True"
+                     PreferredPlacement="TopRight" />
+    </Grid>
     
     
 </UserControl>

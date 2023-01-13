@@ -1170,6 +1170,23 @@
                                                 </AppBarButton.Icon>
                                             </AppBarButton>
 
+                                            <AppBarButton x:Name='PlayerButton'
+                                                          Style='{StaticResource AppBarButtonStyle}'
+                                                          MediaTransportControlsHelper.DropoutOrder='11'
+                                                          Visibility="Collapsed">
+                                                <AppBarButton.Flyout>
+                                                    <Flyout x:Name="PlayerFlyout"
+                                                            FlyoutPresenterStyle="{StaticResource FlyoutStyle}"
+                                                            ShouldConstrainToRootBounds="False">
+                                                        <ListView x:Name="PlayerListView" />
+                                                    </Flyout>
+                                                </AppBarButton.Flyout>
+
+                                                <AppBarButton.Icon>
+                                                    <FontIcon Glyph="&#xE173;" />
+                                                </AppBarButton.Icon>
+                                            </AppBarButton>
+
                                             <AppBarButton x:Name="FullWindowButton"
                                                           Style='{StaticResource AppBarButtonStyle}'
                                                           MediaTransportControlsHelper.DropoutOrder="17">
