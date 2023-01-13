@@ -31,6 +31,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
     public enum PlayType { success, fail }
 
+    private WebApi webApi;
+
     public string PickCode
     {
         get { return (string)GetValue(PickCodeProperty); }
@@ -44,8 +46,6 @@ public sealed partial class CustomMediaPlayerElement : UserControl
     }
 
     Dictionary<string, string> subDicts;
-
-    private WebApi webApi;
 
     public event EventHandler<RoutedEventArgs> FullWindow;
 
@@ -62,7 +62,6 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
         //m3u8UrlList
         if (webApi == null) webApi = new();
-
 
         //先原画
         List<Quality> QualityItemsSource = new() { new("原画", pickCode: PickCode) };
@@ -92,6 +91,12 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
         mediaTransportControls.SetQuality(QualityItemsSource, this.Resources["QualityDataTemplate"] as DataTemplate);
 
+        List<Player> plsyerSoucre = new() { new(WebApi.playMethod.vlc, pickCode: PickCode),
+                                            new(WebApi.playMethod.pot, pickCode: PickCode)};
+
+        //设置播放器
+        mediaTransportControls.SetPlayer(plsyerSoucre, this.Resources["PlayerDataTemplate"] as DataTemplate);
+
         if (AppSettings.IsFindSub)
         {
             subDicts = DataAccess.FindSubFile(PickCode);
@@ -117,6 +122,10 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         }
 
         await SetMediaPlayer(url, subDicts);
+
+
+
+        this.Loaded -= CustomMediaPlayerElement_Loaded;
     }
 
     public void StopMediaPlayer()
@@ -181,7 +190,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         MediaControl.SetMediaPlayer(media);
     }
 
-    private async void mediaControls_QualityChanged(object sender, SelectionChangedEventArgs e)
+    private async void QualityChanged(object sender, SelectionChangedEventArgs e)
     {
         if (e.AddedItems.FirstOrDefault() is not Quality quality) return;
 
@@ -247,16 +256,25 @@ public sealed partial class CustomMediaPlayerElement : UserControl
                 pc = PickCode,
                 is_like = isLike,
                 image_path = capPath
-            }) ;
+            });
+
+            if(isLike == 1) ShowTeachingTip("已添加进喜欢");
         }
         else
         {
             DataAccess.UpdateSingleFailInfo(PickCode, "is_like", isLike.ToString());
 
-            if (string.IsNullOrEmpty(failInfo.image_path) || !File.Exists(failInfo.image_path))
+            //需要截图
+            if (failInfo.image_path == Const.NoPictruePath || !File.Exists(failInfo.image_path))
             {
                 var capPath = await ScreenshotAsync(PickCode);
                 DataAccess.UpdateSingleFailInfo(PickCode, "image_path", capPath);
+
+                if (isLike == 1) ShowTeachingTip("已添加进喜欢，并截取当前画面作为封面");
+            }
+            else
+            {
+                if (isLike == 1) ShowTeachingTip("已添加进喜欢");
             }
         }
 
@@ -279,15 +297,24 @@ public sealed partial class CustomMediaPlayerElement : UserControl
                 look_later = look_later,
                 image_path = capPath
             });
+
+            if (look_later != 0) ShowTeachingTip("已添加进稍后观看");
         }
         else
         {
             DataAccess.UpdateSingleFailInfo(PickCode, "look_later", look_later.ToString());
 
-            if (string.IsNullOrEmpty(failInfo.image_path) || !File.Exists(failInfo.image_path))
+            //需要添加截图
+            if (failInfo.image_path == Data.Const.NoPictruePath || !File.Exists(failInfo.image_path))
             {
                 var capPath = await ScreenshotAsync(PickCode);
                 DataAccess.UpdateSingleFailInfo(PickCode, "image_path", capPath);
+
+                if (look_later != 0) ShowTeachingTip("已添加进稍后观看，并截取当前画面作为封面");
+            }
+            else
+            {
+                if (look_later != 0) ShowTeachingTip("已添加进稍后观看");
             }
         }
     }
@@ -311,6 +338,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         {
             DataAccess.UpdateSingleFailInfo(PickCode, "image_path", capPath);
         }
+
+        ShowTeachingTip("已截取当前画面作为封面");
     }
 
     public async Task<string> ScreenshotAsync(string PickCode)
@@ -338,4 +367,24 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         return file.Path;
     }
 
+    private async void PlayerChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.FirstOrDefault() is not Player player) return;
+
+        if (webApi == null) webApi = new();
+
+        await webApi.PlayVideoWithOriginUrl(player.PickCode,player.PlayMethod,this.XamlRoot);
+    }
+
+    private async void ShowTeachingTip(string subTitle)
+    {
+        if (Player_TeachingTip.IsOpen) Player_TeachingTip.IsOpen = false;
+
+        Player_TeachingTip.Subtitle = subTitle;
+        Player_TeachingTip.IsOpen = true;
+
+        await Task.Delay(1000);
+
+        Player_TeachingTip.IsOpen = false;
+    }
 }
