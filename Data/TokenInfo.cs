@@ -1956,7 +1956,7 @@ namespace Data
 
         public long look_later { get; set; } = 0;
 
-        public string image_path { get; set; }
+        public string image_path { get; set; } = Data.Const.NoPictruePath;
     }
 
     public enum FailInfoShowType { like,look_later}

@@ -14,6 +14,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Windows.System;
 
 namespace Display.Control;
@@ -224,14 +225,16 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         {
             if (IsShowFailListView)
             {
-                trySwitchToFailView();
+                ShowType_RadioButtons.SelectedIndex = 1;
+                //trySwitchToFailView();
             }
             else
             {
-                trySwitchToSuccessView();
+                ShowType_RadioButtons.SelectedIndex = 0;
+                //trySwitchToSuccessView();
             }
 
-            ShowType_RadioButtons.SelectionChanged += ShowType_RadioButtons_SelectionChanged;
+            //ShowType_RadioButtons.SelectionChanged += ShowType_RadioButtons_SelectionChanged;
             //ShowType_ToggleSwitch.Toggled += ShowType_ToggleSwitch_Toggled;
         }
 
@@ -1170,11 +1173,13 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         }
     }
 
-
     private void ShowData_RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (e.AddedItems[0] is RadioButton)
+        {
+            //IsShowFailListView = true;
             InitFailCollection();
+        }
     }
 
     private async void InitFailCollection()
@@ -1262,6 +1267,92 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             if (FailInfoSuggestBox.Visibility == Visibility.Visible) FailInfoSuggestBox.Visibility = Visibility.Collapsed;
         }
 
+    }
+
+    private async void FailItemAddToLikeButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem item) return;
+
+        if (item.DataContext is not Datum datum) return;
+
+        string PickCode = datum.pc;
+
+        var failInfo = await DataAccess.LoadSingleFailInfo(PickCode);
+
+        if (failInfo == null)
+        {
+            DataAccess.AddOrReplaceFailList_islike_looklater(new()
+            {
+                pc = PickCode,
+                is_like = 1
+            });
+            ShowTeachingTip("已添加进喜欢");
+        }
+        //已添加进数据库但不是喜欢
+        //标记为喜欢
+        else
+        {
+            switch (failInfo.is_like)
+            {
+                case 0:
+                    DataAccess.UpdateSingleFailInfo(PickCode, "is_like", "1");
+                    ShowTeachingTip("已添加进喜欢");
+                    break;
+                default:
+                    ShowTeachingTip("已存在于喜欢，忽略该操作");
+                    break;
+            }
+        }
+    }
+
+    private async void FailItemAddToLookLaterButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem item) return;
+
+        if (item.DataContext is not Datum datum) return;
+
+        string PickCode = datum.pc;
+
+        var failInfo = await DataAccess.LoadSingleFailInfo(PickCode);
+
+        if (failInfo == null)
+        {
+            DataAccess.AddOrReplaceFailList_islike_looklater(new()
+            {
+                pc = PickCode,
+                look_later = 1
+            });
+            ShowTeachingTip("已添加进稍后观看");
+        }
+        //已添加进数据库但不是稍后观看
+        //标记为稍后观看
+        else
+        {
+
+            switch (failInfo.look_later)
+            {
+                case 0:
+                    DataAccess.UpdateSingleFailInfo(PickCode, "look_later", "1");
+                    ShowTeachingTip("已添加进稍后观看");
+                    break;
+                default:
+                    ShowTeachingTip("已存在于稍后观看，忽略该操作");
+                    break;
+            }
+        }
+    }
+
+    private async void ShowTeachingTip(string subTitle)
+    {
+        //之前的通知存在，先隐藏
+        if (FailList_TeachingTip.IsOpen) FailList_TeachingTip.IsOpen = false;
+
+        FailList_TeachingTip.Subtitle = subTitle;
+        FailList_TeachingTip.IsOpen = true;
+
+        await Task.Delay(1000);
+
+        if(FailList_TeachingTip.IsOpen) FailList_TeachingTip.IsOpen = false;
     }
 
 }
