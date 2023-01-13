@@ -1,4 +1,5 @@
 ﻿using Data;
+using Display.Notifications;
 using Display.WindowView;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
@@ -10,6 +11,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
+using Microsoft.Windows.AppNotifications;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -54,6 +56,14 @@ namespace Display
         {
             this.InitializeComponent();
 
+            AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+
+        }
+
+        private void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        {
+            //删除获取演员信息的进度通知
+            NotificationManager.RemoveGetActorInfoProgessToast();
         }
 
         /// <summary>

@@ -6,7 +6,7 @@ using System.Xml.Linq;
 
 namespace Display.Converter;
 
-public class AppUpdateContentConvert : IValueConverter
+public class AppUpdateContentConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {

@@ -1637,9 +1637,6 @@ namespace Data
 
         public async Task<string> TryDownSubFile(string fileName, string pickCode)
         {
-            //string pickCode = subInfo.pickcode;
-            //string fileName = subInfo.name;
-
             //为预防字幕文件没有具体名称，只有数字，更改字幕文件名为 pickCode+字幕文件名
             fileName = $"{pickCode}_{fileName}";
 
@@ -1652,7 +1649,7 @@ namespace Data
                 if (File.Exists(subFile))
                     return subFile;
 
-                string ua = GetInfoFromNetwork.BrowserUserAgent;
+                string ua = GetInfoFromNetwork.DesktopUserAgent;
 
                 //不存在则获取下载链接并下载
                 var subUrlList = GetDownUrl(pickCode, ua);
@@ -1665,7 +1662,7 @@ namespace Data
 
                 subFile = await GetInfoFromNetwork.downloadFile(sub_Url, Sub_SavePath, fileName, false, new()
                 {
-                    {"user-agent", ua }
+                    {"User-Agent", ua }
                 });
 
                 return subFile;

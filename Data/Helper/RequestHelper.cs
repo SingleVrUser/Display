@@ -10,19 +10,24 @@ namespace Data.Helper;
 
 public class RequestHelper
 {
-    public static async Task<string> RequestHtml(HttpClient client,string url, int maxRequestCount = 5)
+    public static async Task<Tuple<string, string>> RequestHtml(HttpClient client,string url, int maxRequestCount = 5)
     {
         // 访问
         HttpResponseMessage response;
         string strResult = string.Empty;
 
-        for(int i = 0; i < maxRequestCount; i++)
+        Tuple<string, string> tuple = null;
+        string RequestUrl = string.Empty;
+
+        for (int i = 0; i < maxRequestCount; i++)
         {
             try
             {
-                response = await client.GetAsync(url);
+                response = await client.GetAsync(new Uri(url));
 
-                if (response.IsSuccessStatusCode)
+                RequestUrl = response.RequestMessage.RequestUri.ToString();
+
+                if (response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.Found)
                 {
                     strResult = await response.Content.ReadAsStringAsync();
                     strResult = strResult.Replace("\r", "").Replace("\n", "").Trim();
@@ -47,7 +52,10 @@ public class RequestHelper
             }
         }
 
-        return strResult;
+        if (!string.IsNullOrEmpty(RequestUrl) && !string.IsNullOrEmpty(strResult))
+            tuple = new(RequestUrl, strResult);
+
+        return tuple;
     }
 
     public static async Task<Tuple<string,string>> PostHtml(HttpClient client, string url, Dictionary<string, string> values, int maxRequestCount = 5)

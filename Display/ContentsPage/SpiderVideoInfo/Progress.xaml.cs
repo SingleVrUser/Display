@@ -495,7 +495,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             progress.Report(currentSpiderInfo);
 
             ////所有任务已结束（后面已经删除了,所以这个没用了）
-            //DataAccess.UpdataSpiderLogDone(task_id);
+            //DataAccess.UpdateSpiderLogDone(task_id);
 
             //删除SpiderTask和SpiderLog表中的所有数据
             DataAccess.DeleteSpiderLogTable();
@@ -533,7 +533,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                         //System.Diagnostics.Debug.WriteLine($"{spiderSourceName}查询到的{name}");
 
                         //记录为正在进行
-                        DataAccess.UpdataSpiderTask(name, spiderSource, SpiderStates.doing);
+                        DataAccess.UpdateSpiderTask(name, spiderSource, SpiderStates.doing);
                     }
                 }
 
@@ -598,7 +598,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     //使用第一个符合条件的Name
                     resultInfo = DataAccess.LoadOneVideoInfoByCID(result[0]);
 
-                    DataAccess.UpdataFileToInfo(name, true);
+                    DataAccess.UpdateFileToInfo(name, true);
                 }
                 //数据库没有，则开始搜刮
                 else
@@ -721,11 +721,11 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     lock (myLock)
                     {
                         //记录为已完成且已全部完成
-                        DataAccess.UpdataSpiderTask(name, spiderSource, SpiderStates.done, true);
+                        DataAccess.UpdateSpiderTask(name, spiderSource, SpiderStates.done, true);
                     }
 
                     //更新FileToInfo表
-                    DataAccess.UpdataFileToInfo(name, true);
+                    DataAccess.UpdateFileToInfo(name, true);
                 }
                 else
                 {
@@ -734,7 +734,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     lock (myLock)
                     {
                         //仅记录该搜刮源为已完成
-                        DataAccess.UpdataSpiderTask(name, spiderSource, SpiderStates.done);
+                        DataAccess.UpdateSpiderTask(name, spiderSource, SpiderStates.done);
                         IsAllSpiderSourceAttempt = DataAccess.IsAllSpiderSourceAttempt(name);
                     }
 
@@ -743,7 +743,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                         lock (myLock)
                         {
                             //标记为AllDone
-                            DataAccess.UpdataSpiderTask(name, spiderSource, SpiderStates.done, true);
+                            DataAccess.UpdateSpiderTask(name, spiderSource, SpiderStates.done, true);
                         }
 
                         //宣告失败(搜刮源)
@@ -856,7 +856,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "数据库已存在" }
                 });
 
-                DataAccess.UpdataFileToInfo(VideoName, true);
+                DataAccess.UpdateFileToInfo(VideoName, true);
 
             }
             // 数据库中不存在该数据
@@ -918,7 +918,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 //多次搜索无果，退出
                 if (resultInfo == null)
                 {
-                    DataAccess.UpdataFileToInfo(VideoName, false);
+                    DataAccess.UpdateFileToInfo(VideoName, false);
                     return null;
                 }
 
@@ -926,7 +926,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 DataAccess.AddVideoInfo(resultInfo);
 
                 //更新FileToInfo表
-                DataAccess.UpdataFileToInfo(VideoName, true);
+                DataAccess.UpdateFileToInfo(VideoName, true);
             }
 
             return resultInfo;

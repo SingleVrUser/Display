@@ -32,7 +32,7 @@ namespace Display.WindowView
         {
             this.InitializeComponent();
 
-            this.Title = "Éı¼¶";
+            this.Title = "å‡çº§";
 
             this.Closed += StartWindow_Closed;
         }
@@ -45,10 +45,10 @@ namespace Display.WindowView
 
         private async void Grid_Loaded(object sender, RoutedEventArgs e)
         {
-            //Éı¼¶Êı¾İ¿â£¬v0.15¿ªÊ¼
+            //å‡çº§æ•°æ®åº“ï¼Œv0.15å¼€å§‹
             await Task.Run(async () => await DataAccess.UpdateDatabaseFrom14());
 
-            //¹Ø±Õ´°¿Ú
+            //å…³é—­çª—å£
             this.Close();
         }
 

@@ -262,8 +262,12 @@ namespace Display.ContentsPage
                 progressinfo.status = Status.beforeStart;
                 progress.Report(progressinfo);
 
-                //更新数据库
-                DataAccess.UpdateActorInfoPrifilePath(actorName, imageSavePath);
+                var actorId = DataAccess.GetActorIdByName(actorName);
+                if(actorId != -1)
+                {
+                    //更新数据库
+                    DataAccess.UpdateActorInfoPrifilePath(actorId, imageSavePath);
+                }
             }
 
         }
@@ -471,11 +475,7 @@ namespace Display.ContentsPage
         HttpClient Client;
         private async Task<bool> DownFile(string downurl,string filePath,bool isNeedReplace = false)
         {
-            if(Client == null)
-                Client = new HttpClient();
-            //var handler = new HttpClientHandler { UseCookies = false };
-            //Client = new HttpClient(handler);
-            //Client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/25.0.1.0");
+            if (Client == null) Client = GetInfoFromNetwork.Client;
 
             var directoryName = Path.GetDirectoryName(filePath);
             if (!File.Exists(directoryName))

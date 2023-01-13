@@ -200,11 +200,14 @@ public class AppSettings
         }
     }
 
+    #region 搜刮源设置
+
     /// <summary>
     /// LibreDmm网址
     /// </summary>
     /// 
     private static string _libreDmm_BaseUrl = "https://www.libredmm.com/";
+
     public static string LibreDmm_BaseUrl
     {
         get
@@ -366,6 +369,65 @@ public class AppSettings
             localSettings.Values["javDB_Cookie"] = value;
         }
     }
+
+    #endregion
+
+
+    #region 获取演员信息
+
+    /// <summary>
+    /// minnano-av网址
+    /// </summary>
+    /// 
+
+
+    private static int? _getActorInfoLastIndex;
+
+    public static int GetActorInfoLastIndex
+    {
+        get
+        {
+            if(_getActorInfoLastIndex != null)
+            {
+                return (int)_getActorInfoLastIndex;
+            }
+            else if(localSettings.Values["GetActorInfoLastIndex"] is int index)
+            {
+                return index;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        set
+        {
+            localSettings.Values["GetActorInfoLastIndex"] = value;
+        }
+    }
+
+    private static string _minnanoAv_BaseUrl = "http://www.minnano-av.com/";
+
+    public static string MinnanoAv_BaseUrl
+    {
+        get
+        {
+            var BaseUrl = localSettings.Values["MinnanoAv_BaseUrl"] as string;
+            if (string.IsNullOrEmpty(BaseUrl))
+            {
+                BaseUrl = _minnanoAv_BaseUrl;
+            }
+            return BaseUrl;
+        }
+        set
+        {
+            localSettings.Values["MinnanoAv_BaseUrl"] = value;
+        }
+    }
+
+
+    #endregion
+
 
     /// <summary>
     /// 图片保存地址
