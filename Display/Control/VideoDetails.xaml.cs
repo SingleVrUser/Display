@@ -627,10 +627,14 @@ namespace Display.Control
         //动画结束后开始监听CoverGrid的pointer
         public void ForwardConnectedAnimationCompleted(ConnectedAnimation sender, object args)
         {
+            StartListCover_GridTapped();
+        }
+
+        public void StartListCover_GridTapped()
+        {
             Cover_Grid.PointerEntered += Cover_Image_PointerEntered;
             Cover_Grid.PointerExited += Cover_Image_PointerExited;
             Cover_Grid.Tapped += Cover_Tapped;
-
         }
 
 

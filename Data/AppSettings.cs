@@ -986,7 +986,7 @@ public class AppSettings
 
 
     //展示页设置
-
+    private static bool? _isShowFailListInDisplay;
     /// <summary>
     /// 展示匹配失败的列表?
     /// </summary>
@@ -994,10 +994,16 @@ public class AppSettings
     {
         get
         {
+            if(_isShowFailListInDisplay != null)
+            {
+                return (bool)_isShowFailListInDisplay;
+            }
+
             bool isShow = false;
 
             if (localSettings.Values["IsShowFailListInDisplay"] is bool value)
             {
+                _isShowFailListInDisplay = value;
                 isShow = value;
             }
 
@@ -1005,6 +1011,9 @@ public class AppSettings
         }
         set
         {
+            if (_isShowFailListInDisplay == value) return;
+
+            _isShowFailListInDisplay = value;
             localSettings.Values["IsShowFailListInDisplay"] = value;
         }
     }

@@ -2,21 +2,15 @@
 // Licensed under the MIT License.
 
 using Data;
-using Display.Model;
-using LiveChartsCore.Drawing;
 using Microsoft.Graphics.Canvas;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Graphics.Imaging;
-using Windows.Media;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
@@ -182,7 +176,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
             media.Source = ms;
         }
 
-
+        //先暂停后重新设置源，避免新的源设置失败之前的还在播放
+        if (MediaControl.MediaPlayer.Source != null && MediaControl.MediaPlayer.CurrentState == MediaPlayerState.Playing) MediaControl.MediaPlayer.Pause();
         MediaControl.SetMediaPlayer(media);
     }
 
@@ -203,6 +198,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
             if (downUrlList.Count == 0) return;
             url = downUrlList.FirstOrDefault().Value;
+
+            //url = "https://d99fecf2-385d-4ce3-a85c-c7ec1c7e8627.mock.pstmn.io/video";
 
             //避免重复获取
             quality.Url = url;

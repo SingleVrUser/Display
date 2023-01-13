@@ -50,7 +50,15 @@ namespace Display.Views
             if (anim != null)
             {
                 anim.TryStart(VideoDetailsControl.Cover_Image);
-                anim.Completed += VideoDetailsControl.ForwardConnectedAnimationCompleted;
+
+
+                //有动画，动画完成后监听Cover_Grid（封面显示播放按钮）
+                anim.Completed += (sendre,args)=> VideoDetailsControl.StartListCover_GridTapped();
+            }
+            else
+            {
+                //没有动画，直接监听Cover_Grid（封面显示播放按钮）
+                VideoDetailsControl.StartListCover_GridTapped();
             }
 
         }

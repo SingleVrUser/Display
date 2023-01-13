@@ -73,7 +73,13 @@ namespace Display.Views
 
         private void CarouselControl_Loaded(object sender, RoutedEventArgs e)
         {
+            if (sender is not CommunityToolkit.WinUI.UI.Controls.Carousel control) return;
+
             Page_Loaded();
+
+            control.Loaded -= CarouselControl_Loaded;
+
+
         }
 
         private async void LoadActorPartInfo(int count = 30)
