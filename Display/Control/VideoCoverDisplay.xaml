@@ -722,6 +722,22 @@
                   PointerExited="FailGrid_PointerExited"
                   Margin="5,0">
 
+                <Grid.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="喜欢" Click="FailItemAddToLikeButton_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE006;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="稍后观看"
+                                        Click="FailItemAddToLookLaterButton_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE13B;"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </Grid.ContextFlyout>
+
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="*" />
@@ -881,7 +897,7 @@
                             </TextBlock>
 
                             <TextBlock Visibility="{x:Bind actorInfo.work_time,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
-                            <Run Foreground="Gray">工作时间：</Run>
+                            <Run Foreground="Gray">出演期间：</Run>
                             <Run Text="{x:Bind actorInfo.work_time,Mode=OneWay}" />
                             </TextBlock>
 
@@ -972,7 +988,7 @@
                                    DesiredWidth="400"
                                    StretchContentForSingleRow="True"
                                    Visibility="{x:Bind IsShowFailListView,Mode=OneWay}"
-                                   Padding="10,0"/>
+                                   Padding="10,5"/>
 
         <!--筛选栏，默认隐藏-->
         <customcontrols:InfoListFilter x:Name="InfosFilter"
@@ -1005,7 +1021,6 @@
                 </ToggleSwitch>-->
 
                 <RadioButtons x:Name="ShowType_RadioButtons"
-                              SelectedIndex="0"
                               Grid.Column="2"
                               MaxColumns="2"
                               CharacterSpacing="30"
@@ -1125,5 +1140,10 @@
 
         </RelativePanel>
         
+        
+        <!--TeachingTip-->
+        <TeachingTip x:Name="FailList_TeachingTip"
+                     IsLightDismissEnabled="True"
+                     />
     </Grid>
 </UserControl>
