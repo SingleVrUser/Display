@@ -3,13 +3,20 @@
 
 using Data;
 using Display.Model;
+using LiveChartsCore.Drawing;
+using Microsoft.Graphics.Canvas;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.Foundation;
+using Windows.Graphics.Imaging;
+using Windows.Media;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
@@ -96,6 +103,25 @@ public sealed partial class CustomMediaPlayerElement : UserControl
             subDicts = DataAccess.FindSubFile(PickCode);
         }
 
+        if(playType == PlayType.fail)
+        {
+            bool isLike;
+            bool isLookLater;
+            var failInfo = await DataAccess.LoadSingleFailInfo(PickCode);
+            if (failInfo != null)
+            {
+                isLike = failInfo.is_like == 1 ? true : false;
+                isLookLater = failInfo.look_later == 0 ? false : true;
+            }
+            else
+            {
+                isLike = false;
+                isLookLater = false;
+            }
+
+            mediaTransportControls.SetFailPlayType(isLike, isLookLater);
+        }
+
         await SetMediaPlayer(url, subDicts);
     }
 
@@ -164,9 +190,6 @@ public sealed partial class CustomMediaPlayerElement : UserControl
     {
         if (e.AddedItems.FirstOrDefault() is not Quality quality) return;
 
-        System.Diagnostics.Debug.WriteLine(quality.Name);
-        System.Diagnostics.Debug.WriteLine(quality.Url);
-
         string url = null;
         //m3u8播放
         if (quality.Url != null)
@@ -210,4 +233,112 @@ public sealed partial class CustomMediaPlayerElement : UserControl
     {
         MediaDoubleTapped?.Invoke(sender, e);
     }
+
+    private async void LikeButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not AppBarToggleButton button) return;
+
+        var failInfo = await DataAccess.LoadSingleFailInfo(PickCode);
+
+        int isLike = button.IsChecked == true ? 1 : 0;
+
+        if (failInfo == null)
+        {
+            var capPath = await ScreenshotAsync(PickCode);
+            DataAccess.AddOrReplaceFailList_islike_looklater(new()
+            {
+                pc = PickCode,
+                is_like = isLike,
+                image_path = capPath
+            }) ;
+        }
+        else
+        {
+            DataAccess.UpdateSingleFailInfo(PickCode, "is_like", isLike.ToString());
+
+            if (string.IsNullOrEmpty(failInfo.image_path) || !File.Exists(failInfo.image_path))
+            {
+                var capPath = await ScreenshotAsync(PickCode);
+                DataAccess.UpdateSingleFailInfo(PickCode, "image_path", capPath);
+            }
+        }
+
+    }
+
+    private async void LookLaterButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not AppBarToggleButton button) return;
+
+        var failInfo = await DataAccess.LoadSingleFailInfo(PickCode);
+
+        int look_later = button.IsChecked == true ? Convert.ToInt32(DateTimeOffset.Now.ToUnixTimeSeconds()) : 0;
+
+        if (failInfo == null)
+        {
+            var capPath = await ScreenshotAsync(PickCode);
+            DataAccess.AddOrReplaceFailList_islike_looklater(new()
+            {
+                pc = PickCode,
+                look_later = look_later,
+                image_path = capPath
+            });
+        }
+        else
+        {
+            DataAccess.UpdateSingleFailInfo(PickCode, "look_later", look_later.ToString());
+
+            if (string.IsNullOrEmpty(failInfo.image_path) || !File.Exists(failInfo.image_path))
+            {
+                var capPath = await ScreenshotAsync(PickCode);
+                DataAccess.UpdateSingleFailInfo(PickCode, "image_path", capPath);
+            }
+        }
+    }
+    private async void ScreenshotButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button) return;
+
+        var failInfo = await DataAccess.LoadSingleFailInfo(PickCode);
+
+        var capPath = await ScreenshotAsync(PickCode);
+
+        if (failInfo == null)
+        {
+            DataAccess.AddOrReplaceFailList_islike_looklater(new()
+            {
+                pc = PickCode,
+                image_path = capPath
+            });
+        }
+        else
+        {
+            DataAccess.UpdateSingleFailInfo(PickCode, "image_path", capPath);
+        }
+    }
+
+    public async Task<string> ScreenshotAsync(string PickCode)
+    {
+        string savePath = Path.Combine(AppSettings.Image_SavePath, "Screen");
+        if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
+        StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(savePath);
+        StorageFile file = await storageFolder.CreateFileAsync($"{PickCode}.png", CreationCollisionOption.ReplaceExisting);
+        var fileStream = await file.OpenAsync(FileAccessMode.ReadWrite);
+
+        var rendertarget = new CanvasRenderTarget(
+                CanvasDevice.GetSharedDevice(),
+                MediaControl.MediaPlayer.PlaybackSession.NaturalVideoWidth,
+                MediaControl.MediaPlayer.PlaybackSession.NaturalVideoHeight,
+                96);
+        MediaControl.MediaPlayer.CopyFrameToVideoSurface(rendertarget);
+
+        var targetFileStream = fileStream.AsStreamForWrite();
+        using (targetFileStream)
+        {
+            var stream = targetFileStream.AsRandomAccessStream();
+            await rendertarget.SaveAsync(stream, CanvasBitmapFileFormat.Png);
+        }
+
+        return file.Path;
+    }
+
 }

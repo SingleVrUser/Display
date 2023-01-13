@@ -16,7 +16,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Margin="10,2">
+        <StackPanel Orientation="Horizontal" Margin="2" Spacing="10">
             <Button x:Name="GetActorInfoButton"
                     Content="获取演员信息"
                     Click="GetActorInfoButton_Click"
@@ -24,6 +24,10 @@
             <Button x:Name="ContinueGetActorInfoTaskButton"
                     Content="继续获取演员信息"
                     Click="ContinueGetActorInfoTaskButton_Click"
+                    Visibility="Collapsed"/>
+            <Button x:Name="ShowProgressButton"
+                    Content="显示进度"
+                    Click="ShowProgressButton_Click"
                     Visibility="Collapsed"/>
         </StackPanel>
         
@@ -124,7 +128,7 @@
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
 
-                        <controls:ImageEx x:Name="ActorImage" Source="{x:Bind prifile_path}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform" CornerRadius="5"/>
+                        <controls:ImageEx x:Name="ActorImage" Source="{x:Bind prifile_path}" PlaceholderStretch="Uniform" CornerRadius="5"/>
 
                         <FontIcon FontFamily="Segoe Fluent Icons"
                                   Glyph="&#xE00B;"

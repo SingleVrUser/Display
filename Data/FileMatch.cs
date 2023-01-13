@@ -262,7 +262,7 @@ namespace Data
                     //失败比较特殊
                     //从另外的表中查找
                     case "失败" or "fail":
-                        var failItems = await DataAccess.LoadFailFileInfo(n: keywords);
+                        var failItems = await DataAccess.LoadFailFileInfoWithDatum(n: keywords);
                         failItems.ForEach(item => dicts.TryAdd(item.n,new(item)));
                         continue;
                     default:

@@ -29,8 +29,13 @@
                                                 IsPlaybackRateButtonVisible="True"
                                                 IsPlaybackRateEnabled="True"
                                                 FullWindow="mediaControls_FullWindow"
+                                                LikeButtonClick="LikeButtonClick"
+                                                LookLaterButtonClick="LookLaterButtonClick"
+                                                ScreenshotButtonClick="ScreenshotButtonClick"
                                                 QualityChanged="mediaControls_QualityChanged"
-                                                IsHitTestVisible="True" />
+                                                IsHitTestVisible="True"/>
         </MediaPlayerElement.TransportControls>
     </MediaPlayerElement>
+    
+    
 </UserControl>

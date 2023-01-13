@@ -1,20 +1,12 @@
 ﻿using Microsoft.Data.Sqlite;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.VisualBasic;
-using Org.BouncyCastle.Asn1.X509;
-using Org.BouncyCastle.Utilities.Collections;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using Windows.Media;
 using Windows.Storage;
 
 namespace Data
@@ -200,6 +192,7 @@ namespace Data
                     $"EXISTS FailList_islike_looklater ( " +
                         "pc text," +
                         "is_like integer," +
+                        "score integer," +
                         "look_later integer," +
                         "image_path text," +
                         "PRIMARY KEY('pc')" +
@@ -737,7 +730,7 @@ namespace Data
         /// </summary>
         /// <param name="truename"></param>
         /// <param name="is_wm"></param>
-        public static void AddOrReplaceFailList_islike_looklater(string pc, int is_like, int looklater,string image_path)
+        public static void AddOrReplaceFailList_islike_looklater(FailInfo failInfo)
         {
             using (SqliteConnection db =
               new SqliteConnection($"Filename={dbpath}"))
@@ -748,11 +741,12 @@ namespace Data
                 insertCommand.Connection = db;
 
                 //添加信息，如果已经存在则替换
-                insertCommand.CommandText = $"INSERT OR REPLACE INTO FailList_islike_looklater VALUES (@pc,@is_like,@look_later,@image_path)";
-                insertCommand.Parameters.AddWithValue("@pc", pc);
-                insertCommand.Parameters.AddWithValue("@is_like", is_like);
-                insertCommand.Parameters.AddWithValue("@look_later", looklater);
-                insertCommand.Parameters.AddWithValue("@image_path", image_path);
+                insertCommand.CommandText = $"INSERT OR REPLACE INTO FailList_islike_looklater VALUES (@pc,@is_like,@score,@look_later,@image_path)";
+                insertCommand.Parameters.AddWithValue("@pc", failInfo.pc);
+                insertCommand.Parameters.AddWithValue("@is_like", failInfo.is_like);
+                insertCommand.Parameters.AddWithValue("@score", failInfo.score);
+                insertCommand.Parameters.AddWithValue("@look_later", failInfo.look_later);
+                insertCommand.Parameters.AddWithValue("@image_path", failInfo.image_path);
 
                 insertCommand.ExecuteNonQuery();
 
@@ -971,6 +965,37 @@ namespace Data
         #endregion
 
         #region 更新
+
+        /// <summary>
+        /// 更新FailInfo表
+        /// </summary>
+        /// <param name="pc"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public static void UpdateSingleFailInfo(string pc, string key, string value)
+        {
+            using (SqliteConnection db =
+              new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand Command = new SqliteCommand();
+                Command.Connection = db;
+
+                Command.CommandText = $"UPDATE FailList_islike_looklater set {key} = '{value}' WHERE pc = '{pc}'";
+
+                try
+                {
+                    Command.ExecuteNonQuery();
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e.Message);
+                }
+
+                db.Close();
+            }
+        }
 
         /// <summary>
         /// 更新FileToInfo表
@@ -1372,11 +1397,80 @@ namespace Data
             return data;
         }
 
+        public static async Task<FailInfo> LoadSingleFailInfo(string pc)
+        {
+            FailInfo failInfo = null;
+            using (SqliteConnection db =
+               new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"SELECT info.*,fail.is_like, fail.score, fail.look_later, fail.image_path  FROM FailList_islike_looklater as fail LEFT JOIN FilesInfo as info on info.pc = fail.pc WHERE fail.pc = '{pc}' LIMIT 1", db);
+
+                var query = await selectCommand.ExecuteReaderAsync();
+
+                if (query.Read())
+                {
+                    failInfo = tryCovertQueryToFailInfo(query);
+                }
+                //无结果
+                else
+                {
+                    failInfo = null;
+                }
+
+                db.Close();
+            }
+
+            return failInfo;
+        }
+
         /// <summary>
-        /// 查询失败列表
+        /// 查询失败列表（FailInfo格式）
         /// </summary>
         /// <returns></returns>
-        public static async Task<List<Datum>> LoadFailFileInfo(int offset = 0, int limit = -1, string n = null, string orderBy = null, bool isDesc = false, FailType showType=FailType.All)
+        public static async Task<List<FailInfo>> LoadFailFileInfoWithFailInfo(int offset = 0, int limit = -1, FailInfoShowType showType = FailInfoShowType.like)
+        {
+            List<FailInfo> data = new();
+
+            using (SqliteConnection db =
+               new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                string showTypeStr;
+                if(showType == FailInfoShowType.like)
+                {
+                    showTypeStr = " WHERE is_like = 1";
+                }
+                else
+                {
+                    showTypeStr = " WHERE look_later != 0";
+                }
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"SELECT info.*,fail.is_like, fail.score, fail.look_later, fail.image_path  FROM FailList_islike_looklater as fail LEFT JOIN FilesInfo as info on info.pc = fail.pc{showTypeStr} LIMIT {limit} offset {offset}", db);
+
+                SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
+
+                while (query.Read())
+                {
+                    data.Add(tryCovertQueryToFailInfo(query));
+                }
+
+                db.Close();
+            }
+
+            return data;
+        }
+
+
+        /// <summary>
+        /// 查询失败列表（Datum格式）
+        /// </summary>
+        /// <returns></returns>
+        public static async Task<List<Datum>> LoadFailFileInfoWithDatum(int offset = 0, int limit = -1, string n = null, string orderBy = null, bool isDesc = false, FailType showType=FailType.All)
         {
             List<Datum> data = new List<Datum>();
 
@@ -1454,8 +1548,40 @@ namespace Data
             return count;
         }
 
+        public static int CheckFailInfosCount(FailInfoShowType showType)
+        {
+            int count = 0;
+            using (SqliteConnection db =
+               new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
 
-        public static int CheckFailFilesCount(string n = "",FailType showType= FailType.All)
+                string showTypeStr;
+                if (showType == FailInfoShowType.like)
+                {
+                    showTypeStr = " WHERE is_like = 1";
+                }
+                else
+                {
+                    showTypeStr = " WHERE look_later != 0";
+                }
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"SELECT COUNT(pc) FROM FailList_islike_looklater {showTypeStr}", db);
+
+                SqliteDataReader query = selectCommand.ExecuteReader();
+
+                query.Read();
+                count = query.GetInt32(0);
+                query.Close();
+                db.Close();
+            }
+
+            return count;
+        }
+
+
+        public static int CheckFailDatumFilesCount(string n = "",FailType showType= FailType.All)
         {
             if (!string.IsNullOrEmpty(n) && n.Contains("'"))
             {
@@ -1497,7 +1623,6 @@ namespace Data
 
             return count;
         }
-
 
         /// <summary>
         /// 检查VideoInfo表的数量
@@ -2612,7 +2737,6 @@ namespace Data
         {
             Datum datum = new Datum();
 
-            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
             new SqliteConnection($"Filename={dbpath}"))
             {
@@ -2801,7 +2925,29 @@ namespace Data
             downInfo.addTime = Convert.ToInt64(query["add_time"]);
 
             return downInfo;
+        }
 
+        /// <summary>
+        /// 添加数据库查询结果到FailInfo格式
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        private static FailInfo tryCovertQueryToFailInfo(SqliteDataReader query)
+        {
+            FailInfo info = new();
+
+            if (query.FieldCount == 0) return info;
+
+            info.datum = tryCovertQueryToDatum(query);
+
+            info.pc = info.datum.pc;
+            info.is_like = Convert.ToInt32(query["is_like"]);
+            info.score = Convert.ToSingle(query["score"]);
+            info.look_later = Convert.ToInt64(query["look_later"]);
+            info.image_path = query["image_path"] as string;
+
+
+            return info;
         }
 
         #endregion

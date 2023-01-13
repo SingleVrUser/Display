@@ -91,7 +91,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
             //无筛选功能
             if (filterConditionList!=null && filterConditionList.Contains("fail"))
             {
-                var failList = await DataAccess.LoadFailFileInfo(0,-1,filterKeywords);
+                var failList = await DataAccess.LoadFailFileInfoWithDatum(0,-1,filterKeywords);
                 failList.ForEach(item => Add(new(new(item), imageWidth, imageHeight)));
             }
         }

@@ -13,12 +13,12 @@ public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<Fail
 {
     public async Task LoadData(int startShowCount = 20)
     {
-        var newItems = await DataAccess.LoadFailFileInfo(0, startShowCount,showType: ShowType);
+        var newItems = await DataAccess.LoadFailFileInfoWithDatum(0, startShowCount,showType: ShowType);
 
         if (Count == 0)
         {
             HasMoreItems = true;
-            this.AllCount = DataAccess.CheckFailFilesCount(showType:  ShowType);
+            this.AllCount = DataAccess.CheckFailDatumFilesCount(showType:  ShowType);
         }
         else
             Clear();
@@ -47,7 +47,7 @@ public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<Fail
 
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        var failLists = await DataAccess.LoadFailFileInfo(Items.Count, (int)count, showType: ShowType);
+        var failLists = await DataAccess.LoadFailFileInfoWithDatum(Items.Count, (int)count, showType: ShowType);
 
         if (failLists.Count < count)
         {

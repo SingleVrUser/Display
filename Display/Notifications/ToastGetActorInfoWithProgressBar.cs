@@ -7,19 +7,37 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using System.IO;
+using System.Runtime.CompilerServices;
+using Display.Views;
 
 namespace Display.Notifications;
 
 class ToastGetActorInfoWithProgressBar
 {
-    public const int ScenarioId = 1;
+    public const int NotifyId = 1;
 
     public const string c_tag = "进度";
     public const string c_group = "GetActorInfoProgress";
 
-    public static bool SendToast(int allCount)
+    public static int currentValue = 1;
+
+    public static int allCount = 1;
+
+    public static bool SendToast(int currentValue = 0, int allCount = 0)
     {
+        if (currentValue != 0)
+            ToastGetActorInfoWithProgressBar.currentValue = currentValue;
+        else
+            currentValue = ToastGetActorInfoWithProgressBar.currentValue;
+
+        if (allCount != 0)
+            ToastGetActorInfoWithProgressBar.allCount = allCount;
+        else
+            allCount = ToastGetActorInfoWithProgressBar.allCount;
+
         var appNotification = new AppNotificationBuilder()
+            .AddArgument("action", "ToastClick")
+            .AddArgument(Common.notificationTag, NotifyId.ToString())
 
             .SetAppLogoOverride(new System.Uri("file://" + Path.Combine(Package.Current.InstalledLocation.Path, "Assets/NoPicture.jpg")), AppNotificationImageCrop.Circle)
             .AddText("获取演员信息")
@@ -37,8 +55,8 @@ class ToastGetActorInfoWithProgressBar
 
         AppNotificationProgressData data = new(1);
         data.Title = c_tag;
-        data.Value = 0;
-        data.ValueStringOverride = $"1/{allCount} 演员";
+        data.Value = (double)currentValue / allCount;
+        data.ValueStringOverride = $"{currentValue}/{allCount} 演员";
         data.Status = "正在获取演员信息...";
 
         appNotification.Progress = data;
@@ -49,6 +67,8 @@ class ToastGetActorInfoWithProgressBar
 
     public static async Task<bool> AddValue(int i,int allCount)
     {
+        ToastGetActorInfoWithProgressBar.allCount = allCount;
+
         AppNotificationProgressData data = new(2);
         data.Title = c_tag;
         data.Value = (double)i / allCount;
@@ -56,16 +76,25 @@ class ToastGetActorInfoWithProgressBar
 
         if (i == allCount)
         {
+            currentValue = 1;
             data.Status = "完成";
         }
         else
         {
+            currentValue = i;
             data.Status = "正在获取演员信息...";
         }
 
         var result = await AppNotificationManager.Default.UpdateAsync(data, c_tag, c_group);
 
         return result == AppNotificationProgressResult.Succeeded;
+    }
+
+    public static void NotificationReceived(AppNotificationActivatedEventArgs notificationActivatedEventArgs)
+    {
+        App.ToForeground();
+
+        ActorsPage.Current.ShowButtonWithShowToastAgain();
     }
 
 }
