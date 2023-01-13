@@ -241,7 +241,8 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
         if (SelectedDatum == null) return;
 
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
-        await Views.DetailInfoPage.PlayeVideo(SelectedDatum.pc, this.XamlRoot);
+
+        await Views.DetailInfoPage.PlayeVideo(SelectedDatum.pc, this.XamlRoot, trueName: FileMatch.MatchName(SelectedDatum.n).ToUpper(),lastPage: this);
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
     }
 

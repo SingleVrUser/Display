@@ -36,7 +36,7 @@ public class CustomMediaTransportControls : MediaTransportControls
     }
 
 
-    public void SetFailPlayType(bool islike, bool look_later)
+    public void SetLike_LookLater(bool islike, bool look_later)
     {
         //显示喜欢/稍后观看
         AppBarToggleButton likeButton = GetTemplateChild("IsLikeButton") as AppBarToggleButton;
@@ -52,9 +52,7 @@ public class CustomMediaTransportControls : MediaTransportControls
         Button screenshotButton = GetTemplateChild("ScreenshotButton") as Button;
         screenshotButton.Click += ScreenshotButton_Click; ;
         screenshotButton.Visibility = Visibility.Visible;
-
     }
-
 
     public void SetQuality(List<Quality> QualityItemsSource, DataTemplate QualityDataTemplate)
     {
@@ -121,6 +119,7 @@ public class CustomMediaTransportControls : MediaTransportControls
     {
         ScreenshotButtonClick?.Invoke(sender, e);
     }
+
 
 }
 

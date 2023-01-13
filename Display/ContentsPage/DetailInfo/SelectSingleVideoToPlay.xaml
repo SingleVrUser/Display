@@ -9,7 +9,7 @@
 
     <StackPanel Spacing="5" HorizontalAlignment="Stretch">
         <TextBlock Text="多文件视频，播放选择哪一集？"/>
-        <ListView x:FieldModifier="public" x:Name="ContentListView" SelectionMode="None" ItemsSource="{x:Bind pickCodeInfoList}" IsItemClickEnabled="True">
+        <ListView x:FieldModifier="public" x:Name="ContentListView" SelectionMode="None" DataContext="{x:Bind trueName}" ItemsSource="{x:Bind pickCodeInfoList}" IsItemClickEnabled="True">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="data:Datum">
                     <TextBlock Text="{x:Bind n}" TextWrapping="Wrap"/>

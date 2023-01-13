@@ -47,7 +47,8 @@
 
         <TeachingTip x:Name="Player_TeachingTip"
                      IsLightDismissEnabled="True"
-                     PreferredPlacement="TopRight" />
+                     PreferredPlacement="TopRight"
+                     PlacementMargin="0,5,-22,0"/>
     </Grid>
     
     

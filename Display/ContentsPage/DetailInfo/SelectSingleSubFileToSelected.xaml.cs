@@ -15,6 +15,8 @@ namespace Display.ContentsPage.DetailInfo;
 /// </summary>
 public sealed partial class SelectSingleSubFileToSelected : Page
 {
+    private string trueName;
+
 
     private List<SubInfo> subInfoList { get; set; }
 
@@ -23,11 +25,12 @@ public sealed partial class SelectSingleSubFileToSelected : Page
         this.InitializeComponent();
     }
 
-    public SelectSingleSubFileToSelected(List<SubInfo> subList)
+    public SelectSingleSubFileToSelected(List<SubInfo> subList,string trueName)
     {
         this.InitializeComponent();
 
         subInfoList = subList;
+        this.trueName = trueName;
     }
 
 }

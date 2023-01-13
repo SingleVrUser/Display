@@ -140,7 +140,7 @@ namespace Data
                       "true_url text," +
                       "ua text," +
                       "add_time integer," +
-                      "PRIMARY KEY('file_pickcode')" +
+                      "PRIMARY KEY('file_pickcode','ua')" +
                       ") ";
                 createTable.ExecuteNonQuery();
 
@@ -1343,8 +1343,10 @@ namespace Data
                     ($"SELECT * from VideoInfo WHERE truename = '{truename}' LIMIT 1", db);
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
-                query.Read();
-                data = ConvertQueryTovideoInfo(query);
+                while (query.Read())
+                {
+                    data = ConvertQueryTovideoInfo(query);
+                }
 
                 db.Close();
             }
@@ -2213,7 +2215,7 @@ namespace Data
         }
 
         /// <summary>
-        /// 获取演员出演的视频信息（By Name）
+        /// 获取VideoInfo（By Name）
         /// </summary>
         /// <param Name="actorName"></param>
         /// <returns></returns>
@@ -2408,11 +2410,11 @@ namespace Data
         }
 
         /// <summary>
-        /// 获取演员出演的视频信息（By TrueName）
+        /// 获取FileInfo（By TrueName）
         /// </summary>
         /// <param Name="actorName"></param>
         /// <returns></returns>
-        public static List<Datum> loadVideoInfoByTruename(string truename)
+        public static List<Datum> loadFileInfoByTruename(string truename)
         {
             var tuple = FileMatch.SpliteLeftAndRightFromCid(truename);
 
