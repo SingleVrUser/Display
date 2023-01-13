@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Data;
+using Data.Spider;
 using Display.WindowView;
 using LiveChartsCore;
 using LiveChartsCore.Defaults;
@@ -20,8 +21,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Media;
 using WinUIEx;
+using static Data.Spider.Manager;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -238,7 +239,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// <summary>
         /// 显示饼形图
         /// </summary>
-        /// <param name="datumList"></param>
+        /// <param Name="datumList"></param>
         private void ShowFilesPieCharts(List<Datum> datumList)
         {
             FileInfoPieChart.Visibility = Visibility.Visible;
@@ -306,9 +307,9 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// <summary>
         /// 分析文件信息（饼形图）
         /// </summary>
-        /// <param name="DataInfo"></param>
-        /// <param name="TypeInfo"></param>
-        /// <param name="Name"></param>
+        /// <param Name="DataInfo"></param>
+        /// <param Name="TypeInfo"></param>
+        /// <param Name="Name"></param>
         private void UpdateFileStaticstics(Datum DataInfo, FileStatistics TypeInfo, string Name)
         {
             TypeInfo.size += DataInfo.s;
@@ -509,13 +510,15 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// <summary>
         /// 创建SpiderTask
         /// </summary>
-        /// <param name="spiderSourceName"></param>
+        /// <param Name="spiderSourceName"></param>
         /// <returns></returns>
         private async Task CreadSpiderTask(SpiderSourceName spiderSourceName, IProgress<SpiderInfo> progress)
         {
             string name = null;
             VideoInfo resultInfo;
             SpiderSource spiderSource = new(spiderSourceName);
+
+            var spiderManager = Manager.Current;
 
             SpiderInfo currentSpiderInfo;
             while (true)
@@ -530,7 +533,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
                     if (!string.IsNullOrEmpty(name))
                     {
-                        //System.Diagnostics.Debug.WriteLine($"{spiderSourceName}查询到的{name}");
+                        //System.Diagnostics.Debug.WriteLine($"{spiderSourceName}查询到的{Name}");
 
                         //记录为正在进行
                         DataAccess.UpdateSpiderTask(name, spiderSource, SpiderStates.doing);
@@ -592,6 +595,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     currentSpiderInfo = new(SpiderSourceName.local,name);
                     currentSpiderInfo.State = SpiderStates.doing;
                     currentSpiderInfo.Message = name;
+
                     //不汇报,两次汇报间隔时间太短,会将第二次的数据重复提交两次
                     //progress.Report(currentSpiderInfo);
 
@@ -608,99 +612,18 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     currentSpiderInfo.Message = name;
                     progress.Report(currentSpiderInfo);
 
-                    //不同搜刮源用不同的方式搜刮,并等待对应的时间
-                    switch (spiderSourceName)
+                    //FC2且cookie异常（如未登录）
+                    if (name.Contains("FC2") && spiderSourceName == SpiderSourceName.javdb && !GetInfoFromNetwork.IsJavDbCookieVisiable)
                     {
-                        case SpiderSourceName.javbus:
-                            //System.Diagnostics.Debug.WriteLine("访问JavBus");
-                            resultInfo = await network.SearchInfoFromJavBus(name);
-                            //System.Diagnostics.Debug.WriteLine("JavBus等待 1~3 s");
-
-                            currentSpiderInfo.State = SpiderStates.awaiting;
-                            currentSpiderInfo.Message = "等待 1~3 s";
-                            progress.Report(currentSpiderInfo);
-
-                            await GetInfoFromNetwork.RandomTimeDelay(1, 3);
-                            //System.Diagnostics.Debug.WriteLine("JavBus等待时间到");
-                            break;
-                        case SpiderSourceName.jav321:
-                            //System.Diagnostics.Debug.WriteLine("访问Jav321");
-                            resultInfo = await network.SearchInfoFromJav321(name);
-                            //System.Diagnostics.Debug.WriteLine("Jav321等待 1~2 s");
-
-                            currentSpiderInfo.State = SpiderStates.awaiting;
-                            currentSpiderInfo.Message = "等待 1~2 s";
-                            progress.Report(currentSpiderInfo);
-
-                            await GetInfoFromNetwork.RandomTimeDelay(1, 2);
-                            //System.Diagnostics.Debug.WriteLine("Jav321等待时间到");
-                            break;
-                        case SpiderSourceName.avmoo:
-                            //System.Diagnostics.Debug.WriteLine("访问AvMoo");
-                            resultInfo = await network.SearchInfoFromAvMoo(name);
-                            //System.Diagnostics.Debug.WriteLine("AvMoo等待 1~2 s");
-
-                            currentSpiderInfo.State = SpiderStates.awaiting;
-                            currentSpiderInfo.Message = "等待 1~2 s";
-                            progress.Report(currentSpiderInfo);
-
-                            await GetInfoFromNetwork.RandomTimeDelay(1, 2);
-                            //System.Diagnostics.Debug.WriteLine("AvMoo等待时间到");
-                            break;
-                        case SpiderSourceName.avsox:
-                            //System.Diagnostics.Debug.WriteLine("访问AvSox");
-                            resultInfo = await network.SearchInfoFromAvSox(name);
-                            //System.Diagnostics.Debug.WriteLine("AvSox等待 1~2 s");
-
-                            currentSpiderInfo.State = SpiderStates.awaiting;
-                            currentSpiderInfo.Message = "等待 1~2 s";
-                            progress.Report(currentSpiderInfo);
-
-                            await GetInfoFromNetwork.RandomTimeDelay(1, 2);
-                            //System.Diagnostics.Debug.WriteLine("AvSox等待时间到");
-                            break;
-                        case SpiderSourceName.libredmm:
-                            //System.Diagnostics.Debug.WriteLine("访问LibreDmm");
-                            resultInfo = await network.SearchInfoFromLibreDmm(name);
-                            //System.Diagnostics.Debug.WriteLine("LibreDmm等待 1~2 s");
-
-                            currentSpiderInfo.State = SpiderStates.awaiting;
-                            currentSpiderInfo.Message = "等待 1~2 s";
-                            progress.Report(currentSpiderInfo);
-
-                            await GetInfoFromNetwork.RandomTimeDelay(1, 2);
-                            //System.Diagnostics.Debug.WriteLine("LibreDmm等待时间到");
-                            break;
-                        case SpiderSourceName.fc2club:
-                            //System.Diagnostics.Debug.WriteLine("访问Fc2Hub");
-                            resultInfo = await network.SearchInfoFromFc2Hub(name);
-                            //System.Diagnostics.Debug.WriteLine("Fc2Hub等待 1~2 s");
-
-                            currentSpiderInfo.State = SpiderStates.awaiting;
-                            currentSpiderInfo.Message = "等待 1~2 s";
-                            progress.Report(currentSpiderInfo);
-
-                            await GetInfoFromNetwork.RandomTimeDelay(1, 2);
-                            //System.Diagnostics.Debug.WriteLine("Fc2Hub等待时间到");
-                            break;
-                        case SpiderSourceName.javdb:
-                            //System.Diagnostics.Debug.WriteLine("访问JavDB");
-                            //FC2且cookie异常（如未登录）
-                            if (name.Contains("FC2") && !GetInfoFromNetwork.IsJavDbCookieVisiable)
-                                break;
-
-                            resultInfo = await network.SearchInfoFromJavDB(name);
-                            //System.Diagnostics.Debug.WriteLine("JavDB等待 3~6 s");
-
-                            currentSpiderInfo.State = SpiderStates.awaiting;
-                            currentSpiderInfo.Message = "等待 3~6 s";
-                            progress.Report(currentSpiderInfo);
-
-                            await GetInfoFromNetwork.RandomTimeDelay(3, 6);
-                            //System.Diagnostics.Debug.WriteLine("JavDB等待时间到");
-
-                            break;
+                        break;
                     }
+
+                    //不同搜刮源用不同的方式搜刮,并等待对应的时间
+                    await spiderManager.DispatchSpecificSpiderInfoByCID(name, (int)spiderSourceName);
+                    currentSpiderInfo.State = SpiderStates.awaiting;
+                    currentSpiderInfo.Message = $"等待 {spiderSource.DelayRanges.Item1}~{spiderSource.DelayRanges.Item2} s";
+                    progress.Report(currentSpiderInfo);
+                    await GetInfoFromNetwork.RandomTimeDelay(spiderSource.DelayRanges.Item1, spiderSource.DelayRanges.Item2);
 
                     // 添加搜刮信息到数据库（只有从搜刮源查找到的才添加）
                     if (resultInfo!=null)
@@ -715,7 +638,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     //宣告成功(数据库或搜刮源)
                     currentSpiderInfo.RequestStates = RequestStates.success;
                     currentSpiderInfo.Message = "搜刮完成";
-                    //System.Diagnostics.Debug.WriteLine($"<<发送:{currentSpiderInfo.Name} - {currentSpiderInfo.SpiderSource}<{spiderSource.name}> - {currentSpiderInfo.RequestStates} - {currentSpiderInfo.Message}");
+                    //System.Diagnostics.Debug.WriteLine($"<<发送:{currentSpiderInfo.Name} - {currentSpiderInfo.SpiderSource}<{spiderSource.Name}> - {currentSpiderInfo.RequestStates} - {currentSpiderInfo.Message}");
                     progress.Report(currentSpiderInfo);
 
                     lock (myLock)
@@ -765,172 +688,177 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
         }
 
-        /// <summary>
-        /// 搜索所有的信息
-        /// </summary>
-        /// <param name="matchVideoResults"></param>
-        /// <param name="progress"></param>
-        /// <returns></returns>
-        private async Task SearchAllInfo(List<MatchVideoResult> matchVideoResults, IProgress<SpliderInfoProgress> progress)
-        {
-            for (int i = 0; i < matchVideoResults.Count; i++)
-            {
-                if (s_cts.IsCancellationRequested)
-                {
-                    return;
-                }
+        ///// <summary>
+        ///// 搜索所有的信息
+        ///// </summary>
+        ///// <param Name="matchVideoResults"></param>
+        ///// <param Name="progress"></param>
+        ///// <returns></returns>
+        //private async Task SearchAllInfo(List<MatchVideoResult> matchVideoResults, IProgress<SpliderInfoProgress> progress)
+        //{
+        //    for (int i = 0; i < matchVideoResults.Count; i++)
+        //    {
+        //        if (s_cts.IsCancellationRequested)
+        //        {
+        //            return;
+        //        }
 
-                var matchResult = matchVideoResults[i];
+        //        var matchResult = matchVideoResults[i];
 
 
-                SpliderInfoProgress spliderInfoProgress = new();
-                spliderInfoProgress.matchResult = matchResult;
+        //        SpliderInfoProgress spliderInfoProgress = new();
+        //        spliderInfoProgress.matchResult = matchResult;
 
-                //存在匹配文件
-                if (matchResult.MatchName != null)
-                {
-                    spliderInfoProgress.videoInfo = await SearchInfoByWeb(matchResult.MatchName, progress);
+        //        //存在匹配文件
+        //        if (matchResult.MatchName != null)
+        //        {
+        //            spliderInfoProgress.videoInfo = await SearchInfoByWeb(matchResult.MatchName, progress);
 
-                    //检索失败
-                    if (spliderInfoProgress.videoInfo == null)
-                    {
-                        spliderInfoProgress.matchResult.status = false;
-                        spliderInfoProgress.matchResult.statusCode = -2;
-                        spliderInfoProgress.matchResult.message = "检索失败";
-                    }
-                    //成功
-                    else
-                    {
-                        spliderInfoProgress.matchResult.status = true;
-                        spliderInfoProgress.matchResult.statusCode = 1;
-                        spliderInfoProgress.matchResult.message = "检索成功";
-                    }
+        //            //检索失败
+        //            if (spliderInfoProgress.videoInfo == null)
+        //            {
+        //                spliderInfoProgress.matchResult.status = false;
+        //                spliderInfoProgress.matchResult.statusCode = -2;
+        //                spliderInfoProgress.matchResult.message = "检索失败";
+        //            }
+        //            //成功
+        //            else
+        //            {
+        //                spliderInfoProgress.matchResult.status = true;
+        //                spliderInfoProgress.matchResult.statusCode = 1;
+        //                spliderInfoProgress.matchResult.message = "检索成功";
+        //            }
 
-                }
+        //        }
 
-                spliderInfoProgress.index = i + 1;
+        //        spliderInfoProgress.index = i + 1;
 
-                //获取到该信息，在UI上显示
-                progress.Report(spliderInfoProgress);
+        //        //获取到该信息，在UI上显示
+        //        progress.Report(spliderInfoProgress);
 
-            }
-        }
+        //    }
+        //}
 
-        /// <summary>
-        /// 更新显示的VideoInfo
-        /// </summary>
-        /// <param name="newInfo"></param>
-        private void tryUpdateVideoInfo(VideoInfo newInfo)
-        {
-            if (newInfo == null) return;
+        ///// <summary>
+        ///// 更新显示的VideoInfo
+        ///// </summary>
+        ///// <param Name="newInfo"></param>
+        //private void tryUpdateVideoInfo(VideoInfo newInfo)
+        //{
+        //    if (newInfo == null) return;
 
-            foreach (var VideoInfoItem in newInfo.GetType().GetProperties())
-            {
-                var key = VideoInfoItem.Name;
-                var value = VideoInfoItem.GetValue(newInfo);
+        //    foreach (var VideoInfoItem in newInfo.GetType().GetProperties())
+        //    {
+        //        var key = VideoInfoItem.Name;
+        //        var value = VideoInfoItem.GetValue(newInfo);
 
-                var newItem = videoInfo.GetType().GetProperty(key);
-                newItem.SetValue(videoInfo, value);
-            }
-        }
+        //        var newItem = videoInfo.GetType().GetProperty(key);
+        //        newItem.SetValue(videoInfo, value);
+        //    }
+        //}
 
-        /// <summary>
-        /// 按顺序从网站中获取信息
-        /// </summary>
-        /// <param name="VideoName"></param>
-        /// <returns></returns>
-        private async Task<VideoInfo> SearchInfoByWeb(string VideoName, IProgress<SpliderInfoProgress> progress)
-        {
-            VideoInfo resultInfo = null;
+        ///// <summary>
+        ///// 按顺序从网站中获取信息
+        ///// </summary>
+        ///// <param Name="VideoName"></param>
+        ///// <returns></returns>
+        //private async Task<VideoInfo> SearchInfoByWeb(string VideoName, IProgress<SpliderInfoProgress> progress)
+        //{
+        //    VideoInfo resultInfo = null;
 
-            var result = DataAccess.SelectTrueName(VideoName.ToUpper());
+        //    var spiderManager = Data.Spider.Manager.Current;
 
-            //如果数据库已存在该数据
-            if (result.Count != 0)
-            {
-                //使用第一个符合条件的Name
-                resultInfo = DataAccess.LoadOneVideoInfoByCID(result[0]);
+        //    var result = DataAccess.SelectTrueName(VideoName.ToUpper());
 
-                progress.Report(new SpliderInfoProgress()
-                {
-                    matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "数据库已存在" }
-                });
+        //    //如果数据库已存在该数据
+        //    if (result.Count != 0)
+        //    {
+        //        //使用第一个符合条件的Name
+        //        resultInfo = DataAccess.LoadOneVideoInfoByCID(result[0]);
 
-                DataAccess.UpdateFileToInfo(VideoName, true);
+        //        progress.Report(new SpliderInfoProgress()
+        //        {
+        //            matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "数据库已存在" }
+        //        });
 
-            }
-            // 数据库中不存在该数据
-            // 从相关网站中搜索
-            else
-            {
-                //Fc2类型
-                if (VideoName.ToLower().Contains("fc2-"))
-                {
-                    if (AppSettings.isUseFc2Hub)
-                    {
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~2秒" } });
-                        await GetInfoFromNetwork.RandomTimeDelay(1, 2);
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从fc2hub中搜索" } });
-                        //先从fc2hub中搜索
-                        resultInfo = await network.SearchInfoFromFc2Hub(VideoName);
-                    }
+        //        DataAccess.UpdateFileToInfo(VideoName, true);
 
-                    //搜索无果，尝试用javdb
-                    if (resultInfo == null && AppSettings.isUseJavDB && !string.IsNullOrEmpty(AppSettings.javdb_Cookie))
-                    {
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待3~6秒" } });
-                        await GetInfoFromNetwork.RandomTimeDelay(3, 6);
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavDB中搜索" } });
-                        resultInfo = await network.SearchInfoFromJavDB(VideoName);
-                    }
+        //    }
+        //    // 数据库中不存在该数据
+        //    // 从相关网站中搜索
+        //    else
+        //    {
+        //        //Fc2类型
+        //        if (VideoName.ToLower().Contains("fc2-"))
+        //        {
+        //            if (AppSettings.isUseFc2Hub)
+        //            {
+        //                progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~2秒" } });
+        //                await GetInfoFromNetwork.RandomTimeDelay(1, 2);
+        //                progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从fc2hub中搜索" } });
+        //                //先从fc2hub中搜索
+        //                resultInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(VideoName,Fc2hub.Id);
+        //            }
 
-                }
-                else
-                {
-                    if (AppSettings.isUseJavBus)
-                    {
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~3秒" } });
-                        await GetInfoFromNetwork.RandomTimeDelay(1, 3);
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavBus中搜索" } });
-                        //先从javbus中搜索
-                        resultInfo = await network.SearchInfoFromJavBus(VideoName);
-                    }
+        //            //搜索无果，尝试用javdb
+        //            if (resultInfo == null && AppSettings.isUseJavDB && !string.IsNullOrEmpty(AppSettings.javdb_Cookie))
+        //            {
+        //                progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待3~6秒" } });
+        //                await GetInfoFromNetwork.RandomTimeDelay(3, 6);
+        //                progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavDB中搜索" } });
 
-                    //搜索无果，使用libredmm搜索
-                    if (resultInfo == null && AppSettings.isUseLibreDmm)
-                    {
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~2秒" } });
-                        await GetInfoFromNetwork.RandomTimeDelay(1, 2);
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从LibreDmm中搜索" } });
-                        resultInfo = await network.SearchInfoFromLibreDmm(VideoName);
-                    }
+        //                resultInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(VideoName, JavDB.Id);
+        //            }
 
-                    //搜索无果，使用javdb搜索
-                    if (resultInfo == null && AppSettings.isUseJavDB)
-                    {
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待3~6秒" } });
-                        await GetInfoFromNetwork.RandomTimeDelay(3, 6);
-                        progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavDB中搜索" } });
-                        resultInfo = await network.SearchInfoFromJavDB(VideoName);
-                    }
-                }
+        //        }
+        //        else
+        //        {
+        //            if (AppSettings.isUseJavBus)
+        //            {
+        //                progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~3秒" } });
+        //                await GetInfoFromNetwork.RandomTimeDelay(1, 3);
+        //                progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavBus中搜索" } });
+        //                //先从javbus中搜索
+        //                resultInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(VideoName, JavBus.Id);
+        //            }
 
-                //多次搜索无果，退出
-                if (resultInfo == null)
-                {
-                    DataAccess.UpdateFileToInfo(VideoName, false);
-                    return null;
-                }
+        //            //搜索无果，使用libredmm搜索
+        //            if (resultInfo == null && AppSettings.isUseLibreDmm)
+        //            {
+        //                progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待1~2秒" } });
+        //                await GetInfoFromNetwork.RandomTimeDelay(1, 2);
+        //                progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从LibreDmm中搜索" } });
 
-                // 添加进数据库
-                DataAccess.AddVideoInfo(resultInfo);
+        //                resultInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(VideoName, LibreDmm.Id);
+        //            }
 
-                //更新FileToInfo表
-                DataAccess.UpdateFileToInfo(VideoName, true);
-            }
+        //            //搜索无果，使用javdb搜索
+        //            if (resultInfo == null && AppSettings.isUseJavDB)
+        //            {
+        //                progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "等待3~6秒" } });
+        //                await GetInfoFromNetwork.RandomTimeDelay(3, 6);
+        //                progress.Report(new SpliderInfoProgress() { matchResult = new MatchVideoResult() { MatchName = VideoName, status = true, message = "从JavDB中搜索" } });
 
-            return resultInfo;
-        }
+        //                resultInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(VideoName, JavDB.Id);
+        //            }
+        //        }
+
+        //        //多次搜索无果，退出
+        //        if (resultInfo == null)
+        //        {
+        //            DataAccess.UpdateFileToInfo(VideoName, false);
+        //            return null;
+        //        }
+
+        //        // 添加进数据库
+        //        DataAccess.AddVideoInfo(resultInfo);
+
+        //        //更新FileToInfo表
+        //        DataAccess.UpdateFileToInfo(VideoName, true);
+        //    }
+
+        //    return resultInfo;
+        //}
 
         /// <summary>
         /// 当前窗口请求关闭，显示关闭提示，如确定关闭则退出当前所有进程
@@ -987,8 +915,8 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// <summary>
         /// 点击“失败数：xx”显示失败列表
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private async void askLookFailResult_Tapped(object sender, TappedRoutedEventArgs e)
         {
             ContentDialog dialog = new ContentDialog();
@@ -1011,8 +939,8 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// <summary>
         /// 点击了进度中的更多
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void ProgressMore_Click(object sender, RoutedEventArgs e)
         {
             FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);

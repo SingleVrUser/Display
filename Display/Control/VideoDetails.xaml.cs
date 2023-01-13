@@ -8,13 +8,18 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Windows.Foundation.Metadata;
+using Windows.Storage;
+using Windows.Storage.Streams;
+using Windows.System.Profile;
 using static Display.ContentsPage.SpiderVideoInfo.FileStatistics;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -36,7 +41,6 @@ namespace Display.Control
         public VideoDetails()
         {
             this.InitializeComponent();
-
         }
 
         ObservableCollection<string> ShowImageList = new();
@@ -55,11 +59,14 @@ namespace Display.Control
             ////查询该视频对应的演员列表
             var actorList = await DataAccess.LoadActorInfoByVideoName(resultinfo.truename);
 
-            //var actorList = resultinfo.actor.Split(',');
             for (var i = 0; i < actorList.Count; i++)
             {
-                var actorImageControl = new Control.ActorImage(actorList[i]);
-                actorImageControl.Click += ActorButtonOnClick;
+                var actor = actorList[i];
+                var actorImageControl = new Control.ActorImage(actor, resultinfo.releasetime);
+
+                if(!string.IsNullOrEmpty(actor.name))
+                    actorImageControl.Click += ActorButtonOnClick;
+
                 ActorSatckPanel.Children.Insert(i, actorImageControl);
             }
 
@@ -304,14 +311,28 @@ namespace Display.Control
         /// <summary>
         /// 重新搜刮后选择了选项，并按下了确认键
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void FindInfoAgainSmoke_ConfirmClick(object sender, RoutedEventArgs e)
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
+        private async void FindInfoAgainSmoke_ConfirmClick(object sender, RoutedEventArgs e)
         {
             if (!(sender is Button button)) return;
 
             //获取最新的信息
             if(!(button.DataContext is VideoInfo videoInfo)) return;
+
+            await UpdateInfo(videoInfo);
+
+            //退出Smoke
+            FindInfoAgainSmokeCancel();
+        }
+
+        private async Task UpdateInfo(VideoInfo videoInfo)
+        {
+            //重新下载图片
+            if (!string.IsNullOrEmpty(videoInfo.imageurl))
+            {
+                await GetInfoFromNetwork.downloadFile(videoInfo.imageurl, Path.Combine(AppSettings.Image_SavePath, videoInfo.truename), videoInfo.truename, true);
+            }
 
             //更新数据库
             DataAccess.UpdateDataFromVideoInfo(videoInfo);
@@ -330,11 +351,28 @@ namespace Display.Control
                 newItem.SetValue(resultinfo, value);
             }
 
+            //图片地址不变，但内容变了
+            //为了图片显示能够变化
+            string oldPath = resultinfo.imagepath;
+            string newPath = videoInfo.imagepath;
+            //string NoPictruePath = "ms-appx:///Assets/NoPicture.jpg";
+            if (!oldPath.Contains("ms-appx:") && File.Exists(newPath))
+            {
+                StorageFile file = await StorageFile.GetFileFromPathAsync(newPath);
+
+                using (IRandomAccessStream fileStream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read))
+                {
+                    // Set the image source to the selected bitmap
+                    BitmapImage bitmapImage = new BitmapImage();
+
+                    await bitmapImage.SetSourceAsync(fileStream);
+                    Cover_Image.Source = bitmapImage;
+                }
+            }
+
+
             //重新加载数据
             loadData();
-
-            //退出Smoke
-            FindInfoAgainSmokeCancel();
         }
 
         private void FindInfoAgainSmokeCancelGrid_Tapped(object sender, TappedRoutedEventArgs e)
@@ -452,17 +490,68 @@ namespace Display.Control
             return $"{ShowImageFlipView.SelectedIndex+1}/{ShowImageList.Count}";
         }
 
-        //private string GetFileNameFromFullPath(object fullpath)
-        //{
-        //    return Path.GetFileName(fullpath as string);
-        //}
-
         public event RoutedEventHandler DeleteClick;
         private void DeletedAppBarButton_Click(object sender, RoutedEventArgs e)
         {
-
             DeleteClick?.Invoke(sender, e);
-            
+        }
+
+        private async void EditAppBarButton_Click(object sender, RoutedEventArgs e)
+        {
+            var EditPage = new EditInfo(resultinfo);
+            ContentDialog dialog = new()
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "编辑",
+                PrimaryButtonText = "确定",
+                SecondaryButtonText = "返回",
+                DefaultButton = ContentDialogButton.Primary,
+                Content = EditPage,
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                //确定修改
+                var VideoCoverDisplayClassInfo = EditPage.GetInfoAfterEdit();
+
+                VideoInfo newInfo = new();
+
+                //构建构建新的VideoInfo
+                //更新UI
+                foreach (var item in VideoCoverDisplayClassInfo.GetType().GetProperties())
+                {
+                    var name = item.Name;
+
+                    //忽略自定义数据
+                    if (name == "look_later" || name == "score" || name == "is_like")
+                        continue;
+
+                    //新值
+                    var newValue = item.GetValue(VideoCoverDisplayClassInfo);
+
+                    //为新的Videoinfo赋值
+                    var newItem = newInfo.GetType().GetProperty(name);
+
+                    if(newItem!= null)
+                    {
+                        newItem.SetValue(newInfo, newValue);
+                    }
+
+                    //原先的旧值
+                    var oldItem = resultinfo.GetType().GetProperty(name);
+                    var oldValue = oldItem.GetValue(resultinfo);
+
+                    //与新值比较，判断是否需要更新正在显示的ResultInfo数据
+                    if (newValue != oldValue)
+                    {
+                        oldItem.SetValue(resultinfo, newValue);
+                    }
+                }
+
+                await UpdateInfo(newInfo);
+            }
         }
 
         private void OpenDirectory_Click(object sender, RoutedEventArgs e)
@@ -543,5 +632,7 @@ namespace Display.Control
             Cover_Grid.Tapped += Cover_Tapped;
 
         }
+
+
     }
 }

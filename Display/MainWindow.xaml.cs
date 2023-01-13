@@ -73,8 +73,8 @@ namespace Display
         /// <summary>
         /// NavView加载
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void NavView_Loaded(object sender, RoutedEventArgs e)
         {
             //数据文件存在
@@ -153,8 +153,8 @@ namespace Display
         /// <summary>
         /// NavigationView的选择改变
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="args"></param>
         private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
             if (args.IsSettingsSelected == true)
@@ -200,8 +200,8 @@ namespace Display
         /// <summary>
         /// 跳转页面失败
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void ContentFrame_NavigationFailed(object sender, NavigationFailedEventArgs e)
         {
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
@@ -237,8 +237,8 @@ namespace Display
         /// <summary>
         /// 请求返回
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="args"></param>
         private void NavView_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
         {
             TryGoBack();
@@ -262,8 +262,8 @@ namespace Display
         /// <summary>
         /// 搜索框中的选项被选中
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="args"></param>
         private async void SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
             var nowItem = args.SelectedItem as VideoInfo;
@@ -290,8 +290,8 @@ namespace Display
         /// <summary>
         /// 提交搜索选项
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="args"></param>
         private void CustomAutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
             var types = sender.DataContext as List<string>;
@@ -302,8 +302,8 @@ namespace Display
         /// <summary>
         /// 点击了全屏或退出全屏按键
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void fullScrenWindowButton_Click(object sender, RoutedEventArgs e)
         {
             if (appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
@@ -319,8 +319,8 @@ namespace Display
         /// <summary>
         /// 监听ESC按键（退出全屏）
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void RootGrid_KeyDown(object sender, KeyRoutedEventArgs e)
         {
             if (e.Key == Windows.System.VirtualKey.Escape)

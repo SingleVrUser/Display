@@ -27,6 +27,8 @@
                                 Value="900" />
                         <Setter Target="ThumbnailGrid.MaxHeight"
                                 Value="600" />
+                        <Setter Target="Cover_Image.MaxHeight"
+                                Value="700" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -95,15 +97,7 @@
                 </CommandBar.PrimaryCommands>
 
                 <CommandBar.SecondaryCommands>
-                    <AppBarButton Icon="Delete"
-                                  Label="删除"
-                                  Click="DeletedAppBarButton_Click">
-                        <AppBarButton.KeyboardAccelerators>
-                            <KeyboardAccelerator Modifiers="Control"
-                                                 Key="D" />
-                        </AppBarButton.KeyboardAccelerators>
-                    </AppBarButton>
-
+                    
                     <AppBarButton Icon="Find"
                                   Label="重新搜刮"
                                   Click="FindAppBarButton_Click">
@@ -112,6 +106,7 @@
                                                  Key="F" />
                         </AppBarButton.KeyboardAccelerators>
                     </AppBarButton>
+                    
 
 
                     <AppBarButton Icon="OpenFile"
@@ -120,6 +115,24 @@
                         <AppBarButton.KeyboardAccelerators>
                             <KeyboardAccelerator Modifiers="Control"
                                                  Key="I" />
+                        </AppBarButton.KeyboardAccelerators>
+                    </AppBarButton>
+
+                    <AppBarButton Icon="Edit"
+                                  Label="编辑"
+                                  Click="EditAppBarButton_Click">
+                        <AppBarButton.KeyboardAccelerators>
+                            <KeyboardAccelerator Modifiers="Control"
+                                                 Key="E" />
+                        </AppBarButton.KeyboardAccelerators>
+                    </AppBarButton>
+
+                    <AppBarButton Icon="Delete"
+                                  Label="删除"
+                                  Click="DeletedAppBarButton_Click">
+                        <AppBarButton.KeyboardAccelerators>
+                            <KeyboardAccelerator Modifiers="Control"
+                                                 Key="D" />
                         </AppBarButton.KeyboardAccelerators>
                     </AppBarButton>
 
@@ -181,10 +194,10 @@
 
                         <Image x:FieldModifier="public"
                                x:Name="Cover_Image"
-                               Source="{x:Bind resultinfo.imagepath,Converter={StaticResource NotExistsImagePathConverter},Mode=OneWay}"
+                               Source="{x:Bind resultinfo.imagepath,Converter={StaticResource NotExistsImagePathConverter}}"
                                HorizontalAlignment="Left"
                                VerticalAlignment="Center"
-                               MaxHeight="780" />
+                               MaxHeight="500" />
 
                         <Grid x:Name="VideoPlayIconInCover"
                               Visibility="Collapsed">
@@ -302,6 +315,7 @@
 
                                     <TextBlock Text="{x:Bind resultinfo.producer,Mode=OneWay}"
                                                Padding="60,0,0,0"
+                                               TextTrimming="CharacterEllipsis"
                                                IsTextSelectionEnabled="True"/>
                                 </Grid>
 
@@ -351,8 +365,7 @@
                                       VerticalScrollMode="Disabled"
                                       HorizontalAlignment="Left">
                             <StackPanel x:Name="ActorSatckPanel"
-                                        Orientation="Horizontal">
-                            </StackPanel>
+                                        Orientation="Horizontal" />
                         </ScrollViewer>
                     </StackPanel>
 

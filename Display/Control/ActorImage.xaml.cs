@@ -1,20 +1,10 @@
 ﻿using Data;
+using Display.Views;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Imaging;
-using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -23,42 +13,20 @@ namespace Display.Control
 {
     public sealed partial class ActorImage : UserControl
     {
-        private static readonly string noPictruePath = "ms-appx:///Assets/NoPicture.jpg";
+        public ActorInfo ActorInfo;
 
-        private string actorName;
+        private string releaseTime;
 
-        private int actorId;
 
-        public ActorImage(string actorName)
+        public ActorImage(ActorInfo actorInfo, string releaseTime)
         {
             this.InitializeComponent();
 
-            //检查演员图片是否存在
-            string imagePath = Path.Combine(AppSettings.ActorInfo_SavePath, actorName, "face.jpg");
-            if (!File.Exists(imagePath))
-            {
-                imagePath = noPictruePath;
-            }
+            this.ActorInfo = actorInfo;
+            this.releaseTime = releaseTime;
 
-            ShowImage.Source = new BitmapImage(new Uri(imagePath));
-
-            this.actorName = actorName;
-        }
-
-        public ActorImage(ActorInfo actorInfo)
-        {
-            this.InitializeComponent();
-
-            string imagePath;
-            if (string.IsNullOrEmpty(actorInfo.prifile_path))
-            {
-                imagePath = noPictruePath;
-            }
-            else
-            {
-                imagePath = actorInfo.prifile_path;
-            }
-            ShowImage.Source = new BitmapImage(new Uri(imagePath));
+            //是否可点击
+            if (string.IsNullOrEmpty(actorInfo.name)) return;
 
             //是否喜欢
             if (actorInfo.is_like == 1)
@@ -66,9 +34,28 @@ namespace Display.Control
                 LikeFontIcon.Visibility = Visibility.Visible;
             }
 
-            this.actorName = actorInfo.name;
-            this.actorId = actorInfo.id;
-            //ShowText.Text = actorInfo.name;
+            //右键菜单
+            RootGrid.ContextFlyout = this.Resources["LikeMenuFlyout"] as MenuFlyout;
+
+
+            //监听Pointer后改变鼠标
+            RootGrid.PointerEntered += Grid_PointerEntered;
+            RootGrid.PointerExited += Grid_PointerExited;
+
+            //显示作品时年龄
+            tryShowActorAge(actorInfo.birthday);
+        }
+
+        private void tryShowActorAge(string birthday)
+        {
+            if (FileMatch.CalculatTimeStrDiff(birthday, releaseTime) is TimeSpan dtDif)
+            {
+                if (dtDif != TimeSpan.Zero)
+                {
+                    WorkYearDiff_TextBlock.Text = ((int)dtDif.TotalDays / 365).ToString();
+                    WorkYearDiff_TextBlock.Visibility = Visibility.Visible;
+                }
+            }
         }
 
 
@@ -104,7 +91,30 @@ namespace Display.Control
                     break;
             }
 
-            DataAccess.UpdateSingleDataFromActorInfo(actorId.ToString(), "is_like", is_like.ToString());
+            DataAccess.UpdateSingleDataFromActorInfo(ActorInfo.id.ToString(), "is_like", is_like.ToString());
+        }
+
+        private async void GetInfoMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
+        {
+            GetActorInfoProgressRing.Visibility = Visibility.Visible;
+
+            var newInfo = await ActorsPage.GetActorInfo(ActorInfo);
+            if (newInfo == null)
+            {
+                GetActorInfoProgressRing.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            //更新头像
+            if (!string.IsNullOrEmpty(newInfo.prifile_path))
+            {
+                ActorInfo.prifile_path = newInfo.prifile_path;
+            }
+
+            //更新年龄
+            tryShowActorAge(newInfo.birthday);
+
+            GetActorInfoProgressRing.Visibility = Visibility.Collapsed;
         }
     }
 }

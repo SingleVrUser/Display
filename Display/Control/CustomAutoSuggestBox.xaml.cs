@@ -124,8 +124,8 @@ namespace Display.Control
         /// 切换搜索范围
         /// 左键单选
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void ChangedFindMethod_Click(object sender, RoutedEventArgs e)
         {
             if (!(sender is ToggleMenuFlyoutItem item)) return;
@@ -151,8 +151,8 @@ namespace Display.Control
         /// <summary>
         /// 搜索方式全选或重设
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void SelectedAllFindMethod_Clicked(object sender, RoutedEventArgs e)
         {
             if (!(sender is ToggleMenuFlyoutItem item)) return;
@@ -178,8 +178,8 @@ namespace Display.Control
         /// 切换搜索范围
         /// 右键多选
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void ChangedFindMethod_RightTapped(object sender, Microsoft.UI.Xaml.Input.RightTappedRoutedEventArgs e)
         {
             if (!(sender is ToggleMenuFlyoutItem item)) return;

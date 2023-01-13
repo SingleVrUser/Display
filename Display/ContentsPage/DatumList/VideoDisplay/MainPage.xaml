@@ -52,10 +52,7 @@
         </Style>
     </Page.Resources>
 
-    <Grid AllowDrop="True"
-          x:Name="MainGrid"
-          Drop="VideoGrid_Drop"
-          DragOver="Link_DragOver">
+    <Grid x:Name="MainGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="auto" />
@@ -70,7 +67,11 @@
                               FirstColumn="0"
                               Orientation="Horizontal"
                               Rows="2"
-                              Columns="1">
+                              Columns="1"
+                              AllowDrop="True"
+                              Drop="VideoUniformGrid_Drop"
+                              DragOver="Link_DragOver"
+                              Background="Transparent">
 
         </controls:UniformGrid>
 

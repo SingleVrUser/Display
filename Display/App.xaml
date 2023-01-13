@@ -22,11 +22,16 @@
                 <!--控件颜色-->
                 <ResourceDictionary>
                     <Color x:Key="ColorChecked">#8cb3ff</Color>
+                    <!--<Color x:Key="ColorAngleMark">#6495ed</Color>-->
                     <SolidColorBrush x:Key="CustomToggleButtonBackgroundChecked" Color="{StaticResource ColorChecked}" />
+                    <SolidColorBrush x:Key="AngleMarkBackground"
+                                     Color="CornflowerBlue"
+                                     Opacity="0.8"/>
                 </ResourceDictionary>
 
                 <ResourceDictionary>
-                    
+
+
                     <Style TargetType="TextBlock">
                         <Setter Property="FontFamily"
                                 Value="霞鹜文楷" />

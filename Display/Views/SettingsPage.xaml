@@ -50,7 +50,6 @@
                     </DataTemplate>
                 </Setter.Value>
             </Setter>
-
         </Style>
 
         <converter:BoolToVisiableConverter x:Key="BoolToVisiableConverter" />
