@@ -12,15 +12,18 @@ namespace Display.ContentsPage.DetailInfo
     /// </summary>
     public sealed partial class SelectSingleVideoToPlay : Page
     {
+        private string trueName;
+
         private List<Datum> pickCodeInfoList { get; set; }
         public SelectSingleVideoToPlay()
         {
             this.InitializeComponent();
         }
-        public SelectSingleVideoToPlay(List<Datum> pickCodeInfoList)
+        public SelectSingleVideoToPlay(List<Datum> pickCodeInfoList,string trueName)
         {
             this.InitializeComponent();
             this.pickCodeInfoList = pickCodeInfoList;
+            this.trueName = trueName;
         }
     }
 }
