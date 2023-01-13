@@ -112,7 +112,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
                 if (item.CheckUrl.Contains("http"))
                 {
-                    bool isUseful = await network.CheckUrlUseful(item.CheckUrl);
+                    bool isUseful = await GetInfoFromNetwork.CheckUrlUseful(item.CheckUrl);
 
                     //网络有用
                     if (isUseful)

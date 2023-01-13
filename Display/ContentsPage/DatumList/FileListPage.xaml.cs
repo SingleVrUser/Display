@@ -76,15 +76,15 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
     public void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
-        // Raise the PropertyChanged event, passing the name of the property whose value has changed.
+        // Raise the PropertyChanged event, passing the Name of the property whose value has changed.
         this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     /// <summary>
     /// Grid加载时调用
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    /// <param Name="sender"></param>
+    /// <param Name="e"></param>
     private void Grid_loaded(object sender, RoutedEventArgs e)
     {
         ProgressRing.IsActive = true;
@@ -397,6 +397,12 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
             await Move115Files(item.Cid, sourceFilesInfos);
 
         }
+
+        //从中转站拖入的，中转站为空时隐藏
+        if (TransferStation_Grid.Visibility == Visibility.Visible && (transferStationFiles == null || transferStationFiles.Count == 0))
+        {
+            TransferStation_Grid.Visibility = Visibility.Collapsed;
+        }
     }
 
     /// <summary>
@@ -539,7 +545,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
     /// <summary>
     /// 显示确认提示框
     /// </summary>
-    /// <param name="selectedItemList"></param>
+    /// <param Name="selectedItemList"></param>
     /// <returns></returns>
     private async Task<ContentDialogResult> ShowContentDialog(List<string> NameList)
     {

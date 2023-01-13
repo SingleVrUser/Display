@@ -49,7 +49,7 @@ namespace Display.ContentsPage
             this.Loaded -= Grid_Loaded;
 
             actorinfo = new(new() { { "prifile_path", false } });
-            actorinfo.SetFilter(new() { "name != ''" });
+            actorinfo.SetFilter(new() { "Name != ''" });
             await actorinfo.LoadData();
             BasicGridView.ItemsSource = actorinfo;
 
@@ -350,9 +350,9 @@ namespace Display.ContentsPage
         /// <summary>
         /// 从文件中获取演员地址，占用内存过大，弃用
         /// </summary>
-        /// <param name="json"></param>
-        /// <param name="name"></param>
-        /// <param name="count"></param>
+        /// <param Name="json"></param>
+        /// <param Name="name"></param>
+        /// <param Name="count"></param>
         /// <returns></returns>
         private List<string> getImageUrlFormFileTreeContent(JObject json, string name, int count)
         {

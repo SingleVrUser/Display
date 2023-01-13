@@ -52,6 +52,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
             this.currentWindow = window;
 
+            window.SetWindowSize(500, 666);
             window.Content = this;
             window.Activate();
 
@@ -61,7 +62,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
         /// <summary>
         /// 从其他页面Navigate来
         /// </summary>
-        /// <param name="e"></param>
+        /// <param Name="e"></param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);

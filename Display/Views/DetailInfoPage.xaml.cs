@@ -1,27 +1,17 @@
-﻿using CommunityToolkit.WinUI.UI.Animations;
-using Data;
-using Display.ContentsPage;
+﻿using Data;
 using Display.Control;
 using Display.WindowView;
-using LiveChartsCore.Drawing;
-using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
 using static Data.WebApi;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -63,7 +53,6 @@ namespace Display.Views
                 anim.Completed += VideoDetailsControl.ForwardConnectedAnimationCompleted;
             }
 
-
         }
 
         // Create connected animation back to collection page.
@@ -92,8 +81,8 @@ namespace Display.Views
         /// <summary>
         /// 演员更多页跳转
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void Actor_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not Grid clickButton) return;
@@ -121,8 +110,8 @@ namespace Display.Views
         /// <summary>
         /// 标签更多页跳转
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private void Label_Click(object sender, RoutedEventArgs e)
         {
             var clickButton = sender as HyperlinkButton;
@@ -136,8 +125,8 @@ namespace Display.Views
         /// <summary>
         /// 视频播放页面跳转
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private async void VideoPlay_Click(object sender, RoutedEventArgs e)
         {
             if (!(sender is Button VideoPlayButton))
@@ -298,8 +287,8 @@ namespace Display.Views
         /// <summary>
         /// 点击了删除键
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="e"></param>
         private async void Delete_Click(object sender, RoutedEventArgs e)
         {
             ContentDialog dialog = new ContentDialog()

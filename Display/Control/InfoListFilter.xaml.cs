@@ -59,8 +59,8 @@ namespace Display.Control
         /// <summary>
         /// 取消或选择Type的筛选
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="args"></param>
         private void Type_ToggleSplitButton_Click(SplitButton sender, SplitButtonClickEventArgs args)
         {
             if (!(sender is ToggleSplitButton splitButton)) return;
@@ -90,8 +90,8 @@ namespace Display.Control
         /// <summary>
         /// 取消或选择Score的筛选
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="args"></param>
         private void Score_ToggleSplitButton_Click(SplitButton sender, SplitButtonClickEventArgs args)
         {
             if (!(sender is ToggleSplitButton splitButton)) return;
@@ -125,8 +125,8 @@ namespace Display.Control
         /// <summary>
         /// 取消或选择Year的筛选
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
+        /// <param Name="sender"></param>
+        /// <param Name="args"></param>
         private void Year_ToggleSplitButton_Click(SplitButton sender, SplitButtonClickEventArgs args)
         {
             if (!(sender is ToggleSplitButton splitButton)) return;

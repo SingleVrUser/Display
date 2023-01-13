@@ -18,7 +18,7 @@ namespace Data
         /// <summary>
         /// //正则删除某些关键词
         /// </summary>
-        /// <param name="name"></param>
+        /// <param Name="name"></param>
         /// <returns></returns>
         public static string DeleteSomeKeywords(string name)
         {
@@ -43,7 +43,7 @@ namespace Data
         ///// <summary>
         ///// 是否是特殊番号(用于区分AvMoo和AvSox)
         ///// </summary>
-        ///// <param name="cid"></param>
+        ///// <param Name="cid"></param>
         ///// <returns></returns>
         //public static bool IsSpecialCid(string cid)
         //{
@@ -192,7 +192,7 @@ namespace Data
         /// <summary>
         /// List<class>转换,VideoInfo ==> VideoCoverDisplayClass
         /// </summary>
-        /// <param name="VideoInfoList"></param>
+        /// <param Name="VideoInfoList"></param>
         /// <returns></returns>
         public static List<VideoCoverDisplayClass> getFileGrid(List<VideoInfo> VideoInfoList, double imgwidth, double imgheight)
         {
@@ -293,6 +293,24 @@ namespace Data
             return result;
         }
 
+        public static TimeSpan CalculatTimeStrDiff(string dt1Str,string dt2Str)
+        {
+            if (string.IsNullOrEmpty(dt1Str) || string.IsNullOrEmpty(dt2Str)) return TimeSpan.Zero;
+
+            DateTime dt1 = Convert.ToDateTime(dt1Str);
+
+            DateTime dt2 = Convert.ToDateTime(dt2Str);
+
+            if (dt2 > dt1)
+            {
+                return dt2 - dt1;
+            }
+            else
+            {
+                return dt1 - dt2;
+            }
+        }
+
         public static int ConvertDateTimeToInt32(string dateStr)
         {
             DateTime dt1 = new DateTime(1970, 1, 1, 8, 0, 0);
@@ -303,7 +321,7 @@ namespace Data
         /// <summary>
         /// 字符串内容是否为数字
         /// </summary>
-        /// <param name="_string"></param>
+        /// <param Name="_string"></param>
         /// <returns></returns>
         public static bool isNumberic1(this string _string)
         {
@@ -378,7 +396,7 @@ namespace Data
         /// <summary>
         /// 从文件中挑选出视频文件
         /// </summary>
-        /// <param name="data"></param>
+        /// <param Name="data"></param>
         /// <returns></returns>
         public static List<MatchVideoResult> GetVideoAndMatchFile(List<Datum> data)
         {
@@ -523,7 +541,7 @@ namespace Data
         //临时方法
         public static Visibility showIfImageENotNull(string imagepath)
         {
-            if (imagepath == "ms-appx:///Assets/NoPicture.jpg")
+            if (imagepath == Data.Const.NoPictruePath)
             {
                 return Visibility.Collapsed;
             }
@@ -536,7 +554,7 @@ namespace Data
         //临时方法
         public static Visibility showIfImageNull(string imagepath)
         {
-            if (imagepath == "ms-appx:///Assets/NoPicture.jpg")
+            if (imagepath == Data.Const.NoPictruePath)
             {
                 return Visibility.Visible;
             }

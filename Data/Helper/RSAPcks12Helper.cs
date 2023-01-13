@@ -22,10 +22,10 @@ namespace Data.Helper
         /// <summary>
         /// 签名
         /// </summary>
-        /// <param name="p12Cert">P12/PFX证书的 base64格式</param>
-        /// <param name="certPwd">证书密码</param>
-        /// <param name="contentData">要签名的数据</param>
-        /// <param name="signAlgorithm">签名算法</param>
+        /// <param Name="p12Cert">P12/PFX证书的 base64格式</param>
+        /// <param Name="certPwd">证书密码</param>
+        /// <param Name="contentData">要签名的数据</param>
+        /// <param Name="signAlgorithm">签名算法</param>
         /// <returns></returns>
         public static string SignDataWithPcks12(string p12Cert, string certPwd, byte[] contentData, string signAlgorithm = "SHA1WithRSA")
         {
@@ -34,10 +34,10 @@ namespace Data.Helper
         /// <summary>
         /// 签名
         /// </summary>
-        /// <param name="p12CertData">P12/PFX证书</param>
-        /// <param name="certPwdData">证书密码</param>
-        /// <param name="contentData">要签名的数据</param>
-        /// <param name="signAlgorithm">签名算法</param>
+        /// <param Name="p12CertData">P12/PFX证书</param>
+        /// <param Name="certPwdData">证书密码</param>
+        /// <param Name="contentData">要签名的数据</param>
+        /// <param Name="signAlgorithm">签名算法</param>
         /// <returns></returns>
         public static byte[] SignDataWithPcks12(byte[] p12CertData, char[] certPwdData, byte[] contentData, string signAlgorithm = "SHA1WithRSA")
         {
@@ -50,10 +50,10 @@ namespace Data.Helper
         /// <summary>
         /// 验签
         /// </summary>
-        /// <param name="x509Cert">x509通用证书base64格式</param>
-        /// <param name="content">原始数据</param>
-        /// <param name="sign">签名结果base64格式</param>
-        /// <param name="signAlgorithm">签名算法</param>
+        /// <param Name="x509Cert">x509通用证书base64格式</param>
+        /// <param Name="content">原始数据</param>
+        /// <param Name="sign">签名结果base64格式</param>
+        /// <param Name="signAlgorithm">签名算法</param>
         /// <returns></returns>
         public static bool VerifyDataWithX509(string x509Cert, byte[] content, string sign, string signAlgorithm = "SHA1WithRSA")
         {
@@ -62,10 +62,10 @@ namespace Data.Helper
         /// <summary>
         /// 验签
         /// </summary>
-        /// <param name="x509CertData">x509通用证书</param>
-        /// <param name="contentData">原始数据</param>
-        /// <param name="signData">签名结果</param>
-        /// <param name="signAlgorithm">签名算法</param>
+        /// <param Name="x509CertData">x509通用证书</param>
+        /// <param Name="contentData">原始数据</param>
+        /// <param Name="signData">签名结果</param>
+        /// <param Name="signAlgorithm">签名算法</param>
         /// <returns></returns>
         public static bool VerifyDataWithX509(byte[] x509CertData, byte[] contentData, byte[] signData, string signAlgorithm = "SHA1WithRSA")
         {
@@ -103,8 +103,8 @@ namespace Data.Helper
         /// <summary>
         /// 获取RSA私钥
         /// </summary>
-        /// <param name="p12Cert">P12/PFX证书的 base64格式</param>
-        /// <param name="certPwd">证书密码</param>
+        /// <param Name="p12Cert">P12/PFX证书的 base64格式</param>
+        /// <param Name="certPwd">证书密码</param>
         /// <returns></returns>
         public static string GetPrivateKeyFromPcks12(string p12Cert, string certPwd)
         {
@@ -113,8 +113,8 @@ namespace Data.Helper
         /// <summary>
         /// 获取RSA私钥
         /// </summary>
-        /// <param name="p12CertData">P12/PFX证书</param>
-        /// <param name="certPwdData">证书密码</param>
+        /// <param Name="p12CertData">P12/PFX证书</param>
+        /// <param Name="certPwdData">证书密码</param>
         /// <returns></returns>
         public static byte[] GetPrivateKeyFromPcks12(byte[] p12CertData, char[] certPwdData)
         {
@@ -125,8 +125,8 @@ namespace Data.Helper
         /// <summary>
         /// 获取RSA公钥
         /// </summary>
-        /// <param name="p12Cert">P12/PFX证书的 base64格式</param>
-        /// <param name="certPwd">证书密码</param>
+        /// <param Name="p12Cert">P12/PFX证书的 base64格式</param>
+        /// <param Name="certPwd">证书密码</param>
         /// <returns></returns>
         public static string GetPublicKeyFromPcks12(string p12Cert, string certPwd)
         {
@@ -135,8 +135,8 @@ namespace Data.Helper
         /// <summary>
         /// 获取RSA公钥
         /// </summary>
-        /// <param name="p12CertData">P12/PFX证书</param>
-        /// <param name="certPwdData">证书密码</param>
+        /// <param Name="p12CertData">P12/PFX证书</param>
+        /// <param Name="certPwdData">证书密码</param>
         /// <returns></returns>
         public static byte[] GetPublicKeyFromPcks12(byte[] p12CertData, char[] certPwdData)
         {
@@ -149,7 +149,7 @@ namespace Data.Helper
         /// <summary>
         /// 获取RSA公钥
         /// </summary>
-        /// <param name="x509Cert">x509通用证书base64格式</param>
+        /// <param Name="x509Cert">x509通用证书base64格式</param>
         /// <returns></returns>
         public static string GetPublicKeyFromX509(string x509Cert)
         {
@@ -158,7 +158,7 @@ namespace Data.Helper
         /// <summary>
         /// 获取RSA公钥
         /// </summary>
-        /// <param name="x509CertData">x509通用证书</param>
+        /// <param Name="x509CertData">x509通用证书</param>
         /// <returns></returns>
         public static byte[] GetPublicKeyFromX509(byte[] x509CertData)
         {
@@ -185,9 +185,9 @@ namespace Data.Helper
         /// <summary>
         /// 公钥加密
         /// </summary>
-        /// <param name="x509Cert">x509通用证书base64格式</param>
-        /// <param name="contentData">待加密的数据</param>
-        /// <param name="algorithm">加密算法</param>
+        /// <param Name="x509Cert">x509通用证书base64格式</param>
+        /// <param Name="contentData">待加密的数据</param>
+        /// <param Name="algorithm">加密算法</param>
         /// <returns></returns>
         public static string EncryptWithX509(string x509Cert, byte[] contentData, string algorithm = "RSA/ECB/PKCS1Padding")
         {
@@ -196,9 +196,9 @@ namespace Data.Helper
         /// <summary>
         /// 公钥加密
         /// </summary>
-        /// <param name="x509CertData">x509通用证书</param>
-        /// <param name="contentData">待加密的数据</param>
-        /// <param name="algorithm">加密算法</param>
+        /// <param Name="x509CertData">x509通用证书</param>
+        /// <param Name="contentData">待加密的数据</param>
+        /// <param Name="algorithm">加密算法</param>
         /// <returns></returns>
         public static byte[] EncryptWithX509(byte[] x509CertData, byte[] contentData, string algorithm = "RSA/ECB/PKCS1Padding")
         {
@@ -207,9 +207,9 @@ namespace Data.Helper
         /// <summary>
         /// 公钥加密
         /// </summary>
-        /// <param name="publicKey">RSA公钥 base64格式</param>
-        /// <param name="contentData">待加密的数据</param>
-        /// <param name="algorithm">加密算法</param>
+        /// <param Name="publicKey">RSA公钥 base64格式</param>
+        /// <param Name="contentData">待加密的数据</param>
+        /// <param Name="algorithm">加密算法</param>
         /// <returns></returns>
         public static string EncryptWithPublicKey(string publicKey, byte[] contentData, string algorithm = "RSA/ECB/PKCS1Padding")
         {
@@ -218,9 +218,9 @@ namespace Data.Helper
         /// <summary>
         /// 公钥加密
         /// </summary>
-        /// <param name="publicKey">RSA公钥</param>
-        /// <param name="contentData">待加密的数据</param>
-        /// <param name="algorithm">加密算法</param>
+        /// <param Name="publicKey">RSA公钥</param>
+        /// <param Name="contentData">待加密的数据</param>
+        /// <param Name="algorithm">加密算法</param>
         /// <returns></returns>
         public static byte[] EncryptWithPublicKey(byte[] publicKey, byte[] contentData, string algorithm = "RSA/ECB/PKCS1Padding")
         {
@@ -230,11 +230,11 @@ namespace Data.Helper
         /// <summary>
         /// 解密
         /// </summary>
-        /// <param name="p12Cert">P12/PFX证书的 base64格式</param>
-        /// <param name="certPwd">证书密码</param>
-        /// <param name="content">待解密数据 base64格式</param>
-        /// <param name="encoding">解密出来的数据编码格式，默认UTF-8</param>
-        /// <param name="algorithm">加密算法</param>
+        /// <param Name="p12Cert">P12/PFX证书的 base64格式</param>
+        /// <param Name="certPwd">证书密码</param>
+        /// <param Name="content">待解密数据 base64格式</param>
+        /// <param Name="encoding">解密出来的数据编码格式，默认UTF-8</param>
+        /// <param Name="algorithm">加密算法</param>
         /// <returns></returns>
         public static string DecryptWithPcks12(string p12Cert, string certPwd, string content, string encoding = "UTF-8", string algorithm = "RSA/ECB/PKCS1Padding")
         {
@@ -243,10 +243,10 @@ namespace Data.Helper
         /// <summary>
         /// 解密
         /// </summary>
-        /// <param name="p12Data">P12/PFX证书</param>
-        /// <param name="certPwdData">证书密码</param>
-        /// <param name="contentData">待解密数据</param>
-        /// <param name="algorithm">加密算法</param>
+        /// <param Name="p12Data">P12/PFX证书</param>
+        /// <param Name="certPwdData">证书密码</param>
+        /// <param Name="contentData">待解密数据</param>
+        /// <param Name="algorithm">加密算法</param>
         /// <returns></returns>
         public static byte[] DecryptWithPcks12(byte[] p12Data, char[] certPwdData, byte[] contentData, string algorithm = "RSA/ECB/PKCS1Padding")
         {
@@ -256,10 +256,10 @@ namespace Data.Helper
         /// <summary>
         /// 私钥解密
         /// </summary>
-        /// <param name="privateKey">RSA私钥  base64格式</param>
-        /// <param name="content">待解密数据 base64格式</param>
-        /// <param name="encoding">解密出来的数据编码格式，默认UTF-8</param>
-        /// <param name="algorithm">加密算法</param>
+        /// <param Name="privateKey">RSA私钥  base64格式</param>
+        /// <param Name="content">待解密数据 base64格式</param>
+        /// <param Name="encoding">解密出来的数据编码格式，默认UTF-8</param>
+        /// <param Name="algorithm">加密算法</param>
         /// <returns></returns>
         public static string DecryptWithPrivateKey(string privateKey, string content, string encoding = "UTF-8", string algorithm = "RSA/ECB/PKCS1Padding")
         {
@@ -268,9 +268,9 @@ namespace Data.Helper
         /// <summary>
         /// 私钥解密
         /// </summary>
-        /// <param name="privateKey">RSA私钥</param>
-        /// <param name="contentData">待解密数据</param>
-        /// <param name="algorithm">加密算法</param>
+        /// <param Name="privateKey">RSA私钥</param>
+        /// <param Name="contentData">待解密数据</param>
+        /// <param Name="algorithm">加密算法</param>
         /// <returns></returns>
         public static byte[] DecryptWithPrivateKey(byte[] privateKey, byte[] contentData, string algorithm)
         {
@@ -290,9 +290,9 @@ namespace Data.Helper
         /// <summary>
         /// 私钥加密
         /// </summary>
-        /// <param name="privateKey">RSA私钥 base64格式</param>
-        /// <param name="contentData">待加密的数据</param>
-        /// <param name="algorithm">加密算法</param>
+        /// <param Name="privateKey">RSA私钥 base64格式</param>
+        /// <param Name="contentData">待加密的数据</param>
+        /// <param Name="algorithm">加密算法</param>
         /// <returns></returns>
         public static string EncryptWithPrivateKey(string privateKey, byte[] contentData, string algorithm = "RSA/ECB/PKCS1Padding")
         {
@@ -301,9 +301,9 @@ namespace Data.Helper
         /// <summary>
         /// 私钥加密
         /// </summary>
-        /// <param name="privateKey">RSA私钥</param>
-        /// <param name="contentData">待加密的数据</param>
-        /// <param name="algorithm">加密算法</param>
+        /// <param Name="privateKey">RSA私钥</param>
+        /// <param Name="contentData">待加密的数据</param>
+        /// <param Name="algorithm">加密算法</param>
         /// <returns></returns>
         public static byte[] EncryptWithPrivateKey(byte[] privateKey, byte[] contentData, string algorithm = "RSA/ECB/PKCS1Padding")
         {
@@ -313,10 +313,10 @@ namespace Data.Helper
         /// <summary>
         /// 公钥解密
         /// </summary>
-        /// <param name="publicKey">RSA公钥  base64格式</param>
-        /// <param name="content">待解密数据 base64格式</param>
-        /// <param name="encoding">解密出来的数据编码格式，默认UTF-8</param>
-        /// <param name="algorithm">加密算法</param>
+        /// <param Name="publicKey">RSA公钥  base64格式</param>
+        /// <param Name="content">待解密数据 base64格式</param>
+        /// <param Name="encoding">解密出来的数据编码格式，默认UTF-8</param>
+        /// <param Name="algorithm">加密算法</param>
         /// <returns></returns>
         public static string DecryptWithPublicKey(string publicKey, byte[] content, string encoding = "UTF-8", string algorithm = "RSA/ECB/PKCS1Padding")
         {
@@ -326,9 +326,9 @@ namespace Data.Helper
         /// <summary>
         /// 公钥解密
         /// </summary>
-        /// <param name="publicKey">RSA公钥</param>
-        /// <param name="contentData">待解密数据</param>
-        /// <param name="algorithm">加密算法</param>
+        /// <param Name="publicKey">RSA公钥</param>
+        /// <param Name="contentData">待解密数据</param>
+        /// <param Name="algorithm">加密算法</param>
         /// <returns></returns>
         public static byte[] DecryptWithPublicKey(byte[] publicKey, byte[] contentData, string algorithm = "RSA/ECB/PKCS1Padding")
         {
@@ -341,11 +341,11 @@ namespace Data.Helper
         /// <summary>
         /// 根据crt以及RSA私钥生成pfx证书
         /// </summary>
-        /// <param name="passWord">证书密码</param>
-        /// <param name="x509CertData">crt证书</param>
-        /// <param name="privateKey">Rsa私钥</param>
-        /// <param name="x509CertChainData">证书链</param>
-        /// <param name="alias">默认别名</param>
+        /// <param Name="passWord">证书密码</param>
+        /// <param Name="x509CertData">crt证书</param>
+        /// <param Name="privateKey">Rsa私钥</param>
+        /// <param Name="x509CertChainData">证书链</param>
+        /// <param Name="alias">默认别名</param>
         /// <returns></returns>
         public static MemoryStream GeneratePFX(string passWord, byte[] x509CertData, byte[] privateKey, byte[] x509CertChainData = null, string alias = "PrimaryCertificate")
         {

@@ -62,7 +62,7 @@ namespace Data
         /// <summary>
         /// 更新cookie
         /// </summary>
-        /// <param name="cookie"></param>
+        /// <param Name="cookie"></param>
         public void RefreshCookie(string cookie)
         {
             Client.DefaultRequestHeaders.Remove("Cookie");
@@ -171,9 +171,9 @@ namespace Data
         /// <summary>
         /// 导入CidList获取到的所有信息到数据库
         /// </summary>
-        /// <param name="cidList"></param>
-        /// <param name="getFilesProgressInfo"></param>
-        /// <param name="progress"></param>
+        /// <param Name="cidList"></param>
+        /// <param Name="getFilesProgressInfo"></param>
+        /// <param Name="progress"></param>
         /// <returns></returns>
         public async Task GetAllFileInfoToDataAccess(List<string> cidList, GetFilesProgressInfo getFilesProgressInfo, CancellationToken token, IProgress<GetFileProgessIProgress> progress = null)
         {
@@ -271,8 +271,8 @@ namespace Data
         /// <summary>
         /// 获取所有文件信息
         /// </summary>
-        /// <param name="cid"></param>
-        /// <param name="webFileInfoList"></param>
+        /// <param Name="cid"></param>
+        /// <param Name="webFileInfoList"></param>
         /// <returns></returns>
         public async Task<GetFilesProgressInfo> TraverseAllFileInfo(string cid, GetFilesProgressInfo getFilesProgressInfo, CancellationToken token, IProgress<GetFileProgessIProgress> progress = null)
         {
@@ -352,9 +352,9 @@ namespace Data
         /// <summary>
         /// 修改文件列表的排列顺序
         /// </summary>
-        /// <param name="cid"></param>
-        /// <param name="orderBy"></param>
-        /// <param name="asc"></param>
+        /// <param Name="cid"></param>
+        /// <param Name="orderBy"></param>
+        /// <param Name="asc"></param>
         /// <returns></returns>
         public async Task ChangedShowType(string cid, OrderBy orderBy = OrderBy.user_ptime, int asc = 0)
         {
@@ -381,9 +381,9 @@ namespace Data
         /// <summary>
         /// 删除115文件
         /// </summary>
-        /// <param name="pid"></param>
-        /// <param name="fids"></param>
-        /// <param name="ignore_warn"></param>
+        /// <param Name="pid"></param>
+        /// <param Name="fids"></param>
+        /// <param Name="ignore_warn"></param>
         /// <returns></returns>
         public async Task DeleteFiles(string pid,List<string> fids,int ignore_warn = 1)
         {
@@ -415,7 +415,7 @@ namespace Data
         /// <summary>
         /// 从115回收站恢复文件
         /// </summary>
-        /// <param name="rids"></param>
+        /// <param Name="rids"></param>
         /// <returns></returns>
         public async Task RevertFiles(List<string> rids)
         {
@@ -442,8 +442,8 @@ namespace Data
         /// <summary>
         /// 移动文件
         /// </summary>
-        /// <param name="pid"></param>
-        /// <param name="fids"></param>
+        /// <param Name="pid"></param>
+        /// <param Name="fids"></param>
         /// <returns></returns>
         public async Task MoveFiles(string pid, List<string> fids)
         {
@@ -477,13 +477,13 @@ namespace Data
         /// <summary>
         /// 获取文件信息
         /// </summary>
-        /// <param name="cid"></param>
-        /// <param name="limit"></param>
-        /// <param name="offset"></param>
-        /// <param name="useApi2"></param>
-        /// <param name="LoadAll"></param>
-        /// <param name="orderBy"></param>
-        /// <param name="asc"></param>
+        /// <param Name="cid"></param>
+        /// <param Name="limit"></param>
+        /// <param Name="offset"></param>
+        /// <param Name="useApi2"></param>
+        /// <param Name="LoadAll"></param>
+        /// <param Name="orderBy"></param>
+        /// <param Name="asc"></param>
         /// <returns></returns>
         public async Task<WebFileInfo> GetFileAsync(string cid, int limit = 40, int offset = 0, bool useApi2 = false, bool LoadAll = false, OrderBy orderBy = OrderBy.user_ptime,int asc=0)
         {
@@ -586,8 +586,8 @@ namespace Data
         /// <summary>
         /// 获取文件夹属性（含大小和数量）
         /// </summary>
-        /// <param name="cid"></param>
-        /// <param name="limit"></param>
+        /// <param Name="cid"></param>
+        /// <param Name="limit"></param>
         /// <returns></returns>
         public async Task<FolderCategory> GetFolderCategory(string cid)
         {
@@ -757,7 +757,7 @@ namespace Data
         /// <summary>
         /// 请求115浏览器下载
         /// </summary>
-        /// <param name="videoInfoList"></param>
+        /// <param Name="videoInfoList"></param>
         async Task<bool> RequestDownBy115Browser(List<Datum> videoInfoList)
         {
 
@@ -821,7 +821,7 @@ namespace Data
         /// <summary>
         /// 请求比特彗星下载
         /// </summary>
-        /// <param name="videoInfoList"></param>
+        /// <param Name="videoInfoList"></param>
         /// <returns></returns>
         async Task<bool> RequestDownByBitComet(List<Datum> videoInfoList, string ua, string save_path, string topFolderName = null)
         {
@@ -881,7 +881,7 @@ namespace Data
         /// <summary>
         /// 请求Aria2下载
         /// </summary>
-        /// <param name="videoInfoList"></param>
+        /// <param Name="videoInfoList"></param>
         /// <returns></returns>
         async Task<bool> RequestDownByAria2(List<Datum> videoInfoList, string ua, string save_path, string topFolderName = null)
         {
@@ -973,11 +973,11 @@ namespace Data
         /// <summary>
         /// 链接只能一个一个添加，添加多个视为为同一文件的不同源
         /// </summary>
-        /// <param name="apiUrl"></param>
-        /// <param name="password"></param>
-        /// <param name="urls"></param>
-        /// <param name="ua"></param>
-        /// <param name="save_path"></param>
+        /// <param Name="apiUrl"></param>
+        /// <param Name="password"></param>
+        /// <param Name="urls"></param>
+        /// <param Name="ua"></param>
+        /// <param Name="save_path"></param>
         /// <returns></returns>
         async Task<bool> pushDownRequestToAria2(string apiUrl, string password, List<string> urls, string ua, string save_path, string sha1 = null)
         {
@@ -1074,14 +1074,14 @@ namespace Data
         /// <summary>
         /// 向比特彗星发送下载请求
         /// </summary>
-        /// <param name="client">带user和passwd的HttpClient</param>
-        /// <param name="baseUrl">比特彗星接口地址</param>
-        /// <param name="downUrl">文件下载地址</param>
-        /// <param name="save_path">文件保存路径</param>
-        /// <param name="filename">文件名臣</param>
-        /// <param name="referrer">下载需要的referrer</param>
-        /// <param name="user_agent">下载需要的user_agent</param>
-        /// <param name="cookie">个别需要的Cookie</param>
+        /// <param Name="client">带user和passwd的HttpClient</param>
+        /// <param Name="baseUrl">比特彗星接口地址</param>
+        /// <param Name="downUrl">文件下载地址</param>
+        /// <param Name="save_path">文件保存路径</param>
+        /// <param Name="filename">文件名臣</param>
+        /// <param Name="referrer">下载需要的referrer</param>
+        /// <param Name="user_agent">下载需要的user_agent</param>
+        /// <param Name="cookie">个别需要的Cookie</param>
         /// <returns></returns>
         async Task<bool> pushDownRequestToBitComet(HttpClient client, string baseUrl, string downUrl, string save_path, string filename = "", string referrer = "", string user_agent = "", string cookie = "")
         {
@@ -1112,8 +1112,8 @@ namespace Data
         /// <summary>
         /// 获取网页中比特彗星的默认存储地址
         /// </summary>
-        /// <param name="client"></param>
-        /// <param name="baseUrl"></param>
+        /// <param Name="client"></param>
+        /// <param Name="baseUrl"></param>
         /// <returns></returns>
         async Task<string> getBitCometDefaultSavePath(HttpClient client, string baseUrl)
         {
@@ -1247,7 +1247,7 @@ namespace Data
         /// <summary>
         /// 获取下载链接
         /// </summary>
-        /// <param name="pickcode"></param>
+        /// <param Name="pickcode"></param>
         /// <returns></returns>
         public Dictionary<string, string> GetDownUrl(string pickcode, string ua)
         {
@@ -1350,11 +1350,11 @@ namespace Data
         /// <summary>
         /// PotPlayer播放（原画）
         /// </summary>
-        /// <param name="playUrl"></param>
-        /// <param name="FileName"></param>
-        /// <param name="showWindow"></param>
-        /// <param name="referrerUrl"></param>
-        /// <param name="user_agnet"></param>
+        /// <param Name="playUrl"></param>
+        /// <param Name="FileName"></param>
+        /// <param Name="showWindow"></param>
+        /// <param Name="referrerUrl"></param>
+        /// <param Name="user_agnet"></param>
         public static void Play115SourceVideoWithPotPlayer(string playUrl, string user_agnet, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string subFile = null)
         {
             var process = new Process();
@@ -1375,7 +1375,7 @@ namespace Data
         /// <summary>
         /// PotPlayer播放(m3u8)
         /// </summary>
-        /// <param name="pickCode"></param>
+        /// <param Name="pickCode"></param>
         public async void PlayeByPotPlayer(string pickCode)
         {
             var m3U8Infos = await Getm3u8InfoByPickCode(pickCode);
@@ -1389,7 +1389,7 @@ namespace Data
         /// <summary>
         /// 解析m3u8内容
         /// </summary>
-        /// <param name="m3u8_info"></param>
+        /// <param Name="m3u8_info"></param>
         /// <returns></returns>
         public async Task<m3u8Info> Getm3u8Content(m3u8Info m3u8_info)
         {
@@ -1463,11 +1463,11 @@ namespace Data
         /// <summary>
         /// mpv播放
         /// </summary>
-        /// <param name="playUrl"></param>
-        /// <param name="FileName"></param>
-        /// <param name="showWindow"></param>
-        /// <param name="referrerUrl"></param>
-        /// <param name="user_agnet"></param>
+        /// <param Name="playUrl"></param>
+        /// <param Name="FileName"></param>
+        /// <param Name="showWindow"></param>
+        /// <param Name="referrerUrl"></param>
+        /// <param Name="user_agnet"></param>
         public void Play115SourceVideoWithMpv(string playUrl, string user_agnet, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string title = null, string subFile = null)
         {
             var process = new Process();
@@ -1503,11 +1503,11 @@ namespace Data
         /// <summary>
         /// vlc播放（原画）
         /// </summary>
-        /// <param name="playUrl"></param>
-        /// <param name="FileName"></param>
-        /// <param name="showWindow"></param>
-        /// <param name="referrerUrl"></param>
-        /// <param name="user_agnet"></param>
+        /// <param Name="playUrl"></param>
+        /// <param Name="FileName"></param>
+        /// <param Name="showWindow"></param>
+        /// <param Name="referrerUrl"></param>
+        /// <param Name="user_agnet"></param>
         public static void Play115SourceVideoWithVlc(string playUrl, string user_agnet, string FileName, bool showWindow = true, string referrerUrl = "https://115.com", string title = null, string subFile = null)
         {
             var process = new Process();
@@ -1541,11 +1541,11 @@ namespace Data
         /// <summary>
         /// vlc播放(m3u8)
         /// </summary>
-        /// <param name="playUrl"></param>
-        /// <param name="FileName"></param>
-        /// <param name="showWindow"></param>
-        /// <param name="referrerUrl"></param>
-        /// <param name="user_agnet"></param>
+        /// <param Name="playUrl"></param>
+        /// <param Name="FileName"></param>
+        /// <param Name="showWindow"></param>
+        /// <param Name="referrerUrl"></param>
+        /// <param Name="user_agnet"></param>
         public async void PlayByVlc(string pickCode)
         {
             var m3U8Infos = await Getm3u8InfoByPickCode(pickCode);
@@ -1560,7 +1560,7 @@ namespace Data
         /// <summary>
         /// 原画播放
         /// </summary>
-        /// <param name="pickcode"></param>
+        /// <param Name="pickcode"></param>
         public async Task PlayVideoWithOriginUrl(string pickcode, playMethod playMethod, XamlRoot xamlRoot, SubInfo subInfo = null)
         {
             //播放路径检查选择
