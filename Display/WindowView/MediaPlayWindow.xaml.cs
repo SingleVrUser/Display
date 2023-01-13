@@ -1,9 +1,12 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using Data;
 using Display.Control;
+using Display.Views;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using static Display.Control.CustomMediaPlayerElement;
 
@@ -20,20 +23,26 @@ public sealed partial class MediaPlayWindow : Window
     private AppWindow appwindow;
     private string PickCode;
     private PlayType PlayType;
+    private string TrueName;
 
-    public MediaPlayWindow(string pickCode, PlayType playType)
+    private Page lastPage;
+
+    public MediaPlayWindow(string pickCode, PlayType playType, string truename, Page lastPage)
     {
         this.InitializeComponent();
 
         this.ExtendsContentIntoTitleBar = true;
         this.SetTitleBar(AppTitleBar);
 
+
         this.PickCode = pickCode;
         this.PlayType = playType;
+        this.TrueName = truename;
+        this.lastPage = lastPage;
+
         appwindow = App.getAppWindow(this);
 
         this.Closed += MediaPlayWindow_Closed;
-
     }
 
     private void MediaPlayWindow_Closed(object sender, WindowEventArgs args)
@@ -42,13 +51,44 @@ public sealed partial class MediaPlayWindow : Window
         {
             mediaControl.StopMediaPlayer();
             VideoPlayGrid.Children.Remove(mediaControl);
+        }
 
+        //上一页为详情页，生效喜欢或稍后观看的修改
+        int newestIsLike = mediaControl.IsLike;
+        int newestLookLater = mediaControl.LookLater;
+        if (lastPage is DetailInfoPage detailInfoPage)
+        {
+            if (detailInfoPage.DetailInfo.is_like != newestIsLike)
+                detailInfoPage.DetailInfo.is_like = newestIsLike;
+
+            if (detailInfoPage.DetailInfo.look_later != newestLookLater)
+                detailInfoPage.DetailInfo.look_later = newestLookLater;
+        }
+        else if(lastPage is VideoViewPage videoViewPage)
+        {
+            var storageItem = videoViewPage._storeditem;
+
+            if (videoViewPage._storeditem != null && videoViewPage._storeditem.truename == TrueName)
+            {
+                if (storageItem.is_like != newestIsLike)
+                    storageItem.is_like = newestIsLike;
+
+                if (storageItem.look_later != newestLookLater)
+                    storageItem.look_later = newestLookLater;
+            }
+        }else if(lastPage is ActorInfoPage actorInfoPage)
+        {
+            if (actorInfoPage._storeditem.is_like != newestIsLike)
+                actorInfoPage._storeditem.is_like = newestIsLike;
+
+            if (actorInfoPage._storeditem.look_later != newestLookLater)
+                actorInfoPage._storeditem.look_later = newestLookLater;
         }
     }
 
-    public static MediaPlayWindow CreateNewWindow(string pickCode, PlayType playType)
+    public static MediaPlayWindow CreateNewWindow(string pickCode, PlayType playType,string trueName,Page lastPage)
     {
-        MediaPlayWindow newWindow = new(pickCode, playType);
+        MediaPlayWindow newWindow = new(pickCode, playType, trueName,lastPage);
         newWindow.Activate();
 
         return newWindow;

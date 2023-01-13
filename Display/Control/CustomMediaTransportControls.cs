@@ -1,9 +1,11 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Data;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using Windows.Media.Capture.Core;
 using WinRT;
+using static Data.WebApi;
 using static Display.Control.CustomMediaPlayerElement;
 
 namespace Display.Control;
@@ -16,6 +18,7 @@ public class CustomMediaTransportControls : MediaTransportControls
     public event EventHandler<RoutedEventArgs> ScreenshotButtonClick;
 
     public event SelectionChangedEventHandler QualityChanged;
+    public event SelectionChangedEventHandler PlayerChanged;
 
     public CustomMediaTransportControls()
     {
@@ -33,7 +36,7 @@ public class CustomMediaTransportControls : MediaTransportControls
     }
 
 
-    public void SetFailPlayType(bool islike, bool look_later)
+    public void SetLike_LookLater(bool islike, bool look_later)
     {
         //显示喜欢/稍后观看
         AppBarToggleButton likeButton = GetTemplateChild("IsLikeButton") as AppBarToggleButton;
@@ -49,9 +52,7 @@ public class CustomMediaTransportControls : MediaTransportControls
         Button screenshotButton = GetTemplateChild("ScreenshotButton") as Button;
         screenshotButton.Click += ScreenshotButton_Click; ;
         screenshotButton.Visibility = Visibility.Visible;
-
     }
-
 
     public void SetQuality(List<Quality> QualityItemsSource, DataTemplate QualityDataTemplate)
     {
@@ -77,6 +78,25 @@ public class CustomMediaTransportControls : MediaTransportControls
         qualityListView.SelectionChanged += QualityListView_SelectionChanged;
     }
 
+    public void SetPlayer(List<Player> PlayerItemsSource, DataTemplate QualityDataTemplate)
+    {
+        Button playerButton = GetTemplateChild("PlayerButton") as Button;
+        playerButton.Visibility = Visibility.Visible;
+
+        //画质选择列表
+        ListView playerListView = GetTemplateChild("PlayerListView") as ListView;
+        playerListView.ItemTemplate = QualityDataTemplate;
+
+        playerListView.ItemsSource = PlayerItemsSource;
+
+        playerListView.SelectionChanged += PlayerListView_SelectionChanged;
+    }
+
+    private void PlayerListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        PlayerChanged?.Invoke(sender, e);
+    }
+
     private void QualityListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         QualityChanged?.Invoke(sender, e);
@@ -100,6 +120,7 @@ public class CustomMediaTransportControls : MediaTransportControls
         ScreenshotButtonClick?.Invoke(sender, e);
     }
 
+
 }
 
 public class Quality
@@ -115,5 +136,24 @@ public class Quality
 
         if (url != null) this.Url = url;
         if (pickCode != null) this.PickCode = pickCode;
+    }
+}
+
+public class Player
+{
+    public playMethod PlayMethod;
+
+    public string Name => PlayMethod.ToString();
+
+    public string Url { get; set; }
+    public string PickCode { get; set; }
+
+    public Player(playMethod playerMethod, string url = null, string pickCode = null)
+    {
+        this.PlayMethod = playerMethod;
+
+        if (url != null) this.Url = url;
+        if (pickCode != null) this.PickCode = pickCode;
+
     }
 }

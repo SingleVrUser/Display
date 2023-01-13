@@ -1155,7 +1155,8 @@
                                             </AppBarButton>
                                             <AppBarButton x:Name='QualityButton'
                                                           Style='{StaticResource AppBarButtonStyle}'
-                                                          MediaTransportControlsHelper.DropoutOrder='11'
+                                                          MediaTransportControlsHelper.DropoutOrder='10'
+                                                          ToolTipService.ToolTip="切换画质"
                                                           Visibility="Collapsed">
                                                 <AppBarButton.Flyout>
                                                     <Flyout x:Name="QualityFlyout"
@@ -1170,9 +1171,27 @@
                                                 </AppBarButton.Icon>
                                             </AppBarButton>
 
+                                            <AppBarButton x:Name='PlayerButton'
+                                                          Style='{StaticResource AppBarButtonStyle}'
+                                                          MediaTransportControlsHelper.DropoutOrder='11'
+                                                          ToolTipService.ToolTip="切换播放器"
+                                                          Visibility="Collapsed">
+                                                <AppBarButton.Flyout>
+                                                    <Flyout x:Name="PlayerFlyout"
+                                                            FlyoutPresenterStyle="{StaticResource FlyoutStyle}"
+                                                            ShouldConstrainToRootBounds="False">
+                                                        <ListView x:Name="PlayerListView" />
+                                                    </Flyout>
+                                                </AppBarButton.Flyout>
+
+                                                <AppBarButton.Icon>
+                                                    <FontIcon Glyph="&#xE173;" />
+                                                </AppBarButton.Icon>
+                                            </AppBarButton>
+
                                             <AppBarButton x:Name="FullWindowButton"
                                                           Style='{StaticResource AppBarButtonStyle}'
-                                                          MediaTransportControlsHelper.DropoutOrder="17">
+                                                          MediaTransportControlsHelper.DropoutOrder="12">
                                                 <AppBarButton.Icon>
                                                     <SymbolIcon x:Name="FullWindowSymbol"
                                                                 Symbol="FullScreen" />
@@ -1181,7 +1200,7 @@
 
                                             <AppBarButton x:Name="DummyButton"
                                                           Style='{StaticResource AppBarButtonStyle}'
-                                                          MediaTransportControlsHelper.DropoutOrder="12"
+                                                          MediaTransportControlsHelper.DropoutOrder="13"
                                                           Visibility="Collapsed"
                                                           IsEnabled="False">
                                                 <AppBarButton.Icon>

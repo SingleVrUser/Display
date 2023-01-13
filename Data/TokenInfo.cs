@@ -1800,11 +1800,14 @@ namespace Data
         public string name { get; set; }
         public string fileBelongPickcode { get; set; }
 
-        public SubInfo(string pickcode, string name, string fileBelongPickcode)
+        public string trueName { get; set; }
+
+        public SubInfo(string pickcode, string name, string fileBelongPickcode, string trueName)
         {
             this.pickcode = pickcode;
             this.name = name;
             this.fileBelongPickcode = fileBelongPickcode;
+            this.trueName = trueName;
         }
 
         public SubInfo()

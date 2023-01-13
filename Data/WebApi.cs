@@ -1569,6 +1569,7 @@ namespace Data
             string downUrl;
             string subFile = null;
 
+            //检查播放器设置
             switch (playMethod)
             {
                 case playMethod.pot:
@@ -1588,7 +1589,6 @@ namespace Data
                     //ua = "Lavf/58.76.100";
                     break;
             }
-
             if (string.IsNullOrEmpty(savePath))
             {
                 ContentDialog dialog = new ContentDialog()
@@ -1602,11 +1602,14 @@ namespace Data
 
                 await dialog.ShowAsync();
 
+                return;
             }
 
+            //检查字幕
             if (AppSettings.IsFindSub && subInfo != null)
                 subFile = await TryDownSubFile(subInfo.name,subInfo.pickcode);
 
+            //检查播放方式
             switch (playMethod)
             {
                 case playMethod.pot:

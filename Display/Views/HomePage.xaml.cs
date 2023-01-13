@@ -27,10 +27,10 @@ namespace Display.Views
     public sealed partial class HomePage : Page
     {
         public ObservableCollection<VideoCoverDisplayClass> Items = new();
-        public List<VideoCoverDisplayClass> NewAddItems = new();
-        private List<VideoCoverDisplayClass> lookLaterList = new();
-        private List<VideoCoverDisplayClass> recentCoverList = new();
-        private List<VideoCoverDisplayClass> LoveCoverList = new();
+        public ObservableCollection<VideoCoverDisplayClass> NewAddItems = new();
+        private ObservableCollection<VideoCoverDisplayClass> lookLaterList = new();
+        private ObservableCollection<VideoCoverDisplayClass> recentCoverList = new();
+        private ObservableCollection<VideoCoverDisplayClass> LoveCoverList = new();
 
         //过渡动画用
         private enum navigationAnimationType { image, gridView};
@@ -181,18 +181,18 @@ namespace Display.Views
 
         private void tryUpdateCoverShow()
         {
-            //稍后观看
-            tryUpdateVideoCoverDisplayClass(DataAccess.getNameAndImageFromLookLater(),lookLaterList);
-
             //最近视频
             tryUpdateVideoCoverDisplayClass(DataAccess.getNameAndIamgeRecent(), recentCoverList);
 
             //喜欢视频
             tryUpdateVideoCoverDisplayClass(DataAccess.getNameAndImageFromLike(), LoveCoverList);
 
+            //稍后观看
+            tryUpdateVideoCoverDisplayClass(DataAccess.getNameAndImageFromLookLater(), lookLaterList);
+
         }
 
-        private void tryUpdateVideoCoverDisplayClass(List<VideoInfo> videoInfos, List<VideoCoverDisplayClass> videoList)
+        private void tryUpdateVideoCoverDisplayClass(List<VideoInfo> videoInfos, ObservableCollection<VideoCoverDisplayClass> videoList)
         {
             //添加
             var addList = new List<VideoInfo>();

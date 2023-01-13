@@ -8,9 +8,11 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.UserDataTasks;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
@@ -23,13 +25,29 @@ namespace Display.Control;
 
 public sealed partial class CustomMediaPlayerElement : UserControl
 {
+
     public static readonly DependencyProperty PickCodeProperty =
         DependencyProperty.Register("PickCode", typeof(string), typeof(CustomMediaPlayerElement), null);
 
     public static readonly DependencyProperty playTypeProperty =
         DependencyProperty.Register("playType", typeof(PlayType), typeof(CustomMediaPlayerElement), null);
 
+    public static readonly DependencyProperty TrueNameProperty =
+        DependencyProperty.Register("TrueName", typeof(string), typeof(CustomMediaPlayerElement), null);
+
+    public int IsLike;
+    public int LookLater;
+
     public enum PlayType { success, fail }
+
+    private WebApi webApi;
+
+
+    public string TrueName
+    {
+        get { return (string)GetValue(TrueNameProperty); }
+        set { SetValue(TrueNameProperty, value); }
+    }
 
     public string PickCode
     {
@@ -45,8 +63,6 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
     Dictionary<string, string> subDicts;
 
-    private WebApi webApi;
-
     public event EventHandler<RoutedEventArgs> FullWindow;
 
     public CustomMediaPlayerElement()
@@ -60,17 +76,15 @@ public sealed partial class CustomMediaPlayerElement : UserControl
     {
         if (PickCode == null) return;
 
+
+        //设置画质
+
         //m3u8UrlList
         if (webApi == null) webApi = new();
-
-
         //先原画
         List<Quality> QualityItemsSource = new() { new("原画", pickCode: PickCode) };
-
         var m3u8InfoList = await webApi.Getm3u8InfoByPickCode(PickCode);
-
         string url = null;
-
         //有m3u8
         if (m3u8InfoList != null && m3u8InfoList.Count > 0)
         {
@@ -89,23 +103,31 @@ public sealed partial class CustomMediaPlayerElement : UserControl
                 url = downUrlList.FirstOrDefault().Value;
             }
         }
-
         mediaTransportControls.SetQuality(QualityItemsSource, this.Resources["QualityDataTemplate"] as DataTemplate);
 
+        //设置播放器
+        List<Player> plsyerSoucre = new() { new(WebApi.playMethod.vlc, pickCode: PickCode),
+                                            new(WebApi.playMethod.mpv, pickCode: PickCode),
+                                            new(WebApi.playMethod.pot, pickCode: PickCode)};
+        mediaTransportControls.SetPlayer(plsyerSoucre, this.Resources["PlayerDataTemplate"] as DataTemplate);
+
+        //设置字幕
         if (AppSettings.IsFindSub)
         {
             subDicts = DataAccess.FindSubFile(PickCode);
         }
 
-        if(playType == PlayType.fail)
+        //设置喜欢、稍后观看
+        bool isLike;
+        bool isLookLater;
+        if (playType == PlayType.fail)
         {
-            bool isLike;
-            bool isLookLater;
             var failInfo = await DataAccess.LoadSingleFailInfo(PickCode);
             if (failInfo != null)
             {
-                isLike = failInfo.is_like == 1 ? true : false;
-                isLookLater = failInfo.look_later == 0 ? false : true;
+
+                isLike = this.IsLike == 1 ? true : false;
+                isLookLater = this.LookLater == 0 ? false : true;
             }
             else
             {
@@ -113,10 +135,29 @@ public sealed partial class CustomMediaPlayerElement : UserControl
                 isLookLater = false;
             }
 
-            mediaTransportControls.SetFailPlayType(isLike, isLookLater);
+            mediaTransportControls.SetLike_LookLater(isLike, isLookLater);
+        }
+        else
+        {
+            var videoInfo = DataAccess.LoadOneVideoInfoByCID(TrueName);
+
+            //有该数据才可用Like和LookLater
+            if (videoInfo != null)
+            {
+                this.IsLike = videoInfo.is_like;
+                this.LookLater = Convert.ToInt32(videoInfo.look_later);
+
+                isLike = this.IsLike == 1 ? true : false;
+                isLookLater = this.LookLater == 0 ? false : true;
+
+                mediaTransportControls.SetLike_LookLater(isLike, isLookLater);
+            }
         }
 
+
         await SetMediaPlayer(url, subDicts);
+
+        this.Loaded -= CustomMediaPlayerElement_Loaded;
     }
 
     public void StopMediaPlayer()
@@ -181,7 +222,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         MediaControl.SetMediaPlayer(media);
     }
 
-    private async void mediaControls_QualityChanged(object sender, SelectionChangedEventArgs e)
+    private async void QualityChanged(object sender, SelectionChangedEventArgs e)
     {
         if (e.AddedItems.FirstOrDefault() is not Quality quality) return;
 
@@ -218,12 +259,10 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         }
     }
 
-
     private void mediaControls_FullWindow(object sender, RoutedEventArgs e)
     {
         FullWindow?.Invoke(sender, e);
     }
-
 
     public event DoubleTappedEventHandler MediaDoubleTapped;
     private void MediaControl_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
@@ -235,30 +274,60 @@ public sealed partial class CustomMediaPlayerElement : UserControl
     {
         if (sender is not AppBarToggleButton button) return;
 
-        var failInfo = await DataAccess.LoadSingleFailInfo(PickCode);
+        IsLike = button.IsChecked == true ? 1 : 0;
 
-        int isLike = button.IsChecked == true ? 1 : 0;
-
-        if (failInfo == null)
+        if (playType == PlayType.fail)
         {
-            var capPath = await ScreenshotAsync(PickCode);
-            DataAccess.AddOrReplaceFailList_islike_looklater(new()
+            var failInfo = await DataAccess.LoadSingleFailInfo(PickCode);
+
+            if (failInfo == null)
             {
-                pc = PickCode,
-                is_like = isLike,
-                image_path = capPath
-            }) ;
+                var capPath = await ScreenshotAsync(PickCode);
+                DataAccess.AddOrReplaceFailList_islike_looklater(new()
+                {
+                    pc = PickCode,
+                    is_like = IsLike,
+                    image_path = capPath
+                });
+
+                if (IsLike == 1) ShowTeachingTip("已添加进喜欢");
+            }
+            else
+            {
+                DataAccess.UpdateSingleFailInfo(PickCode, "is_like", IsLike.ToString());
+
+                //需要截图
+                if (failInfo.image_path == Const.NoPictruePath || !File.Exists(failInfo.image_path))
+                {
+                    var capPath = await ScreenshotAsync(PickCode);
+                    DataAccess.UpdateSingleFailInfo(PickCode, "image_path", capPath);
+
+                    if (IsLike == 1) ShowTeachingTip("已添加进喜欢，并截取当前画面作为封面");
+                }
+                else
+                {
+                    if (IsLike == 1) ShowTeachingTip("已添加进喜欢");
+                }
+            }
         }
         else
         {
-            DataAccess.UpdateSingleFailInfo(PickCode, "is_like", isLike.ToString());
+            var videoInfo = DataAccess.LoadOneVideoInfoByCID(TrueName);
 
-            if (string.IsNullOrEmpty(failInfo.image_path) || !File.Exists(failInfo.image_path))
+            if(videoInfo != null)
             {
-                var capPath = await ScreenshotAsync(PickCode);
-                DataAccess.UpdateSingleFailInfo(PickCode, "image_path", capPath);
+                DataAccess.UpdateSingleDataFromVideoInfo(TrueName, "is_like", IsLike.ToString());
+
+                if (IsLike == 1) ShowTeachingTip("已添加进喜欢");
             }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"数据库不存在该数据:{TrueName}");
+            }
+
         }
+
+        
 
     }
 
@@ -268,28 +337,57 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
         var failInfo = await DataAccess.LoadSingleFailInfo(PickCode);
 
-        int look_later = button.IsChecked == true ? Convert.ToInt32(DateTimeOffset.Now.ToUnixTimeSeconds()) : 0;
+        LookLater = button.IsChecked == true ? Convert.ToInt32(DateTimeOffset.Now.ToUnixTimeSeconds()) : 0;
 
-        if (failInfo == null)
+        if (playType == PlayType.fail)
         {
-            var capPath = await ScreenshotAsync(PickCode);
-            DataAccess.AddOrReplaceFailList_islike_looklater(new()
+            if (failInfo == null)
             {
-                pc = PickCode,
-                look_later = look_later,
-                image_path = capPath
-            });
+                var capPath = await ScreenshotAsync(PickCode);
+                DataAccess.AddOrReplaceFailList_islike_looklater(new()
+                {
+                    pc = PickCode,
+                    look_later = LookLater,
+                    image_path = capPath
+                });
+
+                if (LookLater != 0) ShowTeachingTip("已添加进稍后观看");
+            }
+            else
+            {
+                DataAccess.UpdateSingleFailInfo(PickCode, "look_later", LookLater.ToString());
+
+                //需要添加截图
+                if (failInfo.image_path == Data.Const.NoPictruePath || !File.Exists(failInfo.image_path))
+                {
+                    var capPath = await ScreenshotAsync(PickCode);
+                    DataAccess.UpdateSingleFailInfo(PickCode, "image_path", capPath);
+
+                    if (LookLater != 0) ShowTeachingTip("已添加进稍后观看，并截取当前画面作为封面");
+                }
+                else
+                {
+                    if (LookLater != 0) ShowTeachingTip("已添加进稍后观看");
+                }
+            }
         }
         else
         {
-            DataAccess.UpdateSingleFailInfo(PickCode, "look_later", look_later.ToString());
+            var videoInfo = DataAccess.LoadOneVideoInfoByCID(TrueName);
 
-            if (string.IsNullOrEmpty(failInfo.image_path) || !File.Exists(failInfo.image_path))
+            if (videoInfo != null)
             {
-                var capPath = await ScreenshotAsync(PickCode);
-                DataAccess.UpdateSingleFailInfo(PickCode, "image_path", capPath);
+                DataAccess.UpdateSingleDataFromVideoInfo(TrueName, "look_later", LookLater.ToString());
+
+                if (LookLater != 0) ShowTeachingTip("已添加进稍后观看");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"数据库不存在该数据:{TrueName}");
             }
         }
+
+        
     }
     private async void ScreenshotButtonClick(object sender, RoutedEventArgs e)
     {
@@ -311,6 +409,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         {
             DataAccess.UpdateSingleFailInfo(PickCode, "image_path", capPath);
         }
+
+        ShowTeachingTip("已截取当前画面作为封面");
     }
 
     public async Task<string> ScreenshotAsync(string PickCode)
@@ -338,4 +438,24 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         return file.Path;
     }
 
+    private async void PlayerChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.FirstOrDefault() is not Player player) return;
+
+        if (webApi == null) webApi = new();
+
+        await webApi.PlayVideoWithOriginUrl(player.PickCode,player.PlayMethod,this.XamlRoot);
+    }
+
+    private async void ShowTeachingTip(string subTitle)
+    {
+        if (Player_TeachingTip.IsOpen) Player_TeachingTip.IsOpen = false;
+
+        Player_TeachingTip.Subtitle = subTitle;
+        Player_TeachingTip.IsOpen = true;
+
+        await Task.Delay(1000);
+
+        Player_TeachingTip.IsOpen = false;
+    }
 }

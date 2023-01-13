@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -18,11 +19,15 @@ namespace Display.Views
     /// </summary>
     public sealed partial class VideoViewPage : Page
     {
+        public static VideoViewPage Current;
+
         //为返回动画做准备（需启动缓存）
-        VideoCoverDisplayClass _storeditem;
+        public VideoCoverDisplayClass _storeditem;
         public VideoViewPage()
         {
             this.InitializeComponent();
+
+            Current = this;
 
             //启动缓存（为了返回无需过长等待，也为了返回动画）
             NavigationCacheMode = Microsoft.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
@@ -75,7 +80,8 @@ namespace Display.Views
 
             if (VideoPlayButton.DataContext is not VideoCoverDisplayClass videoInfo) return;
 
-            List<Datum> videoInfoList = DataAccess.loadVideoInfoByTruename(videoInfo.truename);
+            List<Datum> videoInfoList = DataAccess.loadFileInfoByTruename(videoInfo.truename);
+
 
             //没有
             if (videoInfoList.Count == 0)
@@ -87,14 +93,17 @@ namespace Display.Views
             }
             else if (videoInfoList.Count == 1)
             {
+                _storeditem = videoInfo;
 
-                await Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc, this.XamlRoot);
+                await Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc, this.XamlRoot, trueName: videoInfo.truename, lastPage: this);
                 ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             }
 
             //有多集
             else
             {
+                _storeditem = videoInfo;
+
                 List<Datum> multisetList = new();
                 foreach (var videoinfo in videoInfoList)
                 {
@@ -103,7 +112,7 @@ namespace Display.Views
 
                 multisetList = multisetList.OrderBy(item => item.n).ToList();
 
-                ContentsPage.DetailInfo.SelectSingleVideoToPlay newPage = new(multisetList);
+                ContentsPage.DetailInfo.SelectSingleVideoToPlay newPage = new(multisetList, videoInfo.truename);
                 newPage.ContentListView.ItemClick += ContentListView_ItemClick; ;
 
                 VideoPlayButton.Flyout = new Flyout()
@@ -117,7 +126,10 @@ namespace Display.Views
         {
             var SingleVideoInfo = e.ClickedItem as Data.Datum;
 
-            await Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc, this.XamlRoot);
+            if (sender is not ListView listView) return;
+            if (listView.DataContext is not string trueName) return;
+
+            await Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc, this.XamlRoot, trueName:trueName, lastPage: this);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
