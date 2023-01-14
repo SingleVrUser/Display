@@ -319,7 +319,7 @@ namespace Display.ContentsPage
                             string name = matchName.Groups[1].Value;
                             var url = matchName.Groups[2].Value;
 
-                            if (name.Contains(actorName))
+                            if (name.Contains($"{actorName}."))
                             {
                                 string imageUrl = $"https://raw.githubusercontent.com/gfriends/gfriends/master/{key}/{path}/{url}";
                                 if (!urlList.Contains(imageUrl))
