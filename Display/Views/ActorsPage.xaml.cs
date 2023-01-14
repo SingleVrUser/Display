@@ -58,15 +58,15 @@ namespace Display.Views
 
             LoadActorPartInfo();
 
-            //上次获取信息是否已经完成
-            if(AppSettings.GetActorInfoLastIndex == -1)
-            {
-                GetActorInfoButton.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                ContinueGetActorInfoTaskButton.Visibility = Visibility.Visible;
-            }
+            ////上次获取信息是否已经完成
+            //if(AppSettings.GetActorInfoLastIndex == -1)
+            //{
+            //    GetActorInfoButton.Visibility = Visibility.Visible;
+            //}
+            //else
+            //{
+            //    ContinueGetActorInfoTaskButton.Visibility = Visibility.Visible;
+            //}
 
             ProgressRing.IsActive = false;
         }
