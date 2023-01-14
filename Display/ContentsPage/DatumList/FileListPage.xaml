@@ -366,5 +366,8 @@
             </ListView>
 
         </Grid>
+
+        <TeachingTip x:Name="LightDismissTeachingTip"
+                     IsLightDismissEnabled="True" />
     </Grid>
 </Page>
