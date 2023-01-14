@@ -670,7 +670,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
     private void ShowTeachingTip(string subtitle, string content = null)
     {
-        TeachingTip LightDismissTeachingTip = new() { IsLightDismissEnabled = true };
+        TeachingTip LightDismissTeachingTip = new() { IsLightDismissEnabled = true,XamlRoot=this.XamlRoot };
         LightDismissTeachingTip.Subtitle = subtitle;
         if (content != null)
             LightDismissTeachingTip.Content = content;
