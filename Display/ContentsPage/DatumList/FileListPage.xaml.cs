@@ -668,14 +668,21 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
         }
     }
 
-    private void ShowTeachingTip(string subtitle, string content = null)
+    private async void ShowTeachingTip(string subtitle, string content = null)
     {
-        TeachingTip LightDismissTeachingTip = new() { IsLightDismissEnabled = true,XamlRoot=this.XamlRoot };
+        if (LightDismissTeachingTip.IsOpen) LightDismissTeachingTip.IsOpen = false;
+
         LightDismissTeachingTip.Subtitle = subtitle;
+
         if (content != null)
             LightDismissTeachingTip.Content = content;
 
         LightDismissTeachingTip.IsOpen = true;
+
+        await Task.Delay(1000);
+
+        if (LightDismissTeachingTip.IsOpen) LightDismissTeachingTip.IsOpen = false;
+
     }
 
 }
