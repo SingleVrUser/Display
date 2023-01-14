@@ -20,6 +20,9 @@ public class JavDB
 
     public static Tuple<int, int> DelayRanges = new(3, 6);
 
+    public static readonly char manSymbol = '♂';
+
+    public static readonly char womanSymbol = '♀';
 
     public const bool IgnoreFc2 = false;
 
@@ -149,7 +152,7 @@ public class JavDB
             if (search_left_cid == left_cid
                      && (search_right_cid == right_cid
                             || (Int32.TryParse(right_cid, out currentNum)
-                                    && Int32.TryParse(right_cid, out searchNum)
+                                    && Int32.TryParse(search_right_cid, out searchNum)
                                         && currentNum.Equals(searchNum))))
             {
                 var detail_url = SearchResultNodes[i].SelectSingleNode(".//a").Attributes["href"].Value;
@@ -273,11 +276,21 @@ public class JavDB
             else if (key.Contains("演員"))
             {
                 var actorNodes = valueNode.SelectNodes("a");
+                var genderNodes = valueNode.SelectNodes("strong");
+
                 if (actorNodes == null) continue;
                 List<string> actorList = new List<string>();
-                foreach (var node in actorNodes)
+
+
+                for (int j = 0; j < actorNodes.Count; j++)
                 {
-                    actorList.Add(node.InnerText);
+                    var actorNode = actorNodes[j];
+
+                    //♀ or ♂
+                    var genderNode = genderNodes[j];
+
+
+                    actorList.Add($"{actorNode.InnerText}{genderNode.InnerText}");
                 }
                 videoInfo.actor = string.Join(",", actorList);
             }
@@ -316,5 +329,26 @@ public class JavDB
         }
 
         return videoInfo;
+    }
+
+    public static string TrimGenderFromActorName(string actorName)
+    {
+        return actorName.TrimEnd(new char[] { manSymbol ,womanSymbol});
+    }
+
+    public static string RemoveGenderFromActorListString(string actorListString)
+    {
+        string result = actorListString;
+
+        if (result.Contains(manSymbol))
+        {
+            result = result.Replace(manSymbol, char.MinValue);
+        }
+        else if (result.Contains(womanSymbol))
+        {
+            result = result.Replace(womanSymbol, char.MinValue);
+        }
+
+        return result;
     }
 }

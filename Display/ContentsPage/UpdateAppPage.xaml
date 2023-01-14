@@ -68,13 +68,17 @@
                    Foreground="DarkGray"
                    FontSize="12"/>
 
-        <Grid Grid.Row="3"
-              Grid.ColumnSpan="2"
-              BorderBrush="{StaticResource ControlElevationBorderBrush}"
-              BorderThickness="1"
-              CornerRadius="5"
-              Padding="10">
-            <controls:MarkdownTextBlock Text="{x:Bind ReleaseInfo.UpdateContent,Converter={StaticResource AppUpdateContentConvert}}" Background="Transparent" LinkClicked="MarkdownTextBlock_LinkClicked"/>
-        </Grid>
+        <ScrollViewer>
+            <Grid Grid.Row="3"
+                  Grid.ColumnSpan="2"
+                  BorderBrush="{StaticResource ControlElevationBorderBrush}"
+                  BorderThickness="1"
+                  CornerRadius="5"
+                  Padding="10">
+                <controls:MarkdownTextBlock Text="{x:Bind ReleaseInfo.UpdateContent,Converter={StaticResource AppUpdateContentConvert}}"
+                                            Background="Transparent"
+                                            LinkClicked="MarkdownTextBlock_LinkClicked" />
+            </Grid>
+        </ScrollViewer>
     </Grid>
 </Page>

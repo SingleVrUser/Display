@@ -321,7 +321,7 @@ namespace Display.Views
 
             if (result == ContentDialogResult.Primary)
             {
-                if (sender is AppBarButton appBarButton)
+                if (sender is AppBarButton)
                 {
                     //从数据库中删除
                     DataAccess.DeleteDataInVideoInfoTable(DetailInfo.truename);

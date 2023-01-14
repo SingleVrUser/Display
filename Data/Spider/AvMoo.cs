@@ -114,7 +114,7 @@ public class AvMoo
             if (search_left_cid == left_cid
                      && (search_right_cid == right_cid
                             || (Int32.TryParse(right_cid, out currentNum)
-                                    && Int32.TryParse(right_cid, out searchNum)
+                                    && Int32.TryParse(search_right_cid, out searchNum)
                                         && currentNum.Equals(searchNum))))
             {
                 var detail_url = SearchResultNodes[i].SelectSingleNode(".//a[@class='movie-box']").Attributes["href"].Value;

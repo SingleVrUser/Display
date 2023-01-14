@@ -90,6 +90,8 @@ public class Manager
 
     public async Task<List<VideoInfo>> DispatchSpiderInfosByCIDInOrder(string CID)
     {
+        CID = CID.ToUpper();
+
         List<VideoInfo> videoInfos = new();
 
         foreach (int id in Enum.GetValues(typeof(SpiderSourceName)))
@@ -131,7 +133,7 @@ public class Manager
     {
         if (!spiderByCIDHandlers.TryGetValue(spiderId, out Func<string, Task<VideoInfo>> func)) return null;
 
-        return await func(CID);
+        return await func(CID.ToUpper());
     }
 
 
