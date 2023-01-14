@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -284,6 +285,7 @@ namespace Data
         public static void AddActorInfo(string actor_name,List<string> video_nameList)
         {
             string singleActorName;
+            int is_woman = 1;
             string[] otherNames = null;
 
             if(actor_name != null)
@@ -293,13 +295,18 @@ namespace Data
                 if (match_result.Success)
                 {
                     singleActorName = match_result.Groups[1].Value;
+                    is_woman = singleActorName.EndsWith(Spider.JavDB.manSymbol) ? 0 : 1;
+                    singleActorName = Spider.JavDB.TrimGenderFromActorName(singleActorName);
+
 
                     otherNames = match_result.Groups[2].Value.Split("、");
                 }
                 else
                 {
-                    singleActorName = actor_name;
+                    is_woman = actor_name.EndsWith(Spider.JavDB.manSymbol) ? 0 : 1;
+                    singleActorName = Spider.JavDB.TrimGenderFromActorName(actor_name);
                 }
+
             }
             else
             {
@@ -311,7 +318,7 @@ namespace Data
             //数据库中不存在该名称
             if (actor_id == -1)
             {
-                ActorInfo actorInfo = new() { name=singleActorName };
+                ActorInfo actorInfo = new() { name= singleActorName, is_woman = is_woman};
 
                 //检查演员图片是否存在
                 string imagePath = Path.Combine(AppSettings.ActorInfo_SavePath, singleActorName, "face.jpg");
@@ -321,6 +328,11 @@ namespace Data
                 }
 
                 actor_id = InsertActorInfo(actorInfo);
+            }
+            //为了弥补之前所有的is_woman都默认为1
+            else if(is_woman == 0)
+            {
+                UpdateActorInfoIsWoman(actor_id, is_woman);
             }
 
             //添加Actor_Names
@@ -639,7 +651,15 @@ namespace Data
                     if (item.Name == "is_wm")
                         continue;
 
-                    dicts.Add($"@{item.Name}", $"{item.GetValue(data)}");
+                    string value = string.Empty + item.GetValue(data);
+
+                    //去除演员性别标记
+                    if (item.Name == "actor")
+                    {
+                        value =  Spider.JavDB.RemoveGenderFromActorListString(value);
+                    }
+
+                    dicts.Add($"@{item.Name}", $"{value}");
                 }
 
                 //添加信息，如果已经存在则跳过
@@ -656,11 +676,10 @@ namespace Data
                 //Debug.WriteLine($"添加信息{data.truename},{data.producer},{data.is_wm}");
 
                 //添加演员信息
-                AddActorInfo(data.actor, new() { data.truename });
+                AddActorInfoByActorInfo(data, new() { data.truename }, db);
 
                 //添加是否步兵
                 AddOrReplaceIs_Wm(data.truename,data.producer, data.is_wm);
-
 
                 db.Close();
             }
@@ -1071,6 +1090,29 @@ namespace Data
 
 
         /// <summary>
+        /// 更新演员性别
+        /// </summary>
+        /// <param Name="truename"></param>
+        /// <param Name="key"></param>
+        /// <param Name="value"></param>
+        public static void UpdateActorInfoIsWoman(long id, int is_woman)
+        {
+            using (SqliteConnection db =
+               new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"UPDATE ActorInfo SET is_woman = '{is_woman}' WHERE id = '{id}'", db);
+
+                selectCommand.ExecuteNonQuery();
+
+                db.Close();
+            }
+
+        }
+
+        /// <summary>
         /// 更新演员头像地址
         /// </summary>
         /// <param Name="truename"></param>
@@ -1091,7 +1133,6 @@ namespace Data
                 db.Close();
             }
 
-            //return data;
         }
 
 
@@ -1156,13 +1197,19 @@ namespace Data
                 foreach (var item in videoInfo.GetType().GetProperties())
                 {
                     var name = item.Name;
+                    var value = string.Empty + item.GetValue(videoInfo);
 
                     //忽略是否步兵
                     //忽略自定义数据
                     if (name == "look_later" || name == "score" || name == "is_like" || name == "is_wm")
                     continue;
 
-                    Dict.Add($"@{name}", new Tuple<string,string>($"{name} = @{name}", $"{item.GetValue(videoInfo)}"));
+                    if(name == "actor")
+                    {
+                        value = Spider.JavDB.TrimGenderFromActorName(value);
+                    }
+
+                    Dict.Add($"@{name}", new Tuple<string,string>($"{name} = @{name}", $"{value}"));
                 }
 
                 Command.CommandText = $"UPDATE VideoInfo SET {string.Join(",", Dict.Values.ToList().Select(item => item.Item1))} WHERE truename == @truename";
@@ -1182,30 +1229,35 @@ namespace Data
                 Command = new($"DELETE FROM Actor_Video WHERE video_name =='{videoInfo.truename}'", db);
                 Command.ExecuteNonQuery();
 
-                string actor_str = videoInfo.actor;
-                var actor_list = actor_str.Split(",");
-                foreach (var actor_name in actor_list)
-                {
-                    //查询Actor_ID
-                    Command = new($"SELECT id FROM ActorInfo WHERE Name == '{actor_name}'", db);
-
-                    if (Command.ExecuteScalar() is long actor_id)
-                    {
-                        //添加信息，如果已经存在则忽略
-                        Command.CommandText = $"INSERT OR IGNORE INTO Actor_Video VALUES (@actor_id,@video_name)";
-                        Command.Parameters.AddWithValue("@actor_id", actor_id);
-                        Command.Parameters.AddWithValue("@video_name", videoInfo.truename);
-                        Command.ExecuteNonQuery();
-                    }
-                    // 没有该演员信息的话
-                    // 新添加演员信息
-                    else
-                    {
-                        AddActorInfo(actor_name, new() { videoInfo.truename });
-                    }
-                }
-
+                AddActorInfoByActorInfo(videoInfo, new() { videoInfo.truename }, db);
+                
                 db.Close();
+            }
+        }
+
+        private static void AddActorInfoByActorInfo(VideoInfo videoInfo, List<string> video_nameList, SqliteConnection db)
+        {
+            string actor_str = videoInfo.actor;
+            var actor_list = actor_str.Split(",");
+            foreach (var actor_name in actor_list)
+            {
+                //查询Actor_ID
+                SqliteCommand Command = new($"SELECT id FROM ActorInfo WHERE Name == '{Spider.JavDB.TrimGenderFromActorName(actor_name)}'", db);
+
+                if (Command.ExecuteScalar() is long actor_id)
+                {
+                    //添加信息，如果已经存在则忽略
+                    Command.CommandText = $"INSERT OR IGNORE INTO Actor_Video VALUES (@actor_id,@video_name)";
+                    Command.Parameters.AddWithValue("@actor_id", actor_id);
+                    Command.Parameters.AddWithValue("@video_name", videoInfo.truename);
+                    Command.ExecuteNonQuery();
+                }
+                // 没有该演员信息的话
+                // 新添加演员信息
+                else
+                {
+                    AddActorInfo(actor_name, video_nameList);
+                }
             }
         }
 

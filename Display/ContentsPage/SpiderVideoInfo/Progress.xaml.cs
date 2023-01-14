@@ -380,6 +380,9 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 return;
             }
 
+            //匹配成功的视频总数量（1：匹配成功，2：已添加（多集只保留一个番号））
+            int matchSuccessVideoCount = matchVideoResults.Where(item => item.statusCode == 1 || item.statusCode == 2).ToList().Count;
+
             //匹配到的番号总数量
             int totalCount = matchVideoResults.Where(item=>!string.IsNullOrEmpty(item.MatchName)).ToList().Count;
             MatchCidCount_Run.Text = totalCount.ToString();
@@ -390,9 +393,8 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 return;
             }
 
-
             //正则匹配成功的番号占总视频数的
-            FileNameSuccessRate_Run.Text = $"{totalCount * 100 / videoCount}%";
+            FileNameSuccessRate_Run.Text = $"{matchSuccessVideoCount * 100 / videoCount}%";
 
             //统计成功的名称
             int successCount = 0;
@@ -619,7 +621,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     }
 
                     //不同搜刮源用不同的方式搜刮,并等待对应的时间
-                    await spiderManager.DispatchSpecificSpiderInfoByCID(name, (int)spiderSourceName);
+                    resultInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(name, (int)spiderSourceName);
                     currentSpiderInfo.State = SpiderStates.awaiting;
                     currentSpiderInfo.Message = $"等待 {spiderSource.DelayRanges.Item1}~{spiderSource.DelayRanges.Item2} s";
                     progress.Report(currentSpiderInfo);
