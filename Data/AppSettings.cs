@@ -375,11 +375,6 @@ public class AppSettings
 
     #region 获取演员信息
 
-    /// <summary>
-    /// minnano-av网址
-    /// </summary>
-    /// 
-
 
     private static int? _getActorInfoLastIndex;
 
@@ -408,6 +403,10 @@ public class AppSettings
         }
     }
 
+    /// <summary>
+    /// minnano-av网址
+    /// </summary>
+    /// 
     private static string _minnanoAv_BaseUrl = "http://www.minnano-av.com/";
 
     public static string MinnanoAv_BaseUrl

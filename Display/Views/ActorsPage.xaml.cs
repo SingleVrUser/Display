@@ -50,16 +50,15 @@ namespace Display.Views
             ProgressRing.IsActive = true;
 
             actorinfo = new(new() { { "is_like", true }, { "prifile_path", true } });
-
+            BasicGridView.ItemsSource = actorinfo;
             await actorinfo.LoadData();
 
             TotalCount_TextBlock.Text = actorinfo.AllCount.ToString();
-            BasicGridView.ItemsSource = actorinfo;
 
             LoadActorPartInfo();
 
             //上次获取信息是否已经完成
-            if(AppSettings.GetActorInfoLastIndex == -1)
+            if (AppSettings.GetActorInfoLastIndex == -1)
             {
                 GetActorInfoButton.Visibility = Visibility.Visible;
             }
@@ -78,7 +77,6 @@ namespace Display.Views
             Page_Loaded();
 
             control.Loaded -= CarouselControl_Loaded;
-
 
         }
 
@@ -260,8 +258,6 @@ namespace Display.Views
 
             await GetActorsInfo(infos, AppSettings.GetActorInfoLastIndex);
 
-            //获取完成，初始化续传索引
-            AppSettings.GetActorInfoLastIndex = -1;
 
             //删除文件
             File.Delete(filePath);
@@ -294,6 +290,7 @@ namespace Display.Views
                 //有数据说明已经搜索过了
                 if (!string.IsNullOrEmpty(info.bwh))
                 {
+                    System.Diagnostics.Debug.WriteLine($"{i} 已经搜索过了");
                     await Notifications.ToastGetActorInfoWithProgressBar.AddValue(i + 1, allCount);
                     continue;
                 }
@@ -305,6 +302,9 @@ namespace Display.Views
                 //等待1~2秒
                 await GetInfoFromNetwork.RandomTimeDelay(1, 2);
             }
+
+            //获取完成，初始化续传索引
+            AppSettings.GetActorInfoLastIndex = -1;
         }
 
         public static async Task<ActorInfo> GetActorInfo(ActorInfo info)
