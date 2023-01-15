@@ -78,6 +78,7 @@ class ToastGetActorInfoWithProgressBar
         {
             currentValue = 1;
             data.Status = "完成";
+            await Task.Delay(100);
         }
         else
         {
@@ -85,6 +86,7 @@ class ToastGetActorInfoWithProgressBar
             data.Status = "正在获取演员信息...";
         }
 
+        System.Diagnostics.Debug.WriteLine("更新通知信息");
         var result = await AppNotificationManager.Default.UpdateAsync(data, c_tag, c_group);
 
         return result == AppNotificationProgressResult.Succeeded;
