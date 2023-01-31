@@ -220,9 +220,9 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         {
 
         }
-        //展示的是失败列表
         else
         {
+            //展示的是失败列表
             if (IsShowFailListView)
             {
                 ShowType_RadioButtons.SelectedIndex = 1;
