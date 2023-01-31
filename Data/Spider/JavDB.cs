@@ -290,7 +290,7 @@ public class JavDB
                     var genderNode = genderNodes[j];
 
 
-                    actorList.Add($"{actorNode.InnerText}{genderNode.InnerText}");
+                    actorList.Add($"{actorNode.InnerText.Trim()}{genderNode.InnerText}");
                 }
                 videoInfo.actor = string.Join(",", actorList);
             }

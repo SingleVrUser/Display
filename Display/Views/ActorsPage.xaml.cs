@@ -253,17 +253,27 @@ namespace Display.Views
 
             //反序列化
             string filePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "ActorInfo","getting.json");
-            string jsonString = await File.ReadAllTextAsync(filePath);
-            List<ActorInfo> infos = JsonSerializer.Deserialize<List<ActorInfo>>(jsonString);
+            if (File.Exists(filePath))
+            {
+                string jsonString = await File.ReadAllTextAsync(filePath);
+                List<ActorInfo> infos = JsonSerializer.Deserialize<List<ActorInfo>>(jsonString);
 
-            await GetActorsInfo(infos, AppSettings.GetActorInfoLastIndex);
+                await GetActorsInfo(infos, AppSettings.GetActorInfoLastIndex);
 
+                //删除文件
+                File.Delete(filePath);
 
-            //删除文件
-            File.Delete(filePath);
+            }
+            //文件不存在，重新开始
+            else
+            {
+                AppSettings.GetActorInfoLastIndex = -1;
+            }
+
 
             button.Visibility = Visibility.Collapsed;
             GetActorInfoButton.Visibility = Visibility.Visible;
+
         }
 
         private static async Task GetActorsInfo(List<ActorInfo> infos,int startIndex = 0)
