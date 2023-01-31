@@ -158,15 +158,16 @@ namespace Data
                         "work_time text," +
                         "prifile_path text," +
                         "blog_url text," +
-                        "info_url text," +
                         "is_like integer," +
                         "addtime integer," +
+                        "info_url text," +
                         "PRIMARY KEY (id)" +
                       ") ";
 
                 createTable.ExecuteNonQuery();
 
                 //为ActorInfo添加info_url
+                //info_url必须在最后（插入数据的顺序）
                 createTable.CommandText = "ALTER TABLE ActorInfo ADD COLUMN info_url Text";
 
                 //可能已存在
@@ -298,7 +299,6 @@ namespace Data
                     is_woman = singleActorName.EndsWith(Spider.JavDB.manSymbol) ? 0 : 1;
                     singleActorName = Spider.JavDB.TrimGenderFromActorName(singleActorName);
 
-
                     otherNames = match_result.Groups[2].Value.Split("、");
                 }
                 else
@@ -392,8 +392,6 @@ namespace Data
 
                     createTable.ExecuteNonQuery();
                 }
-
-
             }
 
         }
@@ -885,7 +883,7 @@ namespace Data
                 long addTime = DateTimeOffset.Now.ToUnixTimeSeconds();
 
                 //插入新记录
-                Command.CommandText = $"INSERT INTO ActorInfo VALUES (NULL,@Name,@is_woman,@birthday,@bwh,@height,@works_count,@work_time,@prifile_path,@blog_url,@info_url,@is_like,@addtime);";
+                Command.CommandText = $"INSERT INTO ActorInfo VALUES (NULL,@Name,@is_woman,@birthday,@bwh,@height,@works_count,@work_time,@prifile_path,@blog_url,@is_like,@addtime,@info_url);";
                 Command.Parameters.AddWithValue("@Name", actorInfo.name);
                 Command.Parameters.AddWithValue("@is_woman", actorInfo.is_woman);
                 Command.Parameters.AddWithValue("@birthday", actorInfo.birthday);
@@ -895,9 +893,9 @@ namespace Data
                 Command.Parameters.AddWithValue("@work_time", actorInfo.work_time);
                 Command.Parameters.AddWithValue("@prifile_path", actorInfo.prifile_path);
                 Command.Parameters.AddWithValue("@blog_url", actorInfo.blog_url);
-                Command.Parameters.AddWithValue("@info_url", actorInfo.info_url);
                 Command.Parameters.AddWithValue("@is_like", actorInfo.is_like);
                 Command.Parameters.AddWithValue("@addtime", actorInfo.addtime);
+                Command.Parameters.AddWithValue("@info_url", actorInfo.info_url);
 
                 Command.ExecuteReader();
 
@@ -2047,6 +2045,11 @@ namespace Data
                 {
                     selectCommand = new SqliteCommand($"SELECT VideoInfo.* FROM VideoInfo LEFT JOIN Is_Wm ON VideoInfo.truename = Is_Wm.truename LEFT JOIN ProducerInfo ON VideoInfo.producer = ProducerInfo.Name{filterStr}{orderStr} LIMIT {limit} offset {offset}",db); 
                 }
+                else if(rangesDicts == null && filterConditionList?.Count == 1 && filterConditionList.FirstOrDefault() == "actor")
+                {
+                    selectCommand = new SqliteCommand
+                        ($"SELECT VideoInfo.* FROM VideoInfo LEFT JOIN Actor_Video ON VideoInfo.truename = Actor_Video.video_name LEFT JOIN Actor_Names ON Actor_Video.actor_id = Actor_Names.id WHERE Actor_Names.name == '{filterKeywords}'{orderStr} LIMIT {limit} offset {offset}", db);
+                }
                 //普通查询
                 else
                 {
@@ -2925,7 +2928,7 @@ namespace Data
             dataInfo.prifile_path = query["prifile_path"] as string;
             dataInfo.blog_url = query["blog_url"] as string;
             dataInfo.info_url = query["info_url"] as string;
-            dataInfo.is_like = Convert.ToInt32(query["is_like"]);
+            dataInfo.is_like = query["is_like"] is not long ? 0: Convert.ToInt32(query["is_like"]);
             dataInfo.addtime = Convert.ToInt64(query["addtime"]);
 
             dataInfo.bust = query["bust"] is not long ? 0 : Convert.ToInt32(query["bust"]);
