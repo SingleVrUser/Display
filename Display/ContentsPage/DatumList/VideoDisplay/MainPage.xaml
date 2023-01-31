@@ -7,6 +7,7 @@
       xmlns:local="using:Display.ContentsPage.DatumList.VideoDisplay"
       xmlns:data="using:Data"
       xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+      xmlns:control="using:Display.Control"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       mc:Ignorable="d">
@@ -22,6 +23,9 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <SolidColorBrush x:Key="MediaTransportControlsPanelBackground"
+                         Color="#60ffffff" />
 
         <!--<MenuFlyout x:Key="MediaContentFlyout">
             <MenuFlyoutItem  x:Name="DeletedFileItem" Text="删除文件"
@@ -189,7 +193,6 @@
                                             <RowDefinition Height="auto" />
                                         </Grid.RowDefinitions>
 
-
                                         <Grid CornerRadius="5"
                                               HorizontalAlignment="Center"
                                               VerticalAlignment="Center">
@@ -209,11 +212,12 @@
                                         </Border>-->
 
                                         <StackPanel Grid.Row="1"
-                                                    HorizontalAlignment="Center">
+                                                    HorizontalAlignment="Center"
+                                                    Background="Orange">
                                             <TextBlock Text="{x:Bind truename}"
                                                        IsTextSelectionEnabled="True" />
                                             <TextBlock Text="{x:Bind releasetime}" />
-                                            <TextBlock Text="{x:Bind actor}" />
+                                            <control:TextBlockWithLongText StringValue="{x:Bind actor}" />
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal"

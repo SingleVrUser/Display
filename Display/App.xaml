@@ -199,10 +199,6 @@
                           TintLuminosityOpacity="0.5"
                           TintColor="#0593ff" FallbackColor="SkyBlue" />-->
             
-            
-
-
-
         </ResourceDictionary>
     </Application.Resources>
 </Application>

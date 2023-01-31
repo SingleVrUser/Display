@@ -583,6 +583,37 @@ namespace Data
             return WebFileInfoResult;
         }
 
+        public async Task<FilesShowInfo> GetFilesShowInfo(string cid)
+        {
+            FilesShowInfo result = null;
+
+            string url = $"https://webapi.115.com/files?aid=1&cid={cid}&o=user_ptime&asc=0&offset=0&show_dir=1&limit=30&code=&scid=&snap=0&natsort=1&star=1&source=&format=json";
+            HttpResponseMessage response;
+            try
+            {
+                response = await Client.GetAsync(url);
+            }
+            catch (AggregateException e)
+            {
+                FileMatch.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
+                return result;
+            }
+            catch (HttpRequestException e)
+            {
+                FileMatch.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
+                return result;
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                var strResult = await response.Content.ReadAsStringAsync();
+
+                result = JsonConvert.DeserializeObject<FilesShowInfo>(strResult);
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// 获取文件夹属性（含大小和数量）
         /// </summary>
