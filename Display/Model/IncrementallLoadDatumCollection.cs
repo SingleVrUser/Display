@@ -30,13 +30,16 @@ public class IncrementallLoadDatumCollection : ObservableCollection<FilesInfo>, 
 
     public async Task<WebFileInfo> GetFilesInfoAsync(int limit, int offset)
     {
-        var FilesInfo = await webApi.GetFileAsync(cid, limit, offset, orderBy: orderby, asc: asc);
-
-        this.asc = FilesInfo.is_asc;
+        //查询该目录的排列方式
+        var filesShowMethod = await webApi.GetFilesShowInfo(cid);
 
         WebApi.OrderBy order;
-        Enum.TryParse(FilesInfo.order, out order);
+        Enum.TryParse(filesShowMethod.order, out order);
         if (this.orderby != order) this.orderby = order;
+
+        this.asc = filesShowMethod.is_asc;
+
+        var FilesInfo = await webApi.GetFileAsync(cid, limit, offset, orderBy: orderby, asc: asc);
 
         //汇报事件
         GetFileInfoCompletedEventArgs args = new() { orderby = this.orderby , asc = this.asc, TimeReached = DateTime.Now };

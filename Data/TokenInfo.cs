@@ -81,6 +81,18 @@ namespace Data
         public string SEID { get; set; }
     }
 
+    public class FilesShowInfo
+    {
+        public int count { get; set; }
+        public int errNo { get; set; }
+        public string error { get; set; }
+        public int fc_mix { get; set; }
+        public int is_asc { get; set; }
+        public string order { get; set; }
+        public bool state { get; set; }
+
+    }
+
     public class WebFileInfo
     {
         public Datum[] data { get; set; }
