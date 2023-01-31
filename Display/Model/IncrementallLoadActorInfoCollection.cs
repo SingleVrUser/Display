@@ -72,7 +72,6 @@ public class IncrementallLoadActorInfoCollection : ObservableCollection<ActorInf
     private int defaultAddCount = 40;
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        System.Diagnostics.Debug.WriteLine($">>>>>>>>>>>增量加载{Count}-{Count + defaultAddCount}");
         int getCount = await LoadData(defaultAddCount, Count);
 
 
