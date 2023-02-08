@@ -136,6 +136,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
             }
 
             mediaTransportControls.SetLike_LookLater(isLike, isLookLater);
+
+            mediaTransportControls.SetScreenButton();
         }
         else
         {
