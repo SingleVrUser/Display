@@ -1323,7 +1323,7 @@ namespace Data
             {
                 return downUrlList;
             }
-
+                
             DownUrlBase64EncryptInfo downurl_base64EncryptInfo;
 
             if (response.IsSuccessful && response.Content != null)
@@ -1614,6 +1614,7 @@ namespace Data
                 case playMethod.vlc:
                     savePath = AppSettings.VlcExePath;
                     ua = GetInfoFromNetwork.BrowserUserAgent;
+                    //ua = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36 115Browser/8.3.0";
                     //ua = "Mozilla/5.0; Windows NT/10.0.19044; 115Desktop/2.0.1.7";
                     //ua = "VLC/3.0.12.1 LibVLC/3.0.12.1";
                     //ua = "nPlayer/3.0";
@@ -1640,30 +1641,22 @@ namespace Data
             if (AppSettings.IsFindSub && subInfo != null)
                 subFile = await TryDownSubFile(subInfo.name,subInfo.pickcode);
 
+            //获取下载地址
+            var downUrlList = GetDownUrl(pickcode, ua);
+            if (downUrlList.Count == 0) return;
+            downUrl = downUrlList.First().Value;
+
             //检查播放方式
             switch (playMethod)
             {
                 case playMethod.pot:
-                    var downUrlList = GetDownUrl(pickcode, ua);
-                    if (downUrlList.Count == 0) return;
-
-                    downUrl = downUrlList.First().Value;
                     Play115SourceVideoWithPotPlayer(downUrl, user_agnet: ua, savePath, false, subFile: subFile);
                     break;
                 case playMethod.mpv:
-                    downUrlList = GetDownUrl(pickcode, ua);
-                    if (downUrlList.Count == 0) return;
-
-
-                    downUrl = downUrlList.First().Value;
                     Play115SourceVideoWithMpv(downUrl, user_agnet: ua, savePath, false, title: downUrlList.First().Key, subFile: subFile);
                     break;
                 case playMethod.vlc:
                     //vlc不支持带“; ”的user-agent
-                    downUrlList = GetDownUrl(pickcode, ua);
-                    if (downUrlList.Count == 0) return;
-
-                    downUrl = downUrlList.First().Value;
                     Play115SourceVideoWithVlc(downUrl, user_agnet: ua, savePath, false, title: downUrlList.First().Key, subFile: subFile);
                     break;
             }

@@ -49,10 +49,15 @@ public class CustomMediaTransportControls : MediaTransportControls
         lookLaterButton.IsEnabled = true;
         lookLaterButton.IsChecked = look_later;
 
+    }
+
+    public void SetScreenButton()
+    {
         Button screenshotButton = GetTemplateChild("ScreenshotButton") as Button;
         screenshotButton.Click += ScreenshotButton_Click; ;
         screenshotButton.Visibility = Visibility.Visible;
     }
+
 
     public void SetQuality(List<Quality> QualityItemsSource, DataTemplate QualityDataTemplate)
     {
