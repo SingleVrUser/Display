@@ -76,7 +76,6 @@ namespace Data
         public async Task<bool> UpdateLoginInfo()
         {
             bool result = false;
-            //Uri uri = new Uri("https://webapi.115.com/files?aid=1&cid=2223208807868137192&o=user_ptime&asc=0&offset=0&show_dir=1&limit=56&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json");
             HttpResponseMessage response;
             try
             {

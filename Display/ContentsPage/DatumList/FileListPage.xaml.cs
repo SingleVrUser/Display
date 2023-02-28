@@ -269,11 +269,18 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
     }
 
+    /// <summary>
+    /// 拖拽文件，在中转站上松开
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void TransferStationGrid_Drop(object sender, DragEventArgs e)
     {
         if (sender is not Grid) return;
 
         if (e.DataView.Properties.Values.FirstOrDefault() is not List<Data.FilesInfo> sourceFilesInfos) return;
+
+        System.Diagnostics.Debug.WriteLine("拖拽文件，在中转站上松开");
 
         if (transferStationFiles == null)
         {
@@ -284,13 +291,99 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
         transferStationFiles.Add(new(sourceFilesInfos));
     }
 
-    private void Move_DragOver(object sender, DragEventArgs e)
+    private void DeletedFileMove_DragOver(object sender, DragEventArgs e)
     {
-        e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Move;
+        e.AcceptedOperation = DataPackageOperation.Move;
+
+        e.DragUIOverride.Caption = "删除";
     }
-    private void Link_DragOver(object sender, DragEventArgs e)
+
+    /// <summary>
+    /// 拖拽文件，在文件列表上方不松开
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void FileMove_DragOver(object sender, DragEventArgs e)
     {
-        e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Link;
+        if (sender is not ListView target) return;
+
+        if (e.DataView.Properties.Values.FirstOrDefault() is not List<Data.FilesInfo> sourceFilesInfos) return;
+        int index = GetInsertIndex(target, e);
+
+        // 范围之外
+        if(index == -1)
+        {
+            e.AcceptedOperation = DataPackageOperation.None;
+            e.DragUIOverride.Caption = null;
+
+            // 文件从中转站中拖拽过来，允许拖拽文件到此处
+            if (!filesInfos.Contains(sourceFilesInfos.FirstOrDefault()))
+            {
+                e.AcceptedOperation = DataPackageOperation.Move;
+            }
+        }
+        else
+        {
+            var item = filesInfos[index];
+            //目标与移动文件有重合，退出
+            if (sourceFilesInfos.Contains(item))
+            {
+                System.Diagnostics.Debug.WriteLine("目标与移动文件有重合，退出");
+
+                e.AcceptedOperation = DataPackageOperation.None;
+                e.DragUIOverride.Caption = null;
+            }
+            else
+            {
+                e.AcceptedOperation = DataPackageOperation.Move;
+                e.DragUIOverride.Caption = $"移动到 {item.Name}";
+            }
+        }
+
+    }
+
+
+    /// <summary>
+    /// 拖拽文件，在中转站上方不松开
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void TransferMove_DragOver(object sender, DragEventArgs e)
+    {
+        if(sender is not Grid target) return;
+
+        if (e.DataView.Properties.Values.FirstOrDefault() is not List<Data.FilesInfo> sourceFilesInfos) return;
+
+        if(transferStationFiles == null)
+        {
+            e.AcceptedOperation = DataPackageOperation.Move;
+        }
+        else
+        {
+            // 如果移动的文件已经在中转站了，没必要再移动了
+            var sameFile = transferStationFiles.Where(item =>
+            {
+                if (sourceFilesInfos.Count == item.TransferFiles.Count)
+                {
+                    foreach (var file in item.TransferFiles)
+                    {
+                        if (!sourceFilesInfos.Contains(file)) return false;
+                    }
+
+                    return true;
+                }
+
+                return false;
+            }).FirstOrDefault();
+
+            if (sameFile == null)
+            {
+                e.AcceptedOperation = DataPackageOperation.Move;
+            }
+        }
+
+        
+
     }
 
     private void EmptyTranferStationButton_Click(object sender, RoutedEventArgs e)
@@ -329,7 +422,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
             await webApi.DeleteFiles(sourceFilesInfos.FirstOrDefault().datum.pid, sourceFilesInfos.Select(item =>
             {
                 //文件
-                if (item.Fid != null)
+                if (item.Type == FilesInfo.FileType.File )
                     return item.Fid;
                 //文件夹
                 else
@@ -338,8 +431,6 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
                 }
             }).ToList());
         }
-
-
 
         VisualStateManager.GoToState(this, "NoDelete", true);
     }
@@ -355,39 +446,44 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
         VisualStateManager.GoToState(this, "NoDelete", true);
     }
 
+
+    /// <summary>
+    /// 拖拽文件，在文件列表上松开
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void BaseExample_Drop(object sender, DragEventArgs e)
     {
         if (sender is not ListView target) return;
 
         if (e.DataView.Properties.Values.FirstOrDefault() is not List<Data.FilesInfo> sourceFilesInfos) return;
 
+        System.Diagnostics.Debug.WriteLine("拖拽文件，在文件列表上松开");
+
         int index = GetInsertIndex(target, e);
 
-        //在范围之外，退出
+        //在范围之外
         if (index == -1)
         {
-            System.Diagnostics.Debug.WriteLine("在范围之外，退出");
-
-            //文件列表中的
-            if (filesInfos.Contains(sourceFilesInfos.FirstOrDefault()))
-            {
-
-            }
-            //中转站的
-            else
+            // 文件从中转站中拖拽过来，允许拖拽文件到此处
+            if (!filesInfos.Contains(sourceFilesInfos.FirstOrDefault()))
             {
                 await Move115Files(filesInfos.cid, sourceFilesInfos);
 
                 sourceFilesInfos.ForEach(item => filesInfos.Add(item));
+
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("在范围之外，退出");
+                return;
             }
 
-
-            return;
         }
         else
         {
-            //目标与移动文件有重合，退出
             var item = filesInfos[index];
+            //目标与移动文件有重合，退出
             if (sourceFilesInfos.Contains(item))
             {
                 System.Diagnostics.Debug.WriteLine("目标与移动文件有重合，退出");
@@ -436,13 +532,13 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
             }
         }
 
-        // 删除中转站列表
+        // 从中转站列表中删除已经移动的文件
         if (transferStationFiles != null)
         {
-            var transferFiles = transferStationFiles.Where(item =>
+            var transferListReadlyRemove = transferStationFiles.Where(item =>
             {
-                if (item.TransferFiles.Count != files.Count)
-                    return false;
+                //if (item.TransferFiles.Count != files.Count)
+                //    return false;
 
                 foreach (var file in item.TransferFiles)
                 {
@@ -451,10 +547,17 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
                 }
 
                 return true;
-            }).FirstOrDefault();
+            }).ToList();
 
-            if (transferFiles != null)
-                transferStationFiles.Remove(transferFiles);
+            foreach(var file in transferListReadlyRemove)
+            {
+                transferStationFiles.Remove(file);
+
+                System.Diagnostics.Debug.WriteLine("从中转站列表中删除已经移动的文件");
+            }
+
+            //if (transferListReadlyRemove != null)
+            //    transferListReadlyRemove);
         }
 
     }
