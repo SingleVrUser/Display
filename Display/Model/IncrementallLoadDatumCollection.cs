@@ -80,7 +80,7 @@ public class IncrementallLoadDatumCollection : ObservableCollection<FilesInfo>, 
     
     public async Task SetCid(string cid)
     {
-        bool isNeedLoad = Count == 0?true:false;
+        bool isNeedLoad = Count == 0 ? true:false;
 
         this.cid = cid;
         Clear();

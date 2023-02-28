@@ -28,7 +28,7 @@
     <Resource Language="x-generate"/>
   </Resources>
 
-  <Applications>
+  <Applications>  
     <Application Id="App"
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
@@ -58,9 +58,10 @@
           </com:ComServer>
         </com:Extension>
       </Extensions>
-      
-      
+
+
     </Application>
+    
   </Applications>
 
   <Capabilities>

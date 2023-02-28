@@ -201,7 +201,7 @@
                       SelectionMode="Multiple"
                       AllowDrop="True"
                       Drop="BaseExample_Drop"
-                      DragOver="Move_DragOver">
+                      DragOver="FileMove_DragOver">
 
                 <interactivity:Interaction.Behaviors>
                     <behaviors:QuickReturnHeaderBehavior />
@@ -262,7 +262,7 @@
                       Height="70"
                       AllowDrop="True"
                       Drop="RecyStationGrid_Drop"
-                      DragOver="Move_DragOver"
+                      DragOver="DeletedFileMove_DragOver"
                       DragEnter="RecyStationGrid_DragEnter"
                       DragLeave="RecyStationGrid_DragLeave">
                     <Grid.RowDefinitions>
@@ -331,7 +331,7 @@
               Style="{StaticResource TempGridStyle}"
               AllowDrop="True"
               Drop="TransferStationGrid_Drop"
-              DragOver="Link_DragOver"
+              DragOver="TransferMove_DragOver"
               VerticalAlignment="Bottom"
               HorizontalAlignment="Stretch"
               Margin="100,5"
