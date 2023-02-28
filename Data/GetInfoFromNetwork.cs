@@ -1,5 +1,6 @@
 ﻿using Data.Helper;
 using HtmlAgilityPack;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -54,11 +55,29 @@ namespace Data
 
         public static string BrowserUserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36 115Browser/8.3.0";
         public static string DesktopUserAgent = "Mozilla/5.0; Windows NT/10.0.19044; 115Desktop/2.0.1.7";
-        //public static string MediaElementUserAgent = "NSPlayer/12.00.22621.0963 WMFSDK/12.00.22621.0963";
-        public static string MediaElementUserAgent = "NSPlayer/12.00.22621.1105 WMFSDK/12.00.22621.1105";
+
+        private static string _mediaElementUserAgent;
+        public static string MediaElementUserAgent
+        {
+            get
+            {
+                if(string.IsNullOrEmpty(_mediaElementUserAgent))
+                    _mediaElementUserAgent= BuilderMediaElementUserAgent();
+
+                return _mediaElementUserAgent;
+            }
+        }
 
         public GetInfoFromNetwork()
         {
+        }
+
+        public static string BuilderMediaElementUserAgent()
+        {
+            string build = Environment.OSVersion.Version.Build.ToString();
+            string ubr = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "UBR", "1265").ToString();
+
+            return $"NSPlayer/12.00.{build}.{ubr} WMFSDK/12.00.{build}.{ubr}";
         }
 
         public static HttpClient CreateClient(Dictionary<string, string> headers)
