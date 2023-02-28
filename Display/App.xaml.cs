@@ -84,6 +84,7 @@ namespace Display
             notificationManager.Init();
 
             AppMainWindow.Activate();
+
         }
 
 
