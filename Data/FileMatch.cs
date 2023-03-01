@@ -270,10 +270,10 @@ namespace Data
                         break;
                 }
 
-                int leftCount = dicts.Count - limit;
+                int leftCount = limit - dicts.Count;
 
                 // 当数量超过Limit数量时，跳过（不包括失败列表）
-                if (leftCount >= 0) continue;
+                if (leftCount <= 0) continue;
 
                 var newItems = DataAccess.loadVideoInfoBySomeType(trueType, keywords, leftCount);
 
