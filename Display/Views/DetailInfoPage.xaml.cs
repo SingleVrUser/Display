@@ -112,7 +112,7 @@ namespace Display.Views
 
             if (string.IsNullOrEmpty(actorName)) return;
 
-            Tuple<List<string>, string> TypesAndName = new(new() { "actor" }, actorName);
+            Tuple<List<string>, string, bool> TypesAndName = new(new() { "actor" }, actorName, false);
 
             //准备动画
             ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", clickButton);
@@ -129,7 +129,7 @@ namespace Display.Views
         {
             var clickButton = sender as HyperlinkButton;
             string LabelName = clickButton.Content as string;
-            Tuple<List<string>, string> TypesAndName = new(new() { "category" }, LabelName);
+            Tuple<List<string>, string, bool> TypesAndName = new(new() { "category" }, LabelName, false);
 
             ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", clickButton);
             Frame.Navigate(typeof(ActorInfoPage), TypesAndName);

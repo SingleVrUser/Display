@@ -17,6 +17,8 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
     private double imageWidth { get; set; }
     private double imageHeight { get; set; }
 
+    private bool isFuzzyQueryActor { get; set; }
+
     private string orderBy { get; set; }
     private bool isDesc { get; set; }
 
@@ -33,7 +35,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
 
     public async Task LoadData(int startShowCount = 20)
     {
-        var newItems = await DataAccess.LoadVideoInfo(startShowCount, 0,orderBy,isDesc, filterConditionList, filterKeywords, ranges);
+        var newItems = await DataAccess.LoadVideoInfo(startShowCount, 0,orderBy,isDesc, filterConditionList, filterKeywords, ranges, isFuzzyQueryActor);
 
         if (Count == 0)
             this.AllCount = DataAccess.CheckVideoInfoCount(orderBy, isDesc, filterConditionList, filterKeywords,ranges);
@@ -49,10 +51,11 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
         this.imageHeight = imgheight;
     }
 
-    public void SetFilter(List<string> filterConditionList, string filterKeywords)
+    public void SetFilter(List<string> filterConditionList, string filterKeywords, bool isFuzzyQueryActor)
     {
         this.filterConditionList = filterConditionList;
         this.filterKeywords = filterKeywords;
+        this.isFuzzyQueryActor = isFuzzyQueryActor;
     }
 
     public void SetRange(Dictionary<string, string> ranges)
@@ -75,7 +78,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
 
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        var lists = await DataAccess.LoadVideoInfo(defaultCount, Count, orderBy, isDesc, filterConditionList, filterKeywords, ranges);
+        var lists = await DataAccess.LoadVideoInfo(defaultCount, Count, orderBy, isDesc, filterConditionList, filterKeywords, ranges, isFuzzyQueryActor);
 
         //在最后的时候加载匹配失败的
         //用于展示搜索结果

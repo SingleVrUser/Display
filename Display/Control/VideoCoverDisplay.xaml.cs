@@ -202,6 +202,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// </summary>
     private double SliderMaxValue = 900;
 
+    private bool isFuzzyQueryActor = true;
+
     List<string> filterConditionList;
     Dictionary<string,string> filterRanges;
     string filterKeywords;
@@ -218,7 +220,6 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         //展示的是搜索结果
         if (IsShowSearchListView)
         {
-
         }
         else
         {
@@ -226,16 +227,11 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             if (IsShowFailListView)
             {
                 ShowType_RadioButtons.SelectedIndex = 1;
-                //trySwitchToFailView();
             }
             else
             {
                 ShowType_RadioButtons.SelectedIndex = 0;
-                //trySwitchToSuccessView();
             }
-
-            //ShowType_RadioButtons.SelectionChanged += ShowType_RadioButtons_SelectionChanged;
-            //ShowType_ToggleSwitch.Toggled += ShowType_ToggleSwitch_Toggled;
         }
 
         this.Loaded -= PageLoaded;
@@ -244,9 +240,11 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 加载搜索结果
     /// </summary>
-    public async void ReLoadSearchResult(List<string> types, string ShowName)
+    public async void ReLoadSearchResult(List<string> types, string ShowName, bool isFuzzyQueryActor)
     {
         bool isShowHeaderCover = false;
+
+        this.isFuzzyQueryActor = isFuzzyQueryActor;
 
         if (types.Count == 1)
         {
@@ -267,14 +265,18 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
                     return;
                 case "actor":
                     Title = ShowName;
-                    //查询演员信息
-                    var actorinfos = await DataAccess.LoadActorInfo(filterList: new() { $"Name == '{ShowName}'" });
 
-                    if (actorinfos.Count!=0)
+                    // 准确查询演员，一般来源于详情页和演员页
+                    if (!isFuzzyQueryActor)
                     {
-                        actorInfo = actorinfos.FirstOrDefault();
+                        var actorinfos = await DataAccess.LoadActorInfo(filterList: new() { $"Name == '{ShowName}'" });
 
-                    isShowHeaderCover = true;
+                        if (actorinfos.Count != 0)
+                        {
+                            actorInfo = actorinfos.FirstOrDefault();
+
+                            isShowHeaderCover = true;
+                        }
                     }
 
                     break;
@@ -879,15 +881,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         //更新GridView的来源
         var imgSize = ImageSize;
 
-        //if (SuccessInfoCollection == null || !string.IsNullOrEmpty(filterKeywords) ||)
-        //{
-        //    SuccessInfoCollection = new(imgSize.Item1, imgSize.Item2);
-        //    SuccessInfoCollection.SetFilter(filterConditionList, filterKeywords);
-        //    await SuccessInfoCollection.LoadData();
-        //}
-
         SuccessInfoCollection = new(imgSize.Item1, imgSize.Item2);
-        SuccessInfoCollection.SetFilter(filterConditionList, filterKeywords);
+        SuccessInfoCollection.SetFilter(filterConditionList, filterKeywords, isFuzzyQueryActor);
         await SuccessInfoCollection.LoadData();
 
         BasicGridView.ItemsSource = SuccessInfoCollection;
@@ -1134,7 +1129,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         SuccessInfoCollection.SetOrder(SuccessListOrderBy, SuccessListIsDesc);
         SuccessInfoCollection.SetRange(filterRanges);
-        SuccessInfoCollection.SetFilter(filterConditionList, filterKeywords);
+        SuccessInfoCollection.SetFilter(filterConditionList, filterKeywords, isFuzzyQueryActor);
         await SuccessInfoCollection.LoadData();
     }
 
