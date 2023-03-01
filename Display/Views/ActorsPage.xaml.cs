@@ -110,7 +110,7 @@ namespace Display.Views
 
         private void GoToActorInfo(ActorInfo actorinfo)
         {
-            Tuple<List<string>, string> TypeAndName = new(new() { "actor" }, actorinfo.name);
+            Tuple<List<string>, string, bool> TypeAndName = new(new() { "actor" }, actorinfo.name, false);
             Frame.Navigate(typeof(ActorInfoPage), TypeAndName);
         }
 

@@ -296,7 +296,7 @@ namespace Display
         {
             var types = sender.DataContext as List<string>;
 
-            ContentFrame.Navigate(typeof(ActorInfoPage), new Tuple<List<string>, string>(types, sender.Text), new SuppressNavigationTransitionInfo());
+            ContentFrame.Navigate(typeof(ActorInfoPage), new Tuple<List<string>, string, bool>(types, sender.Text, true), new SuppressNavigationTransitionInfo());
         }
 
         /// <summary>
