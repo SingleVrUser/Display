@@ -30,7 +30,7 @@ namespace Display.Control
 
                 var Selectedtypes = GetSelectedTypes();
 
-                List<VideoInfo> item = await FileMatch.getVideoInfoFromType(Selectedtypes, searchText);
+                List<VideoInfo> item = await FileMatch.getVideoInfoFromType(Selectedtypes, searchText, 50);
 
                 if (item.Count == 0)
                 {
