@@ -1589,6 +1589,48 @@ namespace Data
             return data;
         }
 
+        public static int GetCount_FailFileInfoWithDatum(int offset = 0, int limit = -1, string n = null, string orderBy = null, bool isDesc = false, FailType showType = FailType.All)
+        {
+            int count = 0;
+
+            using (SqliteConnection db =
+               new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                string orderStr = GetOrderStr(orderBy, isDesc);
+
+                string queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n.Replace("'", "%")}%'";
+
+                string showTypeStr;
+                switch (showType)
+                {
+                    case FailType.MatchFail:
+                        showTypeStr = " AND FileToInfo.truename == ''";
+                        break;
+                    case FailType.SpiderFail:
+                        showTypeStr = " AND FileToInfo.truename != ''";
+                        break;
+                    default:
+                        showTypeStr = string.Empty;
+                        break;
+                }
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"SELECT COUNT(pc) FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{showTypeStr}{queryStr}{orderStr} LIMIT {limit} offset {offset} ", db);
+
+                SqliteDataReader query = selectCommand.ExecuteReader();
+
+                query.Read();
+                count = query.GetInt32(0);
+                query.Close();
+
+                db.Close();
+            }
+
+            return count;
+        }
+
         /// <summary>
         /// 检查演员列表数量
         /// </summary>
@@ -2317,7 +2359,7 @@ namespace Data
         /// </summary>
         /// <param Name="actorName"></param>
         /// <returns></returns>
-        public static List<VideoInfo> loadVideoInfoBySomeType(string type, string label)
+        public static List<VideoInfo> loadVideoInfoBySomeType(string type, string label, int limit)
         {
             List<VideoInfo> data = new List<VideoInfo>();
 
@@ -2329,11 +2371,11 @@ namespace Data
                 SqliteCommand selectCommand;
                 if (label == "")
                 {
-                    selectCommand = new SqliteCommand($"SELECT * from VideoInfo WHERE {type} == ''", db);
+                    selectCommand = new SqliteCommand($"SELECT * from VideoInfo WHERE {type} == '' LIMIT {limit}", db);
                 }
                 else
                 {
-                    selectCommand = new SqliteCommand($"SELECT * from VideoInfo WHERE {type} LIKE '%{label}%'", db);
+                    selectCommand = new SqliteCommand($"SELECT * from VideoInfo WHERE {type} LIKE '%{label}%' LIMIT {limit}", db);
                 }
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
