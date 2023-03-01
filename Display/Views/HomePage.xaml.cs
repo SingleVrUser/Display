@@ -245,14 +245,14 @@ namespace Display.Views
 
         private void MoreLikeVideoClick(object sender, RoutedEventArgs e)
         {
-            Tuple<List<string>, string> TypesAndName = new(new() { "is_like" }, "1");
+            Tuple<List<string>, string, bool> TypesAndName = new(new() { "is_like" }, "1", false);
 
             Frame.Navigate(typeof(ActorInfoPage), TypesAndName);
         }
 
         private void MoreLookLaterVideoClick(object sender, RoutedEventArgs e)
         {
-            Tuple<List<string>, string> TypesAndName = new(new() { "look_later" }, "1");
+            Tuple<List<string>, string, bool> TypesAndName = new(new() { "look_later" }, "1", false);
 
             Frame.Navigate(typeof(ActorInfoPage), TypesAndName);
         }

@@ -21,32 +21,35 @@ namespace Display.Control
         //输入的Text改变
         private async void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
-            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput && sender.Text != "")
+            string searchText = sender.Text;
+
+            if (args.Reason != AutoSuggestionBoxTextChangeReason.UserInput || string.IsNullOrWhiteSpace(searchText))
+                return;
+
+            System.Diagnostics.Debug.WriteLine($"输入：{searchText}");
+
+            //过滤非法元素
+            searchText = searchText.Replace("'", "");
+
+            System.Diagnostics.Debug.WriteLine($"过滤非法元素后：{searchText}");
+
+            var Selectedtypes = GetSelectedTypes();
+
+            List<VideoInfo> item = await FileMatch.getVideoInfoFromType(Selectedtypes, searchText, 50);
+
+            if (item.Count == 0)
             {
-                string searchText = sender.Text;
+                NavViewSearchBox.ItemTemplate = Resources["notFoundedSuggestionBox"] as DataTemplate;
+                sender.ItemTemplate = null;
+                sender.ItemsSource = new List<string>() { "未找到" };
+            }
+            else
+            {
+                object context;
+                Resources.TryGetValue("FoundedSuggestionBox", out context);
+                NavViewSearchBox.ItemTemplate = context as DataTemplate;
 
-                //过滤非法元素
-                searchText = searchText.Replace("'", "");
-
-                var Selectedtypes = GetSelectedTypes();
-
-                List<VideoInfo> item = await FileMatch.getVideoInfoFromType(Selectedtypes, searchText, 50);
-
-                if (item.Count == 0)
-                {
-                    NavViewSearchBox.ItemTemplate = Resources["notFoundedSuggestionBox"] as DataTemplate;
-                    sender.ItemTemplate = null;
-                    sender.ItemsSource = new List<string>() { "未找到" };
-                }
-                else
-                {
-                    object context;
-                    Resources.TryGetValue("FoundedSuggestionBox", out context);
-                    NavViewSearchBox.ItemTemplate = context as DataTemplate;
-
-                    sender.ItemsSource = item;
-                }
-
+                sender.ItemsSource = item;
             }
         }
 
