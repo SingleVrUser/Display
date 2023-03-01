@@ -229,7 +229,7 @@ namespace Data
         }
 
         //根据类别搜索结果
-        public static async Task<List<VideoInfo>> getVideoInfoFromType(List<string> types, string keywords)
+        public static async Task<List<VideoInfo>> getVideoInfoFromType(List<string> types, string keywords, int limit)
         {
             if (types == null) return null;
 
@@ -262,7 +262,7 @@ namespace Data
                     //失败比较特殊
                     //从另外的表中查找
                     case "失败" or "fail":
-                        var failItems = await DataAccess.LoadFailFileInfoWithDatum(n: keywords);
+                        var failItems = await DataAccess.LoadFailFileInfoWithDatum(n: keywords, limit:limit);
                         failItems.ForEach(item => dicts.TryAdd(item.n,new(item)));
                         continue;
                     default:
@@ -270,7 +270,12 @@ namespace Data
                         break;
                 }
 
-                var newItems = DataAccess.loadVideoInfoBySomeType(trueType, keywords);
+                int leftCount = dicts.Count - limit;
+
+                // 当数量超过Limit数量时，跳过（不包括失败列表）
+                if (leftCount >= 0) continue;
+
+                var newItems = DataAccess.loadVideoInfoBySomeType(trueType, keywords, leftCount);
 
                 newItems.ForEach(item => dicts.TryAdd(item.truename, item));
             }
