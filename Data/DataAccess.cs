@@ -2024,7 +2024,7 @@ namespace Data
         /// </summary>
         /// <param Name="limit"></param>
         /// <returns></returns>
-        public static async Task<List<VideoInfo>> LoadVideoInfo(int limit = 1, int offset = 0, string orderBy = null, bool isDesc = false, List<string> filterConditionList = null,string filterKeywords = null,Dictionary<string, string> rangesDicts = null)
+        public static async Task<List<VideoInfo>> LoadVideoInfo(int limit = 1, int offset = 0, string orderBy = null, bool isDesc = false, List<string> filterConditionList = null,string filterKeywords = null,Dictionary<string, string> rangesDicts = null, bool isFuzzyQueryActor = true)
         {
             List<VideoInfo> data = new List<VideoInfo>();
 
@@ -2045,7 +2045,7 @@ namespace Data
                 {
                     selectCommand = new SqliteCommand($"SELECT VideoInfo.* FROM VideoInfo LEFT JOIN Is_Wm ON VideoInfo.truename = Is_Wm.truename LEFT JOIN ProducerInfo ON VideoInfo.producer = ProducerInfo.Name{filterStr}{orderStr} LIMIT {limit} offset {offset}",db); 
                 }
-                else if(rangesDicts == null && filterConditionList?.Count == 1 && filterConditionList.FirstOrDefault() == "actor")
+                else if(rangesDicts == null && filterConditionList?.Count == 1 && filterConditionList.FirstOrDefault() == "actor" && !isFuzzyQueryActor)
                 {
                     selectCommand = new SqliteCommand
                         ($"SELECT VideoInfo.* FROM VideoInfo LEFT JOIN Actor_Video ON VideoInfo.truename = Actor_Video.video_name LEFT JOIN Actor_Names ON Actor_Video.actor_id = Actor_Names.id WHERE Actor_Names.name == '{filterKeywords}'{orderStr} LIMIT {limit} offset {offset}", db);

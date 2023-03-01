@@ -24,6 +24,7 @@ namespace Display.Views
         //为返回动画做准备（需启动缓存）
         public VideoCoverDisplayClass _storeditem;
 
+
         public ActorInfoPage()
         {
             //启动缓存（为了返回无需过长等待，也为了返回动画）
@@ -69,9 +70,11 @@ namespace Display.Views
                 var item = e.Parameter;
                 if (item == null) return;
                 //需要显示的是搜索结果
-                if (item is Tuple<List<string>, string> typesAndName)
+                if (item is Tuple<List<string>, string, bool> tuple)
                 {
-                    LoadShowInfo(typesAndName);
+                    Tuple<List<string>, string> typesAndName = new (tuple.Item1, tuple.Item2);
+
+                    LoadShowInfo(typesAndName, tuple.Item3);
                 }
                 else
                 {
@@ -81,7 +84,7 @@ namespace Display.Views
                 ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("ForwardConnectedAnimation");
                 if (animation != null)
                 {
-                    if(typesAndName.Item1.Count==1 && typesAndName.Item1.FirstOrDefault() == "actor")
+                    if(tuple.Item1.Count==1 && tuple.Item1.FirstOrDefault() == "actor")
                     {
                         animation.TryStart(videoControl.HeaderCover);
                     }
@@ -93,10 +96,9 @@ namespace Display.Views
             }
         }
 
-        private void LoadShowInfo(Tuple<List<string>, string> typesAndName)
+        private void LoadShowInfo(Tuple<List<string>, string> typesAndName, bool isFuzzyQueryActor)
         {
-
-            videoControl.ReLoadSearchResult(typesAndName.Item1, typesAndName.Item2);
+            videoControl.ReLoadSearchResult(typesAndName.Item1, typesAndName.Item2, isFuzzyQueryActor);
         }
 
         /// <summary>
