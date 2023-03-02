@@ -3,7 +3,7 @@
 
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="using:Display.Control">
+                    xmlns:local="using:Display.Controls">
 
     <SolidColorBrush x:Key="MediaTransportControlsPanelBackground"
                      Color="#60ffffff" />

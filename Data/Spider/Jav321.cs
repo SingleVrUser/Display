@@ -4,14 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using static Data.Model.SpiderInfo;
 
 namespace Data.Spider;
 
 public class Jav321
 {
-    public const int Id = (int)Manager.SpiderSourceName.jav321;
+    public const int Id = (int)SpiderSourceName.Jav321;
 
-    public const string Abbreviation = "jav321";
+    public const string Abbreviation = "Jav321";
 
     public const string Keywords = "bittorrent Download dmm";
 

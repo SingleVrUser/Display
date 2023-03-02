@@ -76,6 +76,7 @@
     <None Remove="ContentsPage\SelectSingleSubFileToSelected.xaml" />
     <None Remove="ContentsPage\SelectSingleVideoToPlay.xaml" />
     <None Remove="ContentsPage\Sort115\MainPage.xaml" />
+    <None Remove="ContentsPage\Sort115\Settings18Page.xaml" />
     <None Remove="ContentsPage\spiderVideoInfo.xaml" />
     <None Remove="ContentsPage\SpiderVideoInfo\Progress.xaml" />
     <None Remove="ContentsPage\SpiderVideoInfo_ConditionalCheck.xaml" />
@@ -83,22 +84,23 @@
     <None Remove="ContentsPage\UpdateImagePath.xaml" />
     <None Remove="ContentsPage\VideoPlay - 复制.xaml" />
     <None Remove="ContentsPage\VideoPlay.xaml" />
-    <None Remove="Control\ActorImage.xaml" />
-    <None Remove="Control\Browser.xaml" />
-    <None Remove="Control\CustomAutoSuggestBox.xaml" />
-    <None Remove="Control\CustomMediaPlayerElement.xaml" />
-    <None Remove="Control\Explorer.xaml" />
-    <None Remove="Control\FileAutoSuggestBox.xaml" />
-    <None Remove="Control\InfoListFilter.xaml" />
-    <None Remove="Control\MultipleCoverShow.xaml" />
-    <None Remove="Control\RangeSlider.xaml" />
-    <None Remove="Control\ShowCountControl.xaml" />
-    <None Remove="Control\StatusShow.xaml" />
-    <None Remove="Control\TextBlockWithLongText.xaml" />
-    <None Remove="Control\TextBlockWithStressText.xaml" />
-    <None Remove="Control\UserInfo.xaml" />
-    <None Remove="Control\VideoCoverDisplay.xaml" />
-    <None Remove="Control\VideoDetails.xaml" />
+    <None Remove="Controls\ActorImage.xaml" />
+    <None Remove="Controls\Browser.xaml" />
+    <None Remove="Controls\CustomAutoSuggestBox.xaml" />
+    <None Remove="Controls\CustomMediaPlayerElement.xaml" />
+    <None Remove="Controls\Explorer.xaml" />
+    <None Remove="Controls\FileAutoSuggestBox.xaml" />
+    <None Remove="Controls\FolderControl.xaml" />
+    <None Remove="Controls\InfoListFilter.xaml" />
+    <None Remove="Controls\MultipleCoverShow.xaml" />
+    <None Remove="Controls\RangeSlider.xaml" />
+    <None Remove="Controls\ShowCountControl.xaml" />
+    <None Remove="Controls\StatusShow.xaml" />
+    <None Remove="Controls\TextBlockWithLongText.xaml" />
+    <None Remove="Controls\TextBlockWithStressText.xaml" />
+    <None Remove="Controls\UserInfo.xaml" />
+    <None Remove="Controls\VideoCoverDisplay.xaml" />
+    <None Remove="Controls\VideoDetails.xaml" />
     <None Remove="Settings\GetVideoInfo.xaml" />
     <None Remove="VideoPlayWindow.xaml" />
     <None Remove="Views\BrowserPage.xaml" />
@@ -146,7 +148,7 @@
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230217.4" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="QRCoder" Version="1.4.3" />
     <PackageReference Include="SQLitePCLRaw.bundle_winsqlite3" Version="2.1.4" />
     <PackageReference Include="WinUIEx" Version="2.1.0" />
@@ -319,6 +321,15 @@
     <None Update="Assets\SmallTile.scale-125.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
+    </None>
+    <Page Update="ContentsPage\Sort115\Settings18Page.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Controls\FolderControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <None Update="Control\FolderControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
     </None>
     <Page Update="Control\RangeSlider.xaml">
       <Generator>MSBuild:Compile</Generator>

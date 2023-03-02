@@ -12,6 +12,7 @@ using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
 using Newtonsoft.Json.Linq;
 using static Data.Spider.Manager;
+using static Data.Model.SpiderInfo;
 
 namespace Data
 {

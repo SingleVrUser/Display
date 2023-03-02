@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:data="using:Data"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-    xmlns:customecontrol="using:Display.Control"
+    xmlns:customecontrol="using:Display.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     mc:Ignorable="d">

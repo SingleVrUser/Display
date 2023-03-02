@@ -206,7 +206,7 @@ public class AppSettings
     /// LibreDmm网址
     /// </summary>
     /// 
-    private static string _libreDmm_BaseUrl = "https://www.libredmm.com/";
+    private static string _libreDmm_BaseUrl = "https://www.Libredmm.com/";
 
     public static string LibreDmm_BaseUrl
     {
@@ -229,7 +229,7 @@ public class AppSettings
     /// JavBus网址
     /// </summary>
     /// 
-    private static string _javBus_BaseUrl = "https://www.javbus.com/";
+    private static string _javBus_BaseUrl = "https://www.Javbus.com/";
     public static string JavBus_BaseUrl
     {
         get
@@ -251,7 +251,7 @@ public class AppSettings
     /// AvMoo网址
     /// </summary>
     /// 
-    private static string _avmoo_BaseUrl = "https://avmoo.click/";
+    private static string _avmoo_BaseUrl = "https://Avmoo.click/";
     public static string AvMoo_BaseUrl
     {
         get
@@ -273,7 +273,7 @@ public class AppSettings
     /// AvSox网址
     /// </summary>
     /// 
-    private static string _avsox_BaseUrl = "https://avsox.click/";
+    private static string _avsox_BaseUrl = "https://Avsox.click/";
     public static string AvSox_BaseUrl
     {
         get
@@ -295,7 +295,7 @@ public class AppSettings
     /// Jav321网址
     /// </summary>
     /// 
-    private static string _jav321_BaseUrl = "https://www.jav321.com/";
+    private static string _jav321_BaseUrl = "https://www.Jav321.com/";
     public static string Jav321_BaseUrl
     {
         get
@@ -316,7 +316,7 @@ public class AppSettings
     /// <summary>
     /// JavDB网址
     /// </summary>
-    private static string _javDB_BaseUrl = "https://javdb.com/";
+    private static string _javDB_BaseUrl = "https://Javdb.com/";
     public static string JavDB_BaseUrl
     {
         get

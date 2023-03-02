@@ -1,0 +1,81 @@
+﻿<!-- Copyright (c) Microsoft Corporation and Contributors. -->
+<!-- Licensed under the MIT License. -->
+
+<UserControl
+    x:Class="Display.Controls.InfoListFilter"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Display.Controls"
+    xmlns:sys="using:System"
+    xmlns:datahelper="using:Data.Helper"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+
+        <!--筛选Flyout的样式-->
+        <Style TargetType="FlyoutPresenter" x:Key="FilterFlyoutPresenterStyle">
+            <Setter Property="Padding" Value="10,-3,10,3" />
+            <Setter Property="CornerRadius" Value="5" />
+        </Style>
+    </UserControl.Resources>
+    
+    <Grid ColumnSpacing="5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+
+        <ToggleSplitButton x:Name="Year_ToggleSplitButton" Content="年份" Grid.Column="0" Click="Year_ToggleSplitButton_Click" Tag="Year">
+            <ToggleSplitButton.Flyout>
+                <Flyout FlyoutPresenterStyle="{StaticResource FilterFlyoutPresenterStyle}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+
+                        <RadioButtons x:Name="Year_RadioButtons" SelectedIndex="0" SelectionChanged="Year_RadioButtons_SelectionChanged" Tag="Year">
+                            <RadioButton GroupName="Year" Content="{x:Bind sys:DateTime.Now.Year}" IsChecked="True"/>
+                            <RadioButton GroupName="Year" Content="{x:Bind datahelper:MatchHelper.Int32Subtract(sys:DateTime.Now.Year,1)}"/>
+                            <RadioButton GroupName="Year" Content="{x:Bind datahelper:MatchHelper.Int32Subtract(sys:DateTime.Now.Year,2)}"/>
+                            <RadioButton GroupName="Year" x:Name="customTimeRange_RadioButton" Content="自定义"/>
+                        </RadioButtons>
+
+                        <TextBox x:Name="Year_CustomeTextBox" Grid.Row="1"
+                                 Visibility="{x:Bind customTimeRange_RadioButton.IsChecked,Mode=OneWay}"
+                                 Text="{x:Bind datahelper:MatchHelper.Int32Subtract(sys:DateTime.Now.Year,3)}"
+                                 TextChanged="Year_CustomeTextBox_TextChanged"/>
+                    </Grid>
+                </Flyout>
+            </ToggleSplitButton.Flyout>
+        </ToggleSplitButton>
+        <ToggleSplitButton x:Name="Score_ToggleSplitButton" Content="评分" Grid.Column="1" Click="Score_ToggleSplitButton_Click" Tag="Score">
+            <ToggleSplitButton.Flyout>
+                <Flyout FlyoutPresenterStyle="{StaticResource FilterFlyoutPresenterStyle}">
+                    <RadioButtons x:Name="Score_RadioButtons" SelectedIndex="0" SelectionChanged="Score_RadioButtons_SelectionChanged" Tag="Score">
+                        <RadioButton Content="5星" Tag="5"/>
+                        <RadioButton Content="4星" Tag="4"/>
+                        <RadioButton Content="3星" Tag="3"/>
+                        <RadioButton Content="2星" Tag="2"/>
+                        <RadioButton Content="1星" Tag="1"/>
+                        <RadioButton Content="未评分" Tag="-1"/>
+                    </RadioButtons>
+                </Flyout>
+            </ToggleSplitButton.Flyout>
+        </ToggleSplitButton>
+
+        <ToggleSplitButton x:Name="Type_ToggleSplitButton" Content="类别" Grid.Column="2" Click="Type_ToggleSplitButton_Click" Tag="Type">
+            <ToggleSplitButton.Flyout>
+                <Flyout FlyoutPresenterStyle="{StaticResource FilterFlyoutPresenterStyle}">
+                    <RadioButtons x:Name="Type_RadioButtons" SelectedIndex="0" SelectionChanged="Type_RadioButtons_SelectionChanged" Tag="Type">
+                        <RadioButton GroupName="Type" Content="骑兵" IsChecked="True"/>
+                        <RadioButton GroupName="Type" Content="步兵"/>
+                    </RadioButtons>
+                </Flyout>
+            </ToggleSplitButton.Flyout>
+        </ToggleSplitButton>
+    </Grid>
+</UserControl>

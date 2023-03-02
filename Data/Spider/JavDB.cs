@@ -7,12 +7,13 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Media.Ocr;
+using static Data.Model.SpiderInfo;
 
 namespace Data.Spider;
 
 public class JavDB
 {
-    public const int Id = (int)Manager.SpiderSourceName.javdb;
+    public const int Id = (int)SpiderSourceName.Javdb;
 
     public const string Abbreviation = "db";
 

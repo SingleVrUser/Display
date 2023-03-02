@@ -1,4 +1,5 @@
 ﻿using Data;
+using Display.Helper;
 using Display.Views;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
@@ -34,9 +35,9 @@ namespace Display
         {
             InitializeComponent();
 
-            SetStyle();
-
             appwindow = App.getAppWindow(this);
+
+            SetStyle();
         }
 
         /// <summary>
@@ -46,6 +47,10 @@ namespace Display
         {
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(AppTitleBar);
+
+            appwindow.SetIcon(Path.Combine(Windows.ApplicationModel.Package.Current.InstalledLocation.Path, "Assets/pokeball.ico"));
+
+            this.Title = "Display";
 
             AppTitleBar.Height = NavView.CompactPaneLength - 5;
 
@@ -274,7 +279,7 @@ namespace Display
                 //选中的是失败项
                 if(nowItem.series == "fail")
                 {
-                    await DetailInfoPage.PlayeVideo(nowItem.busurl, ((Page)ContentFrame.Content).XamlRoot);
+                    await PlayeVideoHelper.PlayeVideo(nowItem.busurl, ((Page)ContentFrame.Content).XamlRoot);
                 }
                 //正常点击
                 else

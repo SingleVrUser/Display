@@ -1,0 +1,58 @@
+﻿<UserControl
+    x:Class="Display.Controls.UserInfo"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Display.Controls"
+    xmlns:data="using:Data"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <!--头像栏-->
+    <Grid Height="120" Width="230">
+        <!--有数据时-->
+        <StackPanel
+            Orientation="Horizontal"
+            Padding="20,0"
+            Visibility="{x:Bind isShowUserInfo(status),Mode=OneWay}">
+            <!--头像-->
+            <PersonPicture ProfilePicture="{x:Bind userinfo.face,Mode=OneWay}" x:Name="face_Picture"/>
+
+            <!--信息-->
+            <StackPanel x:Name="userInfo_StackPanel" Padding="5,5" HorizontalAlignment="Center">
+                <StackPanel x:Name="vipCard_stackpanel"
+                            Background="#ffa502"
+                            CornerRadius="5"
+                            Width="50"
+                            HorizontalAlignment="Right"
+                            Visibility="{x:Bind isShowVip(status),Mode=OneWay}">
+                    <TextBlock FontSize="10" FontFamily="Segoe UI" Foreground="White" HorizontalAlignment="Center" Text="{x:Bind data:UserData.getVipName(userinfo.mark1),Mode=OneWay}"/>
+                </StackPanel>
+                <TextBlock x:Name="UserName_TextBlock" FontWeight="Bold" FontSize="20" HorizontalAlignment="Center" Text="{x:Bind userinfo.user_name,Mode=OneWay}"/>
+                <!--<TextBlock FontWeight="Bold" FontSize="20" HorizontalAlignment="Center""/>-->
+                <HyperlinkButton HorizontalAlignment="Right" Content="更新信息" Click="UpdataButton_Click"/>
+                <HyperlinkButton HorizontalAlignment="Right" Content="退出登录" Click="Logout_Click"/>
+
+            </StackPanel>
+        </StackPanel>
+
+        <!--无数据时-->
+        <Grid Visibility="{x:Bind isShowOtherInfo(status),Mode=OneWay}" >
+            <StackPanel VerticalAlignment="Center">
+                <!--未登录时-->
+                <StackPanel Visibility="{x:Bind isProcess(status),Mode=OneWay}" Orientation="Horizontal" Spacing="5">
+                    <TextBlock Text="未登录，请先登录" VerticalAlignment="Center"/>
+                    <Button Content="登录" Click="LoginButton_Click"/>
+                </StackPanel>
+                
+                <!--更新信息时-->
+                <StackPanel Orientation="Horizontal" Spacing="10"  Visibility="{x:Bind isUpdate(status),Mode=OneWay}">
+                    <ProgressRing IsActive="True"/>
+                    <TextBlock Text="正在更新信息" VerticalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
+    
+
+</UserControl>

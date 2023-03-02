@@ -1,0 +1,177 @@
+<!-- Copyright (c) Microsoft Corporation and Contributors. -->
+<!-- Licensed under the MIT License. -->
+
+<Page
+    x:Class="Display.ContentsPage.Sort115.Settings18Page"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Display.ContentsPage.Sort115"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodels="using:Display.ViewModels"
+    xmlns:models="using:Display.Models"
+    mc:Ignorable="d">
+
+    <Page.DataContext>
+        <viewmodels:SortSettingsViewModel x:Name="ViewModel" />
+    </Page.DataContext>
+
+    <Page.Resources>
+        <Style TargetType="TextBox"
+               x:Key="ValueTextBoxStyle">
+            <Setter Property="HorizontalAlignment"
+                    Value="Left" />
+            <Setter Property="MinWidth"
+                    Value="300" />
+            <Setter Property="CornerRadius"
+                    Value="4" />
+        </Style>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+        </Style>
+
+        <Style TargetType="TextBlock"
+               x:Key="RowTextBlockStyle">
+            <Setter Property="TextWrapping"
+                    Value="Wrap" />
+        </Style>
+    </Page.Resources>
+
+    <Pivot>
+        <PivotItem Header="命名">
+            <Grid RowSpacing="10"
+                  ColumnSpacing="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!--<TextBlock Grid.Row="0" Grid.Column="0"></TextBlock>-->
+
+                <!--标题-->
+                <TextBlock Grid.Row="0"
+                           Grid.Column="1">规则</TextBlock>
+                <TextBlock Grid.Row="0"
+                           Grid.Column="2">例</TextBlock>
+
+                <TextBlock Grid.Row="1"
+                           Grid.Column="0"
+                           Style="{StaticResource RowTextBlockStyle}">文件名（单集）</TextBlock>
+                <TextBox x:Name="SingleVideoNameFormatTextBox"
+                         Grid.Row="1"
+                         Grid.Column="1"
+                         Text="{x:Bind ViewModel.SingleVideoNameFormat,Mode=TwoWay}"
+                         Style="{StaticResource ValueTextBoxStyle}" />
+                <TextBlock Grid.Row="1"
+                           Grid.Column="2"
+                           Text="{x:Bind ViewModel.SingleVideoNameSample,Mode=OneWay}" />
+
+                <Line  Grid.Row="2"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="2"
+                       Stroke="SkyBlue"
+                       StrokeThickness="2"></Line>
+
+                <TextBlock Grid.Row="2"
+                           Grid.Column="0"
+                           Style="{StaticResource RowTextBlockStyle}">文件名（多集）</TextBlock>
+                <TextBox Grid.Row="2"
+                         Grid.Column="1"
+                         Text="{x:Bind ViewModel.MultipleVideoNameFormat,Mode=TwoWay}"
+                         Style="{StaticResource ValueTextBoxStyle}" />
+
+                <TextBlock Grid.Row="2"
+                           Grid.Column="2"
+                           Text="{x:Bind ViewModel.MultipleVideoNameSample,Mode=OneWay}" />
+
+
+                <TextBlock Grid.Row="3"
+                           Grid.Column="0"
+                           Style="{StaticResource RowTextBlockStyle}">番号</TextBlock>
+                <TextBox Grid.Row="3"
+                         Grid.Column="1"
+                         Text="{x:Bind ViewModel.NumNameFormat,Mode=TwoWay}"
+                         Style="{StaticResource ValueTextBoxStyle}" />
+                <TextBlock x:Name="NumNameSampleTextBlock"
+                           Grid.Row="3"
+                           Grid.Column="2"
+                           Text="{x:Bind ViewModel.NumNameSample,Mode=OneWay}" />
+
+                <TextBlock Grid.Row="4"
+                           Grid.Column="0"
+                           Style="{StaticResource RowTextBlockStyle}">演员查询为空的替换词</TextBlock>
+                <TextBox x:Name="ActorNullStringTextBox"
+                         Grid.Row="4"
+                         Grid.Column="1"
+                         Text="素人"
+                         Style="{StaticResource ValueTextBoxStyle}" />
+                <TextBlock Grid.Row="4"
+                           Grid.Column="2"
+                           Text="{x:Bind ActorNullStringTextBox.Text,Mode=OneWay}" />
+
+                <TextBlock Grid.Row="5"
+                           Grid.Column="0"
+                           Style="{StaticResource RowTextBlockStyle}">分隔符</TextBlock>
+                <TextBox x:Name="SeparatorTextBox"
+                         Grid.Row="5"
+                         Grid.Column="1"
+                         Text="{x:Bind ViewModel.Separator,Mode=TwoWay}"
+                         Style="{StaticResource ValueTextBoxStyle}" />
+                <TextBlock Grid.Row="5"
+                           Grid.Column="2"
+                           Text="{x:Bind ViewModel.Separator,Mode=OneWay}" />
+
+                <TextBlock Grid.Row="6"
+                           Grid.Column="0"
+                           Style="{StaticResource RowTextBlockStyle}">序号</TextBlock>
+                <ComboBox x:Name="PartNumComboBox"
+                          Grid.Row="6"
+                          Grid.Column="1"
+                          DisplayMemberPath="Item1"
+                          SelectedValuePath="Item2"
+                          SelectedIndex="{x:Bind ViewModel.SeparatorNumSelectedIndex,Mode=TwoWay}"
+                          ItemsSource="{x:Bind ViewModel.PartNumCombos}" />
+                <TextBlock Grid.Row="6"
+                           Grid.Column="2"
+                           Text="{x:Bind (models:PartNumCombo)PartNumComboBox.SelectedValue,Mode=OneWay}" />
+
+                <TextBlock Grid.Row="7"
+                           Grid.Column="0"
+                           Style="{StaticResource RowTextBlockStyle}">番号格式</TextBlock>
+                <ComboBox x:Name="NumNameCapFormatComboBox"
+                          Grid.Row="7"
+                          Grid.Column="1"
+                          DisplayMemberPath="Item1"
+                          SelectedValuePath="Item2"
+                          SelectedIndex="{x:Bind ViewModel.NumNameFormatSelectedIndex,Mode=TwoWay}"
+                          ItemsSource="{x:Bind ViewModel.NumNameFormatCombos}" />
+                <TextBlock Grid.Row="7"
+                           Grid.Column="2"
+                           Text="{x:Bind NumNameSampleTextBlock.Text,Mode=OneWay}" />
+
+            </Grid>
+        </PivotItem>
+
+        <PivotItem Header="搜刮源">
+
+        </PivotItem>
+
+        <PivotItem Header="存放目录">
+
+        </PivotItem>
+
+    </Pivot>
+</Page>
