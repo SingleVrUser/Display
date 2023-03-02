@@ -1,4 +1,4 @@
-﻿using Display.Control;
+﻿using Display.Controls;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using System;

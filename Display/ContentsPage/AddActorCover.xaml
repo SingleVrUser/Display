@@ -6,8 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:data="using:Data"
-    xmlns:controls="using:Display.Control"
-    xmlns:control="using:CommunityToolkit.WinUI.UI.Controls"
+      xmlns:customcontrols="using:Display.Controls"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d">
     <Page.Resources>
         <!--<converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter"/>-->
@@ -22,15 +22,15 @@
                 PointerEntered="connectedElement_PointerEntered"
                 PointerExited="connectedElement_PointerExited">
                 <Grid Visibility="{x:Bind data:FileMatch.showIfImageNull(prifile_path),Mode=OneWay}">
-                    <control:ImageEx Source="{x:Bind prifile_path,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
+                    <controls:ImageEx Source="{x:Bind prifile_path,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
 
                     <TextBlock Text="{x:Bind name}" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" TextWrapping="Wrap" Margin="5"/>
 
-                    <controls:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
+                    <customcontrols:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
                 </Grid>
 
                 <Grid Visibility="{x:Bind data:FileMatch.showIfImageENotNull(prifile_path),Mode=OneWay}">
-                    <control:ImageEx Margin="0,0,0,20" x:Name="ActorImage" Source="{x:Bind prifile_path,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
+                    <controls:ImageEx Margin="0,0,0,20" x:Name="ActorImage" Source="{x:Bind prifile_path,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
 
                     <StackPanel VerticalAlignment="Bottom">
                         <RelativePanel Margin="5,0">
@@ -48,8 +48,8 @@
                         <TextBlock Text="{x:Bind genderInfo,Mode=OneWay}" Visibility="Collapsed"/>
                         <TextBlock Text="{x:Bind ageInfo,Mode=OneWay}" Visibility="Collapsed"/>
                     </StackPanel>
-                    
-                    <controls:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
+
+                    <customcontrols:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
                 </Grid>
 
             </Grid>
@@ -83,7 +83,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
-        <control:AdaptiveGridView Grid.Row="1"
+        <controls:AdaptiveGridView Grid.Row="1"
                 x:Name="BasicGridView"
                 IsItemClickEnabled="True"
                 Padding="10,0"
@@ -92,7 +92,7 @@
                 SelectionMode="Multiple"
                 SelectionChanged="BasicGridView_SelectionChanged"
                 ItemTemplate="{StaticResource GirdViewTemplate}">
-        </control:AdaptiveGridView>
+        </controls:AdaptiveGridView>
 
         <Grid x:Name="SmokeGrid" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Collapsed" >
 

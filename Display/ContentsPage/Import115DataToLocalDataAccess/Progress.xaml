@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:data="using:Data"
     mc:Ignorable="d"
-    xmlns:control="using:Display.Control"
+    xmlns:customcontrols="using:Display.Controls"
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals">
     <Page.Resources>
         <Style TargetType="TextBlock">
@@ -63,7 +63,7 @@
             <Expander.Header>
                 <RelativePanel MinWidth="200">
                     <TextBlock Text="获取数量" RelativePanel.AlignVerticalCenterWithPanel="True"/>
-                    <control:StatusShow x:Name="GetFolderCategory_Progress" status="doing" RelativePanel.AlignRightWithPanel="True"/>
+                    <customcontrols:StatusShow x:Name="GetFolderCategory_Progress" status="doing" RelativePanel.AlignRightWithPanel="True"/>
                 </RelativePanel>
             </Expander.Header>
 
@@ -121,7 +121,7 @@
                             <TextBlock>请求速度（次/分钟）</TextBlock>
                         </ToolTipService.ToolTip>
                     </TextBlock>
-                    <control:StatusShow x:Name="GetInfos_Progress" status="doing" RelativePanel.AlignRightWithPanel="True"/>
+                    <customcontrols:StatusShow x:Name="GetInfos_Progress" status="doing" RelativePanel.AlignRightWithPanel="True"/>
                 </RelativePanel>
             </Expander.Header>
 

@@ -6,13 +6,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media.Protection.PlayReady;
 using Windows.Media.Streaming.Adaptive;
+using static Data.Model.SpiderInfo;
 using static Data.Spider.Manager;
 
 namespace Data.Spider;
 
 public class LibreDmm
 {
-    public const int Id = (int)SpiderSourceName.libredmm;
+    public const int Id = (int)SpiderSourceName.Libredmm;
 
     public const string Abbreviation = "libre";
 

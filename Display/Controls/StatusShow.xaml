@@ -1,0 +1,19 @@
+﻿<UserControl
+    x:Class="Display.Controls.StatusShow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Display.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <!--等待，正确，错误-->
+    <Grid>
+        <ProgressRing
+            x:Name="doing_status"
+            IsEnabled="True"
+            Visibility="Collapsed"/>
+        <SymbolIcon x:Name="success_status" Symbol="Accept" Foreground="Green" Visibility="Collapsed"/>
+        <SymbolIcon x:Name="error_status" Symbol="Clear" Foreground="Red" Visibility="Collapsed"/>
+    </Grid>
+</UserControl>

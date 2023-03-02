@@ -61,10 +61,12 @@ namespace Data
         {
             get
             {
-                if(string.IsNullOrEmpty(_mediaElementUserAgent))
-                    _mediaElementUserAgent= BuilderMediaElementUserAgent();
+                //if(string.IsNullOrEmpty(_mediaElementUserAgent))
+                //    _mediaElementUserAgent= BuilderMediaElementUserAgent();
 
-                return _mediaElementUserAgent;
+                //return _mediaElementUserAgent;
+                return "NSPlayer/12.00.22621.1105 WMFSDK/12.00.22621.1105";
+
             }
         }
 

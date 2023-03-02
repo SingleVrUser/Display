@@ -7,7 +7,7 @@
       xmlns:local="using:Display.ContentsPage.DatumList.VideoDisplay"
       xmlns:data="using:Data"
       xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-      xmlns:control="using:Display.Control"
+      xmlns:customcontrols="using:Display.Controls"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       mc:Ignorable="d">
@@ -224,7 +224,7 @@
                                             <TextBlock Text="{x:Bind truename}"
                                                        IsTextSelectionEnabled="True" />
                                             <TextBlock Text="{x:Bind releasetime}" />
-                                            <control:TextBlockWithLongText StringValue="{x:Bind actor}" />
+                                            <customcontrols:TextBlockWithLongText StringValue="{x:Bind actor}" />
                                         </StackPanel>
 
                                         <StackPanel Orientation="Horizontal"

@@ -6,8 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:data="using:Data"
-    xmlns:controls="using:Display.Control"
-    xmlns:control="using:CommunityToolkit.WinUI.UI.Controls"
+      xmlns:customcontrols="using:Display.Controls"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d">
     <Page.Resources>
         <DataTemplate x:DataType="data:ThumbnailInfo" x:Key="ThumbnialInfoDataTemplate">
@@ -23,7 +23,7 @@
 
                 <TextBlock Grid.Row="1" HorizontalAlignment="Right"/>
 
-                <controls:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
+                <customcontrols:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
             </Grid>
         </DataTemplate>
     </Page.Resources>
@@ -103,7 +103,7 @@
             <CheckBox x:Name="selectedCheckBox" Content="共选 0 项" CornerRadius="10" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
         </RelativePanel>
 
-        <control:AdaptiveGridView
+        <controls:AdaptiveGridView
             Loaded="BasicGridView_Loaded"
             Grid.Row="2"
             x:Name="BasicGridView"
@@ -115,7 +115,7 @@
             SelectionChanged="BasicGridView_SelectionChanged"
             ItemsSource="{x:Bind thumbnailInfo}"
             ItemTemplate="{StaticResource ThumbnialInfoDataTemplate}">
-        </control:AdaptiveGridView>
+        </controls:AdaptiveGridView>
 
         <!--<ProgressBar x:Name="TotalProgressBar" VerticalAlignment="Top" Visibility="Collapsed"/>-->
     </Grid>
