@@ -1,5 +1,6 @@
 ﻿using Data;
 using Display.Control;
+using Display.Helper;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -53,7 +54,7 @@ namespace Display.Views
 
             if (string.IsNullOrEmpty(pickCode)) return;
 
-            await Views.DetailInfoPage.PlayeVideo(pickCode, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.fail);
+            await PlayeVideoHelper.PlayeVideo(pickCode, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.fail);
         }
 
         /// <summary>
@@ -95,7 +96,7 @@ namespace Display.Views
             {
                 _storeditem = videoInfo;
 
-                await Views.DetailInfoPage.PlayeVideo(videoInfoList[0].pc, this.XamlRoot, trueName: videoInfo.truename, lastPage: this);
+                await PlayeVideoHelper.PlayeVideo(videoInfoList[0].pc, this.XamlRoot, trueName: videoInfo.truename, lastPage: this);
                 ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             }
 
@@ -129,7 +130,7 @@ namespace Display.Views
             if (sender is not ListView listView) return;
             if (listView.DataContext is not string trueName) return;
 
-            await Views.DetailInfoPage.PlayeVideo(SingleVideoInfo.pc, this.XamlRoot, trueName:trueName, lastPage: this);
+            await PlayeVideoHelper.PlayeVideo(SingleVideoInfo.pc, this.XamlRoot, trueName:trueName, lastPage: this);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)

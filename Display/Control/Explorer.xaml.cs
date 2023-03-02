@@ -44,7 +44,12 @@ namespace Display.Control
         }
 
 
-        //获取Cid所有的文件（文件和文件夹）
+        /// <summary>
+        /// 获取当前Cid下的文件（文件和文件夹，一层）
+        /// </summary>
+        /// <param name="folderCid"></param>
+        /// <param name="outType"></param>
+        /// <returns></returns>
         public List<Datum> GetFilesFromItems(string folderCid, FilesInfo.FileType outType)
         {
             List<Datum> items;
@@ -71,7 +76,6 @@ namespace Display.Control
 
             if(outType == FilesInfo.FileType.Folder)
             {
-
                 var itamsdfs = items.Where(x => string.IsNullOrEmpty(x.fid));
                 items = items.Where(x => string.IsNullOrEmpty(x.fid)).ToList();
             }

@@ -1027,14 +1027,14 @@
                               SelectionChanged="ShowType_RadioButtons_SelectionChanged"
                               Visibility="{x:Bind IsShowSucAndFailSwitchButton}">
                     <RadioButton x:Name="SuccessData_RadioButton"
-                                 Content="&#xEC61;"
+                                 Content="&#xE930;"
                                  FontSize="20"
                                  HorizontalContentAlignment="Center"
                                  FontFamily="Segoe Fluent Icons"
                                  Style="{StaticResource RadioButtonCustomizeStyle}"
                                  ToolTipService.ToolTip="匹配成功" />
                     <RadioButton x:Name="FailData_RadioButton"
-                                 Content="&#xEB90;"
+                                 Content="&#xEA39;"
                                  FontSize="20"
                                  FontFamily="Segoe Fluent Icons"
                                  HorizontalContentAlignment="Center"
