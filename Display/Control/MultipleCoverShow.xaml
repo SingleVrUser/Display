@@ -72,8 +72,8 @@
                                   VerticalAlignment="Center"
                                   Source="{Binding imagepath}"
                                   Stretch="Uniform">
-                                <Image.ContextFlyout>
-                                    <!--右键操作-->
+                                <!--<Image.ContextFlyout>
+                                    --><!--右键操作--><!--
                                     <MenuFlyout>
                                         <MenuFlyoutItem Text="移出" IsEnabled="False">
                                             <MenuFlyoutItem.Icon>
@@ -81,7 +81,7 @@
                                             </MenuFlyoutItem.Icon>
                                         </MenuFlyoutItem>
                                     </MenuFlyout>
-                                </Image.ContextFlyout>
+                                </Image.ContextFlyout>-->
                             </Image>
                         </Grid>
 

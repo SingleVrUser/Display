@@ -52,22 +52,128 @@
             <Setter Property="TextWrapping"
                     Value="Wrap" />
         </Style>
+
+        <DataTemplate x:Key="FolderDataTemplate" x:DataType="x:String">
+            <Grid ColumnSpacing="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.ContextFlyout>
+                    <!--右键操作-->
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="删除">
+                            <MenuFlyoutItem.Icon>
+                                <SymbolIcon Symbol="Delete" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </Grid.ContextFlyout>
+
+                <ToolTipService.ToolTip>
+                    <TextBlock  Text="{x:Bind}" />
+                </ToolTipService.ToolTip>
+
+                <Image Width="30"
+                       Height="30">
+                    <Image.Source>
+                        <SvgImageSource UriSource="/Assets/115/file_type/folder/folder.svg"
+                                        RasterizePixelWidth="35"
+                                        RasterizePixelHeight="30" />
+                    </Image.Source>
+                </Image>
+
+                <TextBlock Grid.Column="1"
+                           Text="{x:Bind}"
+                           TextTrimming="CharacterEllipsis"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Left" />
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="FetchingSourceTemplate"
+                      x:DataType="x:String">
+            <Grid Padding="10,10,10,0">
+                <TextBlock Text="{x:Bind}" />
+            </Grid>
+        </DataTemplate>
+
+        <Style TargetType="TextBlock" x:Key="TitleTextBlockStyle">
+            <Setter Property="HorizontalAlignment"
+                    Value="Right" />
+            <Setter Property="Foreground"
+                    Value="Gray" />
+        </Style>
     </Page.Resources>
 
-    <Grid Padding="20">
+    <Grid Padding="20,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
+
+        <Grid>
+            <Button HorizontalAlignment="Left"
+                    Content="返回" />
+            <TextBlock Text="搜刮源和类型 > 整理规则"/>
+            <Button HorizontalAlignment="Right" Content="下一步"/>
+        </Grid>
+
         <StackPanel Spacing="10"
                     Orientation="Horizontal"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Center">
-            <Grid Style="{StaticResource BaseGrid}">
-                <TextBlock Text="需要归档整理的文件夹或文件" />
-            </Grid>
+                    Grid.Row="1">
 
+            <StackPanel>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="18+"
+                               Style="{StaticResource TitleTextBlockStyle}" />
+
+                    <GridView SelectionMode="Multiple"
+                              Grid.Row="1"
+                              ItemTemplate="{StaticResource FetchingSourceTemplate}">
+
+                        <x:String>douban</x:String>
+                        <x:String>tvmb</x:String>
+                    </GridView>
+                    <ListView Grid.Row="2"
+                              ItemsSource="{x:Bind folders}"
+                              ItemTemplate="{StaticResource FolderDataTemplate}" />
+                </Grid>
+                
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="影视资源"
+                               Style="{StaticResource TitleTextBlockStyle}" />
+
+                    <GridView SelectionMode="Multiple"
+                              Grid.Row="1"
+                              ItemTemplate="{StaticResource FetchingSourceTemplate}">
+
+                        <x:String>JavaBus</x:String>
+                        <x:String>JavLib</x:String>
+                        <x:String>Javbus</x:String>
+                        <x:String>AvMoo</x:String>
+                        <x:String>Libdrm</x:String>
+                    </GridView>
+                    <ListView Grid.Row="2"
+                              ItemsSource="{x:Bind folders}"
+                              ItemTemplate="{StaticResource FolderDataTemplate}" />
+                </Grid>
+
+
+            </StackPanel>
+ 
             <StackPanel Style="{StaticResource BaseStackPanel}">
 
                 <StackPanel Style="{StaticResource BaseStackPanel}">
@@ -195,9 +301,6 @@
             
         </StackPanel>
 
-        <StackPanel Grid.Row="1">
-            <TextBlock Text="结果"/>
-        </StackPanel>
 
     </Grid>
 </Page>

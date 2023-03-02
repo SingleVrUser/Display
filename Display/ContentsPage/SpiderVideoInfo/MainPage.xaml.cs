@@ -1,7 +1,9 @@
 ﻿using Data;
+using Display.Helper;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -117,8 +119,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
         if (FailList == null || FailList.Count == 0)
         {
-            SelectNull_TeachintTip.Subtitle = "当前没有需要搜刮的内容";
-            SelectNull_TeachintTip.IsOpen = true;
+            ShowTeachingTip("当前没有需要搜刮的内容");
             return;
         }
 
@@ -126,14 +127,20 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
 
         if (failDatums.Count == 0)
         {
-            SelectNull_TeachintTip.Subtitle = "未填写任何番号，请填写后继续";
-            SelectNull_TeachintTip.IsOpen = true;
+            ShowTeachingTip("未填写任何番号，请填写后继续");
             return;
         }
 
         //创建进度窗口
         var page = new ContentsPage.SpiderVideoInfo.Progress(failDatums);
         page.CreateWindow();
+    }
+
+    private void ShowTeachingTip(string content, FrameworkElement target =null)
+    {
+        SelectNull_TeachingtTip.Target = target != null ? target : StartMatchName_Button;
+        SelectNull_TeachingtTip.Subtitle = content;
+        SelectNull_TeachingtTip.IsOpen = true;
     }
 
     /// <summary>
@@ -144,51 +151,39 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
         //检查是否有选中文件
         if (Explorer.FolderTreeView.SelectedNodes.Count == 0)
         {
-            SelectNull_TeachintTip.Subtitle = "没有选择文件夹，请选择后继续";
-            SelectNull_TeachintTip.IsOpen = true;
+            ShowTeachingTip("没有选择文件夹，请选择后继续");
             return;
         }
 
         //获取需要搜刮的文件
-        List<Datum> datumList = new();
-        List<string> folderNameList = new();
-        foreach (var node in Explorer.FolderTreeView.SelectedNodes)
-        {
-            var explorer = node.Content as ExplorerItem;
-
-            if (explorer == null) continue;
-
-            //文件夹
-            folderNameList.Add(explorer.Name);
-
-            //文件夹下的文件
-            var items = Explorer.GetFilesFromItems(explorer.Cid, FilesInfo.FileType.File);
-
-            datumList.AddRange(items);
-        }
+        var tuple = GetCurrentSelectedFolder();
+        var folderNameList = tuple.Item1;
+        var datumList = tuple.Item2;
 
         //创建进度窗口
         var page = new ContentsPage.SpiderVideoInfo.Progress(folderNameList, datumList);
         page.CreateWindow();
     }
 
-    /// <summary>
-    /// 切换“本地数据库”或“匹配失败”显示
-    /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
-    private void RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private Tuple<List<string>, List<Datum>> GetCurrentSelectedFolder()
     {
-        //if (e.AddedItems.Count == 0) return;
+        List<string> folderNameList = new();
+        List<Datum> datumList = new();
+        foreach (var node in Explorer.FolderTreeView.SelectedNodes)
+        {
+            if (node.Content is not ExplorerItem explorer) continue;
 
-        //if (e.AddedItems[0] is RadioButton radioButton)
-        //{
-        //    if (radioButton.Name == nameof(matchFail_RadioButton))
-        //    {
-        //    }
-        //}
+            //文件夹
+            folderNameList.Add(explorer.Name);
+
+            //文件夹下的文件和文件夹
+            var items = Explorer.GetFilesFromItems(explorer.Cid, FilesInfo.FileType.File);
+
+            datumList.AddRange(items);
+        }
+
+        return new Tuple<List<string>, List<Datum>>(folderNameList, datumList);
     }
-
 
     /// <summary>
     /// 点击显示文件信息
@@ -242,7 +237,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
 
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
 
-        await Views.DetailInfoPage.PlayeVideo(SelectedDatum.pc, this.XamlRoot, trueName: FileMatch.MatchName(SelectedDatum.n).ToUpper(),lastPage: this);
+        await PlayeVideoHelper.PlayeVideo(SelectedDatum.pc, this.XamlRoot, trueName: FileMatch.MatchName(SelectedDatum.n).ToUpper(),lastPage: this);
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
     }
 
@@ -310,8 +305,25 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
 
     private void Sort115Button_Click(object sender, RoutedEventArgs e)
     {
-        Sort115.MainPage Page = new();
+        //检查是否有选中文件
+        if (Explorer.FolderTreeView.SelectedNodes.Count == 0)
+        {
+            ShowTeachingTip("没有选择文件夹，请选择后继续", Sort115Button);
+            return;
+        }
 
+        //获取需要整理的文件
+        List<string> folderNameList = new();
+        foreach (var node in Explorer.FolderTreeView.SelectedNodes)
+        {
+            if (node.Content is not ExplorerItem explorer) continue;
+
+            //文件夹
+            folderNameList.Add(explorer.Name);
+        }
+
+        //创建新窗口
+        Sort115.MainPage Page = new(folderNameList);
         Page.CreateWindow();
     }
 }

@@ -27,9 +27,13 @@ namespace Display.ContentsPage.Sort115;
 /// </summary>
 public sealed partial class MainPage : Page
 {
-    public MainPage()
+    private List<string> folders;
+
+    public MainPage(List<string> folders)
     {
         this.InitializeComponent();
+
+        this.folders = folders;
     }
 
     public void CreateWindow()

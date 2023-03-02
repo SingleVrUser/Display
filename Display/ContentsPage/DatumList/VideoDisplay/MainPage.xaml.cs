@@ -660,13 +660,12 @@ public sealed partial class MainPage : Page
 
         if (e.DataView.Properties.Values.FirstOrDefault() is not List<Data.FilesInfo> filesInfos) return;
 
-        //List<FilesInfo> filesInfo = new();
-
         FilesInfos.Clear();
         foreach (var info in filesInfos)
         {
-            if (info.Type == FilesInfo.FileType.File && info.datum.iv == 1)
-                FilesInfos.Add(info);
+            //if (info.Type == FilesInfo.FileType.File && info.datum.iv == 1)
+
+            FilesInfos.Add(info);
         }
 
         TryPlayVideoFromSelectedFiles(FilesInfos.ToList());

@@ -6,6 +6,7 @@ using CommunityToolkit.WinUI.UI.Controls;
 using Data;
 using Display.ContentsPage.Import115DataToLocalDataAccess;
 using Display.Control;
+using Display.Helper;
 using Display.Model;
 using Microsoft.UI;
 using Microsoft.UI.Text;
@@ -13,6 +14,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Media;
+using Newtonsoft.Json.Linq;
 using Org.BouncyCastle.Asn1.Cms;
 using System;
 using System.Collections;
@@ -24,6 +26,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Windows.ApplicationModel.DataTransfer;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -87,20 +90,19 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
     /// <param Name="e"></param>
     private void Grid_loaded(object sender, RoutedEventArgs e)
     {
-        ProgressRing.IsActive = true;
+
+        MyProgressBar.Visibility = Visibility.Visible;
 
         filesInfos = new("0");
         BaseExample.ItemsSource = filesInfos;
         metadataControl.Items = _units;
         filesInfos.GetFileInfoCompleted += FilesInfos_GetFileInfoCompleted;
-
-        ProgressRing.IsActive = false;
-
     }
 
     private void FilesInfos_GetFileInfoCompleted(object sender, GetFileInfoCompletedEventArgs e)
     {
         ChangedOrderIcon(e.orderby, e.asc);
+        MyProgressBar.Visibility = Visibility.Collapsed;
     }
 
     private RelayCommand<string> _openFolderCommand;
@@ -131,8 +133,8 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
     private void OpenFolder_Tapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
     {
-        if (!(sender is Grid grid)) return;
-        if (!(grid.DataContext is FilesInfo filesInfo)) return;
+        if (sender is not Grid grid) return;
+        if (grid.DataContext is not FilesInfo filesInfo) return;
 
 
         ChangedFolder(filesInfo);
@@ -788,6 +790,15 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
     }
 
+    private async void PlayVideoButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem item) return;
+
+        if (item.DataContext is not FilesInfo info) return;
+
+        await PlayeVideoHelper.PlayeVideo(info.datum.pc, this.XamlRoot, trueName: info.Name, lastPage: this);
+    }
+
 }
 
 class TransferStationFiles
@@ -808,6 +819,6 @@ class TransferStationFiles
 
         this.TransferFiles = transferFiles;
 
-
     }
+
 }

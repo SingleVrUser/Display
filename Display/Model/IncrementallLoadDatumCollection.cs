@@ -2,6 +2,8 @@
 using Microsoft.UI.Xaml.Data;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.Foundation;
 
@@ -13,7 +15,22 @@ public class IncrementallLoadDatumCollection : ObservableCollection<FilesInfo>, 
 
     public bool HasMoreItems { get; private set; } = true;
 
-    public int AllCount { get;private set; }
+    private int _allCount;
+    public int AllCount
+    {
+        get
+        {
+            return this._allCount;
+        }
+        private set
+        {
+            if (this._allCount == value) return;
+
+            this._allCount = value;
+
+            OnPropertyChanged(new PropertyChangedEventArgs(nameof(AllCount)));
+        }    
+    }
 
     public WebApi.OrderBy orderby { get;private set; } = WebApi.OrderBy.user_ptime;
 
@@ -55,10 +72,9 @@ public class IncrementallLoadDatumCollection : ObservableCollection<FilesInfo>, 
     public async Task<int> LoadData(int limit = 40,int offset=0)
     {
         var FilesInfo = await GetFilesInfoAsync(limit,offset);
-
         if (AllCount!= FilesInfo.count) AllCount = FilesInfo.count;
 
-        if(FilesInfo.data == null)
+        if (FilesInfo.data == null)
         {
             HasMoreItems = false;
             return 0;
@@ -80,11 +96,12 @@ public class IncrementallLoadDatumCollection : ObservableCollection<FilesInfo>, 
     
     public async Task SetCid(string cid)
     {
-        bool isNeedLoad = Count == 0 ? true:false;
-
         this.cid = cid;
         Clear();
-        HasMoreItems = true;
+
+        //当目录为空时，HasMoreItems==True无法激活查询服务，需要手动LoadData
+        bool isNeedLoad = Count == 0;
+        HasMoreItems = !isNeedLoad;
 
         if (isNeedLoad) await LoadData();
     }
@@ -105,7 +122,7 @@ public class IncrementallLoadDatumCollection : ObservableCollection<FilesInfo>, 
     private int defaultCount = 40;
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        int getCount = await LoadData(defaultCount, Count);
+        int getCount = HasMoreItems ? await LoadData(defaultCount, Count) : 0;
 
         return new LoadMoreItemsResult
         {

@@ -103,11 +103,12 @@
                         <AppBarButton Label="开始搜刮"
                                       x:Name="StartMatchName_Button"
                                       Click="StartMatchName_ButtonClick"/>
-                        <AppBarSeparator />
                     </controls:TabbedCommandBarItem>
 
                     <controls:TabbedCommandBarItem Header="整理">
-                        <AppBarButton Label="归档整理" Click="Sort115Button_Click"/>
+                        <AppBarButton Label="归档整理"
+                                      x:Name="Sort115Button"
+                                      Click="Sort115Button_Click"/>
                         <AppBarSeparator />
                     </controls:TabbedCommandBarItem>
                 </controls:TabbedCommandBar.MenuItems>
@@ -440,8 +441,7 @@
             </Expander.Header>
         </Expander>
 
-        <TeachingTip x:Name="SelectNull_TeachintTip"
-                     Target="{x:Bind StartMatchName_Button}"
+        <TeachingTip x:Name="SelectNull_TeachingtTip"
                      PreferredPlacement="BottomLeft"
                      IsLightDismissEnabled="True" />
     </Grid>

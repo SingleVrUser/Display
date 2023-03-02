@@ -26,12 +26,8 @@ namespace Display.Control
             if (args.Reason != AutoSuggestionBoxTextChangeReason.UserInput || string.IsNullOrWhiteSpace(searchText))
                 return;
 
-            System.Diagnostics.Debug.WriteLine($"输入：{searchText}");
-
             //过滤非法元素
             searchText = searchText.Replace("'", "");
-
-            System.Diagnostics.Debug.WriteLine($"过滤非法元素后：{searchText}");
 
             var Selectedtypes = GetSelectedTypes();
 
