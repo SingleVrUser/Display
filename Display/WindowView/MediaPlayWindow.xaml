@@ -13,7 +13,7 @@
     <Grid x:Name="RootGrid">
         <Grid.RowDefinitions>
             <RowDefinition x:Name="TitleBarRowDefinition" Height="28" />
-            <RowDefinition />
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <Grid x:Name="AppTitleBar">
