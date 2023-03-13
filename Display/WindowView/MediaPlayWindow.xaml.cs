@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
-using Data;
-using Display.Controls;
 using Display.Views;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -120,13 +118,13 @@ public sealed partial class MediaPlayWindow : Window
     {
         if (appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
         {
+            this.ExtendsContentIntoTitleBar = false;
+            TitleBarRowDefinition.Height = new GridLength(0);
+
             appwindow.SetPresenter(AppWindowPresenterKind.FullScreen);
 
             //监听ESC退出
             RootGrid.KeyDown += RootGrid_KeyDown;
-
-            this.ExtendsContentIntoTitleBar = false;
-            TitleBarRowDefinition.Height = new(0);
 
             VisualStateManager.GoToState(mediaControl.mediaTransportControls, "FullWindowState", true);
         }
@@ -137,18 +135,19 @@ public sealed partial class MediaPlayWindow : Window
     /// </summary>
     private void cancelFullScreen()
     {
-        if (appwindow.Presenter.Kind == AppWindowPresenterKind.FullScreen)
-        {
-            appwindow.SetPresenter(Microsoft.UI.Windowing.AppWindowPresenterKind.Default);
+        if (appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen) return;
 
-            //取消监听
-            RootGrid.KeyDown -= RootGrid_KeyDown;
 
-            this.ExtendsContentIntoTitleBar = true;
-            TitleBarRowDefinition.Height = new(28);
+        this.ExtendsContentIntoTitleBar = true;
+        TitleBarRowDefinition.Height = new GridLength(28);
 
-            VisualStateManager.GoToState(mediaControl.mediaTransportControls, "NoFullWindowState", true);
-        }
+        appwindow.SetPresenter(Microsoft.UI.Windowing.AppWindowPresenterKind.Default);
+
+        //取消监听
+        RootGrid.KeyDown -= RootGrid_KeyDown;
+
+
+        VisualStateManager.GoToState(mediaControl.mediaTransportControls, "NoFullWindowState", true);
     }
 
     private void RootGrid_KeyDown(object sender, KeyRoutedEventArgs e)

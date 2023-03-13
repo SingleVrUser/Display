@@ -27,13 +27,13 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 {
 
     public static readonly DependencyProperty PickCodeProperty =
-        DependencyProperty.Register("PickCode", typeof(string), typeof(CustomMediaPlayerElement), null);
+        DependencyProperty.Register(nameof(PickCode), typeof(string), typeof(CustomMediaPlayerElement), null);
 
     public static readonly DependencyProperty playTypeProperty =
-        DependencyProperty.Register("playType", typeof(PlayType), typeof(CustomMediaPlayerElement), null);
+        DependencyProperty.Register(nameof(playType), typeof(PlayType), typeof(CustomMediaPlayerElement), null);
 
     public static readonly DependencyProperty TrueNameProperty =
-        DependencyProperty.Register("TrueName", typeof(string), typeof(CustomMediaPlayerElement), null);
+        DependencyProperty.Register(nameof(TrueName), typeof(string), typeof(CustomMediaPlayerElement), null);
 
     public int IsLike;
     public int LookLater;
@@ -45,20 +45,20 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
     public string TrueName
     {
-        get { return (string)GetValue(TrueNameProperty); }
-        set { SetValue(TrueNameProperty, value); }
+        get => (string)GetValue(TrueNameProperty);
+        set => SetValue(TrueNameProperty, value);
     }
 
     public string PickCode
     {
-        get { return (string)GetValue(PickCodeProperty); }
-        set { SetValue(PickCodeProperty, value); }
+        get => (string)GetValue(PickCodeProperty);
+        set => SetValue(PickCodeProperty, value);
     }
 
     public PlayType playType
     {
-        get { return (PlayType)GetValue(playTypeProperty); }
-        set { SetValue(playTypeProperty, value); }
+        get => (PlayType)GetValue(playTypeProperty);
+        set => SetValue(playTypeProperty, value);
     }
 
     Dictionary<string, string> subDicts;
@@ -127,8 +127,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
             if (failInfo != null)
             {
 
-                isLike = this.IsLike == 1 ? true : false;
-                isLookLater = this.LookLater == 0 ? false : true;
+                isLike = this.IsLike == 1;
+                isLookLater = this.LookLater != 0;
             }
             else
             {
@@ -150,8 +150,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
                 this.IsLike = videoInfo.is_like;
                 this.LookLater = Convert.ToInt32(videoInfo.look_later);
 
-                isLike = this.IsLike == 1 ? true : false;
-                isLookLater = this.LookLater == 0 ? false : true;
+                isLike = this.IsLike == 1;
+                isLookLater = this.LookLater != 0;
 
                 mediaTransportControls.SetLike_LookLater(isLike, isLookLater);
             }
