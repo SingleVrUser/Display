@@ -10,7 +10,7 @@
       xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:data="using:Data"
       xmlns:local="using:Display.ContentsPage.DatumList"
-      xmlns:control="using:Display.Control"
+      xmlns:control="using:Display.Controls"
       xmlns:converter="using:Display.Converter"
       xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
       xmlns:controls1="using:Display.Controls"
