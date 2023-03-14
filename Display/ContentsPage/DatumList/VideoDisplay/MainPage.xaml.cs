@@ -13,11 +13,13 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Media.Core;
@@ -355,13 +357,17 @@ public sealed partial class MainPage : Page
         var playbackItem = new MediaPlaybackItem(source);
         media.Source = playbackItem;
 
-        
-
         mediaPlayerElement.SetMediaPlayer(media);
         mediaPlayerElement.MediaPlayer.PlaybackSession.BufferingStarted += PlaybackSession_BufferingStarted;
+        mediaPlayerElement.MediaPlayer.MediaFailed += MediaPlayer_MediaFailed;
 
         Video_UniformGrid.Children.Add(mediaPlayerElement);
 
+    }
+
+    private void MediaPlayer_MediaFailed(MediaPlayer sender, MediaPlayerFailedEventArgs args)
+    {
+        Debug.WriteLine("MediaFailed");
     }
 
     private void PlaybackSession_BufferingStarted(MediaPlaybackSession sender, object args)
@@ -407,27 +413,24 @@ public sealed partial class MainPage : Page
     {
         FindCidInfo_ProgressRing.Visibility = Visibility.Visible;
 
-        Dictionary<string, VideoInfo> cidInfoDicts = new();
-
-        string noPicturePath = Data.Const.NoPictruePath;
+        var noPicturePath = Data.Const.NoPictruePath;
 
         //搜刮
         foreach (var video in filesInfos)
         {
+            VideoInfo cidInfo = null;
+
             var name = video.Name;
             var cid = FileMatch.MatchName(name);
             if (cid == null)
             {
-                cidInfoDicts.Add(name, new() { truename = name, imagepath = noPicturePath });
+                cidInfo = new VideoInfo { truename = name, imagepath = noPicturePath };
+                CidInfos.Add(cidInfo);
                 continue;
             }
 
-            //已存在，跳过
-            if (cidInfoDicts.ContainsKey(name) == true) continue;
+            var result = DataAccess.SelectTrueName(cid);
 
-            var result = DataAccess.SelectTrueName(name);
-
-            VideoInfo cidInfo = null;
             //数据库中有
             if (result.Count != 0)
             {
@@ -442,8 +445,7 @@ public sealed partial class MainPage : Page
                 cidInfo = await spiderManager.DispatchSpiderInfoByCIDInOrder(cid);
             }
 
-            if (cidInfo == null) cidInfo = new() { truename = cid, imagepath = noPicturePath };
-
+            cidInfo ??= new VideoInfo { truename = cid, imagepath = noPicturePath };
             CidInfos.Add(cidInfo);
 
         }
@@ -581,11 +583,11 @@ public sealed partial class MainPage : Page
 
     private void RemovePlayingVideo(String pc)
     {
-        var media = Video_UniformGrid.Children.Where(item => (item as MediaPlayerElement).Tag.ToString() == pc).FirstOrDefault();
-        if (media != null)
-        {
-            Video_UniformGrid.Children.Remove(media);
-        }
+        var media = Video_UniformGrid.Children.FirstOrDefault(item => (item as MediaPlayerElement)?.Tag.ToString() == pc);
+        if (media == null || media is not MediaPlayerElement mediaPlayerElement) return;
+
+        mediaPlayerElement.MediaPlayer.Dispose();
+        Video_UniformGrid.Children.Remove(mediaPlayerElement);
 
     }
 
