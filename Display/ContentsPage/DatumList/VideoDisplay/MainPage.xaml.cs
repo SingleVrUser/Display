@@ -13,13 +13,11 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
-using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Media.Core;
@@ -574,10 +572,11 @@ public sealed partial class MainPage : Page
     private void RemoveCidInfo(FilesInfo fileInfo)
     {
         //移除cid信息（预览图/信息）
-        var removeCids = CidInfos.Where(item => item.truename == FileMatch.MatchName(fileInfo.Name).ToUpper()).ToList();
-        foreach (var cid in removeCids)
+        var removeCid = CidInfos.FirstOrDefault(item => item.truename == FileMatch.MatchName(fileInfo.Name).ToUpper());
+
+        if (removeCid != null)
         {
-            CidInfos.Remove(cid);
+            CidInfos.Remove(removeCid);
         }
     }
 
@@ -701,8 +700,8 @@ public sealed partial class MainPage : Page
 
     private void EnlargeButton_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        if (sender is not Button button) return;
-        if (button.DataContext is not VideoInfo videoInfo) return;
+        if (sender is not Button { DataContext: VideoInfo videoInfo }) return;
+
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
 
         SmokeGrid.Visibility = Visibility.Visible;
@@ -716,6 +715,25 @@ public sealed partial class MainPage : Page
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
 
         SmokeGrid.Visibility = Visibility.Collapsed;
+    }
+
+
+    private void CidInfoUserControlPointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        if (e.Pointer.PointerDeviceType is PointerDeviceType.Mouse or PointerDeviceType.Pen)
+        {
+            VisualStateManager.GoToState(sender as Control, "EnlargeButtonShown", true);
+        }
+
+
+    }
+
+    private void CidInfoUserControlPointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        if (e.Pointer.PointerDeviceType is PointerDeviceType.Mouse or PointerDeviceType.Pen)
+        {
+            VisualStateManager.GoToState(sender as Control, "EnlargeButtonHidden", true);
+        }
     }
 
 
