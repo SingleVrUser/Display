@@ -41,9 +41,10 @@
 
         <Grid Grid.Row="1" x:Name="VideoPlayGrid">
             <customcontrols:CustomMediaPlayerElement x:Name="mediaControl"
-                                                     PickCode="{x:Bind PickCode}"
-                                                     playType="{x:Bind PlayType}"
-                                                     TrueName="{x:Bind TrueName}"
+                                                     PickCode="{x:Bind _pickCode}"
+                                                     playType="{x:Bind _playType}"
+                                                     TrueName="{x:Bind _trueName}"
+                                                     SubInfo="{x:Bind _subInfo}"
                                                      FullWindow="mediaControls_FullWindow"
                                                      MediaDoubleTapped="mediaControl_MediaDoubleTapped"/>
 

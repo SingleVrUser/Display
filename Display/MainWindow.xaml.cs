@@ -279,7 +279,7 @@ namespace Display
                 //选中的是失败项
                 if(nowItem.series == "fail")
                 {
-                    await PlayeVideoHelper.PlayeVideo(nowItem.busurl, ((Page)ContentFrame.Content).XamlRoot);
+                    await PlayVideoHelper.PlayVideo(nowItem.busurl, ((Page)ContentFrame.Content).XamlRoot);
                 }
                 //正常点击
                 else

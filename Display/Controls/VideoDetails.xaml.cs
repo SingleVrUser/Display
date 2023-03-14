@@ -1,10 +1,10 @@
 ﻿using Data;
 using Display.ContentsPage.DetailInfo;
 using Microsoft.UI.Input;
-using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
@@ -16,10 +16,6 @@ using System.Threading.Tasks;
 using Windows.Foundation.Metadata;
 using Windows.Storage;
 using Windows.Storage.Streams;
-using Windows.UI;
-using Microsoft.UI;
-using Microsoft.UI.Xaml.Media;
-using Color = System.Drawing.Color;
 using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -76,11 +72,15 @@ namespace Display.Controls
             var categoryList = resultinfo.category?.Split(",");
             for (var i = 0; i < categoryList?.Length; i++)
             {
+                var content = categoryList[i];
+
+                if(string.IsNullOrEmpty(content)) continue;
+
                 // 定义button
                 var button = new Button()
                 {
                     FontFamily = new FontFamily("霞鹜文楷"),
-                    Content = categoryList[i],
+                    Content = content,
                     BorderThickness = new Thickness(0),
                     Background = Application.Current.Resources["ButtonEmphasizeBackground"] as SolidColorBrush,
                     

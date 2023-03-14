@@ -172,13 +172,18 @@
             </StackPanel>
         </RelativePanel>-->
 
-        <Grid>
+        <Grid Grid.Row="0">
+
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
 
             <CommandBar Grid.Column="1">
+                <CommandBar.Transitions>
+                    <EdgeUIThemeTransition Edge="Right" />
+                </CommandBar.Transitions>
+
                 <AppBarButton Icon="Play"
                               Label="播放"
                               Click="PlayButton_Click" />
@@ -225,28 +230,22 @@
 
             <controls:MetadataControl Margin="10,5"
                                       Grid.Row="1"
+                                      Grid.Column="0"
                                       x:Name="metadataControl"
                                       Separator=" > "
                                       HorizontalAlignment="Left"
-                                      VerticalAlignment="Bottom"/>
+                                      VerticalAlignment="Bottom">
+                <controls:MetadataControl.Transitions>
+                    <EdgeUIThemeTransition Edge="Bottom"/>
+                </controls:MetadataControl.Transitions>
+            </controls:MetadataControl>
 
-            <TeachingTip x:Name="SelectedNull_TeachingTip"
+            <TeachingTip Grid.Column="0" x:Name="SelectedNull_TeachingTip"
                          Target="{x:Bind ImportDataButton}"
                          IsLightDismissEnabled="True"
                          Foreground="{ThemeResource TextBoxButtonForegroundThemeBrush}"
                          Subtitle="当前未选中文件夹，请选中后继续" />
-
-            <!--<Button Style="{StaticResource DateTimePickerFlyoutLoopingSelectorNavigationButtonStyle}"
-                    Content="导入设置"
-                    RelativePanel.AlignRightWithPanel="True"
-                    RelativePanel.AlignVerticalCenterWithPanel="True"
-                    Visibility="Collapsed">
-                <Button.Flyout>
-
-                </Button.Flyout>
-            </Button>-->
         </Grid>
-
 
         <ListView x:Name="BaseExample"
                       Grid.Row="1"

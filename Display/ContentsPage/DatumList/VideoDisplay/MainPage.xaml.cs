@@ -16,10 +16,12 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Media.Core;
+using Windows.Media.Playback;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -173,7 +175,7 @@ public sealed partial class MainPage : Page
 
     public void CreateWindow()
     {
-        CommonWindow window = new CommonWindow("播放");
+        var window = new CommonWindow("播放");
 
         window.Closed += Window_Closed;
         window.Content = this;
@@ -190,7 +192,8 @@ public sealed partial class MainPage : Page
         foreach (var child in Video_UniformGrid.Children)
         {
             var videoControl = child as MediaPlayerElement;
-            videoControl.SetMediaPlayer(null);
+            //videoControl?.SetMediaPlayer(null);
+            videoControl?.MediaPlayer.Dispose();
         }
         Video_UniformGrid.Children.Clear();
     }
@@ -198,8 +201,7 @@ public sealed partial class MainPage : Page
 
     private void OpenFolder_Tapped(object sender, DoubleTappedRoutedEventArgs e)
     {
-        if (!(sender is Grid grid)) return;
-        if (!(grid.DataContext is FilesInfo filesInfo)) return;
+        if (sender is not Grid { DataContext: FilesInfo filesInfo }) return;
 
 
         ChangedFolder(filesInfo);
@@ -207,8 +209,7 @@ public sealed partial class MainPage : Page
 
     private void TextBlock_Tapped(object sender, TappedRoutedEventArgs e)
     {
-        if (!(sender is TextBlock textBlock)) return;
-        if (!(textBlock.DataContext is FilesInfo filesInfo)) return;
+        if (sender is not TextBlock { DataContext: FilesInfo filesInfo }) return;
 
         ChangedFolder(filesInfo);
     }
@@ -244,7 +245,7 @@ public sealed partial class MainPage : Page
     private void PlayVideoButton_Click(object sender, RoutedEventArgs e)
     {
         //检查选中的文件或文件夹
-        if (!(VideoShow_ListView.SelectedItems.FirstOrDefault() is FilesInfo)) return;
+        if (VideoShow_ListView.SelectedItems.FirstOrDefault() is not FilesInfo) return;
 
         List<FilesInfo> filesInfo = new();
         foreach (var item in VideoShow_ListView.SelectedItems)
@@ -283,7 +284,7 @@ public sealed partial class MainPage : Page
     private async Task AddMediaElement(FilesInfo file)
     {
         string videoUrl = null;
-        string pickCode = file.datum.pc;
+        var pickCode = file.datum.pc;
 
         //转码成功，可以用m3u8
         if (file.datum.vdi != 0)
@@ -311,7 +312,6 @@ public sealed partial class MainPage : Page
         if (videoUrl == null) return;
 
         //MenuFlyout menuFlyout = this.Resources["MediaContentFlyout"] as MenuFlyout;
-
         MenuFlyout menuFlyout = new();
 
         var MenuFlyoutItemDeletedFromList = new MenuFlyoutItem()
@@ -334,14 +334,49 @@ public sealed partial class MainPage : Page
         menuFlyout.Items.Add(MenuFlyoutItemDeletedFromList);
         menuFlyout.Items.Add(MenuFlyoutItemDeletedFrom115);
 
-        Video_UniformGrid.Children.Add(
-            new MediaPlayerElement()
-            {
-                Source = MediaSource.CreateFromUri(new Uri(videoUrl)),
-                ContextFlyout = menuFlyout,
-                Tag = file.datum.pc
-            });
+        var source = MediaSource.CreateFromUri(new Uri(videoUrl));
+        //var mediaPlayerElement = new MediaPlayerElement()
+        //{
+        //    Source = source,
+        //    ContextFlyout = menuFlyout,
+        //    Tag = file.datum.pc
+        //};
 
+        var mediaPlayerElement = new MediaPlayerElement()
+        {
+            ContextFlyout = menuFlyout,
+            Tag = file.datum.pc
+        };
+
+        var media = new MediaPlayer();
+        media.SeekCompleted += MediaPlayer_SeekCompleted;
+        media.BufferingStarted += MediaPlayer_BufferingStarted;
+
+        var playbackItem = new MediaPlaybackItem(source);
+        media.Source = playbackItem;
+
+        
+
+        mediaPlayerElement.SetMediaPlayer(media);
+        mediaPlayerElement.MediaPlayer.PlaybackSession.BufferingStarted += PlaybackSession_BufferingStarted;
+
+        Video_UniformGrid.Children.Add(mediaPlayerElement);
+
+    }
+
+    private void PlaybackSession_BufferingStarted(MediaPlaybackSession sender, object args)
+    {
+        Debug.WriteLine("Buffering Started");
+    }
+
+    private void MediaPlayer_BufferingStarted(Windows.Media.Playback.MediaPlayer sender, object args)
+    {
+        Debug.WriteLine("Buffering Started");
+    }
+
+    private void MediaPlayer_SeekCompleted(Windows.Media.Playback.MediaPlayer sender, object args)
+    {
+        Debug.WriteLine("Seek Completed");
     }
 
     private async void tryPlayVideos(List<FilesInfo> filesInfo)
@@ -363,7 +398,6 @@ public sealed partial class MainPage : Page
         VideoPlay_Pivot.SelectedIndex = 1;
 
         // 搜索影片信息
-
         CidInfos.Clear();
         await FindAndShowInfosFromInternet(PlayingVideoInfos.ToList());
 
@@ -591,22 +625,20 @@ public sealed partial class MainPage : Page
 
             filesInfo.ForEach(item => filesInfos.Remove(item));
 
-            await webApi.DeleteFiles(filesInfo.FirstOrDefault().datum.pid, filesInfo.Select(item => item.Fid).ToList());
+            await webApi.DeleteFiles(filesInfo.FirstOrDefault()?.datum.pid, filesInfo.Select(item => item.Fid).ToList());
         }
     }
+    
 
-
-    private void InfoGridVisiableButton_Click(object sender, RoutedEventArgs e)
+    private void InfoGridVisibilityButton_Click(object sender, RoutedEventArgs e)
     {
         switch (InfoGrid.Visibility)
         {
             case Visibility.Visible:
-                InfoGrid.Visibility = Visibility.Collapsed;
-                InfoGridVisiableButton.Content = "\uF743";
+                VisualStateManager.GoToState(this, "InfoGridCollapsed", true);
                 break;
             case Visibility.Collapsed:
-                InfoGrid.Visibility = Visibility.Visible;
-                InfoGridVisiableButton.Content = "\uF745";
+                VisualStateManager.GoToState(this, "InfoGridVisible", true);
                 break;
         }
     }

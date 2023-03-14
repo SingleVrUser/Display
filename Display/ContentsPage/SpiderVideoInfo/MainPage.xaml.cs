@@ -237,7 +237,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
 
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
 
-        await PlayeVideoHelper.PlayeVideo(SelectedDatum.pc, this.XamlRoot, trueName: FileMatch.MatchName(SelectedDatum.n).ToUpper(),lastPage: this);
+        await PlayVideoHelper.PlayVideo(SelectedDatum.pc, this.XamlRoot, trueName: FileMatch.MatchName(SelectedDatum.n).ToUpper(),lastPage: this);
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
     }
 

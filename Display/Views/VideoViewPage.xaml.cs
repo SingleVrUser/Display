@@ -54,7 +54,7 @@ namespace Display.Views
 
             if (string.IsNullOrEmpty(pickCode)) return;
 
-            await PlayeVideoHelper.PlayeVideo(pickCode, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.fail);
+            await PlayVideoHelper.PlayVideo(pickCode, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.fail);
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace Display.Views
             {
                 _storeditem = videoInfo;
 
-                await PlayeVideoHelper.PlayeVideo(videoInfoList[0].pc, this.XamlRoot, trueName: videoInfo.truename, lastPage: this);
+                await PlayVideoHelper.PlayVideo(videoInfoList[0].pc, this.XamlRoot, trueName: videoInfo.truename, lastPage: this);
                 ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             }
 
@@ -130,7 +130,7 @@ namespace Display.Views
             if (sender is not ListView listView) return;
             if (listView.DataContext is not string trueName) return;
 
-            await PlayeVideoHelper.PlayeVideo(SingleVideoInfo.pc, this.XamlRoot, trueName:trueName, lastPage: this);
+            await PlayVideoHelper.PlayVideo(SingleVideoInfo.pc, this.XamlRoot, trueName:trueName, lastPage: this);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)

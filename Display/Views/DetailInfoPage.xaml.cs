@@ -162,7 +162,7 @@ namespace Display.Views
             else if (videoInfoList.Count == 1)
             {
 
-                await PlayeVideoHelper.PlayeVideo(videoInfoList[0].pc, this.XamlRoot, trueName: name, lastPage: this);
+                await PlayVideoHelper.PlayVideo(videoInfoList[0].pc, this.XamlRoot, trueName: name, lastPage: this);
             }
 
             //有多集
@@ -195,7 +195,7 @@ namespace Display.Views
             if (sender is not ListView listView) return;
             if (listView.DataContext is not string trueName) return;
 
-            await PlayeVideoHelper.PlayeVideo(SingleVideoInfo.pc,this.XamlRoot, trueName: trueName, lastPage: this);
+            await PlayVideoHelper.PlayVideo(SingleVideoInfo.pc,this.XamlRoot, trueName: trueName, lastPage: this);
         }
 
 
@@ -266,7 +266,7 @@ namespace Display.Views
             //一集
             else if (videoInfoList.Count == 1)
             {
-                await PlayeVideoHelper.PlayeVideo(videoInfoList[0].pc, this.XamlRoot, trueName: name, lastPage: this);
+                await PlayVideoHelper.PlayVideo(videoInfoList[0].pc, this.XamlRoot, trueName: name, lastPage: this);
             }
 
             //有多集

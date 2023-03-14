@@ -6,13 +6,16 @@ using Microsoft.Graphics.Canvas;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.UserDataTasks;
+using Windows.Foundation;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
@@ -34,6 +37,11 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
     public static readonly DependencyProperty TrueNameProperty =
         DependencyProperty.Register(nameof(TrueName), typeof(string), typeof(CustomMediaPlayerElement), null);
+
+    public static readonly DependencyProperty SubInfoProperty =
+        DependencyProperty.Register(nameof(SubInfo), typeof(SubInfo), typeof(CustomMediaPlayerElement), null);
+
+
 
     public int IsLike;
     public int LookLater;
@@ -59,6 +67,12 @@ public sealed partial class CustomMediaPlayerElement : UserControl
     {
         get => (PlayType)GetValue(playTypeProperty);
         set => SetValue(playTypeProperty, value);
+    }
+
+    public SubInfo SubInfo
+    {
+        get => (SubInfo)GetValue(SubInfoProperty);
+        set => SetValue(SubInfoProperty, value);
     }
 
     Dictionary<string, string> subDicts;
@@ -112,13 +126,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
                                             new(WebApi.playMethod.mpv, pickCode: PickCode),
                                             new(WebApi.playMethod.pot, pickCode: PickCode)};
         mediaTransportControls.SetPlayer(plsyerSoucre, this.Resources["PlayerDataTemplate"] as DataTemplate);
-
-        //设置字幕
-        if (AppSettings.IsFindSub)
-        {
-            subDicts = DataAccess.FindSubFile(PickCode);
-        }
-
+        
         //设置喜欢、稍后观看
         bool isLike;
         bool isLookLater;
@@ -159,58 +167,64 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         }
 
 
-        await SetMediaPlayer(url, subDicts);
+        await SetMediaPlayer(url);
 
         this.Loaded -= CustomMediaPlayerElement_Loaded;
     }
 
-    public void StopMediaPlayer()
+    public void DisposeMediaPlayer()
     {
-        MediaControl.MediaPlayer.Pause();
-        MediaControl.Source = null;
+        //MediaControl.MediaPlayer.Pause();
+        //MediaControl.Source = null;
+        MediaControl.MediaPlayer.Dispose();
+
     }
 
-    private async Task SetMediaPlayer(string url, Dictionary<string,string> subDicts = null)
+    private async Task SetMediaPlayer(string url)
     {
         if (string.IsNullOrEmpty(url)) return;
 
         //添加播放链接
-        MediaSource ms = MediaSource.CreateFromUri(new Uri(url));
+        var ms = MediaSource.CreateFromUri(new Uri(url));
 
         var media = new MediaPlayer();
 
         //添加字幕文件
-        if (subDicts != null && subDicts.Count!=0)
+        if (SubInfo != null)
         {
-            ms.ExternalTimedTextSources.Clear();
+            //ms.ExternalTimedTextSources.Clear();
 
-            foreach (var item in subDicts)
+            //下载字幕
+            var subPath = await webApi.TryDownSubFile(SubInfo.name, SubInfo.pickcode);
+
+            if (!string.IsNullOrEmpty(subPath))
             {
-                string subPickCode = item.Key;
-                string subName = item.Value;
+                var storageFile = await StorageFile.GetFileFromPathAsync(subPath);
+                IRandomAccessStream stream = await storageFile.OpenReadAsync();
 
-                //下载字幕
-                string subPath = await webApi.TryDownSubFile(subName, subPickCode);
-
-                if (!string.IsNullOrEmpty(subPath))
-                {
-                    StorageFile srtfile = await StorageFile.GetFileFromPathAsync(subPath);
-                    IRandomAccessStream stream = await srtfile.OpenReadAsync();
-
-                    TimedTextSource txtsrc = TimedTextSource.CreateFromStream(stream, subName);
-                    ms.ExternalTimedTextSources.Add(txtsrc);
-                }
+                TimedTextSource txtsrc = TimedTextSource.CreateFromStream(stream, SubInfo.name);
+                ms.ExternalTimedTextSources.Add(txtsrc);
             }
 
             var playbackItem = new MediaPlaybackItem(ms);
 
-            if (playbackItem.TimedMetadataTracks.Count > 0)
+
+            if (ms.ExternalTimedTextSources.Count > 0)
             {
-                //选择默认字幕
-                media.BufferingStarted += (sender, e) =>
+                Debug.WriteLine("发现字幕文件");
+
+                playbackItem.TimedMetadataTracksChanged += (item, args) =>
                 {
                     playbackItem.TimedMetadataTracks.SetPresentationMode(0, TimedMetadataTrackPresentationMode.PlatformPresented);
+                    
+                    Debug.WriteLine("默认选中第一个字幕");
+
                 };
+
+            }
+            else
+            {
+                Debug.WriteLine("没有字幕文件");
             }
 
             media.Source = playbackItem;
@@ -225,6 +239,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         if (MediaControl.MediaPlayer.Source != null && MediaControl.MediaPlayer.CurrentState == MediaPlayerState.Playing) MediaControl.MediaPlayer.Pause();
         MediaControl.SetMediaPlayer(media);
     }
+
 
     private async void QualityChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -256,13 +271,13 @@ public sealed partial class CustomMediaPlayerElement : UserControl
             //记录当前的时间
             var time = MediaControl.MediaPlayer.Position;
 
-            await SetMediaPlayer(url, subDicts);
+            await SetMediaPlayer(url);
 
             //恢复之前的时间
             MediaControl.MediaPlayer.Position = time;
         }
     }
-
+    
     private void mediaControls_FullWindow(object sender, RoutedEventArgs e)
     {
         FullWindow?.Invoke(sender, e);
