@@ -391,17 +391,47 @@
                                   ItemClick="ThumbnailGridView_ItemClick">
                             <GridView.ItemTemplate>
                                 <DataTemplate x:DataType="x:String">
-                                    <controls:ImageEx x:Name="Thumbnail_Image"
-                                                      Source="{x:Bind Mode=OneWay}"
-                                                      Height="120"
-                                                      Width="180"
-                                                      Stretch="UniformToFill"
-                                                      PlaceholderSource="/Assets/NoPicture.jpg"
-                                                      PlaceholderStretch="Uniform"
-                                                      HorizontalAlignment="Center"
-                                                      VerticalAlignment="Center"
-                                                      PointerEntered="Thumbnail_Image_PointerEntered"
-                                                      PointerExited="Thumbnail_Image_PointerExited" />
+                                    <UserControl PointerEntered="EnLargeImage_OnPointerEntered" PointerExited="EnLargeImage_OnPointerExited">
+                                        <Grid>
+                                            <VisualStateManager.VisualStateGroups>
+                                                <VisualStateGroup x:Name="HoveringStates">
+                                                    <VisualState x:Name="EnlargeButtonHidden" />
+                                                    <VisualState x:Name="EnlargeButtonShown">
+                                                        <VisualState.Setters>
+                                                            <Setter Target="EnlargeButton.Visibility"
+                                                                    Value="Visible" />
+                                                        </VisualState.Setters>
+
+
+                                                    </VisualState>
+                                                </VisualStateGroup>
+                                            </VisualStateManager.VisualStateGroups>
+
+                                            <controls:ImageEx x:Name="Thumbnail_Image"
+                                                              Source="{x:Bind Mode=OneWay}"
+                                                              Height="120"
+                                                              Width="180"
+                                                              Stretch="UniformToFill"
+                                                              PlaceholderSource="/Assets/NoPicture.jpg"
+                                                              PlaceholderStretch="Uniform"
+                                                              HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center"
+                                                              PointerEntered="Thumbnail_Image_PointerEntered"
+                                                              PointerExited="Thumbnail_Image_PointerExited" />
+
+                                            <Button x:Name="EnlargeButton"
+                                                    BorderThickness="0"
+                                                    HorizontalAlignment="Right"
+                                                    VerticalAlignment="Bottom"
+                                                    PointerEntered="EnlargeButton_PointerEntered"
+                                                    PointerExited="EnlargeButton_PointerExited"
+                                                    Visibility="Collapsed"
+                                                    Background="Transparent">
+                                                <SymbolIcon Symbol="Find" />
+                                            </Button>
+                                        </Grid>
+                                    </UserControl>
+
                                 </DataTemplate>
                             </GridView.ItemTemplate>
                         </GridView>
@@ -487,6 +517,19 @@
                     </Grid>
                 </Grid>
 
+            </Grid>
+
+            <Grid x:Name="EnLargeGrid"
+                  Grid.Column="0"
+                  Visibility="Collapsed"
+                  Margin="65,20"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  CornerRadius="10"
+                  IsHitTestVisible="False">
+
+                <Image x:Name="EnlargeImage"
+                       MaxWidth="800" />
             </Grid>
 
         </Grid>

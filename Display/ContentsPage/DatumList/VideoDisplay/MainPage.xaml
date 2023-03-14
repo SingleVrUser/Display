@@ -272,47 +272,62 @@
                                   SelectedIndex="{x:Bind VideoPlay_ListView.SelectedIndex,Mode=TwoWay}">
                             <FlipView.ItemTemplate>
                                 <DataTemplate x:DataType="data:VideoInfo">
-                                    <Grid RowSpacing="10">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="auto" />
-                                            <RowDefinition Height="auto" />
-                                            <RowDefinition Height="auto" />
-                                        </Grid.RowDefinitions>
+                                    <UserControl PointerEntered="CidInfoUserControlPointerEntered" PointerExited="CidInfoUserControlPointerExited">
+                                        <Grid RowSpacing="10">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="auto" />
+                                                <RowDefinition Height="auto" />
+                                                <RowDefinition Height="auto" />
+                                            </Grid.RowDefinitions>
+                                            <VisualStateManager.VisualStateGroups>
+                                                <VisualStateGroup x:Name="HoveringStates">
+                                                    <VisualState x:Name="EnlargeButtonHidden"/>
+                                                    <VisualState x:Name="EnlargeButtonShown">
+                                                        <VisualState.Setters>
+                                                            <Setter Target="EnlargeButton.Visibility" Value="Visible"/>
+                                                        </VisualState.Setters>
 
-                                        <Grid CornerRadius="5"
-                                              HorizontalAlignment="Center"
-                                              VerticalAlignment="Center">
-                                            <Image Source="{x:Bind imagepath}"
-                                                   Height="230" />
+                                    
+                                                    </VisualState>
+                                                </VisualStateGroup>
+                                            </VisualStateManager.VisualStateGroups>
 
-                                            <Button x:Name="EnlargeButton"
-                                                    HorizontalAlignment="Right"
-                                                    VerticalAlignment="Bottom"
-                                                    PointerEntered="EnlargeButton_PointerEntered"
-                                                    PointerExited="EnlargeButton_PointerExited"
-                                                    Background="Transparent">
-                                                <SymbolIcon Symbol="Find" />
-                                            </Button>
+                                            <Grid CornerRadius="5"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center">
+                                                <Image Source="{x:Bind imagepath}"
+                                                       Height="230" />
+
+                                                <Button x:Name="EnlargeButton"
+                                                        HorizontalAlignment="Right"
+                                                        VerticalAlignment="Bottom"
+                                                        PointerEntered="EnlargeButton_PointerEntered"
+                                                        PointerExited="EnlargeButton_PointerExited"
+                                                        Background="Transparent"
+                                                        Visibility="Collapsed"
+                                                        BorderThickness="0">
+                                                    <SymbolIcon Symbol="Find" />
+                                                </Button>
+                                            </Grid>
+
+                                            <StackPanel Grid.Row="1"
+                                                        HorizontalAlignment="Center">
+                                                <TextBlock Text="{x:Bind truename}"
+                                                           IsTextSelectionEnabled="True" />
+                                                <TextBlock Text="{x:Bind releasetime}" />
+                                                <customcontrols:TextBlockWithLongText StringValue="{x:Bind actor}" />
+                                            </StackPanel>
+
+                                            <StackPanel Orientation="Horizontal"
+                                                        Grid.Row="2"
+                                                        HorizontalAlignment="Center"
+                                                        Spacing="5"
+                                                        Visibility="Collapsed">
+                                                <Button Content="刷新" />
+                                            </StackPanel>
                                         </Grid>
-                                        <!--<Border HorizontalAlignment="Center">
-                                        </Border>-->
+                                    </UserControl>
 
-                                        <StackPanel Grid.Row="1"
-                                                    HorizontalAlignment="Center">
-                                            <TextBlock Text="{x:Bind truename}"
-                                                       IsTextSelectionEnabled="True" />
-                                            <TextBlock Text="{x:Bind releasetime}" />
-                                            <customcontrols:TextBlockWithLongText StringValue="{x:Bind actor}" />
-                                        </StackPanel>
-
-                                        <StackPanel Orientation="Horizontal"
-                                                    Grid.Row="2"
-                                                    HorizontalAlignment="Center"
-                                                    Spacing="5"
-                                                    Visibility="Collapsed">
-                                            <Button Content="刷新" />
-                                        </StackPanel>
-                                    </Grid>
                                 </DataTemplate>
                             </FlipView.ItemTemplate>
                         </FlipView>

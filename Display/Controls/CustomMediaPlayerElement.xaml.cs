@@ -75,8 +75,6 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         set => SetValue(SubInfoProperty, value);
     }
 
-    Dictionary<string, string> subDicts;
-
     public event EventHandler<RoutedEventArgs> FullWindow;
 
     public CustomMediaPlayerElement()

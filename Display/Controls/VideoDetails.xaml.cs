@@ -645,6 +645,39 @@ namespace Display.Controls
             Cover_Grid.Tapped += Cover_Tapped;
         }
 
+        private void EnlargeButton_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            if (sender is not Button { DataContext: string imagePath }) return;
 
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
+
+            EnLargeGrid.Visibility = Visibility.Visible;
+
+            EnlargeImage.Source = new BitmapImage(new Uri(imagePath));
+        }
+
+        private void EnlargeButton_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
+
+            EnLargeGrid.Visibility = Visibility.Collapsed;
+        }
+
+        private void EnLargeImage_OnPointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            if (e.Pointer.PointerDeviceType is PointerDeviceType.Mouse or PointerDeviceType.Pen)
+            {
+                VisualStateManager.GoToState(sender as Control, "EnlargeButtonShown", true);
+            }
+        }
+
+
+        private void EnLargeImage_OnPointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            if (e.Pointer.PointerDeviceType is PointerDeviceType.Mouse or PointerDeviceType.Pen)
+            {
+                VisualStateManager.GoToState(sender as Control, "EnlargeButtonHidden", true);
+            }
+        }
     }
 }
