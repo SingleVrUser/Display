@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using Data;
 using Display.Views;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -19,13 +20,14 @@ namespace Display.WindowView;
 public sealed partial class MediaPlayWindow : Window
 {
     private AppWindow appwindow;
-    private string PickCode;
-    private PlayType PlayType;
-    private string TrueName;
+    private readonly string _pickCode;
+    private readonly PlayType _playType;
+    private readonly string _trueName;
+    private readonly SubInfo _subInfo;
 
     private Page lastPage;
 
-    public MediaPlayWindow(string pickCode, PlayType playType, string truename, Page lastPage)
+    public MediaPlayWindow(string pickCode, PlayType playType, string truename, Page lastPage, SubInfo subInfo)
     {
         this.InitializeComponent();
 
@@ -33,10 +35,11 @@ public sealed partial class MediaPlayWindow : Window
         this.SetTitleBar(AppTitleBar);
 
 
-        this.PickCode = pickCode;
-        this.PlayType = playType;
-        this.TrueName = truename;
+        this._pickCode = pickCode;
+        this._playType = playType;
+        this._trueName = truename;
         this.lastPage = lastPage;
+        this._subInfo = subInfo;
 
         appwindow = App.getAppWindow(this);
 
@@ -47,7 +50,7 @@ public sealed partial class MediaPlayWindow : Window
     {
         if (mediaControl.IsLoaded && VideoPlayGrid.Children.Contains(mediaControl))
         {
-            mediaControl.StopMediaPlayer();
+            mediaControl.DisposeMediaPlayer();
             VideoPlayGrid.Children.Remove(mediaControl);
         }
 
@@ -66,7 +69,7 @@ public sealed partial class MediaPlayWindow : Window
         {
             var storageItem = videoViewPage._storeditem;
 
-            if (videoViewPage._storeditem != null && videoViewPage._storeditem.truename == TrueName)
+            if (videoViewPage._storeditem != null && videoViewPage._storeditem.truename == _trueName)
             {
                 if (storageItem.is_like != newestIsLike)
                     storageItem.is_like = newestIsLike;
@@ -84,9 +87,9 @@ public sealed partial class MediaPlayWindow : Window
         }
     }
 
-    public static MediaPlayWindow CreateNewWindow(string pickCode, PlayType playType,string trueName,Page lastPage)
+    public static MediaPlayWindow CreateNewWindow(string pickCode, PlayType playType,string trueName,Page lastPage, SubInfo subInfo)
     {
-        MediaPlayWindow newWindow = new(pickCode, playType, trueName,lastPage);
+        MediaPlayWindow newWindow = new(pickCode, playType, trueName,lastPage, subInfo);
         newWindow.Activate();
 
         return newWindow;
@@ -94,7 +97,7 @@ public sealed partial class MediaPlayWindow : Window
 
     private Visibility isPickCodeNull()
     {
-        return PickCode == null ? Visibility.Visible : Visibility.Collapsed;
+        return _pickCode == null ? Visibility.Visible : Visibility.Collapsed;
     }
 
     #region 全屏设置

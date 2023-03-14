@@ -673,6 +673,7 @@
                                             <EasingDoubleKeyFrame KeyTime="0:0:0.7"
                                                                   Value="0" />
                                         </DoubleAnimationUsingKeyFrames>
+
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="IsHitTestVisible"
                                                                        Storyboard.TargetName="ControlPanel_ControlPanelVisibilityStates_Border">
                                             <DiscreteObjectKeyFrame KeyTime="0"

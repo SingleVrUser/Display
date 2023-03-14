@@ -1,22 +1,20 @@
 ﻿using Data;
 using Display.Controls;
+using Display.Views;
 using Display.WindowView;
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using static Data.WebApi;
-using Display.Views;
 
 namespace Display.Helper;
 
-public class PlayeVideoHelper
+public class PlayVideoHelper
 {
-
-    public async static Task PlayeVideo(string pickCode, XamlRoot xamlRoot = null, SubInfo subInfo = null, CustomMediaPlayerElement.PlayType playType = CustomMediaPlayerElement.PlayType.success, string trueName = "", Page lastPage = null)
+    public async static Task PlayVideo(string pickCode, XamlRoot xamlRoot = null, SubInfo subInfo = null, CustomMediaPlayerElement.PlayType playType = CustomMediaPlayerElement.PlayType.success, string trueName = "", Page lastPage = null)
     {
         //115Cookie未空
         if (string.IsNullOrEmpty(AppSettings._115_Cookie) && xamlRoot != null)
@@ -101,7 +99,7 @@ public class PlayeVideoHelper
                 break;
             //MediaElement播放
             case 4:
-                MediaPlayWindow.CreateNewWindow(pickCode, playType, trueName, lastPage);
+                MediaPlayWindow.CreateNewWindow(pickCode, playType, trueName, lastPage, subInfo);
                 break;
         }
     }
@@ -113,7 +111,7 @@ public class PlayeVideoHelper
         if (sender is not ListView listView) return;
         if (listView.DataContext is not string trueName) return;
 
-        await PlayeVideo(SingleVideoInfo.fileBelongPickcode, subInfo: SingleVideoInfo, trueName: trueName, lastPage: DetailInfoPage.Current);
+        await PlayVideo(SingleVideoInfo.fileBelongPickcode, subInfo: SingleVideoInfo, trueName: trueName, lastPage: DetailInfoPage.Current);
     }
 
 }

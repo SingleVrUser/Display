@@ -770,7 +770,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
         if (item.DataContext is not FilesInfo info) return;
 
-        await PlayeVideoHelper.PlayeVideo(info.datum.pc, this.XamlRoot, trueName: info.Name, lastPage: this);
+        await PlayVideoHelper.PlayVideo(info.datum.pc, this.XamlRoot, trueName: info.Name, lastPage: this);
     }
 
     private void Sort115Button_Click(object sender, RoutedEventArgs e)

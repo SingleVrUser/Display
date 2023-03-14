@@ -13,6 +13,23 @@
       mc:Ignorable="d">
 
     <Page.Resources>
+
+        <!--<Storyboard x:Name="OpenInfoGridStoryboard">
+            <DoubleAnimation Storyboard.TargetName="InfoGrid"
+                             Storyboard.TargetProperty="Width"
+                             From="40"
+                             To="0"
+                             Duration="0:0:1" />
+        </Storyboard>
+
+        <Storyboard x:Name="CloseInfoGridStoryboard">
+            <DoubleAnimation Storyboard.TargetName="InfoGrid"
+                             Storyboard.TargetProperty="Width"
+                             From="0"
+                             To="40"
+                             Duration="0:0:1" />
+        </Storyboard>-->
+
         <Style TargetType="Pivot">
             <Setter Property="HeaderTemplate">
                 <Setter.Value>
@@ -23,25 +40,12 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
         <SolidColorBrush x:Key="MediaTransportControlsPanelBackground"
                          Color="#60ffffff" />
-
-        <!--<MenuFlyout x:Key="MediaContentFlyout">
-            <MenuFlyoutItem  x:Name="DeletedFileItem" Text="删除文件"
-                            Click="DeletedFileButton_Click">
-                <MenuFlyoutItem.Icon>
-                    <FontIcon Glyph="&#xE107;" />
-                </MenuFlyoutItem.Icon>
-            </MenuFlyoutItem>
-        </MenuFlyout>-->
-
-
         <Style TargetType="MediaPlayerElement">
             <Setter Property="AreTransportControlsEnabled"
                     Value="True" />
         </Style>
-
         <Style TargetType="MediaTransportControls"
                BasedOn="{StaticResource DefaultMediaTransportControlsStyle}"
                x:Key="MediaTransportControls">
@@ -59,13 +63,77 @@
     <Grid x:Name="MainGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="auto" />
+            <ColumnDefinition x:Name="InfoColumn" Width="380"/>
         </Grid.ColumnDefinitions>
-
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="InfoGridVisibility">
+                <VisualState x:Name="InfoGridVisible">
+                    <Storyboard>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Width"
+                                                       Storyboard.TargetName="InfoColumn"
+                                                       EnableDependentAnimation="True">
+                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                    Value="0" />
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0.3"
+                                                    Value="380" />
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity"
+                                                       Storyboard.TargetName="InfoGrid">
+                            <EasingDoubleKeyFrame KeyTime="0"
+                                                  Value="0" />
+                            <EasingDoubleKeyFrame KeyTime="0:0:0.3"
+                                                  Value="1" />
+                        </DoubleAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+
+                <VisualState x:Name="InfoGridCollapsed">
+                    <VisualState.Setters>
+                        <Setter Target="InfoGridVisibilityButton.Content"
+                                Value="&#xF743;" />
+                    </VisualState.Setters>
+
+                    <Storyboard>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Width"
+                                                       Storyboard.TargetName="InfoColumn"
+                                                       EnableDependentAnimation="True">
+                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                     Value="380" />
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0.3"
+                                                     Value="0" />
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity"
+                                                       Storyboard.TargetName="InfoGrid">
+                            <EasingDoubleKeyFrame KeyTime="0"
+                                                  Value="1" />
+                            <EasingDoubleKeyFrame KeyTime="0:0:0.3"
+                                                  Value="0" />
+                        </DoubleAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility"
+                                                       Storyboard.TargetName="InfoGrid">
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0.4"
+                                                    Value="Collapsed" />
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <!--<DoubleAnimation Storyboard.TargetProperty="Y"
+                                         Storyboard.TargetName="TranslateVertical"
+                                         From="0.5"
+                                         To="50"
+                                         Duration="0:0:0.7" />-->
+
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
 
         <controls:UniformGrid x:Name="Video_UniformGrid"
                               FirstColumn="0"
@@ -79,12 +147,12 @@
 
         </controls:UniformGrid>
 
-        <HyperlinkButton x:Name="InfoGridVisiableButton"
+        <HyperlinkButton Grid.Row="0" Grid.Column="0" x:Name="InfoGridVisibilityButton"
                          Foreground="White"
                          FontFamily="Segoe Fluent Icons"
                          Content="&#xF745;"
                          HorizontalAlignment="Right"
-                         Click="InfoGridVisiableButton_Click"
+                         Click="InfoGridVisibilityButton_Click"
                          FontSize="20"
                          FontWeight="Bold"
                          HorizontalContentAlignment="Center"
@@ -94,8 +162,18 @@
         </HyperlinkButton>
 
         <Grid x:Name="InfoGrid"
-              Grid.Column="1"
+              Grid.Row="0" Grid.Column="1"
               Width="380">
+
+            <Grid.Transitions>
+                <PaneThemeTransition x:Name="PaneThemeTransition"
+                                     Edge="Right" />
+            </Grid.Transitions>
+
+            <Grid.RenderTransform>
+                <TranslateTransform x:Name="InfoGridTranslateVertical" />
+            </Grid.RenderTransform>
+
             <Pivot x:Name="VideoPlay_Pivot">
                 <PivotItem Header="文件">
                     <Grid>
@@ -304,12 +382,14 @@
         </Grid>
 
         <Grid x:Name="SmokeGrid"
-              Grid.ColumnSpan="2"
+              Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0"
               Visibility="Collapsed"
               Margin="65,20"
               HorizontalAlignment="Center"
               VerticalAlignment="Center"
-              CornerRadius="10">
+              CornerRadius="10"
+              IsHitTestVisible="False">
+
             <Image x:Name="EnlargeImage"
                    MaxWidth="800" />
         </Grid>

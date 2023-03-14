@@ -344,7 +344,14 @@
                                               Padding="0,5"
                                               Margin="50,0,0,0">-->
 
-                                <controls:WrapPanel x:Name="CategoryWrapPanel" Margin="50,0,0,0" HorizontalSpacing="10" VerticalSpacing="6"/>
+                                <controls:WrapPanel x:Name="CategoryWrapPanel"
+                                                    Margin="50,0,0,0"
+                                                    HorizontalSpacing="10"
+                                                    VerticalSpacing="6">
+                                    <controls:WrapPanel.ChildrenTransitions>
+                                        <EntranceThemeTransition/>
+                                    </controls:WrapPanel.ChildrenTransitions>
+                                </controls:WrapPanel>
 
                                 <!--</ScrollViewer>-->
                             </Grid>

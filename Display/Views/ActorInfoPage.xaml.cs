@@ -130,7 +130,7 @@ namespace Display.Views
             //播放失败列表（imgUrl就是pc）
             if(videoInfo.series == "fail")
             {
-                await PlayeVideoHelper.PlayeVideo(videoInfo.imageurl, this.XamlRoot, playType:PlayType.fail);
+                await PlayVideoHelper.PlayVideo(videoInfo.imageurl, this.XamlRoot, playType:PlayType.fail);
                 return;
             }
 
@@ -148,7 +148,7 @@ namespace Display.Views
             }
             else if (videoInfoList.Count == 1)
             {
-                await PlayeVideoHelper.PlayeVideo(videoInfoList[0].pc, this.XamlRoot, trueName: videoInfo.truename, lastPage: this);
+                await PlayVideoHelper.PlayVideo(videoInfoList[0].pc, this.XamlRoot, trueName: videoInfo.truename, lastPage: this);
             }
 
             //有多集
@@ -179,7 +179,7 @@ namespace Display.Views
             if (sender is not ListView listView) return;
             if (listView.DataContext is not string trueName) return;
 
-            await PlayeVideoHelper.PlayeVideo(SingleVideoInfo.pc, this.XamlRoot, trueName: trueName, lastPage: this);
+            await PlayVideoHelper.PlayVideo(SingleVideoInfo.pc, this.XamlRoot, trueName: trueName, lastPage: this);
         }
 
         private async void SingleVideoPlayClick(object sender, RoutedEventArgs e)
@@ -188,7 +188,7 @@ namespace Display.Views
 
             if (VideoPlayButton.DataContext is not Datum datum) return;
 
-            await PlayeVideoHelper.PlayeVideo(datum.pc, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.fail);
+            await PlayVideoHelper.PlayVideo(datum.pc, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.fail);
         }
     }
 
