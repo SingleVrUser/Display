@@ -188,7 +188,7 @@ namespace Display.Controls
 
             List<Datum> downVideoInfoList = new List<Datum>();
 
-            WebApi webapi = new();
+            var webApi = WebApi.GlobalWebApi;
 
             //下载方式
             WebApi.downType downType;
@@ -219,7 +219,7 @@ namespace Display.Controls
                 string topFolderName = null;
                 if (videoinfoList.Count > 1)
                     topFolderName = name;
-                bool isOk = await webapi.RequestDown(videoinfoList, downType, savePath, topFolderName);
+                bool isOk = await webApi.RequestDown(videoinfoList, downType, savePath, topFolderName);
 
                 if (isOk)
                     ShowTeachingTip("发送下载请求成功");
@@ -252,7 +252,7 @@ namespace Display.Controls
                 if (downVideoInfoList.Count > 1)
                     topFolderName = name;
 
-                bool isOk = await webapi.RequestDown(downVideoInfoList, downType, savePath, topFolderName);
+                bool isOk = await webApi.RequestDown(downVideoInfoList, downType, savePath, topFolderName);
 
                 if (isOk)
                     ShowTeachingTip("发送下载请求成功");

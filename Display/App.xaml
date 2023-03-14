@@ -244,6 +244,9 @@
             <SolidColorBrush x:Key="CircleBorderBrush"
                              Color="{StaticResource ControlColorBorder}" />
 
+            <SolidColorBrush x:Key="CircleLightBorderBrush"
+                             Color="{StaticResource ControlColorBorder}" Opacity=".4"/>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

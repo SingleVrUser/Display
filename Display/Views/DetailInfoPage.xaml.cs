@@ -128,7 +128,8 @@ namespace Display.Views
         /// <param Name="e"></param>
         private void Label_Click(object sender, RoutedEventArgs e)
         {
-            var clickButton = sender as HyperlinkButton;
+            if (sender is not Button clickButton) return;
+
             string LabelName = clickButton.Content as string;
             Tuple<List<string>, string, bool> TypesAndName = new(new() { "category" }, LabelName, false);
 

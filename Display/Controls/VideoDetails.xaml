@@ -225,7 +225,7 @@
                     </Grid>
 
                     <!--右侧信息-->
-                    <Grid Grid.Column="1"
+                    <Grid Grid.Row="0" Grid.Column="1"
                           RowSpacing="3">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
@@ -249,7 +249,8 @@
                             <HyperlinkButton NavigateUri="{x:Bind resultinfo.busurl,Mode=OneWay}"
                                              Opacity="1"
                                              CornerRadius="10"
-                                             Padding="5">
+                                             Padding="5"
+                                             ToolTipService.ToolTip="{x:Bind resultinfo.busurl,Mode=OneWay}">
                                 <FontIcon FontFamily="Segoe Fluent Icons"
                                           Glyph="&#xF6FA;"
                                           Foreground="LightGray"
@@ -332,7 +333,7 @@
                             </StackPanel>
 
                             <Grid Grid.Row="1"
-                                  Grid.ColumnSpan="2">
+                                  Grid.ColumnSpan="2" Grid.Column="0">
                                 <TextBlock Text="类别"
                                            Style="{StaticResource LeftTitle}" />
                                 <!--<ScrollViewer HorizontalScrollBarVisibility="Visible"
@@ -372,6 +373,7 @@
 
                     <!--缩略图-->
                     <StackPanel x:Name="ThumbnailStackPanel"
+                                Grid.Column="0"
                                 Grid.Row="2"
                                 Grid.ColumnSpan="2"
                                 Visibility="Collapsed">

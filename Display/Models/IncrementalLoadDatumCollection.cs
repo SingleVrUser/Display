@@ -3,13 +3,12 @@ using Microsoft.UI.Xaml.Data;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.Foundation;
 
 namespace Display.Models;
 
-public class IncrementallLoadDatumCollection : ObservableCollection<FilesInfo>, ISupportIncrementalLoading
+public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, ISupportIncrementalLoading
 {
     private WebApi webApi { get; set; }
 
@@ -38,10 +37,10 @@ public class IncrementallLoadDatumCollection : ObservableCollection<FilesInfo>, 
 
     public string cid { get; set; }
 
-    public IncrementallLoadDatumCollection(string cid)
+    public IncrementalLoadDatumCollection(string cid)
     {
         this.cid = cid;
-        webApi= new WebApi();
+        webApi= WebApi.GlobalWebApi;
 
     }
 
