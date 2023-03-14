@@ -4,8 +4,6 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI.Controls;
 using Data;
-using Display.ContentsPage.Import115DataToLocalDataAccess;
-using Display.Controls;
 using Display.Helper;
 using Display.Models;
 using Microsoft.UI;
@@ -14,21 +12,14 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Media;
-using Newtonsoft.Json.Linq;
-using Org.BouncyCastle.Asn1.Cms;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Windows.ApplicationModel.DataTransfer;
-using static System.Net.Mime.MediaTypeNames;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -42,8 +33,8 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 {
     ObservableCollection<MetadataItem> _units;
 
-    IncrementallLoadDatumCollection _filesInfos;
-    IncrementallLoadDatumCollection filesInfos
+    IncrementalLoadDatumCollection _filesInfos;
+    IncrementalLoadDatumCollection filesInfos
     {
         get => _filesInfos;
         set
@@ -165,7 +156,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
     private void ToTopButton_Click(object sender, RoutedEventArgs e)
     {
-        if(BaseExample.ItemsSource is IncrementallLoadDatumCollection Collection)
+        if(BaseExample.ItemsSource is IncrementalLoadDatumCollection Collection)
             BaseExample.ScrollIntoView(Collection.First());
     }
 
@@ -416,8 +407,9 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
         {
             sourceFilesInfos.ForEach(item => filesInfos.Remove(item));
 
-            if(webApi==null) webApi = new();
-            await webApi.DeleteFiles(sourceFilesInfos.FirstOrDefault().datum.pid, sourceFilesInfos.Select(item =>
+            webApi ??= WebApi.GlobalWebApi;
+
+            await webApi.DeleteFiles(sourceFilesInfos.FirstOrDefault()?.datum.pid, sourceFilesInfos.Select(item =>
             {
                 //文件
                 if (item.Type == FilesInfo.FileType.File )
@@ -505,20 +497,9 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
     /// <returns></returns>
     private async Task Move115Files(string pid, List<FilesInfo> files)
     {
-        if (webApi == null) webApi = new();
-        await webApi.MoveFiles(pid, files.Select(item =>
-        {
-            //文件夹
-            if(item.Type == FilesInfo.FileType.Folder)
-            {
-                return item.Cid;
-            }
-            //文件
-            else
-            {
-                return item.Fid;
-            }
-        }).ToList());
+        webApi ??= WebApi.GlobalWebApi;
+
+        await webApi.MoveFiles(pid, files.Select(item => item.Type == FilesInfo.FileType.Folder ? item.Cid : item.Fid).ToList());
 
         //删除列表文件
         foreach(var item in files)
@@ -742,8 +723,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
         {
             if (BaseExample.SelectedItems.FirstOrDefault() is not FilesInfo) return;
 
-            if (webApi == null)
-                webApi = new();
+            webApi ??= WebApi.GlobalWebApi;
 
             List<Datum> videoinfos = new();
 

@@ -80,7 +80,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         //设置画质
 
         //m3u8UrlList
-        if (webApi == null) webApi = new();
+        webApi ??= WebApi.GlobalWebApi;
+
         //先原画
         List<Quality> QualityItemsSource = new() { new("原画", pickCode: PickCode) };
         var m3u8InfoList = await webApi.Getm3u8InfoByPickCode(PickCode);
@@ -445,7 +446,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
     {
         if (e.AddedItems.FirstOrDefault() is not Player player) return;
 
-        if (webApi == null) webApi = new();
+        webApi ??= WebApi.GlobalWebApi;
 
         await webApi.PlayVideoWithOriginUrl(player.PickCode,player.PlayMethod,this.XamlRoot);
     }

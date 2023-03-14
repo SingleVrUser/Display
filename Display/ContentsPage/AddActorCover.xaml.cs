@@ -541,7 +541,7 @@ namespace Display.ContentsPage
         /// </summary>
         private async void getActorCoverByWebVideo()
         {
-            WebApi webApi = new();
+            var webApi = WebApi.GlobalWebApi;
             var startTime = DateTimeOffset.Now;
 
             //获取链接

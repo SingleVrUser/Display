@@ -31,20 +31,20 @@ namespace Display.ContentsPage.SpiderVideoInfo
             this.InitializeComponent();
             lastPage = page;
 
-            IntitializeView();
+            InitializeView();
         }
 
         public ConditionalCheck()
         {
             this.InitializeComponent();
 
-            IntitializeView();
+            InitializeView();
 
         }
 
-        private void IntitializeView()
+        private void InitializeView()
         {
-            webapi = new();
+            webapi = WebApi.GlobalWebApi;
             ConditionCheckItems = new();
             network = new();
 

@@ -10,7 +10,7 @@
 
     <UserControl.Resources>
         <Style TargetType="controls:ImageEx"
-               x:Key="newAddCoverResources">
+               x:Key="NewAddCoverResources">
             <Setter Property="MaxHeight"
                     Value="210" />
             <Setter Property="MaxWidth"
@@ -42,12 +42,11 @@
 
         <Grid
             BorderThickness="1"
-            BorderBrush="{StaticResource ControlElevationBorderBrush}"
+              BorderBrush="{StaticResource CircleLightBorderBrush}"
             CornerRadius="8"
             Margin="0,5"
             MinHeight="280">
             <controls:AdaptiveGridView
-                    Grid.Row="1"
                     StretchContentForSingleRow="True"
                     OneRowModeEnabled="True"
                     ItemHeight="250"

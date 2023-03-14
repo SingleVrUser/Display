@@ -3,32 +3,23 @@
 
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI.Controls;
-using CommunityToolkit.WinUI.UI.Controls.TextToolbarSymbols;
 using Data;
-using Data.Spider;
 using Display.Models;
-using Display.Views;
 using Display.WindowView;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
-using Org.BouncyCastle.Asn1.X509;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Media.Core;
-using static QRCoder.PayloadGenerator;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -47,7 +38,7 @@ public sealed partial class MainPage : Page
 
     ObservableCollection<FilesInfo> FilesInfos;
 
-    IncrementallLoadDatumCollection FilesInfosCollection;
+    IncrementalLoadDatumCollection FilesInfosCollection;
 
     ObservableCollection<MetadataItem> _units;
 
@@ -74,14 +65,10 @@ public sealed partial class MainPage : Page
 
         _units = new ObservableCollection<MetadataItem>() { new MetadataItem { Label = "播放列表", Command = OpenFolderCommand, CommandParameter = "0" } };
         metadataControl.Items = _units;
-        network = new();
-        webApi = new();
-        this.Loaded += PageLoaded;
-    }
+        network = new GetInfoFromNetwork();
+        webApi = WebApi.GlobalWebApi;
 
 
-    private void PageLoaded(object sender, RoutedEventArgs e)
-    {
         TryPlayVideoFromSelectedFiles(FilesInfos.ToList());
     }
 
@@ -468,7 +455,7 @@ public sealed partial class MainPage : Page
 
     private void Slider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
-        System.Diagnostics.Debug.WriteLine(e.NewValue);
+        System.Diagnostics.Debug.WriteLine($"进度条拖到 {e.NewValue}%");
 
         foreach (var item in Video_UniformGrid.Children)
         {
@@ -492,7 +479,7 @@ public sealed partial class MainPage : Page
         await webApi.DeleteFiles(fileInfo.Cid, new() { fid });
 
         // 接着，删除资源管理器的文件，如果存在（有可能已经关掉了）
-        if (LastFilesListView.IsLoaded && LastFilesListView.ItemsSource is IncrementallLoadDatumCollection filesInfos && filesInfos.Contains(fileInfo))
+        if (LastFilesListView.IsLoaded && LastFilesListView.ItemsSource is IncrementalLoadDatumCollection filesInfos && filesInfos.Contains(fileInfo))
         {
             filesInfos.Remove(fileInfo);
         }

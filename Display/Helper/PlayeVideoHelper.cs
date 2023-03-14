@@ -89,18 +89,15 @@ public class PlayeVideoHelper
                 break;
             //PotPlayer播放
             case 1:
-                WebApi webapi = new();
-                await webapi.PlayVideoWithOriginUrl(pickCode, playMethod.pot, xamlRoot, subInfo);
+                await GlobalWebApi.PlayVideoWithOriginUrl(pickCode, playMethod.pot, xamlRoot, subInfo);
                 break;
             //mpv播放
             case 2:
-                webapi = new();
-                await webapi.PlayVideoWithOriginUrl(pickCode, playMethod.mpv, xamlRoot, subInfo);
+                await GlobalWebApi.PlayVideoWithOriginUrl(pickCode, playMethod.mpv, xamlRoot, subInfo);
                 break;
             //vlc播放
             case 3:
-                webapi = new();
-                await webapi.PlayVideoWithOriginUrl(pickCode, playMethod.vlc, xamlRoot, subInfo);
+                await GlobalWebApi.PlayVideoWithOriginUrl(pickCode, playMethod.vlc, xamlRoot, subInfo);
                 break;
             //MediaElement播放
             case 4:

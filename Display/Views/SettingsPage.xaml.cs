@@ -45,7 +45,8 @@ namespace Display.Views
         private async void InitializationView()
         {
             //初始化115状态
-            webapi ??= new WebApi();
+            webapi ??= WebApi.GlobalWebApi;
+
             if (!string.IsNullOrEmpty(AppSettings._115_Cookie) && WebApi.UserInfo == null)
             {
                 await Task.Run(async () =>
