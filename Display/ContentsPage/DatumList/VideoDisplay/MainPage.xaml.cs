@@ -50,6 +50,8 @@ public sealed partial class MainPage : Page
 
     WebApi webApi;
 
+    private bool _isDisposing;
+
 
     /// <summary>
     /// 可播放的最大数量
@@ -184,6 +186,7 @@ public sealed partial class MainPage : Page
 
     private void Window_Closed(object sender, WindowEventArgs args)
     {
+        _isDisposing = true;
         RemoveMediaControl();
     }
 
@@ -335,53 +338,42 @@ public sealed partial class MainPage : Page
         menuFlyout.Items.Add(MenuFlyoutItemDeletedFrom115);
 
         var source = MediaSource.CreateFromUri(new Uri(videoUrl));
-        //var mediaPlayerElement = new MediaPlayerElement()
-        //{
-        //    Source = source,
-        //    ContextFlyout = menuFlyout,
-        //    Tag = file.datum.pc
-        //};
-
         var mediaPlayerElement = new MediaPlayerElement()
         {
+            Source = source,
             ContextFlyout = menuFlyout,
             Tag = file.datum.pc
         };
 
-        var media = new MediaPlayer();
-        media.SeekCompleted += MediaPlayer_SeekCompleted;
-        media.BufferingStarted += MediaPlayer_BufferingStarted;
+        // 是否自动播放
+        if (AppSettings.IsAutoPlayInVideoDisplay) mediaPlayerElement.AutoPlay = true;
 
-        var playbackItem = new MediaPlaybackItem(source);
-        media.Source = playbackItem;
+        // 是否需要改变起始位置
+        if (AppSettings.AutoPlayPositionPercentage != 0.0)
+        {
+            mediaPlayerElement.MediaPlayer.MediaOpened += MediaPlayer_MediaOpened;
+        }
 
-        mediaPlayerElement.SetMediaPlayer(media);
-        mediaPlayerElement.MediaPlayer.PlaybackSession.BufferingStarted += PlaybackSession_BufferingStarted;
         mediaPlayerElement.MediaPlayer.MediaFailed += MediaPlayer_MediaFailed;
 
         Video_UniformGrid.Children.Add(mediaPlayerElement);
 
     }
 
+    private void MediaPlayer_MediaOpened(MediaPlayer sender, object args)
+    {
+        Debug.WriteLine($"当前视频长度：{sender.NaturalDuration}");
+
+        sender.Position = sender.NaturalDuration * AppSettings.AutoPlayPositionPercentage / 100;
+
+        Debug.WriteLine($"将进度调到：{sender.Position}");
+    }
+
     private void MediaPlayer_MediaFailed(MediaPlayer sender, MediaPlayerFailedEventArgs args)
     {
-        Debug.WriteLine("MediaFailed");
+        Debug.WriteLine("播放失败");
     }
 
-    private void PlaybackSession_BufferingStarted(MediaPlaybackSession sender, object args)
-    {
-        Debug.WriteLine("Buffering Started");
-    }
-
-    private void MediaPlayer_BufferingStarted(Windows.Media.Playback.MediaPlayer sender, object args)
-    {
-        Debug.WriteLine("Buffering Started");
-    }
-
-    private void MediaPlayer_SeekCompleted(Windows.Media.Playback.MediaPlayer sender, object args)
-    {
-        Debug.WriteLine("Seek Completed");
-    }
 
     private async void tryPlayVideos(List<FilesInfo> filesInfo)
     {
@@ -416,6 +408,8 @@ public sealed partial class MainPage : Page
         //搜刮
         foreach (var video in filesInfos)
         {
+            if (_isDisposing) return;
+
             VideoInfo cidInfo = null;
 
             var name = video.Name;
@@ -580,12 +574,14 @@ public sealed partial class MainPage : Page
         }
     }
 
-    private void RemovePlayingVideo(String pc)
+    private void RemovePlayingVideo(string pc)
     {
         var media = Video_UniformGrid.Children.FirstOrDefault(item => (item as MediaPlayerElement)?.Tag.ToString() == pc);
         if (media == null || media is not MediaPlayerElement mediaPlayerElement) return;
 
-        mediaPlayerElement.MediaPlayer.Dispose();
+        //mediaPlayerElement.MediaPlayer.Dispose();
+        mediaPlayerElement.MediaPlayer.Pause();
+        mediaPlayerElement.MediaPlayer.SetUriSource(null);
         Video_UniformGrid.Children.Remove(mediaPlayerElement);
 
     }
@@ -622,7 +618,7 @@ public sealed partial class MainPage : Page
 
         if (result == ContentDialogResult.Primary)
         {
-            System.Diagnostics.Debug.WriteLine("删除");
+            Debug.WriteLine("删除");
 
             filesInfo.ForEach(item => filesInfos.Remove(item));
 
@@ -633,14 +629,15 @@ public sealed partial class MainPage : Page
 
     private void InfoGridVisibilityButton_Click(object sender, RoutedEventArgs e)
     {
-        switch (InfoGrid.Visibility)
+        if (RootSplitView.IsPaneOpen)
         {
-            case Visibility.Visible:
-                VisualStateManager.GoToState(this, "InfoGridCollapsed", true);
-                break;
-            case Visibility.Collapsed:
-                VisualStateManager.GoToState(this, "InfoGridVisible", true);
-                break;
+            RootSplitView.IsPaneOpen = false;
+            ((HyperlinkButton)sender).Content = "\uf743";
+        }
+        else
+        {
+            RootSplitView.IsPaneOpen = true;
+            ((HyperlinkButton)sender).Content = "\uf745";
         }
     }
 

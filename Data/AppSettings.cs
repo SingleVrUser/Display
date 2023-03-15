@@ -86,15 +86,51 @@ public class AppSettings
     {
         get
         {
-            bool isUpdated = false;
+            bool isDefaultPlaySingleVideo = false;
             if (localSettings.Values["IsDefaultPlaySingleVideo"] is bool value)
             {
-                isUpdated = value;
+                isDefaultPlaySingleVideo = value;
             }
-            return isUpdated;
+            return isDefaultPlaySingleVideo;
         }
         set => localSettings.Values["IsDefaultPlaySingleVideo"] = value;
     }
+
+
+    /// <summary>
+    /// 是否自动播放视频
+    /// </summary>
+    public static bool IsAutoPlayInVideoDisplay
+    {
+        get
+        {
+            var isAutoPlayVideo = true;
+            if (localSettings.Values["IsAutoPlayInVideoDisplay"] is bool value)
+            {
+                isAutoPlayVideo = value;
+            }
+            return isAutoPlayVideo;
+        }
+        set => localSettings.Values["IsAutoPlayInVideoDisplay"] = value;
+    }
+
+    /// <summary>
+    /// 自动播放的位置
+    /// </summary>
+    public static double AutoPlayPositionPercentage
+    {
+        get
+        {
+            var positionPercentage = 0.0;
+            if (localSettings.Values["AutoPlayPositionPercentage"] is double value)
+            {
+                positionPercentage = value;
+            }
+            return positionPercentage;
+        }
+        set => localSettings.Values["AutoPlayPositionPercentage"] = value;
+    }
+
 
 
     /// <summary>

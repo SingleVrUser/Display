@@ -184,7 +184,7 @@
         </Flyout>
 
         <converter:BytesToSizeStrConverter x:Key="BytesToSizeStrConverter" />
-        <converter:BoolToVisiableConverter x:Key="BoolToVisiableConverter" />
+        <converter:BoolToVisibleConverter x:Key="BoolToVisiableConverter" />
         <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter" />
         <converter:CollapsedWhenNullConverter x:Key="CollapsedWhenNullConverter" />
 
