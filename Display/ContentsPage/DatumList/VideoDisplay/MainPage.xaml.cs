@@ -192,12 +192,12 @@ public sealed partial class MainPage : Page
 
     private void RemoveMediaControl()
     {
-        foreach (var child in Video_UniformGrid.Children)
-        {
-            var videoControl = child as MediaPlayerElement;
-            //videoControl?.SetMediaPlayer(null);
-            videoControl?.MediaPlayer.Dispose();
-        }
+        //foreach (var child in Video_UniformGrid.Children)
+        //{
+        //    var videoControl = child as MediaPlayerElement;
+        //    videoControl?.MediaPlayer.Pause();
+        //    videoControl?.SetMediaPlayer(null);
+        //}
         Video_UniformGrid.Children.Clear();
     }
 
@@ -346,15 +346,19 @@ public sealed partial class MainPage : Page
         };
 
         // 是否自动播放
-        if (AppSettings.IsAutoPlayInVideoDisplay) mediaPlayerElement.AutoPlay = true;
-
-        // 是否需要改变起始位置
-        if (AppSettings.AutoPlayPositionPercentage != 0.0)
+        if (AppSettings.IsAutoPlayInVideoDisplay)
         {
-            mediaPlayerElement.MediaPlayer.MediaOpened += MediaPlayer_MediaOpened;
+            mediaPlayerElement.AutoPlay = true;
+
+            // 是否需要改变起始位置
+            if (AppSettings.AutoPlayPositionPercentage != 0.0)
+            {
+                mediaPlayerElement.MediaPlayer.PlaybackSession.MediaPlayer.MediaOpened += MediaPlayer_MediaOpened;
+            }
         }
 
-        mediaPlayerElement.MediaPlayer.MediaFailed += MediaPlayer_MediaFailed;
+
+        //mediaPlayerElement.MediaPlayer.MediaFailed += MediaPlayer_MediaFailed;
 
         Video_UniformGrid.Children.Add(mediaPlayerElement);
 
@@ -566,7 +570,7 @@ public sealed partial class MainPage : Page
     private void RemoveCidInfo(FilesInfo fileInfo)
     {
         //移除cid信息（预览图/信息）
-        var removeCid = CidInfos.FirstOrDefault(item => item.truename == FileMatch.MatchName(fileInfo.Name).ToUpper());
+        var removeCid = CidInfos.FirstOrDefault(item => item.truename== fileInfo.Name ||  item.truename == FileMatch.MatchName(fileInfo.Name)?.ToUpper());
 
         if (removeCid != null)
         {
@@ -579,9 +583,8 @@ public sealed partial class MainPage : Page
         var media = Video_UniformGrid.Children.FirstOrDefault(item => (item as MediaPlayerElement)?.Tag.ToString() == pc);
         if (media == null || media is not MediaPlayerElement mediaPlayerElement) return;
 
-        //mediaPlayerElement.MediaPlayer.Dispose();
-        mediaPlayerElement.MediaPlayer.Pause();
-        mediaPlayerElement.MediaPlayer.SetUriSource(null);
+        //mediaPlayerElement.MediaPlayer?.Pause();
+        //mediaPlayerElement.MediaPlayer?.SetUriSource(null);
         Video_UniformGrid.Children.Remove(mediaPlayerElement);
 
     }
@@ -643,7 +646,7 @@ public sealed partial class MainPage : Page
 
     private void Target_DragOver(object sender, DragEventArgs e)
     {
-        e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy;
+        e.AcceptedOperation = DataPackageOperation.Copy;
     }
 
     private void Target_DragEnter(object sender, DragEventArgs e)
