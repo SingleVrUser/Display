@@ -52,7 +52,7 @@
             </Setter>
         </Style>
 
-        <converter:BoolToVisiableConverter x:Key="BoolToVisiableConverter" />
+        <converter:BoolToVisibleConverter x:Key="BoolToVisiableConverter" />
 
     </Page.Resources>
     <Grid>

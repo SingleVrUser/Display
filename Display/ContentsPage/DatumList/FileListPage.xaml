@@ -206,7 +206,8 @@
                 <CommandBar.SecondaryCommands>
                     <AppBarButton Icon="Sort"
                                   Label="整理"
-                                  Click="Sort115Button_Click"/>
+                                  Click="Sort115Button_Click"
+                                  IsEnabled="False"/>
                     <AppBarButton Icon="Setting"
                                   Label="设置">
                         <AppBarButton.Flyout>

@@ -4,16 +4,11 @@ using System;
 
 namespace Display.Converter;
 
-public class BoolToVisiableConverter : IValueConverter
+public class BoolToVisibleConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        if(value is bool isTrue && isTrue)
-        {
-            return Visibility.Visible;
-        }
-
-        return Visibility.Collapsed;
+        return value is true ? Visibility.Visible : Visibility.Collapsed;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)

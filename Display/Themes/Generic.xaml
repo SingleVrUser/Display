@@ -1034,7 +1034,8 @@
 
                                             <AppBarToggleButton x:Name='IsLikeButton'
                                                                 Style='{StaticResource AppBarToggleButtonStyle}'
-                                                          Visibility='Collapsed'
+                                                                ToolTipService.ToolTip="喜欢"
+                                                                Visibility='Collapsed'
                                                           IsEnabled="False">
                                                 <AppBarToggleButton.Icon>
                                                     <FontIcon Glyph="&#xE006;" />
@@ -1043,7 +1044,8 @@
 
                                             <AppBarToggleButton x:Name='LookLaterButton'
                                                                 Style='{StaticResource AppBarToggleButtonStyle}'
-                                                          Visibility='Collapsed'
+                                                                ToolTipService.ToolTip="稍后观看"
+                                                                Visibility='Collapsed'
                                                           IsEnabled="False">
                                                 <AppBarToggleButton.Icon>
                                                     <FontIcon Glyph="&#xE13B;" />
@@ -1157,7 +1159,7 @@
                                             <AppBarButton x:Name='QualityButton'
                                                           Style='{StaticResource AppBarButtonStyle}'
                                                           MediaTransportControlsHelper.DropoutOrder='10'
-                                                          ToolTipService.ToolTip="切换画质"
+                                                          ToolTipService.ToolTip="画质"
                                                           Visibility="Collapsed">
                                                 <AppBarButton.Flyout>
                                                     <Flyout x:Name="QualityFlyout"
@@ -1175,7 +1177,7 @@
                                             <AppBarButton x:Name='PlayerButton'
                                                           Style='{StaticResource AppBarButtonStyle}'
                                                           MediaTransportControlsHelper.DropoutOrder='11'
-                                                          ToolTipService.ToolTip="切换播放器"
+                                                          ToolTipService.ToolTip="播放器"
                                                           Visibility="Collapsed">
                                                 <AppBarButton.Flyout>
                                                     <Flyout x:Name="PlayerFlyout"
