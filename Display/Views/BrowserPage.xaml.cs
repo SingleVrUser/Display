@@ -61,8 +61,7 @@ namespace Display.Views
             }
             else
             {
-                if (webApi == null)
-                    webApi = new();
+                webApi ??= WebApi.GlobalWebApi;
 
                 List<Datum> videoinfos = new();
 

@@ -2,13 +2,12 @@
 // Licensed under the MIT License.
 
 using Data;
-using Display.Control;
 using Display.Views;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using static Display.Control.CustomMediaPlayerElement;
+using static Display.Controls.CustomMediaPlayerElement;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -21,24 +20,25 @@ namespace Display.WindowView;
 public sealed partial class MediaPlayWindow : Window
 {
     private AppWindow appwindow;
-    private string PickCode;
-    private PlayType PlayType;
-    private string TrueName;
+    private readonly string _pickCode;
+    private readonly PlayType _playType;
+    private readonly string _trueName;
+    private readonly SubInfo _subInfo;
 
     private Page lastPage;
 
-    public MediaPlayWindow(string pickCode, PlayType playType, string truename, Page lastPage)
+    public MediaPlayWindow(string pickCode, PlayType playType, string trueName, Page lastPage, SubInfo subInfo)
     {
         this.InitializeComponent();
 
         this.ExtendsContentIntoTitleBar = true;
         this.SetTitleBar(AppTitleBar);
 
-
-        this.PickCode = pickCode;
-        this.PlayType = playType;
-        this.TrueName = truename;
+        this._pickCode = pickCode;
+        this._playType = playType;
+        this._trueName = trueName;
         this.lastPage = lastPage;
+        this._subInfo = subInfo;
 
         appwindow = App.getAppWindow(this);
 
@@ -49,46 +49,54 @@ public sealed partial class MediaPlayWindow : Window
     {
         if (mediaControl.IsLoaded && VideoPlayGrid.Children.Contains(mediaControl))
         {
-            mediaControl.StopMediaPlayer();
+            mediaControl.DisposeMediaPlayer();
             VideoPlayGrid.Children.Remove(mediaControl);
         }
 
         //上一页为详情页，生效喜欢或稍后观看的修改
-        int newestIsLike = mediaControl.IsLike;
-        int newestLookLater = mediaControl.LookLater;
-        if (lastPage is DetailInfoPage detailInfoPage)
+        var newestIsLike = mediaControl.IsLike;
+        var newestLookLater = mediaControl.LookLater;
+        switch (lastPage)
         {
-            if (detailInfoPage.DetailInfo.is_like != newestIsLike)
-                detailInfoPage.DetailInfo.is_like = newestIsLike;
-
-            if (detailInfoPage.DetailInfo.look_later != newestLookLater)
-                detailInfoPage.DetailInfo.look_later = newestLookLater;
-        }
-        else if(lastPage is VideoViewPage videoViewPage)
-        {
-            var storageItem = videoViewPage._storeditem;
-
-            if (videoViewPage._storeditem != null && videoViewPage._storeditem.truename == TrueName)
+            case DetailInfoPage detailInfoPage:
             {
-                if (storageItem.is_like != newestIsLike)
-                    storageItem.is_like = newestIsLike;
+                if (detailInfoPage.DetailInfo.is_like != newestIsLike)
+                    detailInfoPage.DetailInfo.is_like = newestIsLike;
 
-                if (storageItem.look_later != newestLookLater)
-                    storageItem.look_later = newestLookLater;
+                if (detailInfoPage.DetailInfo.look_later != newestLookLater)
+                    detailInfoPage.DetailInfo.look_later = newestLookLater;
+                break;
             }
-        }else if(lastPage is ActorInfoPage actorInfoPage)
-        {
-            if (actorInfoPage._storeditem.is_like != newestIsLike)
-                actorInfoPage._storeditem.is_like = newestIsLike;
+            case VideoViewPage videoViewPage:
+            {
+                var storageItem = videoViewPage._storeditem;
 
-            if (actorInfoPage._storeditem.look_later != newestLookLater)
-                actorInfoPage._storeditem.look_later = newestLookLater;
+                if (videoViewPage._storeditem != null && videoViewPage._storeditem.truename == _trueName)
+                {
+                    if (storageItem.is_like != newestIsLike)
+                        storageItem.is_like = newestIsLike;
+
+                    if (storageItem.look_later != newestLookLater)
+                        storageItem.look_later = newestLookLater;
+                }
+
+                break;
+            }
+            case ActorInfoPage actorInfoPage:
+            {
+                if (actorInfoPage._storeditem.is_like != newestIsLike)
+                    actorInfoPage._storeditem.is_like = newestIsLike;
+
+                if (actorInfoPage._storeditem.look_later != newestLookLater)
+                    actorInfoPage._storeditem.look_later = newestLookLater;
+                break;
+            }
         }
     }
 
-    public static MediaPlayWindow CreateNewWindow(string pickCode, PlayType playType,string trueName,Page lastPage)
+    public static MediaPlayWindow CreateNewWindow(string pickCode, PlayType playType,string trueName,Page lastPage, SubInfo subInfo)
     {
-        MediaPlayWindow newWindow = new(pickCode, playType, trueName,lastPage);
+        MediaPlayWindow newWindow = new(pickCode, playType, trueName,lastPage, subInfo);
         newWindow.Activate();
 
         return newWindow;
@@ -96,7 +104,7 @@ public sealed partial class MediaPlayWindow : Window
 
     private Visibility isPickCodeNull()
     {
-        return PickCode == null ? Visibility.Visible : Visibility.Collapsed;
+        return _pickCode == null ? Visibility.Visible : Visibility.Collapsed;
     }
 
     #region 全屏设置
@@ -120,13 +128,13 @@ public sealed partial class MediaPlayWindow : Window
     {
         if (appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
         {
+            this.ExtendsContentIntoTitleBar = false;
+            TitleBarRowDefinition.Height = new GridLength(0);
+
             appwindow.SetPresenter(AppWindowPresenterKind.FullScreen);
 
             //监听ESC退出
             RootGrid.KeyDown += RootGrid_KeyDown;
-
-            this.ExtendsContentIntoTitleBar = false;
-            TitleBarRowDefinition.Height = new(0);
 
             VisualStateManager.GoToState(mediaControl.mediaTransportControls, "FullWindowState", true);
         }
@@ -137,18 +145,19 @@ public sealed partial class MediaPlayWindow : Window
     /// </summary>
     private void cancelFullScreen()
     {
-        if (appwindow.Presenter.Kind == AppWindowPresenterKind.FullScreen)
-        {
-            appwindow.SetPresenter(Microsoft.UI.Windowing.AppWindowPresenterKind.Default);
+        if (appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen) return;
 
-            //取消监听
-            RootGrid.KeyDown -= RootGrid_KeyDown;
 
-            this.ExtendsContentIntoTitleBar = true;
-            TitleBarRowDefinition.Height = new(28);
+        this.ExtendsContentIntoTitleBar = true;
+        TitleBarRowDefinition.Height = new GridLength(28);
 
-            VisualStateManager.GoToState(mediaControl.mediaTransportControls, "NoFullWindowState", true);
-        }
+        appwindow.SetPresenter(AppWindowPresenterKind.Default);
+
+        //取消监听
+        RootGrid.KeyDown -= RootGrid_KeyDown;
+
+
+        VisualStateManager.GoToState(mediaControl.mediaTransportControls, "NoFullWindowState", true);
     }
 
     private void RootGrid_KeyDown(object sender, KeyRoutedEventArgs e)

@@ -37,7 +37,7 @@ namespace Display.ContentsPage
             window.ExtendsContentIntoTitleBar = true;
             window.SetTitleBar(AppTitleBar);
 
-            webapi = new();
+            webapi = WebApi.GlobalWebApi;
         }
 
         private void Grid_Loaded(object sender, RoutedEventArgs e)

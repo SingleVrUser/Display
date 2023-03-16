@@ -223,7 +223,7 @@ namespace Display.ContentsPage
 
         private async void GetThumbnailFromWebVideo(List<ThumbnailInfo> thumbnailinfos, GetThumbnailFromWebVideoSetting getThumbnailFromWebVideoSetting, IProgress<progressClass> overallProgress, IProgress<progressInfo> getImageProgress, CancellationTokenSource s_cts)
         {
-            WebApi webApi = new();
+            var webApi = WebApi.GlobalWebApi;
             GetImageByOpenCV openCV = new(true);
 
             for (int i = 0; i < thumbnailinfos.Count; i++)

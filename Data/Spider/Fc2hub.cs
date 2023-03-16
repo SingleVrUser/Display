@@ -6,12 +6,13 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media.Protection.PlayReady;
+using static Data.Model.SpiderInfo;
 
 namespace Data.Spider;
 
 public class Fc2hub
 {
-    public const int Id = (int)Manager.SpiderSourceName.fc2club;
+    public const int Id = (int)SpiderSourceName.Fc2club;
 
     public const string Abbreviation = "fc";
 

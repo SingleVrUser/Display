@@ -25,7 +25,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
     /// </summary>
     public sealed partial class Progress : Page
     {
-        WebApi webapi = new ();
+        WebApi webapi = WebApi.GlobalWebApi;
         public ObservableCollection<FolderCategory> FolderCategory = new();
         public ObservableCollection<Datum> FilesItemsSource = new();
         List<string> cidList;

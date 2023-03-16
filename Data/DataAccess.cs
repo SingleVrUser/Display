@@ -240,9 +240,9 @@ namespace Data
                     $"EXISTS SpiderTask ( " +
                       "Name text," +
                       "bus text," +
-                      "jav321 text," +
-                      "avmoo text," +
-                      "avsox text," +
+                      "Jav321 text," +
+                      "Avmoo text," +
+                      "Avsox text," +
                       "libre text," +
                       "fc text," +
                       "db text," +
@@ -959,16 +959,16 @@ namespace Data
                 insertCommand.Connection = db;
 
                 //添加信息，如果已经存在则替换
-                insertCommand.CommandText = $"INSERT OR REPLACE INTO SpiderTask VALUES (@Name,@bus,@jav321,@avmoo,@avsox,@libre,@fc,@db,@done,@task_id);";
+                insertCommand.CommandText = $"INSERT OR REPLACE INTO SpiderTask VALUES (@Name,@bus,@Jav321,@Avmoo,@Avsox,@libre,@fc,@db,@done,@task_id);";
 
                 //fc只有javdb，fc2club能刮
                 bool isFc = FileMatch.IsFC2(name);
 
                 insertCommand.Parameters.AddWithValue("@Name", name);
                 insertCommand.Parameters.AddWithValue("@bus", !isFc && AppSettings.isUseJavBus?"ready": "done");
-                insertCommand.Parameters.AddWithValue("@jav321", !isFc && AppSettings.isUseJav321?"ready": "done");
-                insertCommand.Parameters.AddWithValue("@avmoo", !isFc && AppSettings.isUseAvMoo?"ready": "done");
-                insertCommand.Parameters.AddWithValue("@avsox", AppSettings.isUseAvSox?"ready": "done");
+                insertCommand.Parameters.AddWithValue("@Jav321", !isFc && AppSettings.isUseJav321?"ready": "done");
+                insertCommand.Parameters.AddWithValue("@Avmoo", !isFc && AppSettings.isUseAvMoo?"ready": "done");
+                insertCommand.Parameters.AddWithValue("@Avsox", AppSettings.isUseAvSox?"ready": "done");
                 insertCommand.Parameters.AddWithValue("@libre", !isFc && AppSettings.isUseLibreDmm ? "ready" : "done");
                 insertCommand.Parameters.AddWithValue("@fc", isFc && AppSettings.isUseFc2Hub ? "ready" : "done");
                 insertCommand.Parameters.AddWithValue("@db", AppSettings.isUseJavDB ? "ready" : "done");
@@ -1884,7 +1884,7 @@ namespace Data
 
                 SqliteCommand selectCommand = new SqliteCommand
                     ($"SELECT Name from SpiderTask WHERE Done == 0 AND " +
-                        $"(libre != 'doing' AND bus != 'doing' AND jav321 != 'doing' AND avmoo != 'doing' AND avsox != 'doing' AND fc != 'doing' AND db != 'doing' AND fc != 'doing') AND " +
+                        $"(libre != 'doing' AND bus != 'doing' AND Jav321 != 'doing' AND Avmoo != 'doing' AND Avsox != 'doing' AND fc != 'doing' AND db != 'doing' AND fc != 'doing') AND " +
                         $"{spiderSource.Name} == 'ready' LIMIT 1", db);
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
@@ -1944,7 +1944,7 @@ namespace Data
 
                 SqliteCommand selectCommand = new SqliteCommand
                     ($"SELECT Name FROM SpiderTask WHERE Name == '{QueryName}' AND " +
-                    $"libre == 'done' AND bus == 'done' AND jav321 == 'done' AND avmoo == 'done' AND avsox == 'done' AND fc == 'done' AND db == 'done' " +
+                    $"libre == 'done' AND bus == 'done' AND Jav321 == 'done' AND Avmoo == 'done' AND Avsox == 'done' AND fc == 'done' AND db == 'done' " +
                     $"AND done == 0", db);
 
                 string name = (string)selectCommand.ExecuteScalar();

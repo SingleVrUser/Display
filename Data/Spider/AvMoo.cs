@@ -4,15 +4,16 @@ using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Media.Protection.PlayReady;
+using static Data.Model.SpiderInfo;
 using static Data.Spider.Manager;
 
 namespace Data.Spider;
 
 public class AvMoo
 {
-    public const int Id = (int)SpiderSourceName.avmoo;
+    public const int Id = (int)SpiderSourceName.Avmoo;
 
-    public const string Abbreviation = "avmoo";
+    public const string Abbreviation = "Avmoo";
 
     public const string Keywords = "AVMOO";
 

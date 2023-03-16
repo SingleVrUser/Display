@@ -32,7 +32,7 @@ namespace Display.Views
         //public UserInfo UserInfo;
         ObservableCollection<Datum> groups;
         ObservableCollection<string> failList;
-        private WebApi webapi = new();
+        private WebApi webapi = WebApi.GlobalWebApi;
 
         public LoginPage()
         {

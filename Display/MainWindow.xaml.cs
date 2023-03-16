@@ -1,4 +1,5 @@
 ﻿using Data;
+using Display.Helper;
 using Display.Views;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
@@ -34,9 +35,9 @@ namespace Display
         {
             InitializeComponent();
 
-            SetStyle();
-
             appwindow = App.getAppWindow(this);
+
+            SetStyle();
         }
 
         /// <summary>
@@ -46,6 +47,10 @@ namespace Display
         {
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(AppTitleBar);
+
+            appwindow.SetIcon(Path.Combine(Windows.ApplicationModel.Package.Current.InstalledLocation.Path, "Assets/pokeball.ico"));
+
+            this.Title = "Display";
 
             AppTitleBar.Height = NavView.CompactPaneLength - 5;
 
@@ -117,34 +122,36 @@ namespace Display
             if (ReleaseCheck == null) return;
 
             //可以升级且最新版本不是忽略的版本
-            if (ReleaseCheck.CanUpdate && ReleaseCheck.LatestVersion != AppSettings.IgnoreUpdateAppVersion)
+            if (!ReleaseCheck.CanUpdate || ReleaseCheck.LatestVersion == AppSettings.IgnoreUpdateAppVersion) return;
+
+            var dialog = new ContentDialog
             {
-                ContentDialog dialog = new ContentDialog();
-
                 // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
-                dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
-                dialog.Title = "有新版本可升级";
-                dialog.PrimaryButtonText = "下载";
-                dialog.SecondaryButtonText = "忽略该版本";
-                dialog.CloseButtonText = "取消";
-                dialog.DefaultButton = ContentDialogButton.Primary;
-                dialog.Content = new ContentsPage.UpdateAppPage(ReleaseCheck);
-                dialog.XamlRoot = ((Page)ContentFrame.Content).XamlRoot;
-                var result = await dialog.ShowAsync();
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+                Title = "有新版本可升级",
+                PrimaryButtonText = "下载",
+                SecondaryButtonText = "忽略该版本",
+                CloseButtonText = "取消",
+                DefaultButton = ContentDialogButton.Primary,
+                Content = new ContentsPage.UpdateAppPage(ReleaseCheck),
+                XamlRoot = ((Page)ContentFrame.Content).XamlRoot
+            };
 
-                switch(result)
-                {
-                    //下载
-                    case ContentDialogResult.Primary:
-                        await Launcher.LaunchUriAsync(new Uri(ReleaseCheck.AppAsset.browser_download_url));
-                        break;
-                    //忽略该版本
-                    case ContentDialogResult.Secondary:
-                        AppSettings.IgnoreUpdateAppVersion = ReleaseCheck.LatestVersion;
-                        break;
-                    default:
-                        return;
-                }
+            var result = await dialog.ShowAsync();
+
+            switch(result)
+            {
+                //下载
+                case ContentDialogResult.Primary:
+                    await Launcher.LaunchUriAsync(new Uri(ReleaseCheck.AppAsset.browser_download_url));
+                    break;
+                //忽略该版本
+                case ContentDialogResult.Secondary:
+                    AppSettings.IgnoreUpdateAppVersion = ReleaseCheck.LatestVersion;
+                    break;
+                case ContentDialogResult.None:
+                default:
+                    return;
             }
 
         }
@@ -274,7 +281,7 @@ namespace Display
                 //选中的是失败项
                 if(nowItem.series == "fail")
                 {
-                    await DetailInfoPage.PlayeVideo(nowItem.busurl, ((Page)ContentFrame.Content).XamlRoot);
+                    await PlayVideoHelper.PlayVideo(nowItem.busurl, ((Page)ContentFrame.Content).XamlRoot);
                 }
                 //正常点击
                 else

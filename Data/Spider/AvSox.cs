@@ -4,14 +4,15 @@ using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Media.Protection.PlayReady;
+using static Data.Model.SpiderInfo;
 
 namespace Data.Spider;
 
 public class AvSox
 {
-    public const int Id = (int)Manager.SpiderSourceName.avsox;
+    public const int Id = (int)SpiderSourceName.Avsox;
 
-    public const string Abbreviation = "avsox";
+    public const string Abbreviation = "Avsox";
 
     public const string Keywords = "AVSOX";
 
