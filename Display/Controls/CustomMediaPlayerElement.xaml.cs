@@ -478,7 +478,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
         webApi ??= WebApi.GlobalWebApi;
 
-        await webApi.PlayVideoWithOriginUrl(player.PickCode,player.PlayMethod,this.XamlRoot);
+        await webApi.PlayVideoWithOriginUrl(player.PickCode,player.PlayMethod,this.XamlRoot, SubInfo);
     }
 
     private async void ShowTeachingTip(string subTitle)
