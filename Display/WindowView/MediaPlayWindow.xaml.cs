@@ -27,17 +27,16 @@ public sealed partial class MediaPlayWindow : Window
 
     private Page lastPage;
 
-    public MediaPlayWindow(string pickCode, PlayType playType, string truename, Page lastPage, SubInfo subInfo)
+    public MediaPlayWindow(string pickCode, PlayType playType, string trueName, Page lastPage, SubInfo subInfo)
     {
         this.InitializeComponent();
 
         this.ExtendsContentIntoTitleBar = true;
         this.SetTitleBar(AppTitleBar);
 
-
         this._pickCode = pickCode;
         this._playType = playType;
-        this._trueName = truename;
+        this._trueName = trueName;
         this.lastPage = lastPage;
         this._subInfo = subInfo;
 
@@ -55,35 +54,43 @@ public sealed partial class MediaPlayWindow : Window
         }
 
         //上一页为详情页，生效喜欢或稍后观看的修改
-        int newestIsLike = mediaControl.IsLike;
-        int newestLookLater = mediaControl.LookLater;
-        if (lastPage is DetailInfoPage detailInfoPage)
+        var newestIsLike = mediaControl.IsLike;
+        var newestLookLater = mediaControl.LookLater;
+        switch (lastPage)
         {
-            if (detailInfoPage.DetailInfo.is_like != newestIsLike)
-                detailInfoPage.DetailInfo.is_like = newestIsLike;
-
-            if (detailInfoPage.DetailInfo.look_later != newestLookLater)
-                detailInfoPage.DetailInfo.look_later = newestLookLater;
-        }
-        else if(lastPage is VideoViewPage videoViewPage)
-        {
-            var storageItem = videoViewPage._storeditem;
-
-            if (videoViewPage._storeditem != null && videoViewPage._storeditem.truename == _trueName)
+            case DetailInfoPage detailInfoPage:
             {
-                if (storageItem.is_like != newestIsLike)
-                    storageItem.is_like = newestIsLike;
+                if (detailInfoPage.DetailInfo.is_like != newestIsLike)
+                    detailInfoPage.DetailInfo.is_like = newestIsLike;
 
-                if (storageItem.look_later != newestLookLater)
-                    storageItem.look_later = newestLookLater;
+                if (detailInfoPage.DetailInfo.look_later != newestLookLater)
+                    detailInfoPage.DetailInfo.look_later = newestLookLater;
+                break;
             }
-        }else if(lastPage is ActorInfoPage actorInfoPage)
-        {
-            if (actorInfoPage._storeditem.is_like != newestIsLike)
-                actorInfoPage._storeditem.is_like = newestIsLike;
+            case VideoViewPage videoViewPage:
+            {
+                var storageItem = videoViewPage._storeditem;
 
-            if (actorInfoPage._storeditem.look_later != newestLookLater)
-                actorInfoPage._storeditem.look_later = newestLookLater;
+                if (videoViewPage._storeditem != null && videoViewPage._storeditem.truename == _trueName)
+                {
+                    if (storageItem.is_like != newestIsLike)
+                        storageItem.is_like = newestIsLike;
+
+                    if (storageItem.look_later != newestLookLater)
+                        storageItem.look_later = newestLookLater;
+                }
+
+                break;
+            }
+            case ActorInfoPage actorInfoPage:
+            {
+                if (actorInfoPage._storeditem.is_like != newestIsLike)
+                    actorInfoPage._storeditem.is_like = newestIsLike;
+
+                if (actorInfoPage._storeditem.look_later != newestLookLater)
+                    actorInfoPage._storeditem.look_later = newestLookLater;
+                break;
+            }
         }
     }
 
@@ -144,7 +151,7 @@ public sealed partial class MediaPlayWindow : Window
         this.ExtendsContentIntoTitleBar = true;
         TitleBarRowDefinition.Height = new GridLength(28);
 
-        appwindow.SetPresenter(Microsoft.UI.Windowing.AppWindowPresenterKind.Default);
+        appwindow.SetPresenter(AppWindowPresenterKind.Default);
 
         //取消监听
         RootGrid.KeyDown -= RootGrid_KeyDown;

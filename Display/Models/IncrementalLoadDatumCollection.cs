@@ -17,10 +17,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
     private int _allCount;
     public int AllCount
     {
-        get
-        {
-            return this._allCount;
-        }
+        get => this._allCount;
         private set
         {
             if (this._allCount == value) return;
@@ -81,13 +78,10 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
 
         foreach (var datum in FilesInfo.data)
         {
-            Add(new(datum));
+            Add(new FilesInfo(datum));
         }
 
-        if (AllCount <= Count)
-        {
-            HasMoreItems = false;
-        }
+        HasMoreItems = AllCount > Count;
 
         return FilesInfo.data.Length;
     }

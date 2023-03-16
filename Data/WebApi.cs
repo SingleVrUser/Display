@@ -70,6 +70,14 @@ namespace Data
             Client.DefaultRequestHeaders.Add("Cookie", cookie);
         }
 
+        public static Windows.Web.Http.HttpClient GetVideoClient()
+        {
+            var httpClient = new Windows.Web.Http.HttpClient();
+            httpClient.DefaultRequestHeaders.Add("Referer", "https://115.com/?cid=0&offset=0&tab=&mode=wangpan");
+            httpClient.DefaultRequestHeaders.Add("User-Agent", GetInfoFromNetwork.BrowserUserAgent);
+            return httpClient;
+        }
+
         /// <summary>
         /// 检查登录状态
         /// </summary>

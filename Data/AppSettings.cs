@@ -104,7 +104,7 @@ public class AppSettings
     {
         get
         {
-            var isAutoPlayVideo = true;
+            var isAutoPlayVideo = false;
             if (localSettings.Values["IsAutoPlayInVideoDisplay"] is bool value)
             {
                 isAutoPlayVideo = value;
@@ -121,7 +121,7 @@ public class AppSettings
     {
         get
         {
-            var positionPercentage = 0.0;
+            var positionPercentage = 33.0;
             if (localSettings.Values["AutoPlayPositionPercentage"] is double value)
             {
                 positionPercentage = value;
@@ -129,6 +129,24 @@ public class AppSettings
             return positionPercentage;
         }
         set => localSettings.Values["AutoPlayPositionPercentage"] = value;
+    }
+
+
+    /// <summary>
+    /// 视频最大播放数量
+    /// </summary>
+    public static double MaxVideoPlayCount
+    {
+        get
+        {
+            var count = 1.0;
+            if (localSettings.Values["MaxVideoPlayCount"] is double value)
+            {
+                count = value;
+            }
+            return count;
+        }
+        set => localSettings.Values["MaxVideoPlayCount"] = value;
     }
 
 

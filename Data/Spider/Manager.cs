@@ -72,20 +72,6 @@ public class Manager
             if (videoInfo != null) break;
         }
 
-        //if (!isFc && AppSettings.isUseJavBus)
-        //if (videoInfo == null && !isFc && AppSettings.isUseJav321)
-        //    videoInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(CID, Jav321.Id);
-        //if (videoInfo == null && !isFc && AppSettings.isUseAvMoo)
-        //    videoInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(CID, AvMoo.Id);
-        //if (videoInfo == null && AppSettings.isUseAvSox)
-        //    videoInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(CID, AvSox.Id);
-        //if (videoInfo == null && !isFc && AppSettings.isUseLibreDmm)
-        //    videoInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(CID, LibreDmm.Id);
-        //if (videoInfo == null && isFc && AppSettings.isUseFc2Hub)
-        //    videoInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(CID, Fc2hub.Id);
-        //if (videoInfo == null && AppSettings.isUseJavDB)
-        //    videoInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(CID, JavDB.Id);
-
         return videoInfo;
     }
 

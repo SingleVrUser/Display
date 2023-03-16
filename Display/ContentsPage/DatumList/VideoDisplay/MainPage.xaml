@@ -14,7 +14,6 @@
       mc:Ignorable="d">
 
     <Page.Resources>
-        <converter:BoolToVisibleConverter x:Name="BoolToVisibleConverter"/>
         <!--<Storyboard x:Name="OpenInfoGridStoryboard">
             <DoubleAnimation Storyboard.TargetName="InfoGrid"
                              Storyboard.TargetProperty="Width"
@@ -282,16 +281,20 @@
                         </PivotItem>
                         <PivotItem Header="设置">
                             <StackPanel Padding="0,10">
-                                <ToggleSwitch Header="默认单视频播放"
-                                              IsOn="{x:Bind data:AppSettings.IsDefaultPlaySingleVideo,Mode=TwoWay}" />
+                                <Slider Header="最大播放数"
+                                        Value="{x:Bind data:AppSettings.MaxVideoPlayCount,Mode=TwoWay}"
+                                        Minimum="1"
+                                        Maximum="4"
+                                        TickFrequency="1"
+                                        TickPlacement="Outside"
+                                        SnapsTo="Ticks" />
 
                                 <ToggleSwitch x:Name="IsAutoPlayButton"
                                               Header="自动播放"
                                               IsOn="{x:Bind data:AppSettings.IsAutoPlayInVideoDisplay,Mode=TwoWay}" />
 
                                 <Slider Header="起始位置"
-                                        Value="{x:Bind data:AppSettings.AutoPlayPositionPercentage,Mode=TwoWay}"
-                                        Visibility="{x:Bind IsAutoPlayButton.IsOn,Mode=OneWay,Converter={StaticResource BoolToVisibleConverter}}" />
+                                        Value="{x:Bind data:AppSettings.AutoPlayPositionPercentage,Mode=TwoWay}"/>
                             </StackPanel>
                         </PivotItem>
                     </Pivot>
