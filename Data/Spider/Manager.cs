@@ -8,6 +8,7 @@ using System.Runtime;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using static Data.Model.SpiderInfo;
 
 namespace Data.Spider;
 
@@ -70,20 +71,6 @@ public class Manager
 
             if (videoInfo != null) break;
         }
-
-        //if (!isFc && AppSettings.isUseJavBus)
-        //if (videoInfo == null && !isFc && AppSettings.isUseJav321)
-        //    videoInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(CID, Jav321.Id);
-        //if (videoInfo == null && !isFc && AppSettings.isUseAvMoo)
-        //    videoInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(CID, AvMoo.Id);
-        //if (videoInfo == null && AppSettings.isUseAvSox)
-        //    videoInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(CID, AvSox.Id);
-        //if (videoInfo == null && !isFc && AppSettings.isUseLibreDmm)
-        //    videoInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(CID, LibreDmm.Id);
-        //if (videoInfo == null && isFc && AppSettings.isUseFc2Hub)
-        //    videoInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(CID, Fc2hub.Id);
-        //if (videoInfo == null && AppSettings.isUseJavDB)
-        //    videoInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(CID, JavDB.Id);
 
         return videoInfo;
     }
@@ -170,7 +157,8 @@ public class Manager
     }
 
 
-    public enum SpiderSourceName { javbus, jav321, avmoo, avsox, libredmm, fc2club, javdb, local }
+
+
     public class SpiderSource
     {
         public string Name { get; private set; }
@@ -189,39 +177,39 @@ public class Manager
 
             switch (source)
             {
-                case SpiderSourceName.javbus:
+                case SpiderSourceName.Javbus:
                     name = JavBus.Abbreviation;
                     DelayRanges = JavBus.DelayRanges;
                     IsTrue = JavBus.IsTrue;
                     break;
-                case SpiderSourceName.jav321:
+                case SpiderSourceName.Jav321:
                     name = Jav321.Abbreviation;
                     DelayRanges = Jav321.DelayRanges;
                     IsTrue = Jav321.IsTrue;
                     break;
-                case SpiderSourceName.avmoo:
+                case SpiderSourceName.Avmoo:
                     name = AvMoo.Abbreviation;
                     DelayRanges = AvMoo.DelayRanges;
                     IsTrue = AvMoo.IsTrue;
                     break;
-                case SpiderSourceName.avsox:
+                case SpiderSourceName.Avsox:
                     name = AvSox.Abbreviation;
                     DelayRanges = AvSox.DelayRanges;
                     IsTrue = AvSox.IsTrue;
                     break;
-                case SpiderSourceName.libredmm:
+                case SpiderSourceName.Libredmm:
                     name = LibreDmm.Abbreviation;
                     DelayRanges = LibreDmm.DelayRanges;
                     IsTrue = LibreDmm.IsTrue;
                     break;
-                case SpiderSourceName.fc2club:
+                case SpiderSourceName.Fc2club:
                     name = Fc2hub.Abbreviation;
                     DelayRanges = Fc2hub.DelayRanges;
                     IsTrue = Fc2hub.IsTrue;
                     OnlyFc2 = Fc2hub.OnlyFc2;
                     IgnoreFc2 = Fc2hub.IgnoreFc2;
                     break;
-                case SpiderSourceName.javdb:
+                case SpiderSourceName.Javdb:
                     name = JavDB.Abbreviation;
                     DelayRanges = JavDB.DelayRanges;
                     IsTrue = JavDB.IsTrue;
@@ -231,9 +219,7 @@ public class Manager
 
             this.Name = name;
         }
-
-
     }
 
-
 }
+

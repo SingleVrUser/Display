@@ -5,7 +5,7 @@
       xmlns:converter="using:Display.Converter"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:control="using:Display.Control"
+      xmlns:customcontrols="using:Display.Controls"
       xmlns:data="using:Data"
       mc:Ignorable="d">
 
@@ -52,7 +52,7 @@
             </Setter>
         </Style>
 
-        <converter:BoolToVisiableConverter x:Key="BoolToVisiableConverter" />
+        <converter:BoolToVisibleConverter x:Key="BoolToVisiableConverter" />
 
     </Page.Resources>
     <Grid>
@@ -65,12 +65,12 @@
         <!--用户信息-->
         <StackPanel Orientation="Horizontal"
                     Padding="10,0">
-            <control:UserInfo x:Name="userInfoControl"
-                              UpdateClick="UpdateButton_Click"
-                              Loginlick="LoginButton_Click"
-                              LogoutClick="LogoutButton_Click"
-                              HorizontalAlignment="Left"
-                              Margin="5" />
+            <customcontrols:UserInfo x:Name="userInfoControl"
+                                     UpdateClick="UpdateButton_Click"
+                                     Loginlick="LoginButton_Click"
+                                     LogoutClick="LogoutButton_Click"
+                                     HorizontalAlignment="Left"
+                                     Margin="5" />
 
             <!--提示-->
             <InfoBar x:Name="infobar"
@@ -653,9 +653,9 @@
                                                          Text="{x:Bind data:AppSettings.BitCometSettings.ApiUrl}"
                                                          x:Name="BitCometDownApi_TextBox"
                                                          Width="540" />
-                                                <control:StatusShow HorizontalAlignment="Right"
-                                                                    x:Name="BitCometCheckStatus"
-                                                                    Margin="5,0" />
+                                                <customcontrols:StatusShow HorizontalAlignment="Right"
+                                                                           x:Name="BitCometCheckStatus"
+                                                                           Margin="5,0" />
                                             </StackPanel>
 
                                             <Button x:Name="BitCometCheckButton"
@@ -709,9 +709,9 @@
                                                          Text="{x:Bind data:AppSettings.Aria2Settings.ApiUrl}"
                                                          x:Name="Aria2DownApi_TextBox"
                                                          Width="650" />
-                                                <control:StatusShow HorizontalAlignment="Right"
-                                                                    x:Name="Aria2CheckStatus"
-                                                                    Margin="5,0" />
+                                                <customcontrols:StatusShow HorizontalAlignment="Right"
+                                                                           x:Name="Aria2CheckStatus"
+                                                                           Margin="5,0" />
                                             </StackPanel>
 
                                             <Button x:Name="Aria2CheckButton"

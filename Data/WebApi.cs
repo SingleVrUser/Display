@@ -11,15 +11,12 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Windows.Storage;
-using static Data.WebApi;
 
 namespace Data
 {
@@ -35,6 +32,10 @@ namespace Data
 
         //string api_version = "2.0.1.7";
 
+        private static WebApi _webApi;
+
+        public static WebApi GlobalWebApi => _webApi ??= new WebApi();
+
         public WebApi(bool useCookie = true)
         {
             if (useCookie)
@@ -48,7 +49,7 @@ namespace Data
         /// </summary>
         public void InitializeInternet()
         {
-            Client = GetInfoFromNetwork.CreateClient(new() { { "user-agent", GetInfoFromNetwork.BrowserUserAgent } });
+            Client = GetInfoFromNetwork.CreateClient(new Dictionary<string, string> { { "user-agent", GetInfoFromNetwork.BrowserUserAgent } });
 
             var cookie = AppSettings._115_Cookie;
 
@@ -67,6 +68,14 @@ namespace Data
         {
             Client.DefaultRequestHeaders.Remove("Cookie");
             Client.DefaultRequestHeaders.Add("Cookie", cookie);
+        }
+
+        public static Windows.Web.Http.HttpClient GetVideoClient()
+        {
+            var httpClient = new Windows.Web.Http.HttpClient();
+            httpClient.DefaultRequestHeaders.Add("Referer", "https://115.com/?cid=0&offset=0&tab=&mode=wangpan");
+            httpClient.DefaultRequestHeaders.Add("User-Agent", GetInfoFromNetwork.BrowserUserAgent);
+            return httpClient;
         }
 
         /// <summary>
@@ -1658,6 +1667,8 @@ namespace Data
                     //vlc不支持带“; ”的user-agent
                     Play115SourceVideoWithVlc(downUrl, user_agnet: ua, savePath, false, title: downUrlList.First().Key, subFile: subFile);
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(playMethod), playMethod, null);
             }
         }
 

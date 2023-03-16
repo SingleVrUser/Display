@@ -32,50 +32,46 @@ namespace Display.Views
 
         ObservableCollection<string> SpiderMothodList = new();
 
-        private WebApi webapi;
+        private static WebApi webapi;
 
         public SettingsPage()
         {
             this.InitializeComponent();
 
-            this.Loaded += PageLoaded;
-        }
-
-        private void PageLoaded(object sender, RoutedEventArgs e)
-        {
             InitializationView();
-
-            this.Loaded -= PageLoaded;
         }
+
 
         private async void InitializationView()
         {
             //初始化115状态
-            await Task.Run(async () =>
+            webapi ??= WebApi.GlobalWebApi;
+
+            if (!string.IsNullOrEmpty(AppSettings._115_Cookie) && WebApi.UserInfo == null)
             {
-                webapi = new();
-                if (!string.IsNullOrEmpty(AppSettings._115_Cookie) && WebApi.UserInfo == null)
+                await Task.Run(async () =>
                 {
                     var isLogin = await webapi.UpdateLoginInfo();
 
-                    if (isLogin)
-                    {
-                        //检查一下是否为隐藏模式
-                        await webapi.IsHiddenModel();
-                    }
-                }
-            });
+                        //if (isLogin)
+                        //{
+                        //    //检查一下是否为隐藏模式
+                        //    await webapi.IsHiddenModel();
+                        //}
+                });
+            }
 
             updateUserInfo();
             updateLoginStatus();
-            infobar.IsOpen = WebApi.isEnterHiddenMode == true ? false : true;
+
+            //infobar.IsOpen = WebApi.isEnterHiddenMode != true;
 
             DataAccessSavePath_TextBox.Text = AppSettings.DataAccess_SavePath;
         }
 
         private void updateUserInfo()
         {
-            userInfoControl.userinfo = WebApi.UserInfo == null ? null: WebApi.UserInfo.data;
+            userInfoControl.userinfo = WebApi.UserInfo?.data;
         }
 
         private void updateLoginStatus()

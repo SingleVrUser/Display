@@ -2,20 +2,8 @@
 // Licensed under the MIT License.
 
 using Data.Model;
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.System;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -39,7 +27,7 @@ namespace Display.ContentsPage
 
         private async void MarkdownTextBlock_LinkClicked(object sender, CommunityToolkit.WinUI.UI.Controls.LinkClickedEventArgs e)
         {
-            if (Uri.TryCreate(e.Link, UriKind.Absolute, out Uri link))
+            if (Uri.TryCreate(e.Link, UriKind.Absolute, out var link))
             {
                 await Launcher.LaunchUriAsync(link);
             }

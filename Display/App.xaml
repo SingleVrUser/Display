@@ -2,7 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-             xmlns:local="using:Display">
+             xmlns:local="using:Display"
+             xmlns:ui="using:Windows.UI">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -21,12 +22,15 @@
 
                 <!--控件颜色-->
                 <ResourceDictionary>
-                    <Color x:Key="ColorChecked">#8cb3ff</Color>
+                    <ui:Color x:Key="ColorChecked">#8cb3ff</ui:Color>
                     <!--<Color x:Key="ColorAngleMark">#6495ed</Color>-->
                     <SolidColorBrush x:Key="CustomToggleButtonBackgroundChecked" Color="{StaticResource ColorChecked}" />
                     <SolidColorBrush x:Key="AngleMarkBackground"
                                      Color="CornflowerBlue"
                                      Opacity="0.8"/>
+
+                    <SolidColorBrush x:Key="ButtonEmphasizeBackground"
+                                     Color="{StaticResource ColorLightEmphasize}"/>
                 </ResourceDictionary>
 
                 <ResourceDictionary>
@@ -194,11 +198,55 @@
 
             <x:Double x:Key="ContentDialogMaxWidth">900</x:Double>
 
-            <!--<AcrylicBrush x:Key="CustomAcrylicInAppLuminosity"
-                          TintOpacity="0.8"
-                          TintLuminosityOpacity="0.5"
-                          TintColor="#0593ff" FallbackColor="SkyBlue" />-->
-            
+
+            <!--颜色-->
+            <ui:Color x:Key="ColorDefault">#FBFBFB</ui:Color>
+            <ui:Color x:Key="ColorSecondary">#8CB3FF</ui:Color>
+            <ui:Color x:Key="ColorTertiary">#0E6BE9</ui:Color>
+            <ui:Color x:Key="ColorLightEmphasize">#DAE5FF</ui:Color>
+            <ui:Color x:Key="ControlColorDefault">#FFFFFF</ui:Color>
+            <ui:Color x:Key="ControlColorBorder">#EEEEF1</ui:Color>
+
+            <!--数值-->
+            <Thickness x:Key="AppBarButtonCompactMargin">0,-5,0,-20</Thickness>
+
+            <!--样式-->
+
+            <Style TargetType="TextBlock"
+                   x:Key="BoldTextBlock">
+                <!--<Setter Property="FontWeight"
+                        Value="Bold" />-->
+                <Setter Property="FontSize"
+                        Value="20" />
+                <Setter Property="CharacterSpacing"
+                        Value="50" />
+            </Style>
+
+
+            <Style TargetType="TextBlock"
+                   x:Key="LightBoldTextBlock">
+                <Setter Property="FontWeight"
+                        Value="Bold" />
+                <Setter Property="HorizontalAlignment"
+                        Value="Center" />
+                <Setter Property="VerticalAlignment"
+                        Value="Center" />
+                <Setter Property="FontSize"
+                        Value="20" />
+                <Setter Property="CharacterSpacing"
+                        Value="100" />
+                <Setter Property="Opacity"
+                        Value=".5" />
+                <Setter Property="TextWrapping"
+                        Value="Wrap" />
+            </Style>
+
+            <SolidColorBrush x:Key="CircleBorderBrush"
+                             Color="{StaticResource ControlColorBorder}" />
+
+            <SolidColorBrush x:Key="CircleLightBorderBrush"
+                             Color="{StaticResource ControlColorBorder}" Opacity=".4"/>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

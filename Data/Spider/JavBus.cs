@@ -6,12 +6,13 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media.Protection.PlayReady;
+using static Data.Model.SpiderInfo;
 
 namespace Data.Spider;
 
 public class JavBus
 {
-    public const int Id = (int)Manager.SpiderSourceName.javbus;
+    public const int Id = (int)SpiderSourceName.Javbus;
 
     public const string Abbreviation = "bus";
 

@@ -1,5 +1,5 @@
 ﻿using Data;
-using Display.Model;
+using Display.Models;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -541,7 +541,7 @@ namespace Display.ContentsPage
         /// </summary>
         private async void getActorCoverByWebVideo()
         {
-            WebApi webApi = new();
+            var webApi = WebApi.GlobalWebApi;
             var startTime = DateTimeOffset.Now;
 
             //获取链接
