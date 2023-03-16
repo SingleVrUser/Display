@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -192,12 +193,19 @@ public sealed partial class MainPage : Page
 
     private void RemoveMediaControl()
     {
-        //foreach (var child in Video_UniformGrid.Children)
-        //{
-        //    var videoControl = child as MediaPlayerElement;
-        //    videoControl?.MediaPlayer.Pause();
-        //    videoControl?.SetMediaPlayer(null);
-        //}
+        foreach (var child in Video_UniformGrid.Children)
+        {
+            var videoControl = child as MediaPlayerElement;
+            try
+            {
+                //videoControl?.SetMediaPlayer(null);
+                videoControl?.MediaPlayer?.PlaybackSession?.MediaPlayer?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"关闭MediaControl出错{ex.Message}");
+            }
+        }
         Video_UniformGrid.Children.Clear();
     }
 
@@ -250,15 +258,7 @@ public sealed partial class MainPage : Page
         //检查选中的文件或文件夹
         if (VideoShow_ListView.SelectedItems.FirstOrDefault() is not FilesInfo) return;
 
-        List<FilesInfo> filesInfo = new();
-        foreach (var item in VideoShow_ListView.SelectedItems)
-        {
-            var info = (FilesInfo)item;
-
-            //if (info.Type == FilesInfo.FileType.File && info.datum.iv == 1)
-
-            filesInfo.Add(info);
-        }
+        var filesInfo = VideoShow_ListView.SelectedItems.Cast<FilesInfo>().ToList();
 
         TryPlayVideoFromSelectedFiles(filesInfo);
     }
@@ -284,11 +284,10 @@ public sealed partial class MainPage : Page
         }
     }
 
-    private async Task AddMediaElement(FilesInfo file)
+    private async Task<string> GetVideoUrl(FilesInfo file)
     {
         string videoUrl = null;
         var pickCode = file.datum.pc;
-
         //转码成功，可以用m3u8
         if (file.datum.vdi != 0)
         {
@@ -310,10 +309,11 @@ public sealed partial class MainPage : Page
                 videoUrl = downUrlList.FirstOrDefault().Value;
             }
         }
+        return videoUrl;
+    }
 
-
-        if (videoUrl == null) return;
-
+    private MenuFlyout BuildMenuFlyout(FilesInfo file)
+    {
         //MenuFlyout menuFlyout = this.Resources["MediaContentFlyout"] as MenuFlyout;
         MenuFlyout menuFlyout = new();
 
@@ -333,10 +333,18 @@ public sealed partial class MainPage : Page
         MenuFlyoutItemDeletedFrom115.Click += RemoveFileFrom115Button_Click;
         MenuFlyoutItemDeletedFrom115.DataContext = file;
 
-
         menuFlyout.Items.Add(MenuFlyoutItemDeletedFromList);
         menuFlyout.Items.Add(MenuFlyoutItemDeletedFrom115);
 
+        return menuFlyout;
+    }
+
+    private async Task AddMediaElement(FilesInfo file)
+    {
+        string videoUrl = await GetVideoUrl(file);
+        if (videoUrl == null) return;
+
+        MenuFlyout menuFlyout = BuildMenuFlyout(file);
         var source = MediaSource.CreateFromUri(new Uri(videoUrl));
         var mediaPlayerElement = new MediaPlayerElement()
         {
@@ -384,6 +392,7 @@ public sealed partial class MainPage : Page
         ChangedVideo_UniformGrid(filesInfo.Count);
 
         PlayingVideoInfos.Clear();
+
         RemoveMediaControl();
 
         foreach (var file in filesInfo.Take(MaxCanPlayCount))
@@ -407,7 +416,7 @@ public sealed partial class MainPage : Page
     {
         FindCidInfo_ProgressRing.Visibility = Visibility.Visible;
 
-        var noPicturePath = Data.Const.NoPictruePath;
+        var noPicturePath = Const.NoPictruePath;
 
         //搜刮
         foreach (var video in filesInfos)
@@ -502,10 +511,10 @@ public sealed partial class MainPage : Page
     /// </summary>
     /// <param name="fileInfo"></param>
     /// <returns></returns>
-    private async Task DeledtedFileFrom115Async(FilesInfo fileInfo)
+    private async Task DeletedFileFrom115Async(FilesInfo fileInfo)
     {
         // 首先，从播放列表中删除
-        string fid = DeletedFileFromListAsync(fileInfo);
+        var fid = DeletedFileFromListAsync(fileInfo);
 
         // 然后，删除115文件
         await webApi.DeleteFiles(fileInfo.Cid, new() { fid });
@@ -517,8 +526,7 @@ public sealed partial class MainPage : Page
         }
 
         // 最后，播放下一集（如果存在）
-        await TryAddNextVideo();
-
+        await TryRemoveCurrentVideoAndPlayNextVideo(fileInfo);
     }
 
     /// <summary>
@@ -543,21 +551,21 @@ public sealed partial class MainPage : Page
             //移除正在播放视频列表
             if (PlayingVideoInfos.Contains(fileInfo)) PlayingVideoInfos.Remove(fileInfo);
 
-            //移除正在播放的视频
-            RemovePlayingVideo(fileInfo.datum.pc);
+            ////移除正在播放的视频
+            //RemovePlayingVideo(fileInfo.datum.pc);
         }
         // 文件夹
         else
         {
             var playList = PlayingVideoInfos.Where(info => info.Cid == fileInfo.Cid).ToList();
 
-            playList?.ForEach(info =>
+            playList.ForEach(info =>
             {
                 //移除正在播放的视频
                 PlayingVideoInfos.Remove(info);
 
-                //移除正在播放的视频
-                RemovePlayingVideo(info.datum.pc);
+                ////移除正在播放的视频
+                //RemovePlayingVideo(info.datum.pc);
             });
         }
 
@@ -578,14 +586,21 @@ public sealed partial class MainPage : Page
         }
     }
 
-    private void RemovePlayingVideo(string pc)
+    private void RemovePlayingVideo(MediaPlayerElement mediaPlayerElement)
     {
-        var media = Video_UniformGrid.Children.FirstOrDefault(item => (item as MediaPlayerElement)?.Tag.ToString() == pc);
-        if (media == null || media is not MediaPlayerElement mediaPlayerElement) return;
 
         //mediaPlayerElement.MediaPlayer?.Pause();
         //mediaPlayerElement.MediaPlayer?.SetUriSource(null);
-        Video_UniformGrid.Children.Remove(mediaPlayerElement);
+
+        try
+        {
+            mediaPlayerElement.MediaPlayer?.Dispose();
+            Video_UniformGrid.Children.Remove(mediaPlayerElement);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"删除正在播放的视频文件时出现问题{ex.Message}");
+        }
 
     }
 
@@ -744,15 +759,13 @@ public sealed partial class MainPage : Page
     /// <param name="e"></param>
     private async void RemoveFileFromListButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem item) return;
-
-        if (item.DataContext is not FilesInfo fileInfo) return;
+        if (sender is not MenuFlyoutItem { DataContext: FilesInfo fileInfo }) return;
 
         // 从播放列表中删除
         DeletedFileFromListAsync(fileInfo);
 
         // 移除视频后，如果播放列表中有其余的视频则插入到播放中
-        await TryAddNextVideo();
+        await TryRemoveCurrentVideoAndPlayNextVideo(fileInfo);
 
     }
 
@@ -760,8 +773,12 @@ public sealed partial class MainPage : Page
     /// 自动播放下一视频
     /// </summary>
     /// <returns></returns>
-    private async Task TryAddNextVideo()
+    private async Task TryRemoveCurrentVideoAndPlayNextVideo(FilesInfo removeFileInfo)
     {
+        // 即将删除的视频所属控件
+        var media = Video_UniformGrid.Children.FirstOrDefault(item => (item as MediaPlayerElement)?.Tag.ToString() == removeFileInfo.datum.pc);
+        if (media == null || media is not MediaPlayerElement mediaPlayerElement) return;
+
         //正在播放的文件的pc
         var playingPcList = Video_UniformGrid.Children.Select(element => ((MediaPlayerElement)element).Tag.ToString()).ToList();
 
@@ -771,7 +788,7 @@ public sealed partial class MainPage : Page
 
         if (videoInfo != null)
         {
-            await AddMediaElement(videoInfo);
+            await ChangedVideoSourceAndMoveToLast(mediaPlayerElement, videoInfo);
 
             // 添加到正在播放的视频的信息中
             PlayingVideoInfos.Add(videoInfo);
@@ -782,9 +799,26 @@ public sealed partial class MainPage : Page
         // 没有下一集，则修改布局
         else
         {
+            //移除正在播放的视频
+            RemovePlayingVideo(mediaPlayerElement);
+
             // 修改布局
             ChangedVideo_UniformGrid(Video_UniformGrid.Children.Count);
         }
+    }
+
+    private async Task ChangedVideoSourceAndMoveToLast(MediaPlayerElement mediaPlayerElement, FilesInfo videoInfo)
+    {
+        //将即将删除的视频移到最后
+        Video_UniformGrid.Children.Move((uint)Video_UniformGrid.Children.IndexOf(mediaPlayerElement), (uint)Video_UniformGrid.Children.Count - 1);
+        
+        var videoUrl = await GetVideoUrl(videoInfo);
+        if (videoUrl == null) return;
+
+        var menuFlyout = BuildMenuFlyout(videoInfo);
+        mediaPlayerElement.MediaPlayer.SetUriSource(new Uri(videoUrl));
+        mediaPlayerElement.ContextFlyout = menuFlyout;
+        mediaPlayerElement.Tag = videoInfo.datum.pc;
     }
 
     /// <summary>
@@ -794,15 +828,13 @@ public sealed partial class MainPage : Page
     /// <param name="e"></param>
     private async void RemoveFileFrom115Button_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem item) return;
-
-        if (item.DataContext is not FilesInfo fileInfo) return;
+        if (sender is not MenuFlyoutItem { DataContext: FilesInfo fileInfo }) return;
 
         var result = await TipDeletedFiles();
 
         if (result == ContentDialogResult.Primary)
         {
-            await DeledtedFileFrom115Async(fileInfo);
+            await DeletedFileFrom115Async(fileInfo);
         }
 
     }

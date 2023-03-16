@@ -1659,6 +1659,8 @@ namespace Data
                     //vlc不支持带“; ”的user-agent
                     Play115SourceVideoWithVlc(downUrl, user_agnet: ua, savePath, false, title: downUrlList.First().Key, subFile: subFile);
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(playMethod), playMethod, null);
             }
         }
 

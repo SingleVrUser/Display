@@ -6,16 +6,12 @@ using Microsoft.Graphics.Canvas;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.UserDataTasks;
-using Windows.Foundation;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
@@ -120,10 +116,10 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         mediaTransportControls.SetQuality(QualityItemsSource, this.Resources["QualityDataTemplate"] as DataTemplate);
 
         //设置播放器
-        List<Player> plsyerSoucre = new() { new(WebApi.playMethod.vlc, pickCode: PickCode),
+        List<Player> playerItemsSource = new() { new Player(WebApi.playMethod.vlc, pickCode: PickCode),
                                             new(WebApi.playMethod.mpv, pickCode: PickCode),
                                             new(WebApi.playMethod.pot, pickCode: PickCode)};
-        mediaTransportControls.SetPlayer(plsyerSoucre, this.Resources["PlayerDataTemplate"] as DataTemplate);
+        mediaTransportControls.SetPlayer(playerItemsSource, this.Resources["PlayerDataTemplate"] as DataTemplate);
         
         //设置喜欢、稍后观看
         bool isLike;
@@ -237,8 +233,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         if (MediaControl.MediaPlayer.Source != null && MediaControl.MediaPlayer.CurrentState == MediaPlayerState.Playing) MediaControl.MediaPlayer.Pause();
         MediaControl.SetMediaPlayer(media);
     }
-
-
+    
     private async void QualityChanged(object sender, SelectionChangedEventArgs e)
     {
         if (e.AddedItems.FirstOrDefault() is not Quality quality) return;
