@@ -11,11 +11,16 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using System.Threading.Tasks;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
 using Windows.Storage.Streams;
+using MediaPlayerElement_Test.Models;
+using Windows.Security.Cryptography;
+using Display.Helper;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -105,7 +110,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         //没有m3u8，获取下载链接播放
         else
         {
-            var downUrlList = webApi.GetDownUrl(PickCode,GetInfoFromNetwork.MediaElementUserAgent);
+            var downUrlList = webApi.GetDownUrl(PickCode,GetInfoFromNetwork.BrowserUserAgent);
 
             if (downUrlList.Count>0)
             {
@@ -168,8 +173,6 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
     public void DisposeMediaPlayer()
     {
-        //MediaControl.MediaPlayer.Pause();
-        //MediaControl.Source = null;
         MediaControl.MediaPlayer.Dispose();
 
     }
@@ -179,25 +182,45 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         if (string.IsNullOrEmpty(url)) return;
 
         //添加播放链接
-        var ms = MediaSource.CreateFromUri(new Uri(url));
+
+        MediaSource ms;
+        if (url.Contains("m3u8"))
+        {
+            ms = MediaSource.CreateFromUri(new Uri(url));
+        }
+        else
+        {
+            var httpClient = WebApi.GetVideoClient();
+            var videoStream = await HttpRandomAccessStream.CreateAsync(httpClient, new Uri(url));
+            ms = MediaSource.CreateFromStream(videoStream, "video/mp4");
+        }
 
         var media = new MediaPlayer();
 
         //添加字幕文件
         if (SubInfo != null)
         {
-            //ms.ExternalTimedTextSources.Clear();
-
             //下载字幕
             var subPath = await webApi.TryDownSubFile(SubInfo.name, SubInfo.pickcode);
 
             if (!string.IsNullOrEmpty(subPath))
             {
-                var storageFile = await StorageFile.GetFileFromPathAsync(subPath);
-                IRandomAccessStream stream = await storageFile.OpenReadAsync();
+                //var timedTextSource = TimedTextSource.CreateFromUri(new Uri(subPath), SubInfo.name);
+                //ms.ExternalTimedTextSources.Add(timedTextSource);
 
-                TimedTextSource txtsrc = TimedTextSource.CreateFromStream(stream, SubInfo.name);
-                ms.ExternalTimedTextSources.Add(txtsrc);
+                var textEncoding = FileEncodingHelper.GetEncoding(subPath);
+
+                //如果文本格式不是UTF-8，就将文本转换为该格式
+                if (!Equals(textEncoding, Encoding.UTF8))
+                {
+                    Debug.WriteLine("字幕不是UTF-8，转为该格式并覆盖");
+                    await File.WriteAllTextAsync(subPath,
+                        await File.ReadAllTextAsync(subPath, textEncoding),
+                        Encoding.UTF8);
+                }
+
+                ms.ExternalTimedTextSources.Add(TimedTextSource.CreateFromUri(new Uri(subPath)));
+
             }
 
             var playbackItem = new MediaPlaybackItem(ms);
@@ -214,7 +237,6 @@ public sealed partial class CustomMediaPlayerElement : UserControl
                     Debug.WriteLine("默认选中第一个字幕");
 
                 };
-
             }
             else
             {
@@ -228,6 +250,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         {
             media.Source = ms;
         }
+
+
 
         //先暂停后重新设置源，避免新的源设置失败之前的还在播放
         if (MediaControl.MediaPlayer.Source != null && MediaControl.MediaPlayer.CurrentState == MediaPlayerState.Playing) MediaControl.MediaPlayer.Pause();
@@ -247,12 +271,10 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         //原画播放
         else if (quality.Url == null && quality.PickCode != null)
         {
-            var downUrlList = webApi.GetDownUrl(PickCode, GetInfoFromNetwork.MediaElementUserAgent);
+            var downUrlList = webApi.GetDownUrl(PickCode, GetInfoFromNetwork.BrowserUserAgent);
 
             if (downUrlList.Count == 0) return;
             url = downUrlList.FirstOrDefault().Value;
-
-            //url = "https://d99fecf2-385d-4ce3-a85c-c7ec1c7e8627.mock.pstmn.io/video";
 
             //避免重复获取
             quality.Url = url;

@@ -84,7 +84,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
         MyProgressBar.Visibility = Visibility.Visible;
 
-        filesInfos = new("0");
+        filesInfos = new IncrementalLoadDatumCollection("0");
         BaseExample.ItemsSource = filesInfos;
         metadataControl.Items = _units;
         filesInfos.GetFileInfoCompleted += FilesInfos_GetFileInfoCompleted;
