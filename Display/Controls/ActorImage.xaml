@@ -60,7 +60,7 @@
                    Grid.Row="1"
                    Text="{x:Bind ActorInfo.name}" TextTrimming="CharacterEllipsis" IsTextSelectionEnabled="True"/>
 
-        <Border Background="{StaticResource AngleMarkBackground}" VerticalAlignment="Top" HorizontalAlignment="Left" CornerRadius="8"
+        <Border Background="{StaticResource AngleMarkBackground}" VerticalAlignment="Top" HorizontalAlignment="Right" CornerRadius="8"
                 Padding="2,0"
                 Margin="5"
                 Visibility="{x:Bind WorkYearDiff_TextBlock.Visibility}">
