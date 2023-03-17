@@ -935,16 +935,13 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <param Name="args"></param>
     private async void FileAutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
-        if (!(sender is AutoSuggestBox suggestBox))
-            return;
+        localCheckText = sender.Text;
 
-        localCheckText = suggestBox.Text;
+        System.Diagnostics.Debug.WriteLine($"失败项的搜索框输入：{localCheckText}");
+        AllFailInfoCollection = new IncrementalLoadFailDatumInfoCollection { filterName = localCheckText, OrderBy = FailListOrderBy, IsDesc = FailListIsDesc };
 
-        AllFailInfoCollection = new() { filterName = localCheckText, OrderBy = FailListOrderBy, IsDesc = FailListIsDesc };
-
+        FailGridView.ItemsSource = AllFailInfoCollection;
         await AllFailInfoCollection.LoadData();
-        BasicGridView.ItemsSource = AllFailInfoCollection;
-
     }
 
     /// <summary>

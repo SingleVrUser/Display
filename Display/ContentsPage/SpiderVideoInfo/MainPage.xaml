@@ -187,9 +187,6 @@
                                        x:Key="TitleTextBlock">
                                     <Setter Property="Opacity"
                                             Value="0.4" />
-                                    <Setter Property="FontSize"
-                                            Value="15" />
-
                                     <Setter Property="HorizontalAlignment"
                                             Value="Right" />
                                 </Style>

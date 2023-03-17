@@ -350,6 +350,14 @@
                                               IsCompact="True">
                                     <AppBarButton.Flyout>
                                         <Flyout>
+                                            <Flyout.FlyoutPresenterStyle>
+                                                <Style TargetType="FlyoutPresenter">
+                                                    <Setter Property="CornerRadius"
+                                                            Value="{ThemeResource OverlayCornerRadius}" />
+                                                    <Setter Property="Background"
+                                                            Value="{ThemeResource ControlColorDefault}" />
+                                                </Style>
+                                            </Flyout.FlyoutPresenterStyle>
                                             <RatingControl Caption="评分"
                                                            Value="{x:Bind score, Mode=TwoWay}"
                                                            ValueChanged="RatingControl_ValueChanged">
