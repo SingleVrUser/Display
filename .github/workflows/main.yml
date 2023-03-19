@@ -39,7 +39,7 @@ jobs:
         
     - name: Update manifest version
       run: |
-        [xml]$manifest = get-content Package.appxmanifest
+        [xml]$manifest = get-content ".\$env:Project_Directory\Package.appxmanifest"
         $manifest.Package.Identity.Version = "${{ env.version }}"
         $manifest.save("Package.appxmanifest")
 
