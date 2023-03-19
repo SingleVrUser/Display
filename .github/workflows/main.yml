@@ -53,7 +53,6 @@ on:
 jobs:
 
   build:
-    name: 构建应用
     strategy:
       matrix:
         configuration: [Release]
@@ -67,6 +66,8 @@ jobs:
       Project_Directory: Display
 #      Version: '0.${{ github.run_number }}.${{ github.run_attempt }}.0'
       Version: ${{github.event.inputs.version}}
+      Configuration: ${{ matrix.configuration }}
+      Platform: ${{ matrix.platform }}
 
     steps:
     - name: Checkout
@@ -96,8 +97,6 @@ jobs:
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
 
     # Decode the base 64 encoded pfx and save the Signing_Certificate
     - name: Decode the pfx
@@ -113,8 +112,6 @@ jobs:
         Appx_Bundle: Never
         Appx_Package_Build_Mode: SideloadOnly
         Appx_Package_Dir: Packages\
-        Configuration: ${{ matrix.configuration }}
-        Platform: ${{ matrix.platform }}
 
     # Remove the pfx
  #   - name: Remove the pfx
@@ -127,20 +124,20 @@ jobs:
         name: MSIX Package
         path: Display/Packages/**/Display*.msix
 
-    - name: Create ZIP of ${{ matrix.platform }} app
-      run: Compress-Archive Display/Packages/Display*_${{ matrix.platform }}_Test 'Display_${{ env.version }}_${{ matrix.platform }}.zip'
+    - name: Create ZIP of $env.platform app
+      run: Compress-Archive Display/Packages/Display*_$env.platform_Test 'Display_$env.version_$env.platform.zip'
 
-    - name: Upload ZIP of ${{ matrix.platform }} app
+    - name: Upload ZIP of $env.platform app
       uses: actions/upload-artifact@v2
       with:
-        name: 'Display_${{ env.version }}_${{ matrix.platform }}.zip'
-        path: 'Display_${{ env.version }}_${{ matrix.platform }}.zip'
+        name: 'Display_${{ env.version }}_${{ env.platform }}.zip'
+        path: 'Display_${{ env.version }}_${{ env.platform }}.zip'
         
 #    # Create the unpackaged app
 #    - name: Build unpackaged app
 #      run: msbuild $env:Solution_Name /t:Publish /p:WindowsPackageType=None /p:Configuration=$env:Configuration /p:Platform=x64
 #      env:
-#        Configuration: ${{ matrix.configuration }}
+#        Configuration: ${{ env.configuration }}
 #        
 #    - name: Create ZIP of unpackaged app
 #      run: Compress-Archive Display/bin/x64/Release/net6.0-windows10.0.19041.0/publish/* 'Display-unpackaged-${{ env.version }}.zip'
@@ -151,6 +148,7 @@ jobs:
 #        name: 'Unpackaged app'
 #        path: "Display-unpackaged-${{ env.version }}.zip"
 
+    steps:
     - name: Create GH release
       if: github.ref_name == 'main'
       uses: softprops/action-gh-release@v1
