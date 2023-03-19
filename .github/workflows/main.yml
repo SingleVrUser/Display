@@ -165,7 +165,7 @@ jobs:
         path: 'Display_${{ env.version }}_x86.zip'
         
   release:
-    needs: release
+    needs: upload
     name: 发布草稿
     runs-on: windows-latest
     steps:
