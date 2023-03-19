@@ -53,11 +53,11 @@ on:
 jobs:
 
   build:
-
+    name: 构建应用
     strategy:
       matrix:
         configuration: [Release]
-        platform: [x64,x86]
+        platform: [x86,x64]
 
     runs-on: windows-latest  # For a list of available runner types, refer to
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
@@ -141,7 +141,10 @@ jobs:
 #      with:
 #        name: 'Unpackaged app'
 #        path: "Display-unpackaged-${{ env.version }}.zip"
- 
+  Upload:
+    name: 打包并上传
+    runs-on: windows-latest
+    steps:
     - name: Create ZIP of x64 app
       run: Compress-Archive Display/Packages/Display*_x64_Test 'Display_${{ env.version }}_x64.zip'
       
@@ -159,7 +162,11 @@ jobs:
       with:
         name: 'Display_${{ env.version }}_x86.zip'
         path: 'Display_${{ env.version }}_x86.zip'
-
+        
+  Release:
+    name: 发布草稿
+    runs-on: windows-latest
+    steps:
     - name: Create GH release
       if: github.ref_name == 'main'
       uses: softprops/action-gh-release@v1
