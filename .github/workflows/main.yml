@@ -126,6 +126,15 @@ jobs:
       with:
         name: MSIX Package
         path: Display/Packages/**/Display*.msix
+
+    - name: Create ZIP of ${{ matrix.platform }} app
+      run: Compress-Archive Display/Packages/Display*_${{ matrix.platform }}_Test 'Display_${{ env.version }}_${{ matrix.platform }}.zip'
+
+    - name: Upload ZIP of ${{ matrix.platform }} app
+      uses: actions/upload-artifact@v2
+      with:
+        name: 'Display_${{ env.version }}_${{ matrix.platform }}.zip'
+        path: 'Display_${{ env.version }}_${{ matrix.platform }}.zip'
         
 #    # Create the unpackaged app
 #    - name: Build unpackaged app
@@ -141,22 +150,17 @@ jobs:
 #      with:
 #        name: 'Unpackaged app'
 #        path: "Display-unpackaged-${{ env.version }}.zip"
-  echo:
-    needs: build
-    name: 打包并上传
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        platform: [x86,x64]
-    env:
-      Versio: ${{github.event.inputs.version}}
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+
+    - name: Create GH release
+      if: github.ref_name == 'main'
+      uses: softprops/action-gh-release@v1
       with:
-        fetch-depth: 0
-        
-    - name: Create ZIP of x64 app
-      run: |
-        cd Display/Packages/
-        ls
+        draft: true
+        prerelease: true
+        name: 'v${{ env.version }}'
+        tag_name: 'v${{ env.version }}'
+        body: '> 初次安装请下载对应框架的zip压缩包（含安装证书、安装脚本），升级或重装仅需下载对应框架的msix包'
+        files: |
+          Display/Packages/**/Display*.msix
+          Display_*.zip
+        fail_on_unmatched_files: true
