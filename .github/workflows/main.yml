@@ -148,7 +148,6 @@ jobs:
 #        name: 'Unpackaged app'
 #        path: "Display-unpackaged-${{ env.version }}.zip"
 
-    steps:
     - name: Create GH release
       if: github.ref_name == 'main'
       uses: softprops/action-gh-release@v1
