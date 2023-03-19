@@ -141,7 +141,8 @@ jobs:
 #      with:
 #        name: 'Unpackaged app'
 #        path: "Display-unpackaged-${{ env.version }}.zip"
-  Upload:
+  upload:
+    needs: build
     name: 打包并上传
     runs-on: windows-latest
     steps:
@@ -163,7 +164,8 @@ jobs:
         name: 'Display_${{ env.version }}_x86.zip'
         path: 'Display_${{ env.version }}_x86.zip'
         
-  Release:
+  release:
+    needs: release
     name: 发布草稿
     runs-on: windows-latest
     steps:
