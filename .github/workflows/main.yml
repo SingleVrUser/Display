@@ -37,12 +37,11 @@ jobs:
       with:
         fetch-depth: 0
         
-    - name: File Regex Replace
-      uses: mingjun97/file-regex-replace@v1
-      with:
-        regex: 'Version="([0-9\.]*)"'
-        replacement: 'Version="${{ env.version }}"'
-        include: Package.appxmanifest
+    - name: Update manifest version
+      run: |
+        [xml]$manifest = get-content Package.appxmanifest
+        $manifest.Package.Identity.Version = "${{ env.version }}"
+        $manifest.save("Package.appxmanifest")
 
 
     # Install the .NET Core workload
@@ -75,9 +74,9 @@ jobs:
         Appx_Package_Build_Mode: SideloadOnly
         Appx_Package_Dir: Packages\
 
-    # Remove the pfx
- #   - name: Remove the pfx
- #     run: Remove-Item -path $env:Wap_Project_Directory\$env:Signing_Certificate
+     # Remove the pfx
+    - name: Remove the pfx
+      run: Remove-Item -path $env:Project_Directory\Display_TemporaryKey.pfx
 
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload build artifacts
