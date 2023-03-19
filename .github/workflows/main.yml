@@ -124,10 +124,10 @@ jobs:
         name: MSIX Package
         path: Display/Packages/**/Display*.msix
 
-    - name: Create ZIP of $env.platform app
-      run: Compress-Archive Display/Packages/Display*_$env.platform_Test 'Display_$env.version_$env.platform.zip'
+    - name: Create ZIP of ${{ env.platform }} app
+      run: Compress-Archive Display/Packages/Display*_${{ env.platform }}_Test 'Display_${{ env.version }}_${{ env.platform }}.zip'
 
-    - name: Upload ZIP of $env.platform app
+    - name: Upload ZIP of ${{ env.platform }} app
       uses: actions/upload-artifact@v2
       with:
         name: 'Display_${{ env.version }}_${{ env.platform }}.zip'
