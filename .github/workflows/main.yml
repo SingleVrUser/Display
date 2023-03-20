@@ -83,8 +83,8 @@ jobs:
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3.1.2
       with:
-        name: MSIX Package
-        path: Display/Packages/**/Display*.msix
+        name: 'Display_${{ env.version }}_${{ env.platform }}.msix'
+        path: Display/Packages/Display*_${{ env.platform }}_Test/Display_${{ env.version }}_${{ env.platform }}.msix
 
     - name: Create ZIP of ${{ env.platform }} app
       run: Compress-Archive Display/Packages/Display*_${{ env.platform }}_Test 'Display_${{ env.version }}_${{ env.platform }}.zip'
