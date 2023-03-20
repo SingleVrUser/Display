@@ -14,6 +14,11 @@ namespace Display.Controls
 {
     public sealed partial class CustomAutoSuggestBox : UserControl
     {
+        //提交请求（按下Enter）
+        public event TypedEventHandler<AutoSuggestBox, AutoSuggestBoxQuerySubmittedEventArgs> QuerySubmitted;
+        public event System.EventHandler<object> OpenAutoSuggestionBoxCompleted;
+        public event System.EventHandler<object> CloseAutoSuggestionBoxCompleted;
+
         public CustomAutoSuggestBox()
         {
             this.InitializeComponent();
@@ -59,8 +64,8 @@ namespace Display.Controls
             return Selectedtypes;
         }
 
-        //提交请求（按下Enter）
-        public event TypedEventHandler<AutoSuggestBox, AutoSuggestBoxQuerySubmittedEventArgs> QuerySubmitted;
+
+
         private void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
             if (args.QueryText != "Data.VideoInfo")
@@ -89,12 +94,13 @@ namespace Display.Controls
             SuggestionChosen?.Invoke(sender, args);
         }
 
+
         private void NavViewSearchBox_GotFocus(object sender, RoutedEventArgs e)
         {
             if (selectFoundMethodButton.Visibility == Visibility.Collapsed)
             {
-                openAutoSuggestionBoxStoryboard.Begin();
-            }
+                OpenAutoSuggestionBoxStoryboard.Begin();
+    }
         }
 
         private void NavViewSearchBox_LostFocus(object sender, RoutedEventArgs e)
@@ -103,12 +109,14 @@ namespace Display.Controls
 
             if (selectFoundMethodButton.FocusState != FocusState.Pointer)
             {
-                closeAutoSuggestionBoxStoryboard.Begin();
+                CloseAutoSuggestionBoxStoryboard.Begin();
+
 
                 //清空输入
                 NavViewSearchBox.Text = "";
                 autoSuggestBox.ItemsSource = null;
             }
+
         }
 
         /// <summary>
@@ -227,5 +235,14 @@ namespace Display.Controls
             }
         }
 
+        private void OpenAutoSuggestionBoxStoryboard_OnCompleted(object sender, object e)
+        {
+            OpenAutoSuggestionBoxCompleted?.Invoke(sender, e);
+        }
+
+        private void CloseAutoSuggestionBoxStoryboard_OnCompleted(object sender, object e)
+        {
+            CloseAutoSuggestionBoxCompleted?.Invoke(sender, e);
+        }
     }
 }

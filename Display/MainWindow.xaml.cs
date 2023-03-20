@@ -1,4 +1,6 @@
 ﻿
+using Display.Controls;
+using Display.Data;
 using Display.Helper;
 using Display.Views;
 using Microsoft.UI.Windowing;
@@ -12,7 +14,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Windows.System;
-using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -22,18 +23,15 @@ namespace Display
     /// <summary>
     /// An empty window that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainWindow : Window
+    public sealed partial class MainWindow
     {
-        private AppWindow appwindow;
+        private AppWindow _appwindow;
 
-        //全屏前记录当前状态
-        private AppWindowPresenterKind _markPresenterKindBeforeFullScreen;
+        private bool _isPanalOpen;
 
         public MainWindow()
         {
             InitializeComponent();
-
-            appwindow = App.getAppWindow(this);
 
             SetStyle();
         }
@@ -43,14 +41,13 @@ namespace Display
         /// </summary>
         private void SetStyle()
         {
-            ExtendsContentIntoTitleBar = true;
-            SetTitleBar(AppTitleBar);
+            _appwindow = App.getAppWindow(this);
 
-            appwindow.SetIcon(Path.Combine(Windows.ApplicationModel.Package.Current.InstalledLocation.Path, "Assets/pokeball.ico"));
+            _appwindow.SetIcon(Path.Combine(Windows.ApplicationModel.Package.Current.InstalledLocation.Path, "Assets/pokeball.ico"));
 
             this.Title = "Display";
 
-            AppTitleBar.Height = NavView.CompactPaneLength - 5;
+            AppTitleBar.Height = NavView.CompactPaneLength -2;
 
             NavView.Resources["NavigationViewContentMargin"] = new Thickness()
             {
@@ -59,7 +56,86 @@ namespace Display
                 Right = 0,
                 Bottom = 0
             };
+
+
+            // 支持自定义标题栏
+            if (AppWindowTitleBar.IsCustomizationSupported())
+            {
+                NavView.AlwaysShowHeader = false;
+                var titleBar = _appwindow.TitleBar;
+                titleBar.ExtendsContentIntoTitleBar = true;
+                titleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
+                AppTitleBar.Loaded += AppTitleBar_Loaded;
+                AppTitleBar.SizeChanged += AppTitleBar_SizeChanged;
+                CustomAutoSuggestBox.OpenAutoSuggestionBoxCompleted += OpenAutoSuggestionBoxCompleted; ;
+                CustomAutoSuggestBox.CloseAutoSuggestionBoxCompleted += CloseAutoSuggestionBoxCompleted;
+            }
+            else
+            {
+                NavView.AlwaysShowHeader = true;
+                NavView.HeaderTemplate = RootGrid.Resources["HeaderTemplate"] as DataTemplate;;
+                ExtendsContentIntoTitleBar = true;
+                CustomAutoSuggestBox.Visibility = Visibility.Collapsed;
+                SetTitleBar(AppTitleBar);
+                
+            }
         }
+
+        private void AppTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            SetDragRegionForCustomTitleBar(_appwindow);
+
+        }
+
+        private void AppTitleBar_Loaded(object sender, RoutedEventArgs e)
+        {
+            // 设置拖拽区域
+            SetDragRegionForCustomTitleBar(_appwindow);
+        }
+        private void CloseAutoSuggestionBoxCompleted(object sender, object e)
+        {
+            SetDragRegionForCustomTitleBar(_appwindow);
+        }
+
+        private void OpenAutoSuggestionBoxCompleted(object sender, object e)
+        {
+            SetDragRegionForCustomTitleBar(_appwindow);
+        }
+
+        /// <summary>
+        /// 设置标题栏的拖拽范围
+        /// </summary>
+        /// <param name="appWindow"></param>
+        private void SetDragRegionForCustomTitleBar(AppWindow appWindow)
+        {
+            // 多显示器，scaleAdjustment可能不同
+            double scaleAdjustment = WindowHelper.GetScaleAdjustment(this);
+
+            // 拖拽区域数组
+            List<Windows.Graphics.RectInt32> dragRectsList = new();
+
+            Windows.Graphics.RectInt32 dragRectL;
+            dragRectL.X = (int)((NavView.CompactPaneLength + IconColumn.ActualWidth) * scaleAdjustment);
+            dragRectL.Y = 0;
+            dragRectL.Height = (int)(AppTitleBar.ActualHeight * scaleAdjustment);
+            dragRectL.Width = (int)((TitleColumn.ActualWidth) * scaleAdjustment);
+            dragRectsList.Add(dragRectL);
+
+            Windows.Graphics.RectInt32 dragRectR;
+            dragRectR.X = (int)((IconColumn.ActualWidth
+                                 + TitleColumn.ActualWidth
+                                 + SearchColumn.ActualWidth) * scaleAdjustment);
+            dragRectR.Y = 0;
+            dragRectR.Height = (int)(AppTitleBar.ActualHeight * scaleAdjustment);
+            dragRectR.Width = (int)(RightDragColumn.ActualWidth * scaleAdjustment);
+            dragRectsList.Add(dragRectR);
+
+            Windows.Graphics.RectInt32[] dragRects = dragRectsList.ToArray();
+
+            appWindow.TitleBar.SetDragRectangles(dragRects);
+
+        }
+
 
         /// <summary>
         /// 定义访问的页面
@@ -309,15 +385,15 @@ namespace Display
         /// </summary>
         /// <param Name="sender"></param>
         /// <param Name="e"></param>
-        private void fullScrenWindowButton_Click(object sender, RoutedEventArgs e)
+        private void fullScreenWindowButton_Click(object sender, RoutedEventArgs e)
         {
-            if (appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
+            if (_appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
             {
-                enterlFullScreen();
+                EnterFullScreen();
             }
             else
             {
-                cancelFullScreen();
+                CancelFullScreen();
             }
         }
 
@@ -328,57 +404,56 @@ namespace Display
         /// <param Name="e"></param>
         private void RootGrid_KeyDown(object sender, KeyRoutedEventArgs e)
         {
-            if (e.Key == Windows.System.VirtualKey.Escape)
+            if (e.Key == VirtualKey.Escape)
             {
-                cancelFullScreen();
+                CancelFullScreen();
             }
         }
 
         /// <summary>
         /// 进入全屏
         /// </summary>
-        private void enterlFullScreen()
+        private void EnterFullScreen()
         {
-            if (appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
-            {
-                _markPresenterKindBeforeFullScreen = appwindow.Presenter.Kind;
-                appwindow.SetPresenter(AppWindowPresenterKind.FullScreen);
+            if (_appwindow.Presenter.Kind == AppWindowPresenterKind.FullScreen) return;
 
-                NavView.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftMinimal;
+            _isPanalOpen = NavView.IsPaneOpen;
+            _appwindow.SetPresenter(AppWindowPresenterKind.FullScreen);
+            NavView.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftMinimal;
 
-                //监听ESC退出
-                RootGrid.KeyDown += RootGrid_KeyDown;
-            }
+            //监听ESC退出
+            RootGrid.KeyDown += RootGrid_KeyDown;
         }
 
         /// <summary>
         /// 退出全屏
         /// </summary>
-        private void cancelFullScreen()
+        private void CancelFullScreen()
         {
-            if (appwindow.Presenter.Kind == AppWindowPresenterKind.FullScreen)
-            {
-                NavView.PaneDisplayMode = NavigationViewPaneDisplayMode.Auto;
-                appwindow.SetPresenter(AppWindowPresenterKind.Default);
+            if (_appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen) return;
 
-                //取消监听
-                RootGrid.KeyDown -= RootGrid_KeyDown;
-            }
+            NavView.PaneDisplayMode = NavigationViewPaneDisplayMode.Auto;
+            NavView.IsPaneOpen = _isPanalOpen;
+            _appwindow.SetPresenter(AppWindowPresenterKind.Default);
+
+            //取消监听
+            RootGrid.KeyDown -= RootGrid_KeyDown;
         }
 
         private void FullScreenButton_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            (sender as HyperlinkButton).Opacity = 1;
+            ((HyperlinkButton)sender).Opacity = 1;
         }
 
         private void FullScreenButton_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            (sender as HyperlinkButton).Opacity = 0.2;
+            ((HyperlinkButton)sender).Opacity = 0.2;
         }
 
         private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
         {
             FileMatch.LaunchFolder(AppSettings.DataAccess_SavePath);
         }
+
     }
 }
