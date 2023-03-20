@@ -359,7 +359,7 @@ namespace Display
             if (appwindow.Presenter.Kind == AppWindowPresenterKind.FullScreen)
             {
                 NavView.PaneDisplayMode = NavigationViewPaneDisplayMode.Auto;
-                appwindow.SetPresenter(Microsoft.UI.Windowing.AppWindowPresenterKind.Default);
+                appwindow.SetPresenter(AppWindowPresenterKind.Default);
 
                 //取消监听
                 RootGrid.KeyDown -= RootGrid_KeyDown;
