@@ -97,7 +97,7 @@
                 </CommandBar.PrimaryCommands>
 
                 <CommandBar.SecondaryCommands>
-                    
+
                     <AppBarButton Icon="Find"
                                   Label="重新搜刮"
                                   Click="FindAppBarButton_Click">
@@ -106,7 +106,7 @@
                                                  Key="F" />
                         </AppBarButton.KeyboardAccelerators>
                     </AppBarButton>
-                    
+
 
 
                     <AppBarButton Icon="OpenFile"
@@ -190,7 +190,8 @@
                     <!--封面图-->
                     <Grid CornerRadius="4"
                           x:Name="Cover_Grid"
-                          HorizontalAlignment="Center">
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center">
 
                         <Image x:FieldModifier="public"
                                x:Name="Cover_Image"
@@ -225,7 +226,8 @@
                     </Grid>
 
                     <!--右侧信息-->
-                    <Grid Grid.Row="0" Grid.Column="1"
+                    <Grid Grid.Row="0"
+                          Grid.Column="1"
                           RowSpacing="3">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
@@ -297,7 +299,7 @@
 
                                     <TextBlock Text="{x:Bind resultinfo.director,Mode=OneWay}"
                                                Padding="50,0,0,0"
-                                               IsTextSelectionEnabled="True"/>
+                                               IsTextSelectionEnabled="True" />
                                 </Grid>
 
                                 <Grid MaxWidth="300">
@@ -310,7 +312,8 @@
 
                             </StackPanel>
 
-                            <StackPanel Grid.Row="0" Grid.Column="1">
+                            <StackPanel Grid.Row="0"
+                                        Grid.Column="1">
                                 <Grid>
                                     <TextBlock Text="制作商"
                                                Style="{StaticResource LeftTitle}" />
@@ -318,22 +321,23 @@
                                     <TextBlock Text="{x:Bind resultinfo.producer,Mode=OneWay}"
                                                Padding="60,0,0,0"
                                                TextTrimming="CharacterEllipsis"
-                                               IsTextSelectionEnabled="True"/>
+                                               IsTextSelectionEnabled="True" />
                                 </Grid>
 
                                 <Grid>
                                     <TextBlock Text="发行商"
-                                               Style="{StaticResource LeftTitle}"/>
+                                               Style="{StaticResource LeftTitle}" />
 
                                     <TextBlock Text="{x:Bind resultinfo.publisher,Mode=OneWay}"
                                                Padding="60,0,0,0"
-                                               IsTextSelectionEnabled="True"/>
+                                               IsTextSelectionEnabled="True" />
                                 </Grid>
 
                             </StackPanel>
 
                             <Grid Grid.Row="1"
-                                  Grid.ColumnSpan="2" Grid.Column="0">
+                                  Grid.ColumnSpan="2"
+                                  Grid.Column="0">
                                 <TextBlock Text="类别"
                                            Style="{StaticResource LeftTitle}" />
                                 <!--<ScrollViewer HorizontalScrollBarVisibility="Visible"
@@ -349,7 +353,7 @@
                                                     HorizontalSpacing="10"
                                                     VerticalSpacing="6">
                                     <controls:WrapPanel.ChildrenTransitions>
-                                        <EntranceThemeTransition/>
+                                        <EntranceThemeTransition />
                                     </controls:WrapPanel.ChildrenTransitions>
                                 </controls:WrapPanel>
 
@@ -360,38 +364,40 @@
                     </Grid>
 
                     <!--演员表-->
-                    <StackPanel Grid.Row="1"
-                                Grid.Column="0"
-                                Grid.ColumnSpan="2">
-                        <TextBlock Text="演员表"
-                                   Style="{StaticResource LeftTitle}" />
+                    <controls:HeaderedContentControl Grid.Row="1"
+                                                     Grid.Column="0"
+                                                     Grid.ColumnSpan="2"
+                                                     Header="演员表">
 
-                        <ScrollViewer Grid.Column="1"
-                                      Grid.Row="8"
-                                      HorizontalScrollBarVisibility="Visible"
+                        <ScrollViewer HorizontalScrollBarVisibility="Visible"
                                       HorizontalScrollMode="Auto"
                                       VerticalScrollBarVisibility="Hidden"
                                       VerticalScrollMode="Disabled"
                                       HorizontalAlignment="Left">
-                            <StackPanel x:Name="ActorSatckPanel"
+                            <StackPanel x:Name="ActorStackPanel"
                                         Orientation="Horizontal" />
                         </ScrollViewer>
-                    </StackPanel>
+                    </controls:HeaderedContentControl>
 
                     <!--缩略图-->
-                    <StackPanel x:Name="ThumbnailStackPanel"
-                                Grid.Column="0"
-                                Grid.Row="2"
-                                Grid.ColumnSpan="2"
-                                Visibility="Collapsed">
-                        <TextBlock Text="缩略图"
-                                   Style="{StaticResource LeftTitle}" />
-                        <GridView x:Name="ThumbnailGridView"
-                                  IsItemClickEnabled="True"
-                                  ItemClick="ThumbnailGridView_ItemClick">
-                            <GridView.ItemTemplate>
+                    <controls:HeaderedContentControl x:Name="ThumbnailStackPanel"
+                                                     Grid.Column="0"
+                                                     Grid.Row="2"
+                                                     Grid.ColumnSpan="2"
+                                                     Visibility="Collapsed"
+                                                     HorizontalContentAlignment="Stretch"
+                                                     Header="缩略图">
+
+                        <controls:AdaptiveGridView x:Name="ThumbnailGridView"
+                                                   IsItemClickEnabled="True"
+                                                   ItemClick="ThumbnailGridView_ItemClick"
+                                                   ItemHeight="120"
+                                                   DesiredWidth="180">
+
+                            <controls:AdaptiveGridView.ItemTemplate>
                                 <DataTemplate x:DataType="x:String">
-                                    <UserControl PointerEntered="EnLargeImage_OnPointerEntered" PointerExited="EnLargeImage_OnPointerExited">
+                                    <UserControl PointerEntered="EnLargeImage_OnPointerEntered"
+                                                 PointerExited="EnLargeImage_OnPointerExited">
                                         <Grid>
                                             <VisualStateManager.VisualStateGroups>
                                                 <VisualStateGroup x:Name="HoveringStates">
@@ -409,8 +415,6 @@
 
                                             <controls:ImageEx x:Name="Thumbnail_Image"
                                                               Source="{x:Bind  Mode=OneWay}"
-                                                              Height="120"
-                                                              Width="180"
                                                               Stretch="UniformToFill"
                                                               PlaceholderSource="/Assets/NoPicture.jpg"
                                                               PlaceholderStretch="Uniform"
@@ -433,9 +437,9 @@
                                     </UserControl>
 
                                 </DataTemplate>
-                            </GridView.ItemTemplate>
-                        </GridView>
-                    </StackPanel>
+                            </controls:AdaptiveGridView.ItemTemplate>
+                        </controls:AdaptiveGridView>
+                    </controls:HeaderedContentControl>
                 </Grid>
             </ScrollViewer>
 
