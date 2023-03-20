@@ -1,5 +1,4 @@
-﻿using Data;
-using Display.Models;
+﻿using Display.Models;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -14,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Display.Data;
 
 namespace Display.Controls;
 
@@ -38,10 +38,10 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     private ActorInfo _actorInfo;
     public ActorInfo actorInfo
     {
-        get=> _actorInfo;
+        get => _actorInfo;
         set
         {
-            if(_actorInfo == value) return;
+            if (_actorInfo == value) return;
 
             _actorInfo = value;
 
@@ -203,7 +203,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     private bool isFuzzyQueryActor = true;
 
     List<string> filterConditionList;
-    Dictionary<string,string> filterRanges;
+    Dictionary<string, string> filterRanges;
     string filterKeywords;
 
     public VideoCoverDisplay()
@@ -357,7 +357,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         {
             // SliderValue的0.5~1.5倍
             // 又或者，每行图片最大为1的话，可以缩小到最小值
-            if ((markSliderValue * 0.5 <= newImageWidth && newImageWidth <= markSliderValue * 1.5)||ImageCountPerRow == 1)
+            if ((markSliderValue * 0.5 <= newImageWidth && newImageWidth <= markSliderValue * 1.5) || ImageCountPerRow == 1)
             {
                 AdjustImageSize(newImageWidth);
 
@@ -450,7 +450,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         CollapsedGrid.Visibility = Visibility.Collapsed;
 
     }
-    
+
     private void FailImageGrid_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
         if (!(sender is Grid grid)) return;
@@ -898,7 +898,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         //是否需要动态调整图片大小
         tryStartListeningGridSizeChanged();
 
-        if(OrderButton.Visibility == Visibility.Collapsed) OrderButton.Visibility = Visibility.Visible;
+        if (OrderButton.Visibility == Visibility.Collapsed) OrderButton.Visibility = Visibility.Visible;
 
         //更改排序的Flyout
         ChangedOrderButtonFlyout(true);
@@ -1067,12 +1067,12 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
                 case "Year":
                     if (filterRanges == null)
                         filterRanges = new();
-                    filterRanges["Year"]= InfosFilter.Year;
+                    filterRanges["Year"] = InfosFilter.Year;
                     break;
                 case "Score":
                     if (filterRanges == null)
                         filterRanges = new();
-                    filterRanges["Score"]= InfosFilter.Score.ToString();
+                    filterRanges["Score"] = InfosFilter.Score.ToString();
                     break;
                 case "Type":
                     if (filterRanges == null)
@@ -1088,7 +1088,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         }
 
         LoadDstSuccessInfoCollection();
-    }   
+    }
 
     private void InfoListFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -1100,7 +1100,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         if (filterRanges == null)
             filterRanges = new();
 
-        filterRanges[Key] =Value;
+        filterRanges[Key] = Value;
 
         LoadDstSuccessInfoCollection();
     }
@@ -1188,7 +1188,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
                 {
                     LikeOrLookLater_failInfocollection = new(FailInfoShowType.like);
                 }
-                else if(LikeOrLookLater_failInfocollection.ShowType != FailInfoShowType.like)
+                else if (LikeOrLookLater_failInfocollection.ShowType != FailInfoShowType.like)
                 {
                     LikeOrLookLater_failInfocollection.SetShowType(FailInfoShowType.like);
                 }
@@ -1234,7 +1234,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         if (isShowAllFail)
         {
             //排列按钮
-            if(OrderButton.Visibility == Visibility.Collapsed) OrderButton.Visibility = Visibility.Visible;
+            if (OrderButton.Visibility == Visibility.Collapsed) OrderButton.Visibility = Visibility.Visible;
 
             //显示当前数量
             if (AllFailShowCountControl.Visibility == Visibility.Collapsed) AllFailShowCountControl.Visibility = Visibility.Visible;
@@ -1244,7 +1244,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             if (FailInfoSuggestBox.Visibility == Visibility.Collapsed) FailInfoSuggestBox.Visibility = Visibility.Visible;
 
         }
-        else if(!isShowAllFail)
+        else if (!isShowAllFail)
         {
             //排列按钮
             if (OrderButton.Visibility == Visibility.Visible) OrderButton.Visibility = Visibility.Collapsed;
@@ -1342,7 +1342,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         await Task.Delay(1000);
 
-        if(FailList_TeachingTip.IsOpen) FailList_TeachingTip.IsOpen = false;
+        if (FailList_TeachingTip.IsOpen) FailList_TeachingTip.IsOpen = false;
     }
 
 }
@@ -1370,7 +1370,7 @@ public class CoverItemTemplateSelector : DataTemplateSelector
                 return ImageTemplate;
             }
         }
-        else if(item is FailInfo)
+        else if (item is FailInfo)
         {
             return LikeOrLookLaterInFailCoverTemplate;
         }

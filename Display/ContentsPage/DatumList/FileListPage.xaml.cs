@@ -3,7 +3,6 @@
 
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI.Controls;
-using Data;
 using Display.Helper;
 using Display.Models;
 using Microsoft.UI;
@@ -20,6 +19,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -39,7 +39,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
         get => _filesInfos;
         set
         {
-            if(_filesInfos == value) return;
+            if (_filesInfos == value) return;
             _filesInfos = value;
 
             OnPropertyChanged();
@@ -112,9 +112,9 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
         var index = _units.IndexOf(currentItem);
 
         //不存在，返回
-        if(index <0 ) return;
+        if (index < 0) return;
 
-        for(int i= _units.Count-1; i> index; i--)
+        for (int i = _units.Count - 1; i > index; i--)
         {
             _units.RemoveAt(i);
         }
@@ -156,7 +156,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
     private void ToTopButton_Click(object sender, RoutedEventArgs e)
     {
-        if(BaseExample.ItemsSource is IncrementalLoadDatumCollection Collection)
+        if (BaseExample.ItemsSource is IncrementalLoadDatumCollection Collection)
             BaseExample.ScrollIntoView(Collection.First());
     }
 
@@ -175,7 +175,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
     {
         if (sender is not TextBlock textBlock) return;
 
-        if(textBlock.Inlines.FirstOrDefault() is not Run run) return;
+        if (textBlock.Inlines.FirstOrDefault() is not Run run) return;
 
         //string DownSortIconRun = "\uE015";
 
@@ -193,12 +193,12 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
         }
     }
 
-    private async void ChangedOrder(WebApi.OrderBy orderBy,Run run)
+    private async void ChangedOrder(WebApi.OrderBy orderBy, Run run)
     {
         string UpSortIconRun = "\uE014";
         int asc = run.Text == UpSortIconRun ? 0 : 1;
 
-        await filesInfos.SetOrder(orderBy,asc);
+        await filesInfos.SetOrder(orderBy, asc);
     }
 
     private void ChangedOrderIcon(WebApi.OrderBy orderBy, int asc)
@@ -300,7 +300,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
         int index = GetInsertIndex(target, e);
 
         // 范围之外
-        if(index == -1)
+        if (index == -1)
         {
             e.AcceptedOperation = DataPackageOperation.None;
             e.DragUIOverride.Caption = null;
@@ -339,11 +339,11 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
     /// <param name="e"></param>
     private void TransferMove_DragOver(object sender, DragEventArgs e)
     {
-        if(sender is not Grid target) return;
+        if (sender is not Grid target) return;
 
         if (e.DataView.Properties.Values.FirstOrDefault() is not List<Data.FilesInfo> sourceFilesInfos) return;
 
-        if(transferStationFiles == null)
+        if (transferStationFiles == null)
         {
             e.AcceptedOperation = DataPackageOperation.Move;
         }
@@ -371,7 +371,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
             }
         }
 
-        
+
 
     }
 
@@ -412,7 +412,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
             await webApi.DeleteFiles(sourceFilesInfos.FirstOrDefault()?.datum.pid, sourceFilesInfos.Select(item =>
             {
                 //文件
-                if (item.Type == FilesInfo.FileType.File )
+                if (item.Type == FilesInfo.FileType.File)
                     return item.Fid;
                 //文件夹
                 else
@@ -502,7 +502,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
         await webApi.MoveFiles(pid, files.Select(item => item.Type == FilesInfo.FileType.Folder ? item.Cid : item.Fid).ToList());
 
         //删除列表文件
-        foreach(var item in files)
+        foreach (var item in files)
         {
             //文件列表中的
             if (filesInfos.Contains(item))
@@ -528,13 +528,13 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
                 return true;
             }).ToList();
 
-            foreach(var file in transferListReadlyRemove)
+            foreach (var file in transferListReadlyRemove)
             {
                 transferStationFiles.Remove(file);
 
                 System.Diagnostics.Debug.WriteLine("从中转站列表中删除已经移动的文件");
             }
-            
+
         }
 
     }
@@ -558,7 +558,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
             // Find index based on dividing number of items by height of each item
             int tmp = (int)(pos.Y / itemHeight);
 
-            if(tmp <= target.Items.Count - 1)
+            if (tmp <= target.Items.Count - 1)
             {
                 index = tmp;
             }
@@ -585,7 +585,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
     {
         RecyStationGrid.Visibility = Visibility.Collapsed;
 
-        if(transferStationFiles == null || transferStationFiles.Count == 0)
+        if (transferStationFiles == null || transferStationFiles.Count == 0)
         {
             TransferStation_Grid.Visibility = Visibility.Collapsed;
         }
@@ -599,14 +599,14 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
         List<string> nameList = new();
         foreach (FilesInfo item in BaseExample.SelectedItems)
         {
-            if(item.Type == FilesInfo.FileType.Folder)
+            if (item.Type == FilesInfo.FileType.Folder)
             {
                 cids.Add(item.Cid);
                 nameList.Add(item.Name);
             }
         }
 
-        if(cids.Count == 0)
+        if (cids.Count == 0)
         {
             SelectedNull_TeachingTip.IsOpen = true;
             return;
@@ -793,11 +793,11 @@ class TransferStationFiles
 
     public TransferStationFiles(List<FilesInfo> transferFiles)
     {
-        if(transferFiles.Count == 1)
+        if (transferFiles.Count == 1)
         {
             this.Name = $"{transferFiles.FirstOrDefault().Name}";
         }
-        else if(transferFiles.Count > 1)
+        else if (transferFiles.Count > 1)
         {
             this.Name = $"{transferFiles.FirstOrDefault().Name} 等{transferFiles.Count}个文件";
         }

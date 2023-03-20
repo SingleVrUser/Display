@@ -1,8 +1,6 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Data;
+﻿using Microsoft.UI.Xaml.Data;
 using System;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 
 namespace Display.Converter;
 
@@ -12,7 +10,7 @@ public class AppUpdateContentConverter : IValueConverter
     {
         if (value is not string content) return null;
 
-        if(string.IsNullOrEmpty(content)) return null;
+        if (string.IsNullOrEmpty(content)) return null;
 
         string finallyContent;
 

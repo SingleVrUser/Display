@@ -1,6 +1,4 @@
-﻿using Data;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Data;
+﻿using Microsoft.UI.Xaml.Data;
 using System;
 
 namespace Display.Converter;
@@ -9,7 +7,7 @@ public class IsVideoToBoolConverter : IValueConverter
 {
     public Object Convert(object value, Type targetType, object parameter, string language)
     {
-        if(value is int result && result ==1)
+        if (value is int result && result == 1)
         {
             return true;
         }

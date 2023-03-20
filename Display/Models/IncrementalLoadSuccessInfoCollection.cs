@@ -1,10 +1,11 @@
-﻿using Data;
+﻿
 using Microsoft.UI.Xaml.Data;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Display.Data;
 
 namespace Display.Models;
 
@@ -28,14 +29,14 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
 
     private string filterKeywords { get; set; }
 
-    public IncrementalLoadSuccessInfoCollection(double imgwidth,double imgheight)
+    public IncrementalLoadSuccessInfoCollection(double imgwidth, double imgheight)
     {
         SetImageSize(imgwidth, imgheight);
     }
 
     public async Task LoadData(int startShowCount = 20)
     {
-        var newItems = await DataAccess.LoadVideoInfo(startShowCount, 0,orderBy,isDesc, filterConditionList, filterKeywords, ranges, isFuzzyQueryActor);
+        var newItems = await DataAccess.LoadVideoInfo(startShowCount, 0, orderBy, isDesc, filterConditionList, filterKeywords, ranges, isFuzzyQueryActor);
 
         if (Count == 0)
         {
@@ -46,7 +47,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
                 failCount = DataAccess.GetCount_FailFileInfoWithDatum(0, -1, filterKeywords);
             }
 
-            this.AllCount = successCount+ failCount;
+            this.AllCount = successCount + failCount;
         }
 
         else
@@ -100,12 +101,12 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
             //无筛选功能
             if (IsConatinFail)
             {
-                var failList = await DataAccess.LoadFailFileInfoWithDatum(0,-1,filterKeywords);
+                var failList = await DataAccess.LoadFailFileInfoWithDatum(0, -1, filterKeywords);
                 failList.ForEach(item => Add(new(new(item), imageWidth, imageHeight)));
             }
         }
 
-        lists.ForEach(item => Add(new(item,imageWidth,imageHeight)));
+        lists.ForEach(item => Add(new(item, imageWidth, imageHeight)));
 
         return new LoadMoreItemsResult
         {
@@ -113,5 +114,5 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
         };
     }
 
-    private bool IsConatinFail { get => filterConditionList != null && filterConditionList.Contains("fail");}
+    private bool IsConatinFail { get => filterConditionList != null && filterConditionList.Contains("fail"); }
 }

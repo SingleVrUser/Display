@@ -1,7 +1,6 @@
-﻿using Data;
+﻿
 using Display.Helper;
 using Display.Views;
-using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -12,9 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Windows.Storage;
 using Windows.System;
-using static QRCoder.PayloadGenerator;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -139,7 +137,7 @@ namespace Display
 
             var result = await dialog.ShowAsync();
 
-            switch(result)
+            switch (result)
             {
                 //下载
                 case ContentDialogResult.Primary:
@@ -279,7 +277,7 @@ namespace Display
             if (nowItem != null)
             {
                 //选中的是失败项
-                if(nowItem.series == "fail")
+                if (nowItem.series == "fail")
                 {
                     await PlayVideoHelper.PlayVideo(nowItem.busurl, ((Page)ContentFrame.Content).XamlRoot);
                 }
@@ -365,7 +363,7 @@ namespace Display
 
                 //取消监听
                 RootGrid.KeyDown -= RootGrid_KeyDown;
-            } 
+            }
         }
 
         private void FullScreenButton_PointerEntered(object sender, PointerRoutedEventArgs e)

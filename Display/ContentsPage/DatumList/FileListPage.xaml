@@ -8,12 +8,12 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:behaviors="using:CommunityToolkit.WinUI.UI.Behaviors"
       xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-      xmlns:data="using:Data"
       xmlns:local="using:Display.ContentsPage.DatumList"
       xmlns:control="using:Display.Controls"
       xmlns:converter="using:Display.Converter"
       xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
       xmlns:controls1="using:Display.Controls"
+      xmlns:data="using:Display.Data"
       mc:Ignorable="d">
 
     <Page.Resources>

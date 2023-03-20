@@ -1,17 +1,16 @@
-﻿using System.Collections.Generic;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Display.Models;
+using Microsoft.UI.Xaml;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
-using Microsoft.UI.Xaml;
-using Data;
+using Display.Data;
 
 namespace Display.ViewModels
 {
-    public class Sort115HomeViewModel:ObservableObject
+    public class Sort115HomeViewModel : ObservableObject
     {
         public ObservableCollection<FilesInfo> FoldersVideo = new();
 

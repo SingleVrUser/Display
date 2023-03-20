@@ -1,4 +1,4 @@
-﻿using Data;
+﻿
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Newtonsoft.Json;
@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -71,7 +72,7 @@ namespace Display.Controls
         {
             await webview.ExecuteScriptAsync(
                 "document.getElementById('mini-dialog').remove()");
-            
+
             await webview.ExecuteScriptAsync(
                 "document.getElementById('js_common_mini-dialog').remove()");
 

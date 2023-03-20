@@ -1,10 +1,11 @@
-﻿using Data;
+﻿
 using Microsoft.UI.Xaml.Data;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Display.Data;
 
 namespace Display.Models;
 
@@ -14,22 +15,22 @@ public class IncrementallLoadActorInfoCollection : ObservableCollection<ActorInf
 
     public int AllCount { get; private set; }
 
-    public Dictionary<string,bool> orderByList { get;private set; }
+    public Dictionary<string, bool> orderByList { get; private set; }
 
     public List<string> filterList { get; private set; }
 
-    public bool isDsc { get;private set; }
+    public bool isDsc { get; private set; }
 
-    public IncrementallLoadActorInfoCollection(Dictionary<string, bool> orderByList,int defaultAddCount=40)
+    public IncrementallLoadActorInfoCollection(Dictionary<string, bool> orderByList, int defaultAddCount = 40)
     {
         this.defaultAddCount = defaultAddCount;
 
         SetOrder(orderByList);
     }
 
-    public async Task<int> LoadData(int limit = 40,int offset=0)
+    public async Task<int> LoadData(int limit = 40, int offset = 0)
     {
-        System.Diagnostics.Debug.WriteLine($"加载{offset}-{offset+limit} 中……");
+        System.Diagnostics.Debug.WriteLine($"加载{offset}-{offset + limit} 中……");
 
         var ActorInfos = await DataAccess.LoadActorInfo(limit, offset, orderByList, filterList);
 
@@ -56,7 +57,7 @@ public class IncrementallLoadActorInfoCollection : ObservableCollection<ActorInf
     {
         this.filterList = filterList;
         Clear();
-        if(!HasMoreItems) HasMoreItems = true;
+        if (!HasMoreItems) HasMoreItems = true;
     }
 
     public void SetOrder(Dictionary<string, bool> orderBy)

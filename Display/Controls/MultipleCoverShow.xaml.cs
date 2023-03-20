@@ -1,15 +1,11 @@
-﻿using Data;
+﻿
 using Display.Views;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media.Animation;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using Windows.Media.Core;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -19,7 +15,7 @@ namespace Display.Controls
     public sealed partial class MultipleCoverShow : UserControl
     {
         public static readonly DependencyProperty MoreButtonVisibilityProperty =
-            DependencyProperty.Register("MoreButtonVisibility", typeof(Visibility), typeof(ActorInfoPage), PropertyMetadata.Create(() => Visibility.Collapsed ));
+            DependencyProperty.Register("MoreButtonVisibility", typeof(Visibility), typeof(ActorInfoPage), PropertyMetadata.Create(() => Visibility.Collapsed));
 
         //是否显示MoreButton
         public Visibility MoreButtonVisibility

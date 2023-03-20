@@ -1,4 +1,4 @@
-﻿using Data;
+﻿
 using Display.Helper;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using WinUIEx;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -136,7 +136,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
         page.CreateWindow();
     }
 
-    private void ShowTeachingTip(string content, FrameworkElement target =null)
+    private void ShowTeachingTip(string content, FrameworkElement target = null)
     {
         SelectNull_TeachingtTip.Target = target != null ? target : StartMatchNameButton;
         SelectNull_TeachingtTip.Subtitle = content;
@@ -237,7 +237,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
 
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
 
-        await PlayVideoHelper.PlayVideo(SelectedDatum.pc, this.XamlRoot, trueName: FileMatch.MatchName(SelectedDatum.n).ToUpper(),lastPage: this);
+        await PlayVideoHelper.PlayVideo(SelectedDatum.pc, this.XamlRoot, trueName: FileMatch.MatchName(SelectedDatum.n)?.ToUpper(), lastPage: this);
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
     }
 

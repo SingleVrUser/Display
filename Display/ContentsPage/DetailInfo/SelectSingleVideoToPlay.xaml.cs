@@ -1,6 +1,7 @@
-﻿using Data;
+﻿
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -19,7 +20,7 @@ namespace Display.ContentsPage.DetailInfo
         {
             this.InitializeComponent();
         }
-        public SelectSingleVideoToPlay(List<Datum> pickCodeInfoList,string trueName)
+        public SelectSingleVideoToPlay(List<Datum> pickCodeInfoList, string trueName)
         {
             this.InitializeComponent();
             this.pickCodeInfoList = pickCodeInfoList;

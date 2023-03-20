@@ -4,7 +4,7 @@
       xmlns:local="using:Display.Views"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:data="using:Data"
+      xmlns:data="using:Display.Data"
       mc:Ignorable="d"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -75,7 +75,7 @@
                                              VerticalAlignment="Center"
                                              HorizontalAlignment="Center"
                                              Fill="LightGray" />
-                                    <TextBlock Grid.Column="1"
+                                    <TextBlock Grid.Row="0" Grid.Column="1"
                                                Text="{x:Bind pc}"
                                                x:Phase="1"
                                                Style="{ThemeResource BaseTextBlockStyle}"

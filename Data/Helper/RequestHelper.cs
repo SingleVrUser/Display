@@ -1,16 +1,14 @@
-﻿using HtmlAgilityPack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Windows.Media.Protection.PlayReady;
 
 namespace Data.Helper;
 
 public class RequestHelper
 {
-    public static async Task<Tuple<string, string>> RequestHtml(HttpClient client,string url, int maxRequestCount = 5)
+    public static async Task<Tuple<string, string>> RequestHtml(HttpClient client, string url, int maxRequestCount = 5)
     {
         // 访问
         HttpResponseMessage response;
@@ -35,7 +33,7 @@ public class RequestHelper
                     break;
                 }
                 //JavDb访问Fc2需要登录，如果cookie失效，就无法访问
-                else if(response.StatusCode == System.Net.HttpStatusCode.BadGateway)
+                else if (response.StatusCode == System.Net.HttpStatusCode.BadGateway)
                 {
                     if (url.Contains(AppSettings.JavDB_BaseUrl))
                         GetInfoFromNetwork.IsJavDbCookieVisiable = false;
@@ -43,7 +41,7 @@ public class RequestHelper
                     break;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Debug.WriteLine($"访问网页时发生错误:{ex.Message}");
 
@@ -58,13 +56,13 @@ public class RequestHelper
         return tuple;
     }
 
-    public static async Task<Tuple<string,string>> PostHtml(HttpClient client, string url, Dictionary<string, string> values, int maxRequestCount = 5)
+    public static async Task<Tuple<string, string>> PostHtml(HttpClient client, string url, Dictionary<string, string> values, int maxRequestCount = 5)
     {
         // 访问
         HttpResponseMessage response;
         string strResult = string.Empty;
 
-        Tuple<string,string> tuple = null;
+        Tuple<string, string> tuple = null;
 
         string RequestUrl = string.Empty;
 

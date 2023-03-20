@@ -1,4 +1,4 @@
-﻿using Data;
+﻿
 using Microsoft.UI;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -37,7 +38,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             webview = Browser.webview;
 
             string url;
-            if(Data.StaticData.ImportDataAccess_NavigationUrl != null)
+            if (Data.StaticData.ImportDataAccess_NavigationUrl != null)
             {
                 url = Data.StaticData.ImportDataAccess_NavigationUrl;
             }
@@ -56,7 +57,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             currentWindow = e.Parameter as Window;
             currentWindow.Closed += (sender, args) =>
             {
-                if(webview.CoreWebView2 != null)
+                if (webview.CoreWebView2 != null)
                 {
                     webview.CoreWebView2.Stop();
                 }
@@ -227,9 +228,11 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             foreach (var name in NameList)
             {
                 index++;
-                TextBlock textBlock = new TextBlock() { Text= $"  {index}.{name}" ,
+                TextBlock textBlock = new TextBlock()
+                {
+                    Text = $"  {index}.{name}",
                     IsTextSelectionEnabled = true,
-                    Margin = new Thickness(0,2,0,0)
+                    Margin = new Thickness(0, 2, 0, 0)
                 };
 
                 readyStackPanel.Children.Add(textBlock);
@@ -295,7 +298,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
             var result = await dialog.ShowAsync();
 
-            if(result == ContentDialogResult.Primary)
+            if (result == ContentDialogResult.Primary)
             {
                 DataAccess.DeleteFilesInfoTable();
             }

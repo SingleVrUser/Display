@@ -1,5 +1,4 @@
-﻿using Data;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 using System;
 
@@ -9,7 +8,7 @@ public class IsVideoToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        if(value is int result && result ==1)
+        if (value is int result && result == 1)
         {
             return Visibility.Visible;
         }

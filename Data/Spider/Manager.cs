@@ -1,12 +1,7 @@
 ﻿using Data.Helper;
 using HtmlAgilityPack;
-using Microsoft.Windows.AppNotifications;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using static Data.Model.SpiderInfo;
 

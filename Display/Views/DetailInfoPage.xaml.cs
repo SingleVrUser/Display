@@ -1,7 +1,4 @@
-﻿using Data;
-using Display.Controls;
-using Display.Helper;
-using Display.WindowView;
+﻿using Display.Helper;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -11,9 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Windows.Foundation;
-using static Data.WebApi;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -47,9 +43,9 @@ namespace Display.Views
             {
                 DetailInfo = detailinfo;
             }
-            else if(e.Parameter is VideoInfo videoinfo)
+            else if (e.Parameter is VideoInfo videoinfo)
             {
-                DetailInfo = new(videoinfo,500,300);
+                DetailInfo = new(videoinfo, 500, 300);
             }
 
             var anim = ConnectedAnimationService.GetForCurrentView().GetAnimation("ForwardConnectedAnimation");
@@ -59,7 +55,7 @@ namespace Display.Views
 
 
                 //有动画，动画完成后监听Cover_Grid（封面显示播放按钮）
-                anim.Completed += (sendre,args)=> VideoDetailsControl.StartListCover_GridTapped();
+                anim.Completed += (sendre, args) => VideoDetailsControl.StartListCover_GridTapped();
             }
             else
             {
@@ -76,7 +72,7 @@ namespace Display.Views
 
             //准备动画
             //限定为 返回操作
-            if(e.NavigationMode == NavigationMode.Back)
+            if (e.NavigationMode == NavigationMode.Back)
             {
                 //指定页面
                 if (e.SourcePageType == typeof(VideoViewPage) || e.SourcePageType == typeof(HomePage) || e.SourcePageType == typeof(ActorInfoPage))
@@ -106,7 +102,7 @@ namespace Display.Views
             {
                 actorName = actorNameStr;
             }
-            else if(clickButton.DataContext is ActorInfo actorInfo)
+            else if (clickButton.DataContext is ActorInfo actorInfo)
             {
                 actorName = actorInfo.name;
             }
@@ -151,7 +147,7 @@ namespace Display.Views
             var videoInfoList = DataAccess.loadFileInfoByTruename(name);
 
             //没有该数据
-            if(videoInfoList.Count == 0)
+            if (videoInfoList.Count == 0)
             {
                 VideoPlayButton.Flyout = new Flyout()
                 {
@@ -195,7 +191,7 @@ namespace Display.Views
             if (sender is not ListView listView) return;
             if (listView.DataContext is not string trueName) return;
 
-            await PlayVideoHelper.PlayVideo(SingleVideoInfo.pc,this.XamlRoot, trueName: trueName, lastPage: this);
+            await PlayVideoHelper.PlayVideo(SingleVideoInfo.pc, this.XamlRoot, trueName: trueName, lastPage: this);
         }
 
 

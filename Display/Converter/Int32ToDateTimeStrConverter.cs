@@ -1,6 +1,6 @@
-﻿using Data;
-using Microsoft.UI.Xaml.Data;
+﻿using Microsoft.UI.Xaml.Data;
 using System;
+using Display.Data;
 
 namespace Display.Converter;
 
@@ -10,11 +10,11 @@ public class Int32ToDateTimeStrConverter : IValueConverter
     {
         //2022-09-18 17:24 或者 1663493094
 
-        if(value is int IntValue)
+        if (value is int IntValue)
         {
             return FileMatch.ConvertInt32ToDateTime(IntValue);
         }
-        else if(value is string NumOrStringValue)
+        else if (value is string NumOrStringValue)
         {
             if (!FileMatch.isNumberic1(NumOrStringValue))
                 return NumOrStringValue;

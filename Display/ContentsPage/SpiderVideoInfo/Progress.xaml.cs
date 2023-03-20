@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
-using Data;
-using Data.Spider;
 using Display.WindowView;
 using LiveChartsCore;
 using LiveChartsCore.Defaults;
@@ -21,9 +19,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Display.Data;
+using Display.Spider;
 using WinUIEx;
-using static Data.Model.SpiderInfo;
-using static Data.Spider.Manager;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -57,7 +55,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
         public Progress(List<FailDatum> failDatums)
         {
             this.InitializeComponent();
-            this.failDatumList= failDatums;
+            this.failDatumList = failDatums;
             this.Loaded += ReSpiderPageLoaded;
         }
 
@@ -119,7 +117,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
         {
             if (datumList == null) return;
 
-            TopProgressRing.IsActive= true;
+            TopProgressRing.IsActive = true;
 
             //目前datumList仅有一级目录文件
             //遍历获取文件列表中所有的文件
@@ -172,19 +170,19 @@ namespace Display.ContentsPage.SpiderVideoInfo
         {
             CartesianChart.Visibility = Visibility.Visible;
 
-            SpiderInfos = new List<SpiderInfo>() { 
-                new(SpiderSourceName.Javbus, AppSettings.isUseJavBus) ,
-                new(SpiderSourceName.Jav321, AppSettings.isUseJav321),
-                new(SpiderSourceName.Avmoo, AppSettings.isUseAvMoo),
-                new(SpiderSourceName.Avsox, AppSettings.isUseAvSox),
-                new(SpiderSourceName.Libredmm, AppSettings.isUseLibreDmm),
-                new(SpiderSourceName.Fc2club, AppSettings.isUseFc2Hub),
-                new(SpiderSourceName.Javdb, AppSettings.isUseJavDB),
-                new(SpiderSourceName.Local, true)
+            SpiderInfos = new List<SpiderInfo>() {
+                new(Models.SpiderInfo.SpiderSourceName.Javbus, AppSettings.isUseJavBus) ,
+                new(Models.SpiderInfo.SpiderSourceName.Jav321, AppSettings.isUseJav321),
+                new(Models.SpiderInfo.SpiderSourceName.Avmoo, AppSettings.isUseAvMoo),
+                new(Models.SpiderInfo.SpiderSourceName.Avsox, AppSettings.isUseAvSox),
+                new(Models.SpiderInfo.SpiderSourceName.Libredmm, AppSettings.isUseLibreDmm),
+                new(Models.SpiderInfo.SpiderSourceName.Fc2club, AppSettings.isUseFc2Hub),
+                new(Models.SpiderInfo.SpiderSourceName.Javdb, AppSettings.isUseJavDB),
+                new(Models.SpiderInfo.SpiderSourceName.Local, true)
                 };
 
             //按IsEnable排序
-            SpiderInfos = SpiderInfos.OrderByDescending(item=>item.IsEnable).ToList();
+            SpiderInfos = SpiderInfos.OrderByDescending(item => item.IsEnable).ToList();
 
             SpiderInfo_GridView.ItemsSource = SpiderInfos;
         }
@@ -229,7 +227,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             CartesianChart.YAxes = YAxes;
         }
 
-        private void UpdateSpiderCartesianChart(SpiderSourceName spiderSource)
+        private void UpdateSpiderCartesianChart(Models.SpiderInfo.SpiderSourceName spiderSource)
         {
             var item = CartesianChart.Series.Where(item => item.Name == spiderSource.ToString()).FirstOrDefault();
 
@@ -340,10 +338,10 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// </summary>
         private async Task SpliderVideoInfo(List<MatchVideoResult> matchVideoResults)
         {
-            if (matchVideoResults== null)
+            if (matchVideoResults == null)
                 return;
 
-            if(network ==null)
+            if (network == null)
                 network = new();
 
             ShowSpiderInfoList();
@@ -362,7 +360,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             long task_id = DataAccess.InsertSpiderLog();
 
             //记录到SpiderTask
-            foreach(var item in matchVideoResults)
+            foreach (var item in matchVideoResults)
             {
                 if (item.MatchName == null)
                     continue;
@@ -384,7 +382,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             int matchSuccessVideoCount = matchVideoResults.Where(item => item.statusCode == 1 || item.statusCode == 2).ToList().Count;
 
             //匹配到的番号总数量
-            int totalCount = matchVideoResults.Where(item=>!string.IsNullOrEmpty(item.MatchName)).ToList().Count;
+            int totalCount = matchVideoResults.Where(item => !string.IsNullOrEmpty(item.MatchName)).ToList().Count;
             MatchCidCount_Run.Text = totalCount.ToString();
 
             if (totalCount == 0)
@@ -418,7 +416,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     CidSuccessCount_Run.Text = successCount.ToString();
                     successVIdeoNameList.Add(progressPercent.Name);
 
-                    UpdateSpiderCartesianChart(SpiderSourceName.Local);
+                    UpdateSpiderCartesianChart(Models.SpiderInfo.SpiderSourceName.Local);
                 }
                 //请求失败(搜刮源)
                 else if (progressPercent.RequestStates == RequestStates.fail)
@@ -427,7 +425,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     FailVideoNameList.Add(progressPercent.Name);
                     FailCount_Run.Text = failCount.ToString();
                     ProgressMore_TextBlock.Text = $"失败数：{failCount}";
-                    UpdateSpiderCartesianChart(SpiderSourceName.Local);
+                    UpdateSpiderCartesianChart(Models.SpiderInfo.SpiderSourceName.Local);
 
                     //番号搜刮成功率
                     CidSuccessRate_Run.Text = $"{(totalCount - FailVideoNameList.Count) * 100 / totalCount}%";
@@ -440,7 +438,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
                 i++;
                 //System.Diagnostics.Debug.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>接受:{i} - {progressPercent.Name} - {progressPercent.SpiderSource} - {progressPercent.RequestStates} - {progressPercent.Message}");
-                
+
                 //更新整体进度
                 var currentCount = successVIdeoNameList.Count + FailVideoNameList.Count;
                 overallProgress.Value = currentCount;
@@ -464,7 +462,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             if (!GetInfoFromNetwork.IsJavDbCookieVisiable)
             {
-                JavDbCookieVisiable_TeachingTip.IsOpen= true;
+                JavDbCookieVisiable_TeachingTip.IsOpen = true;
             }
 
             //显示总耗时
@@ -483,7 +481,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             foreach (var item in SpiderInfos.Where(item => item.IsEnable))
             {
-                if (item.SpiderSource == SpiderSourceName.Local) continue;
+                if (item.SpiderSource == Models.SpiderInfo.SpiderSourceName.Local) continue;
 
                 tasks.Add(Task.Run(() => CreadSpiderTask(item.SpiderSource, progress)));
             }
@@ -492,7 +490,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             await Task.WhenAll(tasks);
 
             //数据库源最后完成
-            SpiderInfo currentSpiderInfo = new(SpiderSourceName.Local);
+            SpiderInfo currentSpiderInfo = new(Models.SpiderInfo.SpiderSourceName.Local);
             currentSpiderInfo.State = SpiderStates.done;
             currentSpiderInfo.Message = "完成";
             progress.Report(currentSpiderInfo);
@@ -514,11 +512,11 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// </summary>
         /// <param Name="spiderSourceName"></param>
         /// <returns></returns>
-        private async Task CreadSpiderTask(SpiderSourceName spiderSourceName, IProgress<SpiderInfo> progress)
+        private async Task CreadSpiderTask(Models.SpiderInfo.SpiderSourceName spiderSourceName, IProgress<SpiderInfo> progress)
         {
             string name = null;
             VideoInfo resultInfo;
-            SpiderSource spiderSource = new(spiderSourceName);
+            Manager.SpiderSource spiderSource = new(spiderSourceName);
 
             var spiderManager = Manager.Current;
 
@@ -594,7 +592,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 //如果数据库已存在该数据，直接从数据库中读取
                 if (result.Count != 0)
                 {
-                    currentSpiderInfo = new(SpiderSourceName.Local,name);
+                    currentSpiderInfo = new(Models.SpiderInfo.SpiderSourceName.Local, name);
                     currentSpiderInfo.State = SpiderStates.doing;
                     currentSpiderInfo.Message = name;
 
@@ -615,7 +613,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     progress.Report(currentSpiderInfo);
 
                     //FC2且cookie异常（如未登录）
-                    if (name.Contains("FC2") && spiderSourceName == SpiderSourceName.Javdb && !GetInfoFromNetwork.IsJavDbCookieVisiable)
+                    if (name.Contains("FC2") && spiderSourceName == Models.SpiderInfo.SpiderSourceName.Javdb && !GetInfoFromNetwork.IsJavDbCookieVisiable)
                     {
                         break;
                     }
@@ -628,7 +626,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     await GetInfoFromNetwork.RandomTimeDelay(spiderSource.DelayRanges.Item1, spiderSource.DelayRanges.Item2);
 
                     // 添加搜刮信息到数据库（只有从搜刮源查找到的才添加）
-                    if (resultInfo!=null)
+                    if (resultInfo != null)
                         DataAccess.AddVideoInfo(resultInfo);
 
                 }

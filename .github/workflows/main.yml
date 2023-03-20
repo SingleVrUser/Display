@@ -90,7 +90,7 @@ jobs:
       run: Compress-Archive Display/Packages/Display*_${{ env.platform }}_Test 'Display_${{ env.version }}_${{ env.platform }}.zip'
 
     - name: Upload ZIP of ${{ env.platform }} app
-      uses: actions/upload-artifact@v3.1.2
+      uses: actions/upload-artifact@v2
       with:
         name: 'Display_${{ env.version }}_${{ env.platform }}.zip'
         path: 'Display_${{ env.version }}_${{ env.platform }}.zip'
