@@ -51,7 +51,7 @@ namespace Display.Controls
 
             //演员
             //之前有数据，清空
-            if (ActorSatckPanel.Children.Count != 0) ActorSatckPanel.Children.Clear();
+            if (ActorStackPanel.Children.Count != 0) ActorStackPanel.Children.Clear();
 
             ////查询该视频对应的演员列表
             var actorList = await DataAccess.LoadActorInfoByVideoName(resultinfo.truename);
@@ -64,7 +64,7 @@ namespace Display.Controls
                 if (!string.IsNullOrEmpty(actor.name))
                     actorImageControl.Click += ActorButtonOnClick;
 
-                ActorSatckPanel.Children.Insert(i, actorImageControl);
+                ActorStackPanel.Children.Insert(i, actorImageControl);
             }
 
             //标签
@@ -438,7 +438,7 @@ namespace Display.Controls
                 animation = ThumbnailGridView.PrepareConnectedAnimation("forwardAnimation", _storedItem, "Thumbnail_Image");
             }
 
-            string iamgePath = e.ClickedItem as string;
+            string imagePath = e.ClickedItem as string;
 
             //之前未赋值
             if (ShowImageList.Count == 0)
@@ -449,7 +449,7 @@ namespace Display.Controls
                     var image = ThumbnailList[i];
 
                     ShowImageList.Add(image);
-                    if (image == iamgePath)
+                    if (image == imagePath)
                     {
                         ShowImageFlipView.SelectedIndex = i;
                     }
@@ -459,7 +459,7 @@ namespace Display.Controls
             //之前已赋值
             else
             {
-                var index = ShowImageList.IndexOf(iamgePath);
+                var index = ShowImageList.IndexOf(imagePath);
                 ShowImageFlipView.SelectedIndex = index;
             }
 
