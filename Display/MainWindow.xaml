@@ -9,23 +9,75 @@
         mc:Ignorable="d">
 
     <Grid x:Name="RootGrid">
-        <!--标题-->
+        <Grid.Resources>
+            <DataTemplate x:Key="HeaderTemplate">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="appTitle"
+                               Style="{StaticResource TitleTextBlockStyle}"
+                               FontSize="28"
+                               VerticalAlignment="Center"
+                               Text="{Binding}" />
+
+                    <HyperlinkButton Margin="10,0"
+                                     Grid.Column="1"
+                                     Click="fullScreenWindowButton_Click"
+                                     Opacity="0.2"
+                                     PointerEntered="FullScreenButton_PointerEntered"
+                                     PointerExited="FullScreenButton_PointerExited">
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                  Foreground="LightGray"
+                                  Glyph="&#xE9A6;" />
+                    </HyperlinkButton>
+                    <customcontrols:CustomAutoSuggestBox Grid.Column="2"
+                                                         HorizontalAlignment="Right"
+                                                         SuggestionChosen="SuggestionChosen"
+                                                         QuerySubmitted="CustomAutoSuggestBox_QuerySubmitted" />
+                </Grid>
+            </DataTemplate>
+        </Grid.Resources>
+
+        <!--标题栏-->
         <Grid x:Name="AppTitleBar"
               Canvas.ZIndex="1"
-              Background="White"
-              VerticalAlignment="Top"
-              Margin="0,2,0,0">
+              VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="IconColumn"
+                                  Width="Auto" />
+                <ColumnDefinition x:Name="TitleColumn"
+                                  Width="Auto" />
+                <ColumnDefinition x:Name="SearchColumn"
+                                  Width="Auto" />
+                <ColumnDefinition x:Name="RightDragColumn"
+                                  Width="*" />
+            </Grid.ColumnDefinitions>
 
-            <Image Source="/Assets/pokeball.png"
-                   HorizontalAlignment="Left"
-                   Width="16"
-                   Height="16" />
-            <TextBlock  x:Name="AppTitleTextBlock"
-                        Text="Display"
-                        TextWrapping="NoWrap"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        VerticalAlignment="Center"
-                        Margin="25,0,0,0" />
+            <HyperlinkButton Grid.Column="0"
+                    BorderThickness="0"
+                    Click="fullScreenWindowButton_Click"
+                    Padding="5"
+                    ToolTipService.ToolTip="全屏">
+                <Image Source="/Assets/pokeball.png"
+                       HorizontalAlignment="Left"
+                       Width="20"
+                       Height="20"/>
+            </HyperlinkButton>
+
+            <TextBlock Grid.Column="1"
+                       Text="Display"
+                       TextWrapping="NoWrap"
+                       Padding="2,0,10,0"
+                       Style="{ThemeResource BodyStrongTextBlockStyle}"
+                       VerticalAlignment="Center"/>
+
+            <customcontrols:CustomAutoSuggestBox x:Name="CustomAutoSuggestBox" Grid.Column="2"
+                                                 SuggestionChosen="SuggestionChosen"
+                                                 QuerySubmitted="CustomAutoSuggestBox_QuerySubmitted"/>
+
         </Grid>
 
         <NavigationView x:Name="NavView"
@@ -35,13 +87,14 @@
                         IsBackButtonVisible="Visible"
                         IsBackEnabled="False"
                         BackRequested="NavView_BackRequested"
-                        AlwaysShowHeader="True"
+                        AlwaysShowHeader="False"
                         IsTitleBarAutoPaddingEnabled="True"
                         PaneDisplayMode="Auto"
                         DisplayModeChanged="NavigationViewControl_DisplayModeChanged"
                         OpenPaneLength="150"
-                        IsPaneOpen="{x:Bind data:AppSettings.IsNavigationViewPaneOpen}">
-            
+                        IsPaneOpen="{x:Bind data:AppSettings.IsNavigationViewPaneOpen}"
+                        SelectionFollowsFocus="Disabled">
+
             <!--调整NavigationView样式-->
             <NavigationView.Resources>
                 <Thickness x:Key="NavigationViewMinimalHeaderMargin">-65,43,0,3</Thickness>
@@ -55,41 +108,6 @@
                     </VisualState>
                 </VisualStateGroup>-->
             </NavigationView.Resources>
-
-            <!--自定义Header-->
-            <NavigationView.HeaderTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock x:Name="appTitle"
-                                   Style="{StaticResource TitleTextBlockStyle}"
-                                   FontSize="28"
-                                   VerticalAlignment="Center"
-                                   Text="{Binding}" />
-
-                        <HyperlinkButton Margin="10,0"
-                                         Grid.Column="1"
-                                         Click="fullScrenWindowButton_Click"
-                                         Opacity="0.2"
-                                         PointerEntered="FullScreenButton_PointerEntered"
-                                         PointerExited="FullScreenButton_PointerExited">
-                            <FontIcon
-                                x:Name="FullScreen_FontIcon"
-                                FontFamily="Segoe Fluent Icons"
-                                Foreground="LightGray"
-                                Glyph="&#xE9A6;" />
-                        </HyperlinkButton>
-                        <customcontrols:CustomAutoSuggestBox Grid.Column="2"
-                                                             HorizontalAlignment="Right"
-                                                             SuggestionChosen="SuggestionChosen"
-                                                             QuerySubmitted="CustomAutoSuggestBox_QuerySubmitted" />
-                    </Grid>
-                </DataTemplate>
-            </NavigationView.HeaderTemplate>
 
             <!--菜单-->
             <NavigationView.MenuItems>

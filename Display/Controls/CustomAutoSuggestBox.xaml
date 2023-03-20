@@ -46,7 +46,7 @@
     <Grid>
         <Grid.Resources>
             <!--打开AutoSuggestionBox-->
-            <Storyboard x:Name="openAutoSuggestionBoxStoryboard">
+            <Storyboard x:Name="OpenAutoSuggestionBoxStoryboard" Completed="OpenAutoSuggestionBoxStoryboard_OnCompleted">
                 <DoubleAnimation Storyboard.TargetName="NavViewSearchBox"
                                  Storyboard.TargetProperty="Width"
                                  Duration="0:0:0.5"
@@ -59,8 +59,7 @@
                 </DoubleAnimation>
 
                 <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
-                                               Storyboard.TargetName="selectFoundMethodButton"
-                                               EnableDependentAnimation="True">
+                                               Storyboard.TargetName="selectFoundMethodButton">
                     <EasingDoubleKeyFrame KeyTime="0"
                                           Value="0" />
                     <EasingDoubleKeyFrame KeyTime="0:0:0.2"
@@ -69,11 +68,19 @@
                                           Value="1" />
                 </DoubleAnimationUsingKeyFrames>
 
-                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Y)"
+                <!--<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Y)"
                                                Storyboard.TargetName="Translation1"
                                                EnableDependentAnimation="True">
                     <EasingDoubleKeyFrame KeyTime="0"
                                           Value="20" />
+                    <EasingDoubleKeyFrame KeyTime="0:0:0.5"
+                                          Value="0" />
+                </DoubleAnimationUsingKeyFrames>-->
+                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.X)"
+                                               Storyboard.TargetName="Translation1"
+                                               EnableDependentAnimation="True">
+                    <EasingDoubleKeyFrame KeyTime="0"
+                                          Value="-20" />
                     <EasingDoubleKeyFrame KeyTime="0:0:0.5"
                                           Value="0" />
                 </DoubleAnimationUsingKeyFrames>
@@ -100,7 +107,7 @@
             </Storyboard>
 
             <!--隐藏AutoSuggestionBox-->
-            <Storyboard x:Name="closeAutoSuggestionBoxStoryboard">
+            <Storyboard x:Name="CloseAutoSuggestionBoxStoryboard" Completed="CloseAutoSuggestionBoxStoryboard_OnCompleted">
                 <DoubleAnimation Storyboard.TargetName="NavViewSearchBox"
                                  Storyboard.TargetProperty="Width"
                                  Duration="0:0:0.3"
@@ -114,23 +121,13 @@
                 </DoubleAnimation>
 
                 <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)"
-                                               Storyboard.TargetName="selectFoundMethodButton"
-                                               EnableDependentAnimation="True">
+                                               Storyboard.TargetName="selectFoundMethodButton">
                     <EasingDoubleKeyFrame KeyTime="0"
                                           Value="1" />
                     <EasingDoubleKeyFrame KeyTime="0:0:0.2"
                                           Value="1" />
                     <EasingDoubleKeyFrame KeyTime="0:0:0.3"
                                           Value="0" />
-                </DoubleAnimationUsingKeyFrames>
-
-                <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Y)"
-                                               Storyboard.TargetName="Translation1"
-                                               EnableDependentAnimation="True">
-                    <EasingDoubleKeyFrame KeyTime="0"
-                                          Value="0" />
-                    <EasingDoubleKeyFrame KeyTime="0:0:0.3"
-                                          Value="-20" />
                 </DoubleAnimationUsingKeyFrames>
 
                 <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)"
@@ -217,11 +214,13 @@
                             QueryIcon="Find"
                             PlaceholderText="搜索"
                             IsEnabled="True"
+                            VerticalContentAlignment="Center"
                             TextChanged="AutoSuggestBox_TextChanged"
+                            VerticalAlignment="Center"
                             QuerySubmitted="AutoSuggestBox_QuerySubmitted"
                             SuggestionChosen="AutoSuggestBox_SuggestionChosen"
                             GotFocus="NavViewSearchBox_GotFocus"
-                            LostFocus="NavViewSearchBox_LostFocus" />
+                            LostFocus="NavViewSearchBox_LostFocus"/>
 
         </StackPanel>
 
