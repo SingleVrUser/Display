@@ -1,7 +1,8 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
-using Data;
+using Display.Helper;
+using MediaPlayerElement_Test.Models;
 using Microsoft.Graphics.Canvas;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -11,16 +12,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
-using Windows.Storage.Streams;
-using MediaPlayerElement_Test.Models;
-using Windows.Security.Cryptography;
-using Display.Helper;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -110,9 +107,9 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         //没有m3u8，获取下载链接播放
         else
         {
-            var downUrlList = webApi.GetDownUrl(PickCode,GetInfoFromNetwork.BrowserUserAgent);
+            var downUrlList = webApi.GetDownUrl(PickCode, GetInfoFromNetwork.BrowserUserAgent);
 
-            if (downUrlList.Count>0)
+            if (downUrlList.Count > 0)
             {
                 url = downUrlList.FirstOrDefault().Value;
             }
@@ -125,7 +122,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
                                             new(WebApi.playMethod.mpv, pickCode: PickCode),
                                             new(WebApi.playMethod.pot, pickCode: PickCode)};
         mediaTransportControls.SetPlayer(playerItemsSource, this.Resources["PlayerDataTemplate"] as DataTemplate);
-        
+
         //设置喜欢、稍后观看
         bool isLike;
         bool isLookLater;
@@ -233,7 +230,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
                 playbackItem.TimedMetadataTracksChanged += (item, args) =>
                 {
                     playbackItem.TimedMetadataTracks.SetPresentationMode(0, TimedMetadataTrackPresentationMode.PlatformPresented);
-                    
+
                     Debug.WriteLine("默认选中第一个字幕");
 
                 };
@@ -257,7 +254,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         if (MediaControl.MediaPlayer.Source != null && MediaControl.MediaPlayer.CurrentState == MediaPlayerState.Playing) MediaControl.MediaPlayer.Pause();
         MediaControl.SetMediaPlayer(media);
     }
-    
+
     private async void QualityChanged(object sender, SelectionChangedEventArgs e)
     {
         if (e.AddedItems.FirstOrDefault() is not Quality quality) return;
@@ -292,7 +289,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
             MediaControl.MediaPlayer.Position = time;
         }
     }
-    
+
     private void mediaControls_FullWindow(object sender, RoutedEventArgs e)
     {
         FullWindow?.Invoke(sender, e);
@@ -348,7 +345,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         {
             var videoInfo = DataAccess.LoadOneVideoInfoByCID(TrueName);
 
-            if(videoInfo != null)
+            if (videoInfo != null)
             {
                 DataAccess.UpdateSingleDataFromVideoInfo(TrueName, "is_like", IsLike.ToString());
 
@@ -361,7 +358,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
         }
 
-        
+
 
     }
 
@@ -421,7 +418,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
             }
         }
 
-        
+
     }
     private async void ScreenshotButtonClick(object sender, RoutedEventArgs e)
     {
@@ -478,7 +475,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
         webApi ??= WebApi.GlobalWebApi;
 
-        await webApi.PlayVideoWithOriginUrl(player.PickCode,player.PlayMethod,this.XamlRoot, SubInfo);
+        await webApi.PlayVideoWithOriginUrl(player.PickCode, player.PlayMethod, this.XamlRoot, SubInfo);
     }
 
     private async void ShowTeachingTip(string subTitle)

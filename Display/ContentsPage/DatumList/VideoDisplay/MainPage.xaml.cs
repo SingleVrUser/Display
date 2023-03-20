@@ -3,10 +3,8 @@
 
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI.Controls;
-using Data;
 using Display.Models;
 using Display.WindowView;
-using MediaPlayerElement_Test.Models;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -18,14 +16,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.Media.Core;
 using Windows.Media.Playback;
-using Windows.Media.Streaming.Adaptive;
-using static QRCoder.PayloadGenerator;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -50,7 +45,6 @@ public sealed partial class MainPage : Page
 
     ObservableCollection<MetadataItem> _units;
 
-    GetInfoFromNetwork network;
 
     ListView LastFilesListView;
 
@@ -75,7 +69,6 @@ public sealed partial class MainPage : Page
 
         _units = new ObservableCollection<MetadataItem>() { new MetadataItem { Label = "播放列表", Command = OpenFolderCommand, CommandParameter = "0" } };
         metadataControl.Items = _units;
-        network = new GetInfoFromNetwork();
         webApi = WebApi.GlobalWebApi;
 
 
@@ -349,7 +342,7 @@ public sealed partial class MainPage : Page
         return menuFlyout;
     }
 
-    private async Task AddMediaElement(FilesInfo file,string videoUrl=null,int addIndex=-1)
+    private async Task AddMediaElement(FilesInfo file, string videoUrl = null, int addIndex = -1)
     {
         videoUrl ??= await GetVideoUrl(file);
 
@@ -375,7 +368,7 @@ public sealed partial class MainPage : Page
 
         mediaPlayerElement.MediaPlayer.PlaybackSession.MediaPlayer.MediaOpened += (sender, args) =>
         {
-            MediaPlayer_MediaOpened(sender,args);
+            MediaPlayer_MediaOpened(sender, args);
 
             Debug.WriteLine($"当前视频分辨率为：{sender.PlaybackSession.NaturalVideoWidth} x {sender.PlaybackSession.NaturalVideoHeight}");
 
@@ -492,7 +485,7 @@ public sealed partial class MainPage : Page
             else
             {
                 Debug.WriteLine("数据库不存在该信息，尝试从网络中查找");
-                var spiderManager = Data.Spider.Manager.Current;
+                var spiderManager = Spider.Manager.Current;
 
                 cidInfo = await spiderManager.DispatchSpiderInfoByCIDInOrder(cid);
 
@@ -631,7 +624,7 @@ public sealed partial class MainPage : Page
     private void RemoveCidInfo(FilesInfo fileInfo)
     {
         //移除cid信息（预览图/信息）
-        var removeCid = CidInfos.FirstOrDefault(item => item.truename== fileInfo.Name ||  item.truename == FileMatch.MatchName(fileInfo.Name)?.ToUpper());
+        var removeCid = CidInfos.FirstOrDefault(item => item.truename == fileInfo.Name || item.truename == FileMatch.MatchName(fileInfo.Name)?.ToUpper());
 
         if (removeCid != null)
         {
@@ -701,7 +694,7 @@ public sealed partial class MainPage : Page
             await webApi.DeleteFiles(filesInfo.FirstOrDefault()?.datum.pid, filesInfo.Select(item => item.Fid).ToList());
         }
     }
-    
+
 
     private void InfoGridVisibilityButton_Click(object sender, RoutedEventArgs e)
     {
@@ -842,7 +835,7 @@ public sealed partial class MainPage : Page
         // 即将删除的视频所属控件
         var mediaPlayerElement = GetFirstElementPlayPickCode(removeFileInfo.datum.pc);
 
-        if(mediaPlayerElement == null) return;
+        if (mediaPlayerElement == null) return;
 
         //正在播放的文件的pc
         var playingPcList = Video_UniformGrid.Children.Select(element => ((element as MediaPlayerElement)?.Tag as MediaPlayerWithStreamSource)?.FilesInfo.datum.pc).ToList();
@@ -861,7 +854,7 @@ public sealed partial class MainPage : Page
 
             // 添加到正在播放的视频的信息中
             PlayingVideoInfos.Add(videoInfo);
-            
+
             // 搜索信息
             await FindAndShowInfosFromInternet(new List<FilesInfo>() { videoInfo });
         }
@@ -897,7 +890,7 @@ public sealed partial class MainPage : Page
 
         var menuFlyout = BuildMenuFlyout(videoInfo);
 
-        var mediaPlayerWithStreamSource = await MediaPlayerWithStreamSource.CreateMediaPlayer(videoInfo,videoUrl);
+        var mediaPlayerWithStreamSource = await MediaPlayerWithStreamSource.CreateMediaPlayer(videoInfo, videoUrl);
 
         var mediaPlayer = mediaPlayerWithStreamSource.MediaPlayer;
         mediaPlayer.CurrentStateChanged += MediaPlayer_CurrentStateChanged;
@@ -978,6 +971,6 @@ public sealed partial class MainPage : Page
 
         // 添加新的
         await AddMediaElement(fileInfo, videoUrl, index);
-        
+
     }
 }

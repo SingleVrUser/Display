@@ -1,9 +1,10 @@
-﻿using Data;
+﻿
 using Microsoft.UI.Xaml.Data;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Display.Data;
 
 namespace Display.Models;
 
@@ -24,7 +25,7 @@ public class IncrementallLoadFailInfoCollection : ObservableCollection<FailInfo>
     {
         ShowType = showType;
 
-        if(!HasMoreItems) HasMoreItems = true;
+        if (!HasMoreItems) HasMoreItems = true;
 
         Clear();
 

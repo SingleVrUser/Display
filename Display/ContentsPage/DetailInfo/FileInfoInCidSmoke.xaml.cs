@@ -1,4 +1,5 @@
-using Data;
+
+using Display.Data;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -27,7 +28,7 @@ namespace Display.ContentsPage.DetailInfo
         {
             var VideoInfos = await DataAccess.FindFileInfoByTrueName(truename);
 
-            InfosListView.ItemsSource= VideoInfos;
+            InfosListView.ItemsSource = VideoInfos;
         }
     }
 }

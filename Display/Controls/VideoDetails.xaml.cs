@@ -1,4 +1,4 @@
-﻿using Data;
+﻿
 using Display.ContentsPage.DetailInfo;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using Windows.Foundation.Metadata;
 using Windows.Storage;
 using Windows.Storage.Streams;
+using Display.Data;
 using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -60,7 +61,7 @@ namespace Display.Controls
                 var actor = actorList[i];
                 var actorImageControl = new Controls.ActorImage(actor, resultinfo.releasetime);
 
-                if(!string.IsNullOrEmpty(actor.name))
+                if (!string.IsNullOrEmpty(actor.name))
                     actorImageControl.Click += ActorButtonOnClick;
 
                 ActorSatckPanel.Children.Insert(i, actorImageControl);
@@ -68,13 +69,13 @@ namespace Display.Controls
 
             //标签
             //之前有数据，清空
-            if ( CategoryWrapPanel.Children.Count != 0) CategoryWrapPanel.Children.Clear();
+            if (CategoryWrapPanel.Children.Count != 0) CategoryWrapPanel.Children.Clear();
             var categoryList = resultinfo.category?.Split(",");
             for (var i = 0; i < categoryList?.Length; i++)
             {
                 var content = categoryList[i];
 
-                if(string.IsNullOrEmpty(content)) continue;
+                if (string.IsNullOrEmpty(content)) continue;
 
                 // 定义button
                 var button = new Button()
@@ -83,7 +84,7 @@ namespace Display.Controls
                     Content = content,
                     BorderThickness = new Thickness(0),
                     Background = Application.Current.Resources["ButtonEmphasizeBackground"] as SolidColorBrush,
-                    
+
                 };
                 button.Click += LabelButtonOnClick;
 
@@ -98,7 +99,7 @@ namespace Display.Controls
             List<string> ThumbnailList = new();
 
             //来源为本地
-            if(AppSettings.ThumbnailOrigin == (int)AppSettings.Origin.Local)
+            if (AppSettings.ThumbnailOrigin == (int)AppSettings.Origin.Local)
             {
                 string folderFullName = Path.Combine(AppSettings.Image_SavePath, resultinfo.truename);
                 DirectoryInfo TheFolder = new DirectoryInfo(folderFullName);
@@ -122,13 +123,13 @@ namespace Display.Controls
                 VideoInfo VideoInfo = DataAccess.LoadOneVideoInfoByCID(resultinfo.truename);
 
                 var sampleImageListStr = VideoInfo.sampleImageList;
-                if(!string.IsNullOrEmpty(sampleImageListStr))
+                if (!string.IsNullOrEmpty(sampleImageListStr))
                 {
                     ThumbnailList = sampleImageListStr.Split(",").ToList();
                 }
             }
 
-            if(ThumbnailList.Count > 0)
+            if (ThumbnailList.Count > 0)
             {
                 ThumbnailList = ThumbnailList.OrderByNatural(emp => emp.ToString()).ToList();
                 ThumbnailGridView.ItemsSource = ThumbnailList;
@@ -208,7 +209,7 @@ namespace Display.Controls
                     downType = WebApi.downType._115;
                     break;
             }
-            
+
             string savePath = AppSettings.BitCometSavePath;
 
 
@@ -299,7 +300,7 @@ namespace Display.Controls
         private void FindAppBarButton_Click(object sender, RoutedEventArgs e)
         {
             //第一次启动FindInfoAgainSmoke
-            if(FindInfoAgainSmoke == null)
+            if (FindInfoAgainSmoke == null)
             {
 
                 FindInfoAgainSmoke = new(resultinfo.truename);
@@ -326,7 +327,7 @@ namespace Display.Controls
             if (!(sender is Button button)) return;
 
             //获取最新的信息
-            if(!(button.DataContext is VideoInfo videoInfo)) return;
+            if (!(button.DataContext is VideoInfo videoInfo)) return;
 
             await UpdateInfo(videoInfo);
 
@@ -448,7 +449,7 @@ namespace Display.Controls
                     var image = ThumbnailList[i];
 
                     ShowImageList.Add(image);
-                    if(image == iamgePath)
+                    if (image == iamgePath)
                     {
                         ShowImageFlipView.SelectedIndex = i;
                     }
@@ -495,7 +496,7 @@ namespace Display.Controls
 
         private string GetFileIndex()
         {
-            return $"{ShowImageFlipView.SelectedIndex+1}/{ShowImageList.Count}";
+            return $"{ShowImageFlipView.SelectedIndex + 1}/{ShowImageList.Count}";
         }
 
         public event RoutedEventHandler DeleteClick;
@@ -542,7 +543,7 @@ namespace Display.Controls
                     //为新的Videoinfo赋值
                     var newItem = newInfo.GetType().GetProperty(name);
 
-                    if(newItem!= null)
+                    if (newItem != null)
                     {
                         newItem.SetValue(newInfo, newValue);
                     }

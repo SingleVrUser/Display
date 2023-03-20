@@ -5,7 +5,7 @@
     xmlns:local="using:Display.ContentsPage"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:data="using:Data"
+    xmlns:data="using:Display.Data"
       xmlns:customcontrols="using:Display.Controls"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d">
@@ -104,7 +104,6 @@
         </RelativePanel>
 
         <controls:AdaptiveGridView
-            Loaded="BasicGridView_Loaded"
             Grid.Row="2"
             x:Name="BasicGridView"
             IsItemClickEnabled="True"

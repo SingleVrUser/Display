@@ -1,14 +1,13 @@
-﻿using Data;
+﻿
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Display.Data;
 
 namespace Display.Controls
 {
@@ -74,7 +73,7 @@ namespace Display.Controls
                 items = item.DatumList;
             }
 
-            if(outType == FilesInfo.FileType.Folder)
+            if (outType == FilesInfo.FileType.Folder)
             {
                 var itamsdfs = items.Where(x => string.IsNullOrEmpty(x.fid));
                 items = items.Where(x => string.IsNullOrEmpty(x.fid)).ToList();
@@ -105,7 +104,7 @@ namespace Display.Controls
                     Type = FilesInfo.FileType.Folder,
                     Cid = item.cid,
                     HasUnrealizedChildren = hasUnrealizedChildren,
-                    datum= item
+                    datum = item
                 };
 
                 list.Add(Folders);
@@ -197,7 +196,7 @@ namespace Display.Controls
 
                 //从数据库中获取根目录信息
                 List<Datum> FolderToRootList = DataAccess.getRootByCid(folderCid);
-                foreach(var info in FolderToRootList)
+                foreach (var info in FolderToRootList)
                 {
                     SelectFolderName.Add(new ExplorerItem()
                     {
@@ -283,7 +282,7 @@ namespace Display.Controls
             {
                 bool isNeedLoad = true;
 
-                if(_markShowPartFolderItemList.Count > 0)
+                if (_markShowPartFolderItemList.Count > 0)
                 {
                     var currentCid = (args.Node.Content as ExplorerItem).Cid;
                     foreach (var item in _markShowPartFolderItemList)
@@ -337,7 +336,7 @@ namespace Display.Controls
 
             List<Datum> itemsList;
 
-            if (isInsertLeft && _lastFolderItemList !=null)
+            if (isInsertLeft && _lastFolderItemList != null)
             {
                 itemsList = _lastFolderItemList.LastFolderItem;
                 itemsList = itemsList.GetRange(MaxNum, MaxNum);
@@ -389,7 +388,7 @@ namespace Display.Controls
             node.HasUnrealizedChildren = hasUnrealizedChildren;
         }
 
-        private async void startUpdateTreeView(TreeViewNode node,List<Datum> itemsList)
+        private async void startUpdateTreeView(TreeViewNode node, List<Datum> itemsList)
         {
             readFileProgressBar.Maximum = itemsList.Count;
             readFileProgressBar.Value = 0;
@@ -542,7 +541,7 @@ namespace Display.Controls
         private void Hyperlink_Click(Microsoft.UI.Xaml.Documents.Hyperlink sender, Microsoft.UI.Xaml.Documents.HyperlinkClickEventArgs args)
         {
             if (_lastFolderItemList == null) return;
-            FillTreeNode(_lastFolderItemList.InsertNode,isInsertLeft:true);
+            FillTreeNode(_lastFolderItemList.InsertNode, isInsertLeft: true);
 
             //成功
             ShowNumTextBlock.Visibility = Visibility.Collapsed;
@@ -580,7 +579,7 @@ namespace Display.Controls
             };
 
             var result = await dialog.ShowAsync();
-            if(result == ContentDialogResult.Primary)
+            if (result == ContentDialogResult.Primary)
             {
                 deletedNodeAndDataAccessByCid(FolderTreeView.RootNodes, item.Cid);
 
@@ -613,7 +612,7 @@ namespace Display.Controls
         public List<Datum> LastFolderItem { get; set; }
         public int Count { get; set; }
         public int ShowNum { get; set; }
-}
+    }
 
     /// <summary>
     /// TreeView样式选择

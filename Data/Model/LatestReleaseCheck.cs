@@ -34,17 +34,17 @@ public class LatestReleaseCheck
     /// <summary>
     /// 当前版本
     /// </summary>
-    public string CurrentVersion { get; set;}
+    public string CurrentVersion { get; set; }
 
     /// <summary>
     /// 当前框架
     /// </summary>
-    public string CurrentArchitecture { get; set;}
+    public string CurrentArchitecture { get; set; }
 
     /// <summary>
     /// 对应框架的Asset
     /// </summary>
-    public Asset AppAsset { get; set;}
+    public Asset AppAsset { get; set; }
 
     /// <summary>
     /// 详情信息地址
@@ -54,7 +54,7 @@ public class LatestReleaseCheck
     /// <summary>
     /// 能否升级（当前版本号不等于最新版本号，拥有对应框架的下载包）
     /// </summary>
-    public bool CanUpdate { get; set;}
+    public bool CanUpdate { get; set; }
 
     /// <summary>
     /// 发布时间

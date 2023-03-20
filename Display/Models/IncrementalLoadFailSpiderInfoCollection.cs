@@ -1,11 +1,10 @@
-﻿using CommunityToolkit.WinUI.UI.Controls.TextToolbarSymbols;
-using Data;
+﻿
 using Microsoft.UI.Xaml.Data;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Display.Data;
 
 namespace Display.Models;
 
@@ -13,12 +12,12 @@ public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<Fail
 {
     public async Task LoadData(int startShowCount = 20)
     {
-        var newItems = await DataAccess.LoadFailFileInfoWithDatum(0, startShowCount,showType: ShowType);
+        var newItems = await DataAccess.LoadFailFileInfoWithDatum(0, startShowCount, showType: ShowType);
 
         if (Count == 0)
         {
             HasMoreItems = true;
-            this.AllCount = DataAccess.CheckFailDatumFilesCount(showType:  ShowType);
+            this.AllCount = DataAccess.CheckFailDatumFilesCount(showType: ShowType);
         }
         else
             Clear();

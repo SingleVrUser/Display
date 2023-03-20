@@ -1,17 +1,14 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using Microsoft.UI;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Microsoft.UI.Xaml;
-using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using Org.BouncyCastle.Bcpg.OpenPgp;
+using System.Runtime.CompilerServices;
 using Windows.ApplicationModel;
-using Microsoft.UI;
-using Microsoft.UI.Xaml.Media;
-using Newtonsoft.Json.Linq;
-using static Data.Spider.Manager;
 using static Data.Model.SpiderInfo;
 
 namespace Data
@@ -461,7 +458,7 @@ namespace Data
 
         public string blog_url { set; get; } = string.Empty;
         public int is_like { set; get; } = 0;
-        public long addtime { set; get; } =  DateTimeOffset.Now.ToUnixTimeSeconds();
+        public long addtime { set; get; } = DateTimeOffset.Now.ToUnixTimeSeconds();
 
         public string info_url { get; set; } = string.Empty;
 
@@ -643,14 +640,14 @@ namespace Data
             }
 
         }
-        
+
         private string _imageurl;
         public string imageurl
         {
             get => _imageurl;
             set
             {
-                if(_imageurl == value) return;
+                if (_imageurl == value) return;
                 _imageurl = value;
                 OnPropertyChanged();
             }
@@ -696,7 +693,7 @@ namespace Data
             }
         }
 
-        public int is_wm { get; set; }= -1;
+        public int is_wm { get; set; } = -1;
 
         //public int is_like { get; set; } = 0;
         private int _is_like = 0;
@@ -730,7 +727,7 @@ namespace Data
             OnPropertyChanged();
         }
 
-        public VideoCoverDisplayClass(VideoInfo videoinfo,double imgwidth,double imgheight)
+        public VideoCoverDisplayClass(VideoInfo videoinfo, double imgwidth, double imgheight)
         {
             foreach (var VideoInfoItem in videoinfo.GetType().GetProperties())
             {
@@ -1942,23 +1939,23 @@ namespace Data
             this.Datum = Datum;
         }
 
-        public Datum Datum { get;private set; }
+        public Datum Datum { get; private set; }
 
-        public string MatchName{get;set;}
+        public string MatchName { get; set; }
 
         /// <summary>
         /// 是否是匹配失败
         /// </summary>
-        public bool IsMatchFail { get;set;}
+        public bool IsMatchFail { get; set; }
 
         /// <summary>
         /// 是否是搜刮失败
         /// </summary>
-        public bool IsSpiderFail { get;set;}
+        public bool IsSpiderFail { get; set; }
     }
 
-    
-    public enum FailType { All, MatchFail, SpiderFail}
+
+    public enum FailType { All, MatchFail, SpiderFail }
 
     public class FailInfo
     {
@@ -1975,5 +1972,5 @@ namespace Data
         public string image_path { get; set; } = Data.Const.NoPictruePath;
     }
 
-    public enum FailInfoShowType { like,look_later}
+    public enum FailInfoShowType { like, look_later }
 }

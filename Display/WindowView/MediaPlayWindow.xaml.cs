@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
-using Data;
+using Display.Data;
 using Display.Views;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -59,44 +59,44 @@ public sealed partial class MediaPlayWindow : Window
         switch (lastPage)
         {
             case DetailInfoPage detailInfoPage:
-            {
-                if (detailInfoPage.DetailInfo.is_like != newestIsLike)
-                    detailInfoPage.DetailInfo.is_like = newestIsLike;
-
-                if (detailInfoPage.DetailInfo.look_later != newestLookLater)
-                    detailInfoPage.DetailInfo.look_later = newestLookLater;
-                break;
-            }
-            case VideoViewPage videoViewPage:
-            {
-                var storageItem = videoViewPage._storeditem;
-
-                if (videoViewPage._storeditem != null && videoViewPage._storeditem.truename == _trueName)
                 {
-                    if (storageItem.is_like != newestIsLike)
-                        storageItem.is_like = newestIsLike;
+                    if (detailInfoPage.DetailInfo.is_like != newestIsLike)
+                        detailInfoPage.DetailInfo.is_like = newestIsLike;
 
-                    if (storageItem.look_later != newestLookLater)
-                        storageItem.look_later = newestLookLater;
+                    if (detailInfoPage.DetailInfo.look_later != newestLookLater)
+                        detailInfoPage.DetailInfo.look_later = newestLookLater;
+                    break;
                 }
+            case VideoViewPage videoViewPage:
+                {
+                    var storageItem = videoViewPage._storeditem;
 
-                break;
-            }
+                    if (videoViewPage._storeditem != null && videoViewPage._storeditem.truename == _trueName)
+                    {
+                        if (storageItem.is_like != newestIsLike)
+                            storageItem.is_like = newestIsLike;
+
+                        if (storageItem.look_later != newestLookLater)
+                            storageItem.look_later = newestLookLater;
+                    }
+
+                    break;
+                }
             case ActorInfoPage actorInfoPage:
-            {
-                if (actorInfoPage._storeditem.is_like != newestIsLike)
-                    actorInfoPage._storeditem.is_like = newestIsLike;
+                {
+                    if (actorInfoPage._storeditem.is_like != newestIsLike)
+                        actorInfoPage._storeditem.is_like = newestIsLike;
 
-                if (actorInfoPage._storeditem.look_later != newestLookLater)
-                    actorInfoPage._storeditem.look_later = newestLookLater;
-                break;
-            }
+                    if (actorInfoPage._storeditem.look_later != newestLookLater)
+                        actorInfoPage._storeditem.look_later = newestLookLater;
+                    break;
+                }
         }
     }
 
-    public static MediaPlayWindow CreateNewWindow(string pickCode, PlayType playType,string trueName,Page lastPage, SubInfo subInfo)
+    public static MediaPlayWindow CreateNewWindow(string pickCode, PlayType playType, string trueName, Page lastPage, SubInfo subInfo)
     {
-        MediaPlayWindow newWindow = new(pickCode, playType, trueName,lastPage, subInfo);
+        MediaPlayWindow newWindow = new(pickCode, playType, trueName, lastPage, subInfo);
         newWindow.Activate();
 
         return newWindow;

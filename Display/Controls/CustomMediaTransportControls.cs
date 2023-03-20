@@ -1,12 +1,8 @@
-﻿using Data;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
-using Windows.Media.Capture.Core;
-using WinRT;
-using static Data.WebApi;
-using static Display.Controls.CustomMediaPlayerElement;
+using Display.Data;
 
 namespace Display.Controls;
 
@@ -41,8 +37,8 @@ public class CustomMediaTransportControls : MediaTransportControls
         //显示喜欢/稍后观看
         AppBarToggleButton likeButton = GetTemplateChild("IsLikeButton") as AppBarToggleButton;
         likeButton.Click += LikeButton_Click;
-        likeButton.IsEnabled= true;
-        likeButton.IsChecked= islike;
+        likeButton.IsEnabled = true;
+        likeButton.IsChecked = islike;
 
         AppBarToggleButton lookLaterButton = GetTemplateChild("LookLaterButton") as AppBarToggleButton;
         lookLaterButton.Click += LookLaterButton_Click;
@@ -146,14 +142,14 @@ public class Quality
 
 public class Player
 {
-    public playMethod PlayMethod;
+    public WebApi.playMethod PlayMethod;
 
     public string Name => PlayMethod.ToString();
 
     public string Url { get; set; }
     public string PickCode { get; set; }
 
-    public Player(playMethod playerMethod, string url = null, string pickCode = null)
+    public Player(WebApi.playMethod playerMethod, string url = null, string pickCode = null)
     {
         this.PlayMethod = playerMethod;
 

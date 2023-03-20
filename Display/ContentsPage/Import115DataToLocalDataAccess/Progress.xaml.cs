@@ -1,5 +1,4 @@
-﻿using Data;
-using Display.WindowView;
+﻿using Display.WindowView;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -13,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.System;
+using Display.Data;
 using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -73,7 +73,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
             currentWindow = content.window;
 
-            BackButton.Visibility= Visibility.Visible;
+            BackButton.Visibility = Visibility.Visible;
         }
 
         private async void CurrentWindow_Closed(object sender, WindowEventArgs args)
@@ -116,7 +116,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             List<string> cidWithoutRootList = new();
             foreach (var cid in cidList)
             {
-                if(cid == "0")
+                if (cid == "0")
                 {
                     var RootFileInfo = await webapi.GetFileAsync(cid, LoadAll: true);
 
@@ -167,19 +167,19 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             var startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
 
             //进度条
-            var progress = new Progress<GetFileProgessIProgress> (progressPercent =>
+            var progress = new Progress<GetFileProgessIProgress>(progressPercent =>
             {
                 //正常
-                if(progressPercent.status == ProgressStatus.normal)
+                if (progressPercent.status == ProgressStatus.normal)
                 {
                     successCount = progressPercent.getFilesProgressInfo.AllCount;
                     updataProgress();
                     cps_TextBlock.Text = $"{progressPercent.sendCountPerMinutes} 次/分钟";
-                    leftTime_Run.Text = FileMatch.ConvertDoubleToDateStr(1.5* (folderCount- progressPercent.getFilesProgressInfo.FolderCount));
+                    leftTime_Run.Text = FileMatch.ConvertDoubleToDateStr(1.5 * (folderCount - progressPercent.getFilesProgressInfo.FolderCount));
                     //updateSendSpeed(progressPercent.sendCountPerSecond);
 
                 }
-                else if(progressPercent.status == ProgressStatus.done)
+                else if (progressPercent.status == ProgressStatus.done)
                 {
                     //全部完成
                     if (successCount == overallCount)
@@ -211,7 +211,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                     GetFolderCategory_Expander.IsExpanded = true;
                     GetInfos_Progress.Visibility = Visibility.Collapsed;
                 }
-                else if(progressPercent.status == ProgressStatus.cancel)
+                else if (progressPercent.status == ProgressStatus.cancel)
                 {
                     Debug.WriteLine("退出进程");
                 }
@@ -301,7 +301,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
         private async void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            if(_status == Status.doing)
+            if (_status == Status.doing)
             {
                 ContentDialog dialog = new ContentDialog();
 
@@ -315,7 +315,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                 dialog.Content = "当前任务正在运行，确认返回上一页面？";
 
                 var result = await dialog.ShowAsync();
-                if(result == ContentDialogResult.Primary)
+                if (result == ContentDialogResult.Primary)
                 {
                     tryFrameGoBack();
                 }

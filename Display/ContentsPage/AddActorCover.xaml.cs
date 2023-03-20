@@ -1,4 +1,4 @@
-﻿using Data;
+﻿
 using Display.Models;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -18,6 +18,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -83,7 +84,7 @@ namespace Display.ContentsPage
                 isCheckGit = false;
             }
 
-            var ImageUrlList = GetImageUrlListFromFileTreeAsync(actorInfo.name,filePath:filePath);
+            var ImageUrlList = GetImageUrlListFromFileTreeAsync(actorInfo.name, filePath: filePath);
 
             ShowImageList.Clear();
 
@@ -110,9 +111,9 @@ namespace Display.ContentsPage
 
 
         //JObject json;
-        private List<string> GetImageUrlListFromFileTreeAsync(string actorName,int maxCount = -1, string filePath = null)
+        private List<string> GetImageUrlListFromFileTreeAsync(string actorName, int maxCount = -1, string filePath = null)
         {
-            if(string.IsNullOrEmpty(filePath))
+            if (string.IsNullOrEmpty(filePath))
             {
                 filePath = AppSettings.ActorFileTree_SavePath;
             }
@@ -160,7 +161,7 @@ namespace Display.ContentsPage
 
                 progress_TextBlock.Text = info.text;
 
-                if(info.index == -1)
+                if (info.index == -1)
                 {
                     return;
                 }
@@ -169,7 +170,7 @@ namespace Display.ContentsPage
 
                 item.Status = info.status;
 
-                if(item.Status == Status.error)
+                if (item.Status == Status.error)
                 {
                     failList.Add(item.name);
                 }
@@ -180,19 +181,19 @@ namespace Display.ContentsPage
                 }
 
                 //完成
-                if(item.Status!= Status.doing && actorinfo.Count == info.index + 1)
+                if (item.Status != Status.doing && actorinfo.Count == info.index + 1)
                 {
-                    progress_TextBlock.Text = $"任务已完成，耗时{FileMatch.ConvertDoubleToDateStr((DateTimeOffset.Now-startTime).TotalSeconds)}";
+                    progress_TextBlock.Text = $"任务已完成，耗时{FileMatch.ConvertDoubleToDateStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
                 }
             });
 
-            await Task.Run(()=> getActorCoverByGit(actorinfo.ToList(), progress, s_cts));
+            await Task.Run(() => getActorCoverByGit(actorinfo.ToList(), progress, s_cts));
 
             BasicGridView.ItemClick += BasicGridView_ItemClick;
 
         }
 
-        private async Task getActorCoverByGit(List<ActorInfo> actorinfos,IProgress<progressClass> progress, CancellationTokenSource s_cts)
+        private async Task getActorCoverByGit(List<ActorInfo> actorinfos, IProgress<progressClass> progress, CancellationTokenSource s_cts)
         {
             string filePath = AppSettings.ActorFileTree_SavePath;
 
@@ -209,7 +210,7 @@ namespace Display.ContentsPage
                 isCheckGit = false;
             }
 
-            for (int i = 0;i< actorinfos.Count;i++)
+            for (int i = 0; i < actorinfos.Count; i++)
             {
                 if (s_cts.IsCancellationRequested)
                 {
@@ -239,7 +240,7 @@ namespace Display.ContentsPage
                 {
                     string ImageUrl = string.Empty;
                     var ImageUrlList = GetImageUrlListFromFileTreeAsync(actorName, 1);
-                    if (ImageUrlList.Count>0) ImageUrl = ImageUrlList[0];
+                    if (ImageUrlList.Count > 0) ImageUrl = ImageUrlList[0];
 
                     if (string.IsNullOrEmpty(ImageUrl))
                     {
@@ -263,7 +264,7 @@ namespace Display.ContentsPage
                 progress.Report(progressinfo);
 
                 var actorId = DataAccess.GetActorIdByName(actorName);
-                if(actorId != -1)
+                if (actorId != -1)
                 {
                     //更新数据库
                     DataAccess.UpdateActorInfoPrifilePath(actorId, imageSavePath);
@@ -272,7 +273,7 @@ namespace Display.ContentsPage
 
         }
 
-        private List<string> getImageUrlFormFileTree(string filePath,string actorName, int maxCount)
+        private List<string> getImageUrlFormFileTree(string filePath, string actorName, int maxCount)
         {
             List<string> urlList = new();
 
@@ -433,7 +434,7 @@ namespace Display.ContentsPage
             if (isNeedDownFile)
             {
                 string FiletreeDownUrl = @"https://raw.githubusercontent.com/gfriends/gfriends/master/Filetree.json";
-                result = await DownFile(FiletreeDownUrl, filePath,true);
+                result = await DownFile(FiletreeDownUrl, filePath, true);
             }
 
             return result;
@@ -473,7 +474,7 @@ namespace Display.ContentsPage
         }
 
         HttpClient Client;
-        private async Task<bool> DownFile(string downurl,string filePath,bool isNeedReplace = false)
+        private async Task<bool> DownFile(string downurl, string filePath, bool isNeedReplace = false)
         {
             if (Client == null) Client = GetInfoFromNetwork.Client;
 
@@ -558,9 +559,9 @@ namespace Display.ContentsPage
 
                 //progress_TextBlock.Text = $"{actorName} - 获取演员参演的视频 - 成功";
 
-                
+
                 progress_TextBlock.Text = $"{actorName} - 挑选单体作品（非VR）";
-                var VideoInfoList = VideoList.Where(x=>x.actor == actorName && !x.category.Contains("VR") && !x.series.Contains("VR")).ToList();
+                var VideoInfoList = VideoList.Where(x => x.actor == actorName && !x.category.Contains("VR") && !x.series.Contains("VR")).ToList();
 
                 //无单体作品，跳过
                 if (VideoInfoList.Count == 0)
@@ -572,7 +573,7 @@ namespace Display.ContentsPage
 
                 var videoPlayUrl = string.Empty;
                 Datum videofileListCanPlay = null;
-                for (int i = 0; i < VideoInfoList.Count && videoPlayUrl== string.Empty; i++)
+                for (int i = 0; i < VideoInfoList.Count && videoPlayUrl == string.Empty; i++)
                 {
                     var FirstVideoInfo = VideoInfoList[i];
 
@@ -587,7 +588,7 @@ namespace Display.ContentsPage
                     progress_TextBlock.Text = $"{actorName} - {videoName} - 挑选单体作品中能在线看的";
 
                     //挑选能在线观看的视频
-                    videofileListCanPlay = videoFileList.Where(x => x.vdi != 0) .FirstOrDefault();
+                    videofileListCanPlay = videoFileList.Where(x => x.vdi != 0).FirstOrDefault();
 
                     //全部未转码失败视频，跳过
                     if (videofileListCanPlay == null)
@@ -620,7 +621,7 @@ namespace Display.ContentsPage
                 }
 
                 //无符合条件的视频，跳过
-                if(videoPlayUrl == string.Empty)
+                if (videoPlayUrl == string.Empty)
                 {
                     progress_TextBlock.Text = $"{actorName} - 未找到符合条件的视频";
                     item.Status = Status.error;
@@ -643,7 +644,7 @@ namespace Display.ContentsPage
 
                     var progressInfo = await getActorFaceByVideoPlayUrl(actorName, videoPlayUrl, 1, SavePath, imageName);
 
-                    if(!string.IsNullOrEmpty(progressInfo.imagePath))
+                    if (!string.IsNullOrEmpty(progressInfo.imagePath))
                     {
                         item.prifile_path = progressInfo.imagePath;
 
@@ -661,7 +662,7 @@ namespace Display.ContentsPage
             progress_TextBlock.Text = $"总耗时：{FileMatch.ConvertDoubleToDateStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
         }
 
-        private async Task<progressInfo> getActorFaceByVideoPlayUrl(string actorName, string url, int Task_Count,string SavePath,string imageName, bool isShowWindow = true)
+        private async Task<progressInfo> getActorFaceByVideoPlayUrl(string actorName, string url, int Task_Count, string SavePath, string imageName, bool isShowWindow = true)
         {
             //var faceImagePath = string.Empty;
 
@@ -862,7 +863,7 @@ namespace Display.ContentsPage
 
             foreach (var item in actorinfo)
             {
-                if(item.name == actorName)
+                if (item.name == actorName)
                 {
                     item.prifile_path = imageUrl;
                     break;

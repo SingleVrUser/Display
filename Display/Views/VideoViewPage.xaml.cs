@@ -1,5 +1,4 @@
-﻿using Data;
-using Display.Controls;
+﻿using Display.Controls;
 using Display.Helper;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -8,7 +7,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -130,7 +129,7 @@ namespace Display.Views
             if (sender is not ListView listView) return;
             if (listView.DataContext is not string trueName) return;
 
-            await PlayVideoHelper.PlayVideo(SingleVideoInfo.pc, this.XamlRoot, trueName:trueName, lastPage: this);
+            await PlayVideoHelper.PlayVideo(SingleVideoInfo.pc, this.XamlRoot, trueName: trueName, lastPage: this);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)

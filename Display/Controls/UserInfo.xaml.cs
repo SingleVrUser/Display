@@ -1,4 +1,5 @@
-﻿using Data;
+﻿
+using Display.Data;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -27,7 +28,8 @@ namespace Display.Controls
                 }
                 return statusValue;
             }
-            set {
+            set
+            {
 
                 SetValue(statusProperty, value);
             }
@@ -51,7 +53,7 @@ namespace Display.Controls
 
         private Visibility isShowVip(string status)
         {
-            return status == "Login" && UserName_TextBlock.Text == "" ? Visibility.Collapsed: Visibility.Visible;
+            return status == "Login" && UserName_TextBlock.Text == "" ? Visibility.Collapsed : Visibility.Visible;
         }
 
         private Visibility isShowUserInfo(string status)

@@ -18,7 +18,7 @@ public class GitHubInfo
         /// <summary>
         /// 版本号
         /// </summary>
-        [JsonProperty(NullValueHandling= NullValueHandling.Ignore, PropertyName = "tag_name" , Required = Required.Default)]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore, PropertyName = "tag_name", Required = Required.Default)]
         public string TagName { get; set; }
 
         public string target_commitish { get; set; }

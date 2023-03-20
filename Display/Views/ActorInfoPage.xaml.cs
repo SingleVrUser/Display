@@ -1,15 +1,13 @@
-﻿using Data;
-using Display.Controls;
+﻿using Display.Controls;
 using Display.Helper;
-using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
+using Display.Data;
 using static Display.Controls.CustomMediaPlayerElement;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -45,7 +43,7 @@ namespace Display.Views
                 //指定页面
                 if (e.SourcePageType == typeof(ActorsPage))
                 {
-                    var animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("BackConnectedAnimation",videoControl.HeaderCover);
+                    var animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("BackConnectedAnimation", videoControl.HeaderCover);
 
                     //返回动画应迅速
                     animation.Configuration = new DirectConnectedAnimationConfiguration();
@@ -73,7 +71,7 @@ namespace Display.Views
                 //需要显示的是搜索结果
                 if (item is Tuple<List<string>, string, bool> tuple)
                 {
-                    Tuple<List<string>, string> typesAndName = new (tuple.Item1, tuple.Item2);
+                    Tuple<List<string>, string> typesAndName = new(tuple.Item1, tuple.Item2);
 
                     LoadShowInfo(typesAndName, tuple.Item3);
                 }
@@ -85,7 +83,7 @@ namespace Display.Views
                 ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("ForwardConnectedAnimation");
                 if (animation != null)
                 {
-                    if(tuple.Item1.Count==1 && tuple.Item1.FirstOrDefault() == "actor")
+                    if (tuple.Item1.Count == 1 && tuple.Item1.FirstOrDefault() == "actor")
                     {
                         animation.TryStart(videoControl.HeaderCover);
                     }
@@ -128,9 +126,9 @@ namespace Display.Views
             var videoInfo = VideoPlayButton.DataContext as VideoCoverDisplayClass;
 
             //播放失败列表（imgUrl就是pc）
-            if(videoInfo.series == "fail")
+            if (videoInfo.series == "fail")
             {
-                await PlayVideoHelper.PlayVideo(videoInfo.imageurl, this.XamlRoot, playType:PlayType.fail);
+                await PlayVideoHelper.PlayVideo(videoInfo.imageurl, this.XamlRoot, playType: PlayType.fail);
                 return;
             }
 

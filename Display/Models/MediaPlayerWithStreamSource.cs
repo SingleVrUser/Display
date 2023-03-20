@@ -1,8 +1,8 @@
-﻿using Data;
-using MediaPlayerElement_Test.Models;
+﻿using MediaPlayerElement_Test.Models;
 using System;
 using System.Threading.Tasks;
 using Windows.Media.Playback;
+using Display.Data;
 
 namespace Display.Models
 {
