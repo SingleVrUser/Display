@@ -6,7 +6,6 @@ using System.IO;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Windows.Media.Ocr;
 using static Data.Model.SpiderInfo;
 
 namespace Data.Spider;
@@ -193,7 +192,7 @@ public class JavDB
         //检查是不是没有登录
         if (video_meta_panelNode == null)
         {
-            var headingNode =  htmlDoc.DocumentNode.SelectSingleNode("//p[@class='panel-heading']");
+            var headingNode = htmlDoc.DocumentNode.SelectSingleNode("//p[@class='panel-heading']");
             //没有登录
             if (headingNode != null && headingNode.InnerText.Contains("登入"))
             {
@@ -334,7 +333,7 @@ public class JavDB
 
     public static string TrimGenderFromActorName(string actorName)
     {
-        return actorName.TrimEnd(new char[] { manSymbol ,womanSymbol});
+        return actorName.TrimEnd(new char[] { manSymbol, womanSymbol });
     }
 
     public static string RemoveGenderFromActorListString(string actorListString)

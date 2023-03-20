@@ -1,6 +1,4 @@
-﻿using static Data.Model.SpiderInfo;
-
-namespace Data.Model;
+﻿namespace Data.Model;
 
 public class SpiderInfo
 {

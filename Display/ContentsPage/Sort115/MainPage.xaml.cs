@@ -1,17 +1,17 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
-using System;
-using Data;
 using Display.ViewModels;
 using Display.WindowView;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
-using static Data.Model.SpiderInfo;
+using Display.Data;
+using SpiderInfo = Display.Models.SpiderInfo;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -93,7 +93,7 @@ public sealed partial class MainPage : Page
 
             foreach (var folder in folders)
             {
-                if(!ViewModel.FoldersVideo.Contains(folder))
+                if (!ViewModel.FoldersVideo.Contains(folder))
                     ViewModel.FoldersVideo.Add(folder);
             }
         }
@@ -103,7 +103,7 @@ public sealed partial class MainPage : Page
     {
         if (!e.Data.Properties.TryGetValue("items", out var value)) return;
 
-        if(value is List<FilesInfo>)
+        if (value is List<FilesInfo>)
             e.AcceptedOperation = DataPackageOperation.Link;
     }
 
@@ -142,11 +142,11 @@ public class FetchingSourceOptions
 {
     public string name { get; private set; }
 
-    public SpiderSourceName SpiderSourceName;
+    public SpiderInfo.SpiderSourceName SpiderSourceName;
 
     public bool IsSelected;
 
-    public FetchingSourceOptions(SpiderSourceName SpiderSourceName, bool isSelected = false)
+    public FetchingSourceOptions(SpiderInfo.SpiderSourceName SpiderSourceName, bool isSelected = false)
     {
         this.SpiderSourceName = SpiderSourceName;
         this.name = SpiderSourceName.ToString();

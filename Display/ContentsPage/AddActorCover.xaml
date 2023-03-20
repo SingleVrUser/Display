@@ -5,9 +5,9 @@
     xmlns:local="using:Display.ContentsPage"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:data="using:Data"
       xmlns:customcontrols="using:Display.Controls"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:data="using:Display.Data"
     mc:Ignorable="d">
     <Page.Resources>
         <!--<converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter"/>-->

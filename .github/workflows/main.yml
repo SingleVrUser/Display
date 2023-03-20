@@ -53,11 +53,10 @@ on:
 jobs:
 
   build:
-
     strategy:
       matrix:
         configuration: [Release]
-        platform: [x64,x86]
+        platform: [x86,x64]
 
     runs-on: windows-latest  # For a list of available runner types, refer to
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
@@ -67,6 +66,8 @@ jobs:
       Project_Directory: Display
 #      Version: '0.${{ github.run_number }}.${{ github.run_attempt }}.0'
       Version: ${{github.event.inputs.version}}
+      Configuration: ${{ matrix.configuration }}
+      Platform: ${{ matrix.platform }}
 
     steps:
     - name: Checkout
@@ -96,8 +97,6 @@ jobs:
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
 
     # Decode the base 64 encoded pfx and save the Signing_Certificate
     - name: Decode the pfx
@@ -113,8 +112,6 @@ jobs:
         Appx_Bundle: Never
         Appx_Package_Build_Mode: SideloadOnly
         Appx_Package_Dir: Packages\
-        Configuration: ${{ matrix.configuration }}
-        Platform: ${{ matrix.platform }}
 
     # Remove the pfx
  #   - name: Remove the pfx
@@ -126,12 +123,21 @@ jobs:
       with:
         name: MSIX Package
         path: Display/Packages/**/Display*.msix
+
+    - name: Create ZIP of ${{ env.platform }} app
+      run: Compress-Archive Display/Packages/Display*_${{ env.platform }}_Test 'Display_${{ env.version }}_${{ env.platform }}.zip'
+
+    - name: Upload ZIP of ${{ env.platform }} app
+      uses: actions/upload-artifact@v2
+      with:
+        name: 'Display_${{ env.version }}_${{ env.platform }}.zip'
+        path: 'Display_${{ env.version }}_${{ env.platform }}.zip'
         
 #    # Create the unpackaged app
 #    - name: Build unpackaged app
 #      run: msbuild $env:Solution_Name /t:Publish /p:WindowsPackageType=None /p:Configuration=$env:Configuration /p:Platform=x64
 #      env:
-#        Configuration: ${{ matrix.configuration }}
+#        Configuration: ${{ env.configuration }}
 #        
 #    - name: Create ZIP of unpackaged app
 #      run: Compress-Archive Display/bin/x64/Release/net6.0-windows10.0.19041.0/publish/* 'Display-unpackaged-${{ env.version }}.zip'
@@ -141,24 +147,6 @@ jobs:
 #      with:
 #        name: 'Unpackaged app'
 #        path: "Display-unpackaged-${{ env.version }}.zip"
- 
-    - name: Create ZIP of x64 app
-      run: Compress-Archive Display/Packages/Display*_x64_Test 'Display_${{ env.version }}_x64.zip'
-      
-    - name: Upload ZIP of x64 app
-      uses: actions/upload-artifact@v2
-      with:
-        name: 'Display_${{ env.version }}_x64.zip'
-        path: 'Display_${{ env.version }}_x64.zip'
-
-    - name: Create ZIP of x86 app
-      run: Compress-Archive Display/Packages/Display*_x86_Test 'Display_${{ env.version }}_x86.zip'
-
-    - name: Upload ZIP of x86 app
-      uses: actions/upload-artifact@v2
-      with:
-        name: 'Display_${{ env.version }}_x86.zip'
-        path: 'Display_${{ env.version }}_x86.zip'
 
     - name: Create GH release
       if: github.ref_name == 'main'

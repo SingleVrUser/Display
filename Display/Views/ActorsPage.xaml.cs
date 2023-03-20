@@ -1,5 +1,4 @@
-﻿using Data;
-using Display.Models;
+﻿using Display.Models;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -15,6 +14,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -82,8 +82,8 @@ namespace Display.Views
 
         private async void LoadActorPartInfo(int count = 30)
         {
-            var infos = await DataAccess.LoadActorInfo(count,0,orderByList: new (){ { "RANDOM()", false } },
-                                                                filterList: new (){ "prifile_path != ''" });
+            var infos = await DataAccess.LoadActorInfo(count, 0, orderByList: new() { { "RANDOM()", false } },
+                                                                filterList: new() { "prifile_path != ''" });
 
             infos.ForEach(info => actorPartInfo.Add(info));
 
@@ -129,7 +129,7 @@ namespace Display.Views
             actorPartInfo.Clear();
             LoadActorPartInfo();
 
-            CarouselControl.SelectedIndex = actorPartInfo.Count/2;
+            CarouselControl.SelectedIndex = actorPartInfo.Count / 2;
         }
 
         private void Image_Tapped(object sender, TappedRoutedEventArgs e)
@@ -231,9 +231,9 @@ namespace Display.Views
             var infos = await DataAccess.LoadActorInfo(-1);
 
             int allCount = infos.Count;
-            if(allCount == 0) return;
+            if (allCount == 0) return;
 
-            if (! Notifications.ToastGetActorInfoWithProgressBar.SendToast(allCount)) return;
+            if (!Notifications.ToastGetActorInfoWithProgressBar.SendToast(allCount)) return;
 
             //创建断点续传文件
             string savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "ActorInfo");
@@ -252,7 +252,7 @@ namespace Display.Views
             button.IsEnabled = false;
 
             //反序列化
-            string filePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "ActorInfo","getting.json");
+            string filePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "ActorInfo", "getting.json");
             if (File.Exists(filePath))
             {
                 string jsonString = await File.ReadAllTextAsync(filePath);
@@ -276,7 +276,7 @@ namespace Display.Views
 
         }
 
-        private static async Task GetActorsInfo(List<ActorInfo> infos,int startIndex = 0)
+        private static async Task GetActorsInfo(List<ActorInfo> infos, int startIndex = 0)
         {
             int allCount = infos.Count;
             if (allCount == 0) return;
@@ -286,7 +286,7 @@ namespace Display.Views
             bool isStart = false;
             for (int i = 0; i < allCount; i++)
             {
-                if(!isStart)
+                if (!isStart)
                 {
                     if (i == startIndex) isStart = true;
                     else continue;
@@ -307,7 +307,7 @@ namespace Display.Views
 
                 await GetActorInfo(info);
 
-                await Notifications.ToastGetActorInfoWithProgressBar.AddValue(i+1, allCount);
+                await Notifications.ToastGetActorInfoWithProgressBar.AddValue(i + 1, allCount);
 
                 //等待1~2秒
                 await GetInfoFromNetwork.RandomTimeDelay(1, 2);

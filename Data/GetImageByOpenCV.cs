@@ -1,12 +1,11 @@
-﻿using System;
+﻿using OpenCvSharp;
+using OpenCvSharp.Dnn;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using OpenCvSharp;
-using OpenCvSharp.Dnn;
 using Windows.ApplicationModel;
 
 namespace Data
@@ -15,16 +14,16 @@ namespace Data
     {
         static string faceProto = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/deploy.prototxt");
         static string faceModel = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/res10_300x300_ssd_iter_140000_fp16.caffemodel");
-        
+
         static string genderProto = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/gender_deploy.prototxt");
         static string genderModel = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/gender_net.caffemodel");
-        
+
         static string AgeconfigFile = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/age_deploy.prototxt");
         static string AgefaceModel = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/age_net.caffemodel");
 
         public static bool IsModelFilesExists
         {
-            get => File.Exists(faceProto)&& File.Exists(faceModel)
+            get => File.Exists(faceProto) && File.Exists(faceModel)
                 && File.Exists(genderProto) && File.Exists(genderModel)
                 && File.Exists(AgeconfigFile) && File.Exists(AgefaceModel);
         }
@@ -71,7 +70,7 @@ namespace Data
             return cap.Get(VideoCaptureProperties.FrameCount);
         }
 
-        private async Task MultThread(string url, int Task_Count,int startJumpFrame_num = 1000, int endJumpFrame_num = 0, bool isShowWindow = true)
+        private async Task MultThread(string url, int Task_Count, int startJumpFrame_num = 1000, int endJumpFrame_num = 0, bool isShowWindow = true)
         {
             //string url = @"D:\库\Downloads\115\普通\【楓ふうあ】 SSIS-428\SSIS-428 大嫌いなあなたに懇願ー 生涯最高のイラマチオをください。 楓ふうあ.mp4";
 
@@ -175,7 +174,7 @@ namespace Data
 
             var cap = new VideoCapture(videoPath);
 
-            if(start_frame != 0)
+            if (start_frame != 0)
             {
                 cap.Set(VideoCaptureProperties.PosFrames, start_frame);
             }
@@ -390,7 +389,7 @@ namespace Data
                             }
 
                         }
-                        
+
                     }
                     else
                     {
@@ -413,9 +412,9 @@ namespace Data
             return isGetImage;
         }
 
-        public void Task_GenderByVideo(string videoPath, double start_frame, double length, bool isShowWindow, IProgress<progressInfo> progress, string SavePath, string imageName="")
+        public void Task_GenderByVideo(string videoPath, double start_frame, double length, bool isShowWindow, IProgress<progressInfo> progress, string SavePath, string imageName = "")
         {
-            bool isOnlySaveFace = imageName == "face" ? true: false;
+            bool isOnlySaveFace = imageName == "face" ? true : false;
 
             List<string> genderList = new List<string> { "Male", "Female" };
             List<string> ageList = new List<string> { "(0-2)", "(4-6)", "(8-12)", "(15-20)", "(25-32)", "(38-43)", "(48-53)", "(60-100)" };
@@ -487,17 +486,17 @@ namespace Data
                             progressInfo progressInfo = new();
                             progressInfo.faceList = new();
 
-                            if(imageName == string.Empty)
+                            if (imageName == string.Empty)
                             {
                                 imageName = $"frame{start_frame + idx}";
                             }
 
-                            string imagePath =  Path.Combine(SavePath, $"{imageName}.jpg");
+                            string imagePath = Path.Combine(SavePath, $"{imageName}.jpg");
                             progressInfo.imagePath = imagePath;
                             progressInfo.PixelWidth = image.Cols;
                             progressInfo.PixelHeight = image.Rows;
 
-                            if(!isOnlySaveFace)
+                            if (!isOnlySaveFace)
                             {
                                 FileMatch.CreateDirectoryIfNotExists(SavePath);
                                 image.SaveImage(imagePath);
@@ -585,9 +584,9 @@ namespace Data
                                 }
 
                                 //只挑选符合条件的
-                                if (gender == "Female" && newFaceRecognition.gender.confidence>0.9 && ishsv_qualified && isWHRatioMatch)
+                                if (gender == "Female" && newFaceRecognition.gender.confidence > 0.9 && ishsv_qualified && isWHRatioMatch)
                                 {
-                                    if(isOnlySaveFace)
+                                    if (isOnlySaveFace)
                                     {
                                         //检查是否有SaveImage无法识别的字符
                                         //若有，则先Base64编码

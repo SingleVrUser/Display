@@ -1,4 +1,4 @@
-﻿using Data;
+﻿
 using Display.Controls;
 using Display.Views;
 using Display.WindowView;
@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static Data.WebApi;
+using Display.Data;
 
 namespace Display.Helper;
 
@@ -87,15 +87,15 @@ public class PlayVideoHelper
                 break;
             //PotPlayer播放
             case 1:
-                await GlobalWebApi.PlayVideoWithOriginUrl(pickCode, playMethod.pot, xamlRoot, subInfo);
+                await WebApi.GlobalWebApi.PlayVideoWithOriginUrl(pickCode, WebApi.playMethod.pot, xamlRoot, subInfo);
                 break;
             //mpv播放
             case 2:
-                await GlobalWebApi.PlayVideoWithOriginUrl(pickCode, playMethod.mpv, xamlRoot, subInfo);
+                await WebApi.GlobalWebApi.PlayVideoWithOriginUrl(pickCode, WebApi.playMethod.mpv, xamlRoot, subInfo);
                 break;
             //vlc播放
             case 3:
-                await GlobalWebApi.PlayVideoWithOriginUrl(pickCode, playMethod.vlc, xamlRoot, subInfo);
+                await WebApi.GlobalWebApi.PlayVideoWithOriginUrl(pickCode, WebApi.playMethod.vlc, xamlRoot, subInfo);
                 break;
             //MediaElement播放
             case 4:

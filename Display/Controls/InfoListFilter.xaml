@@ -7,9 +7,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Display.Controls"
     xmlns:sys="using:System"
-    xmlns:datahelper="using:Data.Helper"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:helper="using:Display.Helper"
     mc:Ignorable="d">
 
     <UserControl.Resources>
@@ -39,14 +39,14 @@
 
                         <RadioButtons x:Name="Year_RadioButtons" SelectedIndex="0" SelectionChanged="Year_RadioButtons_SelectionChanged" Tag="Year">
                             <RadioButton GroupName="Year" Content="{x:Bind sys:DateTime.Now.Year}" IsChecked="True"/>
-                            <RadioButton GroupName="Year" Content="{x:Bind datahelper:MatchHelper.Int32Subtract(sys:DateTime.Now.Year,1)}"/>
-                            <RadioButton GroupName="Year" Content="{x:Bind datahelper:MatchHelper.Int32Subtract(sys:DateTime.Now.Year,2)}"/>
+                            <RadioButton GroupName="Year" Content="{x:Bind helper:MatchHelper.Int32Subtract(sys:DateTime.Now.Year,1)}"/>
+                            <RadioButton GroupName="Year" Content="{x:Bind helper:MatchHelper.Int32Subtract(sys:DateTime.Now.Year,2)}"/>
                             <RadioButton GroupName="Year" x:Name="customTimeRange_RadioButton" Content="自定义"/>
                         </RadioButtons>
 
                         <TextBox x:Name="Year_CustomeTextBox" Grid.Row="1"
                                  Visibility="{x:Bind customTimeRange_RadioButton.IsChecked,Mode=OneWay}"
-                                 Text="{x:Bind datahelper:MatchHelper.Int32Subtract(sys:DateTime.Now.Year,3)}"
+                                 Text="{x:Bind helper:MatchHelper.Int32Subtract(sys:DateTime.Now.Year,3)}"
                                  TextChanged="Year_CustomeTextBox_TextChanged"/>
                     </Grid>
                 </Flyout>

@@ -3,7 +3,6 @@
 
 using CommunityToolkit.WinUI.UI;
 using CommunityToolkit.WinUI.UI.Controls;
-using Data;
 using Display.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -11,9 +10,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
-using System.Reflection.Emit;
-using System.Threading.Tasks;
 using Windows.Foundation;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -140,9 +138,9 @@ public sealed partial class EditInfo : Page
     {
         VideoCoverDisplayClass info = this.videoInfo;
 
-        foreach(var option in EditOptions)
+        foreach (var option in EditOptions)
         {
-            if(option is CommonEditOption commonEditOption)
+            if (option is CommonEditOption commonEditOption)
             {
                 switch (commonEditOption.Header)
                 {
@@ -169,12 +167,12 @@ public sealed partial class EditInfo : Page
                         break;
                 }
             }
-            else if(option is TokenizingEditOption tokenizingEditOption)
+            else if (option is TokenizingEditOption tokenizingEditOption)
             {
                 switch (tokenizingEditOption.Header)
                 {
                     case "类别":
-                        info.category = string.Join(",",category_items.Select(item=>item.Name));
+                        info.category = string.Join(",", category_items.Select(item => item.Name));
                         break;
                     case "演员":
                         info.actor = string.Join(",", actor_items.Select(item => item.name));

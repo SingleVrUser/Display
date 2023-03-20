@@ -1,4 +1,4 @@
-﻿using Data;
+﻿
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -8,6 +8,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using Windows.Storage;
 using Windows.System;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -19,12 +20,10 @@ namespace Display.ContentsPage.SpiderVideoInfo
     /// </summary>
     public sealed partial class ConditionalCheck : Page
     {
-        private WebApi webapi;
         ObservableCollection<ConditionCheck> ConditionCheckItems;
         ConditionCheck ImageItem;
 
         SpiderVideoInfo.MainPage lastPage;
-        GetInfoFromNetwork network;
 
         public ConditionalCheck(MainPage page)
         {
@@ -44,9 +43,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
         private void InitializeView()
         {
-            webapi = WebApi.GlobalWebApi;
             ConditionCheckItems = new();
-            network = new();
 
             //显示UI
 
@@ -83,7 +80,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             Check_Condition();
         }
 
-        private void AddSpiderMethod(bool isAdd,string tip,string url)
+        private void AddSpiderMethod(bool isAdd, string tip, string url)
         {
             if (isAdd)
             {
@@ -106,7 +103,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
         private async void Check_Condition()
         {
             bool isAllSuccess = true;
-            foreach(var item in ConditionCheckItems)
+            foreach (var item in ConditionCheckItems)
             {
                 item.Status = Status.doing;
 
@@ -173,7 +170,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
     }
 
 
-    public class ConditionCheck:INotifyPropertyChanged
+    public class ConditionCheck : INotifyPropertyChanged
     {
 
         public event PropertyChangedEventHandler PropertyChanged;

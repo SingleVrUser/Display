@@ -3,14 +3,14 @@ using Display.Models;
 
 namespace Display.ViewModels
 {
-    public partial class SortSettingsViewModel: Sort115Settings
+    public partial class SortSettingsViewModel : Sort115Settings
     {
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(NumNameSample))]
         [NotifyPropertyChangedFor(nameof(SingleVideoNameSample))]
         [NotifyPropertyChangedFor(nameof(MultipleVideoNameSample))]
         private string _numNameFormat = "{字母}-{数字}";
-        
+
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(MultipleVideoNameSample))]
         private string _separator = "-";
@@ -33,8 +33,8 @@ namespace Display.ViewModels
         [NotifyPropertyChangedFor(nameof(MultipleVideoNameSample))]
         private string _multipleVideoNameFormat = "[{番号}] {标题} {演员} {分隔符}{序号}";
 
-        public string NumNameSample => GetNumNameSample(NumNameFormat,NumNameFormatSelectedIndex);
-        public string SingleVideoNameSample => GetSingleVideoNameSample(SingleVideoNameFormat,numName: NumNameSample);
+        public string NumNameSample => GetNumNameSample(NumNameFormat, NumNameFormatSelectedIndex);
+        public string SingleVideoNameSample => GetSingleVideoNameSample(SingleVideoNameFormat, numName: NumNameSample);
 
         public string MultipleVideoNameSample =>
             GetMultipleVideoNameSample(MultipleVideoNameFormat, numName: NumNameSample, Separator, SeparatorNumSelectedIndex);
@@ -61,20 +61,20 @@ namespace Display.ViewModels
 
 
 
-            return GetSingleVideoNameSample(srcName,numName: numName).Replace("{分隔符}", separator)
+            return GetSingleVideoNameSample(srcName, numName: numName).Replace("{分隔符}", separator)
                 .Replace("{序号}", partNum);
         }
 
-        public static string GetNumNameSample(string srcName, int numNameFormatSelectedIndex, string letter="abp", string num = "123")
+        public static string GetNumNameSample(string srcName, int numNameFormatSelectedIndex, string letter = "abp", string num = "123")
         {
             var result = srcName.Replace("{字母}", letter)
                 .Replace("{数字}", num);
             return (NumNameCapFormat)numNameFormatSelectedIndex switch
-                {
-                    NumNameCapFormat.Upper => result.ToUpper(),
-                    NumNameCapFormat.Lower => result.ToLower(),
-                    _ => result
-                };
-        } 
+            {
+                NumNameCapFormat.Upper => result.ToUpper(),
+                NumNameCapFormat.Lower => result.ToLower(),
+                _ => result
+            };
+        }
     }
 }

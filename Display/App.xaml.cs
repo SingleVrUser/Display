@@ -1,4 +1,4 @@
-﻿using Data;
+﻿
 using Display.Notifications;
 using Display.WindowView;
 using Microsoft.UI;
@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using Windows.Storage;
+using Display.Data;
 using WinRT.Interop;
 
 // To learn more about WinUI, the WinUI project structure,

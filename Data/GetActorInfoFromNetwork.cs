@@ -2,14 +2,8 @@
 using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Windows.Media.Ocr;
-using Windows.Media.Protection.PlayReady;
 
 namespace Data;
 
@@ -72,7 +66,7 @@ public class GetActorInfoFromNetwork
                     match = Regex.Match(value, @"T(\d*) / B(\d*).* / W(\d*) / H(\d*)");
                     if (match.Success)
                     {
-                        actorInfo.height = string.IsNullOrEmpty(match.Groups[1].Value)? 0: Convert.ToInt32(match.Groups[1].Value);
+                        actorInfo.height = string.IsNullOrEmpty(match.Groups[1].Value) ? 0 : Convert.ToInt32(match.Groups[1].Value);
                         actorInfo.bust = string.IsNullOrEmpty(match.Groups[2].Value) ? 0 : Convert.ToInt32(match.Groups[2].Value);
                         actorInfo.waist = string.IsNullOrEmpty(match.Groups[3].Value) ? 0 : Convert.ToInt32(match.Groups[3].Value);
                         actorInfo.hips = string.IsNullOrEmpty(match.Groups[4].Value) ? 0 : Convert.ToInt32(match.Groups[4].Value);
@@ -101,7 +95,7 @@ public class GetActorInfoFromNetwork
 
             string img_url = thumNode.GetAttributeValue("src", string.Empty);
 
-            if(! string.IsNullOrEmpty(img_url) )
+            if (!string.IsNullOrEmpty(img_url))
             {
                 actorInfo.image_url = $"{AppSettings.MinnanoAv_BaseUrl}{img_url}";
             }

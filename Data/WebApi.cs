@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Windows.Storage;
+using Display.Helper;
 
 namespace Data
 {
@@ -92,7 +93,7 @@ namespace Data
             }
             catch (HttpRequestException e)
             {
-                FileMatch.tryToast("网络异常", "检查115登录状态时出现异常：", e.Message);
+                Toast.tryToast("网络异常", "检查115登录状态时出现异常：", e.Message);
 
                 return result;
             }
@@ -140,7 +141,7 @@ namespace Data
             }
             catch (AggregateException e)
             {
-                FileMatch.tryToast("网络异常", "检查115隐藏状态时出现异常：", e.Message);
+                Toast.tryToast("网络异常", "检查115隐藏状态时出现异常：", e.Message);
 
                 return result;
             }
@@ -295,7 +296,7 @@ namespace Data
             await Task.Delay(1000);
 
             //查询下一级文件信息
-            var WebFileInfo = await GetFileAsync(cid,LoadAll:true);
+            var WebFileInfo = await GetFileAsync(cid, LoadAll: true);
             sendCount++;
 
             if (WebFileInfo.state)
@@ -382,7 +383,7 @@ namespace Data
             }
             catch (AggregateException e)
             {
-                FileMatch.tryToast("网络异常", "改变115排序顺序时发生异常：", e.Message);
+                Toast.tryToast("网络异常", "改变115排序顺序时发生异常：", e.Message);
             }
         }
 
@@ -393,14 +394,14 @@ namespace Data
         /// <param Name="fids"></param>
         /// <param Name="ignore_warn"></param>
         /// <returns></returns>
-        public async Task DeleteFiles(string pid,List<string> fids,int ignore_warn = 1)
+        public async Task DeleteFiles(string pid, List<string> fids, int ignore_warn = 1)
         {
             var values = new Dictionary<string, string>
             {
                 { "pid", pid},
             };
 
-            for(int i = 0;i < fids.Count;i++)
+            for (int i = 0; i < fids.Count; i++)
             {
                 values.Add($"fid[{i}]", fids[i]);
             }
@@ -416,7 +417,7 @@ namespace Data
             }
             catch (AggregateException e)
             {
-                FileMatch.tryToast("网络异常", "删除115文件时发生异常：", e.Message);
+                Toast.tryToast("网络异常", "删除115文件时发生异常：", e.Message);
             }
         }
 
@@ -443,7 +444,7 @@ namespace Data
             }
             catch (AggregateException e)
             {
-                FileMatch.tryToast("网络异常", "从115回收站恢复文件时发生异常：", e.Message);
+                Toast.tryToast("网络异常", "从115回收站恢复文件时发生异常：", e.Message);
             }
         }
 
@@ -476,7 +477,7 @@ namespace Data
             }
             catch (AggregateException e)
             {
-                FileMatch.tryToast("网络异常", "移动115文件时发生异常：", e.Message);
+                Toast.tryToast("网络异常", "移动115文件时发生异常：", e.Message);
             }
         }
 
@@ -493,7 +494,7 @@ namespace Data
         /// <param Name="orderBy"></param>
         /// <param Name="asc"></param>
         /// <returns></returns>
-        public async Task<WebFileInfo> GetFileAsync(string cid, int limit = 40, int offset = 0, bool useApi2 = false, bool LoadAll = false, OrderBy orderBy = OrderBy.user_ptime,int asc=0)
+        public async Task<WebFileInfo> GetFileAsync(string cid, int limit = 40, int offset = 0, bool useApi2 = false, bool LoadAll = false, OrderBy orderBy = OrderBy.user_ptime, int asc = 0)
         {
             WebFileInfo WebFileInfoResult = new();
 
@@ -515,7 +516,7 @@ namespace Data
             }
             catch (AggregateException e)
             {
-                FileMatch.tryToast("网络异常", "获取文件信息时出现异常：", e.Message);
+                Toast.tryToast("网络异常", "获取文件信息时出现异常：", e.Message);
                 return WebFileInfoResult;
             }
 
@@ -585,7 +586,7 @@ namespace Data
             //需要加载全部，但未加载全部
             else if (LoadAll && WebFileInfoResult.count > limit)
             {
-                WebFileInfoResult = await GetFileAsync(cid, WebFileInfoResult.count, offset,useApi2,LoadAll, orderBy, asc);
+                WebFileInfoResult = await GetFileAsync(cid, WebFileInfoResult.count, offset, useApi2, LoadAll, orderBy, asc);
             }
 
             return WebFileInfoResult;
@@ -603,12 +604,12 @@ namespace Data
             }
             catch (AggregateException e)
             {
-                FileMatch.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
+                Toast.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
                 return result;
             }
             catch (HttpRequestException e)
             {
-                FileMatch.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
+                Toast.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
                 return result;
             }
 
@@ -640,12 +641,12 @@ namespace Data
             }
             catch (AggregateException e)
             {
-                FileMatch.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
+                Toast.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
                 return WebFileInfoResult;
             }
             catch (HttpRequestException e)
             {
-                FileMatch.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
+                Toast.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
                 return WebFileInfoResult;
             }
 
@@ -961,7 +962,7 @@ namespace Data
                 if (string.IsNullOrEmpty(datum.fid) || (!string.IsNullOrEmpty(datum.fid) && datum.fid == "0"))
                 {
                     //获取该文件夹下的文件和文件夹
-                    WebFileInfo webFileInfo = await GetFileAsync(datum.cid,LoadAll:true);
+                    WebFileInfo webFileInfo = await GetFileAsync(datum.cid, LoadAll: true);
                     if (webFileInfo.count == 0)
                     {
                         success = false;
@@ -1088,7 +1089,7 @@ namespace Data
         public async void GetAllFilesTraverseAndDownByBitComet(HttpClient client, string baseUrl, Datum datum, string ua, string save_path)
         {
             //获取该文件夹下的文件和文件夹
-            WebFileInfo webFileInfo = await GetFileAsync(datum.cid,LoadAll:true);
+            WebFileInfo webFileInfo = await GetFileAsync(datum.cid, LoadAll: true);
 
             foreach (var data in webFileInfo.data)
             {
@@ -1299,7 +1300,7 @@ namespace Data
                 var downUrlInfo = DataAccess.GetDownHistoryBypcAndua(pickcode, ua);
 
                 //检查链接是否失效
-                if (downUrlInfo!=null && (tm - downUrlInfo.addTime) > AppSettings.DownUrlOverdueTime)
+                if (downUrlInfo != null && (tm - downUrlInfo.addTime) > AppSettings.DownUrlOverdueTime)
                 {
                     downUrlList.Add(downUrlInfo.fileName, downUrlInfo.trueUrl);
                     return downUrlList;
@@ -1331,7 +1332,7 @@ namespace Data
             {
                 return downUrlList;
             }
-                
+
             DownUrlBase64EncryptInfo downurl_base64EncryptInfo;
 
             if (response.IsSuccessful && response.Content != null)
@@ -1647,7 +1648,7 @@ namespace Data
 
             //检查字幕
             if (AppSettings.IsFindSub && subInfo != null)
-                subFile = await TryDownSubFile(subInfo.name,subInfo.pickcode);
+                subFile = await TryDownSubFile(subInfo.name, subInfo.pickcode);
 
             //获取下载地址
             var downUrlList = GetDownUrl(pickcode, ua);

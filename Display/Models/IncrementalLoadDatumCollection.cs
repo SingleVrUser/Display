@@ -1,10 +1,11 @@
-﻿using Data;
+﻿
 using Microsoft.UI.Xaml.Data;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Display.Data;
 
 namespace Display.Models;
 
@@ -25,19 +26,19 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
             this._allCount = value;
 
             OnPropertyChanged(new PropertyChangedEventArgs(nameof(AllCount)));
-        }    
+        }
     }
 
-    public WebApi.OrderBy orderby { get;private set; } = WebApi.OrderBy.user_ptime;
+    public WebApi.OrderBy orderby { get; private set; } = WebApi.OrderBy.user_ptime;
 
-    public int asc { get;private set; }
+    public int asc { get; private set; }
 
     public string cid { get; set; }
 
     public IncrementalLoadDatumCollection(string cid)
     {
         this.cid = cid;
-        webApi= WebApi.GlobalWebApi;
+        webApi = WebApi.GlobalWebApi;
 
     }
 
@@ -55,7 +56,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         var FilesInfo = await webApi.GetFileAsync(cid, limit, offset, orderBy: orderby, asc: asc);
 
         //汇报事件
-        GetFileInfoCompletedEventArgs args = new() { orderby = this.orderby , asc = this.asc, TimeReached = DateTime.Now };
+        GetFileInfoCompletedEventArgs args = new() { orderby = this.orderby, asc = this.asc, TimeReached = DateTime.Now };
         EventHandler<GetFileInfoCompletedEventArgs> handler = GetFileInfoCompleted;
         if (handler != null)
         {
@@ -65,10 +66,10 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         return FilesInfo;
     }
 
-    public async Task<int> LoadData(int limit = 40,int offset=0)
+    public async Task<int> LoadData(int limit = 40, int offset = 0)
     {
-        var FilesInfo = await GetFilesInfoAsync(limit,offset);
-        if (AllCount!= FilesInfo.count) AllCount = FilesInfo.count;
+        var FilesInfo = await GetFilesInfoAsync(limit, offset);
+        if (AllCount != FilesInfo.count) AllCount = FilesInfo.count;
 
         if (FilesInfo.data == null)
         {
@@ -86,7 +87,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         return FilesInfo.data.Length;
     }
 
-    
+
     public async Task SetCid(string cid)
     {
         this.cid = cid;
@@ -99,11 +100,11 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         if (isNeedLoad) await LoadData();
     }
 
-    public async Task SetOrder(WebApi.OrderBy orderBy,int asc)
+    public async Task SetOrder(WebApi.OrderBy orderBy, int asc)
     {
-        this.orderby= orderBy;
+        this.orderby = orderBy;
         this.asc = asc;
-        await webApi.ChangedShowType(cid,orderBy, asc);
+        await webApi.ChangedShowType(cid, orderBy, asc);
         await SetCid(cid);
     }
 

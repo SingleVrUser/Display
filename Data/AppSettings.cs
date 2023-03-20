@@ -1,5 +1,4 @@
-﻿using Microsoft.UI.Composition;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.IO;
 using Windows.Storage;
@@ -10,11 +9,11 @@ public class AppSettings
 {
     public static ApplicationDataContainer localSettings { get { return ApplicationData.Current.LocalSettings; } }
 
-    
+
     /// <summary>
     /// 展示页的图片大小
     /// </summary>
-    public static Tuple<double,double> ImageSize
+    public static Tuple<double, double> ImageSize
     {
         get
         {
@@ -23,7 +22,7 @@ public class AppSettings
             double width;
             double height;
 
-            if (composite!=null && composite.ContainsKey("ImageWidth") && composite["ImageWidth"] is double tmp)
+            if (composite != null && composite.ContainsKey("ImageWidth") && composite["ImageWidth"] is double tmp)
                 width = tmp;
             else
                 width = 500;
@@ -159,15 +158,15 @@ public class AppSettings
         get
         {
             bool check = true;
-            if(localSettings.Values["IsCheckUpdate"] is bool value)
+            if (localSettings.Values["IsCheckUpdate"] is bool value)
             {
                 check = value;
             }
             return check;
         }
-        set=> localSettings.Values["IsCheckUpdate"] = value;
+        set => localSettings.Values["IsCheckUpdate"] = value;
     }
-    
+
     /// <summary>
     /// 忽略升级的版本号
     /// </summary>
@@ -278,7 +277,7 @@ public class AppSettings
             localSettings.Values["LibreDmm_BaseUrl"] = value;
         }
     }
-    
+
     /// <summary>
     /// JavBus网址
     /// </summary>
@@ -436,11 +435,11 @@ public class AppSettings
     {
         get
         {
-            if(_getActorInfoLastIndex != null)
+            if (_getActorInfoLastIndex != null)
             {
                 return (int)_getActorInfoLastIndex;
             }
-            else if(localSettings.Values["GetActorInfoLastIndex"] is int index)
+            else if (localSettings.Values["GetActorInfoLastIndex"] is int index)
             {
                 _getActorInfoLastIndex = index;
                 return index;
@@ -663,7 +662,7 @@ public class AppSettings
             localSettings.Values["isUseAvMoo"] = value;
         }
     }
-    
+
     /// <summary>
     /// 是否使用AvSox
     /// </summary>
@@ -684,7 +683,7 @@ public class AppSettings
             localSettings.Values["isUseAvSox"] = value;
         }
     }
-    
+
     /// <summary>
     /// 是否使用Jav321
     /// </summary>
@@ -838,7 +837,7 @@ public class AppSettings
             localSettings.Values["IsFindSub"] = value;
         }
     }
-    
+
     /// <summary>
     /// 是否记录下载请求
     /// </summary>
@@ -858,7 +857,7 @@ public class AppSettings
         {
             localSettings.Values["IsRecordDownRequest"] = value;
         }
-    }    
+    }
 
     /// <summary>
     /// 下载链接失效时间
@@ -1047,7 +1046,7 @@ public class AppSettings
     {
         get
         {
-            if(_isShowFailListInDisplay != null)
+            if (_isShowFailListInDisplay != null)
             {
                 return (bool)_isShowFailListInDisplay;
             }

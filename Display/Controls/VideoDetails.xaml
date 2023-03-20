@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converter="using:Display.Converter"
              xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-             xmlns:data="using:Data"
+             xmlns:data="using:Display.Data"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d">
@@ -408,7 +408,7 @@
                                             </VisualStateManager.VisualStateGroups>
 
                                             <controls:ImageEx x:Name="Thumbnail_Image"
-                                                              Source="{x:Bind Mode=OneWay}"
+                                                              Source="{x:Bind  Mode=OneWay}"
                                                               Height="120"
                                                               Width="180"
                                                               Stretch="UniformToFill"

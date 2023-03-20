@@ -1,20 +1,15 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Input;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Data;
-using Microsoft.UI.Xaml.Media.Animation;
-using Microsoft.UI.Input;
+using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
-using OpenCvSharp.Flann;
-using System.ComponentModel;
-using CommunityToolkit.WinUI.UI.Controls;
-using Microsoft.UI.Xaml.Data;
-using System.Xml.Linq;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -33,7 +28,7 @@ namespace Display.Views
         private ObservableCollection<VideoCoverDisplayClass> LoveCoverList = new();
 
         //过渡动画用
-        private enum navigationAnimationType { image, gridView};
+        private enum navigationAnimationType { image, gridView };
         private navigationAnimationType _navigationType;
         private VideoCoverDisplayClass _storeditem;
         private GridView _stroedgridview;
@@ -134,7 +129,7 @@ namespace Display.Views
             //随机获取20个视频
             foreach (var item in DataAccess.getNameAndIamgeRandom())
             {
-                Items.Add(new VideoCoverDisplayClass(item,500,300));
+                Items.Add(new VideoCoverDisplayClass(item, 500, 300));
             }
 
             videoInfoListView.SelectionChanged += videoInfoListView_SelectionChanged;
@@ -234,7 +229,7 @@ namespace Display.Views
 
             foreach (var trueName in delList)
             {
-                var delItem = videoList.FirstOrDefault(x=>x.truename == trueName);
+                var delItem = videoList.FirstOrDefault(x => x.truename == trueName);
                 videoList.Remove(delItem);
             }
             foreach (var item in addList)

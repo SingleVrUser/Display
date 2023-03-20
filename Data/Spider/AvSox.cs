@@ -3,7 +3,6 @@ using HtmlAgilityPack;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Windows.Media.Protection.PlayReady;
 using static Data.Model.SpiderInfo;
 
 namespace Data.Spider;
@@ -153,7 +152,7 @@ public class AvSox
 
     public static async Task<VideoInfo> GetVideoInfoFromHtmlDoc(string CID, string detail_url, HtmlDocument htmlDoc)
     {
-        var info = await Common.AnalysisHtmlDocInfoFromAvSoxOrAvMoo(CID,detail_url,htmlDoc);
+        var info = await Common.AnalysisHtmlDocInfoFromAvSoxOrAvMoo(CID, detail_url, htmlDoc);
         if (info == null) return null;
 
         info.is_wm = 1;

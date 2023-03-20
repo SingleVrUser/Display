@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.Media.Protection.PlayReady;
 using static Data.Model.SpiderInfo;
 
 namespace Data.Spider;
@@ -18,12 +17,12 @@ public class JavBus
 
     public const string Keywords = "JavBus";
 
-    public static Tuple<int, int> DelayRanges = new(1,3);
+    public static Tuple<int, int> DelayRanges = new(1, 3);
 
 
     public const bool IgnoreFc2 = true;
 
-    public static bool IsTrue => AppSettings.isUseJavBus; 
+    public static bool IsTrue => AppSettings.isUseJavBus;
 
     private static string baseUrl => AppSettings.JavBus_BaseUrl;
 

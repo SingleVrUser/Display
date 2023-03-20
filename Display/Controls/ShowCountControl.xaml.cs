@@ -1,7 +1,6 @@
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Org.BouncyCastle.Tls;
 
 namespace Display.Controls;
 

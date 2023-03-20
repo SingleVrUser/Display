@@ -1,4 +1,4 @@
-﻿using Data;
+﻿
 using Microsoft.UI;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -11,6 +11,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -73,7 +74,7 @@ namespace Display.ContentsPage
                     break;
                 }
                 //二维码已更新
-                else if(qrcodeInfo.data.uid != WebApi.QRCodeInfo.data.uid)
+                else if (qrcodeInfo.data.uid != WebApi.QRCodeInfo.data.uid)
                 {
                     return;
                 }
@@ -342,7 +343,7 @@ namespace Display.ContentsPage
             {
                 RefreshQRCode_Grid.Opacity = 0;
             }
-            if(QRCodeImage.Source == null)
+            if (QRCodeImage.Source == null)
             {
                 imageGrid.Visibility = Visibility.Visible;
             }

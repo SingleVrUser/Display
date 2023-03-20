@@ -1,4 +1,4 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
+﻿
 using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Windows.Storage;
 using Windows.System;
 
@@ -55,16 +54,16 @@ namespace Data
         //        || (CID.Contains('-') && Regex.Match(CID, "^SKYHUD-").Success || Regex.Match(CID, "^RED-").Success || Regex.Match(CID, "^SKY-").Success)
         //        || Regex.Match(CID, "^SE-").Success || Regex.Match(CID, "^DSAMBD-").Success;
         //}
-        
+
         /// <summary>
         /// 从文件名中匹配CID名字
         /// </summary>
         /// <param name="src_text"></param>
         /// <returns></returns>
-        public static string MatchName(string src_text,string file_cid="")
+        public static string MatchName(string src_text, string file_cid = "")
         {
             //提取文件名
-            string name = Regex.Match(src_text, @"(.*)(\.\w{3,5})?$",RegexOptions.IgnoreCase).Groups[1].Value;
+            string name = Regex.Match(src_text, @"(.*)(\.\w{3,5})?$", RegexOptions.IgnoreCase).Groups[1].Value;
 
             //删除空格
             name = src_text.Replace(" ", "_");
@@ -202,7 +201,7 @@ namespace Data
             // 初始化为图片大小
             for (var i = 0; i < VideoInfoList.Count; i++)
             {
-                VideoCoverDisplayClass info = new(VideoInfoList[i], imgwidth,imgheight);
+                VideoCoverDisplayClass info = new(VideoInfoList[i], imgwidth, imgheight);
                 FileGrid.Add(info);
             }
 
@@ -235,7 +234,7 @@ namespace Data
 
             string trueType;
             //避免重复
-            Dictionary<string,VideoInfo> dicts = new();
+            Dictionary<string, VideoInfo> dicts = new();
 
             foreach (var type in types)
             {
@@ -262,8 +261,8 @@ namespace Data
                     //失败比较特殊
                     //从另外的表中查找
                     case "失败" or "fail":
-                        var failItems = await DataAccess.LoadFailFileInfoWithDatum(n: keywords, limit:limit);
-                        failItems.ForEach(item => dicts.TryAdd(item.n,new(item)));
+                        var failItems = await DataAccess.LoadFailFileInfoWithDatum(n: keywords, limit: limit);
+                        failItems.ForEach(item => dicts.TryAdd(item.n, new(item)));
                         continue;
                     default:
                         trueType = "truename";
@@ -298,7 +297,7 @@ namespace Data
             return result;
         }
 
-        public static TimeSpan CalculatTimeStrDiff(string dt1Str,string dt2Str)
+        public static TimeSpan CalculatTimeStrDiff(string dt1Str, string dt2Str)
         {
             if (string.IsNullOrEmpty(dt1Str) || string.IsNullOrEmpty(dt2Str)) return TimeSpan.Zero;
 
@@ -357,7 +356,7 @@ namespace Data
                 formatStr = "ss'秒'";
             }
             else if (Second < 3600)
-            {   
+            {
                 formatStr = "mm'分'ss'秒'";
             }
             else if (Second < 86400)
@@ -416,7 +415,7 @@ namespace Data
                 if (file_info.iv == 1)
                 {
                     //根据视频名称匹配番号
-                    var VideoName = FileMatch.MatchName(FileName,file_info.cid);
+                    var VideoName = FileMatch.MatchName(FileName, file_info.cid);
 
                     //无论匹配与否，都存入数据库
                     DataAccess.AddFileToInfo(file_info.pc, VideoName);
@@ -424,7 +423,7 @@ namespace Data
                     //未匹配
                     if (VideoName == null)
                     {
-                        resultList.Add(new MatchVideoResult() { status = false, OriginalName = file_info.n, statusCode = -1, message = "匹配失败"});
+                        resultList.Add(new MatchVideoResult() { status = false, OriginalName = file_info.n, statusCode = -1, message = "匹配失败" });
                         continue;
                     }
 
@@ -433,7 +432,7 @@ namespace Data
 
                     if (existsResult == null)
                     {
-                        resultList.Add(new MatchVideoResult() {status = true, OriginalName=file_info.n, message="匹配成功", statusCode = 1, MatchName = VideoName});
+                        resultList.Add(new MatchVideoResult() { status = true, OriginalName = file_info.n, message = "匹配成功", statusCode = 1, MatchName = VideoName });
                     }
                     else
                     {
@@ -468,17 +467,17 @@ namespace Data
                 switch (key)
                 {
                     case "acw_tc":
-                        cookieList.Add(new CookieFormat() {name=key,value = value, domain = "115.com", hostOnly = true}) ;
+                        cookieList.Add(new CookieFormat() { name = key, value = value, domain = "115.com", hostOnly = true });
                         break;
                     case "115_lang":
-                        cookieList.Add(new CookieFormat() {name = key, value = value, httpOnly = false });
+                        cookieList.Add(new CookieFormat() { name = key, value = value, httpOnly = false });
                         break;
                     case "CID" or "SEID" or "UID" or "USERSESSIONID":
-                        cookieList.Add(new CookieFormat() { name = key, value = value});
+                        cookieList.Add(new CookieFormat() { name = key, value = value });
                         break;
                     //mini_act……_dialog_show
                     default:
-                        cookieList.Add(new CookieFormat() {name = key, value = value ,session = true});
+                        cookieList.Add(new CookieFormat() { name = key, value = value, session = true });
                         break;
                 }
             }
@@ -491,20 +490,6 @@ namespace Data
             await Launcher.LaunchFolderAsync(folder);
         }
 
-        public static void tryToast(string Title, string content1, string content2 = "")
-        {
-            new ToastContentBuilder()
-                    .AddArgument("action", "viewConversation")
-                    .AddArgument("conversationId", 384928)
-
-                    .AddText(Title)
-
-                    .AddText(content1)
-
-                    .AddText(content2)
-
-                    .Show();
-        }
 
         public async static void PlayByPotPlayer(string playUrl)
         {
@@ -581,7 +566,7 @@ namespace Data
         }
 
 
-        public static Tuple<string,string> SpliteLeftAndRightFromCid(string cid)
+        public static Tuple<string, string> SpliteLeftAndRightFromCid(string cid)
         {
             string[] splitList = cid.Split(new char[] { '-', '_' });
             string leftName = splitList[0];
