@@ -4,10 +4,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.Media.Protection.PlayReady;
-using Windows.Media.Streaming.Adaptive;
 using static Data.Model.SpiderInfo;
-using static Data.Spider.Manager;
 
 namespace Data.Spider;
 

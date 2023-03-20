@@ -153,7 +153,7 @@ namespace MediaPlayerElement_Test.Models
             }
 
             var request = new HttpRequestMessage(HttpMethod.Get, _requestedUri);
-            
+
 
             request.Headers.Add("Range", $"bytes={Position}-");
             request.Headers.Add("Connection", "Keep-Alive");

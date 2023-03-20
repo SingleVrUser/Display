@@ -1,17 +1,10 @@
-﻿using Data.Helper;
-using HtmlAgilityPack;
-using Microsoft.Win32;
-using Newtonsoft.Json;
+﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Windows.Media.Ocr;
 
 namespace Data
 {
@@ -31,7 +24,7 @@ namespace Data
 
                 return _client;
             }
-            set=> _client = value;
+            set => _client = value;
         }
 
         private static HttpClient _clientWithJavDBCookie;
@@ -187,9 +180,9 @@ namespace Data
             {
                 int maxTryCount = 3;
 
-                if(headers!= null)
+                if (headers != null)
                 {
-                    foreach(var header in headers)
+                    foreach (var header in headers)
                     {
                         if (Client.DefaultRequestHeaders.Contains(header.Key))
                             Client.DefaultRequestHeaders.Remove(header.Key);

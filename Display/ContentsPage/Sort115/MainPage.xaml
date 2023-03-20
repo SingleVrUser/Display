@@ -8,7 +8,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:local="using:Display.ContentsPage.Sort115"
-      xmlns:data="using:Data"
+      xmlns:data="using:Display.Data"
       xmlns:viewmodels="using:Display.ViewModels"
       xmlns:customcontrols="using:Display.Controls"
       mc:Ignorable="d">

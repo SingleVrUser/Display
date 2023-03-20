@@ -3,7 +3,6 @@
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
 using System.Threading.Tasks;
 using Windows.Foundation;
 
@@ -29,15 +28,15 @@ namespace Display.Controls
         //显示或隐藏搜索框
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            if(!(sender is Button button))
+            if (!(sender is Button button))
             {
                 return;
             }
 
-            button.IsEnabled= false;
+            button.IsEnabled = false;
 
             //关闭
-            if (MyAutoSuggestBox.Visibility == Visibility.Visible && MyAutoSuggestBox.Width==300)
+            if (MyAutoSuggestBox.Visibility == Visibility.Visible && MyAutoSuggestBox.Width == 300)
             {
                 CloseStoryborard.Begin();
 

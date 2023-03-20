@@ -1,5 +1,4 @@
-﻿using Data;
-using Microsoft.UI;
+﻿using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents;
@@ -17,6 +16,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -53,11 +53,11 @@ namespace Display.Views
                 {
                     var isLogin = await webapi.UpdateLoginInfo();
 
-                        //if (isLogin)
-                        //{
-                        //    //检查一下是否为隐藏模式
-                        //    await webapi.IsHiddenModel();
-                        //}
+                    //if (isLogin)
+                    //{
+                    //    //检查一下是否为隐藏模式
+                    //    await webapi.IsHiddenModel();
+                    //}
                 });
             }
 
@@ -121,7 +121,7 @@ namespace Display.Views
             dialog.Content = "点击确认后将删除应用中存储的Cookie";
 
             var result = await dialog.ShowAsync();
-            if(result == ContentDialogResult.Primary)
+            if (result == ContentDialogResult.Primary)
             {
                 WebApi.DeleteCookie();
                 Cookie_TextBox.Text = null;
@@ -201,7 +201,7 @@ namespace Display.Views
             dialog.Content = updateImagePathPage;
 
             var result = await dialog.ShowAsync();
-            if(result == ContentDialogResult.Primary)
+            if (result == ContentDialogResult.Primary)
             {
                 //修改数据库图片地址
                 DataAccess.UpdateAllImagePath(updateImagePathPage.srcPath, updateImagePathPage.dstPath);
@@ -420,7 +420,7 @@ namespace Display.Views
                 }
 
 
-                
+
             }
         }
 
@@ -442,7 +442,7 @@ namespace Display.Views
             //设置创建包里的文本内容
             string ClipboardText = System.Text.Json.JsonSerializer.Serialize(exportCookieList);
             dataPackage.SetText(ClipboardText);
-            
+
             //把数据包放到剪贴板里
             Clipboard.SetContent(dataPackage);
 
@@ -493,7 +493,7 @@ namespace Display.Views
                     break;
             }
 
-            if(toggleButton.IsChecked is bool value)
+            if (toggleButton.IsChecked is bool value)
             {
                 if (!(value || otherOriginUse))
                 {
@@ -567,15 +567,15 @@ namespace Display.Views
                 case 1:
                     openPath = Path.GetDirectoryName(AppSettings.PotPlayerExePath);
                     break;
-                //case 2:
-                //    openPath = Path.GetDirectoryName(AppSettings.MpvExePath);
-                //    break;
-                //case 3:
-                //    openPath = Path.GetDirectoryName(AppSettings.VlcExePath);
-                //    break;
+                    //case 2:
+                    //    openPath = Path.GetDirectoryName(AppSettings.MpvExePath);
+                    //    break;
+                    //case 3:
+                    //    openPath = Path.GetDirectoryName(AppSettings.VlcExePath);
+                    //    break;
             }
 
-            if(! string.IsNullOrEmpty(openPath))
+            if (!string.IsNullOrEmpty(openPath))
             {
                 FileMatch.LaunchFolder(openPath);
             }
@@ -600,12 +600,12 @@ namespace Display.Views
                     case 1:
                         AppSettings.PotPlayerExePath = file.Path;
                         break;
-                    //case 2:
-                    //    AppSettings.MpvExePath = file.Path;
-                    //    break;  
-                    //case 3:
-                    //    AppSettings.VlcExePath = file.Path;
-                    //    break;
+                        //case 2:
+                        //    AppSettings.MpvExePath = file.Path;
+                        //    break;  
+                        //case 3:
+                        //    AppSettings.VlcExePath = file.Path;
+                        //    break;
                 }
                 PlayerExePath_TextBox.Text = file.Path;
             }
@@ -632,7 +632,7 @@ namespace Display.Views
 
             bool isOK = await IsBitCometSettingOK(bitCometSettings.UserName, bitCometSettings.Password, bitCometSettings.ApiUrl);
 
-            if(isOK)
+            if (isOK)
                 BitCometCheckStatus.status = Status.success;
             else
                 BitCometCheckStatus.status = Status.error;
@@ -665,7 +665,7 @@ namespace Display.Views
             return bitCometSettings;
         }
 
-        private async Task<bool> IsBitCometSettingOK(string user,string pwd,string url)
+        private async Task<bool> IsBitCometSettingOK(string user, string pwd, string url)
         {
             bool isOK = false;
 
@@ -690,9 +690,9 @@ namespace Display.Views
                 }
                 else
                 {
-                    if(rep.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    if (rep.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     {
-                        ShowTeachingTip("认证失败","请检查用户名和密码");
+                        ShowTeachingTip("认证失败", "请检查用户名和密码");
                     }
                 }
             }
@@ -700,7 +700,8 @@ namespace Display.Views
             {
                 //出错
                 ShowTeachingTip("网页访问失败", $"{ex.Message}，请检查地址和端口");
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
             }
@@ -709,10 +710,10 @@ namespace Display.Views
             return isOK;
         }
 
-        private void ShowTeachingTip(string subtitle,string content=null)
+        private void ShowTeachingTip(string subtitle, string content = null)
         {
             LightDismissTeachingTip.Subtitle = subtitle;
-            if(content != null)
+            if (content != null)
                 LightDismissTeachingTip.Content = content;
 
             LightDismissTeachingTip.IsOpen = true;
@@ -810,10 +811,13 @@ namespace Display.Views
         {
             bool isOK = false;
 
-            Aria2Request requclass = new() { jsonrpc = "2.0",
+            Aria2Request requclass = new()
+            {
+                jsonrpc = "2.0",
                 method = "aria2.getVersion",
                 id = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString(),
-                _params = new string[] { pwd } };
+                _params = new string[] { pwd }
+            };
 
             var myContent = JsonConvert.SerializeObject(requclass);
 

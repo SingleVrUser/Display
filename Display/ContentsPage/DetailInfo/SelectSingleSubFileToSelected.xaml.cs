@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
-using Data;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -25,7 +25,7 @@ public sealed partial class SelectSingleSubFileToSelected : Page
         this.InitializeComponent();
     }
 
-    public SelectSingleSubFileToSelected(List<SubInfo> subList,string trueName)
+    public SelectSingleSubFileToSelected(List<SubInfo> subList, string trueName)
     {
         this.InitializeComponent();
 

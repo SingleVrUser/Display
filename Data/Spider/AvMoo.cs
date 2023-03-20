@@ -3,9 +3,7 @@ using HtmlAgilityPack;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Windows.Media.Protection.PlayReady;
 using static Data.Model.SpiderInfo;
-using static Data.Spider.Manager;
 
 namespace Data.Spider;
 
@@ -19,7 +17,7 @@ public class AvMoo
 
     public static Tuple<int, int> DelayRanges = new(1, 2);
 
-    public const bool IgnoreFc2 = true; 
+    public const bool IgnoreFc2 = true;
 
     public static bool IsTrue => AppSettings.isUseAvMoo;
 

@@ -1,26 +1,18 @@
 ﻿using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Storage;
-using static Data.FilesInfo;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -65,7 +57,7 @@ namespace Display.ContentsPage
                 {
                     if (item.IsOfType(StorageItemTypes.Folder))
                     {
-                        sha1InfoList.Add(new LocalFileSha1Info() { Name = item.Name, FullPath= item.Path, FileType=FileType.Folder });
+                        sha1InfoList.Add(new LocalFileSha1Info() { Name = item.Name, FullPath = item.Path, FileType = FilesInfo.FileType.Folder });
 
 
                     }
@@ -82,21 +74,21 @@ namespace Display.ContentsPage
                 }
 
                 Tip_TextBlock.Text = $"拖入文件数量：{items.Count}";
-                
+
                 CurrentProgressRing.IsActive = false;
                 Operation_StackPanel.Visibility = Visibility.Visible;
                 CopyAllLink_Button.Visibility = Visibility.Visible;
             }
 
             //开始生成Sha1
-            foreach(var item in sha1InfoList)
+            foreach (var item in sha1InfoList)
             {
                 //文件夹
-                if(item.FileType == FileType.Folder)
+                if (item.FileType == FilesInfo.FileType.Folder)
                 {
                     var Fileitems = GetAllFilesInDiretory(item.FullPath);
                     item.ProgressBarMaximum = Fileitems.Count;
-                    foreach(var file in Fileitems)
+                    foreach (var file in Fileitems)
                     {
                         item.Sha1ShareLink = await GetFileShareSha1Link(file.FullPath);
                         item.ProgressBarValue++;
@@ -219,7 +211,7 @@ namespace Display.ContentsPage
     public class LocalFileSha1Info : INotifyPropertyChanged
     {
         public string Name;
-        public FileType FileType { get; set; } = FileType.File;
+        public FilesInfo.FileType FileType { get; set; } = FilesInfo.FileType.File;
         public long FilesCount { get; set; } = 1;
         public string Icon;
         public string IconPath
@@ -227,9 +219,9 @@ namespace Display.ContentsPage
             get
             {
                 string iconpath;
-                if (FileType == FileType.File)
+                if (FileType == FilesInfo.FileType.File)
                 {
-                    iconpath = getPathFromFileType(Icon);
+                    iconpath = FilesInfo.getPathFromFileType(Icon);
                 }
                 else
                 {
@@ -264,11 +256,11 @@ namespace Display.ContentsPage
             {
                 bool isActive = false;
 
-                if(ProgressBarValue < ProgressBarMaximum)
+                if (ProgressBarValue < ProgressBarMaximum)
                 {
                     isActive = true;
                 }
-                else if(ProgressBarValue == ProgressBarMaximum)
+                else if (ProgressBarValue == ProgressBarMaximum)
                 {
                     Sha1TextColorBrush = new SolidColorBrush(Colors.DodgerBlue);
                     OnPropertyChanged("Sha1TextColorBrush");
@@ -300,13 +292,14 @@ namespace Display.ContentsPage
         {
             get
             {
-                Visibility visibility = Visibility.Collapsed ;
+                Visibility visibility = Visibility.Collapsed;
                 if (ProgressBarValue > 0 && ProgressBarValue < ProgressBarMaximum)
                 {
                     visibility = Visibility.Visible;
                 }
-                else { 
-                    visibility = Visibility.Collapsed; 
+                else
+                {
+                    visibility = Visibility.Collapsed;
                 }
 
                 return visibility;

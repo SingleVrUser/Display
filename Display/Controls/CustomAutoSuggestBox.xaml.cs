@@ -1,10 +1,11 @@
-﻿using Data;
+﻿
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.Foundation;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -52,9 +53,9 @@ namespace Display.Controls
         private List<string> GetSelectedTypes()
         {
             var AllSelectedButtons = GetAllSelectedMethodButton();
-            var Selectedtypes = AllSelectedButtons.Where(item => item.IsChecked).ToList().Select(item => item.Tag.ToString() ).ToList();
+            var Selectedtypes = AllSelectedButtons.Where(item => item.IsChecked).ToList().Select(item => item.Tag.ToString()).ToList();
 
-            
+
             return Selectedtypes;
         }
 
@@ -62,7 +63,7 @@ namespace Display.Controls
         public event TypedEventHandler<AutoSuggestBox, AutoSuggestBoxQuerySubmittedEventArgs> QuerySubmitted;
         private void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
-            if ( args.QueryText != "Data.VideoInfo")
+            if (args.QueryText != "Data.VideoInfo")
             {
                 sender.DataContext = GetSelectedTypes();
 
@@ -138,9 +139,9 @@ namespace Display.Controls
             SelectedAll_Toggle.IsChecked = false;
 
             //单选，只保留一个为选中状态
-            foreach(var button in items)
+            foreach (var button in items)
             {
-                if(button.IsChecked && button.Text != item.Text)
+                if (button.IsChecked && button.Text != item.Text)
                     button.IsChecked = false;
             }
 
@@ -200,7 +201,7 @@ namespace Display.Controls
             {
                 item.IsChecked = !item.IsChecked;
 
-                if(selectedCount == 1)
+                if (selectedCount == 1)
                 {
                     //该项被取消
                     if (!item.IsChecked)

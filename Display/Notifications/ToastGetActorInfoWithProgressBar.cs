@@ -1,14 +1,10 @@
-﻿using Microsoft.Windows.AppNotifications.Builder;
+﻿using Display.Views;
 using Microsoft.Windows.AppNotifications;
+using Microsoft.Windows.AppNotifications.Builder;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
-using System.IO;
-using System.Runtime.CompilerServices;
-using Display.Views;
 
 namespace Display.Notifications;
 
@@ -65,7 +61,7 @@ class ToastGetActorInfoWithProgressBar
         return appNotification.Id != 0; // return true (indicating success) if the toast was sent (if it has an Id)
     }
 
-    public static async Task<bool> AddValue(int i,int allCount)
+    public static async Task<bool> AddValue(int i, int allCount)
     {
         ToastGetActorInfoWithProgressBar.allCount = allCount;
 

@@ -1,10 +1,11 @@
-﻿using Data;
+﻿
 using Display.Views;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using System;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -62,7 +63,7 @@ namespace Display.Controls
         public event RoutedEventHandler Click;
         private void Grid_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            Click?.Invoke(sender,e);
+            Click?.Invoke(sender, e);
         }
 
         private void Grid_PointerEntered(object sender, PointerRoutedEventArgs e)

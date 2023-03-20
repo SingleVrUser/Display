@@ -1,16 +1,10 @@
-using Data;
-using Data.Helper;
-using Data.Spider;
-using HtmlAgilityPack;
+
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Animation;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using Windows.Media.Protection.PlayReady;
+using Display.Data;
+using Display.Spider;
 
 namespace Display.ContentsPage.DetailInfo
 {
@@ -31,18 +25,6 @@ namespace Display.ContentsPage.DetailInfo
             this.cidName = cidName;
         }
 
-        private GetInfoFromNetwork _searchNetwork;
-
-        private GetInfoFromNetwork SearchNetwork
-        {
-            get
-            {
-                if (_searchNetwork == null)
-                    _searchNetwork = new GetInfoFromNetwork();
-                return _searchNetwork;
-            }
-            set => _searchNetwork = value;
-        }
 
         async void FindInfos()
         {
@@ -75,7 +57,7 @@ namespace Display.ContentsPage.DetailInfo
             if (!(sender is ListView listView))
                 return;
 
-            if(listView.SelectedIndex== -1)
+            if (listView.SelectedIndex == -1)
                 Confirm_Button.IsEnabled = false;
             else
             {
@@ -97,7 +79,7 @@ namespace Display.ContentsPage.DetailInfo
             if (!(sender is Button button)) return;
 
             //修改一下
-            button.DataContext= videoInfo;
+            button.DataContext = videoInfo;
 
             ConfirmClick?.Invoke(button, e);
         }
@@ -116,7 +98,7 @@ namespace Display.ContentsPage.DetailInfo
             ReCheckProgressRing.Visibility = Visibility.Visible;
             ConfirmSpecificUrlButton.IsEnabled = false;
 
-            var info =  await Data.Spider.Manager.Current.DispatchSpiderInfoByDetailUrl(cidName, url);
+            var info = await Manager.Current.DispatchSpiderInfoByDetailUrl(cidName, url);
 
             ReCheckProgressRing.Visibility = Visibility.Collapsed;
 

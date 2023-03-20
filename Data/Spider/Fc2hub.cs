@@ -5,7 +5,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Windows.Media.Protection.PlayReady;
 using static Data.Model.SpiderInfo;
 
 namespace Data.Spider;
@@ -41,7 +40,7 @@ public class Fc2hub
         HtmlDocument htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlString);
 
-        return await GetVideoInfoFromHtmlDoc(CID,detail_url,htmlDoc);
+        return await GetVideoInfoFromHtmlDoc(CID, detail_url, htmlDoc);
     }
 
     public static async Task<VideoInfo> GetVideoInfoFromHtmlDoc(string CID, string detail_url, HtmlDocument htmlDoc)

@@ -1,12 +1,10 @@
-﻿using Data;
+﻿
 using Microsoft.UI.Xaml.Data;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
+using Display.Data;
 
 namespace Display.Models;
 
@@ -42,7 +40,7 @@ public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum
 
     public string filterName { get; set; } = string.Empty;
 
-    public int AllCount { get;private set; }
+    public int AllCount { get; private set; }
 
     public bool HasMoreItems { get; set; } = true;
 
@@ -66,10 +64,10 @@ public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
         var failLists = await DataAccess.LoadFailFileInfoWithDatum(Items.Count, (int)count, filterName, OrderBy, IsDesc, ShowType);
-        
+
         if (failLists.Count < count)
         {
-            HasMoreItems= false;
+            HasMoreItems = false;
         }
 
         failLists.ForEach(item => Add(item));
