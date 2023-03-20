@@ -41,7 +41,7 @@ jobs:
       run: |
         [xml]$manifest = get-content ".\$env:Project_Directory\Package.appxmanifest"
         $manifest.Package.Identity.Version = "${{ env.version }}"
-        $manifest.save("Package.appxmanifest")
+        $manifest.save(".\$env:Project_Directory\Package.appxmanifest")
 
 
     # Install the .NET Core workload
