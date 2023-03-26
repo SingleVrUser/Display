@@ -238,13 +238,10 @@
 
                     <!--图片-->
                     <Grid x:Name="showImage">
-                        <controls:ImageEx Stretch="UniformToFill"
-                                          IsCacheEnabled="True"
-                                          EnableLazyLoading="True"
-                                          LazyLoadingThreshold="300"
-                                          Source="{x:Bind imagepath,Mode=OneWay}"
-                                          Width="{x:Bind imagewidth,Mode=OneWay}"
-                                          Height="{x:Bind imageheight,Mode=OneWay}" />
+                        <Image Stretch="UniformToFill"
+                                  Source="{x:Bind imagepath,Mode=OneWay}"
+                                  Width="{x:Bind imagewidth,Mode=OneWay}"
+                                  Height="{x:Bind imageheight,Mode=OneWay}" />
 
                         <RelativePanel>
                             <!--喜欢就显示爱心-->
