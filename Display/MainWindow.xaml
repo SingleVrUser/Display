@@ -151,6 +151,7 @@
             <Frame x:Name="ContentFrame"
                    NavigationFailed="ContentFrame_NavigationFailed"
                    Navigated="ContentFrame_Navigated"
+                   CacheSize="2"
                    KeyboardAcceleratorPlacementMode="Hidden">
                 <Frame.KeyboardAccelerators>
                     <KeyboardAccelerator Key="Left"
