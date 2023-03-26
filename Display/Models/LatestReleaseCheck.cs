@@ -8,23 +8,23 @@ namespace Display.Models;
 
 public class LatestReleaseCheck
 {
-    public LatestReleaseCheck(GitHubInfo.ReleaseInfo releastInfo)
+    public LatestReleaseCheck(GitHubInfo.ReleaseInfo releaseInfo)
     {
-        this.ReleastInfo = releastInfo;
-        this.LatestVersion = releastInfo.TagName.ToLower().Replace("v", "");
+        this.ReleaseInfo = releaseInfo;
+        this.LatestVersion = releaseInfo.TagName.ToLower().Replace("v", "");
         this.CurrentVersion = AppInfo.GetPackageVersion();
         this.CurrentArchitecture = AppInfo.GetPackageArchitecture();
-        this.AppAsset = releastInfo.assets.Where(asset => asset.name.Contains(CurrentArchitecture)).FirstOrDefault();
-        this.MoreInfoUrl = releastInfo.html_url;
+        this.AppAsset = releaseInfo.assets.FirstOrDefault(asset => asset.name.Contains(CurrentArchitecture));
+        this.MoreInfoUrl = releaseInfo.html_url;
         this.CanUpdate = CurrentVersion != LatestVersion && AppAsset != null;
-        this.UpdateContent = releastInfo.UpdateContent;
-        this.PublishedTime = releastInfo.PublishedTime;
+        this.UpdateContent = releaseInfo.UpdateContent;
+        this.PublishedTime = releaseInfo.PublishedTime;
     }
 
     /// <summary>
     /// Release信息
     /// </summary>
-    public GitHubInfo.ReleaseInfo ReleastInfo { get; set; }
+    public GitHubInfo.ReleaseInfo ReleaseInfo { get; set; }
 
     /// <summary>
     /// 最新版本

@@ -30,9 +30,9 @@ namespace Display.Views
             Current = this;
 
             //启动缓存（为了返回无需过长等待，也为了返回动画）
-            NavigationCacheMode = Microsoft.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
+            NavigationCacheMode = NavigationCacheMode.Enabled;
         }
-
+        
         private async void SingleVideoPlay_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not Grid VideoPlayGrid) return;
@@ -134,14 +134,13 @@ namespace Display.Views
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            //videoControl.BasicGridView.ScrollIntoView(_storeditem);
             ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("BackConnectedAnimation");
             if (animation != null)
             {
                 //开始动画
                 if (_storeditem != null)
                 {
-                    ////开始动画
+                    //开始动画
                     videoControl.StartAnimation(animation, _storeditem);
                 }
                 else

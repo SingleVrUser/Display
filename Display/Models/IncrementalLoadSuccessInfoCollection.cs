@@ -42,7 +42,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
         {
             int successCount = DataAccess.CheckVideoInfoCount(orderBy, isDesc, filterConditionList, filterKeywords, ranges);
             int failCount = 0;
-            if (IsConatinFail)
+            if (IsContainFail)
             {
                 failCount = DataAccess.GetCount_FailFileInfoWithDatum(0, -1, filterKeywords);
             }
@@ -85,7 +85,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
         return InnerLoadMoreItemsAsync(count).AsAsyncOperation();
     }
 
-    public int defaultCount = 30;
+    public int defaultCount = 20;
 
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
@@ -99,7 +99,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
 
             //最后显示匹配失败，如果需要显示的话
             //无筛选功能
-            if (IsConatinFail)
+            if (IsContainFail)
             {
                 var failList = await DataAccess.LoadFailFileInfoWithDatum(0, -1, filterKeywords);
                 failList.ForEach(item => Add(new(new(item), imageWidth, imageHeight)));
@@ -114,5 +114,5 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
         };
     }
 
-    private bool IsConatinFail { get => filterConditionList != null && filterConditionList.Contains("fail"); }
+    private bool IsContainFail { get => filterConditionList != null && filterConditionList.Contains("fail"); }
 }
