@@ -39,7 +39,7 @@ namespace Display.Views
             this.InitializeComponent();
 
             //启动缓存
-            NavigationCacheMode = Microsoft.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
+            NavigationCacheMode = NavigationCacheMode.Required;
 
             loadCover();
         }

@@ -56,7 +56,7 @@ namespace Display
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param Name="args">Details about the launch request and process.</param>
-        protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+        protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
             //运行前检查
             var isNormal = checkErrorBeforeActivateMainWindow();

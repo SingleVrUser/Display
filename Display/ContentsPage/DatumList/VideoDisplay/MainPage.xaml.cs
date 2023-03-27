@@ -189,8 +189,10 @@ public sealed partial class MainPage : Page
 
             try
             {
+                Debug.WriteLine("Dispose MediaPlayer");
                 //videoControl?.SetMediaPlayer(null);
                 videoControl?.MediaPlayer?.Dispose();
+
             }
             catch (Exception ex)
             {
@@ -310,47 +312,53 @@ public sealed partial class MainPage : Page
     {
         MenuFlyout menuFlyout = new();
 
-        var MenuFlyoutItemDeletedFromList = new MenuFlyoutItem()
+        var menuFlyoutItemDeletedFromList = new MenuFlyoutItem()
         {
             Text = "从播放列表中移除",
             Icon = new FontIcon { FontFamily = new FontFamily("Segoe Fluent Icons"), Glyph = "\uE108" }
         };
-        MenuFlyoutItemDeletedFromList.Click += RemoveFileFromListButton_Click;
-        MenuFlyoutItemDeletedFromList.DataContext = file;
+        menuFlyoutItemDeletedFromList.Click += RemoveFileFromListButton_Click;
+        menuFlyoutItemDeletedFromList.DataContext = file;
 
-        var MenuFlyoutItemDeletedFrom115 = new MenuFlyoutItem()
+        var menuFlyoutItemDeletedFrom115 = new MenuFlyoutItem()
         {
             Text = "从115中删除",
             Icon = new FontIcon { FontFamily = new FontFamily("Segoe Fluent Icons"), Glyph = "\uE107" }
         };
-        MenuFlyoutItemDeletedFrom115.Click += RemoveFileFrom115Button_Click;
-        MenuFlyoutItemDeletedFrom115.DataContext = file;
+        menuFlyoutItemDeletedFrom115.Click += RemoveFileFrom115Button_Click;
+        menuFlyoutItemDeletedFrom115.DataContext = file;
 
 
-        var MenuFlyoutItemLoadVideoAgain = new MenuFlyoutItem()
+        var menuFlyoutItemLoadVideoAgain = new MenuFlyoutItem()
         {
             Text = "重新加载",
             Icon = new FontIcon { FontFamily = new FontFamily("Segoe Fluent Icons"), Glyph = "\uF83E" }
         };
-        MenuFlyoutItemLoadVideoAgain.Click += LoadVideoAgainButton_Click;
-        MenuFlyoutItemLoadVideoAgain.DataContext = file;
+        menuFlyoutItemLoadVideoAgain.Click += LoadVideoAgainButton_Click;
+        menuFlyoutItemLoadVideoAgain.DataContext = file;
 
-        menuFlyout.Items.Add(MenuFlyoutItemDeletedFromList);
-        menuFlyout.Items.Add(MenuFlyoutItemDeletedFrom115);
-        menuFlyout.Items.Add(MenuFlyoutItemLoadVideoAgain);
+        menuFlyout.Items.Add(menuFlyoutItemDeletedFromList);
+        menuFlyout.Items.Add(menuFlyoutItemDeletedFrom115);
+        menuFlyout.Items.Add(menuFlyoutItemLoadVideoAgain);
 
         return menuFlyout;
     }
 
     private async Task AddMediaElement(FilesInfo file, string videoUrl = null, int addIndex = -1)
     {
+        Debug.WriteLine("获取视频的下载链接");
         videoUrl ??= await GetVideoUrl(file);
+        Debug.WriteLine("成功获取到下载链接");
 
         if (videoUrl == null) return;
 
         var menuFlyout = BuildMenuFlyout(file);
 
+
+        Debug.WriteLine("设置 MediaPlayerWithStreamSource");
         var mediaPlayerWithStreamSource = await MediaPlayerWithStreamSource.CreateMediaPlayer(file, videoUrl);
+
+        Debug.WriteLine("成功设置 MediaPlayerWithStreamSource");
         var mediaPlayer = mediaPlayerWithStreamSource.MediaPlayer;
         var mediaPlayerElement = new MediaPlayerElement()
         {
@@ -358,6 +366,7 @@ public sealed partial class MainPage : Page
             Tag = mediaPlayerWithStreamSource
         };
 
+        Debug.WriteLine("设置mediaPlayer");
         mediaPlayerElement.SetMediaPlayer(mediaPlayer);
 
         // 是否自动播放
@@ -401,7 +410,6 @@ public sealed partial class MainPage : Page
     private static void MediaPlayer_MediaOpened(MediaPlayer sender, object args)
     {
         Debug.WriteLine($"当前视频长度：{sender.NaturalDuration}");
-
 
         // 是否需要改变起始位置
         if (AppSettings.AutoPlayPositionPercentage == 0.0) return;
@@ -489,7 +497,7 @@ public sealed partial class MainPage : Page
 
                 cidInfo = await spiderManager.DispatchSpiderInfoByCIDInOrder(cid);
 
-                Debug.WriteLine($"\t网络搜索到的结果{cidInfo}");
+                Debug.WriteLine($"\t网络搜索到的结果{cidInfo?.truename}");
             }
 
             cidInfo ??= new VideoInfo { truename = cid, imagepath = noPicturePath };
@@ -639,7 +647,13 @@ public sealed partial class MainPage : Page
         try
         {
             if (mediaPlayerElement.Tag is not MediaPlayerWithStreamSource oldMediaPlayerWithStreamSource) return;
+
+
+            Debug.WriteLine("Dispose oldMediaPlayerWithStreamSource mediaPlayer");
+
             oldMediaPlayerWithStreamSource.Dispose();
+            Debug.WriteLine("Dispose oldMediaPlayerWithStreamSource  mediaPlayer success");
+
             Video_UniformGrid.Children.Remove(mediaPlayerElement);
 
             if (_highBitRateVideos.Contains(oldMediaPlayerWithStreamSource.FilesInfo.datum.pc))
@@ -848,12 +862,14 @@ public sealed partial class MainPage : Page
         {
             Debug.WriteLine("准备加载下一集");
 
-            //await ChangedVideoSourceAndMoveToLast(mediaPlayerElement, videoInfo);
+            await RemoveVideoAndPlayNextVideo(mediaPlayerElement, videoInfo);
 
-            await RemoveVideoAndAddNextVideo(mediaPlayerElement, videoInfo);
+            Debug.WriteLine("添加到正在播放的视频的信息中");
 
             // 添加到正在播放的视频的信息中
             PlayingVideoInfos.Add(videoInfo);
+
+            Debug.WriteLine("搜索信息");
 
             // 搜索信息
             await FindAndShowInfosFromInternet(new List<FilesInfo>() { videoInfo });
@@ -914,7 +930,7 @@ public sealed partial class MainPage : Page
     /// <param name="mediaPlayerElement"></param>
     /// <param name="videoInfo"></param>
     /// <returns></returns>
-    private async Task RemoveVideoAndAddNextVideo(MediaPlayerElement mediaPlayerElement, FilesInfo videoInfo)
+    private async Task RemoveVideoAndPlayNextVideo(MediaPlayerElement mediaPlayerElement, FilesInfo videoInfo)
     {
         RemovePlayingVideo(mediaPlayerElement);
 

@@ -238,7 +238,7 @@ namespace Display
         /// <param Name="args"></param>
         private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            if (args.IsSettingsSelected == true)
+            if (args.IsSettingsSelected)
             {
                 NavView.Header = "设置";
                 NavView.SelectedItem = (NavigationViewItem)NavView.SettingsItem;
@@ -251,6 +251,7 @@ namespace Display
                 var navItemTag = args.SelectedItemContainer.Tag.ToString();
                 NavView_Navigate(navItemTag, args.RecommendedNavigationTransitionInfo);
             }
+            
         }
 
         /// <summary>
