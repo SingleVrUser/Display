@@ -1,5 +1,6 @@
 ﻿using MediaPlayerElement_Test.Models;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.Media.Playback;
 using Display.Data;
@@ -41,6 +42,7 @@ namespace Display.Models
 
         public void Dispose()
         {
+            Debug.WriteLine("Dispose MediaPlayerStreamSource");
             _stream?.Dispose();
             MediaPlayer?.Dispose();
         }
