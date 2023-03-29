@@ -238,7 +238,7 @@
 
                     <!--图片-->
                     <Grid x:Name="showImage">
-                        <Image Stretch="UniformToFill"
+                        <controls:ImageEx Stretch="UniformToFill"
                                   Source="{x:Bind imagepath,Mode=OneWay}"
                                   Width="{x:Bind imagewidth,Mode=OneWay}"
                                   Height="{x:Bind imageheight,Mode=OneWay}" />

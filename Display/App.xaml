@@ -44,6 +44,8 @@
                     <Style TargetType="controls:ImageEx">
                         <!--<Setter Property="PlaceholderSource" Value="/Assets/ImageExPlaceholder.jpg"/>-->
                         <Setter Property="PlaceholderStretch" Value="UniformToFill"/>
+                        <Setter Property="EnableLazyLoading" Value="True"/>
+                        <Setter Property="LazyLoadingThreshold" Value="100"/>
                     </Style>
 
                     <!--单选按钮-->
