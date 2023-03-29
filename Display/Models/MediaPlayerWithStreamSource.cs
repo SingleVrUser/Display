@@ -45,6 +45,8 @@ namespace Display.Models
             Debug.WriteLine("Dispose MediaPlayerStreamSource");
             _stream?.Dispose();
             MediaPlayer?.Dispose();
+
+            Debug.WriteLine("Dispose MediaPlayerStreamSource success");
         }
 
     }
