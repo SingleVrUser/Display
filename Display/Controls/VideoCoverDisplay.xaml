@@ -30,7 +30,8 @@
                          Color="#70a1ff"
                          Opacity="0.8" />
 
-        <LinearGradientBrush x:Key="OperableGridBackground" StartPoint="0.5,0"
+        <LinearGradientBrush x:Key="OperableGridBackground"
+                             StartPoint="0.5,0"
                              EndPoint="0.5,1"
                              Opacity="0.7">
             <GradientStop Color="#70a1ff"
@@ -184,7 +185,7 @@
         </Flyout>
 
         <converter:BytesToSizeStrConverter x:Key="BytesToSizeStrConverter" />
-        <converter:BoolToVisibleConverter x:Key="BoolToVisiableConverter" />
+        <converter:BoolToVisibleConverter x:Key="BoolToVisibleConverter" />
         <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter" />
         <converter:CollapsedWhenNullConverter x:Key="CollapsedWhenNullConverter" />
 
@@ -239,9 +240,10 @@
                     <!--图片-->
                     <Grid x:Name="showImage">
                         <controls:ImageEx Stretch="UniformToFill"
-                                  Source="{x:Bind imagepath,Mode=OneWay}"
-                                  Width="{x:Bind imagewidth,Mode=OneWay}"
-                                  Height="{x:Bind imageheight,Mode=OneWay}" />
+                                          IsCacheEnabled="False"
+                                          Source="{x:Bind imagepath,Mode=OneWay}"
+                                          Width="{x:Bind imagewidth,Mode=OneWay}"
+                                          Height="{x:Bind imageheight,Mode=OneWay}"/>
 
                         <RelativePanel>
                             <!--喜欢就显示爱心-->
@@ -597,7 +599,7 @@
                             CornerRadius="5"
                             HorizontalAlignment="Center">
                         <Image Source="{x:Bind image_path}"
-                               MaxHeight="300"/>
+                               MaxHeight="300" />
                     </Border>
 
                     <!--可操作按钮-->
@@ -627,13 +629,13 @@
 
                         <!--点击跳转查看更多信息-->
                         <Grid Grid.Row="1"
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
-                                Background="Transparent"
-                                Tapped="FailGrid_Tapped"
-                                PointerEntered="Button_OnPointerEntered"
-                                PointerExited="Button_PointerExited"
-                                ToolTipService.ToolTip="播放">
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"
+                              Background="Transparent"
+                              Tapped="FailGrid_Tapped"
+                              PointerEntered="Button_OnPointerEntered"
+                              PointerExited="Button_PointerExited"
+                              ToolTipService.ToolTip="播放">
                         </Grid>
 
                         <CommandBar Grid.Row="2"
@@ -703,13 +705,13 @@
 
                     <TextBlock Grid.Column="0"
                                Text="{x:Bind datum.n}"
-                               TextTrimming="CharacterEllipsis"/>
+                               TextTrimming="CharacterEllipsis" />
 
                     <!--评分-->
                     <RatingControl Grid.ColumnSpan="3"
                                    IsClearEnabled="True"
-                                   Grid.Row="1"/>
-                    
+                                   Grid.Row="1" />
+
                 </Grid>
             </Grid>
         </DataTemplate>
@@ -729,15 +731,16 @@
 
                 <Grid.ContextFlyout>
                     <MenuFlyout>
-                        <MenuFlyoutItem Text="喜欢" Click="FailItemAddToLikeButton_Click">
+                        <MenuFlyoutItem Text="喜欢"
+                                        Click="FailItemAddToLikeButton_Click">
                             <MenuFlyoutItem.Icon>
-                                <FontIcon Glyph="&#xE006;"/>
+                                <FontIcon Glyph="&#xE006;" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
                         <MenuFlyoutItem Text="稍后观看"
                                         Click="FailItemAddToLookLaterButton_Click">
                             <MenuFlyoutItem.Icon>
-                                <FontIcon Glyph="&#xE13B;"/>
+                                <FontIcon Glyph="&#xE13B;" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
                     </MenuFlyout>
@@ -773,11 +776,11 @@
 
         <local:CoverItemTemplateSelector x:Key="FailItemTemplateSelector"
                                          WithoutImageTemplate="{StaticResource FailListTemplate}"
-                                         LikeOrLookLaterInFailCoverTemplate="{StaticResource LikeOrLookLaterInFail_CoverTemplate}"/>
-        
+                                         LikeOrLookLaterInFailCoverTemplate="{StaticResource LikeOrLookLaterInFail_CoverTemplate}" />
+
         <local:CoverItemTemplateSelector x:Key="SuccessOrSearchResult_ItemTemplateSelector"
                                          ImageTemplate="{StaticResource ImageTemplate}"
-                                         FailCoverTemplate="{StaticResource FailCoverTemplate}"/>
+                                         FailCoverTemplate="{StaticResource FailCoverTemplate}" />
     </Control.Resources>
 
     <Grid>
@@ -802,7 +805,7 @@
             <local:FileAutoSuggestBox Grid.Row="1"
                                       x:Name="FailInfoSuggestBox"
                                       TextChanged="FileAutoSuggestBox_TextChanged"
-                                      Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}"
+                                      Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource BoolToVisibleConverter}}"
                                       RelativePanel.AlignVerticalCenterWithPanel="True" />
 
             <RadioButtons x:Name="FailShowChanged_RadioButtons"
@@ -811,7 +814,7 @@
                           MaxColumns="3"
                           CharacterSpacing="30"
                           RelativePanel.AlignRightWithPanel="True"
-                          Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}"
+                          Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource BoolToVisibleConverter}}"
                           SelectionChanged="ShowData_RadioButtons_SelectionChanged">
                 <RadioButton x:Name="AllFail_RadioButton"
                              Content="&#xE0A2;"
@@ -819,7 +822,7 @@
                              HorizontalContentAlignment="Center"
                              FontFamily="Segoe Fluent Icons"
                              Style="{StaticResource RadioButtonCustomizeStyle}"
-                             ToolTipService.ToolTip="全部"/>
+                             ToolTipService.ToolTip="全部" />
                 <RadioButton x:Name="FailLike_RadioButton"
                              Content="&#xE006;"
                              FontSize="20"
@@ -884,7 +887,7 @@
 
                             <TextBlock Visibility="{x:Bind actorInfo.birthday,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
                                 <Run Foreground="Gray">出生日期：</Run>
-                                <Run Text="{x:Bind actorInfo.birthday,Mode=OneWay}"/>
+                                <Run Text="{x:Bind actorInfo.birthday,Mode=OneWay}" />
                             </TextBlock>
 
                             <TextBlock Visibility="{x:Bind actorInfo.bwh,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
@@ -993,7 +996,7 @@
                                    DesiredWidth="400"
                                    StretchContentForSingleRow="True"
                                    Visibility="{x:Bind IsShowFailListView,Mode=OneWay}"
-                                   Padding="10,5"/>
+                                   Padding="10,5" />
 
         <!--筛选栏，默认隐藏-->
         <customcontrols:InfoListFilter x:Name="InfosFilter"
@@ -1013,7 +1016,7 @@
                         Orientation="Horizontal"
                         Spacing="5"
                         RelativePanel.AlignVerticalCenterWithPanel="True">
-                
+
                 <!--<ToggleSwitch x:Name="ShowType_ToggleSwitch"
                               VerticalAlignment="Center"
                               MinWidth="120"
@@ -1073,7 +1076,7 @@
                               Unchecked="Filter_ToggleButton_Unchecked">
                     <ToggleButton.Resources>
                         <SolidColorBrush x:Key="ToggleButtonBackgroundPointerOver"
-                                         Color="{StaticResource ColorChecked}"/>
+                                         Color="{StaticResource ColorChecked}" />
                     </ToggleButton.Resources>
                 </ToggleButton>
 
@@ -1088,7 +1091,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Grid ColumnSpacing="8"
-                      Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}"
+                      Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay,Converter={StaticResource BoolToVisibleConverter}}"
                       BorderBrush="{ThemeResource ControlElevationBorderBrush}"
                       BorderThickness="1"
                       Padding="8,0,3,0"
@@ -1130,25 +1133,24 @@
                                                 AllCount="{x:Bind AllFailInfoCollection.AllCount,Mode=OneWay}"
                                                 Clicked="ToTopButton_Click"
                                                 HorizontalAlignment="Right" />
-                        
+
                         <local:ShowCountControl x:Name="LikeOrLookLaterFailShowCountControl"
                                                 CurrentCount="{x:Bind LikeOrLookLater_failInfocollection.Count,Mode=OneWay}"
                                                 AllCount="{x:Bind LikeOrLookLater_failInfocollection.AllCount,Mode=OneWay}"
                                                 Clicked="ToTopButton_Click"
                                                 HorizontalAlignment="Right" />
-                        
-                        
+
+
                     </Grid>
                 </Grid>
 
             </Grid>
 
         </RelativePanel>
-        
-        
+
+
         <!--TeachingTip-->
         <TeachingTip x:Name="FailList_TeachingTip"
-                     IsLightDismissEnabled="True"
-                     />
+                     IsLightDismissEnabled="True" />
     </Grid>
 </UserControl>
