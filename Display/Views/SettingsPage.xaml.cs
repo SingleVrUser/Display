@@ -1,4 +1,5 @@
-﻿using Microsoft.UI;
+﻿using Display.Data;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents;
@@ -16,7 +17,6 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.Storage.Pickers;
-using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -28,11 +28,9 @@ namespace Display.Views
     /// </summary>
     public sealed partial class SettingsPage : Page
     {
-        ObservableCollection<string> resolutionSelectionCollection = new ObservableCollection<string>();
+        ObservableCollection<string> _resolutionSelectionCollection = new();
 
-        ObservableCollection<string> SpiderMothodList = new();
-
-        private static WebApi webapi;
+        private static WebApi _webapi;
 
         public SettingsPage()
         {
@@ -45,13 +43,13 @@ namespace Display.Views
         private async void InitializationView()
         {
             //初始化115状态
-            webapi ??= WebApi.GlobalWebApi;
+            _webapi ??= WebApi.GlobalWebApi;
 
             if (!string.IsNullOrEmpty(AppSettings._115_Cookie) && WebApi.UserInfo == null)
             {
                 await Task.Run(async () =>
                 {
-                    var isLogin = await webapi.UpdateLoginInfo();
+                    var isLogin = await _webapi.UpdateLoginInfo();
 
                     //if (isLogin)
                     //{
@@ -66,17 +64,17 @@ namespace Display.Views
 
             //infobar.IsOpen = WebApi.isEnterHiddenMode != true;
 
-            DataAccessSavePath_TextBox.Text = AppSettings.DataAccess_SavePath;
+            DataAccessSavePathTextBox.Text = AppSettings.DataAccess_SavePath;
         }
 
         private void updateUserInfo()
         {
-            userInfoControl.userinfo = WebApi.UserInfo?.data;
+            UserInfoControl.userinfo = WebApi.UserInfo?.data;
         }
 
         private void updateLoginStatus()
         {
-            userInfoControl.status = WebApi.UserInfo == null ? "NoLogin" : "Login";
+            UserInfoControl.status = WebApi.UserInfo == null ? "NoLogin" : "Login";
         }
 
         private void LoginButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
@@ -102,9 +100,9 @@ namespace Display.Views
 
         private void LogoutButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            webapi.LogoutAccount();
+            _webapi.LogoutAccount();
             //await Task.Delay(2000);
-            userInfoControl.status = "NoLogin";
+            UserInfoControl.status = "NoLogin";
             infobar.Visibility = Visibility.Collapsed;
             //InitializationView();
         }
@@ -129,13 +127,13 @@ namespace Display.Views
 
         }
 
-        private async void UpdateButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        private async void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            userInfoControl.status = "Update";
-            if (await webapi.UpdateLoginInfo())
+            UserInfoControl.status = "Update";
+            if (await _webapi.UpdateLoginInfo())
             {
                 updateUserInfo();
-                infobar.IsOpen = await webapi.IsHiddenModel();
+                infobar.IsOpen = await _webapi.IsHiddenModel();
             }
             else
             {
@@ -157,8 +155,8 @@ namespace Display.Views
                 }
                 else
                 {
-                    ImageSavePath_TextBox.Text = folder.Path;
-                    tryUpdateImagePath(folder.Path);
+                    ImageSavePathTextBox.Text = folder.Path;
+                    TryUpdateImagePath(folder.Path);
                 }
             }
         }
@@ -166,8 +164,8 @@ namespace Display.Views
         /// <summary>
         /// 尝试更新图片保存目录
         /// </summary>
-        /// <param Name="folderPath"></param>
-        private async void tryUpdateImagePath(string folderPath)
+        /// <param name="folderPath"></param>
+        private async void TryUpdateImagePath(string folderPath)
         {
             //原来的地址
             string srcPath = AppSettings.Image_SavePath;
@@ -191,11 +189,13 @@ namespace Display.Views
             if (!isSrcPathError && imagePath.Replace(srcPath, dstPath) == imagePath && File.Exists(imagePath)) return;
 
             //提醒修改数据文件
-            ContentDialog dialog = new ContentDialog();
-            dialog.XamlRoot = this.XamlRoot;
-            dialog.Title = "提醒";
-            dialog.PrimaryButtonText = "修改";
-            dialog.CloseButtonText = "不修改";
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "提醒",
+                PrimaryButtonText = "修改",
+                CloseButtonText = "不修改"
+            };
 
             var updateImagePathPage = new ContentsPage.UpdateImagePath(imagePath, srcPath, dstPath);
             dialog.Content = updateImagePathPage;
@@ -205,14 +205,65 @@ namespace Display.Views
             {
                 //修改数据库图片地址
                 DataAccess.UpdateAllImagePath(updateImagePathPage.srcPath, updateImagePathPage.dstPath);
-                ShowTeachingTip("图片保存地址 和 数据库中已有的图片地址 修改完成");
+                ShowTeachingTip("修改完成，部分修改内容重启后生效");
             }
             else
             {
                 ShowTeachingTip("图片保存地址修改完成");
             }
-
         }
+
+        /// <summary>
+        /// 尝试更新演员保存目录
+        /// </summary>
+        /// <param name="folderPath"></param>
+        private async void TryUpdateActorPath(string folderPath)
+        {
+            //原来的地址
+            var srcPath = AppSettings.ActorInfo_SavePath;
+
+            //需要修改的地址
+            AppSettings.ActorInfo_SavePath = folderPath;
+
+            //检查数据库的是否需要修改
+            string imagePath = DataAccess.GetOneActorProfilePath();
+            if (string.IsNullOrEmpty(imagePath))
+            {
+                ShowTeachingTip("保存地址修改完成");
+                return;
+            }
+
+            var imageRelativePath = Path.GetRelativePath(srcPath, imagePath);
+            var isSrcPathError = imageRelativePath.Split('\\').Length > 2;
+
+            // 数据库的图片地址无需修改
+            if (!isSrcPathError && imagePath.Replace(srcPath, folderPath) == imagePath && File.Exists(imagePath)) return;
+
+            //提醒修改数据文件
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "提醒",
+                PrimaryButtonText = "修改",
+                CloseButtonText = "不修改"
+            };
+
+            var updateImagePathPage = new ContentsPage.UpdateImagePath(imagePath, srcPath, folderPath);
+            dialog.Content = updateImagePathPage;
+
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                //修改数据库图片地址
+                DataAccess.UpdateActorProfilePath(updateImagePathPage.srcPath, updateImagePathPage.dstPath);
+                ShowTeachingTip("修改完成，部分修改内容重启后生效");
+            }
+            else
+            {
+                ShowTeachingTip("演员保存地址修改完成");
+            }
+        }
+
         private async void ActorInfoSavePath_Click(object sender, RoutedEventArgs e)
         {
             var folder = await OpenFolder(PickerLocationId.PicturesLibrary);
@@ -226,8 +277,8 @@ namespace Display.Views
                 else
                 {
                     //修改地址
-                    ActorSavePath_TextBox.Text = folder.Path;
-                    AppSettings.ActorInfo_SavePath = folder.Path;
+                    ActorSavePathTextBox.Text = folder.Path;
+                    TryUpdateActorPath(folder.Path);
 
                 }
             }
@@ -246,7 +297,7 @@ namespace Display.Views
                 }
                 else
                 {
-                    SubSavePath_TextBox.Text = folder.Path;
+                    SubSavePathTextBox.Text = folder.Path;
                     AppSettings.Sub_SavePath = folder.Path;
                 }
             }
@@ -294,50 +345,50 @@ namespace Display.Views
 
         private void JavbusUrlChange_Button_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            AppSettings.JavBus_BaseUrl = JavbusUrl_TextBox.Text;
+            AppSettings.JavBus_BaseUrl = JavbusUrlTextBox.Text;
 
             ShowTeachingTip("修改完成");
         }
         private void Jav321Change_Button_Click(object sender, RoutedEventArgs e)
         {
-            AppSettings.Jav321_BaseUrl = Jav321Url_TextBox.Text;
+            AppSettings.Jav321_BaseUrl = Jav321UrlTextBox.Text;
 
             ShowTeachingTip("修改完成");
         }
         private void AvMooUrlChange_Button_Click(object sender, RoutedEventArgs e)
         {
-            AppSettings.AvMoo_BaseUrl = AvMooUrl_TextBox.Text;
+            AppSettings.AvMoo_BaseUrl = AvMooUrlTextBox.Text;
 
             ShowTeachingTip("修改完成");
         }
         private void AvSoxUrlChange_Button_Click(object sender, RoutedEventArgs e)
         {
-            AppSettings.AvSox_BaseUrl = AvSoxUrl_TextBox.Text;
+            AppSettings.AvSox_BaseUrl = AvSoxUrlTextBox.Text;
 
             ShowTeachingTip("修改完成");
         }
         private void LibreDmmUrlChange_Button_Click(object sender, RoutedEventArgs e)
         {
-            AppSettings.LibreDmm_BaseUrl = LibreDmm_TextBox.Text;
+            AppSettings.LibreDmm_BaseUrl = LibreDmmTextBox.Text;
 
             ShowTeachingTip("修改完成");
         }
         private void Fc2hubUrlChange_Button_Click(object sender, RoutedEventArgs e)
         {
-            AppSettings.Fc2hub_BaseUrl = Fc2hub_TextBox.Text;
+            AppSettings.Fc2hub_BaseUrl = Fc2HubTextBox.Text;
 
             ShowTeachingTip("修改完成");
         }
         private void JavDBUrlChange_Button_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            AppSettings.JavDB_BaseUrl = JavDBUrl_TextBox.Text;
+            AppSettings.JavDB_BaseUrl = JavDbUrlTextBox.Text;
 
             ShowTeachingTip("修改完成");
         }
 
         private void JavDBCookieChange_Button_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            AppSettings.javdb_Cookie = JavDBCookie_TextBox.Text;
+            AppSettings.javdb_Cookie = JavDbCookieTextBox.Text;
 
             GetInfoFromNetwork.IsJavDbCookieVisiable = true;
 
@@ -365,7 +416,7 @@ namespace Display.Views
                 }
                 else
                 {
-                    DataAccessSavePath_TextBox.Text = folder.Path;
+                    DataAccessSavePathTextBox.Text = folder.Path;
                     AppSettings.DataAccess_SavePath = folder.Path;
 
                     ContentDialog dialog = new();
@@ -511,46 +562,46 @@ namespace Display.Views
                 switch (e.AddedItems[0].ToString())
                 {
                     case "WebView":
-                        Resolution_RelativePanel.Visibility = Visibility.Collapsed;
-                        PlayerExePath_RelativePanel.Visibility = Visibility.Collapsed;
-                        FindSubFile_ToggleSwitch.IsEnabled = false;
+                        ResolutionRelativePanel.Visibility = Visibility.Collapsed;
+                        PlayerExePathRelativePanel.Visibility = Visibility.Collapsed;
+                        FindSubFileToggleSwitch.IsEnabled = false;
                         break;
                     case "MediaElement":
-                        Resolution_RelativePanel.Visibility = Visibility.Collapsed;
-                        PlayerExePath_RelativePanel.Visibility = Visibility.Collapsed;
-                        FindSubFile_ToggleSwitch.IsEnabled = true;
+                        ResolutionRelativePanel.Visibility = Visibility.Collapsed;
+                        PlayerExePathRelativePanel.Visibility = Visibility.Collapsed;
+                        FindSubFileToggleSwitch.IsEnabled = true;
                         break;
                     case "PotPlayer":
-                        resolutionSelectionCollection.Clear();
-                        resolutionSelectionCollection.Add("原画");
-                        resolutionSelection_ComboBox.SelectedIndex = 0;
-                        Resolution_RelativePanel.Visibility = Visibility.Visible;
-                        FindSubFile_ToggleSwitch.IsEnabled = true;
+                        _resolutionSelectionCollection.Clear();
+                        _resolutionSelectionCollection.Add("原画");
+                        ResolutionSelectionComboBox.SelectedIndex = 0;
+                        ResolutionRelativePanel.Visibility = Visibility.Visible;
+                        FindSubFileToggleSwitch.IsEnabled = true;
 
-                        PlayerExePath_RelativePanel.Visibility = Visibility.Visible;
+                        PlayerExePathRelativePanel.Visibility = Visibility.Visible;
 
-                        PlayerExePath_TextBox.Text = AppSettings.PotPlayerExePath;
+                        PlayerExePathTextBox.Text = AppSettings.PotPlayerExePath;
                         break;
                     case "mpv":
-                        resolutionSelectionCollection.Clear();
-                        resolutionSelectionCollection.Add("原画");
-                        resolutionSelection_ComboBox.SelectedIndex = 0;
-                        Resolution_RelativePanel.Visibility = Visibility.Visible;
+                        _resolutionSelectionCollection.Clear();
+                        _resolutionSelectionCollection.Add("原画");
+                        ResolutionSelectionComboBox.SelectedIndex = 0;
+                        ResolutionRelativePanel.Visibility = Visibility.Visible;
 
-                        FindSubFile_ToggleSwitch.IsEnabled = true;
+                        FindSubFileToggleSwitch.IsEnabled = true;
 
-                        PlayerExePath_RelativePanel.Visibility = Visibility.Collapsed;
+                        PlayerExePathRelativePanel.Visibility = Visibility.Collapsed;
 
                         //PlayerExePath_TextBox.Text = AppSettings.MpvExePath;
                         break;
                     case "vlc":
-                        resolutionSelectionCollection.Clear();
-                        resolutionSelectionCollection.Add("原画");
-                        resolutionSelection_ComboBox.SelectedIndex = 0;
-                        Resolution_RelativePanel.Visibility = Visibility.Visible;
-                        FindSubFile_ToggleSwitch.IsEnabled = true;
+                        _resolutionSelectionCollection.Clear();
+                        _resolutionSelectionCollection.Add("原画");
+                        ResolutionSelectionComboBox.SelectedIndex = 0;
+                        ResolutionRelativePanel.Visibility = Visibility.Visible;
+                        FindSubFileToggleSwitch.IsEnabled = true;
 
-                        PlayerExePath_RelativePanel.Visibility = Visibility.Collapsed;
+                        PlayerExePathRelativePanel.Visibility = Visibility.Collapsed;
 
                         //PlayerExePath_TextBox.Text = AppSettings.VlcExePath;
                         break;
@@ -562,7 +613,7 @@ namespace Display.Views
         {
             string openPath = string.Empty;
 
-            switch (PlayerSelection_ComboBox.SelectedIndex)
+            switch (PlayerSelectionComboBox.SelectedIndex)
             {
                 case 1:
                     openPath = Path.GetDirectoryName(AppSettings.PotPlayerExePath);
@@ -595,7 +646,7 @@ namespace Display.Views
             var file = await fileOpenPicker.PickSingleFileAsync();
             if (file != null)
             {
-                switch (PlayerSelection_ComboBox.SelectedIndex)
+                switch (PlayerSelectionComboBox.SelectedIndex)
                 {
                     case 1:
                         AppSettings.PotPlayerExePath = file.Path;
@@ -607,13 +658,13 @@ namespace Display.Views
                         //    AppSettings.VlcExePath = file.Path;
                         //    break;
                 }
-                PlayerExePath_TextBox.Text = file.Path;
+                PlayerExePathTextBox.Text = file.Path;
             }
         }
 
         private void BitCometSettingsSave_Click(object sender, RoutedEventArgs e)
         {
-            DownApiSettings bitCometSettings = checkBitCometSettingsFormat(BitCometDownApi_TextBox.Text);
+            DownApiSettings bitCometSettings = checkBitCometSettingsFormat(BitCometDownApiTextBox.Text);
 
             if (bitCometSettings == null)
                 return;
@@ -623,7 +674,7 @@ namespace Display.Views
 
         private async void BitCometSettingsCheck_Click(object sender, RoutedEventArgs e)
         {
-            DownApiSettings bitCometSettings = checkBitCometSettingsFormat(BitCometDownApi_TextBox.Text);
+            DownApiSettings bitCometSettings = checkBitCometSettingsFormat(BitCometDownApiTextBox.Text);
 
             if (bitCometSettings == null)
                 return;
@@ -713,6 +764,7 @@ namespace Display.Views
         private void ShowTeachingTip(string subtitle, string content = null)
         {
             LightDismissTeachingTip.Subtitle = subtitle;
+            LightDismissTeachingTip.IsLightDismissEnabled = true;
             if (content != null)
                 LightDismissTeachingTip.Content = content;
 
@@ -747,7 +799,7 @@ namespace Display.Views
                 }
                 else
                 {
-                    BitCometSavePath_TextBox.Text = folder.Path;
+                    BitCometSavePathTextBox.Text = folder.Path;
 
                     AppSettings.BitCometSavePath = folder.Path;
                 }
@@ -756,7 +808,7 @@ namespace Display.Views
 
         private async void Aria2SettingsCheck_Click(object sender, RoutedEventArgs e)
         {
-            DownApiSettings aria2Settings = checkAria2SettingsFormat(Aria2DownApi_TextBox.Text);
+            DownApiSettings aria2Settings = checkAria2SettingsFormat(Aria2DownApiTextBox.Text);
 
             if (aria2Settings == null)
                 return;
@@ -773,7 +825,7 @@ namespace Display.Views
 
         private void Aria2tSettingsSave_Click(object sender, RoutedEventArgs e)
         {
-            DownApiSettings aria2Settings = checkAria2SettingsFormat(Aria2DownApi_TextBox.Text);
+            DownApiSettings aria2Settings = checkAria2SettingsFormat(Aria2DownApiTextBox.Text);
 
             if (aria2Settings == null)
                 return;
@@ -891,7 +943,7 @@ namespace Display.Views
                 }
                 else
                 {
-                    Aria2SavePath_TextBox.Text = folder.Path;
+                    Aria2SavePathTextBox.Text = folder.Path;
 
                     AppSettings.Aria2SavePath = folder.Path;
                 }
@@ -910,13 +962,13 @@ namespace Display.Views
         private void Aria2SavePathClear_Click(object sender, RoutedEventArgs e)
         {
             AppSettings.Aria2SavePath = String.Empty;
-            Aria2SavePath_TextBox.Text = null;
+            Aria2SavePathTextBox.Text = null;
         }
 
         private void BitCometSavePathClear_Click(object sender, RoutedEventArgs e)
         {
             AppSettings.BitCometSavePath = String.Empty;
-            BitCometSavePath_TextBox.Text = null;
+            BitCometSavePathTextBox.Text = null;
         }
 
         public async static Task<StorageFolder> OpenFolder(PickerLocationId SuggestedStartLocation)

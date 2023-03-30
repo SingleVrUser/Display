@@ -23,7 +23,7 @@ public class IncrementallLoadActorInfoCollection : ObservableCollection<ActorInf
 
     public IncrementallLoadActorInfoCollection(Dictionary<string, bool> orderByList, int defaultAddCount = 40)
     {
-        this.defaultAddCount = defaultAddCount;
+        this._defaultAddCount = defaultAddCount;
 
         SetOrder(orderByList);
     }
@@ -70,10 +70,10 @@ public class IncrementallLoadActorInfoCollection : ObservableCollection<ActorInf
         return InnerLoadMoreItemsAsync(count).AsAsyncOperation();
     }
 
-    private int defaultAddCount = 40;
+    private readonly int _defaultAddCount = 30;
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        int getCount = await LoadData(defaultAddCount, Count);
+        int getCount = await LoadData(_defaultAddCount, Count);
 
 
         return new LoadMoreItemsResult

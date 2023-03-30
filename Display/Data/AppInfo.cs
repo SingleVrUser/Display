@@ -39,14 +39,14 @@ public static class AppInfo
     {
         GitHubInfo.ReleaseInfo result = null;
 
-        var Client = GetInfoFromNetwork.Client;
+        var client = GetInfoFromNetwork.Client;
 
         //设置超时时间（5s）
         var option = new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token;
 
         try
         {
-            var req = await Client.GetAsync(LatestReleaseUrl, option);
+            var req = await client.GetAsync(LatestReleaseUrl, option);
             if (req.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 var content = await req.Content.ReadAsStringAsync();
@@ -69,10 +69,10 @@ public static class AppInfo
     public static async Task<LatestReleaseCheck> GetLatestReleaseCheck()
     {
         //从Github中获取最新信息
-        var LatestReleaseInfo = await GetGithubLatestReleaseAsync();
-        if (LatestReleaseInfo == null)
+        var latestReleaseInfo = await GetGithubLatestReleaseAsync();
+        if (latestReleaseInfo == null)
             return null;
 
-        return new(LatestReleaseInfo);
+        return new LatestReleaseCheck(latestReleaseInfo);
     }
 }

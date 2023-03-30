@@ -56,10 +56,10 @@ public class IncrementallLoadFailInfoCollection : ObservableCollection<FailInfo>
         return InnerLoadMoreItemsAsync(count).AsAsyncOperation();
     }
 
-    private int defaultCount = 20;
+    private readonly int _defaultCount = 20;
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        int getCount = await LoadData(defaultCount, Count);
+        int getCount = await LoadData(_defaultCount, Count);
 
         return new LoadMoreItemsResult
         {

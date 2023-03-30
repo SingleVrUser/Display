@@ -264,7 +264,7 @@
                 </interactivity:Interaction.Behaviors>
 
                 <ListView.Header>
-                    <Grid MinHeight="30">
+                    <Grid MinHeight="30" Background="White">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition MinWidth="50" Width="*" />
                             <ColumnDefinition Width="200" />
