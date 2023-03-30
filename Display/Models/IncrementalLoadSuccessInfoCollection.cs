@@ -85,7 +85,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
         return InnerLoadMoreItemsAsync(count).AsAsyncOperation();
     }
 
-    public int defaultCount = 20;
+    public int defaultCount = 30;
 
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {

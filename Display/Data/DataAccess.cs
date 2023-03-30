@@ -1271,7 +1271,29 @@ namespace Display.Data
                 SqliteCommand selectCommand = new SqliteCommand
                     ($"update VideoInfo set imagepath = REPLACE(imagepath,'{srcPath}','{dstPath}')", db);
 
-                SqliteDataReader query = selectCommand.ExecuteReader();
+                selectCommand.ExecuteScalar();
+
+                db.Close();
+            }
+        }
+
+
+        /// <summary>
+        /// 更新演员头像地址
+        /// </summary>
+        /// <param Name="truename"></param>
+        /// <returns></returns>
+        public static void UpdateActorProfilePath(string srcPath, string dstPath)
+        {
+            using (SqliteConnection db =
+                   new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ($"update ActorInfo set prifile_path = REPLACE(prifile_path,'{srcPath}','{dstPath}')", db);
+
+                selectCommand.ExecuteScalar();
 
                 db.Close();
             }
@@ -1826,6 +1848,33 @@ namespace Display.Data
 
                 SqliteCommand selectCommand = new SqliteCommand
                     ($"SELECT imagepath from VideoInfo WHERE imagepath != '' limit 1", db);
+
+                SqliteDataReader query = selectCommand.ExecuteReader();
+                while (query.Read())
+                {
+                    imagePath = query.GetString(0);
+                }
+                db.Close();
+            }
+
+            return imagePath;
+        }
+
+
+        /// <summary>
+        /// 获取一张演员头像的地址
+        /// </summary>
+        /// <returns></returns>
+        public static string GetOneActorProfilePath()
+        {
+            string imagePath = "";
+            using (SqliteConnection db =
+                   new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                SqliteCommand selectCommand = new SqliteCommand
+                    ("SELECT prifile_path from ActorInfo WHERE prifile_path != '' limit 1", db);
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
                 while (query.Read())

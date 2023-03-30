@@ -5,19 +5,18 @@
     xmlns:local="using:Display.ContentsPage"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    mc:Ignorable="d">
 
 
     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="5">
         <TextBlock Margin="0,5" TextWrapping="Wrap" IsTextSelectionEnabled="True">
-                图片保存路径已从 
+                保存路径已从 
             <Run Foreground="OrangeRed" Text="{x:Bind srcPath}"/>
                 修改为 
             <Run Foreground="OrangeRed" Text="{x:Bind dstPath}"/>
         </TextBlock>
             
-        <TextBlock>数据文件的封面地址是否需要修改？</TextBlock>
+        <TextBlock>数据文件的地址是否需要修改？</TextBlock>
 
         <StackPanel Orientation="Horizontal" Spacing="5">
             <TextBox x:Name="srcPath_TextBox" Text="{x:Bind srcPath,Mode=TwoWay}" TextWrapping="Wrap"/>
