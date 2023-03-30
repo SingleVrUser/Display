@@ -191,23 +191,23 @@ namespace Display
             if (!AppSettings.IsCheckUpdate)
                 return;
 
-            var ReleaseCheck = await AppInfo.GetLatestReleaseCheck();
+            var releaseCheck = await AppInfo.GetLatestReleaseCheck();
 
-            if (ReleaseCheck == null) return;
+            if (releaseCheck == null) return;
 
             //可以升级且最新版本不是忽略的版本
-            if (!ReleaseCheck.CanUpdate || ReleaseCheck.LatestVersion == AppSettings.IgnoreUpdateAppVersion) return;
+            if (!releaseCheck.CanUpdate || releaseCheck.LatestVersion == AppSettings.IgnoreUpdateAppVersion) return;
 
             var dialog = new ContentDialog
             {
                 // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
                 Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
-                Title = "有新版本可升级",
-                PrimaryButtonText = "下载",
+                Title = "有新版本可更新",
+                PrimaryButtonText = "更新",
                 SecondaryButtonText = "忽略该版本",
                 CloseButtonText = "取消",
                 DefaultButton = ContentDialogButton.Primary,
-                Content = new ContentsPage.UpdateAppPage(ReleaseCheck),
+                Content = new ContentsPage.UpdateAppPage(releaseCheck),
                 XamlRoot = ((Page)ContentFrame.Content).XamlRoot
             };
 
@@ -217,17 +217,17 @@ namespace Display
             {
                 //下载
                 case ContentDialogResult.Primary:
-                    await Launcher.LaunchUriAsync(new Uri(ReleaseCheck.AppAsset.browser_download_url));
+                    var installUrl = $"ms-appinstaller:?source={releaseCheck.AppAsset.browser_download_url}";
+                    await Launcher.LaunchUriAsync(new Uri(installUrl));
                     break;
                 //忽略该版本
                 case ContentDialogResult.Secondary:
-                    AppSettings.IgnoreUpdateAppVersion = ReleaseCheck.LatestVersion;
+                    AppSettings.IgnoreUpdateAppVersion = releaseCheck.LatestVersion;
                     break;
                 case ContentDialogResult.None:
                 default:
                     return;
             }
-
         }
 
 
@@ -238,7 +238,7 @@ namespace Display
         /// <param Name="args"></param>
         private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            if (args.IsSettingsSelected == true)
+            if (args.IsSettingsSelected)
             {
                 NavView.Header = "设置";
                 NavView.SelectedItem = (NavigationViewItem)NavView.SettingsItem;
@@ -251,6 +251,7 @@ namespace Display
                 var navItemTag = args.SelectedItemContainer.Tag.ToString();
                 NavView_Navigate(navItemTag, args.RecommendedNavigationTransitionInfo);
             }
+            
         }
 
         /// <summary>

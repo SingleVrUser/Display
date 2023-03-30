@@ -11,7 +11,7 @@
 
     <Page.Resources>
         <Style TargetType="TextBlock"
-               x:Key="Title_TextBlock">
+               x:Key="TitleTextBlock">
             <Setter Property="FontSize"
                     Value="20" />
             <Setter Property="Margin"
@@ -20,7 +20,7 @@
                     Value="Center" />
         </Style>
         <Style TargetType="StackPanel"
-               x:Key="Options_StackPanel">
+               x:Key="OptionsStackPanel">
             <Setter Property="Margin"
                     Value="20,20,0,0" />
         </Style>
@@ -35,8 +35,6 @@
                     Value="Down" />
             <Setter Property="VerticalAlignment"
                     Value="Top" />
-            <Setter Property="IsExpanded"
-                    Value="False" />
         </Style>
         
         <Style TargetType="Pivot">
@@ -65,7 +63,7 @@
         <!--用户信息-->
         <StackPanel Orientation="Horizontal"
                     Padding="10,0">
-            <customcontrols:UserInfo x:Name="userInfoControl"
+            <customcontrols:UserInfo x:Name="UserInfoControl"
                                      UpdateClick="UpdateButton_Click"
                                      Loginlick="LoginButton_Click"
                                      LogoutClick="LogoutButton_Click"
@@ -179,7 +177,7 @@
                                 <RelativePanel>
                                     <TextBlock Text="记录下载请求"
                                                RelativePanel.AlignVerticalCenterWithPanel="True" />
-                                    <ToggleSwitch x:Name="IsRecordDownRequest_ToggleSwitch"
+                                    <ToggleSwitch x:Name="IsRecordDownRequestToggleSwitch"
                                                   OnContent="开启"
                                                   OffContent="关闭"
                                                   RelativePanel.AlignRightWithPanel="True"
@@ -187,19 +185,19 @@
                                                   IsOn="{x:Bind data:AppSettings.IsRecordDownRequest,Mode=TwoWay}" />
                                 </RelativePanel>
 
-                                <RelativePanel x:Name="RecordDownRequest_RelativePanel"
-                                               Visibility="{x:Bind IsRecordDownRequest_ToggleSwitch.IsOn,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}">
+                                <RelativePanel x:Name="RecordDownRequestRelativePanel"
+                                               Visibility="{x:Bind IsRecordDownRequestToggleSwitch.IsOn,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}">
                                     <TextBlock Text="下载链接失效时间"
                                                RelativePanel.AlignVerticalCenterWithPanel="True" />
 
-                                    <TextBlock x:Name="OverdueTime_TextBlock"
-                                               Text="{x:Bind data:FileMatch.ConvertDoubleToDateStr(OverdueTime_NumberBox.Value) ,Mode=OneWay}"
-                                               RelativePanel.LeftOf="OverdueTime_NumberBox"
+                                    <TextBlock x:Name="OverdueTimeTextBlock"
+                                               Text="{x:Bind data:FileMatch.ConvertDoubleToDateStr(OverdueTimeNumberBox.Value) ,Mode=OneWay}"
+                                               RelativePanel.LeftOf="OverdueTimeNumberBox"
                                                RelativePanel.AlignVerticalCenterWithPanel="True"
                                                Margin="10,0"
                                                Opacity="0.5" />
 
-                                    <NumberBox x:Name="OverdueTime_NumberBox"
+                                    <NumberBox x:Name="OverdueTimeNumberBox"
                                                SmallChange="60"
                                                LargeChange="3600"
                                                Minimum="0"
@@ -220,7 +218,7 @@
                                 <RelativePanel>
                                     <TextBlock Text="播放器"
                                                RelativePanel.AlignVerticalCenterWithPanel="True" />
-                                    <ComboBox x:Name="PlayerSelection_ComboBox"
+                                    <ComboBox x:Name="PlayerSelectionComboBox"
                                               RelativePanel.AlignRightWithPanel="True"
                                               SelectedIndex="{x:Bind data:AppSettings.PlayerSelection,Mode=TwoWay}"
                                               SelectionChanged="PlayerSelectionChanged">
@@ -232,29 +230,29 @@
                                     </ComboBox>
                                 </RelativePanel>
 
-                                <RelativePanel x:Name="Resolution_RelativePanel"
+                                <RelativePanel x:Name="ResolutionRelativePanel"
                                                Visibility="Collapsed">
                                     <TextBlock Text="清晰度"
                                                RelativePanel.AlignVerticalCenterWithPanel="True" />
-                                    <ComboBox x:Name="resolutionSelection_ComboBox"
-                                              ItemsSource="{x:Bind resolutionSelectionCollection,Mode=OneWay}"
+                                    <ComboBox x:Name="ResolutionSelectionComboBox"
+                                              ItemsSource="{x:Bind _resolutionSelectionCollection,Mode=OneWay}"
                                               RelativePanel.AlignRightWithPanel="True"
                                               SelectedIndex="0"
                                               IsEnabled="False" />
                                 </RelativePanel>
 
-                                <RelativePanel x:Name="PlayerExePath_RelativePanel"
+                                <RelativePanel x:Name="PlayerExePathRelativePanel"
                                                Visibility="Collapsed">
-                                    <TextBlock x:Name="PlayerExePath_Title"
+                                    <TextBlock x:Name="PlayerExePathTitle"
                                                RelativePanel.AlignVerticalCenterWithPanel="True"
                                                Margin="0,0,10,0">程序位置</TextBlock>
-                                    <TextBox x:Name="PlayerExePath_TextBox"
+                                    <TextBox x:Name="PlayerExePathTextBox"
                                              Width="600"
-                                             RelativePanel.RightOf="PlayerExePath_Title" />
+                                             RelativePanel.RightOf="PlayerExePathTitle" />
                                     <Button Content="修改"
-                                            RelativePanel.LeftOf="OpenPlayerExePath_Button"
+                                            RelativePanel.LeftOf="OpenPlayerExePathButton"
                                             Click="ModifyPlayerExePathButton_Click" />
-                                    <Button x:Name="OpenPlayerExePath_Button"
+                                    <Button x:Name="OpenPlayerExePathButton"
                                             Click="OpenPlayerExePathButton_Click"
                                             Content="打开路径"
                                             RelativePanel.AlignRightWithPanel="True"
@@ -263,11 +261,11 @@
 
                                 <RelativePanel Visibility="Visible">
 
-                                    <TextBlock x:Name="FindSubFile_Title"
+                                    <TextBlock x:Name="FindSubFileTitle"
                                                RelativePanel.AlignVerticalCenterWithPanel="True"
                                                Margin="0,0,10,0">加载字幕</TextBlock>
 
-                                    <ToggleSwitch x:Name="FindSubFile_ToggleSwitch"
+                                    <ToggleSwitch x:Name="FindSubFileToggleSwitch"
                                                   OnContent="启动"
                                                   OffContent="关闭"
                                                   IsOn="{x:Bind data:AppSettings.IsFindSub,Mode=TwoWay}"
@@ -338,14 +336,14 @@
                                         <StackPanel Padding="50,10"
                                                     Spacing="10">
                                             <RelativePanel>
-                                                <TextBlock x:Name="JavbusUrl_TextBlox"
+                                                <TextBlock x:Name="JavbusUrlTextBlox"
                                                            RelativePanel.AlignVerticalCenterWithPanel="True"
                                                            Margin="0,0,10,0">地址</TextBlock>
-                                                <TextBox x:Name="JavbusUrl_TextBox"
+                                                <TextBox x:Name="JavbusUrlTextBox"
                                                          Width="600"
-                                                         RelativePanel.RightOf="JavbusUrl_TextBlox"
+                                                         RelativePanel.RightOf="JavbusUrlTextBlox"
                                                          Text="{x:Bind data:AppSettings.JavBus_BaseUrl}" />
-                                                <Button x:Name="JavbusUrlChange_Button"
+                                                <Button x:Name="JavbusUrlChangeButton"
                                                         Click="JavbusUrlChange_Button_Click"
                                                         Content="修改"
                                                         RelativePanel.AlignRightWithPanel="True" />
@@ -363,14 +361,14 @@
                                         <StackPanel Padding="50,10"
                                                     Spacing="10">
                                             <RelativePanel>
-                                                <TextBlock x:Name="Jav321Url_TextBlox"
+                                                <TextBlock x:Name="Jav321UrlTextBlox"
                                                            RelativePanel.AlignVerticalCenterWithPanel="True"
                                                            Margin="0,0,10,0">地址</TextBlock>
-                                                <TextBox x:Name="Jav321Url_TextBox"
+                                                <TextBox x:Name="Jav321UrlTextBox"
                                                          Width="600"
-                                                         RelativePanel.RightOf="Jav321Url_TextBlox"
+                                                         RelativePanel.RightOf="Jav321UrlTextBlox"
                                                          Text="{x:Bind data:AppSettings.Jav321_BaseUrl}" />
-                                                <Button x:Name="Jav321Change_Button"
+                                                <Button x:Name="Jav321ChangeButton"
                                                         Click="Jav321Change_Button_Click"
                                                         Content="修改"
                                                         RelativePanel.AlignRightWithPanel="True" />
@@ -388,14 +386,14 @@
                                         <StackPanel Padding="50,10"
                                                     Spacing="10">
                                             <RelativePanel>
-                                                <TextBlock x:Name="AvMooUrl_TextBlox"
+                                                <TextBlock x:Name="AvMooUrlTextBlox"
                                                            RelativePanel.AlignVerticalCenterWithPanel="True"
                                                            Margin="0,0,10,0">地址</TextBlock>
-                                                <TextBox x:Name="AvMooUrl_TextBox"
+                                                <TextBox x:Name="AvMooUrlTextBox"
                                                          Width="600"
-                                                         RelativePanel.RightOf="AvMooUrl_TextBlox"
+                                                         RelativePanel.RightOf="AvMooUrlTextBlox"
                                                          Text="{x:Bind data:AppSettings.AvMoo_BaseUrl}" />
-                                                <Button x:Name="AvMooUrlChange_Button"
+                                                <Button x:Name="AvMooUrlChangeButton"
                                                         Click="AvMooUrlChange_Button_Click"
                                                         Content="修改"
                                                         RelativePanel.AlignRightWithPanel="True" />
@@ -413,14 +411,14 @@
                                         <StackPanel Padding="50,10"
                                                     Spacing="10">
                                             <RelativePanel>
-                                                <TextBlock x:Name="AvSoxUrl_TextBlox"
+                                                <TextBlock x:Name="AvSoxUrlTextBlox"
                                                            RelativePanel.AlignVerticalCenterWithPanel="True"
                                                            Margin="0,0,10,0">地址</TextBlock>
-                                                <TextBox x:Name="AvSoxUrl_TextBox"
+                                                <TextBox x:Name="AvSoxUrlTextBox"
                                                          Width="600"
-                                                         RelativePanel.RightOf="AvSoxUrl_TextBlox"
+                                                         RelativePanel.RightOf="AvSoxUrlTextBlox"
                                                          Text="{x:Bind data:AppSettings.AvSox_BaseUrl}" />
-                                                <Button x:Name="AvSoxUrlChange_Button"
+                                                <Button x:Name="AvSoxUrlChangeButton"
                                                         Click="AvSoxUrlChange_Button_Click"
                                                         Content="修改"
                                                         RelativePanel.AlignRightWithPanel="True" />
@@ -439,14 +437,14 @@
                                         <StackPanel Padding="50,10"
                                                     Spacing="10">
                                             <RelativePanel>
-                                                <TextBlock x:Name="LibreDmm_TextBlox"
+                                                <TextBlock x:Name="LibreDmmTextBlox"
                                                            RelativePanel.AlignVerticalCenterWithPanel="True"
                                                            Margin="0,0,10,0">地址</TextBlock>
-                                                <TextBox x:Name="LibreDmm_TextBox"
+                                                <TextBox x:Name="LibreDmmTextBox"
                                                          Width="600"
-                                                         RelativePanel.RightOf="LibreDmm_TextBlox"
+                                                         RelativePanel.RightOf="LibreDmmTextBlox"
                                                          Text="{x:Bind data:AppSettings.LibreDmm_BaseUrl}" />
-                                                <Button x:Name="LibreDmmUrlChange_Button"
+                                                <Button x:Name="LibreDmmUrlChangeButton"
                                                         Click="LibreDmmUrlChange_Button_Click"
                                                         Content="修改"
                                                         RelativePanel.AlignRightWithPanel="True" />
@@ -464,14 +462,14 @@
                                         <StackPanel Padding="50,10"
                                                     Spacing="10">
                                             <RelativePanel>
-                                                <TextBlock x:Name="Fc2hub_TextBlox"
+                                                <TextBlock x:Name="Fc2HubTextBlox"
                                                            RelativePanel.AlignVerticalCenterWithPanel="True"
                                                            Margin="0,0,10,0">地址</TextBlock>
-                                                <TextBox x:Name="Fc2hub_TextBox"
+                                                <TextBox x:Name="Fc2HubTextBox"
                                                          Width="600"
-                                                         RelativePanel.RightOf="Fc2hub_TextBlox"
+                                                         RelativePanel.RightOf="Fc2HubTextBlox"
                                                          Text="{x:Bind data:AppSettings.Fc2hub_BaseUrl}" />
-                                                <Button x:Name="Fc2hubUrlChange_Button"
+                                                <Button x:Name="Fc2HubUrlChangeButton"
                                                         Click="Fc2hubUrlChange_Button_Click"
                                                         Content="修改"
                                                         RelativePanel.AlignRightWithPanel="True" />
@@ -489,28 +487,28 @@
                                         <StackPanel Spacing="5"
                                                     Padding="50,10">
                                             <RelativePanel>
-                                                <TextBlock x:Name="JavDBUrl_TextBlox"
+                                                <TextBlock x:Name="JavDbUrlTextBlox"
                                                            RelativePanel.AlignVerticalCenterWithPanel="True"
                                                            Margin="0,0,10,0"
                                                            Width="50">地址</TextBlock>
-                                                <TextBox x:Name="JavDBUrl_TextBox"
+                                                <TextBox x:Name="JavDbUrlTextBox"
                                                          Width="600"
-                                                         RelativePanel.RightOf="JavDBUrl_TextBlox"
+                                                         RelativePanel.RightOf="JavDbUrlTextBlox"
                                                          Text="{x:Bind data:AppSettings.JavDB_BaseUrl}" />
-                                                <Button x:Name="JavDBUrlChange_Button"
+                                                <Button x:Name="JavDbUrlChangeButton"
                                                         Click="JavDBUrlChange_Button_Click"
                                                         Content="修改"
                                                         RelativePanel.AlignRightWithPanel="True" />
                                             </RelativePanel>
 
                                             <RelativePanel>
-                                                <TextBlock x:Name="JavDBCookie_TextBlox"
+                                                <TextBlock x:Name="JavDbCookieTextBlox"
                                                            RelativePanel.AlignVerticalCenterWithPanel="True"
                                                            Margin="0,0,10,0"
                                                            Width="50">Cookie</TextBlock>
-                                                <TextBox x:Name="JavDBCookie_TextBox"
+                                                <TextBox x:Name="JavDbCookieTextBox"
                                                          Width="600"
-                                                         RelativePanel.RightOf="JavDBCookie_TextBlox"
+                                                         RelativePanel.RightOf="JavDbCookieTextBlox"
                                                          Text="{x:Bind data:AppSettings.javdb_Cookie}">
                                                     <ToolTipService.ToolTip>
                                                         <TextBlock>
@@ -518,7 +516,7 @@
                                                         </TextBlock>
                                                     </ToolTipService.ToolTip>
                                                 </TextBox>
-                                                <Button x:Name="JavDBCookieChange_Button"
+                                                <Button x:Name="JavDbCookieChangeButton"
                                                         Click="JavDBCookieChange_Button_Click"
                                                         Content="修改"
                                                         RelativePanel.AlignRightWithPanel="True" />
@@ -548,14 +546,30 @@
                                     </Style>
                                 </StackPanel.Resources>
 
+                                <RelativePanel>
+                                    <TextBlock x:Name="DataAccessTextBlox"
+                                               RelativePanel.AlignVerticalCenterWithPanel="True"
+                                               Margin="0,0,10,0">数据</TextBlock>
+                                    <TextBox x:Name="DataAccessSavePathTextBox"
+                                             Width="600"
+                                             RelativePanel.RightOf="DataAccessTextBlox" />
+                                    <Button Click="DataAccessSavePath_Click"
+                                            Content="修改"
+                                            RelativePanel.LeftOf="DataAccessOpenPathButton" />
+                                    <Button x:Name="DataAccessOpenPathButton"
+                                            Click="DataAccessOpenPath_Click"
+                                            Content="打开路径"
+                                            RelativePanel.AlignRightWithPanel="True"
+                                            Margin="3,0,0,0" />
+                                </RelativePanel>
 
                                 <RelativePanel>
-                                    <TextBlock x:Name="Image_TextBlox"
+                                    <TextBlock x:Name="ImageTextBlox"
                                                RelativePanel.AlignVerticalCenterWithPanel="True"
                                                Margin="0,0,10,0">图片</TextBlock>
-                                    <TextBox x:Name="ImageSavePath_TextBox"
+                                    <TextBox x:Name="ImageSavePathTextBox"
                                              Width="600"
-                                             RelativePanel.RightOf="Image_TextBlox"
+                                             RelativePanel.RightOf="ImageTextBlox"
                                              Text="{x:Bind data:AppSettings.Image_SavePath}" />
                                     <Button Click="ImageSavePath_Click"
                                             Content="修改"
@@ -567,30 +581,14 @@
                                             Margin="3,0,0,0" />
                                 </RelativePanel>
 
-                                <RelativePanel>
-                                    <TextBlock x:Name="DataAccess_TextBlox"
-                                               RelativePanel.AlignVerticalCenterWithPanel="True"
-                                               Margin="0,0,10,0">数据</TextBlock>
-                                    <TextBox x:Name="DataAccessSavePath_TextBox"
-                                             Width="600"
-                                             RelativePanel.RightOf="DataAccess_TextBlox" />
-                                    <Button Click="DataAccessSavePath_Click"
-                                            Content="修改"
-                                            RelativePanel.LeftOf="DataAccessOpenPath_Button" />
-                                    <Button x:Name="DataAccessOpenPath_Button"
-                                            Click="DataAccessOpenPath_Click"
-                                            Content="打开路径"
-                                            RelativePanel.AlignRightWithPanel="True"
-                                            Margin="3,0,0,0" />
-                                </RelativePanel>
 
                                 <RelativePanel>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock x:Name="ActorInfo_TextBlox"
+                                        <TextBlock x:Name="ActorInfoTextBlox"
                                                    VerticalAlignment="Center"
-                                                   Margin="0,0,10,0">演员信息</TextBlock>
-                                        <TextBox x:Name="ActorSavePath_TextBox"
-                                                 Width="570"
+                                                   Margin="0,0,10,0">演员</TextBlock>
+                                        <TextBox x:Name="ActorSavePathTextBox"
+                                                 Width="600"
                                                  Text="{x:Bind data:AppSettings.ActorInfo_SavePath}" />
                                     </StackPanel>
 
@@ -607,11 +605,11 @@
 
                                 <RelativePanel>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock x:Name="Sub_TextBlox"
+                                        <TextBlock x:Name="SubTextBlox"
                                                    VerticalAlignment="Center"
-                                                   Margin="0,0,10,0">字幕文件</TextBlock>
-                                        <TextBox x:Name="SubSavePath_TextBox"
-                                                 Width="570"
+                                                   Margin="0,0,10,0">字幕</TextBlock>
+                                        <TextBox x:Name="SubSavePathTextBox"
+                                                 Width="600"
                                                  Text="{x:Bind data:AppSettings.Sub_SavePath}" />
                                     </StackPanel>
 
@@ -651,7 +649,7 @@
                                                            VerticalAlignment="Center">远程下载接口</TextBlock>
                                                 <TextBox PlaceholderText="http://用户名:密码@IP地址:监听端口，例:http://admin:123@127.0.0.1:1235"
                                                          Text="{x:Bind data:AppSettings.BitCometSettings.ApiUrl}"
-                                                         x:Name="BitCometDownApi_TextBox"
+                                                         x:Name="BitCometDownApiTextBox"
                                                          Width="540" />
                                                 <customcontrols:StatusShow HorizontalAlignment="Right"
                                                                            x:Name="BitCometCheckStatus"
@@ -671,10 +669,10 @@
 
                                         <RelativePanel Padding="50,0">
                                             <StackPanel Orientation="Horizontal">
-                                                <TextBlock x:Name="BitCometSavePath_TextBlox"
+                                                <TextBlock x:Name="BitCometSavePathTextBlox"
                                                            VerticalAlignment="Center"
                                                            Margin="0,0,10,0">保存路径</TextBlock>
-                                                <TextBox x:Name="BitCometSavePath_TextBox"
+                                                <TextBox x:Name="BitCometSavePathTextBox"
                                                          Width="570"
                                                          Text="{x:Bind data:AppSettings.BitCometSavePath}" />
                                             </StackPanel>
@@ -688,7 +686,7 @@
                                                         Content="删除" />
                                                 <Button Click="BitCometSavePathOpen_Click"
                                                         Content="打开路径"
-                                                        x:Name="BitCometSavePath_Button"
+                                                        x:Name="BitCometSavePathButton"
                                                         Margin="3,0,0,0" />
                                             </StackPanel>
                                         </RelativePanel>
@@ -707,7 +705,7 @@
                                                            VerticalAlignment="Center">远程下载接口</TextBlock>
                                                 <TextBox PlaceholderText="http://token:{secret}@{IP地址}:{监听端口}/jsonrpc，例:http://token:secret142@127.0.0.1:6800/jsonrpc"
                                                          Text="{x:Bind data:AppSettings.Aria2Settings.ApiUrl}"
-                                                         x:Name="Aria2DownApi_TextBox"
+                                                         x:Name="Aria2DownApiTextBox"
                                                          Width="650" />
                                                 <customcontrols:StatusShow HorizontalAlignment="Right"
                                                                            x:Name="Aria2CheckStatus"
@@ -729,7 +727,7 @@
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock VerticalAlignment="Center"
                                                            Margin="0,0,10,0">保存路径</TextBlock>
-                                                <TextBox x:Name="Aria2SavePath_TextBox"
+                                                <TextBox x:Name="Aria2SavePathTextBox"
                                                          Width="680"
                                                          Text="{x:Bind data:AppSettings.Aria2SavePath}" />
                                             </StackPanel>
@@ -742,7 +740,7 @@
                                                         Content="删除" />
                                                 <Button Click="Aria2SavePathOpen_Click"
                                                         Content="打开路径"
-                                                        x:Name="Aria2SavePath_Button"
+                                                        x:Name="Aria2SavePathButton"
                                                         Margin="3,0,0,0" />
                                             </StackPanel>
                                         </RelativePanel>

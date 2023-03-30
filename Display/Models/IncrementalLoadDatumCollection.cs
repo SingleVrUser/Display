@@ -113,10 +113,10 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         return InnerLoadMoreItemsAsync(count).AsAsyncOperation();
     }
 
-    private int defaultCount = 40;
+    private readonly int _defaultCount = 30;
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        int getCount = HasMoreItems ? await LoadData(defaultCount, Count) : 0;
+        int getCount = HasMoreItems ? await LoadData(_defaultCount, Count) : 0;
 
         return new LoadMoreItemsResult
         {

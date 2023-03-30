@@ -663,7 +663,7 @@ namespace Display.Data
                 if (_imagepath == value) return;
 
                 string path = value;
-                _imagepath = !string.IsNullOrEmpty(path) ? path : Data.Const.NoPictruePath;
+                _imagepath = !string.IsNullOrEmpty(path) ? path : Const.NoPictruePath;
                 OnPropertyChanged();
             }
         }

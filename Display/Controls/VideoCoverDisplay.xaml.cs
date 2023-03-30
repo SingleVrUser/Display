@@ -130,13 +130,13 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// 显示的数据
     /// 用于增量显示，成功列表
     /// </summary>
-    private Models.IncrementalLoadSuccessInfoCollection _successInfocollection;
+    private Models.IncrementalLoadSuccessInfoCollection _successInfoCollection;
     public Models.IncrementalLoadSuccessInfoCollection SuccessInfoCollection
     {
-        get => _successInfocollection;
+        get => _successInfoCollection;
         set
         {
-            _successInfocollection = value;
+            _successInfoCollection = value;
 
             OnPropertyChanged();
         }

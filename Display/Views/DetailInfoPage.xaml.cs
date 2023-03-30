@@ -39,23 +39,13 @@ namespace Display.Views
         {
             base.OnNavigatedTo(e);
 
-            if (e.Parameter is VideoCoverDisplayClass detailinfo)
-            {
-                DetailInfo = detailinfo;
-            }
-            else if (e.Parameter is VideoInfo videoinfo)
-            {
-                DetailInfo = new(videoinfo, 500, 300);
-            }
-
             var anim = ConnectedAnimationService.GetForCurrentView().GetAnimation("ForwardConnectedAnimation");
             if (anim != null)
             {
                 anim.TryStart(VideoDetailsControl.Cover_Image);
 
-
                 //有动画，动画完成后监听Cover_Grid（封面显示播放按钮）
-                anim.Completed += (sendre, args) => VideoDetailsControl.StartListCover_GridTapped();
+                anim.Completed += (_, _) => VideoDetailsControl.StartListCover_GridTapped();
             }
             else
             {
@@ -63,6 +53,12 @@ namespace Display.Views
                 VideoDetailsControl.StartListCover_GridTapped();
             }
 
+            DetailInfo = e.Parameter switch
+            {
+                VideoCoverDisplayClass detailinfo => detailinfo,
+                VideoInfo videoinfo => new(videoinfo, 500, 300),
+                _ => DetailInfo
+            };
         }
 
         // Create connected animation back to collection page.

@@ -70,7 +70,7 @@ namespace MediaPlayerElement_Test.Models
                     _inputStream = null;
                 }
 
-                Debug.WriteLine("Seek: {0:N0} -> {1:N0}", Position, position);
+                //Debug.WriteLine("Seek: {0:N0} -> {1:N0}", Position, position);
                 Position = position;
             }
         }
@@ -129,13 +129,22 @@ namespace MediaPlayerElement_Test.Models
                     return default;
                 }
 
-                var result = await _inputStream.ReadAsync(buffer, count, options).AsTask(cancellationToken, progress).ConfigureAwait(false);
+                try
+                {
 
-                // Move position forward.
-                Position += result.Length;
-                Debug.WriteLine("requestedPosition = {0:N0}", Position);
-                return result;
+                    var result = await _inputStream.ReadAsync(buffer, count, options).AsTask(cancellationToken, progress).ConfigureAwait(false);
 
+                    // Move position forward.
+                    Position += result.Length;
+                    //Debug.WriteLine("requestedPosition = {0:N0}", Position);
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+
+                return default;
             });
         }
 
@@ -197,7 +206,7 @@ namespace MediaPlayerElement_Test.Models
 
             _size = response.Content?.Headers?.ContentLength ?? 0;
 
-            Debug.WriteLine($"总大小：{_size}");
+            //Debug.WriteLine($"总大小：{_size}");
 
             if (string.IsNullOrEmpty(_etagHeader) && response.Headers.ContainsKey("ETag"))
             {
