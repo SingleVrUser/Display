@@ -142,14 +142,14 @@ public class Quality
 
 public class Player
 {
-    public WebApi.playMethod PlayMethod;
+    public WebApi.PlayMethod PlayMethod;
 
     public string Name => PlayMethod.ToString();
 
     public string Url { get; set; }
     public string PickCode { get; set; }
 
-    public Player(WebApi.playMethod playerMethod, string url = null, string pickCode = null)
+    public Player(WebApi.PlayMethod playerMethod, string url = null, string pickCode = null)
     {
         this.PlayMethod = playerMethod;
 

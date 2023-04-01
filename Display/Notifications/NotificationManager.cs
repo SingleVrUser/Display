@@ -69,6 +69,8 @@ internal class NotificationManager
 
     public bool DispatchNotification(AppNotificationActivatedEventArgs notificationActivatedEventArgs)
     {
+        if (!notificationActivatedEventArgs.Arguments.ContainsKey(Common.notificationTag)) return false;
+
         var notificationId = notificationActivatedEventArgs.Arguments[Common.notificationTag];
         if (notificationId.Length != 0)
         {

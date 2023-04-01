@@ -94,7 +94,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
         //先原画
         List<Quality> QualityItemsSource = new() { new("原画", pickCode: PickCode) };
-        var m3u8InfoList = await webApi.Getm3u8InfoByPickCode(PickCode);
+        var m3u8InfoList = await webApi.GetM3U8InfoByPickCode(PickCode);
         string url = null;
         //有m3u8
         if (m3u8InfoList != null && m3u8InfoList.Count > 0)
@@ -118,9 +118,9 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         mediaTransportControls.SetQuality(QualityItemsSource, this.Resources["QualityDataTemplate"] as DataTemplate);
 
         //设置播放器
-        List<Player> playerItemsSource = new() { new Player(WebApi.playMethod.vlc, pickCode: PickCode),
-                                            new(WebApi.playMethod.mpv, pickCode: PickCode),
-                                            new(WebApi.playMethod.pot, pickCode: PickCode)};
+        List<Player> playerItemsSource = new() { new Player(WebApi.PlayMethod.vlc, pickCode: PickCode),
+                                            new(WebApi.PlayMethod.mpv, pickCode: PickCode),
+                                            new(WebApi.PlayMethod.pot, pickCode: PickCode)};
         mediaTransportControls.SetPlayer(playerItemsSource, this.Resources["PlayerDataTemplate"] as DataTemplate);
 
         //设置喜欢、稍后观看
@@ -475,7 +475,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
         webApi ??= WebApi.GlobalWebApi;
 
-        await webApi.PlayVideoWithOriginUrl(player.PickCode, player.PlayMethod, this.XamlRoot, SubInfo);
+        await webApi.PlayVideoWithPlayer(player.PickCode, player.PlayMethod, this.XamlRoot, SubInfo);
     }
 
     private async void ShowTeachingTip(string subTitle)
