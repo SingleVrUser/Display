@@ -22,7 +22,7 @@ namespace Display.Data
         /// <summary>
         /// 数据库表初始化
         /// </summary>
-        public async static Task InitializeDatabase(string DataAccess_SavePath = null)
+        public static async Task InitializeDatabase(string DataAccess_SavePath = null)
         {
             if (DataAccess_SavePath == null)
             {
@@ -1414,7 +1414,7 @@ namespace Display.Data
                 SqliteDataReader query = selectCommand.ExecuteReader();
                 while (query.Read())
                 {
-                    data = ConvertQueryTovideoInfo(query);
+                    data = ConvertQueryToVideoInfo(query);
                 }
 
                 db.Close();
@@ -1428,7 +1428,7 @@ namespace Display.Data
         /// </summary>
         /// <param Name="truename"></param>
         /// <returns></returns>
-        public static List<String> SelectTrueName(string truename)
+        public static List<string> SelectTrueName(string truename)
         {
             List<String> entries = new List<string>();
 
@@ -1560,6 +1560,30 @@ namespace Display.Data
             return data;
         }
 
+        public static string GetFileNameFromPickCode(string pc)
+        {
+            string fileName = null;
+
+            using (SqliteConnection db =
+                   new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                var selectCommand = new SqliteCommand
+                    ($"SELECT n from FilesInfo WHERE pc == '{pc}' LIMIT 1", db);
+
+                var query = selectCommand.ExecuteScalar();
+
+                if (query != null)
+                {
+                    fileName = query.ToString();
+                }
+
+                db.Close();
+            }
+
+            return fileName;
+        }
 
         /// <summary>
         /// 查询失败列表（Datum格式）
@@ -1716,6 +1740,7 @@ namespace Display.Data
 
             return count;
         }
+
 
 
         public static int CheckFailDatumFilesCount(string n = "", FailType showType = FailType.All)
@@ -2149,7 +2174,7 @@ namespace Display.Data
 
                 while (query.Read())
                 {
-                    data.Add(ConvertQueryTovideoInfo(query));
+                    data.Add(ConvertQueryToVideoInfo(query));
                 }
 
                 db.Close();
@@ -2239,7 +2264,7 @@ namespace Display.Data
         /// <returns></returns>
         public static string GetLatestFolderPid(string pickCode, int timeEdit = 0)
         {
-            string pid = String.Empty;
+            string pid = string.Empty;
 
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
@@ -2306,7 +2331,7 @@ namespace Display.Data
 
                 while (query.Read())
                 {
-                    data.Add(ConvertQueryTovideoInfo(query));
+                    data.Add(ConvertQueryToVideoInfo(query));
                 }
 
                 db.Close();
@@ -2348,7 +2373,7 @@ namespace Display.Data
 
                 while (query.Read())
                 {
-                    data.Add(ConvertQueryTovideoInfo(query));
+                    data.Add(ConvertQueryToVideoInfo(query));
                 }
 
                 db.Close();
@@ -2391,7 +2416,7 @@ namespace Display.Data
 
                 while (query.Read())
                 {
-                    data.Add(ConvertQueryTovideoInfo(query));
+                    data.Add(ConvertQueryToVideoInfo(query));
                 }
 
                 db.Close();
@@ -2428,7 +2453,7 @@ namespace Display.Data
 
                 while (query.Read())
                 {
-                    data.Add(ConvertQueryTovideoInfo(query));
+                    data.Add(ConvertQueryToVideoInfo(query));
                 }
 
                 db.Close();
@@ -2682,7 +2707,7 @@ namespace Display.Data
         /// </summary>
         /// <param Name="cid"></param>
         /// <returns></returns>
-        public static DownInfo GetDownHistoryBypcAndua(string picoCode, string ua)
+        public static DownInfo GetDownHistoryByPcAndUa(string picoCode, string ua)
         {
             DownInfo data = null;
 
@@ -2789,7 +2814,7 @@ namespace Display.Data
 
                 while (query.Read())
                 {
-                    data.Add(ConvertQueryTovideoInfo(query));
+                    data.Add(ConvertQueryToVideoInfo(query));
                 }
 
                 db.Close();
@@ -2822,7 +2847,7 @@ namespace Display.Data
 
                 while (query.Read())
                 {
-                    data.Add(ConvertQueryTovideoInfo(query));
+                    data.Add(ConvertQueryToVideoInfo(query));
                 }
 
                 db.Close();
@@ -2854,7 +2879,7 @@ namespace Display.Data
 
                 while (query.Read())
                 {
-                    data.Add(ConvertQueryTovideoInfo(query));
+                    data.Add(ConvertQueryToVideoInfo(query));
                 }
 
                 db.Close();
@@ -2888,7 +2913,7 @@ namespace Display.Data
 
                 while (query.Read())
                 {
-                    data.Add(ConvertQueryTovideoInfo(query));
+                    data.Add(ConvertQueryToVideoInfo(query));
                 }
                 db.Close();
             }
@@ -2972,7 +2997,7 @@ namespace Display.Data
         /// </summary>
         /// <param Name="query"></param>
         /// <returns></returns>
-        private static VideoInfo ConvertQueryTovideoInfo(SqliteDataReader query)
+        private static VideoInfo ConvertQueryToVideoInfo(SqliteDataReader query)
         {
             VideoInfo dataInfo = new VideoInfo();
             dataInfo.truename = query["truename"] as string;

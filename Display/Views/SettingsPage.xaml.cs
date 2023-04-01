@@ -28,7 +28,7 @@ namespace Display.Views
     /// </summary>
     public sealed partial class SettingsPage : Page
     {
-        ObservableCollection<string> _resolutionSelectionCollection = new();
+        private readonly ObservableCollection<string> _resolutionSelectionCollection = new();
 
         private static WebApi _webapi;
 
@@ -65,6 +65,18 @@ namespace Display.Views
             //infobar.IsOpen = WebApi.isEnterHiddenMode != true;
 
             DataAccessSavePathTextBox.Text = AppSettings.DataAccess_SavePath;
+
+            _resolutionSelectionCollection.Add("M3U8");
+            _resolutionSelectionCollection.Add("原画");
+            ResolutionSelectionComboBox.SelectedIndex = AppSettings.DefaultPlayQuality;
+            ResolutionSelectionComboBox.SelectionChanged += ResolutionSelectionComboBox_SelectionChanged;
+        }
+
+        private static void ResolutionSelectionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is not ComboBox comboBox) return;
+
+            AppSettings.DefaultPlayQuality = comboBox.SelectedIndex;
         }
 
         private void updateUserInfo()
@@ -77,7 +89,7 @@ namespace Display.Views
             UserInfoControl.status = WebApi.UserInfo == null ? "NoLogin" : "Login";
         }
 
-        private void LoginButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             //显示登录窗口
             WindowView.LoginWindow loginWindow = new WindowView.LoginWindow();
@@ -557,80 +569,85 @@ namespace Display.Views
 
         private void PlayerSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (e.AddedItems.Count != 0)
+            if (e.AddedItems.Count == 0) return;
+
+            switch (e.AddedItems[0].ToString())
             {
-                switch (e.AddedItems[0].ToString())
-                {
-                    case "WebView":
-                        ResolutionRelativePanel.Visibility = Visibility.Collapsed;
-                        PlayerExePathRelativePanel.Visibility = Visibility.Collapsed;
-                        FindSubFileToggleSwitch.IsEnabled = false;
-                        break;
-                    case "MediaElement":
-                        ResolutionRelativePanel.Visibility = Visibility.Collapsed;
-                        PlayerExePathRelativePanel.Visibility = Visibility.Collapsed;
-                        FindSubFileToggleSwitch.IsEnabled = true;
-                        break;
-                    case "PotPlayer":
-                        _resolutionSelectionCollection.Clear();
-                        _resolutionSelectionCollection.Add("原画");
-                        ResolutionSelectionComboBox.SelectedIndex = 0;
-                        ResolutionRelativePanel.Visibility = Visibility.Visible;
-                        FindSubFileToggleSwitch.IsEnabled = true;
+                case "WebView":
+                    ResolutionRelativePanel.Visibility = Visibility.Collapsed;
+                    PlayerExePathRelativePanel.Visibility = Visibility.Collapsed;
+                    FindSubFileToggleSwitch.IsEnabled = false;
+                    break;
+                case "MediaElement":
+                    ResolutionRelativePanel.Visibility = Visibility.Collapsed;
+                    PlayerExePathRelativePanel.Visibility = Visibility.Collapsed;
+                    FindSubFileToggleSwitch.IsEnabled = true;
+                    break;
+                case "PotPlayer":
+                    ResolutionRelativePanel.Visibility = Visibility.Visible;
+                    FindSubFileToggleSwitch.IsEnabled = true;
 
-                        PlayerExePathRelativePanel.Visibility = Visibility.Visible;
+                    PlayerExePathRelativePanel.Visibility = Visibility.Visible;
 
-                        PlayerExePathTextBox.Text = AppSettings.PotPlayerExePath;
-                        break;
-                    case "mpv":
-                        _resolutionSelectionCollection.Clear();
-                        _resolutionSelectionCollection.Add("原画");
-                        ResolutionSelectionComboBox.SelectedIndex = 0;
-                        ResolutionRelativePanel.Visibility = Visibility.Visible;
+                    PlayerExePathTextBox.Text = AppSettings.PotPlayerExePath;
+                    break;
+                case "mpv":
+                    ResolutionRelativePanel.Visibility = Visibility.Visible;
 
-                        FindSubFileToggleSwitch.IsEnabled = true;
+                    FindSubFileToggleSwitch.IsEnabled = true;
 
-                        PlayerExePathRelativePanel.Visibility = Visibility.Collapsed;
+                    PlayerExePathRelativePanel.Visibility = Visibility.Visible;
+                    PlayerExePathTextBox.Text = AppSettings.MpvExePath;
+                    break;
+                case "vlc":
+                    ResolutionRelativePanel.Visibility = Visibility.Visible;
+                    FindSubFileToggleSwitch.IsEnabled = true;
 
-                        //PlayerExePath_TextBox.Text = AppSettings.MpvExePath;
-                        break;
-                    case "vlc":
-                        _resolutionSelectionCollection.Clear();
-                        _resolutionSelectionCollection.Add("原画");
-                        ResolutionSelectionComboBox.SelectedIndex = 0;
-                        ResolutionRelativePanel.Visibility = Visibility.Visible;
-                        FindSubFileToggleSwitch.IsEnabled = true;
-
-                        PlayerExePathRelativePanel.Visibility = Visibility.Collapsed;
-
-                        //PlayerExePath_TextBox.Text = AppSettings.VlcExePath;
-                        break;
-                }
+                    PlayerExePathRelativePanel.Visibility = Visibility.Visible;
+                    PlayerExePathTextBox.Text = AppSettings.VlcExePath;
+                    break;
             }
+        }
+
+        private void ReSetPlayerExePathButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            string exePath;
+            switch (PlayerSelectionComboBox.SelectedIndex)
+            {
+                case 1:
+                    exePath = string.Empty;
+                    AppSettings.PotPlayerExePath = exePath;
+                    PlayerExePathTextBox.Text = exePath;
+                    break;
+                case 2:
+                    exePath = "mpv";
+                    AppSettings.MpvExePath = exePath;
+                    PlayerExePathTextBox.Text = exePath;
+                    break;
+                case 3:
+                    exePath = "vlc";
+                    AppSettings.VlcExePath = exePath;
+                    PlayerExePathTextBox.Text = exePath;
+                    break;
+            }
+
+
         }
 
         private void OpenPlayerExePathButton_Click(object sender, RoutedEventArgs e)
         {
-            string openPath = string.Empty;
-
-            switch (PlayerSelectionComboBox.SelectedIndex)
+            var openPath = PlayerSelectionComboBox.SelectedIndex switch
             {
-                case 1:
-                    openPath = Path.GetDirectoryName(AppSettings.PotPlayerExePath);
-                    break;
-                    //case 2:
-                    //    openPath = Path.GetDirectoryName(AppSettings.MpvExePath);
-                    //    break;
-                    //case 3:
-                    //    openPath = Path.GetDirectoryName(AppSettings.VlcExePath);
-                    //    break;
-            }
+                1 => Path.GetDirectoryName(AppSettings.PotPlayerExePath),
+                2 => Path.GetDirectoryName(AppSettings.MpvExePath),
+                3 => Path.GetDirectoryName(AppSettings.VlcExePath),
+                _ => string.Empty
+            };
 
             if (!string.IsNullOrEmpty(openPath))
             {
                 FileMatch.LaunchFolder(openPath);
             }
-
         }
 
         private async void ModifyPlayerExePathButton_Click(object sender, RoutedEventArgs e)
@@ -638,28 +655,28 @@ namespace Display.Views
             FileOpenPicker fileOpenPicker = new();
             fileOpenPicker.FileTypeFilter.Add(".exe");
             fileOpenPicker.FileTypeFilter.Add(".com");
-            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.AppMainWindow);
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.AppMainWindow);
             fileOpenPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
 
             WinRT.Interop.InitializeWithWindow.Initialize(fileOpenPicker, hwnd);
 
             var file = await fileOpenPicker.PickSingleFileAsync();
-            if (file != null)
+            if (file == null) return;
+
+            switch (PlayerSelectionComboBox.SelectedIndex)
             {
-                switch (PlayerSelectionComboBox.SelectedIndex)
-                {
-                    case 1:
-                        AppSettings.PotPlayerExePath = file.Path;
-                        break;
-                        //case 2:
-                        //    AppSettings.MpvExePath = file.Path;
-                        //    break;  
-                        //case 3:
-                        //    AppSettings.VlcExePath = file.Path;
-                        //    break;
-                }
-                PlayerExePathTextBox.Text = file.Path;
+                case 1:
+                    AppSettings.PotPlayerExePath = file.Path;
+                    break;
+                case 2:
+                    AppSettings.MpvExePath = file.Path;
+                    break;
+                case 3:
+                    AppSettings.VlcExePath = file.Path;
+                    break;
             }
+
+            PlayerExePathTextBox.Text = file.Path;
         }
 
         private void BitCometSettingsSave_Click(object sender, RoutedEventArgs e)

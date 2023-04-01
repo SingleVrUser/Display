@@ -230,17 +230,6 @@
                                     </ComboBox>
                                 </RelativePanel>
 
-                                <RelativePanel x:Name="ResolutionRelativePanel"
-                                               Visibility="Collapsed">
-                                    <TextBlock Text="清晰度"
-                                               RelativePanel.AlignVerticalCenterWithPanel="True" />
-                                    <ComboBox x:Name="ResolutionSelectionComboBox"
-                                              ItemsSource="{x:Bind _resolutionSelectionCollection,Mode=OneWay}"
-                                              RelativePanel.AlignRightWithPanel="True"
-                                              SelectedIndex="0"
-                                              IsEnabled="False" />
-                                </RelativePanel>
-
                                 <RelativePanel x:Name="PlayerExePathRelativePanel"
                                                Visibility="Collapsed">
                                     <TextBlock x:Name="PlayerExePathTitle"
@@ -250,13 +239,31 @@
                                              Width="600"
                                              RelativePanel.RightOf="PlayerExePathTitle" />
                                     <Button Content="修改"
-                                            RelativePanel.LeftOf="OpenPlayerExePathButton"
+                                            RelativePanel.LeftOf="ReSetPlayerExePathButton"
                                             Click="ModifyPlayerExePathButton_Click" />
+
+                                    <Button x:Name="ReSetPlayerExePathButton"
+                                            Click="ReSetPlayerExePathButton_OnClick"
+                                            Content="重置"
+                                            RelativePanel.LeftOf="OpenPlayerExePathButton"
+                                            Margin="3,0,0,0" />
+
                                     <Button x:Name="OpenPlayerExePathButton"
                                             Click="OpenPlayerExePathButton_Click"
                                             Content="打开路径"
                                             RelativePanel.AlignRightWithPanel="True"
                                             Margin="3,0,0,0" />
+
+                                </RelativePanel>
+
+                                <RelativePanel x:Name="ResolutionRelativePanel"
+                                               Visibility="Collapsed">
+                                    <TextBlock Text="清晰度"
+                                               RelativePanel.AlignVerticalCenterWithPanel="True" />
+                                    <ComboBox x:Name="ResolutionSelectionComboBox"
+                                              ItemsSource="{x:Bind _resolutionSelectionCollection,Mode=OneWay}"
+                                              RelativePanel.AlignRightWithPanel="True"
+                                              IsEnabled="True" />
                                 </RelativePanel>
 
                                 <RelativePanel Visibility="Visible">

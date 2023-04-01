@@ -277,7 +277,7 @@ namespace Display.ContentsPage
                 for (int j = 0; j < videofileListAfterDecode.Count; j++)
                 {
                     var videoInfo = videofileListAfterDecode[j];
-                    var m3u8InfoList = await webApi.Getm3u8InfoByPickCode(videoInfo.pc);
+                    var m3u8InfoList = await webApi.GetM3U8InfoByPickCode(videoInfo.pc);
                     if (m3u8InfoList.Count > 0)
                     {
                         ////总帧数计算
@@ -298,12 +298,12 @@ namespace Display.ContentsPage
                 foreach (var pickCode in videoToThumbnail.pickCodeList)
                 {
                     //重新获取（时间过长m3u8地址可能失效）
-                    var m3u8InfoList = await webApi.Getm3u8InfoByPickCode(pickCode);
+                    var m3u8InfoList = await webApi.GetM3U8InfoByPickCode(pickCode);
 
                     if (m3u8InfoList.Count == 0) continue;
 
                     //缩略图画质不需要太好，选择最后一个
-                    var meu8Info = await webApi.Getm3u8Content(m3u8InfoList[m3u8InfoList.Count - 1]);
+                    var meu8Info = await webApi.GetM3U8Content(m3u8InfoList[m3u8InfoList.Count - 1]);
 
                     //总时长
                     var play_long = meu8Info.TotalSecond;
