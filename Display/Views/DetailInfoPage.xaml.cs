@@ -136,7 +136,7 @@ namespace Display.Views
         /// <param Name="e"></param>
         private async void VideoPlay_Click(object sender, RoutedEventArgs e)
         {
-            if (!(sender is Button VideoPlayButton))
+            if (sender is not Button videoPlayButton)
                 return;
 
             string name = DetailInfo.truename;
@@ -145,7 +145,7 @@ namespace Display.Views
             //没有该数据
             if (videoInfoList.Count == 0)
             {
-                VideoPlayButton.Flyout = new Flyout()
+                videoPlayButton.Flyout = new Flyout()
                 {
                     Content = new TextBlock() { Text = "经查询，本地数据库无该文件，请导入后继续" }
                 };
@@ -160,18 +160,14 @@ namespace Display.Views
             //有多集
             else
             {
-                List<Datum> multisetList = new();
-                foreach (var videoinfo in videoInfoList)
-                {
-                    multisetList.Add(videoinfo);
-                }
+                var multisetList = videoInfoList.ToList();
 
                 multisetList = multisetList.OrderBy(item => item.n).ToList();
 
-                ContentsPage.DetailInfo.SelectSingleVideoToPlay newPage = new ContentsPage.DetailInfo.SelectSingleVideoToPlay(multisetList, name);
+                var newPage = new ContentsPage.DetailInfo.SelectSingleVideoToPlay(multisetList, name);
                 newPage.ContentListView.ItemClick += VideoInfoListView_ItemClick;
 
-                VideoPlayButton.Flyout = new Flyout()
+                videoPlayButton.Flyout = new Flyout()
                 {
                     Content = newPage
                 };
@@ -180,14 +176,11 @@ namespace Display.Views
 
         private async void VideoInfoListView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            //var SingleVideoInfo = e.ClickedItem as Data.Datum;
+            if (e.ClickedItem is not Datum singleVideoInfo) return;
 
-            if (!(e.ClickedItem is Data.Datum SingleVideoInfo)) return;
+            if (sender is not ListView { DataContext: string trueName }) return;
 
-            if (sender is not ListView listView) return;
-            if (listView.DataContext is not string trueName) return;
-
-            await PlayVideoHelper.PlayVideo(SingleVideoInfo.pc, this.XamlRoot, trueName: trueName, lastPage: this);
+            await PlayVideoHelper.PlayVideo(singleVideoInfo.pc, this.XamlRoot, trueName: trueName, lastPage: this);
         }
 
 

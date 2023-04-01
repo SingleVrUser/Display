@@ -540,7 +540,7 @@ namespace Display.ContentsPage
         /// <summary>
         /// 获取演员头像（通过视频）
         /// </summary>
-        private async void getActorCoverByWebVideo()
+        private async void GetActorCoverByWebVideo()
         {
             var webApi = WebApi.GlobalWebApi;
             var startTime = DateTimeOffset.Now;
@@ -588,7 +588,7 @@ namespace Display.ContentsPage
                     progress_TextBlock.Text = $"{actorName} - {videoName} - 挑选单体作品中能在线看的";
 
                     //挑选能在线观看的视频
-                    videofileListCanPlay = videoFileList.Where(x => x.vdi != 0).FirstOrDefault();
+                    videofileListCanPlay = videoFileList.FirstOrDefault(x => x.vdi != 0);
 
                     //全部未转码失败视频，跳过
                     if (videofileListCanPlay == null)
@@ -605,10 +605,10 @@ namespace Display.ContentsPage
                     progress_TextBlock.Text = $"{actorName} - {videoName} - {videofileListCanPlay.n} - 获取视频播放地址";
 
                     //获取播放地址
-                    var m3u8InfoList = await webApi.Getm3u8InfoByPickCode(pickCode);
+                    var m3U8InfoList = await webApi.GetM3U8InfoByPickCode(pickCode);
 
                     //文件不存在或已删除
-                    if (m3u8InfoList.Count == 0)
+                    if (m3U8InfoList.Count == 0)
                     {
                         progress_TextBlock.Text = $"{actorName} - {videoName} - {videofileListCanPlay.n} - 文件不存在或已删除";
                         continue;
@@ -616,7 +616,7 @@ namespace Display.ContentsPage
                     //成功
                     else
                     {
-                        videoPlayUrl = m3u8InfoList[0].Url;
+                        videoPlayUrl = m3U8InfoList[0].Url;
                     }
                 }
 

@@ -14,7 +14,7 @@ namespace Display.Helper;
 
 public class PlayVideoHelper
 {
-    public async static Task PlayVideo(string pickCode, XamlRoot xamlRoot = null, SubInfo subInfo = null, CustomMediaPlayerElement.PlayType playType = CustomMediaPlayerElement.PlayType.success, string trueName = "", Page lastPage = null)
+    public static async Task PlayVideo(string pickCode, XamlRoot xamlRoot = null, SubInfo subInfo = null, CustomMediaPlayerElement.PlayType playType = CustomMediaPlayerElement.PlayType.success, string trueName = "", Page lastPage = null)
     {
         //115Cookie未空
         if (string.IsNullOrEmpty(AppSettings._115_Cookie) && xamlRoot != null)
@@ -53,27 +53,23 @@ public class PlayVideoHelper
                 ContentsPage.DetailInfo.SelectSingleSubFileToSelected newPage = new(subInfos, trueName);
                 newPage.ContentListView.ItemClick += SubInfoListView_ItemClick;
 
-                ContentDialog dialog = new();
-                dialog.XamlRoot = xamlRoot;
-                dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
-                dialog.Title = "选择字幕";
-                dialog.PrimaryButtonText = "直接播放";
-                dialog.CloseButtonText = "返回";
-                dialog.Content = newPage;
-                dialog.DefaultButton = ContentDialogButton.Close;
+                ContentDialog dialog = new()
+                {
+                    XamlRoot = xamlRoot,
+                    Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+                    Title = "选择字幕",
+                    PrimaryButtonText = "直接播放",
+                    CloseButtonText = "返回",
+                    Content = newPage,
+                    DefaultButton = ContentDialogButton.Close
+                };
 
                 var result = await dialog.ShowAsync();
 
                 //返回
-                switch (result)
+                if (result != ContentDialogResult.Primary)
                 {
-                    //直接播放
-                    case ContentDialogResult.Primary:
-
-                        break;
-
-                    default:
-                        return;
+                    return;
                 }
             }
         }
@@ -87,15 +83,15 @@ public class PlayVideoHelper
                 break;
             //PotPlayer播放
             case 1:
-                await WebApi.GlobalWebApi.PlayVideoWithOriginUrl(pickCode, WebApi.playMethod.pot, xamlRoot, subInfo);
+                await WebApi.GlobalWebApi.PlayVideoWithPlayer(pickCode, WebApi.PlayMethod.pot, xamlRoot, subInfo);
                 break;
             //mpv播放
             case 2:
-                await WebApi.GlobalWebApi.PlayVideoWithOriginUrl(pickCode, WebApi.playMethod.mpv, xamlRoot, subInfo);
+                await WebApi.GlobalWebApi.PlayVideoWithPlayer(pickCode, WebApi.PlayMethod.mpv, xamlRoot, subInfo);
                 break;
             //vlc播放
             case 3:
-                await WebApi.GlobalWebApi.PlayVideoWithOriginUrl(pickCode, WebApi.playMethod.vlc, xamlRoot, subInfo);
+                await WebApi.GlobalWebApi.PlayVideoWithPlayer(pickCode, WebApi.PlayMethod.vlc, xamlRoot, subInfo);
                 break;
             //MediaElement播放
             case 4:
