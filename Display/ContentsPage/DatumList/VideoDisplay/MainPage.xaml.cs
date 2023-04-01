@@ -284,7 +284,7 @@ public sealed partial class MainPage : Page
         //转码成功，可以用m3u8
         if (file.datum.vdi != 0)
         {
-            var m3u8Infos = await webApi.Getm3u8InfoByPickCode(pickCode);
+            var m3u8Infos = await webApi.GetM3U8InfoByPickCode(pickCode);
 
             if (m3u8Infos.Count > 0)
             {

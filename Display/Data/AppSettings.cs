@@ -7,7 +7,7 @@ namespace Display.Data;
 
 public class AppSettings
 {
-    public static ApplicationDataContainer localSettings { get { return ApplicationData.Current.LocalSettings; } }
+    public static ApplicationDataContainer LocalSettings => ApplicationData.Current.LocalSettings;
 
 
     /// <summary>
@@ -17,7 +17,7 @@ public class AppSettings
     {
         get
         {
-            var composite = (ApplicationDataCompositeValue)localSettings.Values["ImageSize"];
+            var composite = (ApplicationDataCompositeValue)LocalSettings.Values["ImageSize"];
 
             double width;
             double height;
@@ -40,7 +40,7 @@ public class AppSettings
             var composite = new ApplicationDataCompositeValue();
             composite["ImageWidth"] = value.Item1;
             composite["ImageHeight"] = value.Item2;
-            localSettings.Values["ImageSize"] = composite;
+            LocalSettings.Values["ImageSize"] = composite;
         }
     }
 
@@ -52,13 +52,13 @@ public class AppSettings
         get
         {
             bool check = true;
-            if (localSettings.Values["IsAutoAdjustImageSize"] is bool value)
+            if (LocalSettings.Values["IsAutoAdjustImageSize"] is bool value)
             {
                 check = value;
             }
             return check;
         }
-        set => localSettings.Values["IsAutoAdjustImageSize"] = value;
+        set => LocalSettings.Values["IsAutoAdjustImageSize"] = value;
     }
 
     /// <summary>
@@ -69,13 +69,13 @@ public class AppSettings
         get
         {
             bool isUpdated = false;
-            if (localSettings.Values["IsUpdatedDataAccessFrom014"] is bool value)
+            if (LocalSettings.Values["IsUpdatedDataAccessFrom014"] is bool value)
             {
                 isUpdated = value;
             }
             return isUpdated;
         }
-        set => localSettings.Values["IsUpdatedDataAccessFrom014"] = value;
+        set => LocalSettings.Values["IsUpdatedDataAccessFrom014"] = value;
     }
 
     /// <summary>
@@ -86,13 +86,13 @@ public class AppSettings
         get
         {
             bool isDefaultPlaySingleVideo = false;
-            if (localSettings.Values["IsDefaultPlaySingleVideo"] is bool value)
+            if (LocalSettings.Values["IsDefaultPlaySingleVideo"] is bool value)
             {
                 isDefaultPlaySingleVideo = value;
             }
             return isDefaultPlaySingleVideo;
         }
-        set => localSettings.Values["IsDefaultPlaySingleVideo"] = value;
+        set => LocalSettings.Values["IsDefaultPlaySingleVideo"] = value;
     }
 
 
@@ -104,13 +104,13 @@ public class AppSettings
         get
         {
             var isAutoPlayVideo = false;
-            if (localSettings.Values["IsAutoPlayInVideoDisplay"] is bool value)
+            if (LocalSettings.Values["IsAutoPlayInVideoDisplay"] is bool value)
             {
                 isAutoPlayVideo = value;
             }
             return isAutoPlayVideo;
         }
-        set => localSettings.Values["IsAutoPlayInVideoDisplay"] = value;
+        set => LocalSettings.Values["IsAutoPlayInVideoDisplay"] = value;
     }
 
     /// <summary>
@@ -121,13 +121,13 @@ public class AppSettings
         get
         {
             var positionPercentage = 33.0;
-            if (localSettings.Values["AutoPlayPositionPercentage"] is double value)
+            if (LocalSettings.Values["AutoPlayPositionPercentage"] is double value)
             {
                 positionPercentage = value;
             }
             return positionPercentage;
         }
-        set => localSettings.Values["AutoPlayPositionPercentage"] = value;
+        set => LocalSettings.Values["AutoPlayPositionPercentage"] = value;
     }
 
 
@@ -139,13 +139,13 @@ public class AppSettings
         get
         {
             var count = 1.0;
-            if (localSettings.Values["MaxVideoPlayCount"] is double value)
+            if (LocalSettings.Values["MaxVideoPlayCount"] is double value)
             {
                 count = value;
             }
             return count;
         }
-        set => localSettings.Values["MaxVideoPlayCount"] = value;
+        set => LocalSettings.Values["MaxVideoPlayCount"] = value;
     }
 
 
@@ -158,13 +158,13 @@ public class AppSettings
         get
         {
             bool check = true;
-            if (localSettings.Values["IsCheckUpdate"] is bool value)
+            if (LocalSettings.Values["IsCheckUpdate"] is bool value)
             {
                 check = value;
             }
             return check;
         }
-        set => localSettings.Values["IsCheckUpdate"] = value;
+        set => LocalSettings.Values["IsCheckUpdate"] = value;
     }
 
     /// <summary>
@@ -172,8 +172,8 @@ public class AppSettings
     /// </summary>
     public static string IgnoreUpdateAppVersion
     {
-        get => (string)localSettings.Values["IgnoreUpdateAppVersion"];
-        set => localSettings.Values["IgnoreUpdateAppVersion"] = value;
+        get => (string)LocalSettings.Values["IgnoreUpdateAppVersion"];
+        set => LocalSettings.Values["IgnoreUpdateAppVersion"] = value;
     }
 
     /// <summary>
@@ -184,13 +184,13 @@ public class AppSettings
         get
         {
             bool _value = false;
-            if (localSettings.Values["IsNavigationViewPaneOpen"] is bool value)
+            if (LocalSettings.Values["IsNavigationViewPaneOpen"] is bool value)
             {
                 _value = value;
             }
             return _value;
         }
-        set => localSettings.Values["IsNavigationViewPaneOpen"] = value;
+        set => LocalSettings.Values["IsNavigationViewPaneOpen"] = value;
     }
 
     /// <summary>
@@ -202,7 +202,7 @@ public class AppSettings
         {
             bool isToast = false;
 
-            if (localSettings.Values["ProgressOfImportDataAccess_IsToastAfterTask"] is bool value)
+            if (LocalSettings.Values["ProgressOfImportDataAccess_IsToastAfterTask"] is bool value)
             {
                 isToast = value;
             }
@@ -211,7 +211,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["ProgressOfImportDataAccess_IsToastAfterTask"] = value;
+            LocalSettings.Values["ProgressOfImportDataAccess_IsToastAfterTask"] = value;
         }
     }
 
@@ -225,7 +225,7 @@ public class AppSettings
         {
             bool isStart = true;
 
-            if (localSettings.Values["ProgressOfImportDataAccess_IsStartSpiderAfterTask"] is bool value)
+            if (LocalSettings.Values["ProgressOfImportDataAccess_IsStartSpiderAfterTask"] is bool value)
             {
                 isStart = value;
             }
@@ -234,7 +234,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["ProgressOfImportDataAccess_IsStartSpiderAfterTask"] = value;
+            LocalSettings.Values["ProgressOfImportDataAccess_IsStartSpiderAfterTask"] = value;
         }
     }
 
@@ -245,11 +245,11 @@ public class AppSettings
     {
         get
         {
-            return localSettings.Values["Cookie"] as string;
+            return LocalSettings.Values["Cookie"] as string;
         }
         set
         {
-            localSettings.Values["Cookie"] = value;
+            LocalSettings.Values["Cookie"] = value;
         }
     }
 
@@ -265,7 +265,7 @@ public class AppSettings
     {
         get
         {
-            var BaseUrl = localSettings.Values["LibreDmm_BaseUrl"] as string;
+            var BaseUrl = LocalSettings.Values["LibreDmm_BaseUrl"] as string;
             if (string.IsNullOrEmpty(BaseUrl))
             {
                 BaseUrl = _libreDmm_BaseUrl;
@@ -274,7 +274,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["LibreDmm_BaseUrl"] = value;
+            LocalSettings.Values["LibreDmm_BaseUrl"] = value;
         }
     }
 
@@ -287,7 +287,7 @@ public class AppSettings
     {
         get
         {
-            var localJavBusBaseUrl = localSettings.Values["JavBus_BaseUrl"] as string;
+            var localJavBusBaseUrl = LocalSettings.Values["JavBus_BaseUrl"] as string;
             if (string.IsNullOrEmpty(localJavBusBaseUrl))
             {
                 localJavBusBaseUrl = _javBus_BaseUrl;
@@ -296,7 +296,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["JavBus_BaseUrl"] = value;
+            LocalSettings.Values["JavBus_BaseUrl"] = value;
         }
     }
 
@@ -309,7 +309,7 @@ public class AppSettings
     {
         get
         {
-            var url = localSettings.Values["AvMoo_BaseUrl"] as string;
+            var url = LocalSettings.Values["AvMoo_BaseUrl"] as string;
             if (string.IsNullOrEmpty(url))
             {
                 url = _avmoo_BaseUrl;
@@ -318,7 +318,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["AvMoo_BaseUrl"] = value;
+            LocalSettings.Values["AvMoo_BaseUrl"] = value;
         }
     }
 
@@ -331,7 +331,7 @@ public class AppSettings
     {
         get
         {
-            var url = localSettings.Values["AvSox_BaseUrl"] as string;
+            var url = LocalSettings.Values["AvSox_BaseUrl"] as string;
             if (string.IsNullOrEmpty(url))
             {
                 url = _avsox_BaseUrl;
@@ -340,7 +340,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["AvSox_BaseUrl"] = value;
+            LocalSettings.Values["AvSox_BaseUrl"] = value;
         }
     }
 
@@ -353,7 +353,7 @@ public class AppSettings
     {
         get
         {
-            var url = localSettings.Values["Jav321_BaseUrl"] as string;
+            var url = LocalSettings.Values["Jav321_BaseUrl"] as string;
             if (string.IsNullOrEmpty(url))
             {
                 url = _jav321_BaseUrl;
@@ -362,7 +362,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["Jav321_BaseUrl"] = value;
+            LocalSettings.Values["Jav321_BaseUrl"] = value;
         }
     }
 
@@ -374,7 +374,7 @@ public class AppSettings
     {
         get
         {
-            var localJavDBBaseUrl = localSettings.Values["JavDB_BaseUrl"] as string;
+            var localJavDBBaseUrl = LocalSettings.Values["JavDB_BaseUrl"] as string;
             if (string.IsNullOrEmpty(localJavDBBaseUrl))
             {
                 localJavDBBaseUrl = _javDB_BaseUrl;
@@ -383,7 +383,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["JavDB_BaseUrl"] = value;
+            LocalSettings.Values["JavDB_BaseUrl"] = value;
         }
     }
 
@@ -395,7 +395,7 @@ public class AppSettings
     {
         get
         {
-            var url = localSettings.Values["Fc2hub_BaseUrl"] as string;
+            var url = LocalSettings.Values["Fc2hub_BaseUrl"] as string;
             if (string.IsNullOrEmpty(url))
             {
                 url = _fc2hub_BaseUrl;
@@ -404,7 +404,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["Fc2hub_BaseUrl"] = value;
+            LocalSettings.Values["Fc2hub_BaseUrl"] = value;
         }
     }
 
@@ -415,11 +415,11 @@ public class AppSettings
     {
         get
         {
-            return localSettings.Values["javDB_Cookie"] as string;
+            return LocalSettings.Values["javDB_Cookie"] as string;
         }
         set
         {
-            localSettings.Values["javDB_Cookie"] = value;
+            LocalSettings.Values["javDB_Cookie"] = value;
         }
     }
 
@@ -439,7 +439,7 @@ public class AppSettings
             {
                 return (int)_getActorInfoLastIndex;
             }
-            else if (localSettings.Values["GetActorInfoLastIndex"] is int index)
+            else if (LocalSettings.Values["GetActorInfoLastIndex"] is int index)
             {
                 _getActorInfoLastIndex = index;
                 return index;
@@ -451,7 +451,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["GetActorInfoLastIndex"] = value;
+            LocalSettings.Values["GetActorInfoLastIndex"] = value;
             _getActorInfoLastIndex = value;
         }
     }
@@ -466,7 +466,7 @@ public class AppSettings
     {
         get
         {
-            var BaseUrl = localSettings.Values["MinnanoAv_BaseUrl"] as string;
+            var BaseUrl = LocalSettings.Values["MinnanoAv_BaseUrl"] as string;
             if (string.IsNullOrEmpty(BaseUrl))
             {
                 BaseUrl = _minnanoAv_BaseUrl;
@@ -475,7 +475,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["MinnanoAv_BaseUrl"] = value;
+            LocalSettings.Values["MinnanoAv_BaseUrl"] = value;
         }
     }
 
@@ -490,7 +490,7 @@ public class AppSettings
     {
         get
         {
-            string savePath = localSettings.Values["ImageSave_Path"] as string;
+            string savePath = LocalSettings.Values["ImageSave_Path"] as string;
             if (string.IsNullOrEmpty(savePath))
             {
                 savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "Image");
@@ -500,7 +500,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["ImageSave_Path"] = value;
+            LocalSettings.Values["ImageSave_Path"] = value;
         }
     }
 
@@ -511,7 +511,7 @@ public class AppSettings
     {
         get
         {
-            string savePath = localSettings.Values["SubSave_Path"] as string;
+            string savePath = LocalSettings.Values["SubSave_Path"] as string;
             if (string.IsNullOrEmpty(savePath))
             {
                 savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "Sub");
@@ -521,7 +521,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["SubSave_Path"] = value;
+            LocalSettings.Values["SubSave_Path"] = value;
         }
     }
 
@@ -532,7 +532,7 @@ public class AppSettings
     {
         get
         {
-            string savePath = localSettings.Values["ActorInfo_SavePath"] as string;
+            string savePath = LocalSettings.Values["ActorInfo_SavePath"] as string;
             if (string.IsNullOrEmpty(savePath))
             {
                 savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "Actor");
@@ -542,7 +542,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["ActorInfo_SavePath"] = value;
+            LocalSettings.Values["ActorInfo_SavePath"] = value;
         }
     }
 
@@ -571,7 +571,7 @@ public class AppSettings
     {
         get
         {
-            string savePath = localSettings.Values["DataAccess_SavePath"] as string;
+            string savePath = LocalSettings.Values["DataAccess_SavePath"] as string;
             if (string.IsNullOrEmpty(savePath))
             {
                 savePath = ApplicationData.Current.LocalFolder.Path;
@@ -580,7 +580,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["DataAccess_SavePath"] = value;
+            LocalSettings.Values["DataAccess_SavePath"] = value;
         }
     }
 
@@ -591,11 +591,11 @@ public class AppSettings
     {
         get
         {
-            return Convert.ToInt32(localSettings.Values["StartPageIndex"]);
+            return Convert.ToInt32(LocalSettings.Values["StartPageIndex"]);
         }
         set
         {
-            localSettings.Values["StartPageIndex"] = value;
+            LocalSettings.Values["StartPageIndex"] = value;
         }
     }
 
@@ -608,7 +608,7 @@ public class AppSettings
         {
             bool useJavDB = false;
 
-            if (localSettings.Values["isUseJavDB"] is bool value)
+            if (LocalSettings.Values["isUseJavDB"] is bool value)
             {
                 useJavDB = value;
             }
@@ -617,7 +617,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["isUseJavDB"] = value;
+            LocalSettings.Values["isUseJavDB"] = value;
         }
     }
 
@@ -630,7 +630,7 @@ public class AppSettings
         {
             bool useJavBus = true;
 
-            if (localSettings.Values["isUseJavBus"] is bool value)
+            if (LocalSettings.Values["isUseJavBus"] is bool value)
             {
                 useJavBus = value;
             }
@@ -638,7 +638,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["isUseJavBus"] = value;
+            LocalSettings.Values["isUseJavBus"] = value;
         }
     }
 
@@ -651,7 +651,7 @@ public class AppSettings
         {
             bool useJavBus = true;
 
-            if (localSettings.Values["isUseAvMoo"] is bool value)
+            if (LocalSettings.Values["isUseAvMoo"] is bool value)
             {
                 useJavBus = value;
             }
@@ -659,7 +659,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["isUseAvMoo"] = value;
+            LocalSettings.Values["isUseAvMoo"] = value;
         }
     }
 
@@ -672,7 +672,7 @@ public class AppSettings
         {
             bool useJavBus = true;
 
-            if (localSettings.Values["isUseAvSox"] is bool value)
+            if (LocalSettings.Values["isUseAvSox"] is bool value)
             {
                 useJavBus = value;
             }
@@ -680,7 +680,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["isUseAvSox"] = value;
+            LocalSettings.Values["isUseAvSox"] = value;
         }
     }
 
@@ -693,7 +693,7 @@ public class AppSettings
         {
             bool useJavBus = true;
 
-            if (localSettings.Values["isUseJav321"] is bool value)
+            if (LocalSettings.Values["isUseJav321"] is bool value)
             {
                 useJavBus = value;
             }
@@ -701,7 +701,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["isUseJav321"] = value;
+            LocalSettings.Values["isUseJav321"] = value;
         }
     }
 
@@ -714,7 +714,7 @@ public class AppSettings
         {
             bool isUse = true;
 
-            if (localSettings.Values["isUseFc2Hub"] is bool value)
+            if (LocalSettings.Values["isUseFc2Hub"] is bool value)
             {
                 isUse = value;
             }
@@ -722,7 +722,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["isUseFc2Hub"] = value;
+            LocalSettings.Values["isUseFc2Hub"] = value;
         }
     }
 
@@ -735,7 +735,7 @@ public class AppSettings
         {
             bool isUse = true;
 
-            if (localSettings.Values["isUseLibreDmm"] is bool value)
+            if (LocalSettings.Values["isUseLibreDmm"] is bool value)
             {
                 isUse = value;
             }
@@ -743,7 +743,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["isUseLibreDmm"] = value;
+            LocalSettings.Values["isUseLibreDmm"] = value;
         }
     }
 
@@ -751,17 +751,17 @@ public class AppSettings
     {
         get
         {
-            var savePath = localSettings.Values["VlcExePath"];
+            var savePath = LocalSettings.Values["VlcExePath"];
             if (savePath == null)
             {
                 savePath = "vlc";
-                localSettings.Values["VlcExePath"] = savePath;
+                LocalSettings.Values["VlcExePath"] = savePath;
             }
             return savePath.ToString();
         }
         set
         {
-            localSettings.Values["VlcExePath"] = value;
+            LocalSettings.Values["VlcExePath"] = value;
         }
     }
 
@@ -769,30 +769,24 @@ public class AppSettings
     {
         get
         {
-            var savePath = localSettings.Values["MpvExePath"];
+            var savePath = LocalSettings.Values["MpvExePath"];
             if (savePath == null)
             {
                 savePath = "mpv";
-                localSettings.Values["MpvExePath"] = savePath;
+                LocalSettings.Values["MpvExePath"] = savePath;
             }
             return savePath.ToString();
         }
         set
         {
-            localSettings.Values["MpvExePath"] = value;
+            LocalSettings.Values["MpvExePath"] = value;
         }
     }
 
     public static string PotPlayerExePath
     {
-        get
-        {
-            return localSettings.Values["PotPlayerExePath"] as string;
-        }
-        set
-        {
-            localSettings.Values["PotPlayerExePath"] = value;
-        }
+        get => LocalSettings.Values["PotPlayerExePath"] as string;
+        set => LocalSettings.Values["PotPlayerExePath"] = value;
     }
 
     /// <summary>
@@ -804,7 +798,7 @@ public class AppSettings
         {
             int playerSelection = 0;
 
-            if (localSettings.Values["PlayerSelection"] is int value)
+            if (LocalSettings.Values["PlayerSelection"] is int value)
             {
                 playerSelection = value;
             }
@@ -812,10 +806,31 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["PlayerSelection"] = value;
+            LocalSettings.Values["PlayerSelection"] = value;
         }
     }
 
+
+    public enum PlayQuality
+    {
+        M3U8 = 0,
+        Origin = 1
+    }
+
+    public static int DefaultPlayQuality
+    {
+        get
+        {
+            var quality = PlayQuality.M3U8;
+
+            if (LocalSettings.Values["DefaultPlayQuality"] is int value)
+            {
+                quality = (PlayQuality)value;
+            }
+            return (int)quality;
+        }
+        set => LocalSettings.Values["DefaultPlayQuality"] = value;
+    }
 
     /// <summary>
     /// 是否搜索字幕
@@ -824,18 +839,15 @@ public class AppSettings
     {
         get
         {
-            bool isUse = true;
+            var isUse = true;
 
-            if (localSettings.Values["IsFindSub"] is bool value)
+            if (LocalSettings.Values["IsFindSub"] is bool value)
             {
                 isUse = value;
             }
             return isUse;
         }
-        set
-        {
-            localSettings.Values["IsFindSub"] = value;
-        }
+        set => LocalSettings.Values["IsFindSub"] = value;
     }
 
     /// <summary>
@@ -847,7 +859,7 @@ public class AppSettings
         {
             bool isUse = true;
 
-            if (localSettings.Values["IsRecordDownRequest"] is bool value)
+            if (LocalSettings.Values["IsRecordDownRequest"] is bool value)
             {
                 isUse = value;
             }
@@ -855,7 +867,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["IsRecordDownRequest"] = value;
+            LocalSettings.Values["IsRecordDownRequest"] = value;
         }
     }
 
@@ -868,7 +880,7 @@ public class AppSettings
         {
             double OverdueTime = 86400.0;
 
-            if (localSettings.Values["DownUrlOverdueTime"] is double value)
+            if (LocalSettings.Values["DownUrlOverdueTime"] is double value)
             {
                 OverdueTime = value;
             }
@@ -876,7 +888,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["DownUrlOverdueTime"] = value;
+            LocalSettings.Values["DownUrlOverdueTime"] = value;
         }
     }
 
@@ -886,25 +898,21 @@ public class AppSettings
     /// <summary>
     /// 缩略图的显示来源
     /// </summary>
-    //private static Origin _thumbnialOrigin = Origin.Local;
     public static int ThumbnailOrigin
     {
         get
         {
-            var thumbnialOrigin = localSettings.Values["thumbnialOrigin"];
-            if (thumbnialOrigin == null)
+            var thumbnailOrigin = LocalSettings.Values["ThumbnailOrigin"];
+            if (thumbnailOrigin == null)
             {
                 return (int)Origin.Web;
             }
             else
             {
-                return (int)thumbnialOrigin;
+                return (int)thumbnailOrigin;
             }
         }
-        set
-        {
-            localSettings.Values["thumbnialOrigin"] = value;
-        }
+        set => LocalSettings.Values["ThumbnailOrigin"] = value;
     }
 
 
@@ -913,7 +921,7 @@ public class AppSettings
     {
         get
         {
-            var DefaultDownMethod = localSettings.Values["DefaultDownMethod"];
+            var DefaultDownMethod = LocalSettings.Values["DefaultDownMethod"];
 
             if (DefaultDownMethod == null)
             {
@@ -926,7 +934,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["DefaultDownMethod"] = value;
+            LocalSettings.Values["DefaultDownMethod"] = value;
         }
     }
 
@@ -934,7 +942,7 @@ public class AppSettings
     {
         get
         {
-            var BitCometSettingsStr = localSettings.Values["BitCometSettings"];
+            var BitCometSettingsStr = LocalSettings.Values["BitCometSettings"];
 
             if (BitCometSettingsStr == null)
             {
@@ -957,7 +965,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["BitCometSettings"] = JsonConvert.SerializeObject(value);
+            LocalSettings.Values["BitCometSettings"] = JsonConvert.SerializeObject(value);
         }
     }
 
@@ -965,7 +973,7 @@ public class AppSettings
     {
         get
         {
-            var BitCometSavePath = localSettings.Values["BitCometSavePath"];
+            var BitCometSavePath = LocalSettings.Values["BitCometSavePath"];
 
             if (BitCometSavePath == null)
             {
@@ -978,7 +986,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["BitCometSavePath"] = value;
+            LocalSettings.Values["BitCometSavePath"] = value;
         }
 
     }
@@ -987,7 +995,7 @@ public class AppSettings
     {
         get
         {
-            var Aria2SettingsStr = localSettings.Values["Aria2Settings"];
+            var Aria2SettingsStr = LocalSettings.Values["Aria2Settings"];
 
             if (Aria2SettingsStr == null)
             {
@@ -1010,7 +1018,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["Aria2Settings"] = JsonConvert.SerializeObject(value);
+            LocalSettings.Values["Aria2Settings"] = JsonConvert.SerializeObject(value);
         }
     }
 
@@ -1018,7 +1026,7 @@ public class AppSettings
     {
         get
         {
-            var Aria2SavePath = localSettings.Values["Aria2SavePath"];
+            var Aria2SavePath = LocalSettings.Values["Aria2SavePath"];
 
             if (Aria2SavePath == null)
             {
@@ -1031,7 +1039,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["Aria2SavePath"] = value;
+            LocalSettings.Values["Aria2SavePath"] = value;
         }
 
     }
@@ -1053,7 +1061,7 @@ public class AppSettings
 
             bool isShow = false;
 
-            if (localSettings.Values["IsShowFailListInDisplay"] is bool value)
+            if (LocalSettings.Values["IsShowFailListInDisplay"] is bool value)
             {
                 _isShowFailListInDisplay = value;
                 isShow = value;
@@ -1066,7 +1074,7 @@ public class AppSettings
             if (_isShowFailListInDisplay == value) return;
 
             _isShowFailListInDisplay = value;
-            localSettings.Values["IsShowFailListInDisplay"] = value;
+            LocalSettings.Values["IsShowFailListInDisplay"] = value;
         }
     }
     /// <summary>
@@ -1078,7 +1086,7 @@ public class AppSettings
         {
             bool isEnable = true;
 
-            if (localSettings.Values["IsIncrementalShowInDisplay"] is bool value)
+            if (LocalSettings.Values["IsIncrementalShowInDisplay"] is bool value)
             {
                 isEnable = value;
             }
@@ -1087,7 +1095,7 @@ public class AppSettings
         }
         set
         {
-            localSettings.Values["IsIncrementalShowInDisplay"] = value;
+            LocalSettings.Values["IsIncrementalShowInDisplay"] = value;
         }
     }
 
