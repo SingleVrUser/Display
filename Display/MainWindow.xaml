@@ -1,4 +1,4 @@
-﻿<Window x:Class="Display.MainWindow"
+﻿<winUiEx:WindowEx x:Class="Display.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="using:Display"
@@ -6,6 +6,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:data="using:Display.Data"
+        xmlns:winUiEx="using:WinUIEx"
         mc:Ignorable="d">
 
     <Grid x:Name="RootGrid">
@@ -41,7 +42,7 @@
             </DataTemplate>
         </Grid.Resources>
 
-        <!--标题栏-->
+            <!--标题栏-->
         <Grid x:Name="AppTitleBar"
               Canvas.ZIndex="1"
               VerticalAlignment="Top">
@@ -171,7 +172,7 @@
                     VerticalAlignment="Center"
                     Visibility="Collapsed">
             <TextBlock FontSize="30"
-                       CharacterSpacing="100">数据文件缺失，请以下文件是否存在</TextBlock>
+                       CharacterSpacing="100">数据文件缺失，请检查以下文件是否存在</TextBlock>
             <HyperlinkButton FontSize="20"
                              HorizontalAlignment="Center"
                              VerticalAlignment="Center"
@@ -179,4 +180,4 @@
                              Click="HyperlinkButton_Click" />
         </StackPanel>
     </Grid>
-</Window>
+</winUiEx:WindowEx>

@@ -63,7 +63,7 @@
     <Grid>
         <SplitView x:Name="RootSplitView" PanePlacement="Right" IsPaneOpen="True" DisplayMode="Inline" OpenPaneLength="380">
             <SplitView.Pane>
-                <Pivot x:Name="VideoPlay_Pivot">
+                <Pivot x:Name="VideoPlay_Pivot" Background="{StaticResource CardBackgroundFillColorDefaultBrush}">
 
                         <PivotItem Header="文件">
                             <Grid>
