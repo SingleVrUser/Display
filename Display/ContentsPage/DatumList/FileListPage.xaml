@@ -230,9 +230,8 @@
             </CommandBar>
 
             <controls:MetadataControl Margin="10,5"
-                                      Grid.Row="1"
                                       Grid.Column="0"
-                                      x:Name="metadataControl"
+                                      x:Name="MetadataControl"
                                       Separator=" > "
                                       HorizontalAlignment="Left"
                                       VerticalAlignment="Bottom">
@@ -264,7 +263,7 @@
                 </interactivity:Interaction.Behaviors>
 
                 <ListView.Header>
-                    <Grid MinHeight="30" Background="White">
+                <Grid MinHeight="30">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition MinWidth="50" Width="*" />
                             <ColumnDefinition Width="200" />
@@ -347,7 +346,7 @@
             <!--中转站-->
             <Grid x:Name="TransferStation_Grid"
                   Visibility="Collapsed"
-                  Background="White"
+                  Background="{StaticResource CardBackgroundFillColorDefaultBrush}"
                   Style="{StaticResource TempGridStyle}"
                   AllowDrop="True"
                   Drop="TransferStationGrid_Drop"

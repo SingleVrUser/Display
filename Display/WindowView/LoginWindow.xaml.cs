@@ -9,7 +9,7 @@ namespace Display.WindowView
     /// <summary>
     /// An empty window that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class LoginWindow : WinUIEx.WindowEx
+    public sealed partial class LoginWindow
     {
         //private AppWindow appWindow;
         //private WebApi webapi;

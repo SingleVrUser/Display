@@ -1,8 +1,9 @@
 ﻿
-using Display.Controls;
 using Display.Data;
 using Display.Helper;
 using Display.Views;
+using Microsoft.Extensions.Configuration;
+using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -11,9 +12,11 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Windows.System;
+using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -45,9 +48,9 @@ namespace Display
 
             _appwindow.SetIcon(Path.Combine(Windows.ApplicationModel.Package.Current.InstalledLocation.Path, "Assets/pokeball.ico"));
 
-            this.Title = "Display";
+            Title = "Display";
 
-            AppTitleBar.Height = NavView.CompactPaneLength -2;
+            AppTitleBar.Height = NavView.CompactPaneLength - 2;
 
             NavView.Resources["NavigationViewContentMargin"] = new Thickness()
             {
@@ -57,7 +60,6 @@ namespace Display
                 Bottom = 0
             };
 
-
             // 支持自定义标题栏
             if (AppWindowTitleBar.IsCustomizationSupported())
             {
@@ -65,6 +67,8 @@ namespace Display
                 var titleBar = _appwindow.TitleBar;
                 titleBar.ExtendsContentIntoTitleBar = true;
                 titleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
+                titleBar.ButtonBackgroundColor = Colors.Transparent;
+                titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
                 AppTitleBar.Loaded += AppTitleBar_Loaded;
                 AppTitleBar.SizeChanged += AppTitleBar_SizeChanged;
                 CustomAutoSuggestBox.OpenAutoSuggestionBoxCompleted += OpenAutoSuggestionBoxCompleted; ;
@@ -77,8 +81,20 @@ namespace Display
                 ExtendsContentIntoTitleBar = true;
                 CustomAutoSuggestBox.Visibility = Visibility.Collapsed;
                 SetTitleBar(AppTitleBar);
-                
             }
+
+            this.Activated += Window_Activated;
+
+            //Mica
+            Backdrop = new MicaSystemBackdrop();
+        }
+        private void Window_Activated(object sender, WindowActivatedEventArgs args)
+        {
+            AppTitleBar.Opacity = args.WindowActivationState switch
+            {
+                WindowActivationState.Deactivated => 0.5,
+                _ => 1
+            };
         }
 
         private void AppTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)

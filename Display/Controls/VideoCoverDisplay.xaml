@@ -498,7 +498,6 @@
                     <!--图片-->
                     <Grid x:Name="showImage"
                           BorderThickness="2"
-                          BorderBrush="{StaticResource ControlElevationBorderBrush}"
                           Padding="5">
                         <Image MinWidth="{x:Bind imagewidth,Mode=OneWay}"
                                MinHeight="{x:Bind imageheight,Mode=OneWay}">
@@ -581,7 +580,8 @@
 
             <Grid Padding="3,0"
                   HorizontalAlignment="Center"
-                  VerticalAlignment="Center">
+                  VerticalAlignment="Center"
+                  Background="{StaticResource CardBackgroundFillColorDefaultBrush}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="auto" />
@@ -727,7 +727,8 @@
                   Tapped="FailGrid_Tapped"
                   PointerEntered="FailGrid_PointerEntered"
                   PointerExited="FailGrid_PointerExited"
-                  Margin="5,0">
+                  Margin="5,0"
+                  Background="{StaticResource ControlFillColorDefaultBrush}">
 
                 <Grid.ContextFlyout>
                     <MenuFlyout>
