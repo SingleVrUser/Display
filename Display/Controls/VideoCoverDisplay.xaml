@@ -1072,6 +1072,7 @@
                               FontSize="18"
                               Foreground="Gray"
                               Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay}"
+                              Background="Transparent"
                               Unchecked="Filter_ToggleButton_Unchecked">
                     <ToggleButton.Resources>
                         <SolidColorBrush x:Key="ToggleButtonBackgroundPointerOver"
