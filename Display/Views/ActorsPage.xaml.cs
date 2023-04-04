@@ -43,6 +43,7 @@ namespace Display.Views
 
             Current = this;
 
+            Page_Loaded();
         }
 
         private async void Page_Loaded()
@@ -69,17 +70,7 @@ namespace Display.Views
 
             ProgressRing.IsActive = false;
         }
-
-        private void CarouselControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (sender is not CommunityToolkit.WinUI.UI.Controls.Carousel control) return;
-
-            Page_Loaded();
-
-            control.Loaded -= CarouselControl_Loaded;
-
-        }
-
+        
         private async void LoadActorPartInfo(int count = 30)
         {
             var infos = await DataAccess.LoadActorInfo(count, 0, orderByList: new() { { "RANDOM()", false } },
@@ -102,7 +93,7 @@ namespace Display.Views
 
                 _navigationType = navigationAnimationType.gridView;
                 _storeditem = actorinfo;
-                BasicGridView.PrepareConnectedAnimation("ForwardConnectedAnimation", _storeditem, "ActorImage");
+                //BasicGridView.PrepareConnectedAnimation("ForwardConnectedAnimation", _storeditem, "ActorImage");
 
                 GoToActorInfo(actorinfo);
             }
@@ -138,6 +129,7 @@ namespace Display.Views
 
             _navigationType = navigationAnimationType.image;
             _storedimage = image;
+
             ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", _storedimage);
 
             if (image.DataContext is ActorInfo actorinfo)
@@ -147,7 +139,7 @@ namespace Display.Views
             }
         }
 
-        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 

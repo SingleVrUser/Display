@@ -108,7 +108,7 @@ namespace Display.Views
             VideoCoverDisplayClass item = (sender as Button).DataContext as VideoCoverDisplayClass;
 
             //准备动画
-            videoControl.PrepareAnimation(item);
+            //videoControl.PrepareAnimation(item);
             _storeditem = item;
             Frame.Navigate(typeof(DetailInfoPage), item, new SuppressNavigationTransitionInfo());
         }

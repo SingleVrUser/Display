@@ -39,24 +39,31 @@ namespace Display.Views
         {
             base.OnNavigatedTo(e);
 
+
+
             var anim = ConnectedAnimationService.GetForCurrentView().GetAnimation("ForwardConnectedAnimation");
             if (anim != null)
             {
                 anim.TryStart(VideoDetailsControl.Cover_Image);
 
-                //有动画，动画完成后监听Cover_Grid（封面显示播放按钮）
-                anim.Completed += (_, _) => VideoDetailsControl.StartListCover_GridTapped();
+                ////有动画，动画完成后监听Cover_Grid（封面显示播放按钮）
+                //anim.Completed += (_, _) => VideoDetailsControl.StartListCover_GridTapped();
             }
             else
             {
-                //没有动画，直接监听Cover_Grid（封面显示播放按钮）
-                VideoDetailsControl.StartListCover_GridTapped();
+                VideoDetailsControl.CoverImageAddEnterAnimation();
             }
+            //else
+            //{
+            //    //没有动画，直接监听Cover_Grid（封面显示播放按钮）
+            //    VideoDetailsControl.StartListCover_GridTapped();
+            //}
+
 
             DetailInfo = e.Parameter switch
             {
                 VideoCoverDisplayClass detailinfo => detailinfo,
-                VideoInfo videoinfo => new(videoinfo, 500, 300),
+                VideoInfo videoinfo => new VideoCoverDisplayClass(videoinfo, 500, 300),
                 _ => DetailInfo
             };
         }
