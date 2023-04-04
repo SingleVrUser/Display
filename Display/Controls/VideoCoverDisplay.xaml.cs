@@ -130,8 +130,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// 显示的数据
     /// 用于增量显示，成功列表
     /// </summary>
-    private Models.IncrementalLoadSuccessInfoCollection _successInfoCollection;
-    public Models.IncrementalLoadSuccessInfoCollection SuccessInfoCollection
+    private IncrementalLoadSuccessInfoCollection _successInfoCollection;
+    public IncrementalLoadSuccessInfoCollection SuccessInfoCollection
     {
         get => _successInfoCollection;
         set
@@ -146,8 +146,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// 显示的数据
     /// 用于增量显示，失败列表（全部）
     /// </summary>
-    private Models.IncrementalLoadFailDatumInfoCollection _allfailInfocollection;
-    public Models.IncrementalLoadFailDatumInfoCollection AllFailInfoCollection
+    private IncrementalLoadFailDatumInfoCollection _allfailInfocollection;
+    public IncrementalLoadFailDatumInfoCollection AllFailInfoCollection
     {
         get => _allfailInfocollection;
         set

@@ -22,7 +22,9 @@
                 <ResourceDictionary>
                     <ui:Color x:Key="ColorChecked">#8cb3ff</ui:Color>
                     <!--<Color x:Key="ColorAngleMark">#6495ed</Color>-->
-                    <SolidColorBrush x:Key="CustomToggleButtonBackgroundChecked" Color="{StaticResource ColorChecked}" />
+                    <SolidColorBrush x:Key="CustomToggleButtonBackgroundChecked"
+                                     Color="{ThemeResource SystemAccentColor}" />
+
                     <SolidColorBrush x:Key="AngleMarkBackground"
                                      Color="CornflowerBlue"
                                      Opacity="0.8"/>
@@ -36,7 +38,7 @@
                                      Color="#ecf0f1" />
 
                     <SolidColorBrush x:Key="CardBackgroundFillColorDefaultBrush"
-                                     Color="#fdfdfd"/>
+                                     Color="{ThemeResource SystemAltHighColor}"/>
 
                 </ResourceDictionary>
 

@@ -90,7 +90,7 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="auto"/>
                             </Grid.RowDefinitions>
-                            <FlipView x:Name="randomIamgeFlipView" ItemsSource="{x:Bind Items, Mode=OneWay}" Background="Transparent">
+                            <FlipView x:Name="randomImageFlipView" ItemsSource="{x:Bind Items, Mode=OneWay}" Background="Transparent">
                                 <FlipView.ItemTemplate>
                                     <DataTemplate x:DataType="data:VideoInfo">
                                         <Border
@@ -107,20 +107,17 @@
                                 </FlipView.ItemTemplate>
                             </FlipView>
                             
-                            <!--添加selectedPageIndex时刷新有几率闪退-->
                             <PipsPager x:Name="ImagePipsPager"
                                        Grid.Row="1"
                                        HorizontalAlignment="Center"
                                        NumberOfPages="{x:Bind Items.Count}"
-                                       DataContext="{x:Bind randomIamgeFlipView}"/>
-                            <!--SelectedPageIndex="{Binding Path=SelectedIndex,Mode=TwoWay}"
-                                       DataContext="{x:Bind randomIamgeFlipView}"-->
+                                       DataContext="{x:Bind randomImageFlipView}"/>
                         </Grid>
 
                         <ListView x:Name="videoInfoListView"
                               Grid.Column="1"
                               ItemsSource="{x:Bind Items, Mode=OneWay}"
-                              SelectedIndex="{x:Bind randomIamgeFlipView.SelectedIndex, Mode=TwoWay}"
+                              SelectedIndex="{x:Bind randomImageFlipView.SelectedIndex, Mode=TwoWay}"
                                 SelectionChanged="videoInfoListView_SelectionChanged">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="data:VideoInfo">

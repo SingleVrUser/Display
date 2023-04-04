@@ -138,9 +138,11 @@ namespace Display.Controls
 
         }
 
-        private void GridlLoaded(object sender, RoutedEventArgs e)
+        private void GridLoaded(object sender, RoutedEventArgs e)
         {
             loadData();
+
+            StartListCover_GridTapped();
         }
 
         // 点击了演员更多页
@@ -676,6 +678,11 @@ namespace Display.Controls
             {
                 VisualStateManager.GoToState(sender as Control, "EnlargeButtonHidden", true);
             }
+        }
+
+        public void CoverImageAddEnterAnimation()
+        {
+            Cover_Image.Transitions.Add(new EntranceThemeTransition());
         }
     }
 }
