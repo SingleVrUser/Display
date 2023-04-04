@@ -12,7 +12,7 @@
     </UserControl.Resources>
 
     <Grid BorderThickness="0,1,0,0"
-          Loaded="GridlLoaded"
+          Loaded="GridLoaded"
           RowSpacing="10">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
@@ -198,7 +198,7 @@
                                Source="{x:Bind resultinfo.imagepath,Converter={StaticResource NotExistsImagePathConverter}}"
                                HorizontalAlignment="Left"
                                VerticalAlignment="Center"
-                               MaxHeight="500" />
+                               MaxHeight="500"/>
 
                         <Grid x:Name="VideoPlayIconInCover"
                               Visibility="Collapsed">

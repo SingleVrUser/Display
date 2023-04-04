@@ -43,10 +43,16 @@ namespace Display.Models
         public void Dispose()
         {
             Debug.WriteLine("Dispose MediaPlayerStreamSource");
-            _stream?.Dispose();
-            MediaPlayer?.Dispose();
-
-            Debug.WriteLine("Dispose MediaPlayerStreamSource success");
+            try
+            {
+                _stream?.Dispose();
+                MediaPlayer?.Dispose();
+                Debug.WriteLine("Dispose MediaPlayerStreamSource success");
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine($"销毁MediaPlayerStreamSource时发生错误:{e.Message}");
+            }
         }
 
     }

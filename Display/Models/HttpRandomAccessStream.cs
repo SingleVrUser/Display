@@ -77,11 +77,15 @@ namespace MediaPlayerElement_Test.Models
 
         public void Dispose()
         {
+            Debug.WriteLine("开始销毁stream");
+
             if (_isDisposing)
             {
                 return;
             }
 
+
+            Debug.WriteLine("开始销毁_inputStream");
             _isDisposing = true;
             if (_inputStream != null)
             {

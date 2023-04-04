@@ -82,8 +82,8 @@ namespace Display.Controls
                 {
                     FontFamily = new FontFamily("霞鹜文楷"),
                     Content = content,
-                    BorderThickness = new Thickness(0),
-                    Background = Application.Current.Resources["ButtonEmphasizeBackground"] as SolidColorBrush,
+                    BorderThickness = new Thickness(0.5),
+                    Background = Application.Current.Resources["CardBackgroundFillColorDefaultBrush"] as SolidColorBrush,
 
                 };
                 button.Click += LabelButtonOnClick;
@@ -138,9 +138,11 @@ namespace Display.Controls
 
         }
 
-        private void GridlLoaded(object sender, RoutedEventArgs e)
+        private void GridLoaded(object sender, RoutedEventArgs e)
         {
             loadData();
+
+            StartListCover_GridTapped();
         }
 
         // 点击了演员更多页
@@ -239,7 +241,7 @@ namespace Display.Controls
                         CheckBox fileBox = item as CheckBox;
                         if (fileBox.IsChecked == true)
                         {
-                            var selectVideoInfo = videoinfoList.Where(x => x.pc == fileBox.Name).First();
+                            var selectVideoInfo = videoinfoList.FirstOrDefault(x => x.pc == fileBox.Name);
                             if (selectVideoInfo != null)
                             {
                                 downVideoInfoList.Add(selectVideoInfo);
@@ -255,10 +257,7 @@ namespace Display.Controls
 
                 bool isOk = await webApi.RequestDown(downVideoInfoList, downType, savePath, topFolderName);
 
-                if (isOk)
-                    ShowTeachingTip("发送下载请求成功");
-                else
-                    ShowTeachingTip("发送下载请求失败");
+                ShowTeachingTip(isOk ? "发送下载请求成功" : "发送下载请求失败");
             }
             else
             {
@@ -268,18 +267,18 @@ namespace Display.Controls
 
         private void updateLookLater(bool? val)
         {
-            long lookLater_t = val == true ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
+            var lookLaterT = val == true ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
 
-            resultinfo.look_later = lookLater_t;
-            DataAccess.UpdateSingleDataFromVideoInfo(resultinfo.truename, "look_later", lookLater_t.ToString());
+            resultinfo.look_later = lookLaterT;
+            DataAccess.UpdateSingleDataFromVideoInfo(resultinfo.truename, "look_later", lookLaterT.ToString());
         }
 
         private void updateLike(bool? val)
         {
-            int is_like = val == true ? 1 : 0;
+            var isLike = val == true ? 1 : 0;
 
-            resultinfo.is_like = is_like;
-            DataAccess.UpdateSingleDataFromVideoInfo(resultinfo.truename, "is_like", is_like.ToString());
+            resultinfo.is_like = isLike;
+            DataAccess.UpdateSingleDataFromVideoInfo(resultinfo.truename, "is_like", isLike.ToString());
         }
 
         private void Animation_Completed(ConnectedAnimation sender, object args)
@@ -679,6 +678,11 @@ namespace Display.Controls
             {
                 VisualStateManager.GoToState(sender as Control, "EnlargeButtonHidden", true);
             }
+        }
+
+        public void CoverImageAddEnterAnimation()
+        {
+            Cover_Image.Transitions.Add(new EntranceThemeTransition());
         }
     }
 }
