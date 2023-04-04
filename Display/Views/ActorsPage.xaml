@@ -93,8 +93,7 @@
                                         ItemRotationZ ="0"
                                         Orientation="Horizontal"
                                         SelectedIndex="8"
-                                       ItemsSource="{x:Bind actorPartInfo}"
-                                       Loaded="CarouselControl_Loaded">
+                                       ItemsSource="{x:Bind actorPartInfo}">
                         <controls:Carousel.EasingFunction>
                             <CubicEase EasingMode="EaseOut" />
                         </controls:Carousel.EasingFunction>

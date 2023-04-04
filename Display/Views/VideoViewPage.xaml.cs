@@ -17,7 +17,7 @@ namespace Display.Views
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class VideoViewPage : Page
+    public sealed partial class VideoViewPage
     {
         public static VideoViewPage Current;
 
@@ -64,7 +64,7 @@ namespace Display.Views
             VideoCoverDisplayClass item = (sender as Button).DataContext as VideoCoverDisplayClass;
 
             //准备动画
-            videoControl.PrepareAnimation(item);
+            //videoControl.PrepareAnimation(item);
             _storeditem = item;
             Frame.Navigate(typeof(DetailInfoPage), item, new SuppressNavigationTransitionInfo());
         }

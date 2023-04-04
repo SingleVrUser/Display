@@ -86,7 +86,7 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
         filesInfos = new IncrementalLoadDatumCollection("0");
         BaseExample.ItemsSource = filesInfos;
-        metadataControl.Items = _units;
+        MetadataControl.Items = _units;
         filesInfos.GetFileInfoCompleted += FilesInfos_GetFileInfoCompleted;
     }
 

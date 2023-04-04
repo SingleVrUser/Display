@@ -16,26 +16,33 @@
                     <SolidColorBrush x:Key="WindowCaptionBackgroundDisabled">Transparent</SolidColorBrush>
                     <SolidColorBrush x:Key="WindowCaptionForeground">#1e90ff</SolidColorBrush>
                     <SolidColorBrush x:Key="WindowCaptionForegroundDisabled">#abd5ff</SolidColorBrush>
-                    <SolidColorBrush x:Key="RatingControlSelectedForeground" Color="#f7ba36" />
-                    <SolidColorBrush x:Key="RatingControlUnselectedForeground" Color="#ecf0f1" />
                 </ResourceDictionary>
 
                 <!--控件颜色-->
                 <ResourceDictionary>
                     <ui:Color x:Key="ColorChecked">#8cb3ff</ui:Color>
                     <!--<Color x:Key="ColorAngleMark">#6495ed</Color>-->
-                    <SolidColorBrush x:Key="CustomToggleButtonBackgroundChecked" Color="{StaticResource ColorChecked}" />
+                    <SolidColorBrush x:Key="CustomToggleButtonBackgroundChecked"
+                                     Color="{ThemeResource SystemAccentColor}" />
+
                     <SolidColorBrush x:Key="AngleMarkBackground"
                                      Color="CornflowerBlue"
                                      Opacity="0.8"/>
 
                     <SolidColorBrush x:Key="ButtonEmphasizeBackground"
                                      Color="{StaticResource ColorLightEmphasize}"/>
+
+                    <SolidColorBrush x:Key="RatingControlSelectedForeground"
+                                     Color="#f7ba36" />
+                    <SolidColorBrush x:Key="RatingControlUnselectedForeground"
+                                     Color="#ecf0f1" />
+
+                    <SolidColorBrush x:Key="CardBackgroundFillColorDefaultBrush"
+                                     Color="{ThemeResource SystemAltHighColor}"/>
+
                 </ResourceDictionary>
 
                 <ResourceDictionary>
-
-
                     <Style TargetType="TextBlock">
                         <Setter Property="FontFamily"
                                 Value="霞鹜文楷" />
@@ -207,6 +214,7 @@
             <ui:Color x:Key="ColorLightEmphasize">#DAE5FF</ui:Color>
             <ui:Color x:Key="ControlColorDefault">#FFFFFF</ui:Color>
             <ui:Color x:Key="ControlColorBorder">#EEEEF1</ui:Color>
+
 
             <!--数值-->
             <Thickness x:Key="AppBarButtonCompactMargin">0,-5,0,-20</Thickness>

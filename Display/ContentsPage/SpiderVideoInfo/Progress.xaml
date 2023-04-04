@@ -9,8 +9,7 @@
       xmlns:lvc="using:LiveChartsCore.SkiaSharpView.WinUI"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      mc:Ignorable="d"
-      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+      mc:Ignorable="d">
 
     <Page.Resources>
         <Style TargetType="Grid"
@@ -88,7 +87,7 @@
                     <TextBlock Text="文件数量占比" />
                     <lvc:PieChart x:Name="CountPercentPieChart"
                                   LegendPosition="Right"
-                                  LegendBackground="{ThemeResource ApplicationPageBackgroundThemeBrush}" />
+                                  LegendBackground="Transparent" />
                 </StackPanel>
             </Grid>
 
@@ -151,7 +150,7 @@
                                     Grid.Row="1"
                                     Visibility="Collapsed"
                                     LegendPosition="Right"
-                                    LegendBackground="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+                                    LegendBackground="Transparent">
                 </lvc:CartesianChart>
             </Grid>
 
