@@ -30,7 +30,7 @@
                                     Padding="2"
                                     BorderThickness="1"
                                     Spacing="5"
-                                    Background="{StaticResource CardBackgroundFillColorDefaultBrush}">
+                                    Background="{ThemeResource LayerFillColorDefaultBrush}">
                             <Image Height="55"
                                    Source="{x:Bind IconPath}"
                                    Margin="0,30,0,20" />

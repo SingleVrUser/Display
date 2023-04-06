@@ -180,9 +180,17 @@
                                     <ToggleSwitch x:Name="IsRecordDownRequestToggleSwitch"
                                                   OnContent="开启"
                                                   OffContent="关闭"
-                                                  RelativePanel.AlignRightWithPanel="True"
                                                   Margin="0,0,-70,0"
+                                                  RelativePanel.AlignRightWithPanel="True"
                                                   IsOn="{x:Bind data:AppSettings.IsRecordDownRequest,Mode=TwoWay}" />
+
+                                    <HyperlinkButton Content="清空"
+                                                     Click="ClearDownRecordButton_Click"
+                                                     RelativePanel.LeftOf="IsRecordDownRequestToggleSwitch"
+                                                     RelativePanel.AlignVerticalCenterWithPanel="True"
+                                                     Foreground="{ThemeResource DefaultTextForegroundThemeBrush}"
+                                                     Opacity="0.5" />
+
                                 </RelativePanel>
 
                                 <RelativePanel x:Name="RecordDownRequestRelativePanel"
@@ -764,7 +772,7 @@
 
         </ScrollViewer>
 
-        <TeachingTip x:Name="LightDismissTeachingTip"
+        <TeachingTip Grid.Row="0" x:Name="LightDismissTeachingTip"
                      IsLightDismissEnabled="True" />
     </Grid>
 </Page>

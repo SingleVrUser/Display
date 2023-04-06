@@ -31,7 +31,7 @@ namespace MediaPlayerElement_Test.Models
 
         public string ContentType { get; private set; } = string.Empty;
 
-        public bool CanRead => true;
+        public bool CanRead { get; private set; } = true;
 
         public bool CanWrite => false;
 
@@ -70,7 +70,7 @@ namespace MediaPlayerElement_Test.Models
                     _inputStream = null;
                 }
 
-                //Debug.WriteLine("Seek: {0:N0} -> {1:N0}", Position, position);
+                Debug.WriteLine("Seek: {0:N0} -> {1:N0}", Position, position);
                 Position = position;
             }
         }
@@ -83,7 +83,6 @@ namespace MediaPlayerElement_Test.Models
             {
                 return;
             }
-
 
             Debug.WriteLine("开始销毁_inputStream");
             _isDisposing = true;
@@ -101,7 +100,7 @@ namespace MediaPlayerElement_Test.Models
 
         public IAsyncOperationWithProgress<IBuffer, uint> ReadAsync(IBuffer buffer, uint count, InputStreamOptions options)
         {
-            if (_isDisposing)
+            if (_isDisposing || !CanRead)
             {
                 return default;
             }
@@ -160,13 +159,12 @@ namespace MediaPlayerElement_Test.Models
 
         private async Task SendRequestAsync()
         {
-            if (_isDisposing)
+            if (_isDisposing || !CanRead)
             {
                 return;
             }
 
             var request = new HttpRequestMessage(HttpMethod.Get, _requestedUri);
-
 
             request.Headers.Add("Range", $"bytes={Position}-");
             request.Headers.Add("Connection", "Keep-Alive");
@@ -199,6 +197,15 @@ namespace MediaPlayerElement_Test.Models
             catch (Exception ex)
             {
                 Debug.WriteLine($"发生错误:{ex.Message}");
+                CanRead = false;
+                Dispose();
+                return;
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Debug.WriteLine($"访问网页出错：{response.StatusCode}");
+                CanRead = false;
                 Dispose();
                 return;
             }

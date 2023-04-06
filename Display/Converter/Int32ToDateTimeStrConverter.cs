@@ -4,26 +4,20 @@ using Display.Data;
 
 namespace Display.Converter;
 
-public class Int32ToDateTimeStrConverter : IValueConverter
+public class DoubleToInt32Converter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        //2022-09-18 17:24 或者 1663493094
-
-        if (value is int IntValue)
+        if (value is double doubleValue)
         {
-            return FileMatch.ConvertInt32ToDateTime(IntValue);
+            return (int)doubleValue;
         }
-        else if (value is string NumOrStringValue)
+        else if(value is int intValue)
         {
-            if (!FileMatch.isNumberic1(NumOrStringValue))
-                return NumOrStringValue;
-
-            return FileMatch.ConvertInt32ToDateTime(int.Parse(NumOrStringValue));
+            return intValue;
         }
 
-
-        throw new NotImplementedException();
+        return 0;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)

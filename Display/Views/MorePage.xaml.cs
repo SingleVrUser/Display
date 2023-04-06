@@ -73,8 +73,8 @@ namespace Display.Views
 
         private void GridView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var ClickItem = e.ClickedItem as FunctionModule;
-            switch (ClickItem.Name)
+            var clickItem = e.ClickedItem as FunctionModule;
+            switch (clickItem.Name)
             {
                 case "导入115数据":
                     SingleFrameWindow window1 = new SingleFrameWindow();
