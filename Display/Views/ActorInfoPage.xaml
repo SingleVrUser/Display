@@ -8,8 +8,7 @@
       mc:Ignorable="d">
 
     <Grid>
-        <controls:VideoCoverDisplay Grid.Row="1"
-                                   x:Name="videoControl"
+        <controls:VideoCoverDisplay x:Name="videoControl"
                                    Click="{x:Bind OnClicked}"
                                    VideoPlayClick="{x:Bind VideoPlay_Click}"
                                    SingleVideoPlayClick="SingleVideoPlayClick"

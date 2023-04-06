@@ -4,7 +4,6 @@
     <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>Display</RootNamespace>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x86;x64;arm64</Platforms>
     <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
     <PublishProfile>win10-$(Platform).pubxml</PublishProfile>
@@ -23,7 +22,7 @@
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxPackageDir>D:\库\Desktop\打包\</AppxPackageDir>
     <PackageIcon>SmallTile.scale-125.png</PackageIcon>
-    <ApplicationIcon>Assets\pokeball.ico</ApplicationIcon>
+    <Win32Resource>Assets\Win32Resources.res</Win32Resource>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Assets\Models\**" />
@@ -39,6 +38,7 @@
     <Content Remove="Assets\BadgeLogo.scale-200.png" />
     <Content Remove="Assets\BadgeLogo.scale-400.png" />
     <Content Remove="Assets\icons8-text-96.png" />
+    <Content Remove="Assets\Win32Resources.res" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="About\UpdatePlane.xaml" />
@@ -61,6 +61,7 @@
     <None Remove="Assets\Svg\face_male_man_portrait_icon.svg" />
     <None Remove="Assets\Svg\file_document_paper_page_icon.svg" />
     <None Remove="Assets\Tip\FindFolderCid.png" />
+    <None Remove="Assets\Win32Resources.res" />
     <None Remove="ContentsPage\AddActorCover.xaml" />
     <None Remove="ContentsPage\CalculateLocalFileSha1.xaml" />
     <None Remove="ContentsPage\CheckCookie.xaml" />
@@ -153,7 +154,7 @@
     <PackageReference Include="OpenCvSharp4" Version="4.7.0.20230115" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
     <PackageReference Include="QRCoder" Version="1.4.3" />
-    <PackageReference Include="RestSharp" Version="109.0.1" />
+    <PackageReference Include="RestSharp" Version="110.1.0" />
     <PackageReference Include="SQLitePCLRaw.bundle_winsqlite3" Version="2.1.4" />
     <PackageReference Include="WinUIEx" Version="2.1.0" />
     <Manifest Include="$(ApplicationManifest)" />
@@ -424,5 +425,8 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="ContentsPage\DetailInfo\EditInfo.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Win32Resources.res" />
   </ItemGroup>
 </Project>

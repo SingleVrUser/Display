@@ -18,6 +18,9 @@ using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
 using Display.Data;
+using Display.Models;
+using Windows.Media;
+using Display.Views;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -100,7 +103,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         if (m3u8InfoList != null && m3u8InfoList.Count > 0)
         {
             //后m3u8
-            m3u8InfoList.ForEach(item => QualityItemsSource.Add(new(item.Name, item.Url)));
+            m3u8InfoList.ForEach(item => QualityItemsSource.Add(new Quality(item.Name, item.Url)));
 
             url = m3u8InfoList.FirstOrDefault()?.Url;
         }
@@ -171,88 +174,26 @@ public sealed partial class CustomMediaPlayerElement : UserControl
     public void DisposeMediaPlayer()
     {
         MediaControl.MediaPlayer.Dispose();
-
     }
+
+    private MediaPlayerWithStreamSource _currentMediaPlayerWithStreamSource;
 
     private async Task SetMediaPlayer(string url)
     {
         if (string.IsNullOrEmpty(url)) return;
 
-        //添加播放链接
+        //_currentMediaPlayerWithStreamSource?.Dispose();
 
-        MediaSource ms;
-        if (url.Contains("m3u8"))
-        {
-            ms = MediaSource.CreateFromUri(new Uri(url));
-        }
-        else
-        {
-            var httpClient = WebApi.GetVideoClient();
-            var videoStream = await HttpRandomAccessStream.CreateAsync(httpClient, new Uri(url));
-            ms = MediaSource.CreateFromStream(videoStream, "video/mp4");
-        }
-
-        var media = new MediaPlayer();
-
-        //添加字幕文件
-        if (SubInfo != null)
-        {
-            //下载字幕
-            var subPath = await webApi.TryDownSubFile(SubInfo.name, SubInfo.pickcode);
-
-            if (!string.IsNullOrEmpty(subPath))
-            {
-                //var timedTextSource = TimedTextSource.CreateFromUri(new Uri(subPath), SubInfo.name);
-                //ms.ExternalTimedTextSources.Add(timedTextSource);
-
-                var textEncoding = FileEncodingHelper.GetEncoding(subPath);
-
-                //如果文本格式不是UTF-8，就将文本转换为该格式
-                if (!Equals(textEncoding, Encoding.UTF8))
-                {
-                    Debug.WriteLine("字幕不是UTF-8，转为该格式并覆盖");
-                    await File.WriteAllTextAsync(subPath,
-                        await File.ReadAllTextAsync(subPath, textEncoding),
-                        Encoding.UTF8);
-                }
-
-                ms.ExternalTimedTextSources.Add(TimedTextSource.CreateFromUri(new Uri(subPath)));
-
-            }
-
-            var playbackItem = new MediaPlaybackItem(ms);
-
-
-            if (ms.ExternalTimedTextSources.Count > 0)
-            {
-                Debug.WriteLine("发现字幕文件");
-
-                playbackItem.TimedMetadataTracksChanged += (item, args) =>
-                {
-                    playbackItem.TimedMetadataTracks.SetPresentationMode(0, TimedMetadataTrackPresentationMode.PlatformPresented);
-
-                    Debug.WriteLine("默认选中第一个字幕");
-
-                };
-            }
-            else
-            {
-                Debug.WriteLine("没有字幕文件");
-            }
-
-            media.Source = playbackItem;
-
-        }
-        else
-        {
-            media.Source = ms;
-        }
-
-
+        var mediaPlayerWithStreamSource = await MediaPlayerWithStreamSource.CreateMediaPlayer(url, subInfo: SubInfo);
+        var media = mediaPlayerWithStreamSource.MediaPlayer;
 
         //先暂停后重新设置源，避免新的源设置失败之前的还在播放
         if (MediaControl.MediaPlayer.Source != null && MediaControl.MediaPlayer.CurrentState == MediaPlayerState.Playing) MediaControl.MediaPlayer.Pause();
+
         MediaControl.SetMediaPlayer(media);
+
+        _currentMediaPlayerWithStreamSource?.Dispose();
+        _currentMediaPlayerWithStreamSource = mediaPlayerWithStreamSource;
     }
 
     private async void QualityChanged(object sender, SelectionChangedEventArgs e)
@@ -478,15 +419,10 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         await webApi.PlayVideoWithPlayer(player.PickCode, player.PlayMethod, this.XamlRoot, SubInfo);
     }
 
-    private async void ShowTeachingTip(string subTitle)
+    private void ShowTeachingTip(string subTitle)
     {
-        if (Player_TeachingTip.IsOpen) Player_TeachingTip.IsOpen = false;
-
-        Player_TeachingTip.Subtitle = subTitle;
-        Player_TeachingTip.IsOpen = true;
-
-        await Task.Delay(1000);
-
-        Player_TeachingTip.IsOpen = false;
+        BasePage.ShowTeachingTip(PlayerTeachingTip,subTitle);
     }
+
+
 }

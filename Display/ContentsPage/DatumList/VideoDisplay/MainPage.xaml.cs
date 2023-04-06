@@ -3,6 +3,8 @@
 
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI.Controls;
+using Display.Data;
+using Display.Helper;
 using Display.Models;
 using Display.WindowView;
 using Microsoft.UI.Input;
@@ -20,7 +22,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Media.Playback;
-using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -67,7 +68,8 @@ public sealed partial class MainPage : Page
         FilesInfos = new ObservableCollection<FilesInfo>();
         filesInfos.ForEach(item => FilesInfos.Add(item));
 
-        _units = new ObservableCollection<MetadataItem>() { new MetadataItem { Label = "播放列表", Command = OpenFolderCommand, CommandParameter = "0" } };
+        _units = new ObservableCollection<MetadataItem>()
+            { new MetadataItem { Label = "播放列表", Command = OpenFolderCommand, CommandParameter = "0" } };
         metadataControl.Items = _units;
         webApi = WebApi.GlobalWebApi;
 
@@ -80,7 +82,8 @@ public sealed partial class MainPage : Page
         //var maxPlayCount = AppSettings.IsDefaultPlaySingleVideo ? 1 : MaxCanPlayCount;
         var maxPlayCount = MaxCanPlayCount;
 
-        var videoList = filesInfos.Where(item => item.Type == FilesInfo.FileType.File && item.datum.iv == 1).Take(maxPlayCount).ToList();
+        var videoList = filesInfos.Where(item => item.Type == FilesInfo.FileType.File && item.datum.iv == 1)
+            .Take(maxPlayCount).ToList();
         var videoCount = videoList.Count;
 
         if (maxPlayCount == 1)
@@ -99,7 +102,8 @@ public sealed partial class MainPage : Page
                 var leftCount = maxPlayCount - videoCount;
 
                 //是否有文件夹
-                var folderList = filesInfos.Where(item => item.Type == FilesInfo.FileType.Folder).Take(leftCount).ToList();
+                var folderList = filesInfos.Where(item => item.Type == FilesInfo.FileType.Folder).Take(leftCount)
+                    .ToList();
                 if (folderList.Count > 0)
                 {
 
@@ -108,7 +112,8 @@ public sealed partial class MainPage : Page
                         var filesInfo = await webApi.GetFileAsync(folder.Cid, 40);
 
                         // 挑选视频数量
-                        var videoInFolder = filesInfo.data.Where(item => !string.IsNullOrEmpty(item.fid) && item.iv == 1).Take(leftCount).ToList();
+                        var videoInFolder = filesInfo.data
+                            .Where(item => !string.IsNullOrEmpty(item.fid) && item.iv == 1).Take(leftCount).ToList();
                         var videoInFolderCount = videoInFolder.Count;
 
                         if (videoInFolderCount <= 0) continue;
@@ -132,8 +137,10 @@ public sealed partial class MainPage : Page
     }
 
     private RelayCommand<string> _openFolderCommand;
+
     private RelayCommand<string> OpenFolderCommand =>
         _openFolderCommand ??= new RelayCommand<string>(OpenFolder);
+
     private async void OpenFolder(string cid)
     {
         var currentItem = _units.FirstOrDefault(item => item.CommandParameter.ToString() == cid);
@@ -199,6 +206,7 @@ public sealed partial class MainPage : Page
                 Debug.WriteLine($"关闭MediaControl出错{ex.Message}");
             }
         }
+
         Video_UniformGrid.Children.Clear();
     }
 
@@ -303,7 +311,6 @@ public sealed partial class MainPage : Page
             }
         }
 
-
         return videoUrl;
 
     }
@@ -356,7 +363,8 @@ public sealed partial class MainPage : Page
 
 
         Debug.WriteLine("设置 MediaPlayerWithStreamSource");
-        var mediaPlayerWithStreamSource = await MediaPlayerWithStreamSource.CreateMediaPlayer(file, videoUrl);
+        var mediaPlayerWithStreamSource =
+            await MediaPlayerWithStreamSource.CreateMediaPlayer(videoUrl, filesInfo: file);
 
         Debug.WriteLine("成功设置 MediaPlayerWithStreamSource");
         var mediaPlayer = mediaPlayerWithStreamSource.MediaPlayer;
@@ -379,7 +387,8 @@ public sealed partial class MainPage : Page
         {
             MediaPlayer_MediaOpened(sender, args);
 
-            Debug.WriteLine($"当前视频分辨率为：{sender.PlaybackSession.NaturalVideoWidth} x {sender.PlaybackSession.NaturalVideoHeight}");
+            Debug.WriteLine(
+                $"当前视频分辨率为：{sender.PlaybackSession.NaturalVideoWidth} x {sender.PlaybackSession.NaturalVideoHeight}");
 
             if (sender.PlaybackSession.NaturalVideoHeight > 2000)
             {
@@ -574,7 +583,8 @@ public sealed partial class MainPage : Page
         await webApi.DeleteFiles(fileInfo.Cid, new() { fid });
 
         // 接着，删除资源管理器的文件，如果存在（有可能已经关掉了）
-        if (LastFilesListView.IsLoaded && LastFilesListView.ItemsSource is IncrementalLoadDatumCollection filesInfos && filesInfos.Contains(fileInfo))
+        if (LastFilesListView.IsLoaded && LastFilesListView.ItemsSource is IncrementalLoadDatumCollection filesInfos &&
+            filesInfos.Contains(fileInfo))
         {
             filesInfos.Remove(fileInfo);
         }
@@ -632,7 +642,8 @@ public sealed partial class MainPage : Page
     private void RemoveCidInfo(FilesInfo fileInfo)
     {
         //移除cid信息（预览图/信息）
-        var removeCid = CidInfos.FirstOrDefault(item => item.truename == fileInfo.Name || item.truename == FileMatch.MatchName(fileInfo.Name)?.ToUpper());
+        var removeCid = CidInfos.FirstOrDefault(item =>
+            item.truename == fileInfo.Name || item.truename == FileMatch.MatchName(fileInfo.Name)?.ToUpper());
 
         if (removeCid != null)
         {
@@ -665,6 +676,7 @@ public sealed partial class MainPage : Page
         {
             Debug.WriteLine($"删除正在播放的视频文件时出现问题{ex.Message}");
         }
+
         Debug.WriteLine("成功移除正在播放的视频");
 
     }
@@ -705,7 +717,8 @@ public sealed partial class MainPage : Page
 
             filesInfo.ForEach(item => filesInfos.Remove(item));
 
-            await webApi.DeleteFiles(filesInfo.FirstOrDefault()?.datum.pid, filesInfo.Select(item => item.Fid).ToList());
+            await webApi.DeleteFiles(filesInfo.FirstOrDefault()?.datum.pid,
+                filesInfo.Select(item => item.Fid).ToList());
         }
     }
 
@@ -834,7 +847,8 @@ public sealed partial class MainPage : Page
 
     private MediaPlayerElement GetFirstElementPlayPickCode(string pc)
     {
-        var media = Video_UniformGrid.Children.FirstOrDefault(item => ((item as MediaPlayerElement)?.Tag as MediaPlayerWithStreamSource)?.FilesInfo.datum.pc == pc);
+        var media = Video_UniformGrid.Children.FirstOrDefault(item =>
+            ((item as MediaPlayerElement)?.Tag as MediaPlayerWithStreamSource)?.FilesInfo.datum.pc == pc);
         if (media == null || media is not MediaPlayerElement mediaPlayerElement) return null;
 
         return mediaPlayerElement;
@@ -852,7 +866,8 @@ public sealed partial class MainPage : Page
         if (mediaPlayerElement == null) return;
 
         //正在播放的文件的pc
-        var playingPcList = Video_UniformGrid.Children.Select(element => ((element as MediaPlayerElement)?.Tag as MediaPlayerWithStreamSource)?.FilesInfo.datum.pc).ToList();
+        var playingPcList = Video_UniformGrid.Children.Select(element =>
+            ((element as MediaPlayerElement)?.Tag as MediaPlayerWithStreamSource)?.FilesInfo.datum.pc).ToList();
 
         // 挑选播放列表中不是正在播放的视频
         // 删除的一般只有一个，只取一个
@@ -899,14 +914,16 @@ public sealed partial class MainPage : Page
         Debug.WriteLine("正在切换UriSource");
 
         //将即将删除的视频移到最后
-        Video_UniformGrid.Children.Move((uint)Video_UniformGrid.Children.IndexOf(mediaPlayerElement), (uint)Video_UniformGrid.Children.Count - 1);
+        Video_UniformGrid.Children.Move((uint)Video_UniformGrid.Children.IndexOf(mediaPlayerElement),
+            (uint)Video_UniformGrid.Children.Count - 1);
 
         var videoUrl = await GetVideoUrl(videoInfo);
         if (videoUrl == null) return;
 
         var menuFlyout = BuildMenuFlyout(videoInfo);
 
-        var mediaPlayerWithStreamSource = await MediaPlayerWithStreamSource.CreateMediaPlayer(videoInfo, videoUrl);
+        var mediaPlayerWithStreamSource =
+            await MediaPlayerWithStreamSource.CreateMediaPlayer(videoUrl, filesInfo: videoInfo);
 
         var mediaPlayer = mediaPlayerWithStreamSource.MediaPlayer;
         mediaPlayer.CurrentStateChanged += MediaPlayer_CurrentStateChanged;
@@ -988,5 +1005,81 @@ public sealed partial class MainPage : Page
         // 添加新的
         await AddMediaElement(fileInfo, videoUrl, index);
 
+    }
+
+    private System.Timers.Timer aTimer;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void Video_UniformGrid_OnPointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        aTimer?.Stop();
+        Debug.WriteLine("计时器开始");
+
+        // Create a timer with a one second interval.
+        aTimer = new System.Timers.Timer(500);
+        aTimer.Enabled = true;
+        aTimer.Elapsed += timer_Tick; ;
+    }
+
+    //鼠标状态计数器
+    private int _iCount = 0;
+
+    private void timer_Tick(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        //鼠标状态计数器>=0的情况下鼠标可见，<0不可见，并不是直接受api函数影响而改变
+        var i = CursorHelper.GetIdleTick();
+
+        Debug.WriteLine($"限制时间(ms)：{i}");
+
+        if (i > 4000)
+        {
+            while (_iCount >= 0)
+            {
+                Debug.WriteLine($"隐藏鼠标 ({_iCount}）");
+                _iCount = CursorHelper.ShowCursor(false);
+            }
+
+            TryUpdateUi(false);
+        }
+        else
+        {
+            while (_iCount < 0)
+            {
+                Debug.WriteLine($"显示鼠标 ({_iCount}）");
+                _iCount = CursorHelper.ShowCursor(true);
+            }
+            TryUpdateUi();
+        }
+    }
+
+    private void TryUpdateUi(bool isOpenSplitPane = true)
+    {
+        var cursor = isOpenSplitPane ? null : CursorHelper.GetHiddenCursor();
+        var visibility = isOpenSplitPane ? Visibility.Visible: Visibility.Collapsed;
+
+        if (DispatcherQueue.HasThreadAccess)
+        {
+            ProtectedCursor = cursor;
+            SplitViewOpenButton.Visibility = visibility;
+        }
+        else
+        {
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                ProtectedCursor = cursor;
+                SplitViewOpenButton.Visibility = visibility;
+            });
+        }
+    }
+
+    private void Video_UniformGrid_OnPointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        aTimer?.Stop();
+
+        ProtectedCursor = null;
     }
 }

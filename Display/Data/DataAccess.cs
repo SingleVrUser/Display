@@ -398,7 +398,7 @@ namespace Display.Data
             return Path.Combine(newPath, DBNAME);
         }
 
-        public async static void tryCreateDBFile(string TargetPath)
+        public static async void tryCreateDBFile(string TargetPath)
         {
             //获取文件夹
             StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(TargetPath);
@@ -412,22 +412,37 @@ namespace Display.Data
         /// </summary>
         public static void DeleteFilesInfoTable()
         {
-            using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
-            {
-                db.Open();
+            using SqliteConnection db =
+                new SqliteConnection($"Filename={dbpath}");
+            db.Open();
 
-                SqliteCommand insertCommand = new SqliteCommand();
-                insertCommand.Connection = db;
+            var insertCommand = new SqliteCommand();
+            insertCommand.Connection = db;
 
-                // Use parameterized query to prevent SQL injection attacks
-                insertCommand.CommandText = $"delete from FilesInfo";
+            // Use parameterized query to prevent SQL injection attacks
+            insertCommand.CommandText = $"delete from FilesInfo";
 
-                insertCommand.ExecuteReader();
+            insertCommand.ExecuteNonQuery();
 
-                db.Close();
-            }
+            db.Close();
         }
+
+        public static void DeleteDownHistory()
+        {
+            using SqliteConnection db =
+                new SqliteConnection($"Filename={dbpath}");
+            db.Open();
+
+            var insertCommand = new SqliteCommand();
+            insertCommand.Connection = db;
+
+            insertCommand.CommandText = "delete from DownHistory";
+
+            insertCommand.ExecuteNonQuery();
+
+            db.Close();
+        }
+
 
         /// <summary>
         /// 删除SpiderLog中的所有数据
