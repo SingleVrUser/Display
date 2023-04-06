@@ -45,7 +45,7 @@ namespace MediaPlayerElement_Test.Models
         {
             var randomStream = new HttpRandomAccessStream(client, uri);
 
-            return AsyncInfo.Run(async (cancellationToken) =>
+            return AsyncInfo.Run(async (_) =>
             {
                 await randomStream.SendRequestAsync();
                 return randomStream;
