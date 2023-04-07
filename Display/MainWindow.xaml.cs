@@ -194,7 +194,7 @@ namespace Display
                         break;
                 }
             }
-
+            
             //在这里检查应用更新
             TryCheckAppUpdate();
         }
@@ -233,7 +233,8 @@ namespace Display
             {
                 //下载
                 case ContentDialogResult.Primary:
-                    var installUrl = $"ms-appinstaller:?source={releaseCheck.AppAsset.browser_download_url}";
+                    var installUrl = AppInfo.IsWindows11() ? $"ms-appinstaller:?source={releaseCheck.AppAsset.browser_download_url}" : $"{releaseCheck.AppAsset.browser_download_url}";
+                    
                     await Launcher.LaunchUriAsync(new Uri(installUrl));
                     break;
                 //忽略该版本

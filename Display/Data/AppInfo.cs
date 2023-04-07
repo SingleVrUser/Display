@@ -75,4 +75,10 @@ public static class AppInfo
 
         return new LatestReleaseCheck(latestReleaseInfo);
     }
+
+    public static bool IsWindows11()
+    {
+        var os = Environment.OSVersion;
+        return os.Platform == PlatformID.Win32NT && os.Version.Major > 10 || os.Version is { Major: 10, Build: >= 22000 };
+    }
 }
