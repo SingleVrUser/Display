@@ -51,13 +51,43 @@
 
                 <Grid.ContextFlyout>
                     <MenuFlyout>
-                        <MenuFlyoutItem Text="播放"
+                        <MenuFlyoutItem Text="在默认应用播放"
                                         IsEnabled="{x:Bind datum.iv, Converter={StaticResource IsVideoToBoolConverter}}"
                                         Click="PlayVideoButton_Click">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="&#xEE4A;" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
+
+                        <MenuFlyoutSubItem Text="在其他应用播放"
+                                           IsEnabled="{x:Bind datum.iv, Converter={StaticResource IsVideoToBoolConverter}}">
+                            <MenuFlyoutSubItem.Icon>
+                                <FontIcon Glyph="&#xEE4A;" />
+                            </MenuFlyoutSubItem.Icon>
+
+                            <MenuFlyoutItem Text="WebView"
+                                            Tag="0"
+                                            Click="PlayWithPlayerButtonClick"/>
+
+                            <MenuFlyoutItem Text="PotPlayer"
+                                            Tag="1"
+                                            Click="PlayWithPlayerButtonClick"/>
+
+                            <MenuFlyoutItem Text="mpv"
+                                            Tag="2"
+                                            Click="PlayWithPlayerButtonClick"/>
+
+                            <MenuFlyoutItem Text="vlc"
+                                            Tag="3"
+                                            Click="PlayWithPlayerButtonClick"/>
+
+                            <MenuFlyoutItem Text="MediaElement"
+                                            Tag="4"
+                                            Click="PlayWithPlayerButtonClick"/>
+
+
+                        </MenuFlyoutSubItem>
+
                     </MenuFlyout>
                 </Grid.ContextFlyout>
                 <Grid.ColumnDefinitions>

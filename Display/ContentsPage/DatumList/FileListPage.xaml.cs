@@ -753,9 +753,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     
     private async void PlayVideoButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem item) return;
-
-        if (item.DataContext is not FilesInfo info) return;
+        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
 
         await PlayVideoHelper.PlayVideo(info.datum.pc, this.XamlRoot, trueName: info.Name, lastPage: this);
     }
@@ -770,6 +768,16 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         var page = new Sort115.MainPage(folders);
         page.CreateWindow();
+    }
+
+    private async void PlayWithPlayerButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info, Tag: string aTag }) return;
+
+        if (!int.TryParse(aTag, out var playerSelection)) return;
+
+        await Task.Delay(1);
+        await PlayVideoHelper.PlayVideo(info.datum.pc, this.XamlRoot, trueName: info.Name, lastPage: this, playerSelection: playerSelection);
     }
 }
 
