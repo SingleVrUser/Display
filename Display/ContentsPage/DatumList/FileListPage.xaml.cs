@@ -20,6 +20,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Display.Data;
+using Display.Views;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -29,7 +30,7 @@ namespace Display.ContentsPage.DatumList;
 /// <summary>
 /// An empty page that can be used on its own or navigated to within a Frame.
 /// </summary>
-public sealed partial class FileListPage : Page, INotifyPropertyChanged
+public sealed partial class FileListPage : INotifyPropertyChanged
 {
     ObservableCollection<MetadataItem> _units;
 
@@ -81,7 +82,6 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
     /// <param Name="e"></param>
     private void Grid_loaded(object sender, RoutedEventArgs e)
     {
-
         MyProgressBar.Visibility = Visibility.Visible;
 
         filesInfos = new IncrementalLoadDatumCollection("0");
@@ -673,15 +673,16 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
 
     private async void deleData_Click(object sender, RoutedEventArgs e)
     {
-        ContentDialog dialog = new ContentDialog();
+        var dialog = new ContentDialog
+        {
+            XamlRoot = this.XamlRoot,
+            Title = "确认后继续",
+            PrimaryButtonText = "继续",
+            CloseButtonText = "取消",
+            DefaultButton = ContentDialogButton.Close
+        };
 
-        dialog.XamlRoot = this.XamlRoot;
-        dialog.Title = "确认后继续";
-        dialog.PrimaryButtonText = "继续";
-        dialog.CloseButtonText = "取消";
-        dialog.DefaultButton = ContentDialogButton.Close;
-
-        RichTextBlock TextHighlightingRichTextBlock = new();
+        RichTextBlock textHighlightingRichTextBlock = new();
 
         Paragraph paragraph = new();
         paragraph.Inlines.Add(new Run() { Text = "该操作将" });
@@ -690,9 +691,9 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
         paragraph.Inlines.Add(new Run() { Text = "所有", Foreground = new SolidColorBrush(Colors.OrangeRed) });
         paragraph.Inlines.Add(new Run() { Text = "115数据" });
 
-        TextHighlightingRichTextBlock.Blocks.Add(paragraph);
+        textHighlightingRichTextBlock.Blocks.Add(paragraph);
 
-        dialog.Content = TextHighlightingRichTextBlock;
+        dialog.Content = textHighlightingRichTextBlock;
 
         var result = await dialog.ShowAsync();
 
@@ -719,51 +720,37 @@ public sealed partial class FileListPage : Page, INotifyPropertyChanged
             ShowTeachingTip("当前未选中要下载的文件或文件夹");
             return;
         }
-        else
+
+        if (BaseExample.SelectedItems.FirstOrDefault() is not FilesInfo) return;
+
+        webApi ??= WebApi.GlobalWebApi;
+
+        List<Datum> videoinfos = new();
+
+        foreach (var item in BaseExample.SelectedItems)
         {
-            if (BaseExample.SelectedItems.FirstOrDefault() is not FilesInfo) return;
+            if (item is not FilesInfo fileinfo) continue;
 
-            webApi ??= WebApi.GlobalWebApi;
-
-            List<Datum> videoinfos = new();
-
-            foreach (var item in BaseExample.SelectedItems)
-            {
-                if (item is not FilesInfo fileinfo) continue;
-
-                Datum datum = new();
-                datum.cid = fileinfo.Cid;
-                datum.n = fileinfo.Name;
-                datum.pc = fileinfo.datum.pc;
-                datum.fid = fileinfo.Fid;
-                videoinfos.Add(datum);
-            }
-
-            //BitComet只需要cid,n,pc三个值
-            bool isSuccess = await webApi.RequestDown(videoinfos, downtype);
-
-            if (!isSuccess)
-                ShowTeachingTip("请求下载失败");
+            Datum datum = new();
+            datum.cid = fileinfo.Cid;
+            datum.n = fileinfo.Name;
+            datum.pc = fileinfo.datum.pc;
+            datum.fid = fileinfo.Fid;
+            videoinfos.Add(datum);
         }
+
+        //BitComet只需要cid,n,pc三个值
+        bool isSuccess = await webApi.RequestDown(videoinfos, downtype);
+
+        if (!isSuccess)
+            ShowTeachingTip("请求下载失败");
     }
 
-    private async void ShowTeachingTip(string subtitle, string content = null)
+    private void ShowTeachingTip(string message)
     {
-        if (LightDismissTeachingTip.IsOpen) LightDismissTeachingTip.IsOpen = false;
-
-        LightDismissTeachingTip.Subtitle = subtitle;
-
-        if (content != null)
-            LightDismissTeachingTip.Content = content;
-
-        LightDismissTeachingTip.IsOpen = true;
-
-        await Task.Delay(1000);
-
-        if (LightDismissTeachingTip.IsOpen) LightDismissTeachingTip.IsOpen = false;
-
+        BasePage.ShowTeachingTip(lightDismissTeachingTip:LightDismissTeachingTip, message);
     }
-
+    
     private async void PlayVideoButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not MenuFlyoutItem item) return;
