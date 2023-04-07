@@ -21,6 +21,7 @@ using Display.Data;
 using Display.Models;
 using Windows.Media;
 using Display.Views;
+using Microsoft.UI.Xaml.Media;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -192,8 +193,26 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
         MediaControl.SetMediaPlayer(media);
 
+        MediaControl.MediaPlayer.MediaOpened += MediaPlayer_MediaOpened;
+
+
         _currentMediaPlayerWithStreamSource?.Dispose();
         _currentMediaPlayerWithStreamSource = mediaPlayerWithStreamSource;
+    }
+
+    private void MediaPlayer_MediaOpened(MediaPlayer sender, object args)
+    {
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            var transportControlsTemplateRoot = (FrameworkElement)VisualTreeHelper.GetChild(MediaControl.TransportControls, 0);
+            var sliderControl = (Slider)transportControlsTemplateRoot.FindName("ProgressSlider");
+            if (sliderControl != null && sender.PlaybackSession.NaturalDuration.TotalSeconds > 1000)
+            {
+                // 十秒一步
+                sliderControl.StepFrequency = 1000 / sender.PlaybackSession.NaturalDuration.TotalSeconds;
+                sliderControl.SmallChange = 1000 / sender.PlaybackSession.NaturalDuration.TotalSeconds;
+            }
+        });
     }
 
     private async void QualityChanged(object sender, SelectionChangedEventArgs e)
