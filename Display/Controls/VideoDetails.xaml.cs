@@ -17,6 +17,7 @@ using Windows.Foundation.Metadata;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Display.Data;
+using Display.Helper;
 using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -649,7 +650,7 @@ namespace Display.Controls
         {
             if (sender is not Button { DataContext: string imagePath }) return;
 
-            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeNorthwestSoutheast);
+            ProtectedCursor = CursorHelper.GetZoomCursor();
 
             EnLargeGrid.Visibility = Visibility.Visible;
 
