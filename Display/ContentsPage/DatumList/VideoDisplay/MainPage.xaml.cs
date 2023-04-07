@@ -383,7 +383,7 @@ public sealed partial class MainPage : Page
             mediaPlayerElement.AutoPlay = true;
         }
 
-        mediaPlayerElement.MediaPlayer.PlaybackSession.MediaPlayer.MediaOpened += (sender, args) =>
+        mediaPlayerElement.MediaPlayer.MediaOpened += (sender, args) =>
         {
             MediaPlayer_MediaOpened(sender, args);
 
@@ -394,8 +394,21 @@ public sealed partial class MainPage : Page
             {
                 _highBitRateVideos.Add(file.datum.pc);
             }
+
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                var transportControlsTemplateRoot = (FrameworkElement)VisualTreeHelper.GetChild(mediaPlayerElement.TransportControls, 0);
+                var sliderControl = (Slider)transportControlsTemplateRoot.FindName("ProgressSlider");
+                if (sliderControl != null && sender.PlaybackSession.NaturalDuration.TotalSeconds > 1000)
+                {
+                    // 十秒一步
+                    sliderControl.StepFrequency = 1000 / sender.PlaybackSession.NaturalDuration.TotalSeconds;
+                    sliderControl.SmallChange = 1000 / sender.PlaybackSession.NaturalDuration.TotalSeconds;
+                }
+            });
+
         };
-        mediaPlayerElement.MediaPlayer.PlaybackSession.MediaPlayer.MediaEnded += MediaPlayer_MediaEnded;
+        mediaPlayerElement.MediaPlayer.MediaEnded += MediaPlayer_MediaEnded;
 
         mediaPlayerElement.MediaPlayer.MediaFailed += MediaPlayer_MediaFailed;
 
