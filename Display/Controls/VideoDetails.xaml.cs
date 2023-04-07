@@ -649,7 +649,7 @@ namespace Display.Controls
         {
             if (sender is not Button { DataContext: string imagePath }) return;
 
-            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeNorthwestSoutheast);
 
             EnLargeGrid.Visibility = Visibility.Visible;
 
@@ -658,7 +658,7 @@ namespace Display.Controls
 
         private void EnlargeButton_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
+            ProtectedCursor = null;
 
             EnLargeGrid.Visibility = Visibility.Collapsed;
         }

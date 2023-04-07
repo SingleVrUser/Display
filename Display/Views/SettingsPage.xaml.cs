@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using static System.String;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -26,7 +27,7 @@ namespace Display.Views
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class SettingsPage : Page
+    public sealed partial class SettingsPage
     {
         private readonly ObservableCollection<string> _resolutionSelectionCollection = new();
 
@@ -45,7 +46,7 @@ namespace Display.Views
             //初始化115状态
             _webapi ??= WebApi.GlobalWebApi;
 
-            if (!string.IsNullOrEmpty(AppSettings._115_Cookie) && WebApi.UserInfo == null)
+            if (!IsNullOrEmpty(AppSettings._115_Cookie) && WebApi.UserInfo == null)
             {
                 await Task.Run(async () =>
                 {
@@ -188,7 +189,7 @@ namespace Display.Views
 
             //检查数据库的是否需要修改
             string imagePath = DataAccess.GetOneImagePath();
-            if (string.IsNullOrEmpty(imagePath))
+            if (IsNullOrEmpty(imagePath))
             {
                 ShowTeachingTip("图片保存地址修改完成");
                 return;
@@ -239,7 +240,7 @@ namespace Display.Views
 
             //检查数据库的是否需要修改
             string imagePath = DataAccess.GetOneActorProfilePath();
-            if (string.IsNullOrEmpty(imagePath))
+            if (IsNullOrEmpty(imagePath))
             {
                 ShowTeachingTip("保存地址修改完成");
                 return;
@@ -492,7 +493,7 @@ namespace Display.Views
         {
 
             var coookieText = Cookie_TextBox.Text;
-            if (string.IsNullOrEmpty(coookieText))
+            if (IsNullOrEmpty(coookieText))
             {
                 ShowTeachingTip("输入为空");
                 return;
@@ -615,7 +616,7 @@ namespace Display.Views
             switch (PlayerSelectionComboBox.SelectedIndex)
             {
                 case 1:
-                    exePath = string.Empty;
+                    exePath = Empty;
                     AppSettings.PotPlayerExePath = exePath;
                     PlayerExePathTextBox.Text = exePath;
                     break;
@@ -641,10 +642,10 @@ namespace Display.Views
                 1 => Path.GetDirectoryName(AppSettings.PotPlayerExePath),
                 2 => Path.GetDirectoryName(AppSettings.MpvExePath),
                 3 => Path.GetDirectoryName(AppSettings.VlcExePath),
-                _ => string.Empty
+                _ => Empty
             };
 
-            if (!string.IsNullOrEmpty(openPath))
+            if (!IsNullOrEmpty(openPath))
             {
                 FileMatch.LaunchFolder(openPath);
             }
@@ -711,7 +712,7 @@ namespace Display.Views
         {
             DownApiSettings bitCometSettings = new();
 
-            if (string.IsNullOrWhiteSpace(fullApiUrl))
+            if (IsNullOrWhiteSpace(fullApiUrl))
             {
                 ShowTeachingTip("输入不能为空");
 
@@ -753,7 +754,7 @@ namespace Display.Views
                 {
                     string content = await rep.Content.ReadAsStringAsync();
 
-                    if (!string.IsNullOrWhiteSpace(content))
+                    if (!IsNullOrWhiteSpace(content))
                         isOK = true;
                 }
                 else
@@ -774,27 +775,21 @@ namespace Display.Views
                 Debug.WriteLine(ex.Message);
             }
 
-
             return isOK;
         }
 
         private void ShowTeachingTip(string subtitle, string content = null)
         {
-            LightDismissTeachingTip.Subtitle = subtitle;
-            LightDismissTeachingTip.IsLightDismissEnabled = true;
-            if (content != null)
-                LightDismissTeachingTip.Content = content;
-
-            LightDismissTeachingTip.IsOpen = true;
+            BasePage.ShowTeachingTip(LightDismissTeachingTip,subtitle,content);
         }
 
         private void BitCometSavePathOpen_Click(object sender, RoutedEventArgs e)
         {
-            var BitCometSavePath = AppSettings.BitCometSavePath;
+            var bitCometSavePath = AppSettings.BitCometSavePath;
 
-            if (BitCometSavePath == null)
+            if (bitCometSavePath == null)
                 return;
-            FileMatch.LaunchFolder(BitCometSavePath);
+            FileMatch.LaunchFolder(bitCometSavePath);
         }
 
         private async void BitCometSavePathChange_Click(object sender, RoutedEventArgs e)
@@ -854,7 +849,7 @@ namespace Display.Views
         {
             DownApiSettings aria2Settings = new();
 
-            if (string.IsNullOrWhiteSpace(fullApiUrl))
+            if (IsNullOrWhiteSpace(fullApiUrl))
             {
                 ShowTeachingTip("输入不能为空");
 
@@ -906,7 +901,7 @@ namespace Display.Views
                 {
                     string content = await rep.Content.ReadAsStringAsync();
 
-                    if (!string.IsNullOrWhiteSpace(content))
+                    if (!IsNullOrWhiteSpace(content))
                         isOK = true;
                 }
                 else
@@ -978,22 +973,22 @@ namespace Display.Views
 
         private void Aria2SavePathClear_Click(object sender, RoutedEventArgs e)
         {
-            AppSettings.Aria2SavePath = String.Empty;
+            AppSettings.Aria2SavePath = Empty;
             Aria2SavePathTextBox.Text = null;
         }
 
         private void BitCometSavePathClear_Click(object sender, RoutedEventArgs e)
         {
-            AppSettings.BitCometSavePath = String.Empty;
+            AppSettings.BitCometSavePath = Empty;
             BitCometSavePathTextBox.Text = null;
         }
 
-        public async static Task<StorageFolder> OpenFolder(PickerLocationId SuggestedStartLocation)
+        public static async Task<StorageFolder> OpenFolder(PickerLocationId suggestedStartLocation)
         {
             FolderPicker folderPicker = new();
             folderPicker.FileTypeFilter.Add("*");
-            IntPtr hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.AppMainWindow);
-            folderPicker.SuggestedStartLocation = SuggestedStartLocation;
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.AppMainWindow);
+            folderPicker.SuggestedStartLocation = suggestedStartLocation;
 
             WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hwnd);
 
@@ -1001,5 +996,11 @@ namespace Display.Views
 
         }
 
+        private void ClearDownRecordButton_Click(object sender, RoutedEventArgs e)
+        {
+            DataAccess.DeleteDownHistory();
+
+            ShowTeachingTip("已清空");
+        }
     }
 }

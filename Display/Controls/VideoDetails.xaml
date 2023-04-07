@@ -538,7 +538,7 @@
 
         </Grid>
 
-        <TeachingTip x:Name="LightDismissTeachingTip"
+        <TeachingTip Grid.Row="0" x:Name="LightDismissTeachingTip"
                      IsLightDismissEnabled="True" />
     </Grid>
 </UserControl>

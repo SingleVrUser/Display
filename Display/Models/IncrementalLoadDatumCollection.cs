@@ -57,11 +57,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
 
         //汇报事件
         GetFileInfoCompletedEventArgs args = new() { orderby = this.orderby, asc = this.asc, TimeReached = DateTime.Now };
-        EventHandler<GetFileInfoCompletedEventArgs> handler = GetFileInfoCompleted;
-        if (handler != null)
-        {
-            handler(this, args);
-        }
+        GetFileInfoCompleted?.Invoke(this, args);
 
         return FilesInfo;
     }
