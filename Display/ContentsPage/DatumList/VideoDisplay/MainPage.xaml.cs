@@ -795,7 +795,7 @@ public sealed partial class MainPage : Page
     {
         if (sender is not Button { DataContext: VideoInfo videoInfo }) return;
 
-        ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeNorthwestSoutheast);
+        ProtectedCursor = CursorHelper.GetZoomCursor();
 
         SmokeGrid.Visibility = Visibility.Visible;
 
