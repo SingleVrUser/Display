@@ -385,6 +385,8 @@ public sealed partial class MainPage : Page
 
         mediaPlayerElement.MediaPlayer.MediaOpened += (sender, args) =>
         {
+            if(_isDisposing) return;
+
             MediaPlayer_MediaOpened(sender, args);
 
             Debug.WriteLine(

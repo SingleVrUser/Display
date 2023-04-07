@@ -14,12 +14,12 @@ namespace Display.Helper;
 
 public class PlayVideoHelper
 {
-    public static async Task PlayVideo(string pickCode, XamlRoot xamlRoot = null, SubInfo subInfo = null, CustomMediaPlayerElement.PlayType playType = CustomMediaPlayerElement.PlayType.success, string trueName = "", Page lastPage = null)
+    public static async Task PlayVideo(string pickCode, XamlRoot xamlRoot = null, SubInfo subInfo = null, CustomMediaPlayerElement.PlayType playType = CustomMediaPlayerElement.PlayType.success, string trueName = "", Page lastPage = null, int playerSelection = -1)
     {
         //115Cookie未空
         if (string.IsNullOrEmpty(AppSettings._115_Cookie) && xamlRoot != null)
         {
-            ContentDialog dialog = new ContentDialog()
+            var dialog = new ContentDialog()
             {
                 XamlRoot = xamlRoot,
                 Title = "播放失败",
@@ -74,8 +74,10 @@ public class PlayVideoHelper
             }
         }
 
+        if (playerSelection == -1) playerSelection = AppSettings.PlayerSelection;
+
         //选择播放器播放
-        switch (AppSettings.PlayerSelection)
+        switch (playerSelection)
         {
             //浏览器播放
             case 0:
@@ -100,14 +102,13 @@ public class PlayVideoHelper
         }
     }
 
-    private async static void SubInfoListView_ItemClick(object sender, ItemClickEventArgs e)
+    private static async void SubInfoListView_ItemClick(object sender, ItemClickEventArgs e)
     {
-        var SingleVideoInfo = e.ClickedItem as Data.SubInfo;
+        if (e.ClickedItem is not SubInfo singleVideoInfo) return;
 
-        if (sender is not ListView listView) return;
-        if (listView.DataContext is not string trueName) return;
+        if (sender is not ListView { DataContext: string trueName }) return;
 
-        await PlayVideo(SingleVideoInfo.fileBelongPickcode, subInfo: SingleVideoInfo, trueName: trueName, lastPage: DetailInfoPage.Current);
+        await PlayVideo(singleVideoInfo.fileBelongPickcode, subInfo: singleVideoInfo, trueName: trueName, lastPage: DetailInfoPage.Current);
     }
 
 }
