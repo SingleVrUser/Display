@@ -11,7 +11,7 @@ public class CustomMediaTransportControls : MediaTransportControls
     public event EventHandler<RoutedEventArgs> FullWindow;
     public event EventHandler<RoutedEventArgs> LikeButtonClick;
     public event EventHandler<RoutedEventArgs> LookLaterButtonClick;
-    public event EventHandler<RoutedEventArgs> ScreenshotButtonClick;
+    public event EventHandler<RoutedEventArgs> ScreenShotButtonClick;
 
     public event SelectionChangedEventHandler QualityChanged;
     public event SelectionChangedEventHandler PlayerChanged;
@@ -25,8 +25,8 @@ public class CustomMediaTransportControls : MediaTransportControls
     {
         // This is where you would get your custom button and create an event handler for its click method.
         //全屏按钮
-        Button fullWindowButton = GetTemplateChild("FullWindowButton") as Button;
-        fullWindowButton.Click += FullWindowButton_Click;
+        var fullWindowButton = GetTemplateChild("FullWindowButton") as Button;
+        if (fullWindowButton != null) fullWindowButton.Click += FullWindowButton_Click;
 
         base.OnApplyTemplate();
     }
@@ -36,22 +36,31 @@ public class CustomMediaTransportControls : MediaTransportControls
     {
         //显示喜欢/稍后观看
         AppBarToggleButton likeButton = GetTemplateChild("IsLikeButton") as AppBarToggleButton;
-        likeButton.Click += LikeButton_Click;
-        likeButton.IsEnabled = true;
-        likeButton.IsChecked = islike;
+        if (likeButton != null)
+        {
+            likeButton.Click += LikeButton_Click;
+            likeButton.IsEnabled = true;
+            likeButton.IsChecked = islike;
+        }
 
         AppBarToggleButton lookLaterButton = GetTemplateChild("LookLaterButton") as AppBarToggleButton;
-        lookLaterButton.Click += LookLaterButton_Click;
-        lookLaterButton.IsEnabled = true;
-        lookLaterButton.IsChecked = look_later;
-
+        if (lookLaterButton != null)
+        {
+            lookLaterButton.Click += LookLaterButton_Click;
+            lookLaterButton.IsEnabled = true;
+            lookLaterButton.IsChecked = look_later;
+        }
     }
 
     public void SetScreenButton()
     {
         Button screenshotButton = GetTemplateChild("ScreenshotButton") as Button;
-        screenshotButton.Click += ScreenshotButton_Click; ;
-        screenshotButton.Visibility = Visibility.Visible;
+        if (screenshotButton != null)
+        {
+            screenshotButton.Click += ScreenshotButton_Click;
+            ;
+            screenshotButton.Visibility = Visibility.Visible;
+        }
     }
 
 
@@ -67,14 +76,12 @@ public class CustomMediaTransportControls : MediaTransportControls
 
         qualityListView.ItemsSource = QualityItemsSource;
 
-        if (QualityItemsSource.Count == 1)
+        qualityListView.SelectedIndex = QualityItemsSource.Count switch
         {
-            qualityListView.SelectedIndex = 0;
-        }
-        else if (QualityItemsSource.Count > 1)
-        {
-            qualityListView.SelectedIndex = 1;
-        }
+            1 => 0,
+            > 1 => 1,
+            _ => qualityListView.SelectedIndex
+        };
 
         qualityListView.SelectionChanged += QualityListView_SelectionChanged;
     }
@@ -118,7 +125,7 @@ public class CustomMediaTransportControls : MediaTransportControls
     }
     private void ScreenshotButton_Click(object sender, RoutedEventArgs e)
     {
-        ScreenshotButtonClick?.Invoke(sender, e);
+        ScreenShotButtonClick?.Invoke(sender, e);
     }
 
 

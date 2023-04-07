@@ -2,11 +2,13 @@
 // Licensed under the MIT License.
 
 using Display.Data;
+using Display.Helper;
 using Display.Views;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using System.Diagnostics;
 using static Display.Controls.CustomMediaPlayerElement;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -178,6 +180,74 @@ public sealed partial class MediaPlayWindow : Window
         else
         {
             cancelFullScreen();
+        }
+    }
+
+    private System.Timers.Timer aTimer;
+    private void MediaControl_OnPointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        aTimer?.Stop();
+        Debug.WriteLine("计时器开始");
+
+        // Create a timer with a one second interval.
+        aTimer = new System.Timers.Timer(500);
+        aTimer.Enabled = true;
+        aTimer.Elapsed += timer_Tick; ;
+    }
+
+    private void MediaControl_OnPointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        aTimer?.Stop();
+
+        RootGrid.Cursor = null;
+    }
+
+
+    //鼠标状态计数器
+    private int _iCount = 0;
+
+    private void timer_Tick(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        //鼠标状态计数器>=0的情况下鼠标可见，<0不可见，并不是直接受api函数影响而改变
+        var i = CursorHelper.GetIdleTick();
+
+        Debug.WriteLine($"限制时间(ms)：{i}");
+
+        if (i > 4000)
+        {
+            while (_iCount >= 0)
+            {
+                Debug.WriteLine($"隐藏鼠标 ({_iCount}）");
+                _iCount = CursorHelper.ShowCursor(false);
+            }
+
+            TryUpdateUi(false);
+        }
+        else
+        {
+            while (_iCount < 0)
+            {
+                Debug.WriteLine($"显示鼠标 ({_iCount}）");
+                _iCount = CursorHelper.ShowCursor(true);
+            }
+            TryUpdateUi();
+        }
+    }
+
+    private void TryUpdateUi(bool isOpenSplitPane = true)
+    {
+        var cursor = isOpenSplitPane ? null : CursorHelper.GetHiddenCursor();
+
+        if (DispatcherQueue.HasThreadAccess)
+        {
+            RootGrid.Cursor = cursor;
+        }
+        else
+        {
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                RootGrid.Cursor = cursor;
+            });
         }
     }
 }

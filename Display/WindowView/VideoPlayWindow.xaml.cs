@@ -74,10 +74,11 @@ namespace Display
             if (sender.ContainsFullScreenElement)
             {
                 _markPresenterKindBeforeFullScreen = appwindow.Presenter.Kind;
-                appwindow.SetPresenter(AppWindowPresenterKind.FullScreen);
 
                 this.ExtendsContentIntoTitleBar = false;
                 TitleBarRowDefinition.Height = new(0);
+
+                appwindow.SetPresenter(AppWindowPresenterKind.FullScreen);
             }
             else
             {

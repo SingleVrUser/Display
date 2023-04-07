@@ -38,14 +38,14 @@
                                                     FullWindow="mediaControls_FullWindow"
                                                     LikeButtonClick="LikeButtonClick"
                                                     LookLaterButtonClick="LookLaterButtonClick"
-                                                    ScreenshotButtonClick="ScreenshotButtonClick"
+                                                    ScreenShotButtonClick="ScreenshotButtonClick"
                                                     QualityChanged="QualityChanged"
                                                     PlayerChanged="PlayerChanged"
                                                     IsHitTestVisible="True" />
             </MediaPlayerElement.TransportControls>
         </MediaPlayerElement>
 
-        <TeachingTip x:Name="Player_TeachingTip"
+        <TeachingTip x:Name="PlayerTeachingTip"
                      IsLightDismissEnabled="True"
                      PreferredPlacement="TopRight"
                      PlacementMargin="0,5,-22,0"/>
