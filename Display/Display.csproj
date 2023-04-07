@@ -22,7 +22,7 @@
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxPackageDir>D:\库\Desktop\打包\</AppxPackageDir>
     <PackageIcon>SmallTile.scale-125.png</PackageIcon>
-    <Win32Resource>Assets\Win32Resources.res</Win32Resource>
+    <Win32Resource>App.res</Win32Resource>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Assets\Models\**" />
@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="About\UpdatePlane.xaml" />
+    <None Remove="app.manifest" />
     <None Remove="Assets\115favicon.ico" />
     <None Remove="Assets\115\mountain.svg" />
     <None Remove="Assets\115\pic_left_det.svg" />
@@ -61,7 +62,6 @@
     <None Remove="Assets\Svg\face_male_man_portrait_icon.svg" />
     <None Remove="Assets\Svg\file_document_paper_page_icon.svg" />
     <None Remove="Assets\Tip\FindFolderCid.png" />
-    <None Remove="Assets\Win32Resources.res" />
     <None Remove="ContentsPage\AddActorCover.xaml" />
     <None Remove="ContentsPage\CalculateLocalFileSha1.xaml" />
     <None Remove="ContentsPage\CheckCookie.xaml" />
@@ -157,7 +157,7 @@
     <PackageReference Include="RestSharp" Version="110.1.0" />
     <PackageReference Include="SQLitePCLRaw.bundle_winsqlite3" Version="2.1.4" />
     <PackageReference Include="WinUIEx" Version="2.1.0" />
-    <Manifest Include="$(ApplicationManifest)" />
+    <!--<Manifest Include="$(ApplicationManifest)" />-->
   </ItemGroup>
 
   <!-- Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
@@ -425,8 +425,5 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="ContentsPage\DetailInfo\EditInfo.xaml" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Assets\Win32Resources.res" />
   </ItemGroup>
 </Project>

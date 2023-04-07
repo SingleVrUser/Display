@@ -34,14 +34,6 @@ namespace Display.Helper
             [MarshalAs(UnmanagedType.U4)] public uint dwTime;
         }
 
-        private static InputCursor _zoomCursor;
-        public static InputCursor GetZoomCursor()
-        {
-            if (_zoomCursor == null)
-                _zoomCursor = InputDesktopResourceCursor.CreateFromModule("Display", 206);
-            return _zoomCursor;
-        }
-
         private static InputCursor _hiddenCursor;
         public static InputCursor GetHiddenCursor()
         {

@@ -795,7 +795,7 @@ public sealed partial class MainPage : Page
     {
         if (sender is not Button { DataContext: VideoInfo videoInfo }) return;
 
-        ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
+        ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.SizeNorthwestSoutheast);
 
         SmokeGrid.Visibility = Visibility.Visible;
 
@@ -805,7 +805,7 @@ public sealed partial class MainPage : Page
 
     private void EnlargeButton_PointerExited(object sender, PointerRoutedEventArgs e)
     {
-        ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
+        ProtectedCursor = null;
 
         SmokeGrid.Visibility = Visibility.Collapsed;
     }
