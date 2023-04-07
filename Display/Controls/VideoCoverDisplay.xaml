@@ -187,6 +187,7 @@
         <converter:BoolToVisibleConverter x:Key="BoolToVisibleConverter" />
         <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter" />
         <converter:CollapsedWhenNullConverter x:Key="CollapsedWhenNullConverter" />
+        <converter:DoubleToInt32Converter x:Key="DoubleToInt32Converter" />
 
         <!--提示-->
         <TeachingTip x:Name="HintTeachingTip" />
@@ -239,10 +240,11 @@
                     <!--图片-->
                     <Grid x:Name="showImage">
                         <controls:ImageEx Stretch="UniformToFill"
-                                          IsCacheEnabled="False"
                                           Source="{x:Bind imagepath,Mode=OneWay}"
                                           Width="{x:Bind imagewidth,Mode=OneWay}"
-                                          Height="{x:Bind imageheight,Mode=OneWay}"/>
+                                          Height="{x:Bind imageheight,Mode=OneWay}"
+                                          DecodePixelWidth="{x:Bind imagewidth,Converter={StaticResource DoubleToInt32Converter},Mode=OneWay}"
+                                          DecodePixelHeight="{x:Bind imageheight,Converter={StaticResource DoubleToInt32Converter},Mode=OneWay}"/>
 
                         <RelativePanel>
                             <!--喜欢就显示爱心-->
@@ -855,7 +857,7 @@
                       Visibility="{x:Bind IsShowSearchListView}"
                       MinHeight="40"
                       ColumnSpacing="5"
-                      Background="{ThemeResource SystemAltMediumLowColor}">
+                      Background="{ThemeResource LayerFillColorDefaultBrush}">
 
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />

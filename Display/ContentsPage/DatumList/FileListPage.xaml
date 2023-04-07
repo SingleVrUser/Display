@@ -14,6 +14,7 @@
       xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
       xmlns:controls1="using:Display.Controls"
       xmlns:data="using:Display.Data"
+      xmlns:views="using:Display.Views"
       mc:Ignorable="d">
 
     <Page.Resources>
@@ -46,7 +47,7 @@
 
         <DataTemplate x:Key="FileListTemplate"
                       x:DataType="data:FilesInfo">
-            <Grid DoubleTapped="OpenFolder_Tapped" >
+            <Grid DoubleTapped="OpenFolder_Tapped">
 
                 <Grid.ContextFlyout>
                     <MenuFlyout>
@@ -263,7 +264,8 @@
                 </interactivity:Interaction.Behaviors>
 
                 <ListView.Header>
-                <Grid MinHeight="30">
+                <Grid MinHeight="30"
+                      Background="{ThemeResource LayerFillColorDefaultBrush}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition MinWidth="50" Width="*" />
                             <ColumnDefinition Width="200" />
@@ -389,7 +391,7 @@
 
 
 
-        <TeachingTip x:Name="LightDismissTeachingTip"
+        <TeachingTip Grid.Row="0" x:Name="LightDismissTeachingTip"
                      IsLightDismissEnabled="True" />
     </Grid>
 </Page>
