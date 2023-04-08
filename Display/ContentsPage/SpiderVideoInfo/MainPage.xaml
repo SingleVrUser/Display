@@ -5,21 +5,16 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:data="using:Display.Data"
       xmlns:customcontrols="using:Display.Controls"
-      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-      xmlns:converter="using:Display.Converter"
       mc:Ignorable="d">
 
     <Page.Resources>
-        <converter:BytesToSizeStrConverter x:Key="BytesToSizeStrConverter" />
-        <converter:IsVideoToVisibilityConverter x:Key="IsVideoToVisibilityConverter" />
-        <converter:Int32ToDateTimeStrConverter x:Key="Int32ToDateTimeStrConverter" />
-        <converter:IsVideoToBoolConverter x:Key="IsVideoToBoolConverter" />
+        <GridLength x:Key="InfoColumnWidth">400</GridLength>
     </Page.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="{StaticResource InfoColumnWidth}" />
 
         </Grid.ColumnDefinitions>
 
@@ -29,8 +24,8 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="{StaticResource InfoColumnWidth}" />
             </Grid.ColumnDefinitions>
 
 
@@ -120,7 +115,9 @@
                 <customcontrols:Explorer x:Name="Explorer"
                                          ItemClick="ExplorerItemClick"
                                          ItemInvoked="TreeView_ItemInvoked"
-                                         Visibility="{x:Bind localData_RadioButton.IsChecked,Mode=OneWay}" />
+                                         Visibility="{x:Bind localData_RadioButton.IsChecked,Mode=OneWay}"
+                                         PlayVideoClick="Explorer_OnPlayVideoClick"
+                                         PlayWithPlayerClick="Explorer_OnPlayWithPlayerClick"/>
 
                 <!--失败列表-->
                 <Grid x:Name="FailListGrid"
@@ -166,48 +163,6 @@
                                HorizontalAlignment="Center"
                                FontWeight="Bold"
                                FontSize="18" />
-
-                    <Button FontFamily="Segoe Fluent Icons"
-                            Grid.Row="0"
-                            Content="&#xE102;"
-                            CornerRadius="10"
-                            Padding="10"
-                            IsEnabled="{x:Bind SelectedDatum.iv,FallbackValue=False,Mode=OneWay,Converter={StaticResource IsVideoToBoolConverter}}"
-                            HorizontalAlignment="Right"
-                            Click="VideoPlayButton_Click">
-
-                        <Button.ContextFlyout>
-                            <MenuFlyout>
-                                <MenuFlyoutSubItem Text="在其他应用播放">
-                                    <MenuFlyoutSubItem.Icon>
-                                        <FontIcon Glyph="&#xEE4A;" />
-                                    </MenuFlyoutSubItem.Icon>
-
-                                    <MenuFlyoutItem Text="WebView"
-                                                    Tag="0"
-                                                    Click="PlayWithPlayerButtonClick" />
-
-                                    <MenuFlyoutItem Text="PotPlayer"
-                                                    Tag="1"
-                                                    Click="PlayWithPlayerButtonClick" />
-
-                                    <MenuFlyoutItem Text="mpv"
-                                                    Tag="2"
-                                                    Click="PlayWithPlayerButtonClick" />
-
-                                    <MenuFlyoutItem Text="vlc"
-                                                    Tag="3"
-                                                    Click="PlayWithPlayerButtonClick" />
-
-                                    <MenuFlyoutItem Text="MediaElement"
-                                                    Tag="4"
-                                                    Click="PlayWithPlayerButtonClick" />
-
-
-                                </MenuFlyoutSubItem>
-                            </MenuFlyout>
-                        </Button.ContextFlyout>
-                    </Button>
 
                     <ScrollViewer Grid.Row="1"
                                   Padding="5">

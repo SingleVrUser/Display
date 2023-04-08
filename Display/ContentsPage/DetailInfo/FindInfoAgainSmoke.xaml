@@ -26,7 +26,6 @@
             </Setter>
         </Style>
 
-        <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter" />
     </Page.Resources>
 
     <Grid  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"

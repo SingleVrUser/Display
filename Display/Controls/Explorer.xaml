@@ -10,11 +10,51 @@
     mc:Ignorable="d">
     <Control.Resources>
 
-        <!--暂不使用，目前发现 ListView使用 ItemTemplateSelector 会影响ItemClick的点击范围-->
         <!--ListView 的 文件 DataTemplate-->
         <DataTemplate x:Key="FileInSelectFolderTemplate" x:DataType="data:FilesInfo">
             <ListViewItem>
                 <Grid ColumnSpacing="10">
+                    <Grid.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="在默认应用播放"
+                                            IsEnabled="{x:Bind datum.iv, Converter={StaticResource IsVideoToBoolConverter}}"
+                                            Click="PlayVideoButton_Click">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xEE4A;" />
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+
+                            <MenuFlyoutSubItem Text="在其他应用播放"
+                                               IsEnabled="{x:Bind datum.iv, Converter={StaticResource IsVideoToBoolConverter}}">
+                                <MenuFlyoutSubItem.Icon>
+                                    <FontIcon Glyph="&#xEE4A;" />
+                                </MenuFlyoutSubItem.Icon>
+
+                                <MenuFlyoutItem Text="WebView"
+                                                Tag="0"
+                                                Click="PlayWithPlayerButtonClick" />
+
+                                <MenuFlyoutItem Text="PotPlayer"
+                                                Tag="1"
+                                                Click="PlayWithPlayerButtonClick" />
+
+                                <MenuFlyoutItem Text="mpv"
+                                                Tag="2"
+                                                Click="PlayWithPlayerButtonClick" />
+
+                                <MenuFlyoutItem Text="vlc"
+                                                Tag="3"
+                                                Click="PlayWithPlayerButtonClick" />
+
+                                <MenuFlyoutItem Text="MediaElement"
+                                                Tag="4"
+                                                Click="PlayWithPlayerButtonClick" />
+
+                            </MenuFlyoutSubItem>
+
+                        </MenuFlyout>
+                    </Grid.ContextFlyout>
+
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="*"/>
@@ -39,6 +79,47 @@
             <ListViewItem>
                 <StackPanel Orientation="Horizontal" Spacing="5">
                     <Grid ColumnSpacing="10">
+
+                        <Grid.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="在默认应用播放"
+                                                IsEnabled="{x:Bind datum.iv, Converter={StaticResource IsVideoToBoolConverter}}"
+                                                Click="PlayVideoButton_Click">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xEE4A;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+
+                                <MenuFlyoutSubItem Text="在其他应用播放"
+                                                   IsEnabled="{x:Bind datum.iv, Converter={StaticResource IsVideoToBoolConverter}}">
+                                    <MenuFlyoutSubItem.Icon>
+                                        <FontIcon Glyph="&#xEE4A;" />
+                                    </MenuFlyoutSubItem.Icon>
+
+                                    <MenuFlyoutItem Text="WebView"
+                                                    Tag="0"
+                                                    Click="PlayWithPlayerButtonClick" />
+
+                                    <MenuFlyoutItem Text="PotPlayer"
+                                                    Tag="1"
+                                                    Click="PlayWithPlayerButtonClick" />
+
+                                    <MenuFlyoutItem Text="mpv"
+                                                    Tag="2"
+                                                    Click="PlayWithPlayerButtonClick" />
+
+                                    <MenuFlyoutItem Text="vlc"
+                                                    Tag="3"
+                                                    Click="PlayWithPlayerButtonClick" />
+
+                                    <MenuFlyoutItem Text="MediaElement"
+                                                    Tag="4"
+                                                    Click="PlayWithPlayerButtonClick" />
+
+                                </MenuFlyoutSubItem>
+
+                            </MenuFlyout>
+                        </Grid.ContextFlyout>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="32"/>
                             <ColumnDefinition Width="*"/>
@@ -131,6 +212,8 @@
                               MaxWidth="600"
                               Width="180"/>
             <ColumnDefinition />
+
+            <ColumnDefinition Width="2"/>
         </Grid.ColumnDefinitions>
         
         <!--左，文件夹栏-->
@@ -178,7 +261,7 @@
                                ResizeDirection="Columns"
                                ResizeBehavior="BasedOnAlignment"
                                CursorBehavior="ChangeOnGripperHover"
-                               Width="10"
+                               Width="5"
                                Opacity="0.2">
             <controls:GridSplitter.RenderTransform>
                 <TranslateTransform X="-15" />
@@ -186,14 +269,13 @@
         </controls:GridSplitter>
 
         <!--右，文件栏-->
-        <Grid Grid.Column="2">
+        <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <!--VerticalScrollBar拖动过快会崩溃，可能是BUG，暂时隐藏-->
             <!--ListView使用 ItemTemplateSelector 会影响ItemClick的点击范围-->
-
             <ListView ItemsSource="{x:Bind FileInSelectFolder}"
                       Grid.Row="1"
                       ScrollViewer.VerticalScrollBarVisibility="Hidden"

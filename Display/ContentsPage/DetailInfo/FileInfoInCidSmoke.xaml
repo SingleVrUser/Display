@@ -12,11 +12,6 @@
     xmlns:data="using:Display.Data"
     mc:Ignorable="d">
 
-    <Page.Resources>
-        <converter:BytesToSizeStrConverter x:Key="BytesToSizeStrConverter"/>
-        <converter:Int32ToDateTimeStrConverter x:Key="Int32ToDateTimeStrConverter"/>
-    </Page.Resources>
-
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
           Width="400"
           VerticalAlignment="Center"

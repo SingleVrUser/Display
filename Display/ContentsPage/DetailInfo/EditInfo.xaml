@@ -15,8 +15,6 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <converter:NameToColorConverter x:Key="NameToColorConverter" />
-
         <DataTemplate x:Key="TokenTemplate"
                       x:DataType="local:TokenData">
             <StackPanel Orientation="Horizontal">

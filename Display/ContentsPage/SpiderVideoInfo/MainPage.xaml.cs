@@ -315,6 +315,23 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
 
         await PlayVideoHelper.PlayVideo(SelectedDatum.pc, this.XamlRoot, trueName: FileMatch.MatchName(SelectedDatum.n)?.ToUpper(), lastPage: this, playerSelection: playerSelection);
     }
+
+    private async void Explorer_OnPlayVideoClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
+
+        await PlayVideoHelper.PlayVideo(info.datum.pc, this.XamlRoot, trueName: info.Name, lastPage: this);
+    }
+
+    private async void Explorer_OnPlayWithPlayerClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info, Tag: string aTag }) return;
+
+        if (!int.TryParse(aTag, out var playerSelection)) return;
+
+        await Task.Delay(1);
+        await PlayVideoHelper.PlayVideo(info.datum.pc, this.XamlRoot, trueName: info.Name, lastPage: this, playerSelection: playerSelection);
+    }
 }
 
 public class SpliderInfoProgress

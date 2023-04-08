@@ -1,0 +1,19 @@
+<!-- Copyright (c) Microsoft Corporation and Contributors. -->
+<!-- Licensed under the MIT License. -->
+
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converter="using:Display.Converter">
+
+    <converter:BytesToSizeStrConverter x:Key="BytesToSizeStrConverter" />
+    <converter:IsVideoToVisibilityConverter x:Key="IsVideoToVisibilityConverter" />
+    <converter:Int32ToDateTimeStrConverter x:Key="Int32ToDateTimeStrConverter" />
+    <converter:IsVideoToBoolConverter x:Key="IsVideoToBoolConverter" />
+    <converter:AppUpdateContentConverter x:Key="AppUpdateContentConverter" />
+    <converter:CollapsedWhenNullConverter x:Key="CollapsedWhenNullConverter" />
+    <converter:DoubleToInt32Converter x:Key="DoubleToInt32Converter" />
+    <converter:NameToColorConverter x:Key="NameToColorConverter" />
+    <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter" />
+    <converter:BoolToVisibleConverter x:Key="BoolToVisibleConverter" />
+</ResourceDictionary>
