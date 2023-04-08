@@ -8,9 +8,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
              mc:Ignorable="d">
-    <UserControl.Resources>
-        <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter" />
-    </UserControl.Resources>
 
     <Grid BorderThickness="0,1,0,0"
           Loaded="GridLoaded"

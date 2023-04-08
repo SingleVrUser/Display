@@ -10,6 +10,7 @@
       mc:Ignorable="d">
 
     <Page.Resources>
+
         <Style TargetType="TextBlock"
                x:Key="TitleTextBlock">
             <Setter Property="FontSize"
@@ -36,7 +37,7 @@
             <Setter Property="VerticalAlignment"
                     Value="Top" />
         </Style>
-        
+
         <Style TargetType="Pivot">
             <Setter Property="Margin"
                     Value="-15,-20,0,0" />
@@ -49,9 +50,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
-        <converter:BoolToVisibleConverter x:Key="BoolToVisiableConverter" />
-
     </Page.Resources>
     <Grid>
 
@@ -194,7 +192,7 @@
                                 </RelativePanel>
 
                                 <RelativePanel x:Name="RecordDownRequestRelativePanel"
-                                               Visibility="{x:Bind IsRecordDownRequestToggleSwitch.IsOn,Mode=OneWay,Converter={StaticResource BoolToVisiableConverter}}">
+                                               Visibility="{x:Bind IsRecordDownRequestToggleSwitch.IsOn,Mode=OneWay,Converter={StaticResource BoolToVisibleConverter}}">
                                     <TextBlock Text="下载链接失效时间"
                                                RelativePanel.AlignVerticalCenterWithPanel="True" />
 

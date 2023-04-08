@@ -153,10 +153,6 @@
                     Value="Transparent" />
         </Style>
 
-        <converter:BytesToSizeStrConverter x:Key="BytesToSizeStrConverter" />
-        <converter:Int32ToDateTimeStrConverter x:Key="Int32ToDateTimeStrConverter" />
-        <converter:IsVideoToBoolConverter x:Key="IsVideoToBoolConverter" />
-
     </Page.Resources>
 
     <Grid Loaded="Grid_loaded">

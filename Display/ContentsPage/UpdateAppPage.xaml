@@ -5,17 +5,10 @@
     x:Class="Display.ContentsPage.UpdateAppPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:sys="using:System"
-    xmlns:local="using:Display.ContentsPage"
-    xmlns:converter="using:Display.Converter"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-
-    <Page.Resources>
-        <converter:AppUpdateContentConverter x:Key="AppUpdateContentConvert"/>
-    </Page.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -36,7 +29,7 @@
                 <Run Text="{x:Bind ReleaseInfo.LatestVersion}" />
         </TextBlock>
 
-        <HyperlinkButton Grid.Row="1"
+        <HyperlinkButton Grid.Row="1" Grid.Column="0"
                          Content="更多信息"
                          NavigateUri="{x:Bind ReleaseInfo.MoreInfoUrl}"/>
 

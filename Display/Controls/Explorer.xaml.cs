@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Display.Data;
+using Display.Helper;
 
 namespace Display.Controls
 {
@@ -16,6 +17,15 @@ namespace Display.Controls
         ObservableCollection<ExplorerItem> TreeViewDataSource;
         ObservableCollection<ExplorerItem> SelectFolderName;
         ObservableCollection<FilesInfo> FileInSelectFolder;
+
+        public static readonly DependencyProperty FileMenuFlyoutProperty =
+            DependencyProperty.Register(nameof(FileMenuFlyout), typeof(MenuFlyout), typeof(Explorer), null);
+
+        public MenuFlyout FileMenuFlyout
+        {
+            get => (MenuFlyout)GetValue(FileMenuFlyoutProperty);
+            set => SetValue(FileMenuFlyoutProperty, value);
+        }
 
         //存储获取过的Datum，避免重复获取
         List<StoreDatum> StoreDataList = new();
@@ -54,7 +64,7 @@ namespace Display.Controls
             List<Datum> items;
 
             //先从存储的List中获取
-            var item = StoreDataList.Where(x => x.Cid == folderCid).FirstOrDefault();
+            var item = StoreDataList.FirstOrDefault(x => x.Cid == folderCid);
             if (item == null)
             {
                 items = DataAccess.GetListByCid(folderCid);
@@ -568,7 +578,7 @@ namespace Display.Controls
         {
             var item = ((sender as MenuFlyoutItem).DataContext as TreeViewNode).Content as ExplorerItem;
 
-            ContentDialog dialog = new ContentDialog()
+            var dialog = new ContentDialog()
             {
                 XamlRoot = this.XamlRoot,
                 Title = "确认",
@@ -602,6 +612,19 @@ namespace Display.Controls
                     deletedNodeAndDataAccessByCid(nodeChildrens, cid);
                 }
             }
+        }
+
+        public event RoutedEventHandler PlayVideoClick;
+        private void PlayVideoButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            PlayVideoClick?.Invoke(sender, e);
+        }
+
+        public event RoutedEventHandler PlayWithPlayerClick;
+        private void PlayWithPlayerButtonClick(object sender, RoutedEventArgs e)
+        {
+            PlayWithPlayerClick?.Invoke(sender,e);
         }
 
     }

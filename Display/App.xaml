@@ -8,6 +8,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                <XamlControlsResources Source="Themes/Converter.xaml"/>
                 <!-- Other merged dictionaries here -->
 
                 <!--标题栏-->

@@ -1085,6 +1085,7 @@ public sealed partial class MainPage : Page
         {
             DispatcherQueue.TryEnqueue(() =>
             {
+                if (!IsLoaded) return;
                 ProtectedCursor = cursor;
                 SplitViewOpenButton.Visibility = visibility;
             });

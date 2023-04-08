@@ -39,6 +39,7 @@
     <Content Remove="Assets\BadgeLogo.scale-200.png" />
     <Content Remove="Assets\BadgeLogo.scale-400.png" />
     <Content Remove="Assets\icons8-text-96.png" />
+    <Content Remove="Assets\SplashScreen.png" />
     <Content Remove="Assets\Win32Resources.res" />
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +104,7 @@
     <None Remove="Controls\VideoCoverDisplay.xaml" />
     <None Remove="Controls\VideoDetails.xaml" />
     <None Remove="Settings\GetVideoInfo.xaml" />
+    <None Remove="Themes\Converter.xaml" />
     <None Remove="VideoPlayWindow.xaml" />
     <None Remove="Views\BrowserPage.xaml" />
     <None Remove="Views\MorePage.xaml" />
@@ -309,6 +311,9 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="Themes\Converter.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="ContentsPage\Sort115\Settings18Page.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
