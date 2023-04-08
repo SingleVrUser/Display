@@ -199,7 +199,7 @@ public sealed partial class MediaPlayWindow : Window
     {
         aTimer?.Stop();
 
-        RootGrid.Cursor = null;
+        if (RootGrid.IsLoaded && RootGrid.Cursor != null) RootGrid.Cursor = null;
     }
 
 

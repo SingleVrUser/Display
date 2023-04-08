@@ -433,7 +433,7 @@
                                                     PointerExited="EnlargeButton_PointerExited"
                                                     Visibility="Collapsed"
                                                     Background="Transparent">
-                                                <SymbolIcon Symbol="Find" />
+                                                <SymbolIcon Symbol="ZoomIn" />
                                             </Button>
                                         </Grid>
                                     </UserControl>

@@ -187,29 +187,6 @@
                      Visibility="Collapsed"
                      IsIndeterminate="True"/>
 
-        <!--<RelativePanel>
-            <StackPanel Orientation="Horizontal"
-                        Margin="3"
-                        Spacing="5">
-                --><!--<Button Content="播放"
-                        Click="PlayButton_Click" />
-                <Button x:Name="ImportDataButton"
-                        Content="导入"
-                        Click="ImportDataButton_Click" />
-                <Button Content="下载"
-                        Click="DownButton_Click"
-                        ToolTipService.ToolTip="点击使用比特彗星下载，右键选择更多下载方式">
-                    <Button.ContextFlyout>
-                        <MenuFlyout>
-                            <MenuFlyoutItem Text="Aria2下载"
-                                            Click="Aria2Down_Click" />
-                        </MenuFlyout>
-                    </Button.ContextFlyout>
-                </Button>--><!--
-
-            </StackPanel>
-        </RelativePanel>-->
-
         <Grid Grid.Row="0">
 
             <Grid.ColumnDefinitions>
@@ -296,7 +273,7 @@
                       Drop="BaseExample_Drop"
                       DragOver="FileMove_DragOver">
 
-                <interactivity:Interaction.Behaviors>
+            <interactivity:Interaction.Behaviors>
                     <behaviors:QuickReturnHeaderBehavior />
                 </interactivity:Interaction.Behaviors>
 
