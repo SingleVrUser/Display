@@ -85,8 +85,15 @@
                                             Tag="4"
                                             Click="PlayWithPlayerButtonClick"/>
 
-
                         </MenuFlyoutSubItem>
+
+
+                        <MenuFlyoutItem Text="移动到新文件夹" Click="MoveToNewFolderItemClick">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe Fluent Icons"
+                                          Glyph="&#xE8DE;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
 
                     </MenuFlyout>
                 </Grid.ContextFlyout>
@@ -234,11 +241,6 @@
                     </AppBarButton.ContextFlyout>
                 </AppBarButton>
 
-                <AppBarSeparator/>
-
-                <AppBarButton Icon="Download"
-                              Label="下载"/>
-
                 <CommandBar.SecondaryCommands>
                     <AppBarButton Icon="Sort"
                                   Label="整理"
@@ -363,7 +365,8 @@
                       Drop="RecyStationGrid_Drop"
                       DragOver="DeletedFileMove_DragOver"
                       DragEnter="RecyStationGrid_DragEnter"
-                      DragLeave="RecyStationGrid_DragLeave">
+                      DragLeave="RecyStationGrid_DragLeave"
+                      Background="{ThemeResource LayerFillColorDefaultBrush}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="*" />
@@ -383,7 +386,7 @@
             <!--中转站-->
             <Grid x:Name="TransferStation_Grid"
                   Visibility="Collapsed"
-                  Background="{StaticResource CardBackgroundFillColorDefaultBrush}"
+                  Background="{ThemeResource LayerFillColorDefaultBrush}"
                   Style="{StaticResource TempGridStyle}"
                   AllowDrop="True"
                   Drop="TransferStationGrid_Drop"
@@ -402,7 +405,7 @@
                            Foreground="Gray"
                            VerticalAlignment="Top" />
 
-                <HyperlinkButton Content="清空"
+                <HyperlinkButton Grid.Row="0" Content="清空"
                                  HorizontalAlignment="Right"
                                  VerticalAlignment="Top"
                                  Click="EmptyTranferStationButton_Click" />

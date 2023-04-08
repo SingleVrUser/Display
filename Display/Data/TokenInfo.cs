@@ -983,6 +983,7 @@ namespace Display.Data
                     }
                 }
             }
+
         }
 
         public Datum datum;
@@ -1972,4 +1973,16 @@ namespace Display.Data
     }
 
     public enum FailInfoShowType { like, look_later }
+
+    public class MakeDirRequest
+    {
+        public bool state { get; set; }
+        public string error { get; set; }
+        public string errno { get; set; }
+        public int aid { get; set; }
+        public string cid { get; set; }
+        public string cname { get; set; }
+        public string file_id { get; set; }
+        public string file_name { get; set; }
+    }
 }

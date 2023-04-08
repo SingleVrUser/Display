@@ -19,6 +19,7 @@ using System.Web;
 using Windows.Storage;
 using Display.Helper;
 using System.ComponentModel;
+using System.Net.Http.Json;
 
 namespace Display.Data
 {
@@ -450,6 +451,43 @@ namespace Display.Data
         }
 
         /// <summary>
+        /// 请求创建文件夹
+        /// </summary>
+        /// <param name="pid">在当前pid下创建文件夹</param>
+        /// <param name="name">文件夹名称</param>
+        /// <returns>目标cid,创建失败则为null</returns>
+        public async Task<MakeDirRequest> RequestMakeDir(string pid, string name)
+        {
+            var url = "https://webapi.115.com/files/add";
+
+            var values = new Dictionary<string, string>
+            {
+                { "pid", pid},
+                {"cname",name }
+            };
+
+            var content = new FormUrlEncodedContent(values);
+
+            try
+            {
+                var response = await Client.PostAsync(url, content);
+
+                var result = await response.Content.ReadFromJsonAsync<MakeDirRequest>();
+
+                if (string.IsNullOrEmpty(result.error))
+                    return result;
+
+                Debug.WriteLine($"115创建文件夹出错:{result.error}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"解析115创建文件夹请求时出错:{ex.Message}");
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// 移动文件
         /// </summary>
         /// <param Name="pid"></param>
@@ -464,7 +502,7 @@ namespace Display.Data
 
             };
 
-            for (int i = 0; i < fids.Count; i++)
+            for (var i = 0; i < fids.Count; i++)
             {
                 values.Add($"fid[{i}]", fids[i]);
             }

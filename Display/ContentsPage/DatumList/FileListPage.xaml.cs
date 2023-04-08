@@ -15,12 +15,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Display.Data;
 using Display.Views;
+using System.IO;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -317,7 +319,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             //目标与移动文件有重合，退出
             if (sourceFilesInfos.Contains(item))
             {
-                System.Diagnostics.Debug.WriteLine("目标与移动文件有重合，退出");
+                Debug.WriteLine("目标与移动文件有重合，退出");
 
                 e.AcceptedOperation = DataPackageOperation.None;
                 e.DragUIOverride.Caption = null;
@@ -491,6 +493,14 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
     }
 
+    private void TryRemoveFilesInExplorer(List<FilesInfo> files)
+    {
+        foreach (var item in files.Where(item => filesInfos.Contains(item)))
+        {
+            filesInfos.Remove(item);
+        }
+    }
+
     /// <summary>
     /// 移动115文件
     /// </summary>
@@ -502,23 +512,13 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         await webApi.MoveFiles(pid, files.Select(item => item.Type == FilesInfo.FileType.Folder ? item.Cid : item.Fid).ToList());
 
         //删除列表文件
-        foreach (var item in files)
-        {
-            //文件列表中的
-            if (filesInfos.Contains(item))
-            {
-                filesInfos.Remove(item);
-            }
-        }
+        TryRemoveFilesInExplorer(files);
 
         // 从中转站列表中删除已经移动的文件
         if (transferStationFiles != null)
         {
             var transferListReadlyRemove = transferStationFiles.Where(item =>
             {
-                //if (item.TransferFiles.Count != files.Count)
-                //    return false;
-
                 foreach (var file in item.TransferFiles)
                 {
                     if (!files.Contains(file))
@@ -532,7 +532,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             {
                 transferStationFiles.Remove(file);
 
-                System.Diagnostics.Debug.WriteLine("从中转站列表中删除已经移动的文件");
+                Debug.WriteLine("从中转站列表中删除已经移动的文件");
             }
 
         }
@@ -748,9 +748,9 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private void ShowTeachingTip(string message)
     {
-        BasePage.ShowTeachingTip(lightDismissTeachingTip:LightDismissTeachingTip, message);
+        BasePage.ShowTeachingTip(lightDismissTeachingTip: LightDismissTeachingTip, message);
     }
-    
+
     private async void PlayVideoButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
@@ -779,6 +779,74 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         await Task.Delay(1);
         await PlayVideoHelper.PlayVideo(info.datum.pc, this.XamlRoot, trueName: info.Name, lastPage: this, playerSelection: playerSelection);
     }
+
+    private async void MoveToNewFolderItemClick(object sender, RoutedEventArgs e)
+    {
+        List<FilesInfo> fileInfos;
+        string currentFolderId;
+
+        // 选中文件，对当前文件操作
+        if (BaseExample.SelectedItems.Count == 0)
+        {
+            if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
+
+            fileInfos = new List<FilesInfo>
+            {
+                info
+            };
+
+            currentFolderId = info.Cid;
+
+        }
+        else
+        {
+            //获取需要整理的文件
+            fileInfos = BaseExample.SelectedItems.Cast<FilesInfo>().ToList();
+            currentFolderId = fileInfos.FirstOrDefault()?.Cid;
+        }
+
+        if (fileInfos.Count == 0) return;
+
+        var sameName = MatchHelper.GetSameFirstStringFromList(fileInfos.Select(x => string.IsNullOrEmpty(x.datum.ico) ? x.Name : x.Name.Replace($".{x.datum.ico}", "")).ToList());
+
+        TextBox inputTextBox = new()
+        {
+            Text = sameName,
+            PlaceholderText = "输入新文件夹的名称"
+        };
+
+        ContentDialog contentDialog = new()
+        {
+            XamlRoot = this.XamlRoot,
+            Content = inputTextBox,
+            Title = "新文件夹",
+            PrimaryButtonText = "确定",
+            CloseButtonText = "取消",
+            DefaultButton = ContentDialogButton.Primary
+        };
+
+        var result = await contentDialog.ShowAsync();
+
+        if (result != ContentDialogResult.Primary) return;
+
+        webApi ??= WebApi.GlobalWebApi;
+
+        // 新建文件夹
+        var makeDirResult = await webApi.RequestMakeDir(currentFolderId, inputTextBox.Text);
+        if (makeDirResult == null) return;
+
+        // 移动文件到新文件夹
+        Debug.WriteLine($"移动文件数量：{fileInfos.Count}");
+        await Move115Files(makeDirResult.cid, fileInfos);
+
+        // 更新UI
+        // 新建文件夹
+        filesInfos.Insert(0, new FilesInfo(new Datum() { cid = makeDirResult.cid, n = makeDirResult.cname }));
+
+        //// 删除文件
+        //TryRemoveFilesInExplorer(fileInfos);
+
+    }
 }
 
 class TransferStationFiles
@@ -794,7 +862,7 @@ class TransferStationFiles
         }
         else if (transferFiles.Count > 1)
         {
-            this.Name = $"{transferFiles.FirstOrDefault().Name} 等{transferFiles.Count}个文件";
+            this.Name = $"{transferFiles.FirstOrDefault()?.Name} 等{transferFiles.Count}个文件";
         }
 
         this.TransferFiles = transferFiles;
