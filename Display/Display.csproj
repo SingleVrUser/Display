@@ -25,6 +25,7 @@
     <Win32Resource>App.res</Win32Resource>
   </PropertyGroup>
   <ItemGroup>
+    
     <Compile Remove="Assets\Models\**" />
     <Content Remove="Assets\Models\**" />
     <EmbeddedResource Remove="Assets\Models\**" />
