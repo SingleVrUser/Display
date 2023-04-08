@@ -595,7 +595,7 @@ namespace Display.Controls
         {
             SmokeGrid.Visibility = Visibility.Visible;
 
-            FileInfoInCidSmokePage = new(resultinfo.truename);
+            FileInfoInCidSmokePage = new FileInfoInCidSmoke(resultinfo.truename);
             SmokeGrid.Children.Add(FileInfoInCidSmokePage);
 
             SmokeCancelGrid.Tapped += FileInfoInCidSmokeCancelGrid_Tapped;

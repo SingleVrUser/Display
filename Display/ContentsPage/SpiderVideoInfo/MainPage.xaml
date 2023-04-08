@@ -13,6 +13,7 @@
         <converter:BytesToSizeStrConverter x:Key="BytesToSizeStrConverter" />
         <converter:IsVideoToVisibilityConverter x:Key="IsVideoToVisibilityConverter" />
         <converter:Int32ToDateTimeStrConverter x:Key="Int32ToDateTimeStrConverter" />
+        <converter:IsVideoToBoolConverter x:Key="IsVideoToBoolConverter" />
     </Page.Resources>
 
     <Grid>
@@ -167,16 +168,50 @@
                                FontSize="18" />
 
                     <Button FontFamily="Segoe Fluent Icons"
-                            Grid.Column="1"
+                            Grid.Row="0"
                             Content="&#xE102;"
                             CornerRadius="10"
                             Padding="10"
-                            Visibility="{x:Bind SelectedDatum.iv,FallbackValue=Collapsed,Mode=OneWay,Converter={StaticResource IsVideoToVisibilityConverter}}"
+                            IsEnabled="{x:Bind SelectedDatum.iv,FallbackValue=False,Mode=OneWay,Converter={StaticResource IsVideoToBoolConverter}}"
                             HorizontalAlignment="Right"
-                            Click="VideoPlayButton_Click" />
+                            Click="VideoPlayButton_Click">
+
+                        <Button.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutSubItem Text="在其他应用播放">
+                                    <MenuFlyoutSubItem.Icon>
+                                        <FontIcon Glyph="&#xEE4A;" />
+                                    </MenuFlyoutSubItem.Icon>
+
+                                    <MenuFlyoutItem Text="WebView"
+                                                    Tag="0"
+                                                    Click="PlayWithPlayerButtonClick" />
+
+                                    <MenuFlyoutItem Text="PotPlayer"
+                                                    Tag="1"
+                                                    Click="PlayWithPlayerButtonClick" />
+
+                                    <MenuFlyoutItem Text="mpv"
+                                                    Tag="2"
+                                                    Click="PlayWithPlayerButtonClick" />
+
+                                    <MenuFlyoutItem Text="vlc"
+                                                    Tag="3"
+                                                    Click="PlayWithPlayerButtonClick" />
+
+                                    <MenuFlyoutItem Text="MediaElement"
+                                                    Tag="4"
+                                                    Click="PlayWithPlayerButtonClick" />
+
+
+                                </MenuFlyoutSubItem>
+                            </MenuFlyout>
+                        </Button.ContextFlyout>
+                    </Button>
 
                     <ScrollViewer Grid.Row="1"
                                   Padding="5">
+                        
                         <Grid x:Name="FileInfoShow_Grid"
                               RowSpacing="5"
                               ColumnSpacing="5"

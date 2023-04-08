@@ -8,6 +8,7 @@
       xmlns:customcontrols="using:Display.Controls"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:data="using:Display.Data"
+    xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
     mc:Ignorable="d">
     <Page.Resources>
         <!--<converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter"/>-->
@@ -91,7 +92,8 @@
                 DesiredWidth="140"
                 SelectionMode="Multiple"
                 SelectionChanged="BasicGridView_SelectionChanged"
-                ItemTemplate="{StaticResource GirdViewTemplate}">
+                ItemTemplate="{StaticResource GirdViewTemplate}"
+                animations:ItemsReorderAnimation.Duration="00:00:00.0960000">
         </controls:AdaptiveGridView>
 
         <Grid x:Name="SmokeGrid" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Collapsed" >

@@ -9,6 +9,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Display.Data;
+using HarfBuzzSharp;
+using System.Threading.Tasks;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -238,7 +240,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
 
         await PlayVideoHelper.PlayVideo(SelectedDatum.pc, this.XamlRoot, trueName: FileMatch.MatchName(SelectedDatum.n)?.ToUpper(), lastPage: this);
-        ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
+        ProtectedCursor = null;
     }
 
     private void FailTypeComboBoxChanged(object sender, SelectionChangedEventArgs e)
@@ -301,6 +303,17 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
                     break;
             }
         }
+    }
+
+    private async void PlayWithPlayerButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem { Tag: string aTag }) return;
+        if (!int.TryParse(aTag, out var playerSelection)) return;
+        if (SelectedDatum == null) return;
+
+        await Task.Delay(1);
+
+        await PlayVideoHelper.PlayVideo(SelectedDatum.pc, this.XamlRoot, trueName: FileMatch.MatchName(SelectedDatum.n)?.ToUpper(), lastPage: this, playerSelection: playerSelection);
     }
 }
 

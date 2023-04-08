@@ -6,6 +6,7 @@
              xmlns:data="using:Display.Data"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
              mc:Ignorable="d">
     <UserControl.Resources>
         <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter" />
@@ -392,7 +393,8 @@
                                                    IsItemClickEnabled="True"
                                                    ItemClick="ThumbnailGridView_ItemClick"
                                                    ItemHeight="120"
-                                                   DesiredWidth="180">
+                                                   DesiredWidth="180"
+                                                   animations:ItemsReorderAnimation.Duration="00:00:00.0960000">
 
                             <controls:AdaptiveGridView.ItemTemplate>
                                 <DataTemplate x:DataType="x:String">

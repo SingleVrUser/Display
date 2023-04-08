@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:Display.Controls"
              xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+             xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
              xmlns:customcontrols="using:Display.Controls"
              xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
              xmlns:behaviors="using:CommunityToolkit.WinUI.UI.Behaviors"
@@ -847,7 +848,8 @@
                   Margin="4,0,0,0"
                   x:Name="BasicGridView"
                   ItemTemplateSelector="{StaticResource SuccessOrSearchResult_ItemTemplateSelector}"
-                  Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay}">
+                  Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay}"
+                  animations:ItemsReorderAnimation.Duration="00:00:00.0960000">
             <interactivity:Interaction.Behaviors>
                 <behaviors:QuickReturnHeaderBehavior />
             </interactivity:Interaction.Behaviors>
