@@ -105,12 +105,12 @@ namespace Display.Views
         /// </summary>
         private void OnClicked(object sender, RoutedEventArgs e)
         {
-            VideoCoverDisplayClass item = (sender as Button).DataContext as VideoCoverDisplayClass;
+            var item = (sender as Button)?.DataContext as VideoCoverDisplayClass;
 
             //准备动画
             //videoControl.PrepareAnimation(item);
             _storeditem = item;
-            Frame.Navigate(typeof(DetailInfoPage), item, new SuppressNavigationTransitionInfo());
+            Frame.Navigate(typeof(DetailInfoPage), item, new EntranceNavigationTransitionInfo());
         }
 
         /// <summary>
