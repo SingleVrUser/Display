@@ -790,7 +790,7 @@ class TransferStationFiles
     {
         if (transferFiles.Count == 1)
         {
-            this.Name = $"{transferFiles.FirstOrDefault().Name}";
+            this.Name = $"{transferFiles.FirstOrDefault()?.Name}";
         }
         else if (transferFiles.Count > 1)
         {

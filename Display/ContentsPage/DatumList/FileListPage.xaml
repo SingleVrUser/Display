@@ -9,7 +9,7 @@
       xmlns:behaviors="using:CommunityToolkit.WinUI.UI.Behaviors"
       xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:local="using:Display.ContentsPage.DatumList"
-      xmlns:control="using:Display.Controls"
+      xmlns:customControl="using:Display.Controls"
       xmlns:converter="using:Display.Converter"
       xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
       xmlns:controls1="using:Display.Controls"
@@ -233,6 +233,11 @@
                         </MenuFlyout>
                     </AppBarButton.ContextFlyout>
                 </AppBarButton>
+
+                <AppBarSeparator/>
+
+                <AppBarButton Icon="Download"
+                              Label="下载"/>
 
                 <CommandBar.SecondaryCommands>
                     <AppBarButton Icon="Sort"

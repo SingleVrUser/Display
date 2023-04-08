@@ -225,7 +225,7 @@
                                     </FlipView.ItemTemplate>
                                 </FlipView>
 
-                                <ProgressRing x:Name="FindCidInfo_ProgressRing"
+                                <ProgressRing Grid.Row="0" x:Name="FindCidInfo_ProgressRing"
                                               Visibility="Collapsed" />
 
                                 <ListView x:Name="VideoPlay_ListView"
@@ -313,9 +313,7 @@
                                           DragOver="Link_DragOver"
                                           Background="Transparent"
                                           PointerEntered="Video_UniformGrid_OnPointerEntered"
-                                          PointerExited="Video_UniformGrid_OnPointerExited">
-
-                    </controls:UniformGrid>
+                                          PointerExited="Video_UniformGrid_OnPointerExited"/>
 
                     <HyperlinkButton x:Name="SplitViewOpenButton" Foreground="White"
                                      FontFamily="Segoe Fluent Icons"
@@ -326,9 +324,7 @@
                                      FontWeight="Bold"
                                      HorizontalContentAlignment="Center"
                                      Width="40"
-                                     Height="50">
-
-                    </HyperlinkButton>
+                                     Height="50"/>
                 </Grid>
             </SplitView.Content>
         </SplitView>

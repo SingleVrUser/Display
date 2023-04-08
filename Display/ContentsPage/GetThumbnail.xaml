@@ -8,6 +8,7 @@
     xmlns:data="using:Display.Data"
       xmlns:customcontrols="using:Display.Controls"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
     mc:Ignorable="d">
     <Page.Resources>
         <DataTemplate x:DataType="data:ThumbnailInfo" x:Key="ThumbnialInfoDataTemplate">
@@ -113,7 +114,8 @@
             SelectionMode="Multiple"
             SelectionChanged="BasicGridView_SelectionChanged"
             ItemsSource="{x:Bind thumbnailInfo}"
-            ItemTemplate="{StaticResource ThumbnialInfoDataTemplate}">
+            ItemTemplate="{StaticResource ThumbnialInfoDataTemplate}"
+            animations:ItemsReorderAnimation.Duration="00:00:00.0960000">
         </controls:AdaptiveGridView>
 
         <!--<ProgressBar x:Name="TotalProgressBar" VerticalAlignment="Top" Visibility="Collapsed"/>-->
