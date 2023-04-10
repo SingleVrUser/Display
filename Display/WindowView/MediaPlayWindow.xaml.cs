@@ -55,6 +55,9 @@ public sealed partial class MediaPlayWindow : Window
             VideoPlayGrid.Children.Remove(mediaControl);
         }
 
+        mediaControl.PointerExited -= MediaControl_OnPointerExited;
+        aTimer?.Stop();
+
         //上一页为详情页，生效喜欢或稍后观看的修改
         var newestIsLike = mediaControl.IsLike;
         var newestLookLater = mediaControl.LookLater;
@@ -187,7 +190,6 @@ public sealed partial class MediaPlayWindow : Window
     private void MediaControl_OnPointerEntered(object sender, PointerRoutedEventArgs e)
     {
         aTimer?.Stop();
-        Debug.WriteLine("计时器开始");
 
         // Create a timer with a one second interval.
         aTimer = new System.Timers.Timer(500);
@@ -199,7 +201,7 @@ public sealed partial class MediaPlayWindow : Window
     {
         aTimer?.Stop();
 
-        if (RootGrid.IsLoaded && RootGrid.Cursor != null) RootGrid.Cursor = null;
+        RootGrid.Cursor = null;
     }
 
 
@@ -219,9 +221,9 @@ public sealed partial class MediaPlayWindow : Window
             {
                 Debug.WriteLine($"隐藏鼠标 ({_iCount}）");
                 _iCount = CursorHelper.ShowCursor(false);
-            }
 
-            TryUpdateUi(false);
+                TryUpdateUi(false);
+            }
         }
         else
         {
@@ -229,8 +231,9 @@ public sealed partial class MediaPlayWindow : Window
             {
                 Debug.WriteLine($"显示鼠标 ({_iCount}）");
                 _iCount = CursorHelper.ShowCursor(true);
+
+                TryUpdateUi();
             }
-            TryUpdateUi();
         }
     }
 
