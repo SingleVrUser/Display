@@ -73,8 +73,15 @@ public sealed partial class MainPage : Page
         metadataControl.Items = _units;
         webApi = WebApi.GlobalWebApi;
 
+        this.Unloaded += OnUnloaded;
 
         TryPlayVideoFromSelectedFiles(FilesInfos.ToList());
+    }
+
+    private void OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        Video_UniformGrid.PointerExited -= Video_UniformGrid_OnPointerExited;
+        aTimer?.Stop();
     }
 
     private async void TryPlayVideoFromSelectedFiles(List<FilesInfo> filesInfos)
@@ -1056,9 +1063,9 @@ public sealed partial class MainPage : Page
             {
                 Debug.WriteLine($"隐藏鼠标 ({_iCount}）");
                 _iCount = CursorHelper.ShowCursor(false);
+                TryUpdateUi(false);
             }
 
-            TryUpdateUi(false);
         }
         else
         {
@@ -1066,8 +1073,8 @@ public sealed partial class MainPage : Page
             {
                 Debug.WriteLine($"显示鼠标 ({_iCount}）");
                 _iCount = CursorHelper.ShowCursor(true);
+                TryUpdateUi();
             }
-            TryUpdateUi();
         }
     }
 
@@ -1085,7 +1092,6 @@ public sealed partial class MainPage : Page
         {
             DispatcherQueue.TryEnqueue(() =>
             {
-                if (!IsLoaded) return;
                 ProtectedCursor = cursor;
                 SplitViewOpenButton.Visibility = visibility;
             });
