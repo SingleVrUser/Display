@@ -77,8 +77,6 @@ namespace MediaPlayerElement_Test.Models
 
         public void Dispose()
         {
-            Debug.WriteLine("开始销毁stream");
-
             if (_isDisposing)
             {
                 return;
@@ -86,16 +84,9 @@ namespace MediaPlayerElement_Test.Models
 
             Debug.WriteLine("开始销毁_inputStream");
             _isDisposing = true;
-            if (_inputStream != null)
-            {
-                _inputStream.Dispose();
-                _inputStream = null;
-            }
 
-            if (_client == null) return;
-
+            _inputStream?.Dispose();
             _client?.Dispose();
-            _client = null;
         }
 
         public IAsyncOperationWithProgress<IBuffer, uint> ReadAsync(IBuffer buffer, uint count, InputStreamOptions options)
