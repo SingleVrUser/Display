@@ -33,7 +33,7 @@
                          Content="更多信息"
                          NavigateUri="{x:Bind ReleaseInfo.MoreInfoUrl}"/>
 
-        <TextBlock Grid.Column="1"
+        <TextBlock Grid.Row="0" Grid.Column="1"
                    VerticalAlignment="Center">
             <Run FontFamily="Times New Roman"
                  Foreground="DarkGray">当前版本：</Run>
@@ -48,7 +48,7 @@
             <Run Text="{x:Bind ReleaseInfo.CurrentArchitecture}" />
         </TextBlock>
 
-        <TextBlock Grid.Row="2"
+        <TextBlock Grid.Row="2" Grid.Column="0"
                    Text="更新内容"
                    Foreground="DarkGray"
                    Margin="0,8,0,0"/>
@@ -61,13 +61,13 @@
                    Foreground="DarkGray"
                    FontSize="12"/>
 
-            <Grid Grid.Row="3"
-                  Grid.ColumnSpan="2"
+            <Grid  Grid.Row="3"
+                  Grid.ColumnSpan="2" Grid.Column="0"
                   BorderBrush="{StaticResource ControlElevationBorderBrush}"
                   BorderThickness="1"
                   CornerRadius="5">
                 <ScrollViewer Padding="10">
-                    <controls:MarkdownTextBlock Text="{x:Bind ReleaseInfo.UpdateContent,Converter={StaticResource AppUpdateContentConvert}}"
+                    <controls:MarkdownTextBlock Text="{x:Bind ReleaseInfo.UpdateContent,Converter={StaticResource AppUpdateContentConverter}}"
                                                 Background="Transparent"
                                                 LinkClicked="MarkdownTextBlock_LinkClicked" />
                 </ScrollViewer>
