@@ -622,11 +622,11 @@ public sealed partial class MainPage : Page
     /// <returns></returns>
     private string DeletedFileFromListAsync(FilesInfo fileInfo)
     {
-        bool isFile = fileInfo.Type == FilesInfo.FileType.File;
+        var isFile = fileInfo.Type == FilesInfo.FileType.File;
 
         // 文件 fid
         // 文件夹 cid
-        string fid = isFile ? fileInfo.Fid : fileInfo.Cid;
+        var fid = isFile ? fileInfo.Fid : fileInfo.Cid;
 
         //移除播放列表
         if (FilesInfos.Contains(fileInfo)) FilesInfos.Remove(fileInfo);
@@ -634,11 +634,9 @@ public sealed partial class MainPage : Page
         // 文件
         if (isFile)
         {
-            //移除正在播放视频列表
+            //移除正在播放的视频列表
             if (PlayingVideoInfos.Contains(fileInfo)) PlayingVideoInfos.Remove(fileInfo);
 
-            ////移除正在播放的视频
-            //RemovePlayingVideo(fileInfo.datum.pc);
         }
         // 文件夹
         else
@@ -647,11 +645,8 @@ public sealed partial class MainPage : Page
 
             playList.ForEach(info =>
             {
-                //移除正在播放的视频
+                //移除正在播放的视频列表
                 PlayingVideoInfos.Remove(info);
-
-                ////移除正在播放的视频
-                //RemovePlayingVideo(info.datum.pc);
             });
         }
 
@@ -675,15 +670,11 @@ public sealed partial class MainPage : Page
 
     private void RemovePlayingVideo(MediaPlayerElement mediaPlayerElement)
     {
+        if (mediaPlayerElement.Tag is not MediaPlayerWithStreamSource oldMediaPlayerWithStreamSource) return;
 
-        Debug.WriteLine("移除正在播放的视频……");
+        Debug.WriteLine("Dispose oldMediaPlayerWithStreamSource mediaPlayer");
         try
         {
-            if (mediaPlayerElement.Tag is not MediaPlayerWithStreamSource oldMediaPlayerWithStreamSource) return;
-
-
-            Debug.WriteLine("Dispose oldMediaPlayerWithStreamSource mediaPlayer");
-
             oldMediaPlayerWithStreamSource.Dispose();
             Debug.WriteLine("Dispose oldMediaPlayerWithStreamSource  mediaPlayer success");
 
@@ -693,19 +684,20 @@ public sealed partial class MainPage : Page
             {
                 _highBitRateVideos.Remove(oldMediaPlayerWithStreamSource.FilesInfo.datum.pc);
             }
+
+            Debug.WriteLine("成功移除正在播放的视频");
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"删除正在播放的视频文件时出现问题{ex.Message}");
         }
 
-        Debug.WriteLine("成功移除正在播放的视频");
 
     }
 
     private async Task<ContentDialogResult> TipDeletedFiles()
     {
-        ContentDialog dialog = new ContentDialog()
+        var dialog = new ContentDialog()
         {
             XamlRoot = this.XamlRoot,
             Title = "确认",
@@ -972,7 +964,6 @@ public sealed partial class MainPage : Page
     private async Task RemoveVideoAndPlayNextVideo(MediaPlayerElement mediaPlayerElement, FilesInfo videoInfo)
     {
         RemovePlayingVideo(mediaPlayerElement);
-
 
         Debug.WriteLine($"当前高质量视频数量为：{_highBitRateVideos.Count}");
         // 避免同时请求过多

@@ -16,6 +16,7 @@ namespace Display.Models
     public class MediaPlayerWithStreamSource
     {
         private HttpRandomAccessStream _stream;
+        private MediaSource _ms;
         private HttpClient _httpClient;
         public MediaPlayer MediaPlayer = new();
         public FilesInfo FilesInfo;
@@ -40,6 +41,7 @@ namespace Display.Models
             {
                 var videoHttpClient = WebApi.GetVideoClient();
                 var result = await AdaptiveMediaSource.CreateFromUriAsync(new Uri(videoUrl), videoHttpClient);
+                mediaPlayerWithStreamSource._httpClient = videoHttpClient;
 
                 if (result.Status == AdaptiveMediaSourceCreationStatus.Success)
                 {
@@ -66,6 +68,8 @@ namespace Display.Models
 
                 ms = MediaSource.CreateFromStream(mediaPlayerWithStreamSource._stream, "video/mp4");
             }
+
+            mediaPlayerWithStreamSource._ms = ms;
 
             //添加字幕文件
             if (subInfo != null)
@@ -130,6 +134,7 @@ namespace Display.Models
             try
             {
                 _stream?.Dispose();
+                _ms?.Dispose();
                 MediaPlayer?.Dispose();
                 _httpClient?.Dispose();
                 Debug.WriteLine("Dispose MediaPlayerStreamSource success");
