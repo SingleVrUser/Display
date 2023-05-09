@@ -531,7 +531,7 @@ namespace Display.Data
         //临时方法
         public static Visibility showIfImageENotNull(string imagepath)
         {
-            if (imagepath == Data.Const.NoPictruePath)
+            if (imagepath == Data.Const.NoPicturePath)
             {
                 return Visibility.Collapsed;
             }
@@ -544,7 +544,7 @@ namespace Display.Data
         //临时方法
         public static Visibility showIfImageNull(string imagepath)
         {
-            if (imagepath == Data.Const.NoPictruePath)
+            if (imagepath == Data.Const.NoPicturePath)
             {
                 return Visibility.Visible;
             }

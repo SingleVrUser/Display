@@ -442,7 +442,7 @@ namespace Display.Data
             {
                 string path = value;
 
-                path = !string.IsNullOrEmpty(path) ? path : Data.Const.NoPictruePath;
+                path = !string.IsNullOrEmpty(path) ? path : Data.Const.NoPicturePath;
 
                 if (_prifile_path == path) return;
 
@@ -663,7 +663,7 @@ namespace Display.Data
                 if (_imagepath == value) return;
 
                 string path = value;
-                _imagepath = !string.IsNullOrEmpty(path) ? path : Const.NoPictruePath;
+                _imagepath = !string.IsNullOrEmpty(path) ? path : Const.NoPicturePath;
                 OnPropertyChanged();
             }
         }
@@ -935,7 +935,7 @@ namespace Display.Data
     /// <summary>
     /// 文件详情展示
     /// </summary>
-    public class FilesInfo
+    public class FilesInfo : INotifyPropertyChanged
     {
         public FilesInfo()
         {
@@ -1021,22 +1021,29 @@ namespace Display.Data
             return video_quality;
         }
 
-        //public event PropertyChangedEventHandler PropertyChanged;
-
         public enum FileType { Folder, File };
-        public string Name { get; set; }
+
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                _name = value;
+                OnPropertyChanged();
+            }
+        }
         public string Cid { get; set; }
         public string Fid { get; set; }
         public FileType Type { get; set; }
         public string IconPath { get; set; }
 
-        //    private void NotifyPropertyChanged(string propertyName)
-        //    {
-        //        if (PropertyChanged != null)
-        //        {
-        //            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        //        }
-        //    }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public static string getPathFromFileType(string ico)
         {
@@ -1374,7 +1381,7 @@ namespace Display.Data
                 if (string.IsNullOrEmpty(_prifilePhotoPath))
                 {
                     //初始化
-                    _prifilePhotoPath = Data.Const.NoPictruePath;
+                    _prifilePhotoPath = Data.Const.NoPicturePath;
 
                     //检查演员图片是否存在
                     string imagePath = Path.Combine(AppSettings.ActorInfo_SavePath, name, "face.jpg");
@@ -1969,7 +1976,7 @@ namespace Display.Data
 
         public long look_later { get; set; } = 0;
 
-        public string image_path { get; set; } = Data.Const.NoPictruePath;
+        public string image_path { get; set; } = Data.Const.NoPicturePath;
     }
 
     public enum FailInfoShowType { like, look_later }
@@ -1985,4 +1992,13 @@ namespace Display.Data
         public string file_id { get; set; }
         public string file_name { get; set; }
     }
+
+    public class RenameRequest
+    {
+        public bool state { get; set; }
+        public string error { get; set; }
+        public int errno { get; set; }
+        public Dictionary<string,string> data { get; set; }
+    }
+
 }

@@ -476,16 +476,20 @@ public sealed partial class MainPage : Page
 
         // 搜索影片信息
         CidInfos.Clear();
+
+
         await FindAndShowInfosFromInternet(PlayingVideoInfos.ToList());
+
 
     }
 
     private async Task FindAndShowInfosFromInternet(List<FilesInfo> filesInfos)
     {
+        VideoPlay_ListView.IsEnabled = false;
         Debug.WriteLine("正在搜索cid相应的信息");
         FindCidInfo_ProgressRing.Visibility = Visibility.Visible;
 
-        const string noPicturePath = Const.NoPictruePath;
+        const string noPicturePath = Const.NoPicturePath;
 
         //搜刮
         foreach (var video in filesInfos)
@@ -538,8 +542,9 @@ public sealed partial class MainPage : Page
 
         FindCidInfo_ProgressRing.Visibility = Visibility.Collapsed;
 
-
         Debug.WriteLine("完成搜索cid相应的信息");
+
+        VideoPlay_ListView.IsEnabled = true;
     }
 
     private void DoubleVideoPlayButton_Click(object sender, RoutedEventArgs e)

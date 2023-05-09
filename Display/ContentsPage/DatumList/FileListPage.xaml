@@ -47,7 +47,7 @@
 
         <DataTemplate x:Key="FileListTemplate"
                       x:DataType="data:FilesInfo">
-            <Grid DoubleTapped="OpenFolder_Tapped">
+            <Grid DoubleTapped="OpenFolder_Tapped" Background="Transparent">
 
                 <Grid.ContextFlyout>
                     <MenuFlyout>
@@ -95,6 +95,12 @@
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
 
+                        <MenuFlyoutItem Text="重命名" Click="RenameItemClick">
+                            <MenuFlyoutItem.Icon>
+                                <SymbolIcon Symbol="Rename" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+
                     </MenuFlyout>
                 </Grid.ContextFlyout>
                 <Grid.ColumnDefinitions>
@@ -119,7 +125,7 @@
                     </Image>
 
                     <TextBlock Grid.Column="1"
-                               Text="{x:Bind Name}"
+                               Text="{x:Bind Name,Mode=OneWay}"
                                Style="{StaticResource ValueText}"
                                Tapped="TextBlock_Tapped"
                                HorizontalAlignment="Left" />

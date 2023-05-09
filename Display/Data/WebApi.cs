@@ -20,6 +20,10 @@ using Windows.Storage;
 using Display.Helper;
 using System.ComponentModel;
 using System.Net.Http.Json;
+using Display.Views;
+using Display.WindowView;
+using static QRCoder.PayloadGenerator;
+using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace Display.Data
 {
@@ -512,12 +516,49 @@ namespace Display.Data
             HttpResponseMessage response;
             try
             {
-                response = await Client.PostAsync("https://webapi.115.com/files/move", content);
+                await Client.PostAsync("https://webapi.115.com/files/move", content);
             }
             catch (AggregateException e)
             {
                 Toast.tryToast("网络异常", "移动115文件时发生异常：", e.Message);
             }
+        }
+
+        /// <summary>
+        /// 重命名文件
+        /// </summary>
+        /// <param Name="pid"></param>
+        /// <param Name="fids"></param>
+        /// <returns></returns>
+        public async Task<RenameRequest> RenameFile(string pid, string newName)
+        {
+            var values = new Dictionary<string, string>
+            {
+                { $"files_new_name[{pid}]", newName},
+
+            };
+
+            var content = new FormUrlEncodedContent(values);
+
+            RenameRequest result = null;
+
+            try
+            {
+                var response = await Client.PostAsync("https://webapi.115.com/files/batch_rename", content);
+
+                result = await response.Content.ReadFromJsonAsync<RenameRequest>();
+
+                if (string.IsNullOrEmpty(result.error))
+                    return result;
+
+                Debug.WriteLine($"115重命名出错:{result.error}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"解析115重命名请求时出错:{ex.Message}");
+            }
+
+            return result;
         }
 
         public enum OrderBy { file_name, file_size, user_ptime }
@@ -1536,6 +1577,29 @@ namespace Display.Data
                 {
                     m3U8Infos.Add(new m3u8Info(re.Groups[3].Value, re.Groups[1].Value, re.Groups[2].Value, lineList[i + 1].Trim('\r')));
                 }
+            }
+
+            // 检查账号是否异常
+            if (m3U8Infos.Count == 0 && strResult.Contains(Const.AccountAnomalyTip))
+            {
+                var window = new CommonWindow();
+                window.Content = new BrowserPage(window, $"https://v.anxia.com/?pickcode={pickCode}&share_id=0");
+                window.Activate();
+
+                var isClose = false;
+                window.Closed += async (_, _) =>
+                {
+                    m3U8Infos = await GetM3U8InfoByPickCode(pickCode);
+                    isClose = true;
+                };
+
+                //堵塞，直到关闭输入验证码的window
+                while (!isClose)
+                {
+                    await Task.Delay(2000);
+                }
+
+                return m3U8Infos;
             }
 
             //排序

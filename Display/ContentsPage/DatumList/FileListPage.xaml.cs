@@ -49,8 +49,12 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
     }
 
-    WebApi webApi;
+    private WebApi _webApi;
 
+    private WebApi WebApi
+    {
+        get { return _webApi ??= WebApi.GlobalWebApi; }
+    }
 
     /// <summary>
     /// 中转站文件
@@ -409,9 +413,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         {
             sourceFilesInfos.ForEach(item => filesInfos.Remove(item));
 
-            webApi ??= WebApi.GlobalWebApi;
-
-            await webApi.DeleteFiles(sourceFilesInfos.FirstOrDefault()?.datum.pid, sourceFilesInfos.Select(item =>
+            await WebApi.DeleteFiles(sourceFilesInfos.FirstOrDefault()?.datum.pid, sourceFilesInfos.Select(item =>
             {
                 //文件
                 if (item.Type == FilesInfo.FileType.File)
@@ -507,9 +509,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     /// <returns></returns>
     private async Task Move115Files(string pid, List<FilesInfo> files)
     {
-        webApi ??= WebApi.GlobalWebApi;
-
-        await webApi.MoveFiles(pid, files.Select(item => item.Type == FilesInfo.FileType.Folder ? item.Cid : item.Fid).ToList());
+        await WebApi.MoveFiles(pid, files.Select(item => item.Type == FilesInfo.FileType.Folder ? item.Cid : item.Fid).ToList());
 
         //删除列表文件
         TryRemoveFilesInExplorer(files);
@@ -723,8 +723,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (BaseExample.SelectedItems.FirstOrDefault() is not FilesInfo) return;
 
-        webApi ??= WebApi.GlobalWebApi;
-
         List<Datum> videoinfos = new();
 
         foreach (var item in BaseExample.SelectedItems)
@@ -740,7 +738,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
 
         //BitComet只需要cid,n,pc三个值
-        bool isSuccess = await webApi.RequestDown(videoinfos, downtype);
+        bool isSuccess = await WebApi.RequestDown(videoinfos, downtype);
 
         if (!isSuccess)
             ShowTeachingTip("请求下载失败");
@@ -829,10 +827,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (result != ContentDialogResult.Primary) return;
 
-        webApi ??= WebApi.GlobalWebApi;
-
         // 新建文件夹
-        var makeDirResult = await webApi.RequestMakeDir(currentFolderId, inputTextBox.Text);
+        var makeDirResult = await WebApi.RequestMakeDir(currentFolderId, inputTextBox.Text);
         if (makeDirResult == null) return;
 
         // 移动文件到新文件夹
@@ -846,6 +842,43 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         //// 删除文件
         //TryRemoveFilesInExplorer(fileInfos);
 
+    }
+
+    private async void RenameItemClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
+
+        var pid = info.Type == FilesInfo.FileType.File ? info.Fid : info.Cid;
+
+        TextBox inputTextBox = new()
+        {
+            Text = info.Name,
+            PlaceholderText = info.Name
+        };
+
+        ContentDialog contentDialog = new()
+        {
+            XamlRoot = this.XamlRoot,
+            Content = inputTextBox,
+            Title = "重命名",
+            PrimaryButtonText = "确定",
+            CloseButtonText = "取消",
+            DefaultButton = ContentDialogButton.Primary
+        };
+
+        var result = await contentDialog.ShowAsync();
+
+        if (result != ContentDialogResult.Primary) return;
+
+        var renameRequest = await WebApi.RenameFile(pid, inputTextBox.Text);
+
+        var firstData = renameRequest.data.FirstOrDefault();
+
+        if (firstData.Key!=null)
+        {
+            info.Name = firstData.Value;
+        }
+        
     }
 }
 

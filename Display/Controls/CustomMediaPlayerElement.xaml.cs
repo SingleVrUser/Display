@@ -288,7 +288,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
                 DataAccess.UpdateSingleFailInfo(PickCode, "is_like", IsLike.ToString());
 
                 //需要截图
-                if (failInfo.image_path == Const.NoPictruePath || !File.Exists(failInfo.image_path))
+                if (failInfo.image_path == Const.NoPicturePath || !File.Exists(failInfo.image_path))
                 {
                     var capPath = await ScreenshotAsync(PickCode);
                     DataAccess.UpdateSingleFailInfo(PickCode, "image_path", capPath);
@@ -349,7 +349,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
                 DataAccess.UpdateSingleFailInfo(PickCode, "look_later", LookLater.ToString());
 
                 //需要添加截图
-                if (failInfo.image_path == Data.Const.NoPictruePath || !File.Exists(failInfo.image_path))
+                if (failInfo.image_path == Data.Const.NoPicturePath || !File.Exists(failInfo.image_path))
                 {
                     var capPath = await ScreenshotAsync(PickCode);
                     DataAccess.UpdateSingleFailInfo(PickCode, "image_path", capPath);
