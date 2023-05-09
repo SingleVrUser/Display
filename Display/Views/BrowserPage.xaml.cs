@@ -11,12 +11,12 @@ namespace Display.Views
 {
     public sealed partial class BrowserPage : Page
     {
-        public BrowserPage(Window window)
+        public BrowserPage(Window window, string url= "https://115.com/?cid=0&offset=0&mode=wangpan")
         {
             this.InitializeComponent();
             //NavigationCacheMode = NavigationCacheMode.Enabled;
 
-            Browser.webview.Source = new Uri("https://115.com/?cid=0&offset=0&mode=wangpan");
+            Browser.webview.Source = new Uri(url);
 
             Browser.webview.NavigationCompleted += Webview_NavigationCompleted; ;
 

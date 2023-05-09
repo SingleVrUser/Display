@@ -339,7 +339,7 @@ namespace Display.Views
                     var oldActorInfo = actorInfos.FirstOrDefault();
 
                     //数据库中无头像
-                    if (oldActorInfo.prifile_path == Data.Const.NoPictruePath)
+                    if (oldActorInfo.prifile_path == Data.Const.NoPicturePath)
                     {
                         string filePath = Path.Combine(AppSettings.ActorInfo_SavePath, actorName);
 
