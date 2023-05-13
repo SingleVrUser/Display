@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 
 namespace Display.Data
@@ -1813,23 +1814,18 @@ namespace Display.Data
     //字幕文件信息
     public class SubInfo
     {
-        public string pickcode { get; set; }
-        public string name { get; set; }
-        public string fileBelongPickcode { get; set; }
+        public string PickCode { get; set; }
+        public string Name { get; set; }
+        public string FileBelongPickCode { get; set; }
 
-        public string trueName { get; set; }
+        public string TrueName { get; set; }
 
-        public SubInfo(string pickcode, string name, string fileBelongPickcode, string trueName)
+        public SubInfo(string pickCode, string name, string fileBelongPickCode, string trueName)
         {
-            this.pickcode = pickcode;
-            this.name = name;
-            this.fileBelongPickcode = fileBelongPickcode;
-            this.trueName = trueName;
-        }
-
-        public SubInfo()
-        {
-
+            this.PickCode = pickCode;
+            this.Name = name;
+            this.FileBelongPickCode = fileBelongPickCode;
+            this.TrueName = trueName;
         }
     }
 

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
+using static System.Int32;
 
 namespace Display.Data
 {
@@ -1416,7 +1417,7 @@ namespace Display.Data
         {
             if (truename == null) return null;
 
-            VideoInfo data = new VideoInfo();
+            VideoInfo data = null;
 
             using (SqliteConnection db =
                new SqliteConnection($"Filename={dbpath}"))
@@ -1427,7 +1428,7 @@ namespace Display.Data
                     ($"SELECT * from VideoInfo WHERE truename = '{truename}' LIMIT 1", db);
 
                 SqliteDataReader query = selectCommand.ExecuteReader();
-                while (query.Read())
+                if (query.Read())
                 {
                     data = ConvertQueryToVideoInfo(query);
                 }
@@ -2511,8 +2512,7 @@ namespace Display.Data
 
                 string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
 
-                int numResult;
-                bool NameIsNumber = Int32.TryParse(fileNameWithoutExtension, out numResult);
+                bool NameIsNumber = TryParse(fileNameWithoutExtension, out _);
 
                 //1.首先查询同名字幕文件(纯数字则跳过，长度小于10也跳过)
                 if (!NameIsNumber && fileNameWithoutExtension.Length > 10)

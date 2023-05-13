@@ -163,6 +163,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             BaseExample.ScrollIntoView(collection.First());
     }
 
+
     private void PlayButton_Click(object sender, RoutedEventArgs e)
     {
         if (BaseExample.SelectedItems is null || BaseExample.SelectedItems.Count == 0)
@@ -708,15 +709,20 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async void DownButton_Click(object sender, RoutedEventArgs e)
     {
-        await DownFiles(WebApi.downType.bc, sender as Button);
+        await DownFiles(WebApi.downType.bc);
     }
 
     private async void Aria2Down_Click(object sender, RoutedEventArgs e)
     {
-        await DownFiles(WebApi.downType.bc,sender as Button);
+        await DownFiles(WebApi.downType.aria2);
     }
 
-    private async Task DownFiles(WebApi.downType downtype,FrameworkElement target)
+    private async void Browser115Down_Click(object sender, RoutedEventArgs e)
+    {
+        await DownFiles(WebApi.downType._115);
+    }
+
+    private async Task DownFiles(WebApi.downType downType)
     {
         if (BaseExample.SelectedItems is null || BaseExample.SelectedItems.Count==0)
         {
@@ -726,22 +732,22 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (BaseExample.SelectedItems.FirstOrDefault() is not FilesInfo) return;
 
-        List<Datum> videoinfos = new();
+        List<Datum> videoInfos = new();
 
         foreach (var item in BaseExample.SelectedItems)
         {
-            if (item is not FilesInfo fileinfo) continue;
+            if (item is not FilesInfo fileInfo) continue;
 
             Datum datum = new();
-            datum.cid = fileinfo.Cid;
-            datum.n = fileinfo.Name;
-            datum.pc = fileinfo.datum.pc;
-            datum.fid = fileinfo.Fid;
-            videoinfos.Add(datum);
+            datum.cid = fileInfo.Cid;
+            datum.n = fileInfo.Name;
+            datum.pc = fileInfo.datum.pc;
+            datum.fid = fileInfo.Fid;
+            videoInfos.Add(datum);
         }
 
         //BitComet只需要cid,n,pc三个值
-        bool isSuccess = await WebApi.RequestDown(videoinfos, downtype);
+        bool isSuccess = await WebApi.RequestDown(videoInfos, downType);
 
         if (!isSuccess)
             ShowTeachingTip("请求下载失败");
@@ -758,6 +764,12 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         if (sender is not MenuFlyoutItem menuFlyoutItem) return;
         if (menuFlyoutItem.DataContext is null)
         {
+            if (BaseExample.SelectedItems is null || BaseExample.SelectedItems.Count == 0)
+            {
+                ShowTeachingTip("当前未选中文件");
+                return;
+            }
+
             //获取需要播放的文件
             var files = BaseExample.SelectedItems.Cast<FilesInfo>().ToList();
 
@@ -789,12 +801,31 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async void PlayWithPlayerButtonClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info, Tag: string aTag }) return;
-
+        if (sender is not MenuFlyoutItem menuFlyoutItem) return;
+        if (menuFlyoutItem is not { Tag: string aTag }) return;
         if (!int.TryParse(aTag, out var playerSelection)) return;
-
         await Task.Delay(1);
 
+        // 多个播放
+        if (menuFlyoutItem.DataContext is null)
+        {
+            if (BaseExample.SelectedItems is null || BaseExample.SelectedItems.Count == 0)
+            {
+                ShowTeachingTip("当前未选中文件");
+                return;
+            }
+
+            //获取需要播放的文件
+            var files = BaseExample.SelectedItems.Cast<FilesInfo>().ToList();
+
+            var mediaPlayItems = files.Select(x => new MediaPlayItem(x.datum.pc, x.Name)).ToList();
+            await PlayVideoHelper.PlayVideo(mediaPlayItems, this.XamlRoot, lastPage: this, playerSelection: playerSelection);
+
+            return;
+        }
+        
+        // 单个播放
+        if (menuFlyoutItem is not { DataContext: FilesInfo info}) return;
 
         var mediaPlayItem = new MediaPlayItem(info.datum.pc, info.Name);
         await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this, playerSelection: playerSelection);
@@ -901,6 +932,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             info.Name = firstData.Value;
         }
     }
+
 }
 
 class TransferStationFiles

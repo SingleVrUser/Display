@@ -249,6 +249,8 @@
                               ToolTipService.ToolTip="点击使用比特彗星下载，右键选择更多下载方式">
                     <AppBarButton.ContextFlyout>
                         <MenuFlyout>
+                            <MenuFlyoutItem Text="115浏览器下载"
+                                            Click="Browser115Down_Click" />
                             <MenuFlyoutItem Text="Aria2下载"
                                             Click="Aria2Down_Click" />
                         </MenuFlyout>
