@@ -8,12 +8,13 @@
     xmlns:local="using:Display.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:Display.Models"
     mc:Ignorable="d">
 
     <UserControl.Resources>
         <DataTemplate x:Key="QualityDataTemplate"
-                      x:DataType="local:Quality">
-            <TextBlock Text="{x:Bind Name}" />
+                      x:DataType="models:Quality">
+            <TextBlock Text="{x:Bind ShowName}" />
         </DataTemplate>
         
         <DataTemplate x:Key="PlayerDataTemplate"
@@ -38,7 +39,7 @@
                                                     FullWindow="mediaControls_FullWindow"
                                                     LikeButtonClick="LikeButtonClick"
                                                     LookLaterButtonClick="LookLaterButtonClick"
-                                                    ScreenShotButtonClick="ScreenshotButtonClick"
+                                                    ScreenShotButtonClick="ScreenShotButtonClick"
                                                     QualityChanged="QualityChanged"
                                                     PlayerChanged="PlayerChanged"
                                                     IsHitTestVisible="True" />

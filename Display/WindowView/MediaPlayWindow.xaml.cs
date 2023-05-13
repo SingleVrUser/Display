@@ -3,12 +3,16 @@
 
 using Display.Data;
 using Display.Helper;
+using Display.Models;
 using Display.Views;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using Microsoft.UI.Dispatching;
 using static Display.Controls.CustomMediaPlayerElement;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -21,32 +25,50 @@ namespace Display.WindowView;
 /// </summary>
 public sealed partial class MediaPlayWindow : Window
 {
-    private AppWindow appwindow;
-    private readonly string _pickCode;
-    private readonly PlayType _playType;
-    private readonly string _trueName;
-    private readonly SubInfo _subInfo;
+    private readonly AppWindow _appwindow;
 
-    private Page lastPage;
+    private readonly Page _lastPage;
 
-    public MediaPlayWindow(string pickCode, PlayType playType, string trueName, Page lastPage, SubInfo subInfo)
+    public MediaPlayWindow(List<MediaPlayItem> playItems, PlayType playType, Page lastPage)
     {
-        this.InitializeComponent();
+        InitializeComponent();
 
-        this.ExtendsContentIntoTitleBar = true;
-        this.SetTitleBar(AppTitleBar);
+        ExtendsContentIntoTitleBar = true;
+        SetTitleBar(AppTitleBar);
 
-        this._pickCode = pickCode;
-        this._playType = playType;
-        this._trueName = trueName;
-        this.lastPage = lastPage;
-        this._subInfo = subInfo;
+        _lastPage = lastPage;
 
-        appwindow = App.getAppWindow(this);
+        _appwindow = App.getAppWindow(this);
 
-        this.Closed += MediaPlayWindow_Closed;
+        mediaControl.InitLoad(playItems, playType, this);
+
+        Closed += MediaPlayWindow_Closed;
     }
 
+    /// <summary>
+    /// 修改标题
+    /// </summary>
+    /// <param name="title"></param>
+    public void ChangedWindowTitle(string title)
+    {
+        if (DispatcherQueue.HasThreadAccess)
+        {
+            AppTitleTextBlock.Text = title;
+        }
+        else
+        {
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+            {
+                AppTitleTextBlock.Text = title;
+            });
+        }
+    }
+
+    /// <summary>
+    /// 窗口关闭时应保存各信息状态（收藏，稍后观看）
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="args"></param>
     private void MediaPlayWindow_Closed(object sender, WindowEventArgs args)
     {
         if (mediaControl.IsLoaded && VideoPlayGrid.Children.Contains(mediaControl))
@@ -58,65 +80,66 @@ public sealed partial class MediaPlayWindow : Window
         mediaControl.PointerExited -= MediaControl_OnPointerExited;
         aTimer?.Stop();
 
-        //上一页为详情页，生效喜欢或稍后观看的修改
-        var newestIsLike = mediaControl.IsLike;
-        var newestLookLater = mediaControl.LookLater;
-        switch (lastPage)
-        {
-            case DetailInfoPage detailInfoPage:
-                {
-                    if (detailInfoPage.DetailInfo.is_like != newestIsLike)
-                        detailInfoPage.DetailInfo.is_like = newestIsLike;
+        ////上一页为详情页，生效喜欢或稍后观看的修改
+        //var newestIsLike = mediaControl.IsLike;
+        //var newestLookLater = mediaControl.LookLater;
+        //switch (_lastPage)
+        //{
+        //    case DetailInfoPage detailInfoPage:
+        //        {
+        //            if (detailInfoPage.DetailInfo.is_like != newestIsLike)
+        //                detailInfoPage.DetailInfo.is_like = newestIsLike;
 
-                    if (detailInfoPage.DetailInfo.look_later != newestLookLater)
-                        detailInfoPage.DetailInfo.look_later = newestLookLater;
-                    break;
-                }
-            case VideoViewPage videoViewPage:
-                {
-                    var storageItem = videoViewPage._storeditem;
+        //            if (detailInfoPage.DetailInfo.look_later != newestLookLater)
+        //                detailInfoPage.DetailInfo.look_later = newestLookLater;
+        //            break;
+        //        }
+        //    case VideoViewPage videoViewPage:
+        //        {
+        //            var storageItem = videoViewPage._storeditem;
 
-                    if (videoViewPage._storeditem != null && videoViewPage._storeditem.truename == _trueName)
-                    {
-                        if (storageItem.is_like != newestIsLike)
-                            storageItem.is_like = newestIsLike;
+        //            if (videoViewPage._storeditem != null && videoViewPage._storeditem.truename == _trueName)
+        //            {
+        //                if (storageItem.is_like != newestIsLike)
+        //                    storageItem.is_like = newestIsLike;
 
-                        if (storageItem.look_later != newestLookLater)
-                            storageItem.look_later = newestLookLater;
-                    }
+        //                if (storageItem.look_later != newestLookLater)
+        //                    storageItem.look_later = newestLookLater;
+        //            }
 
-                    break;
-                }
-            case ActorInfoPage actorInfoPage:
-                {
-                    if (actorInfoPage._storeditem.is_like != newestIsLike)
-                        actorInfoPage._storeditem.is_like = newestIsLike;
+        //            break;
+        //        }
+        //    case ActorInfoPage actorInfoPage:
+        //        {
+        //            if (actorInfoPage._storeditem.is_like != newestIsLike)
+        //                actorInfoPage._storeditem.is_like = newestIsLike;
 
-                    if (actorInfoPage._storeditem.look_later != newestLookLater)
-                        actorInfoPage._storeditem.look_later = newestLookLater;
-                    break;
-                }
-        }
+        //            if (actorInfoPage._storeditem.look_later != newestLookLater)
+        //                actorInfoPage._storeditem.look_later = newestLookLater;
+        //            break;
+        //        }
+        //}
+        
     }
 
-    public static MediaPlayWindow CreateNewWindow(string pickCode, PlayType playType, string trueName, Page lastPage, SubInfo subInfo)
+    public static MediaPlayWindow CreateNewWindow(List<MediaPlayItem> playItems, PlayType playType, Page lastPage)
     {
-        MediaPlayWindow newWindow = new(pickCode, playType, trueName, lastPage, subInfo);
+        MediaPlayWindow newWindow =  new(playItems, playType, lastPage);
         newWindow.Activate();
 
         return newWindow;
     }
 
-    private Visibility isPickCodeNull()
-    {
-        return _pickCode == null ? Visibility.Visible : Visibility.Collapsed;
-    }
+    //private Visibility IsPickCodeNull()
+    //{
+    //    return _pickCode == null ? Visibility.Visible : Visibility.Collapsed;
+    //}
 
     #region 全屏设置
 
     private void mediaControls_FullWindow(object sender, RoutedEventArgs e)
     {
-        if (appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
+        if (_appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
         {
             enterlFullScreen();
         }
@@ -131,12 +154,12 @@ public sealed partial class MediaPlayWindow : Window
     /// </summary>
     private void enterlFullScreen()
     {
-        if (appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
+        if (_appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
         {
             this.ExtendsContentIntoTitleBar = false;
             TitleBarRowDefinition.Height = new GridLength(0);
 
-            appwindow.SetPresenter(AppWindowPresenterKind.FullScreen);
+            _appwindow.SetPresenter(AppWindowPresenterKind.FullScreen);
 
             //监听ESC退出
             RootGrid.KeyDown += RootGrid_KeyDown;
@@ -150,13 +173,13 @@ public sealed partial class MediaPlayWindow : Window
     /// </summary>
     private void cancelFullScreen()
     {
-        if (appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen) return;
+        if (_appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen) return;
 
 
         this.ExtendsContentIntoTitleBar = true;
         TitleBarRowDefinition.Height = new GridLength(28);
 
-        appwindow.SetPresenter(AppWindowPresenterKind.Default);
+        _appwindow.SetPresenter(AppWindowPresenterKind.Default);
 
         //取消监听
         RootGrid.KeyDown -= RootGrid_KeyDown;
@@ -176,7 +199,7 @@ public sealed partial class MediaPlayWindow : Window
 
     private void mediaControl_MediaDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
-        if (appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
+        if (_appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
         {
             enterlFullScreen();
         }

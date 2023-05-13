@@ -12,7 +12,7 @@ public class GetActorInfoFromNetwork
 {
     public static async Task<ActorInfo> SearchInfoFromMinnanoAv(string name)
     {
-        string baseUrl = AppSettings.MinnanoAv_BaseUrl;
+        string baseUrl = AppSettings.MinnanoAvBaseUrl;
 
         string url = GetInfoFromNetwork.UrlCombine(baseUrl, $"search_result.php?search_scope=actress&search_word={name}&search=+Go+");
 
@@ -98,7 +98,7 @@ public class GetActorInfoFromNetwork
 
             if (!string.IsNullOrEmpty(img_url))
             {
-                actorInfo.image_url = $"{AppSettings.MinnanoAv_BaseUrl}{img_url}";
+                actorInfo.image_url = $"{AppSettings.MinnanoAvBaseUrl}{img_url}";
             }
         }
 

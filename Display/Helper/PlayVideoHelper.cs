@@ -9,14 +9,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Display.Data;
+using Display.Models;
 
 namespace Display.Helper;
 
 public class PlayVideoHelper
 {
-    public static async Task PlayVideo(string pickCode, XamlRoot xamlRoot = null, SubInfo subInfo = null, CustomMediaPlayerElement.PlayType playType = CustomMediaPlayerElement.PlayType.success, string trueName = "", Page lastPage = null, int playerSelection = -1)
+    /// <summary>
+    /// 根据指定播放器播放
+    /// </summary>
+    /// <param name="playItems"></param>
+    /// <param name="xamlRoot"></param>
+    /// <param name="playType"></param>
+    /// <param name="lastPage"></param>
+    /// <param name="playerSelection"></param>
+    /// <returns></returns>
+    public static async Task PlayVideo(List<MediaPlayItem> playItems, XamlRoot xamlRoot = null, CustomMediaPlayerElement.PlayType playType = CustomMediaPlayerElement.PlayType.success, Page lastPage = null, int playerSelection = -1)
     {
-        //115Cookie未空
+        // 播放项不能为空
+        var playItem = playItems?.FirstOrDefault();
+        if(playItem == null) return;
+
+        //115Cookie不能为空
         if (string.IsNullOrEmpty(AppSettings._115_Cookie) && xamlRoot != null)
         {
             var dialog = new ContentDialog()
@@ -31,49 +45,6 @@ public class PlayVideoHelper
             await dialog.ShowAsync();
         }
 
-        //是否需要加载字幕
-        if (AppSettings.IsFindSub && subInfo == null)
-        {
-            var subDict = DataAccess.FindSubFile(pickCode);
-
-            if (subDict.Count == 1)
-            {
-                string subFilePickCode = subDict.First().Key.ToString();
-                string subFileName = subDict.First().Value.ToString();
-                subInfo = new(subFilePickCode, subFileName, pickCode, trueName);
-            }
-            else if (subDict.Count > 1 && xamlRoot != null)
-            {
-                List<SubInfo> subInfos = new();
-                subDict.ToList().ForEach(item => subInfos.Add(new(item.Key, item.Value, pickCode, trueName)));
-
-                //按名称排序
-                subInfos = subInfos.OrderBy(item => item.name).ToList();
-
-                ContentsPage.DetailInfo.SelectSingleSubFileToSelected newPage = new(subInfos, trueName);
-                newPage.ContentListView.ItemClick += SubInfoListView_ItemClick;
-
-                ContentDialog dialog = new()
-                {
-                    XamlRoot = xamlRoot,
-                    Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
-                    Title = "选择字幕",
-                    PrimaryButtonText = "直接播放",
-                    CloseButtonText = "返回",
-                    Content = newPage,
-                    DefaultButton = ContentDialogButton.Close
-                };
-
-                var result = await dialog.ShowAsync();
-
-                //返回
-                if (result != ContentDialogResult.Primary)
-                {
-                    return;
-                }
-            }
-        }
-
         if (playerSelection == -1) playerSelection = AppSettings.PlayerSelection;
 
         //选择播放器播放
@@ -81,34 +52,35 @@ public class PlayVideoHelper
         {
             //浏览器播放
             case 0:
-                VideoPlayWindow.createNewWindow(FileMatch.getVideoPlayUrl(pickCode));
+                VideoPlayWindow.createNewWindow(FileMatch.getVideoPlayUrl(playItem.PickCode));
                 break;
             //PotPlayer播放
             case 1:
-                await WebApi.GlobalWebApi.PlayVideoWithPlayer(pickCode, WebApi.PlayMethod.pot, xamlRoot, subInfo);
+                await WebApi.GlobalWebApi.PlayVideoWithPlayer(playItem, WebApi.PlayMethod.pot, xamlRoot);
                 break;
             //mpv播放
             case 2:
-                await WebApi.GlobalWebApi.PlayVideoWithPlayer(pickCode, WebApi.PlayMethod.mpv, xamlRoot, subInfo);
+                await WebApi.GlobalWebApi.PlayVideoWithPlayer(playItem, WebApi.PlayMethod.mpv, xamlRoot);
                 break;
             //vlc播放
             case 3:
-                await WebApi.GlobalWebApi.PlayVideoWithPlayer(pickCode, WebApi.PlayMethod.vlc, xamlRoot, subInfo);
+                await WebApi.GlobalWebApi.PlayVideoWithPlayer(playItem, WebApi.PlayMethod.vlc, xamlRoot);
                 break;
             //MediaElement播放
             case 4:
-                MediaPlayWindow.CreateNewWindow(pickCode, playType, trueName, lastPage, subInfo);
+                MediaPlayWindow.CreateNewWindow(playItems, playType, lastPage);
                 break;
         }
     }
 
-    private static async void SubInfoListView_ItemClick(object sender, ItemClickEventArgs e)
+    public static async void SubInfoListView_ItemClick(object sender, ItemClickEventArgs e)
     {
         if (e.ClickedItem is not SubInfo singleVideoInfo) return;
 
         if (sender is not ListView { DataContext: string trueName }) return;
 
-        await PlayVideo(singleVideoInfo.fileBelongPickcode, subInfo: singleVideoInfo, trueName: trueName, lastPage: DetailInfoPage.Current);
+        var mediaPlayItem = new MediaPlayItem(singleVideoInfo.fileBelongPickcode, trueName) { SubInfos = new List<SubInfo>(){ singleVideoInfo } };
+        await PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, lastPage: DetailInfoPage.Current);
     }
 
 }

@@ -26,7 +26,7 @@ public class Manager
 
     public Manager()
     {
-        spiderByCIDHandlers = new()
+        spiderByCIDHandlers = new Dictionary<int, Func<string, Task<VideoInfo>>>
         {
             { JavBus.Id, JavBus.SearchInfoFromCID },
             { Jav321.Id, Jav321.SearchInfoFromCID },
@@ -100,16 +100,11 @@ public class Manager
     {
         if (!spiderSource.IsTrue) return false;
 
-        bool isFc2 = CID.Contains("FC2");
+        var isFc2 = CID.Contains("FC2");
 
         //“是Fc2且忽略FC2” 或者 “是Fc2且只有Fc2”
         // 满足以上条件，跳过该搜刮源
-        if ((isFc2 && spiderSource.IgnoreFc2) || (!isFc2 && spiderSource.OnlyFc2))
-        {
-            return false;
-        }
-
-        return true;
+        return (!isFc2 || !spiderSource.IgnoreFc2) && (isFc2 || !spiderSource.OnlyFc2);
     }
 
     public async Task<VideoInfo> DispatchSpecificSpiderInfoByCID(string CID, int spiderId)
@@ -120,19 +115,19 @@ public class Manager
     }
 
 
-    public async Task<VideoInfo> DispatchSpiderInfoByDetailUrl(string CID, string detail_url)
+    public async Task<VideoInfo> DispatchSpiderInfoByDetailUrl(string cid, string detailUrl)
     {
         //先访问detail_url，获取到标题
-        var tuple = await RequestHelper.RequestHtml(GetInfoFromNetwork.Client, detail_url);
+        var tuple = await RequestHelper.RequestHtml(GetInfoFromNetwork.Client, detailUrl);
         if (tuple == null) return null;
 
         string strResult = tuple.Item2;
         HtmlDocument htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(strResult);
-        var TitleNode = htmlDoc.DocumentNode.SelectSingleNode("/html/head/title");
-        if (TitleNode == null) return null;
+        var titleNode = htmlDoc.DocumentNode.SelectSingleNode("/html/head/title");
+        if (titleNode == null) return null;
 
-        var Title = TitleNode.InnerText;
+        var title = titleNode.InnerText;
 
         VideoInfo info = null;
 
@@ -142,11 +137,10 @@ public class Manager
             var keywords = handler.Key;
             var fun = handler.Value;
 
-            if (Title.Contains(keywords))
-            {
-                info = await fun(CID.ToUpper(), detail_url, htmlDoc);
-                break;
-            }
+            if (!title.Contains(keywords)) continue;
+
+            info = await fun(cid.ToUpper(), detailUrl, htmlDoc);
+            break;
         }
 
         return info;
@@ -176,39 +170,39 @@ public class Manager
                 case SpiderInfo.SpiderSourceName.Javbus:
                     name = JavBus.Abbreviation;
                     DelayRanges = JavBus.DelayRanges;
-                    IsTrue = JavBus.IsTrue;
+                    IsTrue = JavBus.IsOn;
                     break;
                 case SpiderInfo.SpiderSourceName.Jav321:
                     name = Jav321.Abbreviation;
                     DelayRanges = Jav321.DelayRanges;
-                    IsTrue = Jav321.IsTrue;
+                    IsTrue = Jav321.IsOn;
                     break;
                 case SpiderInfo.SpiderSourceName.Avmoo:
                     name = AvMoo.Abbreviation;
                     DelayRanges = AvMoo.DelayRanges;
-                    IsTrue = AvMoo.IsTrue;
+                    IsTrue = AvMoo.IsOn;
                     break;
                 case SpiderInfo.SpiderSourceName.Avsox:
                     name = AvSox.Abbreviation;
                     DelayRanges = AvSox.DelayRanges;
-                    IsTrue = AvSox.IsTrue;
+                    IsTrue = AvSox.IsOn;
                     break;
                 case SpiderInfo.SpiderSourceName.Libredmm:
                     name = LibreDmm.Abbreviation;
                     DelayRanges = LibreDmm.DelayRanges;
-                    IsTrue = LibreDmm.IsTrue;
+                    IsTrue = LibreDmm.IsOn;
                     break;
                 case SpiderInfo.SpiderSourceName.Fc2club:
                     name = Fc2hub.Abbreviation;
                     DelayRanges = Fc2hub.DelayRanges;
-                    IsTrue = Fc2hub.IsTrue;
+                    IsTrue = Fc2hub.IsOn;
                     OnlyFc2 = Fc2hub.OnlyFc2;
                     IgnoreFc2 = Fc2hub.IgnoreFc2;
                     break;
                 case SpiderInfo.SpiderSourceName.Javdb:
                     name = JavDB.Abbreviation;
                     DelayRanges = JavDB.DelayRanges;
-                    IsTrue = JavDB.IsTrue;
+                    IsTrue = JavDB.IsOn;
                     IgnoreFc2 = JavDB.IgnoreFc2;
                     break;
             }

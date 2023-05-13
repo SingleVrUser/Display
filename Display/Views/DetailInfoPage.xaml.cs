@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using Windows.Foundation;
 using Display.Data;
+using Display.Models;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -160,8 +161,8 @@ namespace Display.Views
             //一集
             else if (videoInfoList.Count == 1)
             {
-
-                await PlayVideoHelper.PlayVideo(videoInfoList[0].pc, this.XamlRoot, trueName: name, lastPage: this);
+                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].pc, name);
+                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
             }
 
             //有多集
@@ -187,7 +188,9 @@ namespace Display.Views
 
             if (sender is not ListView { DataContext: string trueName }) return;
 
-            await PlayVideoHelper.PlayVideo(singleVideoInfo.pc, this.XamlRoot, trueName: trueName, lastPage: this);
+            var mediaPlayItem = new MediaPlayItem(singleVideoInfo.pc, trueName);
+
+            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot , lastPage: this);
         }
 
 
@@ -219,7 +222,7 @@ namespace Display.Views
                     DataAccess.DeleteDataInVideoInfoTable(DetailInfo.truename);
 
                     //删除存储的文件夹
-                    string savePath = Path.Combine(AppSettings.Image_SavePath, DetailInfo.truename);
+                    string savePath = Path.Combine(AppSettings.ImageSavePath, DetailInfo.truename);
                     if (Directory.Exists(savePath))
                     {
                         Directory.Delete(savePath, true);
@@ -258,7 +261,9 @@ namespace Display.Views
             //一集
             else if (videoInfoList.Count == 1)
             {
-                await PlayVideoHelper.PlayVideo(videoInfoList[0].pc, this.XamlRoot, trueName: name, lastPage: this);
+
+                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].pc, name);
+                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
             }
 
             //有多集

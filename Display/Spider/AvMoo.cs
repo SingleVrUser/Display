@@ -20,7 +20,7 @@ public class AvMoo
 
     public const bool IgnoreFc2 = true;
 
-    public static bool IsTrue => AppSettings.isUseAvMoo;
+    public static bool IsOn => AppSettings.IsUseAvMoo;
 
 
     private static string baseUrl => AppSettings.AvMoo_BaseUrl;

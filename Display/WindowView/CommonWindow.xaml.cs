@@ -1,6 +1,8 @@
 ﻿using Microsoft.UI.Xaml;
 using System.IO;
 using Windows.ApplicationModel;
+using CommunityToolkit.WinUI.UI;
+using Microsoft.UI.Xaml.Controls;
 using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -13,7 +15,9 @@ namespace Display.WindowView
     /// </summary>
     public sealed partial class CommonWindow
     {
-        public CommonWindow(string title = "Display")
+        private const string DefaultTitle = "Display";
+
+        public CommonWindow(string title = DefaultTitle)
         {
             this.InitializeComponent();
             this.Title = title;
@@ -25,5 +29,13 @@ namespace Display.WindowView
             Backdrop = new MicaSystemBackdrop();
         }
 
+        public static void CreateAndShowWindow(Page page,string title= DefaultTitle)
+        {
+            var window = new CommonWindow(title)
+            {
+                Content = page
+            };
+            window.Activate();
+        }
     }
 }

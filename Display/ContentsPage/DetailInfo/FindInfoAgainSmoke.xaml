@@ -155,25 +155,25 @@
                             </VariableSizedWrapGrid.Resources>
                             <CheckBox x:Name="JavBus_CheckBox"
                                       Content="JavBus"
-                                      IsChecked="{x:Bind data:AppSettings.isUseJavBus}" />
+                                      IsChecked="{x:Bind data:AppSettings.IsUseJavBus}" />
                             <CheckBox x:Name="Jav321_CheckBox"
                                       Content="Jav321"
-                                      IsChecked="{x:Bind data:AppSettings.isUseJav321}" />
+                                      IsChecked="{x:Bind data:AppSettings.IsUseJav321}" />
                             <CheckBox x:Name="AvMoo_CheckBox"
                                       Content="AvMoo"
-                                      IsChecked="{x:Bind data:AppSettings.isUseAvMoo}" />
+                                      IsChecked="{x:Bind data:AppSettings.IsUseAvMoo}" />
                             <CheckBox x:Name="AvSox_CheckBox"
                                       Content="AvSox"
-                                      IsChecked="{x:Bind data:AppSettings.isUseAvSox}" />
+                                      IsChecked="{x:Bind data:AppSettings.IsUseAvSox}" />
                             <CheckBox x:Name="LibreDmm_CheckBox"
                                       Content="libredmm"
-                                      IsChecked="{x:Bind data:AppSettings.isUseLibreDmm}" />
+                                      IsChecked="{x:Bind data:AppSettings.IsUseLibreDmm}" />
                             <CheckBox x:Name="Fc2Hub_CheckBox"
                                       Content="Fc2Hub"
-                                      IsChecked="{x:Bind data:AppSettings.isUseFc2Hub}" />
+                                      IsChecked="{x:Bind data:AppSettings.IsUseFc2Hub}" />
                             <CheckBox x:Name="JavDB_CheckBox"
                                       Content="JavDB"
-                                      IsChecked="{x:Bind data:AppSettings.isUseJavDB}" />
+                                      IsChecked="{x:Bind data:AppSettings.IsUseJavDb}" />
                         </VariableSizedWrapGrid>
 
                         <!--刷新-->

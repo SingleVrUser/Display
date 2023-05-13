@@ -9,12 +9,9 @@
       xmlns:behaviors="using:CommunityToolkit.WinUI.UI.Behaviors"
       xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:local="using:Display.ContentsPage.DatumList"
-      xmlns:customControl="using:Display.Controls"
-      xmlns:converter="using:Display.Converter"
-      xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
       xmlns:controls1="using:Display.Controls"
       xmlns:data="using:Display.Data"
-      xmlns:views="using:Display.Views"
+      xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
       mc:Ignorable="d">
 
     <Page.Resources>
@@ -50,7 +47,7 @@
             <Grid DoubleTapped="OpenFolder_Tapped" Background="Transparent">
 
                 <Grid.ContextFlyout>
-                    <MenuFlyout>
+                    <MenuFlyout ShouldConstrainToRootBounds="False">
                         <MenuFlyoutItem Text="在默认应用播放"
                                         IsEnabled="{x:Bind datum.iv, Converter={StaticResource IsVideoToBoolConverter}}"
                                         Click="PlayVideoButton_Click">
@@ -203,7 +200,45 @@
 
                 <AppBarButton Icon="Play"
                               Label="播放"
-                              Click="PlayButton_Click" />
+                              Click="PlayButton_Click">
+                    <AppBarButton.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="在默认应用播放"
+                                            Click="PlayVideoButton_Click">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xEE4A;" />
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+
+                            <MenuFlyoutSubItem Text="在其他应用播放">
+                                <MenuFlyoutSubItem.Icon>
+                                    <FontIcon Glyph="&#xEE4A;" />
+                                </MenuFlyoutSubItem.Icon>
+
+                                <MenuFlyoutItem Text="WebView"
+                                                Tag="0"
+                                                Click="PlayWithPlayerButtonClick" />
+
+                                <MenuFlyoutItem Text="PotPlayer"
+                                                Tag="1"
+                                                Click="PlayWithPlayerButtonClick" />
+
+                                <MenuFlyoutItem Text="mpv"
+                                                Tag="2"
+                                                Click="PlayWithPlayerButtonClick" />
+
+                                <MenuFlyoutItem Text="vlc"
+                                                Tag="3"
+                                                Click="PlayWithPlayerButtonClick" />
+
+                                <MenuFlyoutItem Text="MediaElement"
+                                                Tag="4"
+                                                Click="PlayWithPlayerButtonClick" />
+
+                            </MenuFlyoutSubItem>
+                        </MenuFlyout>
+                    </AppBarButton.ContextFlyout>
+                </AppBarButton>
                 <AppBarButton x:Name="ImportDataButton"
                               Icon="Import"
                               Label="导入"
@@ -257,11 +292,6 @@
                 </controls:MetadataControl.Transitions>
             </controls:MetadataControl>
 
-            <TeachingTip Grid.Column="0" x:Name="SelectedNull_TeachingTip"
-                         Target="{x:Bind ImportDataButton}"
-                         IsLightDismissEnabled="True"
-                         Foreground="{ThemeResource TextBoxButtonForegroundThemeBrush}"
-                         Subtitle="当前未选中文件夹，请选中后继续" />
         </Grid>
 
         <ListView x:Name="BaseExample"
@@ -341,7 +371,7 @@
                       Width="80"
                       Height="70"
                       AllowDrop="True"
-                      Drop="RecyStationGrid_Drop"
+                      Drop="RecycleStationGrid_Drop"
                       DragOver="DeletedFileMove_DragOver"
                       DragEnter="RecyStationGrid_DragEnter"
                       DragLeave="RecyStationGrid_DragLeave"
@@ -387,7 +417,7 @@
                 <HyperlinkButton Grid.Row="0" Content="清空"
                                  HorizontalAlignment="Right"
                                  VerticalAlignment="Top"
-                                 Click="EmptyTranferStationButton_Click" />
+                                 Click="EmptyTransferStationButton_Click" />
 
                 <ListView x:Name="TransferStation_ListView"
                           Grid.Row="1"
@@ -406,9 +436,7 @@
             </Grid>
         </Grid>
 
-
-
-        <TeachingTip Grid.Row="0" x:Name="LightDismissTeachingTip"
+        <TeachingTip Grid.Row="0" Grid.RowSpan="2" x:Name="LightDismissTeachingTip"
                      IsLightDismissEnabled="True" />
     </Grid>
 </Page>

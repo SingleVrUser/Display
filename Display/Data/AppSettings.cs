@@ -422,6 +422,27 @@ public class AppSettings
             LocalSettings.Values["javDB_Cookie"] = value;
         }
     }
+    
+    /// <summary>
+    /// x1080x的Cookie，搜索信息需要
+    /// </summary>
+    public static string X1080XCookie
+    {
+        get => LocalSettings.Values["X1080XCookie"] as string;
+        set => LocalSettings.Values["X1080XCookie"] = value;
+    }
+
+
+    /// <summary>
+    /// JavDB的Cookie，查询FC信息需要
+    /// </summary>
+    public static string X1080XUa
+    {
+        get => LocalSettings.Values["X1080XUa"] as string;
+        set => LocalSettings.Values["X1080XUa"] = value;
+    }
+
+
 
     #endregion
 
@@ -460,9 +481,9 @@ public class AppSettings
     /// minnano-av网址
     /// </summary>
     /// 
-    private static string _minnanoAv_BaseUrl = "http://www.minnano-av.com/";
+    private const string _minnanoAv_BaseUrl = "http://www.minnano-av.com/";
 
-    public static string MinnanoAv_BaseUrl
+    public static string MinnanoAvBaseUrl
     {
         get
         {
@@ -480,13 +501,30 @@ public class AppSettings
     }
 
 
+    public static string X1080XBaseUrl
+    {
+        get
+        {
+            var baseUrl = "https://x222x.me/";
+            if (LocalSettings.Values["MinnanoAv_BaseUrl"] is string url)
+            {
+                baseUrl = url;
+            }
+
+            return baseUrl;
+        }
+        set => LocalSettings.Values["MinnanoAv_BaseUrl"] = value;
+    }
+
+
+
     #endregion
 
 
     /// <summary>
     /// 图片保存地址
     /// </summary>
-    public static string Image_SavePath
+    public static string ImageSavePath
     {
         get
         {
@@ -507,7 +545,7 @@ public class AppSettings
     /// <summary>
     /// 字幕保存地址
     /// </summary>
-    public static string Sub_SavePath
+    public static string SubSavePath
     {
         get
         {
@@ -528,7 +566,7 @@ public class AppSettings
     /// <summary>
     /// 图片保存地址
     /// </summary>
-    public static string ActorInfo_SavePath
+    public static string ActorInfoSavePath
     {
         get
         {
@@ -549,7 +587,7 @@ public class AppSettings
     /// <summary>
     /// 演员头像仓库文件保存地址
     /// </summary>
-    public static string ActorFileTree_SavePath
+    public static string ActorFileTreeSavePath
     {
         get
         {
@@ -567,7 +605,7 @@ public class AppSettings
     /// <summary>
     /// 数据文件存储地址
     /// </summary>
-    public static string DataAccess_SavePath
+    public static string DataAccessSavePath
     {
         get
         {
@@ -602,7 +640,7 @@ public class AppSettings
     /// <summary>
     /// 是否使用JavDB
     /// </summary>
-    public static bool isUseJavDB
+    public static bool IsUseJavDb
     {
         get
         {
@@ -624,7 +662,7 @@ public class AppSettings
     /// <summary>
     /// 是否使用JavBus
     /// </summary>
-    public static bool isUseJavBus
+    public static bool IsUseJavBus
     {
         get
         {
@@ -645,7 +683,7 @@ public class AppSettings
     /// <summary>
     /// 是否使用AvMoo
     /// </summary>
-    public static bool isUseAvMoo
+    public static bool IsUseAvMoo
     {
         get
         {
@@ -666,7 +704,7 @@ public class AppSettings
     /// <summary>
     /// 是否使用AvSox
     /// </summary>
-    public static bool isUseAvSox
+    public static bool IsUseAvSox
     {
         get
         {
@@ -687,7 +725,7 @@ public class AppSettings
     /// <summary>
     /// 是否使用Jav321
     /// </summary>
-    public static bool isUseJav321
+    public static bool IsUseJav321
     {
         get
         {
@@ -708,7 +746,7 @@ public class AppSettings
     /// <summary>
     /// 是否使用Fc2Hub
     /// </summary>
-    public static bool isUseFc2Hub
+    public static bool IsUseFc2Hub
     {
         get
         {
@@ -729,7 +767,7 @@ public class AppSettings
     /// <summary>
     /// 是否使用LibDmm
     /// </summary>
-    public static bool isUseLibreDmm
+    public static bool IsUseLibreDmm
     {
         get
         {
@@ -745,6 +783,25 @@ public class AppSettings
         {
             LocalSettings.Values["isUseLibreDmm"] = value;
         }
+    }
+
+
+    /// <summary>
+    /// 是否使用x1080x
+    /// </summary>
+    public static bool IsUseX1080X
+    {
+        get
+        {
+            var isUse = false;
+
+            if (LocalSettings.Values["IsUseX1080X"] is bool value)
+            {
+                isUse = value;
+            }
+            return isUse;
+        }
+        set => LocalSettings.Values["IsUseX1080X"] = value;
     }
 
     public static string VlcExePath

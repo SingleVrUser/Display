@@ -1384,7 +1384,7 @@ namespace Display.Data
                     _prifilePhotoPath = Data.Const.NoPicturePath;
 
                     //检查演员图片是否存在
-                    string imagePath = Path.Combine(AppSettings.ActorInfo_SavePath, name, "face.jpg");
+                    string imagePath = Path.Combine(AppSettings.ActorInfoSavePath, name, "face.jpg");
                     if (File.Exists(imagePath))
                     {
                         _prifilePhotoPath = imagePath;
@@ -1998,7 +1998,82 @@ namespace Display.Data
         public bool state { get; set; }
         public string error { get; set; }
         public int errno { get; set; }
-        public Dictionary<string,string> data { get; set; }
+        public Dictionary<string, string> data { get; set; }
     }
 
+    public class OfflineDownPathRequest
+    {
+        public bool state { get; set; }
+        public object error { get; set; }
+        public object errno { get; set; }
+        public OfflineDownPathData[] data { get; set; }
+
+    }
+
+    public class OfflineDownPathData
+    {
+        public string id { get; set; }
+        public int user_id { get; set; }
+        public long file_id { get; set; }
+        public string update_time { get; set; }
+        public string is_selected { get; set; }
+        public string file_name { get; set; }
+    }
+
+    public class AddTaskUrlInfo
+    {
+        public bool state { get; set; }
+        public int errno { get; set; }
+
+        public int errcode { get; set; }
+
+        public string errtype { get; set; }
+
+        public string error_msg { get; set; }
+        public string info_hash { get; set; }
+
+        public string url { get; set; }
+
+        public AddTaskUrlInfo[] result { get; set; }
+    }
+
+    public class UploadInfo
+    {
+        public string uploadinfo { get; set; }
+        public int user_id { get; set; }
+        public int app_version { get; set; }
+        public int app_id { get; set; }
+        public string userkey { get; set; }
+        public string url_upload { get; set; }
+        public string url_resume { get; set; }
+        public string url_cancel { get; set; }
+        public string url_speed { get; set; }
+        public Dictionary<string, string> url_speed_test { get; set; }
+        public long size_limit { get; set; }
+        public int size_limit_yun { get; set; }
+        public int max_dir_level { get; set; }
+        public int max_dir_level_yun { get; set; }
+        public int max_file_num { get; set; }
+        public int max_file_num_yun { get; set; }
+        public bool upload_allowed { get; set; }
+        public string upload_allowed_msg { get; set; }
+        public List<string> type_limit { get; set; }
+        public Dictionary<string, string> file_range { get; set; }
+        public int isp_type { get; set; }
+        public bool state { get; set; }
+        public string error { get; set; }
+        public int errno { get; set; }
+    }
+
+    public class OfflineSpaceInfo
+    {
+        public bool state { get; set; }
+        public long data { get; set; }
+        public string size { get; set; }
+        public string url { get; set; }
+        public string bt_url { get; set; }
+        public long limit { get; set; }
+        public string sign { get; set; }
+        public int time { get; set; }
+    }
 }

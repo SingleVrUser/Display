@@ -16,7 +16,7 @@ namespace Display.Data
         private const string DBNAME = "115_uwp.db";
         public static string dbpath
         {
-            get { return NewDBPath(AppSettings.DataAccess_SavePath); }
+            get { return NewDBPath(AppSettings.DataAccessSavePath); }
         }
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace Display.Data
         {
             if (DataAccess_SavePath == null)
             {
-                DataAccess_SavePath = AppSettings.DataAccess_SavePath;
+                DataAccess_SavePath = AppSettings.DataAccessSavePath;
             }
 
             tryCreateDBFile(DataAccess_SavePath);
@@ -34,7 +34,7 @@ namespace Display.Data
             string newDBPath = Path.Combine(DataAccess_SavePath, DBNAME);
 
             //获取文件夹，没有则创建
-            StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(AppSettings.DataAccess_SavePath);
+            StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(AppSettings.DataAccessSavePath);
             //获取数据库文件，没有则创建
             await folder.CreateFileAsync(DBNAME, CreationCollisionOption.OpenIfExists);
 
@@ -318,7 +318,7 @@ namespace Display.Data
                 ActorInfo actorInfo = new() { name = singleActorName, is_woman = is_woman };
 
                 //检查演员图片是否存在
-                string imagePath = Path.Combine(AppSettings.ActorInfo_SavePath, singleActorName, "face.jpg");
+                string imagePath = Path.Combine(AppSettings.ActorInfoSavePath, singleActorName, "face.jpg");
                 if (File.Exists(imagePath))
                 {
                     actorInfo.prifile_path = imagePath;
@@ -977,13 +977,13 @@ namespace Display.Data
                 bool isFc = FileMatch.IsFC2(name);
 
                 insertCommand.Parameters.AddWithValue("@Name", name);
-                insertCommand.Parameters.AddWithValue("@bus", !isFc && AppSettings.isUseJavBus ? "ready" : "done");
-                insertCommand.Parameters.AddWithValue("@Jav321", !isFc && AppSettings.isUseJav321 ? "ready" : "done");
-                insertCommand.Parameters.AddWithValue("@Avmoo", !isFc && AppSettings.isUseAvMoo ? "ready" : "done");
-                insertCommand.Parameters.AddWithValue("@Avsox", AppSettings.isUseAvSox ? "ready" : "done");
-                insertCommand.Parameters.AddWithValue("@libre", !isFc && AppSettings.isUseLibreDmm ? "ready" : "done");
-                insertCommand.Parameters.AddWithValue("@fc", isFc && AppSettings.isUseFc2Hub ? "ready" : "done");
-                insertCommand.Parameters.AddWithValue("@db", AppSettings.isUseJavDB ? "ready" : "done");
+                insertCommand.Parameters.AddWithValue("@bus", !isFc && AppSettings.IsUseJavBus ? "ready" : "done");
+                insertCommand.Parameters.AddWithValue("@Jav321", !isFc && AppSettings.IsUseJav321 ? "ready" : "done");
+                insertCommand.Parameters.AddWithValue("@Avmoo", !isFc && AppSettings.IsUseAvMoo ? "ready" : "done");
+                insertCommand.Parameters.AddWithValue("@Avsox", AppSettings.IsUseAvSox ? "ready" : "done");
+                insertCommand.Parameters.AddWithValue("@libre", !isFc && AppSettings.IsUseLibreDmm ? "ready" : "done");
+                insertCommand.Parameters.AddWithValue("@fc", isFc && AppSettings.IsUseFc2Hub ? "ready" : "done");
+                insertCommand.Parameters.AddWithValue("@db", AppSettings.IsUseJavDb ? "ready" : "done");
                 insertCommand.Parameters.AddWithValue("@done", false);
                 insertCommand.Parameters.AddWithValue("@task_id", task_id);
 

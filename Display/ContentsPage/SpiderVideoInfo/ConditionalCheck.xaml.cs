@@ -50,29 +50,29 @@ namespace Display.ContentsPage.SpiderVideoInfo
             ImageItem = new ConditionCheck()
             {
                 Condition = "图片存放地址",
-                CheckUrl = AppSettings.Image_SavePath,
+                CheckUrl = AppSettings.ImageSavePath,
                 CheckUrlRoutedEventHandler = ImageCheckButton_Click,
 
             };
 
             ConditionCheckItems.Add(ImageItem);
 
-            AddSpiderMethod(AppSettings.isUseJavBus, "访问 JavBus", AppSettings.JavBus_BaseUrl);
+            AddSpiderMethod(AppSettings.IsUseJavBus, "访问 JavBus", AppSettings.JavBus_BaseUrl);
 
-            AddSpiderMethod(AppSettings.isUseJav321, "访问 Jav321", AppSettings.Jav321_BaseUrl);
+            AddSpiderMethod(AppSettings.IsUseJav321, "访问 Jav321", AppSettings.Jav321_BaseUrl);
 
-            AddSpiderMethod(AppSettings.isUseAvMoo, "访问 AvMoo", AppSettings.AvMoo_BaseUrl);
+            AddSpiderMethod(AppSettings.IsUseAvMoo, "访问 AvMoo", AppSettings.AvMoo_BaseUrl);
 
-            AddSpiderMethod(AppSettings.isUseAvSox, "访问 AvSox", AppSettings.AvSox_BaseUrl);
+            AddSpiderMethod(AppSettings.IsUseAvSox, "访问 AvSox", AppSettings.AvSox_BaseUrl);
 
-            AddSpiderMethod(AppSettings.isUseLibreDmm, "访问 LibreDmm", AppSettings.LibreDmm_BaseUrl);
+            AddSpiderMethod(AppSettings.IsUseLibreDmm, "访问 LibreDmm", AppSettings.LibreDmm_BaseUrl);
 
-            AddSpiderMethod(AppSettings.isUseFc2Hub, "访问 Fc2hub", AppSettings.Fc2hub_BaseUrl);
+            AddSpiderMethod(AppSettings.IsUseFc2Hub, "访问 Fc2hub", AppSettings.Fc2hub_BaseUrl);
 
-            AddSpiderMethod(AppSettings.isUseJavDB, "访问 JavDB", AppSettings.JavDB_BaseUrl);
+            AddSpiderMethod(AppSettings.IsUseJavDb, "访问 JavDB", AppSettings.JavDB_BaseUrl);
 
             //至少选择一个搜刮源
-            if (!(AppSettings.isUseJavBus || AppSettings.isUseLibreDmm || AppSettings.isUseFc2Hub || AppSettings.isUseJavDB))
+            if (!(AppSettings.IsUseJavBus || AppSettings.IsUseLibreDmm || AppSettings.IsUseFc2Hub || AppSettings.IsUseJavDb))
             {
                 spiderOrigin_TextBlock.Visibility = Visibility.Visible;
             }

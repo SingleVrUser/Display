@@ -10,20 +10,14 @@ namespace Display.Data
 {
     public class GetInfoFromNetwork
     {
-        public static bool IsJavDbCookieVisiable = true;
+        public static bool IsJavDbCookieVisible = true;
+
+        public static bool IsX1080XCookieVisible = true;
 
         private static HttpClient _client;
         public static HttpClient Client
         {
-            get
-            {
-                if (_client == null)
-                {
-                    _client = CreateClient(new() { { "user-agent", DesktopUserAgent } });
-                }
-
-                return _client;
-            }
+            get { return _client ??= CreateClient(new Dictionary<string, string> { { "user-agent", DesktopUserAgent } }); }
             set => _client = value;
         }
 
@@ -70,14 +64,14 @@ namespace Display.Data
             }
 
             var handler = new HttpClientHandler { UseCookies = false };
-            var Client = new HttpClient(handler);
+            var client = new HttpClient(handler);
 
             foreach (var header in headers)
             {
-                Client.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
+                client.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
             }
 
-            return Client;
+            return client;
         }
 
         public static string UrlCombine(string uri1, string uri2)

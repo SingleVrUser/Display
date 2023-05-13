@@ -20,10 +20,9 @@ using Windows.Storage;
 using Display.Helper;
 using System.ComponentModel;
 using System.Net.Http.Json;
+using Display.Models;
 using Display.Views;
 using Display.WindowView;
-using static QRCoder.PayloadGenerator;
-using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace Display.Data
 {
@@ -34,6 +33,7 @@ namespace Display.Data
         public HttpClient Client;
         public static UserInfo UserInfo;
         public static QRCodeInfo QRCodeInfo;
+        public static UploadInfo UploadInfo;
         public static bool isEnterHiddenMode;
         public TokenInfo TokenInfo;
 
@@ -77,12 +77,23 @@ namespace Display.Data
             Client.DefaultRequestHeaders.Add("Cookie", cookie);
         }
 
-        public static Windows.Web.Http.HttpClient GetVideoClient()
+        private static Windows.Web.Http.HttpClient _windowWebHttpClient;
+        public static Windows.Web.Http.HttpClient GetVideoWindowWebHttpClient()
         {
-            var httpClient = new Windows.Web.Http.HttpClient();
-            httpClient.DefaultRequestHeaders.Add("Referer", "https://115.com/?cid=0&offset=0&tab=&mode=wangpan");
-            httpClient.DefaultRequestHeaders.Add("User-Agent", GetInfoFromNetwork.BrowserUserAgent);
-            return httpClient;
+            if (_windowWebHttpClient != null) return _windowWebHttpClient;
+
+            _windowWebHttpClient = CreateWindowWebHttpClient();
+
+            return _windowWebHttpClient;
+        }
+
+        public static Windows.Web.Http.HttpClient CreateWindowWebHttpClient()
+        {
+            var windowWebHttpClient = new Windows.Web.Http.HttpClient();
+            windowWebHttpClient.DefaultRequestHeaders.Add("Referer", "https://115.com/?cid=0&offset=0&tab=&mode=wangpan");
+            windowWebHttpClient.DefaultRequestHeaders.Add("User-Agent", GetInfoFromNetwork.BrowserUserAgent);
+
+            return windowWebHttpClient;
         }
 
         /// <summary>
@@ -713,7 +724,7 @@ namespace Display.Data
         {
             FolderCategory WebFileInfoResult = null;
 
-            string url = $"https://webapi.115.com/category/get?cid={cid}";
+            var url = $"https://webapi.115.com/category/get?cid={cid}";
             HttpResponseMessage response;
             try
             {
@@ -892,7 +903,7 @@ namespace Display.Data
             {
                 await GetQRCodeInfo();
             }
-            downRequest.key = QRCodeInfo.data.uid;
+            downRequest.key = QRCodeInfo?.data.uid;
 
             //PARAM
             downRequest.param = new Param_Request();
@@ -996,6 +1007,153 @@ namespace Display.Data
             }
 
             return success;
+        }
+
+
+        /// <summary>
+        /// 获取云下载保存路径
+        /// </summary>
+        /// <param Name="cid"></param>
+        /// <param Name="limit"></param>
+        /// <returns></returns>
+        public async Task<OfflineDownPathRequest> GetOfflineDownPath()
+        {
+            const string url = "https://webapi.115.com/offine/downpath";
+            HttpResponseMessage response;
+            try
+            {
+                response = await Client.GetAsync(url);
+            }
+            catch (AggregateException e)
+            {
+                Toast.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
+                return null;
+            }
+            catch (HttpRequestException e)
+            {
+                Toast.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
+                return null;
+            }
+
+            if (!response.IsSuccessStatusCode) return null;
+
+            OfflineDownPathRequest result = null;
+
+            try
+            {
+                var strResult = await response.Content.ReadAsStringAsync();
+                result = JsonConvert.DeserializeObject<OfflineDownPathRequest>(strResult);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"解析115云下载保存路径请求时出错:{ex.Message}");
+            }
+
+            return result;
+        }
+
+        public async Task<bool> GetUploadInfo()
+        {
+            var isSuccess = false;
+            const string url = "https://proapi.115.com/app/uploadinfo";
+
+            var response = await Client.GetAsync(url);
+
+            try
+            {
+                var result = await response.Content.ReadFromJsonAsync<UploadInfo>();
+
+                if (string.IsNullOrEmpty(result.error))
+                {
+                    UploadInfo = result;
+                    isSuccess = true;
+                }
+                    
+                else
+                    Debug.WriteLine($"请求115的UploadInfo时出错：{result.error}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"解析115返回的UploadInfo请求时出错：{ex.Message}");
+            }
+
+            return isSuccess;
+        }
+
+        public async Task<OfflineSpaceInfo> GetOfflineSpaceInfo(string userKey, int userId)
+        {
+            var tm = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
+            var url = $"https://115.com/?ct=offline&ac=space&sign={userKey}&time={tm / 1000}&user_id={userId}&_={tm}";
+
+            var response = await Client.GetAsync(url);
+
+            try
+            {
+                var result = await response.Content.ReadFromJsonAsync<OfflineSpaceInfo>();
+
+                if (result.state)
+                    return result;
+
+                Debug.WriteLine("解析115离线任务请求时出错");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"查看115离线任务时出错：{ex.Message}");
+            }
+
+            return null;
+        }
+
+
+        public async Task<AddTaskUrlInfo> AddTaskUrl(List<string> linkList, long wpPathId,int uid, string sign, long time)
+        {
+            if (linkList.Count == 0) return null;
+
+            string url;
+
+            var content = new MultipartFormDataContent
+            {
+                { new StringContent(""), "savepath" },
+                { new StringContent(wpPathId.ToString()), "wp_path_id" },
+                { new StringContent(uid.ToString()), "uid" },
+                { new StringContent(sign), "sign"},
+                { new StringContent(time.ToString()), "time"}
+            };
+
+            if (linkList.Count == 1)
+            {
+                url = "https://115.com/web/lixian/?ct=lixian&ac=add_task_url";
+                content.Add(new StringContent(linkList[0]), "url");
+            }
+            else
+            {
+                url = "https://115.com/web/lixian/?ct=lixian&ac=add_task_urls";
+
+                for (var i = 0; i < linkList.Count; i++)
+                {
+                    content.Add(new StringContent(linkList[i]), $"url[{i}]");
+                }
+            }
+
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Content = content;
+
+            var response = await Client.SendAsync(request);
+
+            try
+            {
+                var result = await response.Content.ReadFromJsonAsync<AddTaskUrlInfo>();
+
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"发送创建115离线任务时出错：{ex.Message}");
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -1285,6 +1443,7 @@ namespace Display.Data
             }
             catch
             {
+                Debug.WriteLine("获取网页中比特彗星的默认存储地址时出错");
             }
 
             return save_path;
@@ -1373,8 +1532,8 @@ namespace Display.Data
         public Dictionary<string, string> GetDownUrl(string pickCode, string ua)
         {
             Dictionary<string, string> downUrlList = new();
-
-            long tm = DateTimeOffset.Now.ToUnixTimeSeconds();
+            
+            var tm = DateTimeOffset.Now.ToUnixTimeSeconds();
 
             if (AppSettings.IsRecordDownRequest)
             {
@@ -1727,12 +1886,16 @@ namespace Display.Data
         /// <param name="playMethod"></param>
         /// <param name="xamlRoot"></param>
         /// <param name="subInfo"></param>
-        public async Task PlayVideoWithPlayer(string pickCode, PlayMethod playMethod, XamlRoot xamlRoot, SubInfo subInfo = null)
+        public async Task PlayVideoWithPlayer(MediaPlayItem playItem, PlayMethod playMethod, XamlRoot xamlRoot)
         {
             //播放路径检查选择
             string savePath;
             string ua;
             string subFile = null;
+
+            var subInfo = playItem.SubInfos?.FirstOrDefault();
+            var pickCode = playItem.PickCode;
+            var trueName = playItem.Title;
 
             //检查播放器设置
             switch (playMethod)
@@ -1768,10 +1931,54 @@ namespace Display.Data
 
                 return;
             }
-
-            //检查字幕
+            
+            //是否需要加载字幕
             if (AppSettings.IsFindSub && subInfo != null)
+            {
+                var subDict = DataAccess.FindSubFile(pickCode);
+
                 subFile = await TryDownSubFile(subInfo.name, subInfo.pickcode);
+
+                if (subDict.Count == 1)
+                {
+                    var subFilePickCode = subDict.First().Key;
+                    var subFileName = subDict.First().Value;
+                    subInfo = new(subFilePickCode, subFileName, pickCode, trueName);
+                }
+                else if (subDict.Count > 1 && xamlRoot != null)
+                {
+                    List<SubInfo> subInfos = new();
+                    subDict.ToList().ForEach(item => subInfos.Add(new(item.Key, item.Value, pickCode, trueName)));
+
+                    //按名称排序
+                    subInfos = subInfos.OrderBy(item => item.name).ToList();
+
+                    ContentsPage.DetailInfo.SelectSingleSubFileToSelected newPage = new(subInfos, trueName);
+
+                    // 由用户选择字幕
+                    newPage.ContentListView.ItemClick += PlayVideoHelper.SubInfoListView_ItemClick;
+
+                    ContentDialog dialog = new()
+                    {
+                        XamlRoot = xamlRoot,
+                        Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+                        Title = "选择字幕",
+                        PrimaryButtonText = "直接播放",
+                        CloseButtonText = "返回",
+                        Content = newPage,
+                        DefaultButton = ContentDialogButton.Close
+                    };
+
+                    var result = await dialog.ShowAsync();
+
+                    //返回
+                    if (result != ContentDialogResult.Primary)
+                    {
+                        return;
+                    }
+
+                }
+            }
 
             var quality = (AppSettings.PlayQuality)AppSettings.DefaultPlayQuality;
 
@@ -1815,6 +2022,8 @@ namespace Display.Data
             }
         }
 
+
+
         public async Task<string> TryDownSubFile(string fileName, string pickCode)
         {
             //为预防字幕文件没有具体名称，只有数字，更改字幕文件名为 pickCode+字幕文件名
@@ -1822,7 +2031,7 @@ namespace Display.Data
 
 
             if (string.IsNullOrEmpty(pickCode)) return null;
-            var subSavePath = AppSettings.Sub_SavePath;
+            var subSavePath = AppSettings.SubSavePath;
             var subFile = Path.Combine(subSavePath, fileName);
 
             //已存在

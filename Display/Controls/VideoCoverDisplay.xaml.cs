@@ -763,7 +763,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
                 DataAccess.DeleteDataInVideoInfoTable(item.truename);
 
                 //删除存储的文件夹
-                string savePath = Path.Combine(AppSettings.Image_SavePath, item.truename);
+                string savePath = Path.Combine(AppSettings.ImageSavePath, item.truename);
                 if (Directory.Exists(savePath))
                 {
                     Directory.Delete(savePath, true);

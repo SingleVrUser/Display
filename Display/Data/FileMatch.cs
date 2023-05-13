@@ -415,24 +415,24 @@ namespace Display.Data
                 if (file_info.iv == 1)
                 {
                     //根据视频名称匹配番号
-                    var VideoName = FileMatch.MatchName(FileName, file_info.cid);
+                    var videoName = FileMatch.MatchName(FileName, file_info.cid);
 
                     //无论匹配与否，都存入数据库
-                    DataAccess.AddFileToInfo(file_info.pc, VideoName);
+                    DataAccess.AddFileToInfo(file_info.pc, videoName);
 
                     //未匹配
-                    if (VideoName == null)
+                    if (videoName == null)
                     {
                         resultList.Add(new MatchVideoResult() { status = false, OriginalName = file_info.n, statusCode = -1, message = "匹配失败" });
                         continue;
                     }
 
                     //匹配后，查询是否重复匹配
-                    var existsResult = resultList.Where(x => x.MatchName == VideoName).FirstOrDefault();
+                    var existsResult = resultList.FirstOrDefault(x => x.MatchName == videoName);
 
                     if (existsResult == null)
                     {
-                        resultList.Add(new MatchVideoResult() { status = true, OriginalName = file_info.n, message = "匹配成功", statusCode = 1, MatchName = VideoName });
+                        resultList.Add(new MatchVideoResult() { status = true, OriginalName = file_info.n, message = "匹配成功", statusCode = 1, MatchName = videoName });
                     }
                     else
                     {

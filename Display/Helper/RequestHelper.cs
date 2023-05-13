@@ -37,7 +37,7 @@ public class RequestHelper
                 else if (response.StatusCode == System.Net.HttpStatusCode.BadGateway)
                 {
                     if (url.Contains(AppSettings.JavDB_BaseUrl))
-                        GetInfoFromNetwork.IsJavDbCookieVisiable = false;
+                        GetInfoFromNetwork.IsJavDbCookieVisible = false;
 
                     break;
                 }
@@ -65,7 +65,7 @@ public class RequestHelper
 
         Tuple<string, string> tuple = null;
 
-        string RequestUrl = string.Empty;
+        var requestUrl = string.Empty;
 
         var content = new FormUrlEncodedContent(values);
 
@@ -75,16 +75,15 @@ public class RequestHelper
             {
                 response = client.PostAsync(url, content).Result;
 
-                RequestUrl = response.RequestMessage.RequestUri.ToString();
+                requestUrl = response.RequestMessage.RequestUri.ToString();
 
-                if (response.IsSuccessStatusCode)
-                {
-                    strResult = await response.Content.ReadAsStringAsync();
+                if (!response.IsSuccessStatusCode) continue;
 
-                    strResult = strResult.Replace("\r", "").Replace("\n", "").Trim();
+                strResult = await response.Content.ReadAsStringAsync();
 
-                    break;
-                }
+                strResult = strResult.Replace("\r", "").Replace("\n", "").Trim();
+
+                break;
             }
             catch (Exception ex)
             {
@@ -95,8 +94,8 @@ public class RequestHelper
             }
         }
 
-        if (!string.IsNullOrEmpty(RequestUrl) && !string.IsNullOrEmpty(strResult))
-            tuple = new(RequestUrl, strResult);
+        if (!string.IsNullOrEmpty(requestUrl) && !string.IsNullOrEmpty(strResult))
+            tuple = new(requestUrl, strResult);
 
         return tuple;
     }

@@ -37,9 +37,10 @@ namespace Display.Models
             var mediaPlayer = mediaPlayerWithStreamSource.MediaPlayer;
 
             MediaSource ms = null;
+            var videoHttpClient = WebApi.CreateWindowWebHttpClient(); 
+
             if (videoUrl.Contains(".m3u8"))
             {
-                var videoHttpClient = WebApi.GetVideoClient();
                 var result = await AdaptiveMediaSource.CreateFromUriAsync(new Uri(videoUrl), videoHttpClient);
                 mediaPlayerWithStreamSource._httpClient = videoHttpClient;
 
@@ -49,15 +50,10 @@ namespace Display.Models
 
                     mediaPlayerWithStreamSource._httpClient = videoHttpClient;
                 }
-                else
-                {
-                    videoHttpClient.Dispose();
-                }
             }
 
             if (ms == null)
             {
-                var videoHttpClient = WebApi.GetVideoClient();
                 mediaPlayerWithStreamSource._stream = await HttpRandomAccessStream.CreateAsync(videoHttpClient, new Uri(videoUrl));
                 mediaPlayerWithStreamSource._httpClient = videoHttpClient;
 
@@ -104,7 +100,7 @@ namespace Display.Models
                 {
                     Debug.WriteLine("发现字幕文件");
 
-                    playbackItem.TimedMetadataTracksChanged += (item, args) =>
+                    playbackItem.TimedMetadataTracksChanged += (_, _) =>
                     {
                         playbackItem.TimedMetadataTracks.SetPresentationMode(0, TimedMetadataTrackPresentationMode.PlatformPresented);
 

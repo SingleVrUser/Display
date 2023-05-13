@@ -65,7 +65,7 @@ namespace Display.Views
 
             //infobar.IsOpen = WebApi.isEnterHiddenMode != true;
 
-            DataAccessSavePathTextBox.Text = AppSettings.DataAccess_SavePath;
+            DataAccessSavePathTextBox.Text = AppSettings.DataAccessSavePath;
 
             _resolutionSelectionCollection.Add("M3U8");
             _resolutionSelectionCollection.Add("原画");
@@ -162,7 +162,7 @@ namespace Display.Views
 
             if (folder != null)
             {
-                if (folder.Path == AppSettings.Image_SavePath)
+                if (folder.Path == AppSettings.ImageSavePath)
                 {
                     ShowTeachingTip("选择目录与原目录相同，未修改");
                 }
@@ -181,11 +181,11 @@ namespace Display.Views
         private async void TryUpdateImagePath(string folderPath)
         {
             //原来的地址
-            string srcPath = AppSettings.Image_SavePath;
+            string srcPath = AppSettings.ImageSavePath;
 
             //需要修改的地址
             string dstPath = folderPath;
-            AppSettings.Image_SavePath = folderPath;
+            AppSettings.ImageSavePath = folderPath;
 
             //检查数据库的是否需要修改
             string imagePath = DataAccess.GetOneImagePath();
@@ -233,10 +233,10 @@ namespace Display.Views
         private async void TryUpdateActorPath(string folderPath)
         {
             //原来的地址
-            var srcPath = AppSettings.ActorInfo_SavePath;
+            var srcPath = AppSettings.ActorInfoSavePath;
 
             //需要修改的地址
-            AppSettings.ActorInfo_SavePath = folderPath;
+            AppSettings.ActorInfoSavePath = folderPath;
 
             //检查数据库的是否需要修改
             string imagePath = DataAccess.GetOneActorProfilePath();
@@ -283,7 +283,7 @@ namespace Display.Views
 
             if (folder != null)
             {
-                if (folder.Path == AppSettings.Image_SavePath)
+                if (folder.Path == AppSettings.ImageSavePath)
                 {
                     ShowTeachingTip("选择目录与原目录相同，未修改");
                 }
@@ -304,14 +304,14 @@ namespace Display.Views
 
             if (folder != null)
             {
-                if (folder.Path == AppSettings.Sub_SavePath)
+                if (folder.Path == AppSettings.SubSavePath)
                 {
                     ShowTeachingTip("选择目录与原目录相同，未修改");
                 }
                 else
                 {
                     SubSavePathTextBox.Text = folder.Path;
-                    AppSettings.Sub_SavePath = folder.Path;
+                    AppSettings.SubSavePath = folder.Path;
                 }
             }
         }
@@ -323,7 +323,7 @@ namespace Display.Views
         /// <param Name="e"></param>
         private void SubOpenPath_Click(object sender, RoutedEventArgs e)
         {
-            FileMatch.LaunchFolder(AppSettings.Sub_SavePath);
+            FileMatch.LaunchFolder(AppSettings.SubSavePath);
         }
 
         /// <summary>
@@ -333,7 +333,7 @@ namespace Display.Views
         /// <param Name="e"></param>
         private void ActorInfoOpenPath_Click(object sender, RoutedEventArgs e)
         {
-            FileMatch.LaunchFolder(AppSettings.ActorInfo_SavePath);
+            FileMatch.LaunchFolder(AppSettings.ActorInfoSavePath);
         }
 
         /// <summary>
@@ -343,7 +343,7 @@ namespace Display.Views
         /// <param Name="e"></param>
         private void ImageOpenPath_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            FileMatch.LaunchFolder(AppSettings.Image_SavePath);
+            FileMatch.LaunchFolder(AppSettings.ImageSavePath);
         }
 
         /// <summary>
@@ -353,7 +353,7 @@ namespace Display.Views
         /// <param Name="e"></param>
         private void DataAccessOpenPath_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            FileMatch.LaunchFolder(AppSettings.DataAccess_SavePath);
+            FileMatch.LaunchFolder(AppSettings.DataAccessSavePath);
         }
 
         private void JavbusUrlChange_Button_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
@@ -403,7 +403,7 @@ namespace Display.Views
         {
             AppSettings.javdb_Cookie = JavDbCookieTextBox.Text;
 
-            GetInfoFromNetwork.IsJavDbCookieVisiable = true;
+            GetInfoFromNetwork.IsJavDbCookieVisible = true;
 
             ShowTeachingTip("修改完成");
         }
@@ -421,7 +421,7 @@ namespace Display.Views
 
             if (folder != null)
             {
-                var lastDBSavePath = AppSettings.DataAccess_SavePath;
+                var lastDBSavePath = AppSettings.DataAccessSavePath;
                 if (folder.Path == lastDBSavePath)
                 {
                     LightDismissTeachingTip.Subtitle = "选择目录与原目录相同，未修改";
@@ -430,7 +430,7 @@ namespace Display.Views
                 else
                 {
                     DataAccessSavePathTextBox.Text = folder.Path;
-                    AppSettings.DataAccess_SavePath = folder.Path;
+                    AppSettings.DataAccessSavePath = folder.Path;
 
                     ContentDialog dialog = new();
                     dialog.XamlRoot = this.XamlRoot;
@@ -535,25 +535,25 @@ namespace Display.Views
             switch (toggleButton.Content)
             {
                 case "JavBus":
-                    otherOriginUse = AppSettings.isUseJav321 || AppSettings.isUseAvMoo || AppSettings.isUseAvSox || AppSettings.isUseLibreDmm || AppSettings.isUseFc2Hub || AppSettings.isUseJavDB;
+                    otherOriginUse = AppSettings.IsUseJav321 || AppSettings.IsUseAvMoo || AppSettings.IsUseAvSox || AppSettings.IsUseLibreDmm || AppSettings.IsUseFc2Hub || AppSettings.IsUseJavDb;
                     break;
                 case "Jav321":
-                    otherOriginUse = AppSettings.isUseJavBus || AppSettings.isUseAvMoo || AppSettings.isUseAvSox || AppSettings.isUseLibreDmm || AppSettings.isUseFc2Hub || AppSettings.isUseJavDB;
+                    otherOriginUse = AppSettings.IsUseJavBus || AppSettings.IsUseAvMoo || AppSettings.IsUseAvSox || AppSettings.IsUseLibreDmm || AppSettings.IsUseFc2Hub || AppSettings.IsUseJavDb;
                     break;
                 case "AvMoo":
-                    otherOriginUse = AppSettings.isUseJavBus || AppSettings.isUseJav321 || AppSettings.isUseAvSox || AppSettings.isUseLibreDmm || AppSettings.isUseFc2Hub || AppSettings.isUseJavDB;
+                    otherOriginUse = AppSettings.IsUseJavBus || AppSettings.IsUseJav321 || AppSettings.IsUseAvSox || AppSettings.IsUseLibreDmm || AppSettings.IsUseFc2Hub || AppSettings.IsUseJavDb;
                     break;
                 case "AvSox":
-                    otherOriginUse = AppSettings.isUseJavBus || AppSettings.isUseJav321 || AppSettings.isUseAvMoo || AppSettings.isUseLibreDmm || AppSettings.isUseFc2Hub || AppSettings.isUseJavDB;
+                    otherOriginUse = AppSettings.IsUseJavBus || AppSettings.IsUseJav321 || AppSettings.IsUseAvMoo || AppSettings.IsUseLibreDmm || AppSettings.IsUseFc2Hub || AppSettings.IsUseJavDb;
                     break;
                 case "LibreDmm":
-                    otherOriginUse = AppSettings.isUseJavBus || AppSettings.isUseJav321 || AppSettings.isUseAvMoo || AppSettings.isUseAvSox || AppSettings.isUseFc2Hub || AppSettings.isUseJavDB;
+                    otherOriginUse = AppSettings.IsUseJavBus || AppSettings.IsUseJav321 || AppSettings.IsUseAvMoo || AppSettings.IsUseAvSox || AppSettings.IsUseFc2Hub || AppSettings.IsUseJavDb;
                     break;
                 case "Fc2hub":
-                    otherOriginUse = AppSettings.isUseJavBus || AppSettings.isUseJav321 || AppSettings.isUseAvMoo || AppSettings.isUseAvSox || AppSettings.isUseLibreDmm || AppSettings.isUseJavDB;
+                    otherOriginUse = AppSettings.IsUseJavBus || AppSettings.IsUseJav321 || AppSettings.IsUseAvMoo || AppSettings.IsUseAvSox || AppSettings.IsUseLibreDmm || AppSettings.IsUseJavDb;
                     break;
                 case "JavDB":
-                    otherOriginUse = AppSettings.isUseJavBus || AppSettings.isUseJav321 || AppSettings.isUseAvMoo || AppSettings.isUseAvSox || AppSettings.isUseLibreDmm || AppSettings.isUseFc2Hub;
+                    otherOriginUse = AppSettings.IsUseJavBus || AppSettings.IsUseJav321 || AppSettings.IsUseAvMoo || AppSettings.IsUseAvSox || AppSettings.IsUseLibreDmm || AppSettings.IsUseFc2Hub;
                     break;
             }
 
@@ -1001,6 +1001,33 @@ namespace Display.Views
             DataAccess.DeleteDownHistory();
 
             ShowTeachingTip("已清空");
+        }
+
+        private void X1080XBaseUrlChange(object sender, RoutedEventArgs e)
+        {
+            AppSettings.X1080XBaseUrl = X1080XUrlTextBox.Text;
+
+            ShowTeachingTip("修改完成");
+        }
+
+        private void X1080XCookieChange(object sender, RoutedEventArgs e)
+        {
+            AppSettings.X1080XCookie = X1080XCookieTextBox.Text;
+
+            GetInfoFromNetwork.IsX1080XCookieVisible = true;
+
+            Spider.X1080X.TryChangedClientHeader("cookie", AppSettings.X1080XCookie);
+
+            ShowTeachingTip("修改完成");
+        }
+
+        private void X1080XUserAgentChange(object sender, RoutedEventArgs e)
+        {
+            AppSettings.X1080XUa = X1080XuaTextBox.Text;
+
+            Spider.X1080X.TryChangedClientHeader("user-agent", AppSettings.X1080XCookie);
+
+            ShowTeachingTip("修改完成");
         }
     }
 }
