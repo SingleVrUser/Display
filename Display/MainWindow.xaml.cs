@@ -2,6 +2,7 @@
 using Display.Data;
 using Display.Helper;
 using Display.Views;
+using Display.WindowView;
 using Microsoft.Extensions.Configuration;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
@@ -15,8 +16,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using Windows.System;
+using Display.ContentsPage.SearchLink;
 using WinUIEx;
+using Display.Models;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -77,7 +81,7 @@ namespace Display
             else
             {
                 NavView.AlwaysShowHeader = true;
-                NavView.HeaderTemplate = RootGrid.Resources["HeaderTemplate"] as DataTemplate;;
+                NavView.HeaderTemplate = RootGrid.Resources["HeaderTemplate"] as DataTemplate; ;
                 ExtendsContentIntoTitleBar = true;
                 CustomAutoSuggestBox.Visibility = Visibility.Collapsed;
                 SetTitleBar(AppTitleBar);
@@ -156,11 +160,11 @@ namespace Display
         /// <summary>
         /// 定义访问的页面
         /// </summary>
-        private readonly List<(string Tag, Type Page)> _pages = new List<(string Tag, Type Page)>
+        private readonly List<(string Tag, Type Page)> _pages = new()
         {
             ("home",typeof(HomePage)),
             ("videoView",typeof (VideoViewPage)),
-            ("actorsview",typeof(ActorsPage)),
+            ("actorsView",typeof(ActorsPage)),
             ("setting",typeof(SettingsPage)),
             ("more",typeof(MorePage)),
         };
@@ -194,7 +198,7 @@ namespace Display
                         break;
                 }
             }
-            
+
             //在这里检查应用更新
             TryCheckAppUpdate();
         }
@@ -234,7 +238,7 @@ namespace Display
                 //下载
                 case ContentDialogResult.Primary:
                     var installUrl = AppInfo.IsWindows11() ? $"ms-appinstaller:?source={releaseCheck.AppAsset.browser_download_url}" : $"{releaseCheck.AppAsset.browser_download_url}";
-                    
+
                     await Launcher.LaunchUriAsync(new Uri(installUrl));
                     break;
                 //忽略该版本
@@ -268,7 +272,7 @@ namespace Display
                 var navItemTag = args.SelectedItemContainer.Tag.ToString();
                 NavView_Navigate(navItemTag, args.RecommendedNavigationTransitionInfo);
             }
-            
+
         }
 
         /// <summary>
@@ -284,8 +288,8 @@ namespace Display
             }
             else
             {
-                var itme = _pages.FirstOrDefault(p => p.Tag == navItemTag);
-                _page = itme.Page;
+                var item = _pages.FirstOrDefault(p => p.Tag == navItemTag);
+                _page = item.Page;
             }
             var preNavPageType = ContentFrame.CurrentSourcePageType;
 
@@ -365,24 +369,42 @@ namespace Display
         /// <param Name="args"></param>
         private async void SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
-            var nowItem = args.SelectedItem as VideoInfo;
-
-            //点击了某个选项
-            if (nowItem != null)
+            if (args.SelectedItem is string content && content.Contains("未找到"))
             {
-                //选中的是失败项
-                if (nowItem.series == "fail")
+                // 搜索资源
+                //输入框的内容
+                var searchContent = sender.Text;
+                if (!string.IsNullOrEmpty(searchContent))
                 {
-                    await PlayVideoHelper.PlayVideo(nowItem.busurl, ((Page)ContentFrame.Content).XamlRoot);
+                    ContentDialog dialog = new()
+                    {
+                        XamlRoot = RootGrid.XamlRoot,
+                        Content = new SearchLinkPage(searchContent)
+                    };
+
+                    await dialog.ShowAsync();
                 }
-                //正常点击
-                else
-                {
-                    //加载应用记录的图片默认大小
-                    var imageSize = AppSettings.ImageSize;
-                    var newItem = new VideoCoverDisplayClass(nowItem, imageSize.Item1, imageSize.Item2);
-                    ContentFrame.Navigate(typeof(DetailInfoPage), newItem, new SuppressNavigationTransitionInfo());
-                }
+
+
+                return;
+            }
+            
+            if (args.SelectedItem is not VideoInfo nowItem) return;
+
+            //选中的是失败项
+            if (nowItem.series == "fail")
+            {
+
+                var mediaPlayItem = new MediaPlayItem(nowItem.busurl, nowItem.truename);
+                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, ((Page)ContentFrame.Content).XamlRoot);
+            }
+            //正常点击
+            else
+            {
+                //加载应用记录的图片默认大小
+                var imageSize = AppSettings.ImageSize;
+                var newItem = new VideoCoverDisplayClass(nowItem, imageSize.Item1, imageSize.Item2);
+                ContentFrame.Navigate(typeof(DetailInfoPage), newItem, new SuppressNavigationTransitionInfo());
             }
         }
 
@@ -470,8 +492,89 @@ namespace Display
 
         private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
         {
-            FileMatch.LaunchFolder(AppSettings.DataAccess_SavePath);
+            FileMatch.LaunchFolder(AppSettings.DataAccessSavePath);
         }
 
+        private async void CloudDownButtonClick(object sender, TappedRoutedEventArgs e)
+        {
+            CreateCloudDownContentDialog();
+        }
+
+        private async void CreateCloudDownContentDialog(string defaultLink = "")
+        {
+            var downPage = new ContentsPage.OfflineDown.OfflineDownPage(defaultLink);
+
+            var contentDialog = new ContentDialog
+            {
+                XamlRoot = this.RootGrid.XamlRoot,
+                Title = "添加链接任务",
+                PrimaryButtonText = "开始下载",
+                CloseButtonText = "取消",
+                DefaultButton = ContentDialogButton.Primary,
+                Content = downPage,
+                Resources =
+                {
+                    // 使用更大的 MaxWidth
+                    ["ContentDialogMaxWidth"] = 2000
+                }
+            };
+
+            downPage.FailLoaded += DownPage_FailLoaded; ;
+
+            downPage.RequestCompleted += DownPage_RequestCompleted; ;
+
+            var result = await contentDialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                downPage.CreateOfflineDownRequest();
+            }
+        }
+
+        private async void DownPage_RequestCompleted(object sender, ContentsPage.OfflineDown.RequestCompletedEventArgs e)
+        {
+            // 查看是否有失败项
+
+            var info = e?.Info;
+            if (info == null || string.IsNullOrEmpty(info.error_msg)) return;
+
+            //单链接或多链接
+            var failList = !string.IsNullOrEmpty(info.url) ? new List<AddTaskUrlInfo> { info } : info.result?.Where(x => !string.IsNullOrEmpty(x.error_msg)).ToList();
+
+            if (failList == null || failList.Count ==0) return;
+
+            var failPage = new ContentsPage.OfflineDown.FailListPage(failList);
+            var contentDialog = new ContentDialog
+            {
+                XamlRoot = this.RootGrid.XamlRoot,
+                Title = "下载任务失败列表",
+                PrimaryButtonText = "重试",
+                CloseButtonText = "取消",
+                DefaultButton = ContentDialogButton.Close,
+                Content = failPage,
+                Resources =
+                {
+                    // 使用更大的 MaxWidth
+                    ["ContentDialogMaxWidth"] = 2000
+                }
+            };
+
+            var result = await contentDialog.ShowAsync();
+            if (result != ContentDialogResult.Primary) return;
+
+            // 跳转失败的重试
+            var defaultLink = string.Join("\n", failList.Select(x => x.url));
+            CreateCloudDownContentDialog(defaultLink);
+        }
+
+        private void DownPage_FailLoaded(object sender, ContentsPage.OfflineDown.FailLoadedEventArgs e)
+        {
+            ShowTeachingTip(e.Message);
+        }
+
+        private void ShowTeachingTip(string subtitle, string content = null)
+        {
+            BasePage.ShowTeachingTip(LightDismissTeachingTip, subtitle, content);
+        }
     }
 }

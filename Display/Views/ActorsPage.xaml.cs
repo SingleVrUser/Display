@@ -201,7 +201,7 @@ namespace Display.Views
             if (sender is not Button button) return;
             button.IsEnabled = false;
 
-            string baseUrl = AppSettings.MinnanoAv_BaseUrl;
+            string baseUrl = AppSettings.MinnanoAvBaseUrl;
 
             //检查搜刮页是否可用
             bool canUse = await GetInfoFromNetwork.CheckUrlUseful(baseUrl);
@@ -341,7 +341,7 @@ namespace Display.Views
                     //数据库中无头像
                     if (oldActorInfo.prifile_path == Data.Const.NoPicturePath)
                     {
-                        string filePath = Path.Combine(AppSettings.ActorInfo_SavePath, actorName);
+                        string filePath = Path.Combine(AppSettings.ActorInfoSavePath, actorName);
 
                         Uri infoUri = new(actorinfo.info_url);
 

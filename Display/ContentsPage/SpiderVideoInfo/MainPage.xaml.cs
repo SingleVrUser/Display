@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 using Display.Data;
 using HarfBuzzSharp;
 using System.Threading.Tasks;
+using Display.Models;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -239,7 +240,8 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
 
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
 
-        await PlayVideoHelper.PlayVideo(SelectedDatum.pc, this.XamlRoot, trueName: FileMatch.MatchName(SelectedDatum.n)?.ToUpper(), lastPage: this);
+        var mediaPlayItem = new MediaPlayItem(SelectedDatum.pc, SelectedDatum.n);
+        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
         ProtectedCursor = null;
     }
 
@@ -313,14 +315,17 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
 
         await Task.Delay(1);
 
-        await PlayVideoHelper.PlayVideo(SelectedDatum.pc, this.XamlRoot, trueName: FileMatch.MatchName(SelectedDatum.n)?.ToUpper(), lastPage: this, playerSelection: playerSelection);
+
+        var mediaPlayItem = new MediaPlayItem(SelectedDatum.pc, SelectedDatum.n);
+        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this, playerSelection: playerSelection);
     }
 
     private async void Explorer_OnPlayVideoClick(object sender, RoutedEventArgs e)
     {
         if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
 
-        await PlayVideoHelper.PlayVideo(info.datum.pc, this.XamlRoot, trueName: info.Name, lastPage: this);
+        var mediaPlayItem = new MediaPlayItem(info.datum.pc, info.Name);
+        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
     }
 
     private async void Explorer_OnPlayWithPlayerClick(object sender, RoutedEventArgs e)
@@ -330,11 +335,14 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
         if (!int.TryParse(aTag, out var playerSelection)) return;
 
         await Task.Delay(1);
-        await PlayVideoHelper.PlayVideo(info.datum.pc, this.XamlRoot, trueName: info.Name, lastPage: this, playerSelection: playerSelection);
+
+
+        var mediaPlayItem = new MediaPlayItem(info.datum.pc, info.Name);
+        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this, playerSelection: playerSelection);
     }
 }
 
-public class SpliderInfoProgress
+public class SplideInfoProgress
 {
     public VideoInfo videoInfo { get; set; }
     public MatchVideoResult matchResult { get; set; }

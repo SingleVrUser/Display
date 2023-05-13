@@ -43,7 +43,7 @@ namespace Display.Controls
             {
                 NavViewSearchBox.ItemTemplate = Resources["notFoundedSuggestionBox"] as DataTemplate;
                 sender.ItemTemplate = null;
-                sender.ItemsSource = new List<string>() { "未找到" };
+                sender.ItemsSource = new List<string>() { "未找到，点击搜索资源" };
             }
             else
             {
@@ -57,14 +57,12 @@ namespace Display.Controls
 
         private List<string> GetSelectedTypes()
         {
-            var AllSelectedButtons = GetAllSelectedMethodButton();
-            var Selectedtypes = AllSelectedButtons.Where(item => item.IsChecked).ToList().Select(item => item.Tag.ToString()).ToList();
+            var allSelectedButtons = GetAllSelectedMethodButton();
+            var selectedTypes = allSelectedButtons.Where(item => item.IsChecked).ToList().Select(item => item.Tag.ToString()).ToList();
 
 
-            return Selectedtypes;
+            return selectedTypes;
         }
-
-
 
         private void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
@@ -89,7 +87,7 @@ namespace Display.Controls
         private void AutoSuggestBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
             //准备动画
-            ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", sender);
+            var animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", sender);
 
             SuggestionChosen?.Invoke(sender, args);
         }
@@ -100,7 +98,7 @@ namespace Display.Controls
             if (selectFoundMethodButton.Visibility == Visibility.Collapsed)
             {
                 OpenAutoSuggestionBoxStoryboard.Begin();
-    }
+            }
         }
 
         private void NavViewSearchBox_LostFocus(object sender, RoutedEventArgs e)

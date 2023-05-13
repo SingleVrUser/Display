@@ -24,7 +24,7 @@ public class Fc2hub
 
     public const bool IgnoreFc2 = false;
 
-    public static bool IsTrue => AppSettings.isUseFc2Hub;
+    public static bool IsOn => AppSettings.IsUseFc2Hub;
 
     private static string baseUrl => AppSettings.Fc2hub_BaseUrl;
 
@@ -94,7 +94,7 @@ public class Fc2hub
         ////下载封面
         if (!string.IsNullOrEmpty(ImageUrl))
         {
-            string SavePath = AppSettings.Image_SavePath;
+            string SavePath = AppSettings.ImageSavePath;
             string filePath = Path.Combine(SavePath, CID);
             videoInfo.imageurl = ImageUrl;
             videoInfo.imagepath = await GetInfoFromNetwork.downloadFile(ImageUrl, filePath, CID);

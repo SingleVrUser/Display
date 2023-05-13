@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Display.Data;
 using static Display.Controls.CustomMediaPlayerElement;
+using Display.Models;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -120,33 +121,33 @@ namespace Display.Views
         /// <param Name="e"></param>
         private async void VideoPlay_Click(object sender, RoutedEventArgs e)
         {
-            var item = videoControl;
-
-            var VideoPlayButton = (Button)sender;
-            var videoInfo = VideoPlayButton.DataContext as VideoCoverDisplayClass;
+            var videoPlayButton = (Button)sender;
+            if (videoPlayButton.DataContext is not VideoCoverDisplayClass videoInfo) return;
 
             //播放失败列表（imgUrl就是pc）
             if (videoInfo.series == "fail")
             {
-                await PlayVideoHelper.PlayVideo(videoInfo.imageurl, this.XamlRoot, playType: PlayType.fail);
+                var mediaPlayItem = new MediaPlayItem(videoInfo.imageurl, videoInfo.truename);
+                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, playType: PlayType.fail);
                 return;
             }
 
-            List<Datum> videoInfoList = DataAccess.loadFileInfoByTruename(videoInfo.truename);
+            var videoInfoList = DataAccess.loadFileInfoByTruename(videoInfo.truename);
 
             _storeditem = videoInfo;
 
             //没有
             if (videoInfoList.Count == 0)
             {
-                VideoPlayButton.Flyout = new Flyout()
+                videoPlayButton.Flyout = new Flyout()
                 {
                     Content = new TextBlock() { Text = "经查询，本地数据库无该文件，请导入后继续" }
                 };
             }
             else if (videoInfoList.Count == 1)
             {
-                await PlayVideoHelper.PlayVideo(videoInfoList[0].pc, this.XamlRoot, trueName: videoInfo.truename, lastPage: this);
+                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].pc, videoInfo.truename);
+                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
             }
 
             //有多集
@@ -163,7 +164,7 @@ namespace Display.Views
                 ContentsPage.DetailInfo.SelectSingleVideoToPlay newPage = new(multisetList, videoInfo.truename);
                 newPage.ContentListView.ItemClick += ContentListView_ItemClick; ;
 
-                VideoPlayButton.Flyout = new Flyout()
+                videoPlayButton.Flyout = new Flyout()
                 {
                     Content = newPage
                 };
@@ -172,21 +173,22 @@ namespace Display.Views
 
         private async void ContentListView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var SingleVideoInfo = e.ClickedItem as Data.Datum;
+            if (e.ClickedItem is not Data.Datum singleVideoInfo) return;
 
-            if (sender is not ListView listView) return;
-            if (listView.DataContext is not string trueName) return;
-
-            await PlayVideoHelper.PlayVideo(SingleVideoInfo.pc, this.XamlRoot, trueName: trueName, lastPage: this);
+            if (sender is not ListView { DataContext: string trueName }) return;
+            
+            var mediaPlayItem = new MediaPlayItem(singleVideoInfo.pc, trueName);
+            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
         }
 
         private async void SingleVideoPlayClick(object sender, RoutedEventArgs e)
         {
-            if (sender is not Grid VideoPlayButton) return;
+            if (sender is not Grid videoPlayButton) return;
 
-            if (VideoPlayButton.DataContext is not Datum datum) return;
+            if (videoPlayButton.DataContext is not Datum datum) return;
 
-            await PlayVideoHelper.PlayVideo(datum.pc, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.fail);
+            var mediaPlayItem = new MediaPlayItem(datum.pc, datum.n);
+            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.fail);
         }
     }
 

@@ -112,42 +112,34 @@
 
             <!--菜单-->
             <NavigationView.MenuItems>
-                <NavigationViewItem Tag="home"
-                                    Icon="Home"
-                                    Content="主页" />
+                <NavigationViewItem Content="主页"
+                                    Tag="home"
+                                    Icon="Home"/>
                 <NavigationViewItemSeparator />
 
                 <NavigationViewItem Content="展示"
-                                    Tag="videoView">
-                    <NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="Caption" />
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
+                                    Tag="videoView"
+                                    Icon="Caption"/>
 
-                <NavigationViewItem Content="演员一览"
-                                    Tag="actorsview">
-                    <NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="Contact" />
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
+                <NavigationViewItem Content="演员"
+                                    Tag="actorsView"
+                                    Icon="Contact"/>
 
                 <NavigationViewItem Content="其他"
-                                    Tag="more">
-                    <NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="More" />
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
+                                    Tag="more"
+                                    Icon="More"/>
             </NavigationView.MenuItems>
 
             <!--页脚-->
-            <!--<NavigationView.FooterMenuItems>
-                <NavigationViewItem Content="关于"
-                                Tag="about">
-                    <NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="Help" />
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-            </NavigationView.FooterMenuItems>-->
+            <NavigationView.PaneFooter>
+                <StackPanel Orientation="Vertical">
+                    <NavigationViewItem Content="下载"
+                                        Icon="Download"
+                                        Tapped="CloudDownButtonClick">
+                    </NavigationViewItem>
+
+                </StackPanel>
+            </NavigationView.PaneFooter>
 
             <Frame x:Name="ContentFrame"
                    NavigationFailed="ContentFrame_NavigationFailed"
@@ -179,5 +171,10 @@
                              Content="{x:Bind data:DataAccess.dbpath}"
                              Click="HyperlinkButton_Click" />
         </StackPanel>
+
+
+        <TeachingTip x:Name="LightDismissTeachingTip"
+                     IsLightDismissEnabled="True"
+                     Padding="5"/>
     </Grid>
 </winUiEx:WindowEx>

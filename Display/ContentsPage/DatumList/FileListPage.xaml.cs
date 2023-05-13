@@ -130,9 +130,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private void OpenFolder_Tapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
     {
-        if (sender is not Grid grid) return;
-        if (grid.DataContext is not FilesInfo filesInfo) return;
-
+        if (sender is not Grid { DataContext: FilesInfo filesInfo }) return;
 
         ChangedFolder(filesInfo);
     }
@@ -154,22 +152,27 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private void TextBlock_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
     {
-        if (!(sender is TextBlock textBlock)) return;
-        if (!(textBlock.DataContext is FilesInfo filesInfo)) return;
+        if (sender is not TextBlock { DataContext: FilesInfo filesInfo }) return;
 
         ChangedFolder(filesInfo);
     }
 
     private void ToTopButton_Click(object sender, RoutedEventArgs e)
     {
-        if (BaseExample.ItemsSource is IncrementalLoadDatumCollection Collection)
-            BaseExample.ScrollIntoView(Collection.First());
+        if (BaseExample.ItemsSource is IncrementalLoadDatumCollection collection)
+            BaseExample.ScrollIntoView(collection.First());
     }
 
     private void PlayButton_Click(object sender, RoutedEventArgs e)
     {
-        //检查选中的文件或文件夹
-        if (BaseExample.SelectedItems.FirstOrDefault() is not FilesInfo) return;
+        if (BaseExample.SelectedItems is null || BaseExample.SelectedItems.Count == 0)
+        {
+            ShowTeachingTip("当前未选中文件");
+            return;
+        }
+
+        ////检查选中的文件或文件夹
+        //if (BaseExample.SelectedItems.FirstOrDefault() is not FilesInfo) return;
 
         var filesInfo = BaseExample.SelectedItems.Cast<FilesInfo>().ToList();
 
@@ -381,7 +384,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     }
 
-    private void EmptyTranferStationButton_Click(object sender, RoutedEventArgs e)
+    private void EmptyTransferStationButton_Click(object sender, RoutedEventArgs e)
     {
         if (transferStationFiles == null) return;
 
@@ -390,7 +393,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         TransferStation_Grid.Visibility = Visibility.Collapsed;
     }
 
-    private async void RecyStationGrid_Drop(object sender, DragEventArgs e)
+    private async void RecycleStationGrid_Drop(object sender, DragEventArgs e)
     {
         if (sender is not Grid) return;
 
@@ -469,7 +472,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("在范围之外，退出");
+                Debug.WriteLine("在范围之外，退出");
                 return;
             }
 
@@ -593,7 +596,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async void ImportDataButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button) return;
+        if (sender is not Button button) return;
 
         List<string> cids = new();
         List<string> nameList = new();
@@ -608,7 +611,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (cids.Count == 0)
         {
-            SelectedNull_TeachingTip.IsOpen = true;
+            ShowTeachingTip("当前未选中文件");
             return;
         }
 
@@ -705,19 +708,19 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async void DownButton_Click(object sender, RoutedEventArgs e)
     {
-        await DownFiles(Data.WebApi.downType.bc);
+        await DownFiles(WebApi.downType.bc, sender as Button);
     }
 
     private async void Aria2Down_Click(object sender, RoutedEventArgs e)
     {
-        await DownFiles(Data.WebApi.downType.bc);
+        await DownFiles(WebApi.downType.bc,sender as Button);
     }
 
-    private async Task DownFiles(Data.WebApi.downType downtype)
+    private async Task DownFiles(WebApi.downType downtype,FrameworkElement target)
     {
-        if (BaseExample.SelectedItems is null)
+        if (BaseExample.SelectedItems is null || BaseExample.SelectedItems.Count==0)
         {
-            ShowTeachingTip("当前未选中要下载的文件或文件夹");
+            ShowTeachingTip("当前未选中文件");
             return;
         }
 
@@ -751,9 +754,25 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async void PlayVideoButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
+        // 多个播放
+        if (sender is not MenuFlyoutItem menuFlyoutItem) return;
+        if (menuFlyoutItem.DataContext is null)
+        {
+            //获取需要播放的文件
+            var files = BaseExample.SelectedItems.Cast<FilesInfo>().ToList();
 
-        await PlayVideoHelper.PlayVideo(info.datum.pc, this.XamlRoot, trueName: info.Name, lastPage: this);
+            var mediaPlayItems = files.Select(x => new MediaPlayItem(x.datum.pc, x.Name)).ToList();
+            await PlayVideoHelper.PlayVideo(mediaPlayItems, this.XamlRoot, lastPage: this);
+
+            return; 
+        }
+
+        // 单个播放
+        if (menuFlyoutItem.DataContext is not FilesInfo info) return;
+        
+        var mediaPlayItem = new MediaPlayItem(info.datum.pc, info.Name);
+        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>(){ mediaPlayItem }, this.XamlRoot, lastPage: this);
+
     }
 
     private void Sort115Button_Click(object sender, RoutedEventArgs e)
@@ -775,7 +794,10 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         if (!int.TryParse(aTag, out var playerSelection)) return;
 
         await Task.Delay(1);
-        await PlayVideoHelper.PlayVideo(info.datum.pc, this.XamlRoot, trueName: info.Name, lastPage: this, playerSelection: playerSelection);
+
+
+        var mediaPlayItem = new MediaPlayItem(info.datum.pc, info.Name);
+        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this, playerSelection: playerSelection);
     }
 
     private async void MoveToNewFolderItemClick(object sender, RoutedEventArgs e)
@@ -878,7 +900,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         {
             info.Name = firstData.Value;
         }
-        
     }
 }
 

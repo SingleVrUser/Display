@@ -12,7 +12,7 @@ namespace Display.Spider;
 
 public class Common
 {
-    public readonly static HttpClient Client = GetInfoFromNetwork.Client;
+    public static readonly HttpClient Client = GetInfoFromNetwork.Client;
 
     public static Tuple<string, string> SpliteCID(string CID)
     {
@@ -199,7 +199,7 @@ public class Common
         }
 
         //下载图片
-        string filePath = Path.Combine(AppSettings.Image_SavePath, CID);
+        string filePath = Path.Combine(AppSettings.ImageSavePath, CID);
         videoInfo.imageurl = CoverUrl;
         videoInfo.imagepath = await GetInfoFromNetwork.downloadFile(CoverUrl, filePath, CID);
 

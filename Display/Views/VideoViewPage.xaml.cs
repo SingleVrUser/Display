@@ -1,5 +1,7 @@
 ﻿using Display.Controls;
+using Display.Data;
 using Display.Helper;
+using Display.Models;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -7,7 +9,6 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System.Collections.Generic;
 using System.Linq;
-using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -35,16 +36,19 @@ namespace Display.Views
         
         private async void SingleVideoPlay_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is not Grid VideoPlayGrid) return;
+            if (sender is not Grid videoPlayGrid) return;
 
             string pickCode;
-            if (VideoPlayGrid.DataContext is Datum datum)
+            string title;
+            if (videoPlayGrid.DataContext is Datum datum)
             {
                 pickCode = datum.pc;
+                title = datum.n;
             }
-            else if (VideoPlayGrid.DataContext is FailInfo failInfo)
+            else if (videoPlayGrid.DataContext is FailInfo failInfo)
             {
                 pickCode = failInfo.pc;
+                title = failInfo.datum.n;
             }
             else
             {
@@ -53,7 +57,8 @@ namespace Display.Views
 
             if (string.IsNullOrEmpty(pickCode)) return;
 
-            await PlayVideoHelper.PlayVideo(pickCode, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.fail);
+            var mediaPlayItem = new MediaPlayItem(pickCode, title);
+            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.fail);
         }
 
         /// <summary>
@@ -95,7 +100,8 @@ namespace Display.Views
             {
                 _storeditem = videoInfo;
 
-                await PlayVideoHelper.PlayVideo(videoInfoList[0].pc, this.XamlRoot, trueName: videoInfo.truename, lastPage: this);
+                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].pc, videoInfo.truename);
+                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
                 ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             }
 
@@ -124,12 +130,13 @@ namespace Display.Views
 
         private async void ContentListView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var SingleVideoInfo = e.ClickedItem as Data.Datum;
+            if (e.ClickedItem is not Datum singleVideoInfo) return;
 
-            if (sender is not ListView listView) return;
-            if (listView.DataContext is not string trueName) return;
+            if (sender is not ListView { DataContext: string trueName }) return;
 
-            await PlayVideoHelper.PlayVideo(SingleVideoInfo.pc, this.XamlRoot, trueName: trueName, lastPage: this);
+
+            var mediaPlayItem = new MediaPlayItem(singleVideoInfo.pc, trueName);
+            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)

@@ -3,6 +3,8 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using Display.Data;
+using System.Linq;
+using Display.Models;
 
 namespace Display.Controls;
 
@@ -31,60 +33,144 @@ public class CustomMediaTransportControls : MediaTransportControls
         base.OnApplyTemplate();
     }
 
+    private AppBarToggleButton _likeButton;
+
+    private AppBarToggleButton likeButton
+    {
+        get
+        {
+            if (_likeButton == null)
+            {
+                _likeButton = GetTemplateChild("IsLikeButton") as AppBarToggleButton;
+            }
+
+            return _likeButton;
+        }
+    }
+
+    private AppBarToggleButton _lookLaterButton;
+
+    private AppBarToggleButton lookLaterButton
+    {
+        get
+        {
+            if (_lookLaterButton == null)
+            {
+                _lookLaterButton = GetTemplateChild("LookLaterButton") as AppBarToggleButton;
+            }
+
+            return _lookLaterButton;
+        }
+    }
+
+    private bool _isHandlerLikeLookLaterButton = false;
 
     public void SetLike_LookLater(bool islike, bool look_later)
     {
         //显示喜欢/稍后观看
-        AppBarToggleButton likeButton = GetTemplateChild("IsLikeButton") as AppBarToggleButton;
         if (likeButton != null)
         {
-            likeButton.Click += LikeButton_Click;
+            if (!_isHandlerLikeLookLaterButton)
+            {
+                likeButton.Click += LikeButton_Click;
+                _isHandlerLikeLookLaterButton = true;
+            }
             likeButton.IsEnabled = true;
             likeButton.IsChecked = islike;
         }
 
-        AppBarToggleButton lookLaterButton = GetTemplateChild("LookLaterButton") as AppBarToggleButton;
         if (lookLaterButton != null)
         {
-            lookLaterButton.Click += LookLaterButton_Click;
+            if (!_isHandlerLikeLookLaterButton)
+            {
+                lookLaterButton.Click += LookLaterButton_Click;
+                _isHandlerLikeLookLaterButton = true;
+            }
+
             lookLaterButton.IsEnabled = true;
             lookLaterButton.IsChecked = look_later;
         }
     }
 
-    public void SetScreenButton()
+    public void DisableLikeLookAfterButton()
     {
-        Button screenshotButton = GetTemplateChild("ScreenshotButton") as Button;
-        if (screenshotButton != null)
+        if (likeButton != null)
         {
-            screenshotButton.Click += ScreenshotButton_Click;
-            ;
-            screenshotButton.Visibility = Visibility.Visible;
+            likeButton.IsEnabled = false;
+        }
+
+        if (lookLaterButton != null)
+        {
+            lookLaterButton.IsEnabled = false;
         }
     }
 
+    private bool _isHandlerScreenShotButton = false;
+    public void TrySetScreenButton()
+    {
+        if (_isHandlerScreenShotButton) return;
 
-    public void SetQuality(List<Quality> QualityItemsSource, DataTemplate QualityDataTemplate)
+        var screenShotButton = GetTemplateChild("ScreenshotButton") as Button;
+        if (screenShotButton != null)
+        {
+            screenShotButton.Click += ScreenshotButton_Click;
+            ;
+            screenShotButton.Visibility = Visibility.Visible;
+        }
+
+        _isHandlerScreenShotButton = true;
+    }
+
+    public void InitQuality(DataTemplate qualityDataTemplate)
     {
         //画质选择按钮
         Button qualityButton = GetTemplateChild("QualityButton") as Button;
+        if (qualityButton == null) return;
         qualityButton.Visibility = Visibility.Visible;
 
-        //画质选择列表
         ListView qualityListView = GetTemplateChild("QualityListView") as ListView;
-        qualityListView.ItemTemplate = QualityDataTemplate;
-
-        qualityListView.ItemsSource = QualityItemsSource;
-
-        qualityListView.SelectedIndex = QualityItemsSource.Count switch
-        {
-            1 => 0,
-            > 1 => 1,
-            _ => qualityListView.SelectedIndex
-        };
+        if (qualityListView == null) return;
+        qualityListView.ItemTemplate = qualityDataTemplate;
 
         qualityListView.SelectionChanged += QualityListView_SelectionChanged;
     }
+
+    public void SetQualityListSource(List<Quality> qualityItemsSource)
+    {
+        var qualityListView = GetTemplateChild("QualityListView") as ListView;
+        if (qualityListView == null) return;
+
+        qualityListView.ItemsSource = qualityItemsSource;
+    }
+
+
+    //private bool _isHandlerQuality = false;
+    //public void SetQuality(List<Quality> qualityItemsSource, DataTemplate qualityDataTemplate)
+    //{
+    //    //画质选择按钮
+    //    Button qualityButton = GetTemplateChild("QualityButton") as Button;
+    //    if (qualityButton == null) return;
+    //    qualityButton.Visibility = Visibility.Visible;
+
+    //    //画质选择列表
+    //    ListView qualityListView = GetTemplateChild("QualityListView") as ListView;
+    //    if (qualityListView == null) return;
+    //    qualityListView.ItemTemplate = qualityDataTemplate;
+
+    //    qualityListView.ItemsSource = qualityItemsSource;
+
+    //    qualityListView.SelectedIndex = qualityItemsSource.Count switch
+    //    {
+    //        1 => 0,
+    //        > 1 => 1,
+    //        _ => qualityListView.SelectedIndex
+    //    };
+
+    //    if (_isHandlerQuality) return;
+
+    //    qualityListView.SelectionChanged += QualityListView_SelectionChanged;
+    //    _isHandlerQuality = true;
+    //}
 
     public void SetPlayer(List<Player> PlayerItemsSource, DataTemplate QualityDataTemplate)
     {
@@ -103,6 +189,7 @@ public class CustomMediaTransportControls : MediaTransportControls
     private void PlayerListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         PlayerChanged?.Invoke(sender, e);
+
     }
 
     private void QualityListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -131,21 +218,6 @@ public class CustomMediaTransportControls : MediaTransportControls
 
 }
 
-public class Quality
-{
-    public string Name { get; set; }
-
-    public string Url { get; set; }
-    public string PickCode { get; set; }
-
-    public Quality(string name, string url = null, string pickCode = null)
-    {
-        this.Name = name;
-
-        if (url != null) this.Url = url;
-        if (pickCode != null) this.PickCode = pickCode;
-    }
-}
 
 public class Player
 {

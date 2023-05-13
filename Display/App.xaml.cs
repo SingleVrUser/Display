@@ -103,7 +103,7 @@ namespace Display
             if (!Directory.Exists(DataAccess_SavePath))
             {
                 CommonWindow window1 = new();
-                window1.Content = new TextBlock() { Text = $"数据文件存放目录不存在，请检查：{AppSettings.DataAccess_SavePath}", IsTextSelectionEnabled = true, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                window1.Content = new TextBlock() { Text = $"数据文件存放目录不存在，请检查：{AppSettings.DataAccessSavePath}", IsTextSelectionEnabled = true, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
                 window1.Title = "出错";
                 window1.Activate();
 

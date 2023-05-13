@@ -19,16 +19,15 @@ public class Jav321
 
     public static Tuple<int, int> DelayRanges = new(1, 2);
 
-
     public const bool IgnoreFc2 = true;
 
-    public static bool IsTrue => AppSettings.isUseJav321;
+    public static bool IsOn => AppSettings.IsUseJav321;
 
     private static string baseUrl => AppSettings.Jav321_BaseUrl;
 
     public static async Task<VideoInfo> SearchInfoFromCID(string CID)
     {
-        string SearchUrl = GetInfoFromNetwork.UrlCombine(baseUrl, "search");
+        var searchUrl = GetInfoFromNetwork.UrlCombine(baseUrl, "search");
 
         CID = CID.ToUpper();
 
@@ -37,41 +36,42 @@ public class Jav321
             { "sn", CID}
         };
 
-        Tuple<string, string> result = await RequestHelper.PostHtml(Common.Client, SearchUrl, postValues);
+        var result = await RequestHelper.PostHtml(Common.Client, searchUrl, postValues);
         if (result == null) return null;
 
-        string detail_url = result.Item1;
-        string htmlString = result.Item2;
+        var detailUrl = result.Item1;
+        var htmlString = result.Item2;
 
-        HtmlDocument htmlDoc = new HtmlDocument();
+        var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlString);
 
-        return await GetVideoInfoFromHtmlDoc(CID, detail_url, htmlDoc);
+        return await GetVideoInfoFromHtmlDoc(CID, detailUrl, htmlDoc);
     }
 
-    public static async Task<VideoInfo> GetVideoInfoFromHtmlDoc(string CID, string detail_url, HtmlDocument htmlDoc)
+    public static async Task<VideoInfo> GetVideoInfoFromHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
     {
         //标题
-        var TitleNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='panel-heading']/h3");
-        if (TitleNode == null) return null;
+        var titleNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='panel-heading']/h3");
+        if (titleNode == null) return null;
 
-        VideoInfo videoInfo = new VideoInfo();
-        videoInfo.busurl = detail_url;
-
-        videoInfo.title = TitleNode.FirstChild.InnerText;
+        var videoInfo = new VideoInfo
+        {
+            busurl = detailUrl,
+            title = titleNode.FirstChild.InnerText
+        };
 
         //图片地址
-        var ImageNodes = htmlDoc.DocumentNode.SelectNodes("/html/body/div[@class='row'][2]/div[@class='col-md-3']/div//img[@class='img-responsive']");
+        var imageNodes = htmlDoc.DocumentNode.SelectNodes("/html/body/div[@class='row'][2]/div[@class='col-md-3']/div//img[@class='img-responsive']");
         string ImageUrl = string.Empty;
-        List<string> sampleUrlList = new List<string>();
+        var sampleUrlList = new List<string>();
 
         //没有样图
-        if (ImageNodes == null)
+        if (imageNodes == null)
         {
-            var ImageNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='panel-body'][1]/div[@class='row'][1]/div[@class='col-md-3'][1]/img[@class='img-responsive']");
-            if (ImageNode == null) return null;
+            var imageNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='panel-body'][1]/div[@class='row'][1]/div[@class='col-md-3'][1]/img[@class='img-responsive']");
+            if (imageNode == null) return null;
 
-            string imgSrc = ImageNode.GetAttributeValue("src", string.Empty);
+            var imgSrc = imageNode.GetAttributeValue("src", string.Empty);
 
             ImageUrl = imgSrc;
         }
@@ -80,9 +80,9 @@ public class Jav321
         {
             //第一张为封面
             //其余为缩略图
-            for (int i = 0; i < ImageNodes.Count; i++)
+            for (var i = 0; i < imageNodes.Count; i++)
             {
-                var imageNode = ImageNodes[i];
+                var imageNode = imageNodes[i];
                 string imageUrl = imageNode.GetAttributeValue("src", string.Empty);
 
                 //if (imageUrl.EndsWith("webp")) continue;
@@ -99,7 +99,7 @@ public class Jav321
         }
 
         //CID
-        videoInfo.truename = CID;
+        videoInfo.truename = cid;
 
         //其他信息
         var InfoNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='col-md-9']");
@@ -185,10 +185,10 @@ public class Jav321
         ////下载封面
         if (!string.IsNullOrEmpty(ImageUrl))
         {
-            string SavePath = AppSettings.Image_SavePath;
-            string filePath = Path.Combine(SavePath, CID);
+            string SavePath = AppSettings.ImageSavePath;
+            string filePath = Path.Combine(SavePath, cid);
             videoInfo.imageurl = ImageUrl;
-            videoInfo.imagepath = await GetInfoFromNetwork.downloadFile(ImageUrl, filePath, CID);
+            videoInfo.imagepath = await GetInfoFromNetwork.downloadFile(ImageUrl, filePath, cid);
         }
         //（接受无封面）
 

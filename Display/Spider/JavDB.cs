@@ -27,7 +27,7 @@ public class JavDB
 
     public const bool IgnoreFc2 = false;
 
-    public static bool IsTrue => AppSettings.isUseJavDB;
+    public static bool IsOn => AppSettings.IsUseJavDb;
 
     private static string baseUrl => AppSettings.JavDB_BaseUrl;
 
@@ -52,47 +52,44 @@ public class JavDB
 
     public static async Task<VideoInfo> SearchInfoFromCID(string CID)
     {
-        bool isUseCookie = CID.Contains("FC");
+        var isUseCookie = CID.Contains("FC");
 
         if (isUseCookie && string.IsNullOrEmpty(AppSettings.javdb_Cookie)) return null;
 
-        var detail_url = await GetDetailUrlFromCID(CID);
+        var detailUrl = await GetDetailUrlFromCid(CID);
 
         //搜索无果，退出
-        if (detail_url == null) return null;
+        if (detailUrl == null) return null;
 
-        string htmlString;
         Tuple<string, string> tuple;
         //访问fc内容需要cookie
         if (isUseCookie)
-            tuple = await RequestHelper.RequestHtml(ClientWithCookie, detail_url);
+            tuple = await RequestHelper.RequestHtml(ClientWithCookie, detailUrl);
         else
-            tuple = await RequestHelper.RequestHtml(Common.Client, detail_url);
+            tuple = await RequestHelper.RequestHtml(Common.Client, detailUrl);
 
-        htmlString = tuple.Item2;
+        var htmlString = tuple.Item2;
         if (string.IsNullOrEmpty(htmlString)) return null;
 
-        HtmlDocument htmlDoc = new HtmlDocument();
+        var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlString);
 
-        return await GetVideoInfoFromHtmlDoc(CID, detail_url, htmlDoc);
+        return await GetVideoInfoFromHtmlDoc(CID, detailUrl, htmlDoc);
     }
 
-    private static async Task<string> GetDetailUrlFromCID(string CID)
+    private static async Task<string> GetDetailUrlFromCid(string CID)
     {
-        string result;
-
-        string url = GetInfoFromNetwork.UrlCombine(baseUrl, $"search?q={CID}&f=all");
+        var url = GetInfoFromNetwork.UrlCombine(baseUrl, $"search?q={CID}&f=all");
 
         // 访问
         var tuple = await RequestHelper.RequestHtml(Common.Client, url);
         if (tuple == null) return null;
 
-        string strResult = tuple.Item2;
-        HtmlDocument htmlDoc = new HtmlDocument();
+        var strResult = tuple.Item2;
+        var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(strResult);
 
-        result = GetDetailUrlFromSearchResult(htmlDoc, CID);
+        var result = GetDetailUrlFromSearchResult(htmlDoc, CID);
 
         return result;
     }
@@ -101,45 +98,48 @@ public class JavDB
     {
         string result = null;
 
-        var SearchResultNodes = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class,'movie-list')]");
+        var searchResultNodes = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class,'movie-list')]");
 
         //搜索无果，退出
-        if (SearchResultNodes == null) return null;
+        if (searchResultNodes == null) return null;
 
         //分割通过正则匹配得到的CID
-        var spliteResult = Common.SpliteCID(CID);
-        if (spliteResult == null) return null;
+        var splitResult = Common.SpliteCID(CID);
+        if (splitResult == null) return null;
 
-        string left_cid = spliteResult.Item1;
-        string right_cid = spliteResult.Item2;
+        var leftCid = splitResult.Item1;
+        var rightCid = splitResult.Item2;
 
-        string search_left_cid;
-        string search_right_cid;
-        for (var i = 0; i < SearchResultNodes.Count; i++)
+        for (var i = 0; i < searchResultNodes.Count; i++)
         {
-            var movie_list = SearchResultNodes[i];
-            var title_search = movie_list.SelectSingleNode(".//div[@class='video-title']/strong").InnerText;
-            string title = title_search.ToUpper();
+            var searchLeftCid = string.Empty;
+            var searchRightCid = string.Empty;
+
+            var movieList = searchResultNodes[i];
+            var titleSearch = movieList.SelectSingleNode(".//div[@class='video-title']/strong").InnerText;
+            var title = titleSearch.ToUpper();
 
             var split_result = title.Split(new char[] { '-', '_' });
             if (split_result.Length == 1)
             {
                 var match_result = Regex.Match(title, @"([A-Z]+)(\d+)");
-                if (match_result == null) continue;
-                search_left_cid = match_result.Groups[1].Value;
-                search_right_cid = match_result.Groups[2].Value;
+                if (match_result.Success)
+                {
+                    searchLeftCid = match_result.Groups[1].Value;
+                    searchRightCid = match_result.Groups[2].Value;
+                }
             }
             else if (split_result.Length == 2)
             {
-                search_left_cid = split_result[0];
-                search_right_cid = split_result[1];
+                searchLeftCid = split_result[0];
+                searchRightCid = split_result[1];
             }
             else if (split_result.Length == 3)
             {
                 if (title.Contains("HEYDOUGA"))
                 {
-                    search_left_cid = split_result[1];
-                    search_right_cid = split_result[2];
+                    searchLeftCid = split_result[1];
+                    searchRightCid = split_result[2];
                 }
                 else
                     return null;
@@ -147,18 +147,15 @@ public class JavDB
             else
                 return null;
 
-            int currentNum;
-            int searchNum;
-
-            if (search_left_cid == left_cid
-                     && (search_right_cid == right_cid
-                            || (Int32.TryParse(right_cid, out currentNum)
-                                    && Int32.TryParse(search_right_cid, out searchNum)
-                                        && currentNum.Equals(searchNum))))
+            if (searchLeftCid == leftCid
+                && (searchRightCid == rightCid
+                    || (Int32.TryParse(rightCid, out var currentNum)
+                        && Int32.TryParse(searchRightCid, out var searchNum)
+                        && currentNum.Equals(searchNum))))
             {
-                var detail_url = SearchResultNodes[i].SelectSingleNode(".//a").Attributes["href"].Value;
-                detail_url = GetInfoFromNetwork.UrlCombine(AppSettings.JavDB_BaseUrl, detail_url);
-                result = detail_url;
+                var detailUrl = searchResultNodes[i].SelectSingleNode(".//a").Attributes["href"].Value;
+                detailUrl = GetInfoFromNetwork.UrlCombine(AppSettings.JavDB_BaseUrl, detailUrl);
+                result = detailUrl;
                 break;
             }
             else
@@ -303,7 +300,7 @@ public class JavDB
         videoInfo.title = title.Replace(videoInfo.truename, "").Trim();
 
         //下载封面
-        string SavePath = AppSettings.Image_SavePath;
+        string SavePath = AppSettings.ImageSavePath;
         string filePath = Path.Combine(SavePath, CID);
         videoInfo.imageurl = ImageUrl;
         videoInfo.imagepath = await GetInfoFromNetwork.downloadFile(ImageUrl, filePath, CID);

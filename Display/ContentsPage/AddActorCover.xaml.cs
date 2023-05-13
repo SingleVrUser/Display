@@ -69,7 +69,7 @@ namespace Display.ContentsPage
             }
             var actorInfo = e.ClickedItem as ActorInfo;
 
-            string filePath = AppSettings.ActorFileTree_SavePath;
+            string filePath = AppSettings.ActorFileTreeSavePath;
 
             if (isCheckGit)
             {
@@ -115,7 +115,7 @@ namespace Display.ContentsPage
         {
             if (string.IsNullOrEmpty(filePath))
             {
-                filePath = AppSettings.ActorFileTree_SavePath;
+                filePath = AppSettings.ActorFileTreeSavePath;
             }
 
             List<string> result = getImageUrlFormFileTree(filePath, actorName, maxCount);
@@ -195,7 +195,7 @@ namespace Display.ContentsPage
 
         private async Task getActorCoverByGit(List<ActorInfo> actorinfos, IProgress<progressClass> progress, CancellationTokenSource s_cts)
         {
-            string filePath = AppSettings.ActorFileTree_SavePath;
+            string filePath = AppSettings.ActorFileTreeSavePath;
 
             if (isCheckGit)
             {
@@ -234,7 +234,7 @@ namespace Display.ContentsPage
 
                 progress.Report(progressinfo);
 
-                var imageSavePath = System.IO.Path.Combine(AppSettings.ActorInfo_SavePath, actorName, "face.jpg");
+                var imageSavePath = System.IO.Path.Combine(AppSettings.ActorInfoSavePath, actorName, "face.jpg");
 
                 if (!File.Exists(imageSavePath))
                 {
@@ -628,7 +628,7 @@ namespace Display.ContentsPage
                     continue;
                 }
 
-                string SavePath = Path.Combine(AppSettings.ActorInfo_SavePath, actorName);
+                string SavePath = Path.Combine(AppSettings.ActorInfoSavePath, actorName);
                 string imageName = "face";
 
                 string imagePath = Path.Combine(SavePath, $"{imageName}.jpg");
@@ -858,7 +858,7 @@ namespace Display.ContentsPage
             var imageUrl = (sender as HyperlinkButton).DataContext as string;
             string actorName = ShoeActorName.Text;
 
-            string savePath = Path.Combine(AppSettings.ActorInfo_SavePath, actorName);
+            string savePath = Path.Combine(AppSettings.ActorInfoSavePath, actorName);
             await GetInfoFromNetwork.downloadFile(imageUrl, savePath, "face", true);
 
             foreach (var item in actorinfo)

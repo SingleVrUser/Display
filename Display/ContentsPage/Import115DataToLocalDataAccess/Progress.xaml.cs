@@ -294,7 +294,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
         private async void OpenSavePathButton_Click(object sender, RoutedEventArgs e)
         {
-            StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(AppSettings.DataAccess_SavePath);
+            StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(AppSettings.DataAccessSavePath);
 
             await Launcher.LaunchFolderAsync(folder);
         }

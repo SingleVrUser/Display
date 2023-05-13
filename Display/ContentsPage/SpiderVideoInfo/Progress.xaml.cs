@@ -171,13 +171,13 @@ namespace Display.ContentsPage.SpiderVideoInfo
             CartesianChart.Visibility = Visibility.Visible;
 
             SpiderInfos = new List<SpiderInfo>() {
-                new(Models.SpiderInfo.SpiderSourceName.Javbus, AppSettings.isUseJavBus) ,
-                new(Models.SpiderInfo.SpiderSourceName.Jav321, AppSettings.isUseJav321),
-                new(Models.SpiderInfo.SpiderSourceName.Avmoo, AppSettings.isUseAvMoo),
-                new(Models.SpiderInfo.SpiderSourceName.Avsox, AppSettings.isUseAvSox),
-                new(Models.SpiderInfo.SpiderSourceName.Libredmm, AppSettings.isUseLibreDmm),
-                new(Models.SpiderInfo.SpiderSourceName.Fc2club, AppSettings.isUseFc2Hub),
-                new(Models.SpiderInfo.SpiderSourceName.Javdb, AppSettings.isUseJavDB),
+                new(Models.SpiderInfo.SpiderSourceName.Javbus, AppSettings.IsUseJavBus) ,
+                new(Models.SpiderInfo.SpiderSourceName.Jav321, AppSettings.IsUseJav321),
+                new(Models.SpiderInfo.SpiderSourceName.Avmoo, AppSettings.IsUseAvMoo),
+                new(Models.SpiderInfo.SpiderSourceName.Avsox, AppSettings.IsUseAvSox),
+                new(Models.SpiderInfo.SpiderSourceName.Libredmm, AppSettings.IsUseLibreDmm),
+                new(Models.SpiderInfo.SpiderSourceName.Fc2club, AppSettings.IsUseFc2Hub),
+                new(Models.SpiderInfo.SpiderSourceName.Javdb, AppSettings.IsUseJavDb),
                 new(Models.SpiderInfo.SpiderSourceName.Local, true)
                 };
 
@@ -460,7 +460,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             VideoCount_Run.Text = videoCount.ToString();
             FailCount_Run.Text = FailVideoNameList.Count.ToString();
 
-            if (!GetInfoFromNetwork.IsJavDbCookieVisiable)
+            if (!GetInfoFromNetwork.IsJavDbCookieVisible)
             {
                 JavDbCookieVisiable_TeachingTip.IsOpen = true;
             }
@@ -613,7 +613,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     progress.Report(currentSpiderInfo);
 
                     //FC2且cookie异常（如未登录）
-                    if (name.Contains("FC2") && spiderSourceName == Models.SpiderInfo.SpiderSourceName.Javdb && !GetInfoFromNetwork.IsJavDbCookieVisiable)
+                    if (name.Contains("FC2") && spiderSourceName == Models.SpiderInfo.SpiderSourceName.Javdb && !GetInfoFromNetwork.IsJavDbCookieVisible)
                     {
                         break;
                     }

@@ -236,7 +236,7 @@ namespace Display.ContentsPage
                 string startText = $"【{i + 1}/{thumbnailinfos.Count}】 {name}";
 
                 //保存路径
-                string SavePath = Path.Combine(AppSettings.Image_SavePath, name);
+                string SavePath = Path.Combine(AppSettings.ImageSavePath, name);
 
                 //缩略图已存在，跳过
                 string existsPath = Path.Combine(SavePath, $"Thumbnail_{imageCount - 1}.jpg");
@@ -470,7 +470,7 @@ namespace Display.ContentsPage
                 string imagePath = string.Empty;
                 for (int j = 0; j < DownUrlList.Count; j++)
                 {
-                    string SavePath = Path.Combine(AppSettings.Image_SavePath, thumbnail.name);
+                    string SavePath = Path.Combine(AppSettings.ImageSavePath, thumbnail.name);
                     string SaveName = $"Thumbnail_{j}";
                     string saveImagePath = await GetInfoFromNetwork.downloadFile(DownUrlList[j], SavePath, SaveName);
 

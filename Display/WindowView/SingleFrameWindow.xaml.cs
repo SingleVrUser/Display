@@ -32,9 +32,16 @@ namespace Display.WindowView
             ContentFrame.Navigate(page);
         }
 
-        public void NavigationToPageWithWebView(Type page, Window window)
+        private void NavigationToPageWithWebView(Type page, Window window)
         {
             ContentFrame.Navigate(page, window);
+        }
+
+        public static void CreateWindow(Type page)
+        {
+            var window = new SingleFrameWindow();
+            window.NavigationToPageWithWebView(page, window);
+            window.Activate();
         }
 
     }

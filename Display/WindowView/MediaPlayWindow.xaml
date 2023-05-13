@@ -26,8 +26,8 @@
             </Grid.Background>
 
             <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center"
-                        Spacing="10">
+                        Padding="10,0"
+                        Spacing="5">
                 <Image Source="/Assets/pokeball.ico"
                        Width="16"
                        Height="16" />
@@ -35,6 +35,7 @@
                            Text="播放"
                            TextWrapping="NoWrap"
                            Foreground="WhiteSmoke"
+                            Opacity="0.8"
                            VerticalAlignment="Center" />
             </StackPanel>
 
@@ -42,22 +43,18 @@
 
         <Grid Grid.Row="1" x:Name="VideoPlayGrid">
             <customcontrols:CustomMediaPlayerElement x:Name="mediaControl"
-                                                     PickCode="{x:Bind _pickCode}"
-                                                     playType="{x:Bind _playType}"
-                                                     TrueName="{x:Bind _trueName}"
-                                                     SubInfo="{x:Bind _subInfo}"
                                                      FullWindow="mediaControls_FullWindow"
                                                      MediaDoubleTapped="mediaControl_MediaDoubleTapped"
                                                      PointerEntered="MediaControl_OnPointerEntered"
                                                      PointerExited="MediaControl_OnPointerExited"/>
 
-            <!--无链接传入-->
+            <!--无链接传入--><!--
             <StackPanel HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Visibility="{x:Bind isPickCodeNull()}">
+                        Visibility="{x:Bind IsPickCodeNull()}">
                 <TextBlock Text="网页地址为空"
                            FontSize="20" />
-            </StackPanel>
+            </StackPanel>-->
         </Grid>
     </customcontrols:CursorGrid>
 </Window>

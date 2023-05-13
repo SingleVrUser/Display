@@ -382,7 +382,7 @@
             </Grid>
         </Grid>
 
-        <TeachingTip x:Name="JavDbCookieVisiable_TeachingTip"
+        <TeachingTip Grid.Row="0" x:Name="JavDbCookieVisiable_TeachingTip"
                      Title="提示"
                      Subtitle="JavDb访问Fc2时提示异常，Cookie可能已经失效" />
     </Grid>

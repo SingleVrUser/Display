@@ -23,7 +23,7 @@ public class JavBus
 
     public const bool IgnoreFc2 = true;
 
-    public static bool IsTrue => AppSettings.isUseJavBus;
+    public static bool IsOn => AppSettings.IsUseJavBus;
 
     private static string baseUrl => AppSettings.JavBus_BaseUrl;
 
@@ -161,7 +161,7 @@ public class JavBus
         //下载封面
         if (!string.IsNullOrEmpty(ImageUrl))
         {
-            string SavePath = AppSettings.Image_SavePath;
+            string SavePath = AppSettings.ImageSavePath;
 
             string filePath = Path.Combine(SavePath, CID);
             videoInfo.imageurl = ImageUrl;

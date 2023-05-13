@@ -21,7 +21,7 @@ public class LibreDmm
 
     public const bool IgnoreFc2 = true;
 
-    public static bool IsTrue => AppSettings.isUseLibreDmm;
+    public static bool IsOn => AppSettings.IsUseLibreDmm;
 
     private static string baseUrl => AppSettings.LibreDmm_BaseUrl;
 
@@ -105,7 +105,7 @@ public class LibreDmm
         //下载封面
         if (!string.IsNullOrEmpty(ImageUrl))
         {
-            string SavePath = AppSettings.Image_SavePath;
+            string SavePath = AppSettings.ImageSavePath;
             string filePath = Path.Combine(SavePath, CID);
             videoInfo.imageurl = ImageUrl;
             videoInfo.imagepath = await GetInfoFromNetwork.downloadFile(ImageUrl, filePath, CID);

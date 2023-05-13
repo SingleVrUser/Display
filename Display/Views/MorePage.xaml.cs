@@ -74,43 +74,30 @@ namespace Display.Views
         private void GridView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var clickItem = e.ClickedItem as FunctionModule;
-            switch (clickItem.Name)
+            switch (clickItem?.Name)
             {
                 case "导入115数据":
-                    SingleFrameWindow window1 = new SingleFrameWindow();
-                    window1.NavigationToPageWithWebView(typeof(ContentsPage.Import115DataToLocalDataAccess.MainPage), window1);
-                    window1.Activate();
+                    SingleFrameWindow.CreateWindow(typeof(ContentsPage.Import115DataToLocalDataAccess.MainPage));
                     break;
                 case "搜刮信息":
-                    CommonWindow window2 = new CommonWindow();
-                    var page = new ContentsPage.SpiderVideoInfo.MainPage();
-                    window2.Content = page;
-                    window2.Activate();
+                    CommonWindow.CreateAndShowWindow(new ContentsPage.SpiderVideoInfo.MainPage());
                     break;
                 case "计算Sha1":
-                    CommonWindow window3 = new CommonWindow();
-                    window3.Content = new ContentsPage.CalculateLocalFileSha1();
-                    window3.Activate();
+                    CommonWindow.CreateAndShowWindow(new ContentsPage.CalculateLocalFileSha1());
                     break;
                 case "浏览器":
-                    CommonWindow window4 = new CommonWindow();
+                    var window4 = new CommonWindow();
                     window4.Content = new BrowserPage(window4);
                     window4.Activate();
                     break;
                 case "文件列表":
-                    CommonWindow window5 = new CommonWindow();
-                    window5.Content = new ContentsPage.DatumList.FileListPage();
-                    window5.Activate();
+                    CommonWindow.CreateAndShowWindow(new ContentsPage.DatumList.FileListPage());
                     break;
                 case "演员头像":
-                    CommonWindow window6 = new CommonWindow();
-                    window6.Content = new ContentsPage.AddActorCover();
-                    window6.Activate();
+                    CommonWindow.CreateAndShowWindow(new ContentsPage.AddActorCover());
                     break;
                 case "缩略图":
-                    CommonWindow window7 = new CommonWindow();
-                    window7.Content = new ContentsPage.GetThumbnail();
-                    window7.Activate();
+                    CommonWindow.CreateAndShowWindow(new ContentsPage.GetThumbnail());
                     break;
             }
         }

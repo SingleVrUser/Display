@@ -20,7 +20,7 @@ public class AvSox
 
     public const bool IgnoreFc2 = false;
 
-    public static bool IsTrue => AppSettings.isUseAvSox;
+    public static bool IsOn => AppSettings.IsUseAvSox;
 
     private static string baseUrl => AppSettings.AvSox_BaseUrl;
 
@@ -73,22 +73,22 @@ public class AvSox
         var alertNode = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class,'alert-danger')]");
         if (alertNode != null) return null;
 
-        var SearchResultNodes = htmlDoc.DocumentNode.SelectNodes("//div[@id='waterfall']/div[@class='item']");
+        var searchResultNodes = htmlDoc.DocumentNode.SelectNodes("//div[@id='waterfall']/div[@class='item']");
         //搜索无果，退出
-        if (SearchResultNodes == null) return null;
+        if (searchResultNodes == null) return null;
 
         //分割通过正则匹配得到的CID
-        var spliteResult = Common.SpliteCID(CID);
-        if (spliteResult == null) return null;
+        var splitResult = Common.SpliteCID(CID);
+        if (splitResult == null) return null;
 
-        string left_cid = spliteResult.Item1;
-        string right_cid = spliteResult.Item2;
+        var left_cid = splitResult.Item1;
+        var right_cid = splitResult.Item2;
 
         string search_left_cid;
         string search_right_cid;
-        for (var i = 0; i < SearchResultNodes.Count; i++)
+        for (var i = 0; i < searchResultNodes.Count; i++)
         {
-            var movie_list = SearchResultNodes[i];
+            var movie_list = searchResultNodes[i];
             var title_search = movie_list.SelectSingleNode(".//div[@class='photo-info']/span/date")?.InnerText;
             if (title_search == null) continue;
 
@@ -133,7 +133,7 @@ public class AvSox
                                     && Int32.TryParse(search_right_cid, out searchNum)
                                         && currentNum.Equals(searchNum))))
             {
-                var detail_url = SearchResultNodes[i].SelectSingleNode(".//a[contains(@class,'movie-box')]").Attributes["href"].Value;
+                var detail_url = searchResultNodes[i].SelectSingleNode(".//a[contains(@class,'movie-box')]").Attributes["href"].Value;
 
                 //只有“//”没有“http(s)://”，补充上
                 if (!detail_url.Contains("http") && detail_url.Contains("//"))
