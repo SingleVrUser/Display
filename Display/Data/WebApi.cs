@@ -23,6 +23,7 @@ using System.Net.Http.Json;
 using Display.Models;
 using Display.Views;
 using Display.WindowView;
+using Display.Controls;
 
 namespace Display.Data
 {
@@ -1540,7 +1541,7 @@ namespace Display.Data
                 var downUrlInfo = DataAccess.GetDownHistoryByPcAndUa(pickCode, ua);
 
                 //检查链接是否失效
-                if (downUrlInfo != null && (tm - downUrlInfo.addTime) > AppSettings.DownUrlOverdueTime)
+                if (downUrlInfo != null && (tm - downUrlInfo.addTime) < AppSettings.DownUrlOverdueTime)
                 {
                     downUrlList.Add(downUrlInfo.fileName, downUrlInfo.trueUrl);
                     return downUrlList;
@@ -1629,50 +1630,56 @@ namespace Display.Data
         /// <summary>
         /// PotPlayer播放（原画）
         /// </summary>
-        /// <param name="playUrl"></param>
+        /// <param name="playItems"></param>
         /// <param name="userAgent"></param>
         /// <param name="fileName"></param>
+        /// <param name="quality"></param>
         /// <param name="showWindow"></param>
         /// <param name="referrerUrl"></param>
-        /// <param name="subFile"></param>
-        public static void Play115SourceVideoWithPotPlayer(string playUrl, string userAgent, string fileName, bool showWindow = true, string referrerUrl = "https://115.com", string subFile = null)
+        public static async void Play115SourceVideoWithPotPlayer(List<MediaPlayItem> playItems, string userAgent, string fileName, AppSettings.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
         {
-            var process = new Process();
-
-            var addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty : @$" /sub=""{subFile}""";
-
-            process.StartInfo.FileName = fileName;
-            process.StartInfo.Arguments = @$" ""{playUrl}"" /user_agent=""{userAgent}"" /referer=""{referrerUrl}""{addSubFile}";
-            process.StartInfo.UseShellExecute = false;
-            if (!showWindow)
+            var isFirst = true;
+            foreach (var mediaPlayItem in playItems)
             {
-                process.StartInfo.CreateNoWindow = true;
+                var downUrl = await mediaPlayItem.GetUrl(quality);
+                var subFile = await mediaPlayItem.GetOneSubFilePath();
+                var addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty : @$" /sub=""{subFile}""";
+                var arguments = @$" ""{downUrl}"" /user_agent=""{userAgent}"" /referer=""{referrerUrl}""{addSubFile}";
+
+                if (isFirst)
+                {
+                    isFirst = false;
+                    arguments += " /current";
+                    StartProcess(fileName, arguments);
+                    await Task.Delay(10000);
+                }
+                else
+                {
+                    arguments += " /add";
+                    StartProcess(fileName, arguments, showWindow);
+                }
+
+
             }
-            
+        }
+
+        private static void StartProcess(string fileName, string arguments, bool showWindow = false)
+        {
+            using var process = new Process();
+            process.StartInfo.FileName = fileName;
+            process.StartInfo.Arguments = arguments;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = !showWindow;
             try
             {
                 process.Start();
             }
             catch (Win32Exception e)
             {
-                Toast.tryToast("播放错误","调用播放器时出现异常",e.Message);
+                Toast.tryToast("播放错误", "调用播放器时出现异常", e.Message);
             }
         }
-
-        /// <summary>
-        /// PotPlayer播放(m3u8)
-        /// </summary>
-        /// <param name="pickCode"></param>
-        public async void PlayByPotPlayer(string pickCode)
-        {
-            var m3U8Infos = await GetM3U8InfoByPickCode(pickCode);
-            if (m3U8Infos.Count > 0)
-            {
-                //选择最高分辨率的播放
-                FileMatch.PlayByPotPlayer(m3U8Infos[0].Url);
-            }
-        }
-
+        
         /// <summary>
         /// 解析m3u8内容
         /// </summary>
@@ -1767,100 +1774,81 @@ namespace Display.Data
             return m3U8Infos;
         }
 
+
         /// <summary>
         /// mpv播放
         /// </summary>
-        /// <param name="playUrl"></param>
+        /// <param name="playItems"></param>
         /// <param name="userAgent"></param>
         /// <param name="fileName"></param>
+        /// <param name="quality"></param>
         /// <param name="showWindow"></param>
         /// <param name="referrerUrl"></param>
-        /// <param name="title"></param>
-        /// <param name="subFile"></param>
-        public void Play115SourceVideoWithMpv(string playUrl, string userAgent, string fileName, bool showWindow = true, string referrerUrl = "https://115.com", string title = null, string subFile = null)
+        public async void Play115SourceVideoWithMpv(List<MediaPlayItem> playItems, string userAgent, string fileName, AppSettings.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
         {
-            var process = new Process();
-
-            var addTitle = string.Empty;
-
-            if (title == null)
+            var arguments = string.Empty;
+            foreach (var mediaPlayItem in playItems)
             {
-                var matchTitle = Regex.Match(HttpUtility.UrlDecode(playUrl), @"/([-@.\w]+?\.\w+)\?t=");
-                if (matchTitle.Success)
-                    addTitle = @$"  --title=""{matchTitle.Groups[1].Value}""";
-            }
-            else
-            {
-                addTitle = @$"  --title=""{title}""";
-            }
+                var playUrl = await mediaPlayItem.GetUrl(quality);
+                var title = mediaPlayItem.Title;
+                var subFile = await mediaPlayItem.GetOneSubFilePath();
 
-            var addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty : @$" --sub-file=""{subFile}""";
+                var addTitle = string.Empty;
+                if (string.IsNullOrEmpty(title))
+                {
+                    var matchTitle = Regex.Match(HttpUtility.UrlDecode(playUrl), @"/([-@.\w]+?\.\w+)\?t=");
+                    if (matchTitle.Success)
+                        title = matchTitle.Groups[1].Value;
+                }
 
-            process.StartInfo.FileName = fileName;
+                if(!string.IsNullOrEmpty(title))
+                    addTitle = @$"  --title=""播放 - {title}""";
 
-            process.StartInfo.FileName = fileName;
-            process.StartInfo.Arguments = @$" ""{playUrl}"" --referrer=""{referrerUrl}"" --user-agent=""{userAgent}""{addTitle}{addSubFile}";
-            process.StartInfo.UseShellExecute = false;
-            if (!showWindow)
-            {
-                process.StartInfo.CreateNoWindow = true;
+                var addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty : @$" --sub-file=""{subFile}""";
+
+                arguments += " --{" + @$" ""{playUrl}"" --referrer=""{referrerUrl}"" --user-agent=""{userAgent}"" --force-media-title=""{mediaPlayItem.FileName}""{addTitle}{addSubFile}" + " --}";
             }
 
-            try
-            {
-                process.Start();
-            }
-            catch (Win32Exception e)
-            {
-                Toast.tryToast("播放错误","调用播放器时出现异常",e.Message);
-            }
+            StartProcess(fileName, arguments, showWindow);
+
         }
 
         /// <summary>
         /// vlc播放（原画）
         /// </summary>
-        /// <param name="playUrl"></param>
+        /// <param name="playItems"></param>
         /// <param name="userAgent"></param>
         /// <param name="fileName"></param>
+        /// <param name="quality"></param>
         /// <param name="showWindow"></param>
         /// <param name="referrerUrl"></param>
-        /// <param name="title"></param>
-        /// <param name="subFile"></param>
-        public static void Play115SourceVideoWithVlc(string playUrl, string userAgent, string fileName, bool showWindow = true, string referrerUrl = "https://115.com", string title = null, string subFile = null)
+        public static async void Play115SourceVideoWithVlc(List<MediaPlayItem> playItems, string userAgent, string fileName, AppSettings.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
         {
-            var process = new Process();
+            var arguments = string.Empty;
+            foreach (var mediaPlayItem in playItems)
+            {
+                var playUrl = await mediaPlayItem.GetUrl(quality);
+                var title = mediaPlayItem.Title;
+                var subFile = await mediaPlayItem.GetOneSubFilePath();
 
-            string addTitle = string.Empty;
-            if (title == null)
-            {
-                var matchTitle = Regex.Match(HttpUtility.UrlDecode(playUrl), @"/([-@.\w]+?\.\w+)\?t=");
-                if (matchTitle.Success)
-                    addTitle = @$" :meta-title=""{matchTitle.Groups[1].Value}""";
-            }
-            else
-            {
-                addTitle = @$" :meta-title=""{title}""";
+                var addTitle = string.Empty;
+                if (string.IsNullOrEmpty(title))
+                {
+                    var matchTitle = Regex.Match(HttpUtility.UrlDecode(playUrl), @"/([-@.\w]+?\.\w+)\?t=");
+                    if (matchTitle.Success)
+                        addTitle = matchTitle.Groups[1].Value;
+                }
+
+                if (!string.IsNullOrEmpty(title))
+                {
+                    addTitle = @$" :meta-title=""{title}""";
+                }
+                var addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty : @$" :sub-file=""{subFile}""";
+
+                arguments += @$" ""{playUrl}"" :http-referrer=""{referrerUrl}"" :http-user-agent=""{userAgent}""{addTitle}{addSubFile}";
             }
 
-            string addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty : @$" :sub-file=""{subFile}""";
-
-            process.StartInfo.FileName = fileName;
-            process.StartInfo.Arguments = @$" ""{playUrl}"" :http-referrer=""{referrerUrl}"" :http-user-agent=""{userAgent}""{addTitle}{addSubFile}";
-            //process.StartInfo.Arguments = @$" ""{playUrl}""";
-            process.StartInfo.UseShellExecute = false;
-            if (!showWindow)
-            {
-                process.StartInfo.CreateNoWindow = true;
-            }
-
-            try
-            {
-                process.Start();
-            }
-            catch (Win32Exception e)
-            {
-                Toast.tryToast("播放错误", "调用播放器时出现异常", e.Message);
-            }
+            StartProcess(fileName, arguments,showWindow);
         }
 
         /// <summary>
@@ -1882,20 +1870,15 @@ namespace Display.Data
         /// <summary>
         /// 原画播放
         /// </summary>
-        /// <param name="pickCode"></param>
+        /// <param name="playItems"></param>
         /// <param name="playMethod"></param>
         /// <param name="xamlRoot"></param>
-        /// <param name="subInfo"></param>
-        public async Task PlayVideoWithPlayer(MediaPlayItem playItem, PlayMethod playMethod, XamlRoot xamlRoot)
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        public async Task PlayVideoWithPlayer(List<MediaPlayItem> playItems, PlayMethod playMethod, XamlRoot xamlRoot, IProgress<int> progress = null)
         {
-            //播放路径检查选择
             string savePath;
             string ua;
-            string subFile = null;
-
-            var subInfo = playItem.SubInfos?.FirstOrDefault();
-            var pickCode = playItem.PickCode;
-            var trueName = playItem.Title;
 
             //检查播放器设置
             switch (playMethod)
@@ -1915,7 +1898,8 @@ namespace Display.Data
                 default:
                     throw new ArgumentOutOfRangeException(nameof(playMethod), playMethod, null);
             }
-
+            
+            //播放路径检查选择
             if (string.IsNullOrEmpty(savePath))
             {
                 var dialog = new ContentDialog()
@@ -1931,91 +1915,41 @@ namespace Display.Data
 
                 return;
             }
-            
-            //是否需要加载字幕
-            if (AppSettings.IsFindSub && subInfo != null)
-            {
-                var subDict = DataAccess.FindSubFile(pickCode);
-
-                subFile = await TryDownSubFile(subInfo.name, subInfo.pickcode);
-
-                if (subDict.Count == 1)
-                {
-                    var subFilePickCode = subDict.First().Key;
-                    var subFileName = subDict.First().Value;
-                    subInfo = new(subFilePickCode, subFileName, pickCode, trueName);
-                }
-                else if (subDict.Count > 1 && xamlRoot != null)
-                {
-                    List<SubInfo> subInfos = new();
-                    subDict.ToList().ForEach(item => subInfos.Add(new(item.Key, item.Value, pickCode, trueName)));
-
-                    //按名称排序
-                    subInfos = subInfos.OrderBy(item => item.name).ToList();
-
-                    ContentsPage.DetailInfo.SelectSingleSubFileToSelected newPage = new(subInfos, trueName);
-
-                    // 由用户选择字幕
-                    newPage.ContentListView.ItemClick += PlayVideoHelper.SubInfoListView_ItemClick;
-
-                    ContentDialog dialog = new()
-                    {
-                        XamlRoot = xamlRoot,
-                        Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
-                        Title = "选择字幕",
-                        PrimaryButtonText = "直接播放",
-                        CloseButtonText = "返回",
-                        Content = newPage,
-                        DefaultButton = ContentDialogButton.Close
-                    };
-
-                    var result = await dialog.ShowAsync();
-
-                    //返回
-                    if (result != ContentDialogResult.Primary)
-                    {
-                        return;
-                    }
-
-                }
-            }
 
             var quality = (AppSettings.PlayQuality)AppSettings.DefaultPlayQuality;
 
-            //获取下载地址
-            string playUrl;
-            string title;
-            switch (quality)
+            for (int i = 0; i < playItems.Count; i++)
             {
-                case AppSettings.PlayQuality.M3U8:
-                    var m3U8Infos = await GetM3U8InfoByPickCode(pickCode);
-                    if (m3U8Infos.Count == 0) return;
-                    playUrl = m3U8Infos.First().Url;
-                    title = DataAccess.GetFileNameFromPickCode(pickCode);
-                    break;
-                case AppSettings.PlayQuality.Origin:
-                    var downUrlList = GetDownUrl(pickCode, ua);
-                    if (downUrlList.Count == 0) return;
-                    title = downUrlList.First().Key;
-                    playUrl = downUrlList.First().Value;
+                var playItem = playItems[i];
 
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(quality), quality, null);
+                // 获取下载链接
+                await playItem.GetUrl(quality);
+                Debug.WriteLine("成功获取");
+
+
+                // 下载字幕
+                var subPath = await playItem.GetOneSubFilePath();
+
+                if (!string.IsNullOrEmpty(subPath))
+                {
+                    Debug.WriteLine("完成字幕");
+                }
+
+                progress?.Report(i);
             }
 
             //检查播放方式
             switch (playMethod)
             {
                 case PlayMethod.pot:
-                    Play115SourceVideoWithPotPlayer(playUrl, userAgent: ua, savePath, false, subFile: subFile);
+                    Play115SourceVideoWithPotPlayer(playItems, userAgent: ua, savePath, quality, true);
                     break;
                 case PlayMethod.mpv:
-                    Play115SourceVideoWithMpv(playUrl, userAgent: ua, savePath, false, title: title, subFile: subFile);
+                    Play115SourceVideoWithMpv(playItems, userAgent: ua, savePath, quality, false);
                     break;
                 case PlayMethod.vlc:
                     //vlc不支持带“; ”的user-agent
-                    Play115SourceVideoWithVlc(playUrl, userAgent: ua, savePath, false, title: title, subFile: subFile);
+                    Play115SourceVideoWithVlc(playItems, userAgent: ua, savePath, quality, false);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(playMethod), playMethod, null);
@@ -2028,8 +1962,7 @@ namespace Display.Data
         {
             //为预防字幕文件没有具体名称，只有数字，更改字幕文件名为 pickCode+字幕文件名
             fileName = $"{pickCode}_{fileName}";
-
-
+            
             if (string.IsNullOrEmpty(pickCode)) return null;
             var subSavePath = AppSettings.SubSavePath;
             var subFile = Path.Combine(subSavePath, fileName);

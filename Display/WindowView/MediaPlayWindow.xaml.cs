@@ -29,7 +29,7 @@ public sealed partial class MediaPlayWindow : Window
 
     private readonly Page _lastPage;
 
-    public MediaPlayWindow(List<MediaPlayItem> playItems, PlayType playType, Page lastPage)
+    public MediaPlayWindow(List<MediaPlayItem> playItems, Page lastPage)
     {
         InitializeComponent();
 
@@ -40,7 +40,7 @@ public sealed partial class MediaPlayWindow : Window
 
         _appwindow = App.getAppWindow(this);
 
-        mediaControl.InitLoad(playItems, playType, this);
+        mediaControl.InitLoad(playItems, this);
 
         Closed += MediaPlayWindow_Closed;
     }
@@ -124,7 +124,7 @@ public sealed partial class MediaPlayWindow : Window
 
     public static MediaPlayWindow CreateNewWindow(List<MediaPlayItem> playItems, PlayType playType, Page lastPage)
     {
-        MediaPlayWindow newWindow =  new(playItems, playType, lastPage);
+        MediaPlayWindow newWindow =  new(playItems, lastPage);
         newWindow.Activate();
 
         return newWindow;

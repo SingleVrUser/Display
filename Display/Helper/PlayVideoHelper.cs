@@ -56,15 +56,15 @@ public class PlayVideoHelper
                 break;
             //PotPlayer播放
             case 1:
-                await WebApi.GlobalWebApi.PlayVideoWithPlayer(playItem, WebApi.PlayMethod.pot, xamlRoot);
+                await WebApi.GlobalWebApi.PlayVideoWithPlayer(playItems, WebApi.PlayMethod.pot, xamlRoot);
                 break;
             //mpv播放
             case 2:
-                await WebApi.GlobalWebApi.PlayVideoWithPlayer(playItem, WebApi.PlayMethod.mpv, xamlRoot);
+                await WebApi.GlobalWebApi.PlayVideoWithPlayer(playItems, WebApi.PlayMethod.mpv, xamlRoot);
                 break;
             //vlc播放
             case 3:
-                await WebApi.GlobalWebApi.PlayVideoWithPlayer(playItem, WebApi.PlayMethod.vlc, xamlRoot);
+                await WebApi.GlobalWebApi.PlayVideoWithPlayer(playItems, WebApi.PlayMethod.vlc, xamlRoot);
                 break;
             //MediaElement播放
             case 4:
@@ -79,7 +79,7 @@ public class PlayVideoHelper
 
         if (sender is not ListView { DataContext: string trueName }) return;
 
-        var mediaPlayItem = new MediaPlayItem(singleVideoInfo.fileBelongPickcode, trueName) { SubInfos = new List<SubInfo>(){ singleVideoInfo } };
+        var mediaPlayItem = new MediaPlayItem(singleVideoInfo.FileBelongPickCode, trueName) { SubInfos = new List<SubInfo>(){ singleVideoInfo } };
         await PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, lastPage: DetailInfoPage.Current);
     }
 

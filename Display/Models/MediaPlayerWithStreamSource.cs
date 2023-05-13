@@ -71,7 +71,7 @@ namespace Display.Models
             if (subInfo != null)
             {
                 //下载字幕
-                var subPath = await WebApi.GlobalWebApi.TryDownSubFile(subInfo.name, subInfo.pickcode);
+                var subPath = await WebApi.GlobalWebApi.TryDownSubFile(subInfo.Name, subInfo.PickCode);
 
                 if (!string.IsNullOrEmpty(subPath))
                 {

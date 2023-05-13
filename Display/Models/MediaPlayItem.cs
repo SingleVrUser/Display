@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media.Playback;
 using Display.Data;
+using static Display.Data.WebApi;
+using System.Xml.Linq;
 
 namespace Display.Models
 {
@@ -16,6 +19,20 @@ namespace Display.Models
         public string Title;
         public string Description;
         public List<m3u8Info> M3U8Infos;
+
+        private FailInfo _failInfo;
+
+        public async Task<FailInfo> GetFailInfo()
+        {
+            return _failInfo ??= await DataAccess.LoadSingleFailInfo(PickCode);
+        }
+
+        private VideoInfo _videoInfo;
+
+        public VideoInfo GetVideoInfo()
+        {
+            return _videoInfo ??= DataAccess.LoadOneVideoInfoByCID(TrueName);
+        }
 
         public List<Quality> QualityInfos;
 
@@ -34,6 +51,18 @@ namespace Display.Models
             FileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
             TrueName = FileMatch.MatchName(FileNameWithoutExtension)?.ToUpper();
             Title = FileNameWithoutExtension;
+
+
+            if (AppSettings.IsFindSub && string.IsNullOrEmpty(pickCode))
+            {
+                SubInfos = new();
+                var subDict = DataAccess.FindSubFile(pickCode);
+
+                subDict.ToList().ForEach(item => SubInfos.Add(new SubInfo(item.Key, item.Value, pickCode, TrueName)));
+
+                SubInfos = SubInfos.OrderBy(item => item.Name).ToList();
+
+            }
         }
 
         private static WebApi _webApi;
@@ -114,7 +143,8 @@ namespace Display.Models
         public async Task<string> GetUrl(int index = 1)
         {
             var qualities = await GetQualities();
-            if (index > qualities.Count + 1)
+            int maxIndex = qualities.Count - 1;
+            if (index > qualities.Count - 1)
             {
                 index = qualities.Count - 1;
             }
@@ -127,6 +157,37 @@ namespace Display.Models
             }
 
             return quality.Url;
+        }
+
+        public async Task<string> GetUrl(AppSettings.PlayQuality quality)
+        {
+            switch (quality)
+            {
+                case AppSettings.PlayQuality.M3U8:
+                {
+                    var m3U8Infos = await GetM3U8Urls();
+                    if (m3U8Infos == null || m3U8Infos.Count == 0) return GetOriginalUrl();
+
+                    return m3U8Infos.FirstOrDefault()?.Url;
+                }
+                case AppSettings.PlayQuality.Origin:
+                    return GetOriginalUrl();
+                default:
+                    return null;
+            }
+        }
+
+        private string _subFilePath;
+        public async Task<string> GetOneSubFilePath()
+        {
+            if (_subFilePath != null) return _subFilePath;
+
+            var firstSubInfo = SubInfos?.FirstOrDefault();
+            if (firstSubInfo == null) return null;
+
+            _subFilePath = await _webApi.TryDownSubFile(firstSubInfo.Name, firstSubInfo.PickCode);
+
+            return _subFilePath;
         }
 
     }

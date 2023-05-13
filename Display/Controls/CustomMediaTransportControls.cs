@@ -18,6 +18,8 @@ public class CustomMediaTransportControls : MediaTransportControls
     public event SelectionChangedEventHandler QualityChanged;
     public event SelectionChangedEventHandler PlayerChanged;
 
+    public event EventHandler<EventArgs> OnApplyTemplateCompleted;
+
     public CustomMediaTransportControls()
     {
         DefaultStyleKey = typeof(CustomMediaTransportControls);
@@ -31,6 +33,8 @@ public class CustomMediaTransportControls : MediaTransportControls
         if (fullWindowButton != null) fullWindowButton.Click += FullWindowButton_Click;
 
         base.OnApplyTemplate();
+
+        OnApplyTemplateCompleted?.Invoke(sender:null,e:null);
     }
 
     private AppBarToggleButton _likeButton;
@@ -121,6 +125,15 @@ public class CustomMediaTransportControls : MediaTransportControls
         _isHandlerScreenShotButton = true;
     }
 
+    public void DisableScreenButton()
+    {
+        var screenShotButton = GetTemplateChild("ScreenshotButton") as Button;
+        if (screenShotButton != null)
+        {
+            screenShotButton.Visibility = Visibility.Collapsed;
+        }
+    }
+
     public void InitQuality(DataTemplate qualityDataTemplate)
     {
         //画质选择按钮
@@ -135,54 +148,42 @@ public class CustomMediaTransportControls : MediaTransportControls
         qualityListView.SelectionChanged += QualityListView_SelectionChanged;
     }
 
-    public void SetQualityListSource(List<Quality> qualityItemsSource)
+    public void SetQualityListSource(List<Quality> qualityItemsSource,int qualityIndex)
     {
         var qualityListView = GetTemplateChild("QualityListView") as ListView;
         if (qualityListView == null) return;
 
         qualityListView.ItemsSource = qualityItemsSource;
+        int maxIndex = qualityItemsSource.Count - 1;
+        if (qualityIndex > maxIndex)
+        {
+            qualityIndex = maxIndex;
+        }
+
+        qualityListView.SelectedIndex = qualityIndex;
     }
 
-
-    //private bool _isHandlerQuality = false;
-    //public void SetQuality(List<Quality> qualityItemsSource, DataTemplate qualityDataTemplate)
-    //{
-    //    //画质选择按钮
-    //    Button qualityButton = GetTemplateChild("QualityButton") as Button;
-    //    if (qualityButton == null) return;
-    //    qualityButton.Visibility = Visibility.Visible;
-
-    //    //画质选择列表
-    //    ListView qualityListView = GetTemplateChild("QualityListView") as ListView;
-    //    if (qualityListView == null) return;
-    //    qualityListView.ItemTemplate = qualityDataTemplate;
-
-    //    qualityListView.ItemsSource = qualityItemsSource;
-
-    //    qualityListView.SelectedIndex = qualityItemsSource.Count switch
-    //    {
-    //        1 => 0,
-    //        > 1 => 1,
-    //        _ => qualityListView.SelectedIndex
-    //    };
-
-    //    if (_isHandlerQuality) return;
-
-    //    qualityListView.SelectionChanged += QualityListView_SelectionChanged;
-    //    _isHandlerQuality = true;
-    //}
-
-    public void SetPlayer(List<Player> PlayerItemsSource, DataTemplate QualityDataTemplate)
+    public void InitPlayer(DataTemplate qualityDataTemplate)
     {
-        Button playerButton = GetTemplateChild("PlayerButton") as Button;
+        var playerButton = GetTemplateChild("PlayerButton") as Button;
+        var playerListView = GetTemplateChild("PlayerListView") as ListView;
+
+        if (playerButton == null || playerListView == null) return;
+
+        // 显示
         playerButton.Visibility = Visibility.Visible;
 
+        // 样式
+        playerListView.ItemTemplate = qualityDataTemplate;
+
+        //设置播放源
+        List<Player> playerItemsSource = new() {
+            new Player(WebApi.PlayMethod.vlc),
+            new Player(WebApi.PlayMethod.mpv),
+            new Player(WebApi.PlayMethod.pot)};
+
         //画质选择列表
-        ListView playerListView = GetTemplateChild("PlayerListView") as ListView;
-        playerListView.ItemTemplate = QualityDataTemplate;
-
-        playerListView.ItemsSource = PlayerItemsSource;
-
+        playerListView.ItemsSource = playerItemsSource;
         playerListView.SelectionChanged += PlayerListView_SelectionChanged;
     }
 
@@ -225,15 +226,11 @@ public class Player
 
     public string Name => PlayMethod.ToString();
 
-    public string Url { get; set; }
-    public string PickCode { get; set; }
 
-    public Player(WebApi.PlayMethod playerMethod, string url = null, string pickCode = null)
+    public Player(WebApi.PlayMethod playerMethod)
     {
         this.PlayMethod = playerMethod;
 
-        if (url != null) this.Url = url;
-        if (pickCode != null) this.PickCode = pickCode;
 
     }
 }
