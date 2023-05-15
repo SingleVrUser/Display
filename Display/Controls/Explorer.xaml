@@ -13,7 +13,7 @@
         <!--ListView 的 文件 DataTemplate-->
         <DataTemplate x:Key="FileInSelectFolderTemplate" x:DataType="data:FilesInfo">
             <ListViewItem>
-                <Grid ColumnSpacing="10">
+                <Grid ColumnSpacing="10" Background="Transparent">
                     <Grid.ContextFlyout>
                         <MenuFlyout>
                             <MenuFlyoutItem Text="在默认应用播放"
@@ -285,15 +285,14 @@
                       Margin="5"
                       ItemClick="FilesInfoListView_ItemClick">
                 <ListView.Header>
-                    <BreadcrumbBar x:Name="FolderBreadcrumbBar"
-                                   ItemClicked="FolderBreadcrumbBar_ItemClicked"
+                    <BreadcrumbBar ItemClicked="FolderBreadcrumbBar_ItemClicked"
                                    ItemsSource="{x:Bind SelectFolderName}">
                         <BreadcrumbBar.ItemTemplate>
                             <DataTemplate x:DataType="data:ExplorerItem">
                                 <BreadcrumbBarItem Content="{Binding}">
                                     <BreadcrumbBarItem.ContentTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Name}" />
+                                            <TextBlock Text="{Binding Name}"/>
                                         </DataTemplate>
                                     </BreadcrumbBarItem.ContentTemplate>
                                 </BreadcrumbBarItem>

@@ -341,8 +341,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             if (matchVideoResults == null)
                 return;
 
-            if (network == null)
-                network = new();
+            network ??= new GetInfoFromNetwork();
 
             ShowSpiderInfoList();
             ShowSpiderCartesianChart();

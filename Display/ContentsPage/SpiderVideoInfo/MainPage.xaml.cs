@@ -240,7 +240,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
 
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
 
-        var mediaPlayItem = new MediaPlayItem(SelectedDatum.pc, SelectedDatum.n);
+        var mediaPlayItem = new MediaPlayItem(SelectedDatum.pc, SelectedDatum.n, FilesInfo.FileType.File);
         await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
         ProtectedCursor = null;
     }
@@ -316,7 +316,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
         await Task.Delay(1);
 
 
-        var mediaPlayItem = new MediaPlayItem(SelectedDatum.pc, SelectedDatum.n);
+        var mediaPlayItem = new MediaPlayItem(SelectedDatum.pc, SelectedDatum.n, FilesInfo.FileType.File);
         await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this, playerSelection: playerSelection);
     }
 
@@ -324,7 +324,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
         if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
 
-        var mediaPlayItem = new MediaPlayItem(info.datum.pc, info.Name);
+        var mediaPlayItem = new MediaPlayItem(info.datum.pc, info.Name, FilesInfo.FileType.File);
         await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
     }
 
@@ -337,7 +337,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
         await Task.Delay(1);
 
 
-        var mediaPlayItem = new MediaPlayItem(info.datum.pc, info.Name);
+        var mediaPlayItem = new MediaPlayItem(info.datum.pc, info.Name, FilesInfo.FileType.File);
         await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this, playerSelection: playerSelection);
     }
 }

@@ -24,7 +24,7 @@ namespace Display.ContentsPage.DetailInfo
             this.InitializeComponent();
         }
 
-        public DownDialogContent(List<Data.Datum> videoInfoList)
+        public DownDialogContent(List<Datum> videoInfoList)
         {
             this.InitializeComponent();
 

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Display.Data;
 using Display.Helper;
+using Microsoft.UI.Xaml.Input;
 
 namespace Display.Controls
 {
@@ -626,7 +627,7 @@ namespace Display.Controls
         {
             PlayWithPlayerClick?.Invoke(sender,e);
         }
-
+        
     }
 
     public class lastUnAllShowFolderItem

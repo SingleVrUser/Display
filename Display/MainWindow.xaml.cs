@@ -395,7 +395,7 @@ namespace Display
             if (nowItem.series == "fail")
             {
 
-                var mediaPlayItem = new MediaPlayItem(nowItem.busurl, nowItem.truename);
+                var mediaPlayItem = new MediaPlayItem(nowItem.busurl, nowItem.truename,FilesInfo.FileType.File);
                 await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, ((Page)ContentFrame.Content).XamlRoot);
             }
             //正常点击

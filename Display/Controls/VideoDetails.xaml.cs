@@ -121,9 +121,9 @@ namespace Display.Controls
             //来源为网络
             else if (AppSettings.ThumbnailOrigin == (int)AppSettings.Origin.Web)
             {
-                VideoInfo VideoInfo = DataAccess.LoadOneVideoInfoByCID(resultinfo.truename);
+                var videoInfo = DataAccess.LoadOneVideoInfoByCID(resultinfo.truename);
 
-                var sampleImageListStr = VideoInfo.sampleImageList;
+                var sampleImageListStr = videoInfo.sampleImageList;
                 if (!string.IsNullOrEmpty(sampleImageListStr))
                 {
                     ThumbnailList = sampleImageListStr.Split(",").ToList();
@@ -172,31 +172,32 @@ namespace Display.Controls
             string name = resultinfo.truename;
             var videoinfoList = DataAccess.loadFileInfoByTruename(name);
 
-            ContentDialog dialog = new ContentDialog();
-
-            // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
-            dialog.XamlRoot = this.XamlRoot;
-            dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
-            dialog.Title = "下载";
-            dialog.PrimaryButtonText = "下载全部";
-            dialog.SecondaryButtonText = "下载选中项";
-            dialog.CloseButtonText = "返回";
-            dialog.DefaultButton = ContentDialogButton.Primary;
-
             videoinfoList = videoinfoList.OrderBy(item => item.n).ToList();
 
-            var DownDialogContent = new ContentsPage.DetailInfo.DownDialogContent(videoinfoList);
+            var downDialogContent = new DownDialogContent(videoinfoList);
 
-            dialog.Content = DownDialogContent;
+            var dialog = new ContentDialog
+            {
+                // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
+                XamlRoot = this.XamlRoot,
+                Content = downDialogContent,
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+                Title = "下载",
+                PrimaryButtonText = "下载全部",
+                SecondaryButtonText = "下载选中项",
+                CloseButtonText = "返回",
+                DefaultButton = ContentDialogButton.Primary
+            };
+
             var result = await dialog.ShowAsync();
 
-            List<Datum> downVideoInfoList = new List<Datum>();
+            var downVideoInfoList = new List<Datum>();
 
             var webApi = WebApi.GlobalWebApi;
 
             //下载方式
             WebApi.downType downType;
-            switch (DownDialogContent.DownMethod)
+            switch (downDialogContent.DownMethod)
             {
                 case "比特彗星":
                     downType = WebApi.downType.bc;
@@ -234,7 +235,7 @@ namespace Display.Controls
             //下载选中
             else if (result == ContentDialogResult.Secondary)
             {
-                var stackPanel = DownDialogContent.Content as StackPanel;
+                var stackPanel = downDialogContent.Content as StackPanel;
                 foreach (var item in stackPanel.Children)
                 {
                     if (item is CheckBox)

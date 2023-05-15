@@ -198,7 +198,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         // 通过是否有trueName判断匹配失败项和成功项
         if (string.IsNullOrEmpty(trueName))
         {
-            var failInfo = await DataAccess.LoadSingleFailInfo(playItem.PickCode);
+            var failInfo = await playItem.GetFailInfo();
             if (failInfo != null)
             {
 
@@ -217,7 +217,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         }
         else
         {
-            var videoInfo = DataAccess.LoadOneVideoInfoByCID(trueName);
+            var videoInfo = playItem.GetVideoInfo();
 
             //有该数据才可用Like和LookLater
             if (videoInfo != null)
@@ -379,7 +379,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
         if (string.IsNullOrEmpty(trueName))
         {
-            var failInfo = await DataAccess.LoadSingleFailInfo(pickCode);
+            var failInfo = await playItem.GetFailInfo();
 
             if (failInfo == null)
             {
@@ -413,7 +413,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         }
         else
         {
-            var videoInfo = DataAccess.LoadOneVideoInfoByCID(trueName);
+            var videoInfo = playItem.GetVideoInfo();
 
             if (videoInfo != null)
             {
@@ -438,7 +438,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
         if (string.IsNullOrEmpty(pickCode)) return;
 
-        var failInfo = await DataAccess.LoadSingleFailInfo(pickCode);
+        var failInfo = await playItem.GetFailInfo();
 
         LookLater = button.IsChecked == true ? Convert.ToInt32(DateTimeOffset.Now.ToUnixTimeSeconds()) : 0;
 
@@ -476,7 +476,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         }
         else
         {
-            var videoInfo = DataAccess.LoadOneVideoInfoByCID(trueName);
+            var videoInfo = playItem.GetVideoInfo();
 
             if (videoInfo != null)
             {

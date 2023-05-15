@@ -1650,36 +1650,46 @@ namespace Display.Data
                 {
                     isFirst = false;
                     arguments += " /current";
-                    StartProcess(fileName, arguments);
+                    StartProcess(fileName, arguments, exitedHandler: Process_Exited);
                     await Task.Delay(10000);
                 }
                 else
                 {
                     arguments += " /add";
                     StartProcess(fileName, arguments, showWindow);
+                    await Task.Delay(1000);
                 }
-
-
             }
         }
 
-        private static void StartProcess(string fileName, string arguments, bool showWindow = false)
+        private static async void StartProcess(string fileName, string arguments, bool showWindow = false,EventHandler exitedHandler = null)
         {
             using var process = new Process();
             process.StartInfo.FileName = fileName;
             process.StartInfo.Arguments = arguments;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = !showWindow;
+            if (exitedHandler != null)
+            {
+                process.Exited += exitedHandler;
+            }
             try
             {
                 process.Start();
+                await process.WaitForExitAsync();
             }
             catch (Win32Exception e)
             {
                 Toast.tryToast("播放错误", "调用播放器时出现异常", e.Message);
             }
+
         }
-        
+
+        private static void Process_Exited(object sender, EventArgs e)
+        {
+            Debug.WriteLine("Process_Exited");
+        }
+
         /// <summary>
         /// 解析m3u8内容
         /// </summary>
@@ -1918,6 +1928,9 @@ namespace Display.Data
 
             var quality = (AppSettings.PlayQuality)AppSettings.DefaultPlayQuality;
 
+            //打开一层文件夹并添加可播放文件到List中
+            playItems = await MediaPlayItem.OpenFolderThenInsertVideoFileToMediaPlayItem(playItems, GlobalWebApi);
+
             for (int i = 0; i < playItems.Count; i++)
             {
                 var playItem = playItems[i];
@@ -1925,8 +1938,7 @@ namespace Display.Data
                 // 获取下载链接
                 await playItem.GetUrl(quality);
                 Debug.WriteLine("成功获取");
-
-
+                
                 // 下载字幕
                 var subPath = await playItem.GetOneSubFilePath();
 
@@ -1955,9 +1967,7 @@ namespace Display.Data
                     throw new ArgumentOutOfRangeException(nameof(playMethod), playMethod, null);
             }
         }
-
-
-
+        
         public async Task<string> TryDownSubFile(string fileName, string pickCode)
         {
             //为预防字幕文件没有具体名称，只有数字，更改字幕文件名为 pickCode+字幕文件名
@@ -1990,5 +2000,6 @@ namespace Display.Data
             return subFile;
 
         }
+
     }
 }

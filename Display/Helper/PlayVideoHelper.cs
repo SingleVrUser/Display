@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Display.Data;
 using Display.Models;
+using Display.ContentsPage.DetailInfo;
 
 namespace Display.Helper;
 
@@ -27,8 +28,8 @@ public class PlayVideoHelper
     public static async Task PlayVideo(List<MediaPlayItem> playItems, XamlRoot xamlRoot = null, CustomMediaPlayerElement.PlayType playType = CustomMediaPlayerElement.PlayType.success, Page lastPage = null, int playerSelection = -1)
     {
         // 播放项不能为空
-        var playItem = playItems?.FirstOrDefault();
-        if(playItem == null) return;
+        var firstPlayItem = playItems?.FirstOrDefault();
+        if(firstPlayItem == null) return;
 
         //115Cookie不能为空
         if (string.IsNullOrEmpty(AppSettings._115_Cookie) && xamlRoot != null)
@@ -52,7 +53,7 @@ public class PlayVideoHelper
         {
             //浏览器播放
             case 0:
-                VideoPlayWindow.createNewWindow(FileMatch.getVideoPlayUrl(playItem.PickCode));
+                VideoPlayWindow.createNewWindow(FileMatch.getVideoPlayUrl(firstPlayItem.PickCode));
                 break;
             //PotPlayer播放
             case 1:
@@ -79,8 +80,36 @@ public class PlayVideoHelper
 
         if (sender is not ListView { DataContext: string trueName }) return;
 
-        var mediaPlayItem = new MediaPlayItem(singleVideoInfo.FileBelongPickCode, trueName) { SubInfos = new List<SubInfo>(){ singleVideoInfo } };
+        var mediaPlayItem = new MediaPlayItem(singleVideoInfo.FileBelongPickCode, trueName, FilesInfo.FileType.File) { SubInfos = new List<SubInfo>(){ singleVideoInfo } };
         await PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, lastPage: DetailInfoPage.Current);
+    }
+
+
+    public static async void ShowSelectedVideoToPlayPage(List<Datum> multisetList, string trueName, XamlRoot xamlRoot)
+    {
+        //var multisetList = videoInfoList.ToList();
+        multisetList = multisetList.OrderBy(item => item.n).ToList();
+
+        var newPage = new SelectVideoToPlay(multisetList);
+
+        ContentDialog dialog = new()
+        {
+            XamlRoot = xamlRoot,
+            Content = newPage,
+            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+            Title = "播放",
+            PrimaryButtonText = "播放全部",
+            SecondaryButtonText = "播放选中项",
+            CloseButtonText = "返回",
+            DefaultButton = ContentDialogButton.Primary
+        };
+
+        var result = await dialog.ShowAsync();
+
+        if (result == ContentDialogResult.Primary)
+            newPage.PlayAllVideos();
+        else if (result == ContentDialogResult.Secondary) newPage.PlaySelectedVideos();
+
     }
 
 }

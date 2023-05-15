@@ -8,9 +8,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Windows.ApplicationModel.Background;
 using Windows.Foundation;
 using Display.Data;
 using Display.Models;
+using Display.ContentsPage.DetailInfo;
+using System.Xml.Linq;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -147,8 +150,8 @@ namespace Display.Views
             if (sender is not Button videoPlayButton)
                 return;
 
-            string name = DetailInfo.truename;
-            var videoInfoList = DataAccess.loadFileInfoByTruename(name);
+            string trueName = DetailInfo.truename;
+            var videoInfoList = DataAccess.loadFileInfoByTruename(trueName);
 
             //没有该数据
             if (videoInfoList.Count == 0)
@@ -161,37 +164,27 @@ namespace Display.Views
             //一集
             else if (videoInfoList.Count == 1)
             {
-                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].pc, name);
+                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].pc, trueName, FilesInfo.FileType.File);
                 await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
             }
-
             //有多集
             else
             {
-                var multisetList = videoInfoList.ToList();
-
-                multisetList = multisetList.OrderBy(item => item.n).ToList();
-
-                var newPage = new ContentsPage.DetailInfo.SelectSingleVideoToPlay(multisetList, name);
-                newPage.ContentListView.ItemClick += VideoInfoListView_ItemClick;
-
-                videoPlayButton.Flyout = new Flyout()
-                {
-                    Content = newPage
-                };
+                PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, trueName, this.XamlRoot);
             }
         }
 
-        private async void VideoInfoListView_ItemClick(object sender, ItemClickEventArgs e)
-        {
-            if (e.ClickedItem is not Datum singleVideoInfo) return;
 
-            if (sender is not ListView { DataContext: string trueName }) return;
+        //private async void VideoInfoListView_ItemClick(object sender, ItemClickEventArgs e)
+        //{
+        //    if (e.ClickedItem is not Datum singleVideoInfo) return;
 
-            var mediaPlayItem = new MediaPlayItem(singleVideoInfo.pc, trueName);
+        //    if (sender is not ListView { DataContext: string trueName }) return;
 
-            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot , lastPage: this);
-        }
+        //    var mediaPlayItem = new MediaPlayItem(singleVideoInfo.pc, trueName, FilesInfo.FileType.File);
+
+        //    await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot , lastPage: this);
+        //}
 
 
 
@@ -238,6 +231,8 @@ namespace Display.Views
             }
         }
 
+
+
         private async void CoverTapped(object sender, TappedRoutedEventArgs e)
         {
             if (!(sender is Grid grid))
@@ -262,32 +257,14 @@ namespace Display.Views
             else if (videoInfoList.Count == 1)
             {
 
-                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].pc, name);
+                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].pc, name, FilesInfo.FileType.File);
                 await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
             }
 
             //有多集
             else
             {
-                List<Datum> multisetList = new();
-                foreach (var videoinfo in videoInfoList)
-                {
-                    multisetList.Add(videoinfo);
-                }
-
-                multisetList = multisetList.OrderBy(item => item.n).ToList();
-
-                ContentsPage.DetailInfo.SelectSingleVideoToPlay newPage = new ContentsPage.DetailInfo.SelectSingleVideoToPlay(multisetList, name);
-                newPage.ContentListView.ItemClick += VideoInfoListView_ItemClick;
-
-                ContentDialog dialog = new();
-                dialog.XamlRoot = this.XamlRoot;
-                dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
-                dialog.Title = "播放";
-                dialog.CloseButtonText = "返回";
-                dialog.Content = newPage;
-                dialog.DefaultButton = ContentDialogButton.Close;
-                await dialog.ShowAsync();
+                PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, name, this.XamlRoot);
             }
         }
     }

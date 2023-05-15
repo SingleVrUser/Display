@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -57,7 +58,7 @@ namespace Display.Views
 
             if (string.IsNullOrEmpty(pickCode)) return;
 
-            var mediaPlayItem = new MediaPlayItem(pickCode, title);
+            var mediaPlayItem = new MediaPlayItem(pickCode, title, FilesInfo.FileType.File);
             await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.fail);
         }
 
@@ -100,31 +101,17 @@ namespace Display.Views
             {
                 _storeditem = videoInfo;
 
-                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].pc, videoInfo.truename);
+                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].pc, videoInfo.truename, FilesInfo.FileType.File);
                 await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
                 ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             }
-
             //有多集
             else
             {
                 _storeditem = videoInfo;
 
-                List<Datum> multisetList = new();
-                foreach (var videoinfo in videoInfoList)
-                {
-                    multisetList.Add(videoinfo);
-                }
+                PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, videoInfo.truename, this.XamlRoot);
 
-                multisetList = multisetList.OrderBy(item => item.n).ToList();
-
-                ContentsPage.DetailInfo.SelectSingleVideoToPlay newPage = new(multisetList, videoInfo.truename);
-                newPage.ContentListView.ItemClick += ContentListView_ItemClick; ;
-
-                VideoPlayButton.Flyout = new Flyout()
-                {
-                    Content = newPage
-                };
             }
         }
 
@@ -135,7 +122,7 @@ namespace Display.Views
             if (sender is not ListView { DataContext: string trueName }) return;
 
 
-            var mediaPlayItem = new MediaPlayItem(singleVideoInfo.pc, trueName);
+            var mediaPlayItem = new MediaPlayItem(singleVideoInfo.pc, trueName, FilesInfo.FileType.File);
             await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
         }
 

@@ -9,11 +9,10 @@
       xmlns:behaviors="using:CommunityToolkit.WinUI.UI.Behaviors"
       xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:local="using:Display.ContentsPage.DatumList"
-      xmlns:controls1="using:Display.Controls"
+      xmlns:customizeControls="using:Display.Controls"
       xmlns:data="using:Display.Data"
       xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
       mc:Ignorable="d">
-
     <Page.Resources>
         <Style TargetType="TextBlock"
                x:Key="TitleText">
@@ -44,17 +43,17 @@
 
         <DataTemplate x:Key="FileListTemplate"
                       x:DataType="data:FilesInfo">
-            <Grid DoubleTapped="OpenFolder_Tapped" Background="Transparent">
+            <Grid DoubleTapped="OpenFile_DoubleTapped" Background="Transparent">
 
                 <Grid.ContextFlyout>
                     <MenuFlyout ShouldConstrainToRootBounds="False">
-                        <MenuFlyoutItem Text="在默认应用播放"
+                        <!--<MenuFlyoutItem Text="在默认应用播放"
                                         IsEnabled="{x:Bind datum.iv, Converter={StaticResource IsVideoToBoolConverter}}"
                                         Click="PlayVideoButton_Click">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="&#xEE4A;" />
                             </MenuFlyoutItem.Icon>
-                        </MenuFlyoutItem>
+                        </MenuFlyoutItem>-->
 
                         <MenuFlyoutSubItem Text="在其他应用播放"
                                            IsEnabled="{x:Bind datum.iv, Converter={StaticResource IsVideoToBoolConverter}}">
@@ -217,7 +216,7 @@
 
                                 <MenuFlyoutItem Text="WebView"
                                                 Tag="0"
-                                                Click="PlayWithPlayerButtonClick" />
+                                                Click="PlayWithPlayerButtonClick"/>
 
                                 <MenuFlyoutItem Text="PotPlayer"
                                                 Tag="1"
@@ -283,16 +282,50 @@
                 </CommandBar.SecondaryCommands>
             </CommandBar>
 
-            <controls:MetadataControl Margin="10,5"
+            <!--<controls:MetadataControl
                                       Grid.Column="0"
-                                      x:Name="MetadataControl"
                                       Separator=" > "
                                       HorizontalAlignment="Left"
                                       VerticalAlignment="Bottom">
-                <controls:MetadataControl.Transitions>
-                    <EdgeUIThemeTransition Edge="Bottom"/>
-                </controls:MetadataControl.Transitions>
-            </controls:MetadataControl>
+
+                <controls:MetadataControl.Resources>
+                    <Style TargetType="controls:MetadataControl">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="controls:MetadataControl">
+                                    <TextBlock x:Name="TextContainer"
+                                               AutomationProperties.AccessibilityView="{TemplateBinding AutomationProperties.AccessibilityView}"
+                                               Style="{TemplateBinding TextBlockStyle}" 
+                                               AllowDrop="True"
+                                               DragOver="MetadataTextBlock_OnDragOver"
+                                               Tag="{TemplateBinding }"/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </controls:MetadataControl.Resources>
+            </controls:MetadataControl>-->
+
+            <BreadcrumbBar x:Name="MetadataControl"
+                           Margin="10,5"
+                           Grid.Column="0"
+                           ItemClicked="FolderBreadcrumbBar_ItemClicked">
+                <BreadcrumbBar.Transitions>
+                    <EdgeUIThemeTransition Edge="Bottom" />
+                </BreadcrumbBar.Transitions>
+
+                <BreadcrumbBar.ItemTemplate>
+                    <DataTemplate x:DataType="data:ExplorerItem">
+                        <BreadcrumbBarItem Content="{Binding}">
+                            <BreadcrumbBarItem.ContentTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" AllowDrop="True" DragOver="MetadataItem_OnDragOver" Drop="MetadataItem_OnDrop"/>
+                                </DataTemplate>
+                            </BreadcrumbBarItem.ContentTemplate>
+                        </BreadcrumbBarItem>
+                    </DataTemplate>
+                </BreadcrumbBar.ItemTemplate>
+            </BreadcrumbBar>
 
         </Grid>
 
@@ -351,7 +384,7 @@
               BorderThickness="0,1,0,0"
               BorderBrush="{StaticResource CircleElevationBorderBrush}">
             <!--数量指示-->
-            <controls1:ShowCountControl Margin="2"
+            <customizeControls:ShowCountControl Margin="2"
                                       CurrentCount="{x:Bind filesInfos.Count,Mode=OneWay}"
                                       AllCount="{x:Bind filesInfos.AllCount,Mode=OneWay}"
                                       HorizontalAlignment="Right"
