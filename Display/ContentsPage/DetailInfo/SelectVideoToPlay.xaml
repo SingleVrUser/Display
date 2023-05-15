@@ -1,4 +1,4 @@
-﻿<Page x:Class="Display.ContentsPage.DetailInfo.SelectSingleVideoToPlay"
+﻿<Page x:Class="Display.ContentsPage.DetailInfo.SelectVideoToPlay"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:local="using:Display.ContentsPage.DetailInfo"
@@ -9,7 +9,7 @@
 
     <StackPanel Spacing="5" HorizontalAlignment="Stretch">
         <TextBlock Text="多文件视频，播放选择哪一集？"/>
-        <ListView x:FieldModifier="public" x:Name="ContentListView" SelectionMode="None" DataContext="{x:Bind trueName}" ItemsSource="{x:Bind pickCodeInfoList}" IsItemClickEnabled="True">
+        <ListView x:Name="ContentListView" SelectionMode="Multiple" ItemsSource="{x:Bind pickCodeInfoList}" IsItemClickEnabled="True">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="data:Datum">
                     <TextBlock Text="{x:Bind n}" TextWrapping="Wrap"/>

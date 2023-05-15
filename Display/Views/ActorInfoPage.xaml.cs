@@ -127,7 +127,7 @@ namespace Display.Views
             //播放失败列表（imgUrl就是pc）
             if (videoInfo.series == "fail")
             {
-                var mediaPlayItem = new MediaPlayItem(videoInfo.imageurl, videoInfo.truename);
+                var mediaPlayItem = new MediaPlayItem(videoInfo.imageurl, videoInfo.truename, FilesInfo.FileType.File);
                 await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, playType: PlayType.fail);
                 return;
             }
@@ -146,28 +146,30 @@ namespace Display.Views
             }
             else if (videoInfoList.Count == 1)
             {
-                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].pc, videoInfo.truename);
+                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].pc, videoInfo.truename, FilesInfo.FileType.File);
                 await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
             }
 
             //有多集
             else
             {
-                List<Datum> multisetList = new();
-                foreach (var videoinfo in videoInfoList)
-                {
-                    multisetList.Add(videoinfo);
-                }
+                //List<Datum> multisetList = new();
+                //foreach (var info in videoInfoList)
+                //{
+                //    multisetList.Add(info);
+                //}
 
-                multisetList = multisetList.OrderBy(item => item.n).ToList();
+                //multisetList = multisetList.OrderBy(item => item.n).ToList();
 
-                ContentsPage.DetailInfo.SelectSingleVideoToPlay newPage = new(multisetList, videoInfo.truename);
-                newPage.ContentListView.ItemClick += ContentListView_ItemClick; ;
+                //ContentsPage.DetailInfo.SelectVideoToPlay newPage = new(multisetList, videoInfo.truename);
+                //newPage.ContentListView.ItemClick += ContentListView_ItemClick; ;
 
-                videoPlayButton.Flyout = new Flyout()
-                {
-                    Content = newPage
-                };
+                //videoPlayButton.Flyout = new Flyout()
+                //{
+                //    Content = newPage
+                //};
+
+                PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, videoInfo.truename, this.XamlRoot);
             }
         }
 
@@ -177,7 +179,7 @@ namespace Display.Views
 
             if (sender is not ListView { DataContext: string trueName }) return;
             
-            var mediaPlayItem = new MediaPlayItem(singleVideoInfo.pc, trueName);
+            var mediaPlayItem = new MediaPlayItem(singleVideoInfo.pc, trueName, FilesInfo.FileType.File);
             await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
         }
 
@@ -187,7 +189,7 @@ namespace Display.Views
 
             if (videoPlayButton.DataContext is not Datum datum) return;
 
-            var mediaPlayItem = new MediaPlayItem(datum.pc, datum.n);
+            var mediaPlayItem = new MediaPlayItem(datum.pc, datum.n, FilesInfo.FileType.File);
             await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.fail);
         }
     }

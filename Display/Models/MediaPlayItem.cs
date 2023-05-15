@@ -7,6 +7,7 @@ using Windows.Media.Playback;
 using Display.Data;
 using static Display.Data.WebApi;
 using System.Xml.Linq;
+using System.Security.Cryptography;
 
 namespace Display.Models
 {
@@ -18,7 +19,10 @@ namespace Display.Models
         public string PickCode;
         public string Title;
         public string Description;
+        public string Cid;
         public List<m3u8Info> M3U8Infos;
+
+        public FilesInfo.FileType Type;
 
         private FailInfo _failInfo;
 
@@ -42,7 +46,7 @@ namespace Display.Models
         public bool IsRequestM3U8 = false;
         public bool IsRequestOriginal = false;
 
-        public MediaPlayItem(string pickCode, string fileName)
+        public MediaPlayItem(string pickCode, string fileName, FilesInfo.FileType type, string cid = "")
         {
             PickCode = pickCode;
             FileName = fileName;
@@ -51,18 +55,15 @@ namespace Display.Models
             FileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
             TrueName = FileMatch.MatchName(FileNameWithoutExtension)?.ToUpper();
             Title = FileNameWithoutExtension;
+            Type = type;
+            Cid = cid;
 
+            if (!AppSettings.IsFindSub || string.IsNullOrEmpty(pickCode) || type==FilesInfo.FileType.Folder) return;
 
-            if (AppSettings.IsFindSub && string.IsNullOrEmpty(pickCode))
-            {
-                SubInfos = new();
-                var subDict = DataAccess.FindSubFile(pickCode);
-
-                subDict.ToList().ForEach(item => SubInfos.Add(new SubInfo(item.Key, item.Value, pickCode, TrueName)));
-
-                SubInfos = SubInfos.OrderBy(item => item.Name).ToList();
-
-            }
+            SubInfos = new List<SubInfo>();
+            var subDict = DataAccess.FindSubFile(pickCode);
+            subDict.ToList().ForEach(item => SubInfos.Add(new SubInfo(item.Key, item.Value, pickCode, TrueName)));
+            SubInfos = SubInfos.OrderBy(item => item.Name).ToList();
         }
 
         private static WebApi _webApi;
@@ -190,6 +191,32 @@ namespace Display.Models
             return _subFilePath;
         }
 
+
+        public static async Task<List<MediaPlayItem>> OpenFolderThenInsertVideoFileToMediaPlayItem(List<MediaPlayItem> oldMediaPlayItems ,WebApi webApi)
+        {
+            List<MediaPlayItem> newMediaPlayItems = new();
+
+            foreach (var playItem in oldMediaPlayItems)
+            {
+                if (playItem.Type == FilesInfo.FileType.Folder)
+                {
+                    var fileInfos = await webApi.GetFileAsync(playItem.Cid, LoadAll: true);
+                    newMediaPlayItems.AddRange(
+                        fileInfos.data
+                            .Where(x => !string.IsNullOrEmpty(x.fid) && x.iv == 1)
+                            .Select(x => new MediaPlayItem(x.pc, x.n, FilesInfo.FileType.File)));
+                }
+                else
+                {
+                    newMediaPlayItems.Add(playItem);
+                }
+
+
+            }
+
+
+            return newMediaPlayItems;
+        }
     }
 
     public class Quality

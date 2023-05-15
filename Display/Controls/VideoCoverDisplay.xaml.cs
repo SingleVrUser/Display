@@ -1265,15 +1265,15 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         if (item.DataContext is not Datum datum) return;
 
-        string PickCode = datum.pc;
+        string pickCode = datum.pc;
 
-        var failInfo = await DataAccess.LoadSingleFailInfo(PickCode);
+        var failInfo = await DataAccess.LoadSingleFailInfo(pickCode);
 
         if (failInfo == null)
         {
             DataAccess.AddOrReplaceFailList_islike_looklater(new()
             {
-                pc = PickCode,
+                pc = pickCode,
                 is_like = 1
             });
             ShowTeachingTip("已添加进喜欢");
@@ -1285,7 +1285,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             switch (failInfo.is_like)
             {
                 case 0:
-                    DataAccess.UpdateSingleFailInfo(PickCode, "is_like", "1");
+                    DataAccess.UpdateSingleFailInfo(pickCode, "is_like", "1");
                     ShowTeachingTip("已添加进喜欢");
                     break;
                 default:
@@ -1301,15 +1301,15 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         if (item.DataContext is not Datum datum) return;
 
-        string PickCode = datum.pc;
+        string pickCode = datum.pc;
 
-        var failInfo = await DataAccess.LoadSingleFailInfo(PickCode);
+        var failInfo = await DataAccess.LoadSingleFailInfo(pickCode);
 
         if (failInfo == null)
         {
             DataAccess.AddOrReplaceFailList_islike_looklater(new()
             {
-                pc = PickCode,
+                pc = pickCode,
                 look_later = 1
             });
             ShowTeachingTip("已添加进稍后观看");
@@ -1322,7 +1322,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             switch (failInfo.look_later)
             {
                 case 0:
-                    DataAccess.UpdateSingleFailInfo(PickCode, "look_later", "1");
+                    DataAccess.UpdateSingleFailInfo(pickCode, "look_later", "1");
                     ShowTeachingTip("已添加进稍后观看");
                     break;
                 default:
