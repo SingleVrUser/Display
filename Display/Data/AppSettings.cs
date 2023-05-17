@@ -443,7 +443,6 @@ public class AppSettings
     }
 
 
-
     #endregion
 
 
@@ -1083,22 +1082,11 @@ public class AppSettings
     {
         get
         {
-            var Aria2SavePath = LocalSettings.Values["Aria2SavePath"];
+            var aria2SavePath = LocalSettings.Values["Aria2SavePath"];
 
-            if (Aria2SavePath == null)
-            {
-                return null;
-            }
-            else
-            {
-                return Aria2SavePath.ToString();
-            }
+            return aria2SavePath?.ToString();
         }
-        set
-        {
-            LocalSettings.Values["Aria2SavePath"] = value;
-        }
-
+        set => LocalSettings.Values["Aria2SavePath"] = value;
     }
 
 
@@ -1156,8 +1144,19 @@ public class AppSettings
         }
     }
 
-}
 
+    public static string SavePath115Name
+    {
+        get => LocalSettings.Values["SavePath115Name"]?.ToString();
+        set => LocalSettings.Values["SavePath115Name"] = value;
+    }
+
+    public static string SavePath115Cid
+    {
+        get => LocalSettings.Values["SavePath115Cid"]?.ToString();
+        set => LocalSettings.Values["SavePath115Cid"] = value;
+    }
+}
 
 
 public class DownApiSettings

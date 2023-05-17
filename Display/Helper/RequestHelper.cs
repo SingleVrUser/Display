@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ABI.Microsoft.UI.Xaml;
 using Display.Data;
 
 namespace Display.Helper;
@@ -98,5 +100,19 @@ public class RequestHelper
             tuple = new(requestUrl, strResult);
 
         return tuple;
+    }
+
+    public static string DecodeCfEmail(string data)
+    {
+        string email = string.Empty;
+
+        var r = Convert.ToInt32(data[..2], 16);
+
+        for (int i = 2; i < data.Length; i += 2)
+        {
+            email += (char)(Convert.ToInt32(data.Substring(i, 2), 16) ^ r);
+        }
+
+        return email;
     }
 }

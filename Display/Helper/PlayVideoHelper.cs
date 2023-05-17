@@ -108,7 +108,8 @@ public class PlayVideoHelper
 
         if (result == ContentDialogResult.Primary)
             newPage.PlayAllVideos();
-        else if (result == ContentDialogResult.Secondary) newPage.PlaySelectedVideos();
+        else if (result == ContentDialogResult.Secondary)
+            newPage.PlaySelectedVideos();
 
     }
 

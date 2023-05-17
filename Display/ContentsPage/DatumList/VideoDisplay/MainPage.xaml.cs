@@ -240,7 +240,7 @@ public sealed partial class MainPage : Page
 
         if (FilesInfosCollection == null)
         {
-            FilesInfosCollection = new(filesInfo.Cid);
+            FilesInfosCollection = new IncrementalLoadDatumCollection(filesInfo.Cid);
         }
         else
         {

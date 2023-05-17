@@ -12,7 +12,7 @@
     mc:Ignorable="d">
 
     <Grid RowDefinitions="*,auto,auto" RowSpacing="10">
-        <TextBox x:Name="LinkTextBox" PlaceholderText="支持HTTP、HTTPS、FTP、磁力链和电驴链接，换行可添加多个" AcceptsReturn="True" Width="538" Height="178" SelectionChanged="TextBox_OnSelectionChanged"/>
+        <TextBox x:Name="LinkTextBox" IsSpellCheckEnabled="False" PlaceholderText="支持HTTP、HTTPS、FTP、磁力链和电驴链接，换行可添加多个" AcceptsReturn="True" Width="538" Height="178" SelectionChanged="TextBox_OnSelectionChanged"/>
 
         <RelativePanel Grid.Row="1">
             <TextBlock>

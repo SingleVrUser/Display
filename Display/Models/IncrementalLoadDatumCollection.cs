@@ -33,19 +33,23 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
 
     public int asc { get; private set; }
 
-    public string cid { get; set; }
+    public string Cid { get; set; }
 
-    public IncrementalLoadDatumCollection(string cid)
+    private bool IsOnlyFolder { get; set; }
+
+    public IncrementalLoadDatumCollection(string cid,bool isOnlyFolder = false)
     {
-        this.cid = cid;
+        this.Cid = cid;
         webApi = WebApi.GlobalWebApi;
-
+        IsOnlyFolder = isOnlyFolder;
     }
+
+    public WebPath[] WebPaths;
 
     public async Task<WebFileInfo> GetFilesInfoAsync(int limit, int offset)
     {
         //查询该目录的排列方式
-        var filesShowMethod = await webApi.GetFilesShowInfo(cid);
+        var filesShowMethod = await webApi.GetFilesShowInfo(Cid);
 
         WebApi.OrderBy order;
         Enum.TryParse(filesShowMethod.order, out order);
@@ -53,40 +57,41 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
 
         this.asc = filesShowMethod.is_asc;
 
-        var FilesInfo = await webApi.GetFileAsync(cid, limit, offset, orderBy: orderby, asc: asc);
+        var filesInfo = await webApi.GetFileAsync(Cid, limit, offset, orderBy: orderby, asc: asc,isOnlyFolder:IsOnlyFolder);
+        WebPaths = filesInfo.path;
 
         //汇报事件
         GetFileInfoCompletedEventArgs args = new() { orderby = this.orderby, asc = this.asc, TimeReached = DateTime.Now };
         GetFileInfoCompleted?.Invoke(this, args);
 
-        return FilesInfo;
+        return filesInfo;
     }
 
     public async Task<int> LoadData(int limit = 40, int offset = 0)
     {
-        var FilesInfo = await GetFilesInfoAsync(limit, offset);
-        if (AllCount != FilesInfo.count) AllCount = FilesInfo.count;
+        var filesInfo = await GetFilesInfoAsync(limit, offset);
+        if (AllCount != filesInfo.count) AllCount = filesInfo.count;
 
-        if (FilesInfo.data == null)
+        if (filesInfo.data == null)
         {
             HasMoreItems = false;
             return 0;
         }
 
-        foreach (var datum in FilesInfo.data)
+        foreach (var datum in filesInfo.data)
         {
             Add(new FilesInfo(datum));
         }
 
         HasMoreItems = AllCount > Count;
 
-        return FilesInfo.data.Length;
+        return filesInfo.data.Length;
     }
 
 
     public async Task SetCid(string cid)
     {
-        this.cid = cid;
+        this.Cid = cid;
         Clear();
 
         //当目录为空时，HasMoreItems==True无法激活查询服务，需要手动LoadData
@@ -100,8 +105,8 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
     {
         this.orderby = orderBy;
         this.asc = asc;
-        await webApi.ChangedShowType(cid, orderBy, asc);
-        await SetCid(cid);
+        await webApi.ChangedShowType(Cid, orderBy, asc);
+        await SetCid(Cid);
     }
 
     public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)

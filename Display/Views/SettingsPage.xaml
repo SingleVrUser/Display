@@ -513,13 +513,13 @@
                                         </RelativePanel>
 
                                         <RelativePanel>
-                                            <TextBlock x:Name="JavDbCookieTextBlox"
+                                            <TextBlock x:Name="JavDbCookieTextBlock"
                                                        RelativePanel.AlignVerticalCenterWithPanel="True"
                                                        Margin="0,0,10,0"
                                                        Width="50">Cookie</TextBlock>
                                             <TextBox x:Name="JavDbCookieTextBox"
                                                      Width="600"
-                                                     RelativePanel.RightOf="JavDbCookieTextBlox"
+                                                     RelativePanel.RightOf="JavDbCookieTextBlock"
                                                      Text="{x:Bind data:AppSettings.javdb_Cookie}">
                                                 <ToolTipService.ToolTip>
                                                     <TextBlock>
@@ -527,6 +527,7 @@
                                                     </TextBlock>
                                                 </ToolTipService.ToolTip>
                                             </TextBox>
+
                                             <Button x:Name="JavDbCookieChangeButton"
                                                     Click="JavDBCookieChange_Button_Click"
                                                     Content="修改"
@@ -555,6 +556,26 @@
                                             <ToggleButton Content="x1080x"
                                                           IsChecked="{x:Bind data:AppSettings.IsUseX1080X,Mode=TwoWay}"/>
                                         </StackPanel>
+
+                                        <TextBlock Text="保存路径" Margin="0,5"/>
+                                        <RelativePanel Margin="0,5,0,0">
+                                            <TextBox x:Name="SavePath115CidTextBlock" PlaceholderText="从文件夹中选择。或者输入文件夹的cid，输入后点击保存"
+                                                     Width="200"
+                                                     Text="{x:Bind data:AppSettings.SavePath115Cid}" />
+                                            <TextBlock x:Name="SavePath115NameTextBlock"
+                                                       Text="{x:Bind data:AppSettings.SavePath115Name}"
+                                                       RelativePanel.RightOf="SavePath115CidTextBlock"
+                                                       RelativePanel.AlignVerticalCenterWithPanel="True"
+                                                       Margin="10,0" />
+
+                                            <StackPanel RelativePanel.AlignRightWithPanel="True"
+                                                        Orientation="Horizontal"
+                                                        Spacing="5">
+                                                <Button Content="从目录中选择" Click="Selected115SavePathButtonClick"/>
+                                                <Button Content="保存"
+                                                        Click="Save115SavePathButtonClick" />
+                                            </StackPanel>
+                                        </RelativePanel>
                                     </StackPanel>
                                 </PivotItem>
 
@@ -562,12 +583,13 @@
                                     <StackPanel Spacing="5"
                                                 Padding="50,10">
                                         <RelativePanel>
-                                            <TextBlock x:Name="X1080XUrlTextBox"
+                                            <TextBlock x:Name="X1080XUrlTextBlock"
                                                        RelativePanel.AlignVerticalCenterWithPanel="True"
                                                        Margin="0,0,10,0"
                                                        Width="70">地址</TextBlock>
-                                            <TextBox Width="600"
-                                                     RelativePanel.RightOf="X1080XUrlTextBox"
+                                            <TextBox x:Name="X1080UrlTextBox"
+                                                     Width="600"
+                                                     RelativePanel.RightOf="X1080XUrlTextBlock"
                                                      Text="{x:Bind data:AppSettings.X1080XBaseUrl}" />
                                             <Button Click="X1080XBaseUrlChange"
                                                     Content="修改"
@@ -575,12 +597,15 @@
                                         </RelativePanel>
 
                                         <RelativePanel>
-                                            <TextBlock x:Name="X1080XCookieTextBox"
+                                            <TextBlock x:Name="X1080XCookieTextBlock"
                                                        RelativePanel.AlignVerticalCenterWithPanel="True"
                                                        Margin="0,0,10,0"
-                                                       Width="70">Cookie</TextBlock>
+                                                       Width="70"
+                                                       Text="Cookie"/>
                                             <TextBox Width="600"
-                                                     RelativePanel.RightOf="X1080XCookieTextBox"
+                                                     x:Name="X1080XCookieTextBox"
+                                                     RelativePanel.RightOf="X1080XCookieTextBlock"
+                                                     IsSpellCheckEnabled="False"
                                                      Text="{x:Bind data:AppSettings.X1080XCookie}">
                                                 <ToolTipService.ToolTip>
                                                     <TextBlock>
@@ -594,15 +619,15 @@
                                                     RelativePanel.AlignRightWithPanel="True" />
                                         </RelativePanel>
 
-
                                         <RelativePanel>
-                                            <TextBlock x:Name="X1080XuaTextBox"
+                                            <TextBlock x:Name="X1080XuaTextBlock"
                                                        RelativePanel.AlignVerticalCenterWithPanel="True"
                                                        Margin="0,0,10,0"
                                                        Width="70">UserAgent</TextBlock>
-                                            <TextBox Width="600"
-                                                     RelativePanel.RightOf="X1080XuaTextBox"
-                                                     Text="{x:Bind data:AppSettings.X1080XUa}">
+                                            <TextBox x:Name="X1080XuaTextBox" Width="600"
+                                                     RelativePanel.RightOf="X1080XuaTextBlock"
+                                                     Text="{x:Bind data:AppSettings.X1080XUa}"
+                                                     IsSpellCheckEnabled="False">
                                                 <ToolTipService.ToolTip>
                                                     <TextBlock>
                                                         需要与登录端的UserAgent匹配

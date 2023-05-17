@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Mime;
 using Windows.System;
+using Display.ContentsPage;
 using Display.ContentsPage.SearchLink;
 using WinUIEx;
 using Display.Models;
@@ -374,17 +375,25 @@ namespace Display
                 // 搜索资源
                 //输入框的内容
                 var searchContent = sender.Text;
-                if (!string.IsNullOrEmpty(searchContent))
+                if (string.IsNullOrEmpty(searchContent)) return;
+
+                var contentPage = new SearchLinkPage(searchContent);
+
+                ContentDialog dialog = new()
                 {
-                    ContentDialog dialog = new()
-                    {
-                        XamlRoot = RootGrid.XamlRoot,
-                        Content = new SearchLinkPage(searchContent)
-                    };
+                    XamlRoot = RootGrid.XamlRoot,
+                    PrimaryButtonText = "下载选中",
+                    CloseButtonText = "返回",
+                    Content = contentPage
+                };
 
-                    await dialog.ShowAsync();
+                var result = await dialog.ShowAsync();
+
+                if (result == ContentDialogResult.Primary)
+                {
+                    contentPage.OfflineDownSelectedLink();
+                    
                 }
-
 
                 return;
             }
@@ -576,5 +585,6 @@ namespace Display
         {
             BasePage.ShowTeachingTip(LightDismissTeachingTip, subtitle, content);
         }
+
     }
 }
