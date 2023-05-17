@@ -586,20 +586,17 @@ namespace Display.Data
         /// <param Name="orderBy"></param>
         /// <param Name="asc"></param>
         /// <returns></returns>
-        public async Task<WebFileInfo> GetFileAsync(string cid, int limit = 40, int offset = 0, bool useApi2 = false, bool LoadAll = false, OrderBy orderBy = OrderBy.user_ptime, int asc = 0)
+        public async Task<WebFileInfo> GetFileAsync(string cid, int limit = 40, int offset = 0, bool useApi2 = false, bool LoadAll = false, OrderBy orderBy = OrderBy.user_ptime, int asc = 0,bool isOnlyFolder = false)
         {
             WebFileInfo WebFileInfoResult = new();
 
             string url;
-            if (!useApi2)
-            {
-                url = $"https://webapi.115.com/files?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json";
-            }
-            else
-            {
+            url = !useApi2 ? $"https://webapi.115.com/files?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json" :
                 //旧接口只有t，没有修改时间（te），创建时间（tp）
-                url = $"https://aps.115.com/natsort/files.php?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json&fc_mix=0&type=&star=&is_share=&suffix=&custom_order=";
-            }
+                $"https://aps.115.com/natsort/files.php?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json&fc_mix=0&type=&star=&is_share=&suffix=&custom_order=";
+
+            if (isOnlyFolder)
+                url += "&nf=1";
 
             HttpResponseMessage response;
             try
@@ -673,7 +670,7 @@ namespace Display.Data
             //接口1出错，使用接口2
             if (WebFileInfoResult.errNo == 20130827 && useApi2 == false)
             {
-                WebFileInfoResult = await GetFileAsync(cid, limit, offset, true, LoadAll, orderBy, asc);
+                WebFileInfoResult = await GetFileAsync(cid, limit, offset, true, LoadAll, orderBy, asc,isOnlyFolder: isOnlyFolder);
             }
             //需要加载全部，但未加载全部
             else if (LoadAll && WebFileInfoResult.count > limit)
@@ -723,7 +720,12 @@ namespace Display.Data
         /// <returns></returns>
         public async Task<FolderCategory> GetFolderCategory(string cid)
         {
-            FolderCategory WebFileInfoResult = null;
+            FolderCategory webFileInfoResult = null;
+
+            if (cid == "0")
+            {
+                return new FolderCategory() { file_name = "根目录" };
+            }
 
             var url = $"https://webapi.115.com/category/get?cid={cid}";
             HttpResponseMessage response;
@@ -734,22 +736,26 @@ namespace Display.Data
             catch (AggregateException e)
             {
                 Toast.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
-                return WebFileInfoResult;
+                return null;
             }
             catch (HttpRequestException e)
             {
                 Toast.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
-                return WebFileInfoResult;
+                return null;
             }
 
             if (response.IsSuccessStatusCode)
             {
                 var strResult = await response.Content.ReadAsStringAsync();
 
-                WebFileInfoResult = JsonConvert.DeserializeObject<FolderCategory>(strResult);
+                if (strResult == "[]")
+                {
+                    return null;
+                }
+                webFileInfoResult = JsonConvert.DeserializeObject<FolderCategory>(strResult);
             }
 
-            return WebFileInfoResult;
+            return webFileInfoResult;
         }
 
         /// <summary>

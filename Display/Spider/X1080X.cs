@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using CommunityToolkit.Common.Parsers.Markdown.Inlines;
-using Display.Data;
+﻿using Display.Data;
 using Display.Helper;
 using Display.Models;
 using HtmlAgilityPack;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Runtime.InteropServices.ComTypes;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using Windows.Devices.Lights;
 using static System.Int32;
-using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace Display.Spider
 {
@@ -22,6 +21,8 @@ namespace Display.Spider
         public static bool IsOn => AppSettings.IsUseX1080X;
 
         private static HttpClient _client;
+
+        private static readonly string[] ExpectType = { "4K超清", "高清有碼", "BT綜合區" };
 
         public static HttpClient Client
         {
@@ -48,41 +49,37 @@ namespace Display.Spider
             }
 
             _client.DefaultRequestHeaders.Add(key,value);
-
         }
 
-        public static async Task<List<string>> SearchDownLinkFromCid(string cid)
+        public static async Task<List<Forum1080AttachmentInfo>> GetDownLinkFromUrl(string url)
         {
-            var info = await GetDetailUrlFromCid(cid);
-            if(info == null) return null;
-
-            var detailUrl = $"{BaseUrl}forum.php?mod=viewthread&tid={info.Id}";
-
-            var result = await RequestHelper.RequestHtml(Client, detailUrl);
-            if (result == null) return null;
+            var result = await RequestHelper.RequestHtml(Client, url);
 
             var htmlString = result.Item2;
 
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(htmlString);
 
-            var links = GetDownLinkFromHtml(htmlDoc);
+            var links = GetAttmnInfoFromHtml(htmlDoc);
 
             return links;
         }
 
-        private static List<string> GetDownLinkFromHtml(HtmlDocument htmlDoc)
+        private static List<Forum1080AttachmentInfo> GetAttmnInfoFromHtml(HtmlDocument htmlDoc)
         {
-            HashSet<string> links = new();
+            HashSet<Forum1080AttachmentInfo> links = new();
 
             // 先查找磁力链接
             var codeNodes = htmlDoc.DocumentNode.SelectNodes("div[contains(@id,'code')]");
-            foreach (var node in codeNodes)
+            if (codeNodes != null)
             {
-                var codeContent = node.InnerText;
-                foreach (var line in codeContent.Split('\n'))
+                foreach (var node in codeNodes)
                 {
-                    links.Add(line);
+                    var codeContent = node.InnerText;
+                    foreach (var line in codeContent.Split('\n'))
+                    {
+                        links.Add(new Forum1080AttachmentInfo(line, AttmnType.Magnet));
+                    }
                 }
             }
 
@@ -92,34 +89,146 @@ namespace Display.Spider
             }
 
             //附件
-            var attnmNodes = htmlDoc.DocumentNode.SelectNodes(".//dl[@class='tattl']");
-            if (attnmNodes == null) return links.ToList();
+            var attmnNodes = htmlDoc.DocumentNode.SelectNodes(".//dl[@class='tattl']");
 
-            foreach (var node in attnmNodes)
+            // 出售区附件
+            if (attmnNodes == null)
             {
-                var attnmDd = node.SelectSingleNode("dd");
-
-                var attnmA = attnmDd.SelectSingleNode("p[@class='attnm']/a");
-                
-                var name = attnmA.InnerText.Trim();
-                var downLink = attnmA.GetAttributeValue("href", string.Empty);
-                if (!string.IsNullOrEmpty(downLink))
+                var attmnSpanNode = htmlDoc.DocumentNode.SelectNodes(".//span[contains(@id,'attach_')]");
+                if (attmnSpanNode == null)
                 {
-                    links.Add(downLink);
+                    return links.ToList();
                 }
+
+                foreach (var spanNode in attmnSpanNode)
+                {
+                    var nameNode = spanNode.SelectSingleNode("a");
+
+                    var description = spanNode.SelectSingleNode("em")?.InnerText;
+
+                    if (nameNode != null && description != null)
+                    {
+                        var name = nameNode.InnerText.Trim();
+
+                        if (name.Contains("protected"))
+                        {
+                            var emailNode = nameNode.SelectSingleNode("span");
+                            if (emailNode != null)
+                            {
+                                var data = emailNode.GetAttributeValue("data-cfemail", string.Empty);
+
+                                if (!string.IsNullOrEmpty(data))
+                                {
+                                    name = RequestHelper.DecodeCfEmail(data);
+                                }
+                            }
+                        }
+
+                        var downLink = nameNode.GetAttributeValue("href", string.Empty);
+                        var attmnType = GetAttmnTypeFromName(name);
+                        Forum1080AttachmentInfo attmnInfo = new(downLink, attmnType)
+                        {
+                            Name = name
+                        };
+
+                        var result = Regex.Match(description, "([. \\w]+)  , 下载次数: (\\d+)(.*, 售价: 点数 (\\d+))?");
+                        if (result.Success)
+                        {
+                            attmnInfo.Size = result.Groups[1].Value;
+
+                            if (TryParse(result.Groups[2].Value, out int count))
+                            {
+                                attmnInfo.DownCount = count;
+                            }
+
+                            if (TryParse(result.Groups[4].Value, out int countResult))
+                            {
+                                attmnInfo.Expense = countResult;
+                            }
+                        }
+
+
+                        links.Add(attmnInfo);
+                    }
+
+                }
+
+                return links.ToList();
+            }
+            
+            // 普通附件
+            foreach (var node in attmnNodes)
+            {
+                var attmnDd = node.SelectSingleNode("dd");
+
+                var attmnA = attmnDd.SelectSingleNode("p[@class='attnm']/a");
+                
+                var downLink = attmnA.GetAttributeValue("href", string.Empty);
+                if (string.IsNullOrEmpty(downLink)) continue;
+
+                downLink = downLink.Replace("&amp;", "&");
+                var name = attmnA.InnerText.Trim();
+
+                var attmnType = GetAttmnTypeFromName(name);
+
+                Forum1080AttachmentInfo attmnInfo = new(downLink, attmnType)
+                {
+                    Name = name
+                };
+
+                var attmnPStr = attmnDd.SelectNodes("p").FirstOrDefault(x => x.InnerText.Contains("下载次数"));
+                if (attmnPStr != null)
+                {
+                    var result = Regex.Match(attmnPStr.InnerText, "([. \\w]+)  , 下载次数: (\\d+)(.*, 售價: 點數 (\\d+))?");
+                    if (result.Success)
+                    {
+                        attmnInfo.Size = result.Groups[1].Value;
+
+                        if (TryParse(result.Groups[2].Value, out int count))
+                        {
+                            attmnInfo.DownCount = count;
+                        }
+
+                        attmnInfo.Expense = 1;
+                    }
+                }
+
+                links.Add(attmnInfo);
+
             }
 
             return links.ToList();
         }
 
+        private static AttmnType GetAttmnTypeFromName(string name)
+        {
+            AttmnType attmnType;
+            if (name.Contains(".rar"))
+            {
+                attmnType = AttmnType.Rar;
+            }
+            else if (name.Contains(".txt"))
+            {
+                attmnType = AttmnType.Txt;
+            }
+            else if (name.Contains(".torrent"))
+            {
+                attmnType = AttmnType.Torrent;
+            }
+            else
+            {
+                attmnType = AttmnType.Unknown;
+            }
 
-        private static readonly string[] ExpectType = { "4K超清", "高清有碼", "BT綜合區" };
+            return attmnType;
+        }
 
-        public static async Task<Forum1080> GetDetailUrlFromCid(string cid)
+
+        public static async Task<List<Forum1080SearchResult>> GetMatchInfosFromCid(string cid)
         {
             var searchUrl = $"{BaseUrl}search.php?searchsubmit=yes";
 
-            var txt = cid.Replace('-', '+');
+            var txt = cid.Replace('-', '+').Replace(' ', '+');
 
             var postValues = new Dictionary<string, string>
             {
@@ -140,23 +249,11 @@ namespace Display.Spider
             htmlDoc.LoadHtml(htmlString);
 
             var detailInfos = GetDetailInfoFromSearchResult(cid, htmlDoc);
-
-            if (detailInfos == null || detailInfos.Count == 0) return null;
-
-            if (detailInfos.Count == 1)
-            {
-                return detailInfos.FirstOrDefault();
-            }
-
-            foreach (var expect in ExpectType.Select(type => detailInfos.FirstOrDefault(x => x.Type == type)).Where(expect => expect != null))
-            {
-                return expect;
-            }
-
-            return detailInfos.FirstOrDefault();
+            
+            return detailInfos;
         }
 
-        private static List<Forum1080> GetDetailInfoFromSearchResult(string cid,HtmlDocument htmlDoc)
+        private static List<Forum1080SearchResult> GetDetailInfoFromSearchResult(string cid,HtmlDocument htmlDoc)
         {
             var searchResultNodes = htmlDoc.DocumentNode.SelectNodes("//li[@class='pbw']");
 
@@ -167,11 +264,9 @@ namespace Display.Spider
 
                 if (!tipNode.InnerText.Contains("提示信息")) return null;
 
-                string content;
-
                 var messageNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@id='messagetext']");
 
-                content = messageNode != null ? messageNode.InnerText.Trim() : tipNode.InnerText;
+                var content = messageNode != null ? messageNode.InnerText.Trim() : tipNode.InnerText;
 
                 Toast.tryToast("x1080x出错", content);
 
@@ -179,51 +274,32 @@ namespace Display.Spider
             }
 
             //分割通过正则匹配得到的CID
-            var splitResult = Common.SpliteCID(cid);
+            var splitResult = Common.SpliteCID(cid.ToUpper());
             if (splitResult == null) return null;
 
-            var leftCid = splitResult.Item1;
+            var leftCid = splitResult.Item1 ;
             var rightCid = splitResult.Item2;
 
-            List<Forum1080> detailUrlInfos = new();
+            List<Forum1080SearchResult> detailUrlInfos = new();
 
             for (var i = 0; i < searchResultNodes.Count; i++)
             {
-                var searchLeftCid = string.Empty;
-                var searchRightCid = string.Empty;
+                string searchLeftCid;
+                string searchRightCid;
 
                 var pbwNode = searchResultNodes[i];
                 var titleNode = pbwNode.SelectSingleNode(".//h3[@class='xs3']/a");
                 var title = titleNode.InnerText;
                 var upperText = title.ToUpper();
 
-                var split_result = upperText.Split(new char[] { '-', '_' });
-                if (split_result.Length == 1)
+                var matchResult = Regex.Match(upperText, @$"({leftCid})-?0?(\d+)");
+                if (matchResult.Success)
                 {
-                    var match_result = Regex.Match(upperText, @"([A-Z]+)(\d+)");
-                    if (match_result.Success)
-                    {
-                        searchLeftCid = match_result.Groups[1].Value;
-                        searchRightCid = match_result.Groups[2].Value;
-                    }
-                }
-                else if (split_result.Length == 2)
-                {
-                    searchLeftCid = split_result[0];
-                    searchRightCid = split_result[1];
-                }
-                else if (split_result.Length == 3)
-                {
-                    if (upperText.Contains("HEYDOUGA"))
-                    {
-                        searchLeftCid = split_result[1];
-                        searchRightCid = split_result[2];
-                    }
-                    else
-                        return null;
+                    searchLeftCid = matchResult.Groups[1].Value;
+                    searchRightCid = matchResult.Groups[2].Value;
                 }
                 else
-                    return null;
+                    continue;
 
                 if (searchLeftCid != leftCid
                     || (searchRightCid != rightCid
@@ -234,30 +310,37 @@ namespace Display.Spider
                 var detailUrl = titleNode.GetAttributeValue("href",null);
                 if(detailUrl == null) continue;
 
-                detailUrlInfos.Add(GetForum1080FromNode(pbwNode, title));
-                break;
+                detailUrl = detailUrl.Replace("&amp;", "&");
+
+                detailUrlInfos.Add(GetForum1080FromNode(pbwNode, title,detailUrl));
             }
 
             return detailUrlInfos;
         }
 
-        private static Forum1080 GetForum1080FromNode(HtmlNode node,string title)
+        private static Forum1080SearchResult GetForum1080FromNode(HtmlNode node,string title,string detailUrl)
         {
-            Forum1080 forum1080 = new()
+            Forum1080SearchResult forum1080SearchResult = new()
             {
-                Title = title
+                Title = title,
+                Url = detailUrl
             };
-
+            
             var ps = node.SelectNodes("p");
 
-            if (ps.Count != 3) return forum1080;
+            if (ps.Count != 3) return forum1080SearchResult;
 
-            forum1080.Description = ps[0].InnerText;
-            forum1080.Time = ps[1].InnerText;
-            forum1080.Author = ps[2].InnerText;
-            forum1080.Type = ps[3].InnerText;
+            forum1080SearchResult.Description = ps[1].InnerText;
 
-            return forum1080;
+            var span = ps[2].SelectNodes("span");
+
+            if(span.Count != 3)return forum1080SearchResult;
+
+            forum1080SearchResult.Time = span[0].InnerText;
+            forum1080SearchResult.Author = span[1].InnerText;
+            forum1080SearchResult.Type = span[2].InnerText;
+
+            return forum1080SearchResult;
         }
     }
 

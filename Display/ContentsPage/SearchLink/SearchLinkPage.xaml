@@ -5,14 +5,40 @@
     x:Class="Display.ContentsPage.SearchLink.SearchLinkPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Display.ContentsPage.SearchLink"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="using:Display.Models"
     mc:Ignorable="d">
 
-    <Grid RowDefinitions="auto,*">
-        <ProgressBar/>
+    <Grid RowDefinitions="auto,auto,*">
+        <ProgressBar x:Name="MyProgressBar" IsIndeterminate="True"/>
 
-        <TextBlock Grid.Row="1" Text="测试"/>
+        <TextBlock Grid.Row="1" Text="搜索结果"/>
+
+        <ListView x:Name="LinksListView" Grid.Row="2" SelectionMode="Single" CharacterSpacing="12">
+
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="model:Forum1080SearchResult">
+                    <Grid RowDefinitions="*,auto" Row="5" Padding="10">
+                        <!--标题-->
+                        <TextBlock Text="{x:Bind Title}"
+                                   TextWrapping="Wrap"
+                                   FontWeight="Bold"/>
+
+                        <!--<TextBlock Grid.Row="1" Text="{x:Bind Description}" TextWrapping="Wrap"/>-->
+
+                        <Grid Grid.Row="1" ColumnDefinitions="*,auto" ColumnSpacing="5">
+                            <TextBlock Text="{x:Bind Time}"/>
+
+                            <TextBlock Grid.Column="1" Text="{x:Bind Type}"/>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <TextBlock x:Name="WithoutResultTextBlock"
+                   Grid.Row="2"
+                   HorizontalAlignment="Center" Text="无结果" FontWeight="Bold" Visibility="Collapsed"/>
     </Grid>
 </Page>

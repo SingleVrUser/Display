@@ -22,8 +22,6 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Display.Data;
 using Display.Views;
-using System.IO;
-using System.Security.Cryptography;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -257,9 +255,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             }
         }
     }
-
-
-
+    
     private void Source_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
     {
         RecyStationGrid.Visibility = Visibility.Visible;
@@ -479,7 +475,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             // 文件从中转站中拖拽过来，允许拖拽文件到此处
             if (!filesInfos.Contains(sourceFilesInfos.FirstOrDefault()))
             {
-                await Move115Files(filesInfos.cid, sourceFilesInfos);
+                await Move115Files(filesInfos.Cid, sourceFilesInfos);
 
                 sourceFilesInfos.ForEach(item => filesInfos.Add(item));
 

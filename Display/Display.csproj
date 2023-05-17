@@ -78,6 +78,7 @@
     <None Remove="ContentsPage\LoginPage.xaml" />
     <None Remove="ContentsPage\OfflineDown\FailListPage.xaml" />
     <None Remove="ContentsPage\SearchLink\SearchLinkPage.xaml" />
+    <None Remove="ContentsPage\SelectedFolderPage.xaml" />
     <None Remove="ContentsPage\SelectSingleSubFileToSelected.xaml" />
     <None Remove="ContentsPage\SelectSingleVideoToPlay.xaml" />
     <None Remove="ContentsPage\Sort115\MainPage.xaml" />
@@ -314,6 +315,9 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="ContentsPage\SelectedFolderPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="ContentsPage\SearchLink\SearchLinkPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

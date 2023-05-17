@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using Windows.Storage;
+using Display.ContentsPage;
 using Display.Data;
 using Display.Helper;
 using WinRT.Interop;
@@ -86,7 +87,6 @@ namespace Display
             notificationManager.Init();
 
             AppMainWindow.Activate();
-
         }
 
 

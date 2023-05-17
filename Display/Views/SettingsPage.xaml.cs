@@ -1,4 +1,5 @@
-﻿using Display.Data;
+﻿using Display.ContentsPage;
+using Display.Data;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -11,6 +12,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Runtime;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -1005,7 +1008,7 @@ namespace Display.Views
 
         private void X1080XBaseUrlChange(object sender, RoutedEventArgs e)
         {
-            AppSettings.X1080XBaseUrl = X1080XUrlTextBox.Text;
+            AppSettings.X1080XBaseUrl = X1080UrlTextBox.Text;
 
             ShowTeachingTip("修改完成");
         }
@@ -1028,6 +1031,57 @@ namespace Display.Views
             Spider.X1080X.TryChangedClientHeader("user-agent", AppSettings.X1080XCookie);
 
             ShowTeachingTip("修改完成");
+        }
+
+        private async void Selected115SavePathButtonClick(object sender, RoutedEventArgs e)
+        {
+            var contentPage = new SelectedFolderPage();
+            ContentDialog dialog = new()
+            {
+                XamlRoot = this.XamlRoot,
+                Content = contentPage,
+                CloseButtonText = "返回",
+                PrimaryButtonText = "保存到该目录",
+                DefaultButton = ContentDialogButton.Primary,
+                Resources =
+                {
+                    // 使用更大的 MaxWidth
+                    ["ContentDialogMaxWidth"] = 700
+                }
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result != ContentDialogResult.Primary) return;
+            var explorerItem = contentPage.GetCurrentFolder();
+            Debug.WriteLine($"当前选中：{explorerItem.Name}({explorerItem.Cid})");
+
+            AppSettings.SavePath115Name = explorerItem.Name;
+            AppSettings.SavePath115Cid = explorerItem.Cid;
+
+            SavePath115NameTextBlock.Text = explorerItem.Name;
+            SavePath115CidTextBlock.Text = explorerItem.Cid;
+
+            ShowTeachingTip("设置成功");
+        }
+
+        private async void Save115SavePathButtonClick(object sender, RoutedEventArgs e)
+        {
+            var cid = SavePath115CidTextBlock.Text;
+            var cidInfo = await _webapi.GetFolderCategory(cid);
+
+            if (cidInfo != null)
+            {
+                SavePath115NameTextBlock.Text = cidInfo.file_name;
+                AppSettings.SavePath115Name = cidInfo.file_name;
+                AppSettings.SavePath115Cid = cid;
+
+                ShowTeachingTip("保存成功");
+            }
+            else
+            {
+                ShowTeachingTip("保存失败");
+            }
         }
     }
 }

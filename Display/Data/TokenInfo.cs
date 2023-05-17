@@ -182,7 +182,7 @@ namespace Display.Data
     {
         public string name { get; set; }
         public object aid { get; set; }
-        public object cid { get; set; }
+        public string cid { get; set; }
         public object pid { get; set; }
         public object isp { get; set; }
         public string p_cid { get; set; }
