@@ -78,7 +78,7 @@
             <customcontrols:CustomAutoSuggestBox x:Name="CustomAutoSuggestBox" Grid.Column="2"
                                                  SuggestionChosen="SuggestionChosen"
                                                  QuerySubmitted="CustomAutoSuggestBox_QuerySubmitted"/>
-
+            <Button Grid.Column="2" Content="测试" Click="ButtonBase_OnClick" HorizontalAlignment="Center"/>
         </Grid>
 
         <NavigationView x:Name="NavView"

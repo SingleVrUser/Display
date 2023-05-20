@@ -604,5 +604,35 @@ namespace Display
             BasePage.ShowTeachingTip(LightDismissTeachingTip, subtitle, content);
         }
 
+        private async void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            TextBox textBox = new();
+            ContentDialog dialog = new()
+            {
+                XamlRoot = this.RootGrid.XamlRoot,
+                PrimaryButtonText = "上传",
+                CloseButtonText = "返回",
+                Title = "输入需要上传的文件路径",
+                Content = textBox,
+                DefaultButton = ContentDialogButton.Primary
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                var filePath = textBox.Text;
+
+                if (!File.Exists(filePath)) return;
+
+                var upload115 = Upload115.SingleUpload115;
+
+                var uploadInfo = await WebApi.GlobalWebApi.GetUploadInfo();
+
+                if(uploadInfo == null) return;
+
+                await upload115.UploadTo115(filePath, "0", uploadInfo.user_id.ToString(), uploadInfo.userkey);
+            }
+        }
     }
 }

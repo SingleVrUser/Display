@@ -17,7 +17,7 @@ namespace Display.Data
         private static HttpClient _client;
         public static HttpClient Client
         {
-            get { return _client ??= CreateClient(new Dictionary<string, string> { { "user-agent", DesktopUserAgent } }); }
+            get { return _client ??= CreateClient(new Dictionary<string, string> { { "user-agent", UserAgent } }); }
             set => _client = value;
         }
 
@@ -30,7 +30,7 @@ namespace Display.Data
                 {
                     _clientWithJavDBCookie = CreateClient(new Dictionary<string, string>() {
                         {"cookie",AppSettings.javdb_Cookie },
-                        {"user-agent" ,BrowserUserAgent}
+                        {"user-agent" ,UserAgent}
                     });
                 }
 
@@ -40,9 +40,7 @@ namespace Display.Data
             set => _clientWithJavDBCookie = value;
         }
 
-        public static string BrowserUserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36 115Browser/8.3.0";
-        public static string DesktopUserAgent = "Mozilla/5.0; Windows NT/10.0.19044; 115Desktop/2.0.1.7";
-
+        public static string UserAgent = Const.DownUserAgent;
 
         public GetInfoFromNetwork()
         {

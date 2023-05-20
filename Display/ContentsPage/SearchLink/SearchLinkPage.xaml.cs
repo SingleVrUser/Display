@@ -134,9 +134,8 @@ namespace Display.ContentsPage.SearchLink
         {
             var webApi = WebApi.GlobalWebApi;
 
-            if (!await webApi.GetUploadInfo()) return false;
-            
-            var uploadInfo = WebApi.UploadInfo;
+            var uploadInfo = await webApi.GetUploadInfo();
+            if (uploadInfo == null) return false;
 
             var offlineSpaceInfo = await webApi.GetOfflineSpaceInfo(uploadInfo.userkey, uploadInfo.user_id);
 

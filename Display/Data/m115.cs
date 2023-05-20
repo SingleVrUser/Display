@@ -32,10 +32,13 @@ namespace Display.Data
 
         public static (byte[], byte[]) encode(string src, long tm)
         {
-            var hashDlg = MD5.Create();
-            var btext = Encoding.ASCII.GetBytes($"!@###@#{tm}DFDR@#@#");
-            byte[] hashBytes = hashDlg.ComputeHash(btext);
-            var key = Convert.ToHexString(hashBytes);
+            //var hashDlg = MD5.Create();
+            //var btext = Encoding.ASCII.GetBytes();
+            //byte[] hashBytes = hashDlg.ComputeHash(btext);
+            //var key = Convert.ToHexString(hashBytes);
+
+            var key = HashHelper.ComputeMd5ByContent($"!@###@#{tm}DFDR@#@#");
+
             var keyBytes = Encoding.ASCII.GetBytes(key);
 
             var tmp = Encoding.ASCII.GetBytes(src);
