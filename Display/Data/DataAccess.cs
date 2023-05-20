@@ -15,10 +15,7 @@ namespace Display.Data
     public static class DataAccess
     {
         private const string DBNAME = "115_uwp.db";
-        public static string dbpath
-        {
-            get { return NewDBPath(AppSettings.DataAccessSavePath); }
-        }
+        public static string dbpath => NewDBPath(AppSettings.DataAccessSavePath);
 
         /// <summary>
         /// 数据库表初始化

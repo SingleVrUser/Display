@@ -382,8 +382,10 @@ namespace Display
                 ContentDialog dialog = new()
                 {
                     XamlRoot = RootGrid.XamlRoot,
+                    Title = "搜索结果",
                     PrimaryButtonText = "下载选中",
                     CloseButtonText = "返回",
+                    DefaultButton = ContentDialogButton.Primary,
                     Content = contentPage
                 };
 
@@ -391,8 +393,17 @@ namespace Display
 
                 if (result == ContentDialogResult.Primary)
                 {
-                    contentPage.OfflineDownSelectedLink();
-                    
+                    if (string.IsNullOrEmpty(AppSettings.SavePath115Cid) ||
+                        string.IsNullOrEmpty(AppSettings.SavePath115Name))
+                    {
+                        ShowTeachingTip("未设置保存路径");
+                    }
+                    else
+                    {
+                        var isDownSuccess = await contentPage.OfflineDownSelectedLink();
+
+                        ShowTeachingTip(isDownSuccess ? "已下载到网盘中" : "下载失败");
+                    }
                 }
 
                 return;
@@ -543,22 +554,29 @@ namespace Display
         private async void DownPage_RequestCompleted(object sender, ContentsPage.OfflineDown.RequestCompletedEventArgs e)
         {
             // 查看是否有失败项
-
             var info = e?.Info;
-            if (info == null || string.IsNullOrEmpty(info.error_msg)) return;
+            if (info is not { state: true })
+            {
+                ShowTeachingTip("出现未知错误");
+                return;
+            }
 
             //单链接或多链接
             var failList = !string.IsNullOrEmpty(info.url) ? new List<AddTaskUrlInfo> { info } : info.result?.Where(x => !string.IsNullOrEmpty(x.error_msg)).ToList();
 
-            if (failList == null || failList.Count ==0) return;
+            if (failList == null || failList.Count == 0)
+            {
+                ShowTeachingTip("添加任务成功");
+                return;
+            }
 
             var failPage = new ContentsPage.OfflineDown.FailListPage(failList);
             var contentDialog = new ContentDialog
             {
-                XamlRoot = this.RootGrid.XamlRoot,
+                XamlRoot = RootGrid.XamlRoot,
                 Title = "下载任务失败列表",
                 PrimaryButtonText = "重试",
-                CloseButtonText = "取消",
+                CloseButtonText = "返回",
                 DefaultButton = ContentDialogButton.Close,
                 Content = failPage,
                 Resources =

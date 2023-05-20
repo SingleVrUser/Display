@@ -108,14 +108,14 @@ namespace Display.Models
             return m3U8Infos[index].Url;
         }
 
-        public string GetOriginalUrl()
+        public async Task<string> GetOriginalUrl()
         {
             if (IsRequestOriginal)
             {
                 return OriginalUrl;
             }
 
-            var downUrlList = _webApi.GetDownUrl(PickCode, GetInfoFromNetwork.BrowserUserAgent);
+            var downUrlList = await _webApi.GetDownUrl(PickCode, GetInfoFromNetwork.BrowserUserAgent);
             IsRequestOriginal = true;
 
             OriginalUrl = downUrlList.FirstOrDefault().Value;
@@ -154,7 +154,7 @@ namespace Display.Models
 
             if (string.IsNullOrEmpty(quality.Url) && quality.IsOriginal)
             {
-                quality.Url = GetOriginalUrl();
+                quality.Url = await GetOriginalUrl();
             }
 
             return quality.Url;
@@ -167,12 +167,12 @@ namespace Display.Models
                 case AppSettings.PlayQuality.M3U8:
                 {
                     var m3U8Infos = await GetM3U8Urls();
-                    if (m3U8Infos == null || m3U8Infos.Count == 0) return GetOriginalUrl();
+                    if (m3U8Infos == null || m3U8Infos.Count == 0) return await GetOriginalUrl();
 
                     return m3U8Infos.FirstOrDefault()?.Url;
                 }
                 case AppSettings.PlayQuality.Origin:
-                    return GetOriginalUrl();
+                    return await GetOriginalUrl();
                 default:
                     return null;
             }

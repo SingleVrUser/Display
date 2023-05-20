@@ -61,7 +61,7 @@ namespace Display
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
             //运行前检查
-            var isNormal = checkErrorBeforeActivateMainWindow();
+            var isNormal = CheckErrorBeforeActivateMainWindow();
             if (!isNormal) return;
 
             //初始化数据库
@@ -90,17 +90,17 @@ namespace Display
         }
 
 
-        private bool checkErrorBeforeActivateMainWindow()
+        private static bool CheckErrorBeforeActivateMainWindow()
         {
             bool isNormal = true;
 
-            var DataAccess_SavePath = ApplicationData.Current.LocalSettings.Values["DataAccess_SavePath"] as string;
+            var dataAccessSavePath = ApplicationData.Current.LocalSettings.Values["DataAccess_SavePath"] as string;
 
             //首次启动
-            if (string.IsNullOrEmpty(DataAccess_SavePath)) return true;
+            if (string.IsNullOrEmpty(dataAccessSavePath)) return true;
 
             //数据存放目录不存在
-            if (!Directory.Exists(DataAccess_SavePath))
+            if (!Directory.Exists(dataAccessSavePath))
             {
                 CommonWindow window1 = new();
                 window1.Content = new TextBlock() { Text = $"数据文件存放目录不存在，请检查：{AppSettings.DataAccessSavePath}", IsTextSelectionEnabled = true, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
@@ -112,7 +112,7 @@ namespace Display
             //数据文件不存在
             else if (!File.Exists(DataAccess.dbpath))
             {
-                DataAccess.tryCreateDBFile(DataAccess_SavePath);
+                DataAccess.tryCreateDBFile(dataAccessSavePath);
 
                 //CommonWindow window1 = new();
                 //window1.Content = new TextBlock() { Text = $"数据文件不存在，请检查：{DataAccess.dbpath}", IsTextSelectionEnabled = true, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };

@@ -14,39 +14,48 @@ public class Common
 {
     public static readonly HttpClient Client = GetInfoFromNetwork.Client;
 
-    public static Tuple<string, string> SpliteCID(string CID)
+    public static Tuple<string, string> SplitCid(string CID)
     {
-        string left_cid;
-        string right_cid;
+        string leftCid;
+        string rightCid;
 
-        var split_result = CID.Split(new char[] { '-', '_' });
-        if (split_result.Length == 1)
+        if(CID.Contains("H_"))
         {
-            var match_result = Regex.Match(CID, @"([A-Z]+)(\d+)");
-            if (match_result == null) return null;
+            var matchResult = Regex.Match(CID, @"H_\d+([A-Z]+)(\d+)");
 
-            left_cid = match_result.Groups[1].Value;
-            right_cid = match_result.Groups[2].Value;
+            leftCid = matchResult.Groups[1].Value;
+            rightCid = matchResult.Groups[2].Value;
         }
-        else if (split_result.Length == 2)
+        else
         {
-            left_cid = split_result[0];
-            right_cid = split_result[1];
-        }
-        else if (split_result.Length == 3)
-        {
-            if (CID.Contains("HEYDOUGA"))
+            var splitResult = CID.Split('-', '_');
+            if (splitResult.Length == 1)
             {
-                left_cid = split_result[1];
-                right_cid = split_result[2];
+                var matchResult = Regex.Match(CID, @"([A-Z]+)(\d+)");
+
+                leftCid = matchResult.Groups[1].Value;
+                rightCid = matchResult.Groups[2].Value;
+            }
+            else if (splitResult.Length == 2)
+            {
+                leftCid = splitResult[0];
+                rightCid = splitResult[1];
+            }
+            else if (splitResult.Length == 3)
+            {
+                if (CID.Contains("HEYDOUGA"))
+                {
+                    leftCid = splitResult[1];
+                    rightCid = splitResult[2];
+                }
+                else
+                    return null;
             }
             else
                 return null;
         }
-        else
-            return null;
 
-        return new Tuple<string, string>(left_cid, right_cid);
+        return new Tuple<string, string>(leftCid, rightCid);
     }
 
     public static async Task<VideoInfo> AnalysisHtmlDocInfoFromAvSoxOrAvMoo(string CID, string detail_url, HtmlDocument htmlDoc)

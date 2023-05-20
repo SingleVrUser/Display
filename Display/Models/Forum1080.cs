@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using WinRT.Interop;
 
@@ -48,7 +49,7 @@ namespace Display.Models
 
         public AttmnType Type { get; set; }
 
-        public int Expense { get; set; }
+        public int Expense { get; set; } = 0;
 
         public int DownCount { get; set; }
 
@@ -59,6 +60,45 @@ namespace Display.Models
         }
 
     }
+    
+    public class AttmnFileInfo
+    {
+        private string _name;
+        public string Name
+        {
+            get
+            {
+                if (_name != null)
+                    return _name;
+
+                return Path != null ? System.IO.Path.GetFileNameWithoutExtension(Path) : null;
+            }
+            set
+            {
+                if (_name != null && _name == value)
+                    return;
+                _name = value;
+            }
+        }
+
+        public string Path { get; set; }
+        public string QrCodeImagePath { get; set; }
+        public string DetailFileContent { get; set; }
+        public BaiduShareInfo BaiduShareInfo { get; set; }
+
+        public Dictionary<string, List<string>> Links { get; set; } = new();
+
+        public string CompressedPassword { get; set; }
+    }
+
+    public class BaiduShareInfo
+    {
+        public string ShareLink { get; set; }
+        public string SharePassword { get; set; }
+        public string ShareLinkWithPwd => $"{ShareLink}?pwd={SharePassword}";
+    }
+
+
     public enum AttmnType
     {
         Magnet, Torrent, Rar, Txt, Unknown
