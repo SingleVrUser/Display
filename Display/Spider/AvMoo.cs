@@ -79,7 +79,7 @@ public class AvMoo
         if (SearchResultNodes == null) return null;
 
         //分割通过正则匹配得到的CID
-        var spliteResult = Common.SpliteCID(CID);
+        var spliteResult = Common.SplitCid(CID);
         if (spliteResult == null) return null;
 
         string left_cid = spliteResult.Item1;

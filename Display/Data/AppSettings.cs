@@ -583,6 +583,20 @@ public class AppSettings
         }
     }
 
+    public static string X1080XAttmnSavePath
+    {
+        get
+        {
+            string savePath = LocalSettings.Values["X1080XAttmnSavePath"] as string;
+            if (string.IsNullOrEmpty(savePath))
+            {
+                savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "Attmn");
+                FileMatch.CreateDirectoryIfNotExists(savePath);
+            }
+            return savePath;
+        }
+    }
+
     /// <summary>
     /// 演员头像仓库文件保存地址
     /// </summary>
@@ -591,10 +605,7 @@ public class AppSettings
         get
         {
             string savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "Data");
-            if (!Directory.Exists(savePath))
-            {
-                FileMatch.CreateDirectoryIfNotExists(savePath);
-            }
+            FileMatch.CreateDirectoryIfNotExists(savePath);
             string filePath = Path.Combine(savePath, "Filetree.json");
 
             return filePath;

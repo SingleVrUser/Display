@@ -10,12 +10,10 @@
     xmlns:model="using:Display.Models"
     mc:Ignorable="d">
 
-    <Grid RowDefinitions="auto,auto,*">
+    <Grid RowDefinitions="auto,*">
         <ProgressBar x:Name="MyProgressBar" IsIndeterminate="True"/>
 
-        <TextBlock Grid.Row="1" Text="搜索结果"/>
-
-        <ListView x:Name="LinksListView" Grid.Row="2" SelectionMode="Single" CharacterSpacing="12">
+        <ListView x:Name="LinksListView" Grid.Row="1" SelectionMode="Single" CharacterSpacing="12">
 
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="model:Forum1080SearchResult">

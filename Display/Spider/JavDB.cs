@@ -104,7 +104,7 @@ public class JavDB
         if (searchResultNodes == null) return null;
 
         //分割通过正则匹配得到的CID
-        var splitResult = Common.SpliteCID(CID);
+        var splitResult = Common.SplitCid(CID);
         if (splitResult == null) return null;
 
         var leftCid = splitResult.Item1;

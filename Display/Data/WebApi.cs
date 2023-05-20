@@ -1,29 +1,30 @@
-﻿using HtmlAgilityPack;
+﻿using Display.Helper;
+using Display.Models;
+using Display.Views;
+using Display.WindowView;
+using HtmlAgilityPack;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Windows.Storage;
-using Display.Helper;
-using System.ComponentModel;
-using System.Net.Http.Json;
-using Display.Models;
-using Display.Views;
-using Display.WindowView;
-using Display.Controls;
+using HttpMethod = System.Net.Http.HttpMethod;
+using HttpRequestMessage = System.Net.Http.HttpRequestMessage;
 
 namespace Display.Data
 {
@@ -1225,7 +1226,7 @@ namespace Display.Data
                 else
                 {
                     //一般只有一个
-                    var downUrlList = GetDownUrl(datum.pc, ua);
+                    var downUrlList = await GetDownUrl(datum.pc, ua);
                     if (downUrlList.Count == 0)
                     {
                         success = false;
@@ -1312,7 +1313,7 @@ namespace Display.Data
         {
             bool success = false;
 
-            var urlList = GetDownUrl(datum.pc, ua);
+            var urlList = await GetDownUrl(datum.pc, ua);
 
             if (urlList.Count == 0)
                 return false;
@@ -1433,11 +1434,11 @@ namespace Display.Data
             {
                 Timeout = TimeSpan.FromSeconds(5)
             };
-            var Content = new StringContent(myContent, Encoding.UTF8, "application/json");
+            var content = new StringContent(myContent, Encoding.UTF8, "application/json");
 
             try
             {
-                HttpResponseMessage rep = await client.PostAsync(apiUrl, Content);
+                HttpResponseMessage rep = await client.PostAsync(apiUrl, content);
 
                 if (rep.IsSuccessStatusCode)
                 {
@@ -1536,7 +1537,7 @@ namespace Display.Data
         /// <param name="pickCode"></param>
         /// <param name="ua"></param>
         /// <returns></returns>
-        public Dictionary<string, string> GetDownUrl(string pickCode, string ua)
+        public async Task<Dictionary<string, string>> GetDownUrl(string pickCode, string ua)
         {
             Dictionary<string, string> downUrlList = new();
             
@@ -1562,30 +1563,31 @@ namespace Display.Data
             string dataString = Encoding.ASCII.GetString(data);
             var dataUrlEncode = HttpUtility.UrlEncode(dataString);
 
-            var client = new RestClient($"http://proapi.115.com/app/chrome/downurl?t={tm}");
-            var request = new RestRequest();
-            request.AddHeader("User-Agent", ua);
-            request.AddHeader("Cookie", AppSettings._115_Cookie);
-            request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
+            var url = $"http://proapi.115.com/app/chrome/downurl?t={tm}";
             var body = $"data={dataUrlEncode}";
-            request.AddParameter("application/x-www-form-urlencoded", body, ParameterType.RequestBody);
 
-            RestResponse response;
+            using var httpRequest = new HttpRequestMessage(HttpMethod.Post, url);
+            httpRequest.Content = new StringContent(body);
+            httpRequest.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
+
+            HttpResponseMessage response;
+            string content;
             try
             {
-                response = client.Post(request);
+                response = await Client.SendAsync(httpRequest);
+                content = await response.Content.ReadAsStringAsync();
             }
             catch
             {
                 return downUrlList;
             }
 
-            if (response.IsSuccessful && response.Content != null)
+            if (response is { IsSuccessStatusCode: true, Content: not null })
             {
                 DownUrlBase64EncryptInfo downUrlBase64EncryptInfo;
                 try
                 {
-                    downUrlBase64EncryptInfo = JsonConvert.DeserializeObject<DownUrlBase64EncryptInfo>(response.Content);
+                    downUrlBase64EncryptInfo = JsonConvert.DeserializeObject<DownUrlBase64EncryptInfo>(content);
                 }
                 catch
                 {
@@ -1990,7 +1992,7 @@ namespace Display.Data
             var ua = GetInfoFromNetwork.BrowserUserAgent;
 
             //不存在则获取下载链接并下载
-            var subUrlList = GetDownUrl(pickCode, ua);
+            var subUrlList = await GetDownUrl(pickCode, ua);
             if (subUrlList.Count == 0)
             {
                 return null;

@@ -299,18 +299,18 @@ public sealed partial class MainPage : Page
         //转码成功，可以用m3u8
         if (file.datum.vdi != 0)
         {
-            var m3u8Infos = await webApi.GetM3U8InfoByPickCode(pickCode);
+            var m3U8Infos = await webApi.GetM3U8InfoByPickCode(pickCode);
 
-            if (m3u8Infos.Count > 0)
+            if (m3U8Infos.Count > 0)
             {
                 //选择最高分辨率的播放
-                videoUrl = m3u8Infos[0].Url;
+                videoUrl = m3U8Infos[0].Url;
             }
         }
         // 视频未转码，尝试获取直链
         else
         {
-            var downUrlList = webApi.GetDownUrl(pickCode, GetInfoFromNetwork.BrowserUserAgent);
+            var downUrlList = await webApi.GetDownUrl(pickCode, GetInfoFromNetwork.BrowserUserAgent);
 
             if (downUrlList.Count > 0)
             {
