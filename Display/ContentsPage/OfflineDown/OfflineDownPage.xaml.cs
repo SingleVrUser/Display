@@ -51,12 +51,7 @@ namespace Display.ContentsPage.OfflineDown
 
             DownPathComboBox.SelectedIndex = 0;
 
-            if (WebApi.UploadInfo == null)
-            {
-                await _webApi.GetUploadInfo();
-            }
-
-            _uploadInfo = WebApi.UploadInfo;
+            _uploadInfo = await _webApi.GetUploadInfo();
 
             if (_uploadInfo == null)
             {

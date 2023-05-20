@@ -40,7 +40,7 @@ public class JavDB
             {
                 _clientWithJavDBCookie = GetInfoFromNetwork.CreateClient(new Dictionary<string, string>() {
                         {"cookie",AppSettings.javdb_Cookie },
-                        {"user-agent" ,GetInfoFromNetwork.BrowserUserAgent}
+                        {"user-agent" ,GetInfoFromNetwork.UserAgent}
                     });
             }
 

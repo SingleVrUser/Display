@@ -115,7 +115,7 @@ namespace Display.Models
                 return OriginalUrl;
             }
 
-            var downUrlList = await _webApi.GetDownUrl(PickCode, GetInfoFromNetwork.BrowserUserAgent);
+            var downUrlList = await _webApi.GetDownUrl(PickCode, GetInfoFromNetwork.UserAgent);
             IsRequestOriginal = true;
 
             OriginalUrl = downUrlList.FirstOrDefault().Value;

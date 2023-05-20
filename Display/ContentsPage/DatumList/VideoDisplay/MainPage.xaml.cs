@@ -310,7 +310,7 @@ public sealed partial class MainPage : Page
         // 视频未转码，尝试获取直链
         else
         {
-            var downUrlList = await webApi.GetDownUrl(pickCode, GetInfoFromNetwork.BrowserUserAgent);
+            var downUrlList = await webApi.GetDownUrl(pickCode, GetInfoFromNetwork.UserAgent);
 
             if (downUrlList.Count > 0)
             {

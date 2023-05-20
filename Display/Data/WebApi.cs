@@ -35,7 +35,7 @@ namespace Display.Data
         public HttpClient Client;
         public static UserInfo UserInfo;
         public static QRCodeInfo QRCodeInfo;
-        public static UploadInfo UploadInfo;
+        private static UploadInfo _uploadInfo;
         public static bool isEnterHiddenMode;
         public TokenInfo TokenInfo;
 
@@ -58,7 +58,7 @@ namespace Display.Data
         /// </summary>
         public void InitializeInternet()
         {
-            Client = GetInfoFromNetwork.CreateClient(new Dictionary<string, string> { { "user-agent", GetInfoFromNetwork.BrowserUserAgent } });
+            Client = GetInfoFromNetwork.CreateClient(new Dictionary<string, string> { { "user-agent", GetInfoFromNetwork.UserAgent } });
 
             var cookie = AppSettings._115_Cookie;
 
@@ -93,7 +93,7 @@ namespace Display.Data
         {
             var windowWebHttpClient = new Windows.Web.Http.HttpClient();
             windowWebHttpClient.DefaultRequestHeaders.Add("Referer", "https://115.com/?cid=0&offset=0&tab=&mode=wangpan");
-            windowWebHttpClient.DefaultRequestHeaders.Add("User-Agent", GetInfoFromNetwork.BrowserUserAgent);
+            windowWebHttpClient.DefaultRequestHeaders.Add("User-Agent", GetInfoFromNetwork.UserAgent);
 
             return windowWebHttpClient;
         }
@@ -882,12 +882,12 @@ namespace Display.Data
             //BitComet支持文件和文件夹
             else if (downType == downType.bc)
             {
-                success = await RequestDownByBitComet(videoInfoList, GetInfoFromNetwork.BrowserUserAgent, save_path: savePath, topFolderName: topFolderName);
+                success = await RequestDownByBitComet(videoInfoList, GetInfoFromNetwork.UserAgent, save_path: savePath, topFolderName: topFolderName);
             }
             //Arai2也支持文件和文件夹
             else if (downType == downType.aria2)
             {
-                success = await RequestDownByAria2(videoInfoList, GetInfoFromNetwork.BrowserUserAgent, save_path: savePath, topFolderName: topFolderName);
+                success = await RequestDownByAria2(videoInfoList, GetInfoFromNetwork.UserAgent, save_path: savePath, topFolderName: topFolderName);
             }
 
             return success;
@@ -1060,9 +1060,10 @@ namespace Display.Data
             return result;
         }
 
-        public async Task<bool> GetUploadInfo()
+        public async Task<UploadInfo> GetUploadInfo(bool isUpdate=false)
         {
-            var isSuccess = false;
+            if (!isUpdate && _uploadInfo != null) return _uploadInfo;
+
             const string url = "https://proapi.115.com/app/uploadinfo";
 
             var response = await Client.GetAsync(url);
@@ -1073,8 +1074,7 @@ namespace Display.Data
 
                 if (string.IsNullOrEmpty(result.error))
                 {
-                    UploadInfo = result;
-                    isSuccess = true;
+                    _uploadInfo = result;
                 }
                     
                 else
@@ -1085,7 +1085,7 @@ namespace Display.Data
                 Debug.WriteLine($"解析115返回的UploadInfo请求时出错：{ex.Message}");
             }
 
-            return isSuccess;
+            return _uploadInfo;
         }
 
         public async Task<OfflineSpaceInfo> GetOfflineSpaceInfo(string userKey, int userId)
@@ -1903,15 +1903,15 @@ namespace Display.Data
             {
                 case PlayMethod.pot:
                     savePath = AppSettings.PotPlayerExePath;
-                    ua = GetInfoFromNetwork.BrowserUserAgent;
+                    ua = GetInfoFromNetwork.UserAgent;
                     break;
                 case PlayMethod.mpv:
                     savePath = AppSettings.MpvExePath;
-                    ua = GetInfoFromNetwork.BrowserUserAgent;
+                    ua = GetInfoFromNetwork.UserAgent;
                     break;
                 case PlayMethod.vlc:
                     savePath = AppSettings.VlcExePath;
-                    ua = GetInfoFromNetwork.BrowserUserAgent;
+                    ua = GetInfoFromNetwork.UserAgent;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(playMethod), playMethod, null);
@@ -1989,7 +1989,7 @@ namespace Display.Data
             if (File.Exists(subFile))
                 return subFile;
 
-            var ua = GetInfoFromNetwork.BrowserUserAgent;
+            var ua = GetInfoFromNetwork.UserAgent;
 
             //不存在则获取下载链接并下载
             var subUrlList = await GetDownUrl(pickCode, ua);
