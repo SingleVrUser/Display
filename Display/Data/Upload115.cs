@@ -1,28 +1,27 @@
-﻿using Org.BouncyCastle.Asn1.Sec;
+﻿using Aliyun.OSS;
+using Aliyun.OSS.Common;
+using Display.Helper;
+using Display.Models;
+using K4os.Compression.LZ4;
+using Newtonsoft.Json;
+using Org.BouncyCastle.Asn1.Sec;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Agreement;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
-using System.IO;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using Display.Helper;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
-using Aliyun.OSS;
-using Aliyun.OSS.Common;
-using Display.Models;
-using K4os.Compression.LZ4;
-using Newtonsoft.Json;
+using System.Threading.Tasks;
 using HttpHeaders = Aliyun.OSS.Util.HttpHeaders;
-using Windows.Media.Protection.PlayReady;
 
 namespace Display.Data
 {
