@@ -1989,6 +1989,82 @@ namespace Display.Data
         public string file_name { get; set; }
     }
 
+
+    public class ShaSearchResult
+    {
+        public string sha1 { get; set; }
+        public string _ { get; set; }
+        public Curr_User curr_user { get; set; }
+        public int user_id { get; set; }
+        public ShaSearchResultData data { get; set; }
+        public bool state { get; set; }
+        public string error { get; set; }
+    }
+
+    public class Curr_User
+    {
+        public bool state { get; set; }
+        public int user_id { get; set; }
+        public int error_code { get; set; }
+        public string error_msg { get; set; }
+        public int last_login { get; set; }
+        public string ssoent { get; set; }
+        public int user_name { get; set; }
+    }
+
+    public class ShaSearchResultData
+    {
+        public string file_id { get; set; }
+        public string file_name { get; set; }
+        public string file_size { get; set; }
+        public string pick_code { get; set; }
+        public string is_share { get; set; }
+        public string category_id { get; set; }
+        public string area_id { get; set; }
+        public string ico { get; set; }
+    }
+
+    public class AddTaskBtResult
+    {
+        public bool state { get; set; }
+        public int errno { get; set; }
+        public string errtype { get; set; }
+        public int errcode { get; set; }
+        public string info_hash { get; set; }
+        public string name { get; set; }
+        public int start_torrent { get; set; }
+    }
+
+
+    public class TorrentInfoResult
+    {
+        public bool state { get; set; }
+        public string error_msg { get; set; }
+        public int errno { get; set; }
+        public string errtype { get; set; }
+        public int errcode { get; set; }
+        public long file_size { get; set; }
+        public string torrent_name { get; set; }
+        public int file_count { get; set; }
+        public string info_hash { get; set; }
+        public Torrent_Filelist_Web[] torrent_filelist_web { get; set; }
+
+
+    }
+
+    public class Torrent_Filelist_Web
+    {
+        public long size { get; set; }
+        public string path { get; set; }
+        public int wanted { get; set; }
+    }
+
+
+    public class TorrentCidResult
+    {
+        public string cid { get; set; }
+    }
+
     public class RenameRequest
     {
         public bool state { get; set; }

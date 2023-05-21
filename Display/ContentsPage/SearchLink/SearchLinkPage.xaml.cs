@@ -97,6 +97,13 @@ namespace Display.ContentsPage.SearchLink
                 if (down115LinkList.Count == 0) return false;
 
                 return await RequestOfflineDown(down115LinkList);
+            }else if (attmnInfo.Type == AttmnType.Torrent)
+            {
+                var torrentPath = await X1080X.TryDownAttmn(attmnInfo.Url, attmnInfo.Name);
+                if (torrentPath == null) return false;
+                Debug.WriteLine($"附件已保存到：{torrentPath}");
+
+                return await WebApi.GlobalWebApi.CreateTorrentOfflineDown(torrentPath);
             }
 
             return true;

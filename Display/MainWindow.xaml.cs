@@ -625,13 +625,14 @@ namespace Display
 
                 if (!File.Exists(filePath)) return;
 
-                var upload115 = Upload115.SingleUpload115;
+                //var upload115 = Upload115.SingleUpload115;
 
-                var uploadInfo = await WebApi.GlobalWebApi.GetUploadInfo();
+                //var uploadInfo = await WebApi.GlobalWebApi.GetUploadInfo();
 
-                if(uploadInfo == null) return;
+                //if(uploadInfo == null) return;
 
-                await upload115.UploadTo115(filePath, "0", uploadInfo.user_id.ToString(), uploadInfo.userkey);
+                //await upload115.UploadTo115(filePath, "0", uploadInfo.user_id.ToString(), uploadInfo.userkey);
+
             }
         }
     }

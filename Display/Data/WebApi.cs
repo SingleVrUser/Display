@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -23,8 +24,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Windows.Storage;
+using Aliyun.OSS.Model;
 using HttpMethod = System.Net.Http.HttpMethod;
 using HttpRequestMessage = System.Net.Http.HttpRequestMessage;
+using System.Security.Cryptography;
+using System.Xml.Linq;
+using System.Runtime.Intrinsics.Arm;
 
 namespace Display.Data
 {
@@ -465,6 +470,201 @@ namespace Display.Data
             {
                 Toast.tryToast("网络异常", "从115回收站恢复文件时发生异常：", e.Message);
             }
+        }
+
+        public async Task<bool> CreateTorrentOfflineDown(string torrentPath)
+        {
+            var torrentFile = new FileInfo(torrentPath);
+            if (torrentFile.Length > 2097152)
+            {
+                // TODO: 转换为ed2k后添加
+                Debug.WriteLine("不支持添加超2M的种子任务");
+                return false;
+            }
+
+            // 计算torrent文件的sha1
+            var sha1 = HashHelper.ComputeSha1ByPath(torrentPath);
+
+            // 检查网盘中是否有该torrent
+            var info = await SearchInfoBySha1(sha1);
+
+            // 获取上传信息
+            var uploadInfo = await GetUploadInfo();
+
+            // 无该信息
+            if (info == null)
+            {
+                // 获取种子文件应该存放的目录cid
+                var torrentCidInfo = await GetTorrentCid();
+
+                if (torrentCidInfo != null && uploadInfo != null)
+                {
+                    await Upload115.SingleUpload115.UploadTo115(torrentPath, torrentCidInfo.cid, uploadInfo.user_id.ToString(), uploadInfo.userkey);
+                }
+
+                // 再次检查网盘中是否有该torrent
+                info = await SearchInfoBySha1(sha1);
+            }
+
+            // 上传后仍然为空
+            if (info == null || uploadInfo == null)  return false;
+
+            var offlineSpaceInfo = await GetOfflineSpaceInfo(uploadInfo.userkey, uploadInfo.user_id);
+
+            // 获取种子信息
+            var torrentInfo = await GetTorrentInfo(info.data.pick_code, info.sha1, info.user_id.ToString(), offlineSpaceInfo.sign,
+                offlineSpaceInfo.time.ToString());
+
+            if(torrentInfo == null) return false;
+
+            // 最小大小,10 MB
+            long minSize = 10485760;
+            List<int> selectedIndexList = new();
+            for (var i = 0; i < torrentInfo.torrent_filelist_web.Length; i++)
+            {
+                var fileInfo = torrentInfo.torrent_filelist_web[i];
+
+                if (fileInfo.size > minSize)
+                {
+                    selectedIndexList.Add(i);
+                }
+            }
+
+            // 添加任务
+            var taskInfo = await AddTaskBt(torrentInfo.info_hash,string.Join(",",selectedIndexList),AppSettings.SavePath115Cid,uploadInfo.user_id.ToString(),offlineSpaceInfo.sign,offlineSpaceInfo.time.ToString());
+
+            if(taskInfo == null) return false;
+
+            Debug.WriteLine("添加任务成功");
+
+            return true;
+        }
+
+        private async Task<AddTaskBtResult> AddTaskBt(string infoHash, string wanted, string cid, string uid, string sign,string time, string savePath="")
+        {
+            var url =
+                "https://115.com/web/lixian/?ct=lixian&ac=add_task_bt";
+
+            var values = new Dictionary<string, string>
+            {
+                { "info_hash", infoHash},
+                {"wanted",wanted },
+                {"savepath",savePath },
+                {"wp_path_id",cid },
+                {"uid",uid },
+                {"sign",sign },
+                {"time",time }
+            };
+
+            var content = new FormUrlEncodedContent(values);
+
+            try
+            {
+                var response = await Client.PostAsync(url, content);
+
+                var result = await response.Content.ReadFromJsonAsync<AddTaskBtResult>();
+
+                if (result.state)
+                {
+                    return result;
+                }
+
+                Debug.WriteLine("添加torrent任务出错");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"解析115中添加torrent任务时出错:{ex.Message}");
+            }
+
+            return null;
+        }
+
+        private async Task<TorrentInfoResult> GetTorrentInfo(string pickCode, string sha1, string uid, string sign, string time)
+        {
+            var url =
+                "https://115.com/web/lixian/?ct=lixian&ac=torrent";
+
+            var values = new Dictionary<string, string>
+            {
+                { "pickcode", pickCode},
+                {"sha1",sha1 },
+                {"uid",uid },
+                {"sign",sign },
+                {"time",time },
+            };
+
+            var content = new FormUrlEncodedContent(values);
+
+            try
+            {
+                var response = await Client.PostAsync(url,content);
+
+                var result = await response.Content.ReadFromJsonAsync<TorrentInfoResult>();
+
+                if (string.IsNullOrEmpty(result?.error_msg))
+                {
+                    return result;
+                }
+
+                Debug.WriteLine($"获取torrent文件Info出错:{result?.error_msg}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"解析115中torrent文件Info时出错:{ex.Message}");
+            }
+
+            return null;
+        }
+
+        private async Task<TorrentCidResult> GetTorrentCid()
+        {
+            var url =
+                "http://115.com/?ct=lixian&ac=get_id&torrent=1";
+
+            try
+            {
+                var response = await Client.GetAsync(url);
+
+                var result = await response.Content.ReadFromJsonAsync<TorrentCidResult>();
+
+                if (!string.IsNullOrEmpty(result?.cid))
+                {
+                    return result;
+                }
+
+                Debug.WriteLine("获取存放torrent文件的目录cid出错");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"解析115中存放torrent文件的目录cid请求时出错:{ex.Message}");
+            }
+
+            return null;
+        }
+
+        private async Task<ShaSearchResult> SearchInfoBySha1(string sha1)
+        {
+            var url =
+                $"https://webapi.115.com/files/shasearch?sha1={sha1}&_={DateTimeOffset.Now.ToUnixTimeSeconds()}";
+
+            try
+            {
+                var response = await Client.GetAsync(url);
+
+                var result = await response.Content.ReadFromJsonAsync<ShaSearchResult>();
+
+                if (string.IsNullOrEmpty(result.error))
+                    return result;
+
+                Debug.WriteLine($"通过sha1搜索信息出错:{result.error}");
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"解析115通过sha1搜索信息请求时出错:{ex.Message}");
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -1615,7 +1815,6 @@ namespace Display.Data
                             var downUrl = videoInfo["url"]?["url"]?.ToString();
                             downUrlList.Add(videoInfo["file_name"]?.ToString() ?? string.Empty, downUrl);
                         }
-
                     }
                 }
 
