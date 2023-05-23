@@ -25,7 +25,6 @@ using Windows.Media.Streaming.Adaptive;
 using Windows.Storage;
 using Windows.System.Display;
 using Windows.Web.Http;
-using static Display.Controls.CustomMediaPlayerElement;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -66,6 +65,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         _httpClient = WebApi.CreateWindowWebHttpClient();
 
         SetMediaPlayer();
+
+
     }
 
     public void DisposeMediaPlayer()
@@ -152,6 +153,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         //_currentMediaPlayerWithStreamSource = mediaPlayerWithStreamSource;
     }
 
+
+
     private bool _isChangedCurrentItem;
 
     private void MediaPlaybackList_CurrentItemChanged(MediaPlaybackList sender, CurrentMediaPlaybackItemChangedEventArgs args)
@@ -167,6 +170,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
         // 修改标题
         _window.ChangedWindowTitle($"播放 - {playItem.Title}");
+
 
 
         DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, ()=>
@@ -202,8 +206,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
             if (failInfo != null)
             {
 
-                isLike = this.IsLike == 1;
-                isLookLater = this.LookLater != 0;
+                isLike = IsLike == 1;
+                isLookLater = LookLater != 0;
             }
             else
             {
@@ -222,8 +226,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
             //有该数据才可用Like和LookLater
             if (videoInfo != null)
             {
-                this.IsLike = videoInfo.is_like;
-                this.LookLater = Convert.ToInt32(videoInfo.look_later);
+                IsLike = videoInfo.is_like;
+                LookLater = Convert.ToInt32(videoInfo.look_later);
 
                 isLike = this.IsLike == 1;
                 isLookLater = this.LookLater != 0;
@@ -489,8 +493,6 @@ public sealed partial class CustomMediaPlayerElement : UserControl
                 Debug.WriteLine($"数据库不存在该数据:{trueName}");
             }
         }
-
-
     }
     private async void ScreenShotButtonClick(object sender, RoutedEventArgs e)
     {
@@ -545,7 +547,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
     {
         if (e.AddedItems.FirstOrDefault() is not Player player) return;
 
-        await _webApi.PlayVideoWithPlayer(_allMediaPlayItems, player.PlayMethod, this.XamlRoot);
+        await _webApi.PlayVideoWithPlayer(_allMediaPlayItems, player.PlayMethod, XamlRoot);
     }
 
     private void ShowTeachingTip(string subTitle)
@@ -557,7 +559,17 @@ public sealed partial class CustomMediaPlayerElement : UserControl
     {
         mediaTransportControls.InitQuality(Resources["QualityDataTemplate"] as DataTemplate);
 
+        mediaTransportControls.InitPlayer(Resources["PlayerDataTemplate"] as DataTemplate);
 
-        mediaTransportControls.InitPlayer(this.Resources["PlayerDataTemplate"] as DataTemplate);
+        if (_allMediaPlayItems.Count > 1)
+        {
+            mediaTransportControls.SetRightButton();
+        }
+    }
+
+    public event EventHandler<RoutedEventArgs> RightButtonClick;
+    private void MediaTransportControls_OnRightButtonClick(object sender, RoutedEventArgs e)
+    {
+        RightButtonClick?.Invoke(sender,e);
     }
 }

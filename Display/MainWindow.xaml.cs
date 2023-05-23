@@ -1,9 +1,9 @@
 ﻿
+using Display.ContentsPage.SearchLink;
 using Display.Data;
 using Display.Helper;
+using Display.Models;
 using Display.Views;
-using Display.WindowView;
-using Microsoft.Extensions.Configuration;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -13,15 +13,10 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net.Mime;
 using Windows.System;
-using Display.ContentsPage;
-using Display.ContentsPage.SearchLink;
 using WinUIEx;
-using Display.Models;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -35,7 +30,7 @@ namespace Display
     {
         private AppWindow _appwindow;
 
-        private bool _isPanalOpen;
+        private bool _isPanelOpen;
 
         public MainWindow()
         {
@@ -105,7 +100,6 @@ namespace Display
         private void AppTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             SetDragRegionForCustomTitleBar(_appwindow);
-
         }
 
         private void AppTitleBar_Loaded(object sender, RoutedEventArgs e)
@@ -477,7 +471,7 @@ namespace Display
         {
             if (_appwindow.Presenter.Kind == AppWindowPresenterKind.FullScreen) return;
 
-            _isPanalOpen = NavView.IsPaneOpen;
+            _isPanelOpen = NavView.IsPaneOpen;
             _appwindow.SetPresenter(AppWindowPresenterKind.FullScreen);
             NavView.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftMinimal;
 
@@ -493,7 +487,7 @@ namespace Display
             if (_appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen) return;
 
             NavView.PaneDisplayMode = NavigationViewPaneDisplayMode.Auto;
-            NavView.IsPaneOpen = _isPanalOpen;
+            NavView.IsPaneOpen = _isPanelOpen;
             _appwindow.SetPresenter(AppWindowPresenterKind.Default);
 
             //取消监听

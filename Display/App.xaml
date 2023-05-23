@@ -22,7 +22,9 @@
                 <!--控件颜色-->
                 <ResourceDictionary>
                     <ui:Color x:Key="ColorChecked">#8cb3ff</ui:Color>
-                    <!--<Color x:Key="ColorAngleMark">#6495ed</Color>-->
+
+                    <ui:Color x:Key="MediaPlayerBackground">#18191b</ui:Color>
+
                     <SolidColorBrush x:Key="CustomToggleButtonBackgroundChecked"
                                      Color="{ThemeResource SystemAccentColor}" />
 
@@ -40,6 +42,7 @@
 
                     <SolidColorBrush x:Key="CardBackgroundFillColorDefaultBrush"
                                      Color="{ThemeResource SystemAltHighColor}"/>
+
 
                 </ResourceDictionary>
 
@@ -207,7 +210,6 @@
 
             <x:Double x:Key="ContentDialogMaxWidth">900</x:Double>
 
-
             <!--颜色-->
             <ui:Color x:Key="ColorDefault">#FBFBFB</ui:Color>
             <ui:Color x:Key="ColorSecondary">#8CB3FF</ui:Color>
@@ -215,7 +217,6 @@
             <ui:Color x:Key="ColorLightEmphasize">#DAE5FF</ui:Color>
             <ui:Color x:Key="ControlColorDefault">#FFFFFF</ui:Color>
             <ui:Color x:Key="ControlColorBorder">#EEEEF1</ui:Color>
-
 
             <!--数值-->
             <Thickness x:Key="AppBarButtonCompactMargin">0,-5,0,-20</Thickness>
