@@ -1,10 +1,9 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Display.Data;
+using Display.Models;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
-using Display.Data;
-using System.Linq;
-using Display.Models;
 
 namespace Display.Controls;
 
@@ -14,6 +13,7 @@ public class CustomMediaTransportControls : MediaTransportControls
     public event EventHandler<RoutedEventArgs> LikeButtonClick;
     public event EventHandler<RoutedEventArgs> LookLaterButtonClick;
     public event EventHandler<RoutedEventArgs> ScreenShotButtonClick;
+    public event EventHandler<RoutedEventArgs> RightButtonClick;
 
     public event SelectionChangedEventHandler QualityChanged;
     public event SelectionChangedEventHandler PlayerChanged;
@@ -39,7 +39,7 @@ public class CustomMediaTransportControls : MediaTransportControls
 
     private AppBarToggleButton _likeButton;
 
-    private AppBarToggleButton likeButton
+    private AppBarToggleButton LikeButton
     {
         get
         {
@@ -54,7 +54,7 @@ public class CustomMediaTransportControls : MediaTransportControls
 
     private AppBarToggleButton _lookLaterButton;
 
-    private AppBarToggleButton lookLaterButton
+    private AppBarToggleButton LookLaterButton
     {
         get
         {
@@ -67,70 +67,108 @@ public class CustomMediaTransportControls : MediaTransportControls
         }
     }
 
-    private bool _isHandlerLikeLookLaterButton = false;
+    private AppBarToggleButton _screenShotButton;
 
-    public void SetLike_LookLater(bool islike, bool look_later)
+    private AppBarToggleButton ScreenShotButton
     {
+        get
+        {
+            if (_screenShotButton == null)
+            {
+                _screenShotButton = GetTemplateChild("ScreenshotButton") as AppBarToggleButton;
+            }
+
+            return _screenShotButton;
+        }
+    }
+
+    private Button _rightButton;
+
+    private Button RightButton
+    {
+        get
+        {
+            if (_rightButton == null)
+            {
+                _rightButton = GetTemplateChild("RightButton") as Button;
+            }
+
+            return _rightButton;
+        }
+    }
+
+    private ListView _qualityListView;
+
+    private ListView QualityListView
+    {
+        get
+        {
+            if (_qualityListView == null)
+            {
+                _qualityListView = GetTemplateChild("QualityListView") as ListView;
+            }
+
+            return _qualityListView;
+        }
+    }
+
+    private bool _isHandlerLikeAndLookLaterButton = false;
+    private bool _isHandlerScreenShowButton = false;
+
+    public void SetRightButton()
+    {
+        if (RightButton == null) return;
+
+        RightButton.Visibility = Visibility.Visible;
+
+        RightButton.Click += RightButton_Click;
+    }
+
+
+    public void SetLike_LookLater(bool isLike, bool lookLater)
+    {
+        if (LikeButton == null || LookLaterButton == null) return;
+
         //显示喜欢/稍后观看
-        if (likeButton != null)
-        {
-            if (!_isHandlerLikeLookLaterButton)
-            {
-                likeButton.Click += LikeButton_Click;
-                _isHandlerLikeLookLaterButton = true;
-            }
-            likeButton.IsEnabled = true;
-            likeButton.IsChecked = islike;
-        }
+        LikeButton.IsEnabled = true;
+        LikeButton.IsChecked = isLike;
+        
+        LookLaterButton.IsEnabled = true;
+        LookLaterButton.IsChecked = lookLater;
 
-        if (lookLaterButton != null)
-        {
-            if (!_isHandlerLikeLookLaterButton)
-            {
-                lookLaterButton.Click += LookLaterButton_Click;
-                _isHandlerLikeLookLaterButton = true;
-            }
+        if (_isHandlerLikeAndLookLaterButton) return;
 
-            lookLaterButton.IsEnabled = true;
-            lookLaterButton.IsChecked = look_later;
-        }
+        LikeButton.Click += LikeButton_Click;
+        LookLaterButton.Click += LookLaterButton_Click;
     }
 
     public void DisableLikeLookAfterButton()
     {
-        if (likeButton != null)
-        {
-            likeButton.IsEnabled = false;
-        }
+        if (LikeButton == null || LookLaterButton == null) return;
 
-        if (lookLaterButton != null)
-        {
-            lookLaterButton.IsEnabled = false;
-        }
+        LikeButton.IsEnabled = false;
+        LookLaterButton.IsEnabled = false;
     }
 
-    private bool _isHandlerScreenShotButton = false;
+
     public void TrySetScreenButton()
     {
-        if (_isHandlerScreenShotButton) return;
+        if (ScreenShotButton == null) return;
 
-        var screenShotButton = GetTemplateChild("ScreenshotButton") as Button;
-        if (screenShotButton != null)
+        if (!_isHandlerScreenShowButton)
         {
-            screenShotButton.Click += ScreenshotButton_Click;
-            ;
-            screenShotButton.Visibility = Visibility.Visible;
+            ScreenShotButton.Click += ScreenShotButton_Click;
+            _isHandlerScreenShowButton = true;
         }
-
-        _isHandlerScreenShotButton = true;
+        ;
+        ScreenShotButton.Visibility = Visibility.Visible;
     }
 
     public void DisableScreenButton()
     {
-        var screenShotButton = GetTemplateChild("ScreenshotButton") as Button;
-        if (screenShotButton != null)
+        if (ScreenShotButton != null)
         {
-            screenShotButton.Visibility = Visibility.Collapsed;
+            ScreenShotButton.Visibility = Visibility.Collapsed;
         }
     }
 
@@ -140,27 +178,25 @@ public class CustomMediaTransportControls : MediaTransportControls
         Button qualityButton = GetTemplateChild("QualityButton") as Button;
         if (qualityButton == null) return;
         qualityButton.Visibility = Visibility.Visible;
+        
+        if (QualityListView == null) return;
+        QualityListView.ItemTemplate = qualityDataTemplate;
 
-        ListView qualityListView = GetTemplateChild("QualityListView") as ListView;
-        if (qualityListView == null) return;
-        qualityListView.ItemTemplate = qualityDataTemplate;
-
-        qualityListView.SelectionChanged += QualityListView_SelectionChanged;
+        QualityListView.SelectionChanged += QualityListView_SelectionChanged;
     }
 
     public void SetQualityListSource(List<Quality> qualityItemsSource,int qualityIndex)
     {
-        var qualityListView = GetTemplateChild("QualityListView") as ListView;
-        if (qualityListView == null) return;
+        if (QualityListView == null) return;
 
-        qualityListView.ItemsSource = qualityItemsSource;
+        QualityListView.ItemsSource = qualityItemsSource;
         int maxIndex = qualityItemsSource.Count - 1;
         if (qualityIndex > maxIndex)
         {
             qualityIndex = maxIndex;
         }
 
-        qualityListView.SelectedIndex = qualityIndex;
+        QualityListView.SelectedIndex = qualityIndex;
     }
 
     public void InitPlayer(DataTemplate qualityDataTemplate)
@@ -211,12 +247,22 @@ public class CustomMediaTransportControls : MediaTransportControls
     {
         LookLaterButtonClick?.Invoke(sender, e);
     }
-    private void ScreenshotButton_Click(object sender, RoutedEventArgs e)
+    private void ScreenShotButton_Click(object sender, RoutedEventArgs e)
     {
         ScreenShotButtonClick?.Invoke(sender, e);
     }
 
 
+    private bool _isRightButtonPointRight = true;
+    private void RightButton_Click(object sender, RoutedEventArgs e)
+    {
+        _isRightButtonPointRight = !_isRightButtonPointRight;
+
+        VisualStateManager.GoToState(this, _isRightButtonPointRight ? "RightButtonPointRight" : "RightButtonPointLeft",
+            true);
+
+        RightButtonClick?.Invoke(sender, e);
+    }
 }
 
 

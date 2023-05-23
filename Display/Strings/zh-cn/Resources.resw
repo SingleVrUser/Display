@@ -120,8 +120,23 @@
   <data name="downToolTip.Content" xml:space="preserve">
     <value>下载</value>
   </data>
+  <data name="FullWindowButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>全屏</value>
+  </data>
+  <data name="LikeButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>喜欢</value>
+  </data>
+  <data name="LookAfterButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>稍后观看</value>
+  </data>
+  <data name="PlayerButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>播放器</value>
+  </data>
   <data name="playToolTip.Content" xml:space="preserve">
     <value>播放</value>
+  </data>
+  <data name="QualityButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>画质</value>
   </data>
   <data name="sortToolTip.Content" xml:space="preserve">
     <value>排序</value>

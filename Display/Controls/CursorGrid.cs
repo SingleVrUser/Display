@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Display.Controls
 {
-    internal class CursorGrid:Grid
+    internal class CursorGrid : Grid
     {
         public InputCursor Cursor
         {

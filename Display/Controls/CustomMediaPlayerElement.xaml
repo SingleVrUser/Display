@@ -24,7 +24,7 @@
         
     </UserControl.Resources>
 
-    <Grid>
+    <Grid Background="Black">
         <MediaPlayerElement x:Name="MediaControl"
                             AutoPlay="True"
                             AreTransportControlsEnabled="True"
@@ -43,6 +43,7 @@
                                                     ScreenShotButtonClick="ScreenShotButtonClick"
                                                     QualityChanged="QualityChanged"
                                                     PlayerChanged="PlayerChanged"
+                                                    RightButtonClick="MediaTransportControls_OnRightButtonClick"
                                                     IsHitTestVisible="True" />
             </MediaPlayerElement.TransportControls>
         </MediaPlayerElement>

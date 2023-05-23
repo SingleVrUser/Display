@@ -11,6 +11,14 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <customcontrols:CursorGrid x:Name="RootGrid">
+
+        <customcontrols:CursorGrid.Resources>
+            <Style TargetType="TextBlock">
+                <Setter Property="Foreground"
+                        Value="White" />
+            </Style>
+        </customcontrols:CursorGrid.Resources>
+
         <Grid.RowDefinitions>
             <RowDefinition x:Name="TitleBarRowDefinition" Height="28" />
             <RowDefinition Height="*"/>
@@ -41,20 +49,40 @@
 
         </Grid>
 
-        <Grid Grid.Row="1" x:Name="VideoPlayGrid">
-            <customcontrols:CustomMediaPlayerElement x:Name="mediaControl"
-                                                     FullWindow="mediaControls_FullWindow"
-                                                     MediaDoubleTapped="mediaControl_MediaDoubleTapped"
-                                                     PointerEntered="MediaControl_OnPointerEntered"
-                                                     PointerExited="MediaControl_OnPointerExited"/>
+        <UserControl x:Name="MyUserControl" Grid.Row="1">
 
-            <!--无链接传入--><!--
-            <StackPanel HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Visibility="{x:Bind IsPickCodeNull()}">
-                <TextBlock Text="网页地址为空"
-                           FontSize="20" />
-            </StackPanel>-->
-        </Grid>
+            <Grid x:Name="VideoPlayGrid"
+                  Background="{StaticResource MediaPlayerBackground}"
+                  ColumnDefinitions="*,auto">
+
+                <VisualStateManager.VisualStateGroups>
+                    <VisualStateGroup x:Name="WindowStates">
+                        <VisualState x:Name="NoFullWindow" />
+
+                        <VisualState x:Name="FullWindow">
+                            <VisualState.Setters>
+                                <Setter Target="MoreGrid.Visibility"
+                                        Value="Collapsed" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateManager.VisualStateGroups>
+
+                <customcontrols:CustomMediaPlayerElement x:Name="MediaControl"
+                                                         FullWindow="mediaControls_FullWindow"
+                                                         MediaDoubleTapped="mediaControl_MediaDoubleTapped"
+                                                         RightButtonClick="MediaControl_OnRightButtonClick"
+                                                         PointerEntered="MediaControl_OnPointerEntered"
+                                                         PointerExited="MediaControl_OnPointerExited"/>
+
+                <Grid x:Name="MoreGrid"
+                      Grid.Column="1"
+                      Width="380"
+                      Visibility="Collapsed">
+                    <TextBlock Text="内容" />
+                </Grid>
+            </Grid>
+        </UserControl>
+        
     </customcontrols:CursorGrid>
 </Window>

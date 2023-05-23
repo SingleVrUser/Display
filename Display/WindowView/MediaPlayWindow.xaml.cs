@@ -40,7 +40,13 @@ public sealed partial class MediaPlayWindow : Window
 
         _appwindow = App.getAppWindow(this);
 
-        mediaControl.InitLoad(playItems, this);
+        MediaControl.InitLoad(playItems, this);
+
+        if (playItems.Count > 1)
+        {
+            MoreGrid.Visibility = Visibility.Visible;
+
+        }
 
         Closed += MediaPlayWindow_Closed;
     }
@@ -71,13 +77,13 @@ public sealed partial class MediaPlayWindow : Window
     /// <param name="args"></param>
     private void MediaPlayWindow_Closed(object sender, WindowEventArgs args)
     {
-        if (mediaControl.IsLoaded && VideoPlayGrid.Children.Contains(mediaControl))
+        if (MediaControl.IsLoaded && VideoPlayGrid.Children.Contains(MediaControl))
         {
-            mediaControl.DisposeMediaPlayer();
-            VideoPlayGrid.Children.Remove(mediaControl);
+            MediaControl.DisposeMediaPlayer();
+            VideoPlayGrid.Children.Remove(MediaControl);
         }
 
-        mediaControl.PointerExited -= MediaControl_OnPointerExited;
+        MediaControl.PointerExited -= MediaControl_OnPointerExited;
         aTimer?.Stop();
 
         ////上一页为详情页，生效喜欢或稍后观看的修改
@@ -129,52 +135,41 @@ public sealed partial class MediaPlayWindow : Window
 
         return newWindow;
     }
-
-    //private Visibility IsPickCodeNull()
-    //{
-    //    return _pickCode == null ? Visibility.Visible : Visibility.Collapsed;
-    //}
-
+    
     #region 全屏设置
 
     private void mediaControls_FullWindow(object sender, RoutedEventArgs e)
     {
-        if (_appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
-        {
-            enterlFullScreen();
-        }
-        else
-        {
-            cancelFullScreen();
-        }
+        ChangedFullWindow();
     }
 
     /// <summary>
     /// 进入全屏
     /// </summary>
-    private void enterlFullScreen()
+    private void EnterFullScreen()
     {
-        if (_appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
-        {
-            this.ExtendsContentIntoTitleBar = false;
-            TitleBarRowDefinition.Height = new GridLength(0);
+        if (_appwindow.Presenter.Kind == AppWindowPresenterKind.FullScreen) return;
+        
+        ExtendsContentIntoTitleBar = false;
+        TitleBarRowDefinition.Height = new GridLength(0);
 
-            _appwindow.SetPresenter(AppWindowPresenterKind.FullScreen);
+        _appwindow.SetPresenter(AppWindowPresenterKind.FullScreen);
 
-            //监听ESC退出
-            RootGrid.KeyDown += RootGrid_KeyDown;
+        //监听ESC退出
+        RootGrid.KeyDown += RootGrid_KeyDown;
+            
+        VisualStateManager.GoToState(MyUserControl, "FullWindow", true);
 
-            VisualStateManager.GoToState(mediaControl.mediaTransportControls, "FullWindowState", true);
-        }
+        VisualStateManager.GoToState(MediaControl.mediaTransportControls, "FullWindowState", true);
+
     }
 
     /// <summary>
     /// 退出全屏
     /// </summary>
-    private void cancelFullScreen()
+    private void CancelFullScreen()
     {
         if (_appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen) return;
-
 
         this.ExtendsContentIntoTitleBar = true;
         TitleBarRowDefinition.Height = new GridLength(28);
@@ -184,29 +179,35 @@ public sealed partial class MediaPlayWindow : Window
         //取消监听
         RootGrid.KeyDown -= RootGrid_KeyDown;
 
+        VisualStateManager.GoToState(MyUserControl, "NoFullWindow", true);
 
-        VisualStateManager.GoToState(mediaControl.mediaTransportControls, "NoFullWindowState", true);
+        VisualStateManager.GoToState(MediaControl.mediaTransportControls, "NoFullWindowState", true);
     }
 
     private void RootGrid_KeyDown(object sender, KeyRoutedEventArgs e)
     {
         if (e.Key == Windows.System.VirtualKey.Escape)
         {
-            cancelFullScreen();
+            CancelFullScreen();
         }
     }
     #endregion
 
-    private void mediaControl_MediaDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    private void ChangedFullWindow()
     {
         if (_appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
         {
-            enterlFullScreen();
+            EnterFullScreen();
         }
         else
         {
-            cancelFullScreen();
+            CancelFullScreen();
         }
+    }
+
+    private void mediaControl_MediaDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        ChangedFullWindow();
     }
 
     private System.Timers.Timer aTimer;
@@ -275,5 +276,10 @@ public sealed partial class MediaPlayWindow : Window
                 RootGrid.Cursor = cursor;
             });
         }
+    }
+
+    private void MediaControl_OnRightButtonClick(object sender, RoutedEventArgs e)
+    {
+        MoreGrid.Visibility = MoreGrid.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
     }
 }
