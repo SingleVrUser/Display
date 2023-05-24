@@ -41,9 +41,14 @@ namespace Display.Controls
 
             if (item.Count == 0)
             {
+                string content = "未找到";
+                if (AppSettings.IsUseX1080X)
+                {
+                    content += "，点击搜索资源";
+                }
                 NavViewSearchBox.ItemTemplate = Resources["notFoundedSuggestionBox"] as DataTemplate;
                 sender.ItemTemplate = null;
-                sender.ItemsSource = new List<string>() { "未找到，点击搜索资源" };
+                sender.ItemsSource = new List<string> { content };
             }
             else
             {

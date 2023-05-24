@@ -161,6 +161,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
     {
         Debug.WriteLine("切换播放项");
 
+        _isChangedCurrentItem = true;
+
         var index = sender.CurrentItemIndex;
         if (index > _allMediaPlayItems.Count - 1) return;
 
@@ -168,21 +170,22 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
         var playItem = _allMediaPlayItems[(int)index];
 
-        // 修改标题
-        _window.ChangedWindowTitle($"播放 - {playItem.Title}");
-
-
-
         DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, ()=>
-            {
-                _isChangedCurrentItem = true;
-                SetButton(playItem);
+        {
+            // 修改标题
+            _window.ChangedWindowTitle($"播放- {playItem.Title}");
+            mediaTransportControls.SetTitle(playItem.Title);
 
-                SetQualityList(playItem);
+            _window.ChangedVideoListViewIndex((int)index);
 
-                _isChangedCurrentItem = false;
-            }
-        );
+            // 设置喜欢/稍后观看按钮
+            SetButton(playItem);
+
+            // 设置画质列表
+            SetQualityList(playItem);
+        });
+
+        _isChangedCurrentItem = false;
     }
 
     private async void SetQualityList(MediaPlayItem playItem)
@@ -193,51 +196,45 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
     private async void SetButton(MediaPlayItem playItem)
     {
-        var trueName = playItem.TrueName;
-
         //设置喜欢、稍后观看
         bool isLike;
         bool isLookLater;
 
-        // 通过是否有trueName判断匹配失败项和成功项
-        if (string.IsNullOrEmpty(trueName))
+        var videoInfo = playItem.GetVideoInfo();
+
+        // 先判断是否为成功，后判断是否为失败
+        if(videoInfo == null)
         {
             var failInfo = await playItem.GetFailInfo();
-            if (failInfo != null)
-            {
 
-                isLike = IsLike == 1;
-                isLookLater = LookLater != 0;
-            }
-            else
+            if (failInfo == null)
             {
                 isLike = false;
                 isLookLater = false;
+            }
+            else
+            {
+                IsLike = failInfo.is_like;
+                LookLater = Convert.ToInt32(failInfo.look_later);
+
+                isLike = IsLike == 1;
+                isLookLater = LookLater != 0;
             }
 
             mediaTransportControls.SetLike_LookLater(isLike, isLookLater);
 
             mediaTransportControls.TrySetScreenButton();
+
         }
         else
         {
-            var videoInfo = playItem.GetVideoInfo();
+            IsLike = videoInfo.is_like;
+            LookLater = Convert.ToInt32(videoInfo.look_later);
 
-            //有该数据才可用Like和LookLater
-            if (videoInfo != null)
-            {
-                IsLike = videoInfo.is_like;
-                LookLater = Convert.ToInt32(videoInfo.look_later);
+            isLike = this.IsLike == 1;
+            isLookLater = this.LookLater != 0;
 
-                isLike = this.IsLike == 1;
-                isLookLater = this.LookLater != 0;
-
-                mediaTransportControls.SetLike_LookLater(isLike, isLookLater);
-            }
-            else
-            {
-                mediaTransportControls.DisableLikeLookAfterButton();
-            }
+            mediaTransportControls.SetLike_LookLater(isLike, isLookLater);
 
             mediaTransportControls.DisableScreenButton();
         }
@@ -381,8 +378,18 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
         IsLike = button.IsChecked == true ? 1 : 0;
 
-        if (string.IsNullOrEmpty(trueName))
+        var videoInfo = playItem.GetVideoInfo();
+
+        if (videoInfo != null)
         {
+            DataAccess.UpdateSingleDataFromVideoInfo(trueName, "is_like", IsLike.ToString());
+
+            if (IsLike == 1) ShowTeachingTip("已添加进喜欢");
+        }
+        else
+        {
+            Debug.WriteLine($"数据库不存在该数据:{trueName}");
+
             var failInfo = await playItem.GetFailInfo();
 
             if (failInfo == null)
@@ -415,21 +422,6 @@ public sealed partial class CustomMediaPlayerElement : UserControl
                 }
             }
         }
-        else
-        {
-            var videoInfo = playItem.GetVideoInfo();
-
-            if (videoInfo != null)
-            {
-                DataAccess.UpdateSingleDataFromVideoInfo(trueName, "is_like", IsLike.ToString());
-
-                if (IsLike == 1) ShowTeachingTip("已添加进喜欢");
-            }
-            else
-            {
-                Debug.WriteLine($"数据库不存在该数据:{trueName}");
-            }
-        }
     }
 
     private async void LookLaterButtonClick(object sender, RoutedEventArgs e)
@@ -442,12 +434,20 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
         if (string.IsNullOrEmpty(pickCode)) return;
 
-        var failInfo = await playItem.GetFailInfo();
 
         LookLater = button.IsChecked == true ? Convert.ToInt32(DateTimeOffset.Now.ToUnixTimeSeconds()) : 0;
 
-        if (string.IsNullOrEmpty(trueName))
+        var videoInfo = playItem.GetVideoInfo();
+
+        if (videoInfo != null)
         {
+            DataAccess.UpdateSingleDataFromVideoInfo(trueName, "look_later", LookLater.ToString());
+
+            if (LookLater != 0) ShowTeachingTip("已添加进稍后观看");
+        }else
+        {
+            var failInfo = await playItem.GetFailInfo();
+
             if (failInfo == null)
             {
                 var capPath = await ScreenShotAsync(pickCode);
@@ -465,7 +465,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
                 DataAccess.UpdateSingleFailInfo(pickCode, "look_later", LookLater.ToString());
 
                 //需要添加截图
-                if (failInfo.image_path == Data.Const.NoPicturePath || !File.Exists(failInfo.image_path))
+                if (failInfo.image_path == Const.NoPicturePath || !File.Exists(failInfo.image_path))
                 {
                     var capPath = await ScreenShotAsync(pickCode);
                     DataAccess.UpdateSingleFailInfo(pickCode, "image_path", capPath);
@@ -478,42 +478,30 @@ public sealed partial class CustomMediaPlayerElement : UserControl
                 }
             }
         }
-        else
-        {
-            var videoInfo = playItem.GetVideoInfo();
-
-            if (videoInfo != null)
-            {
-                DataAccess.UpdateSingleDataFromVideoInfo(trueName, "look_later", LookLater.ToString());
-
-                if (LookLater != 0) ShowTeachingTip("已添加进稍后观看");
-            }
-            else
-            {
-                Debug.WriteLine($"数据库不存在该数据:{trueName}");
-            }
-        }
     }
     private async void ScreenShotButtonClick(object sender, RoutedEventArgs e)
     {
         if (sender is not Button) return;
 
-        //var failInfo = await DataAccess.LoadSingleFailInfo(PickCode);
+        var playItem = _allMediaPlayItems[(int)_playIndex];
+        var pickCode = playItem.PickCode;
 
-        //var capPath = await ScreenShotAsync(PickCode);
+        var failInfo = await DataAccess.LoadSingleFailInfo(pickCode);
 
-        //if (failInfo == null)
-        //{
-        //    DataAccess.AddOrReplaceFailList_islike_looklater(new()
-        //    {
-        //        pc = PickCode,
-        //        image_path = capPath
-        //    });
-        //}
-        //else
-        //{
-        //    DataAccess.UpdateSingleFailInfo(PickCode, "image_path", capPath);
-        //}
+        var capPath = await ScreenShotAsync(pickCode);
+
+        if (failInfo == null)
+        {
+            DataAccess.AddOrReplaceFailList_islike_looklater(new()
+            {
+                pc = pickCode,
+                image_path = capPath
+            });
+        }
+        else
+        {
+            DataAccess.UpdateSingleFailInfo(pickCode, "image_path", capPath);
+        }
 
         ShowTeachingTip("已截取当前画面作为封面");
     }

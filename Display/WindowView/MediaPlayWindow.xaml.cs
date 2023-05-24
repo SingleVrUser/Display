@@ -44,11 +44,30 @@ public sealed partial class MediaPlayWindow : Window
 
         if (playItems.Count > 1)
         {
-            MoreGrid.Visibility = Visibility.Visible;
+            InitMoreGrid(playItems);
 
         }
 
         Closed += MediaPlayWindow_Closed;
+    }
+
+    private void InitMoreGrid(List<MediaPlayItem> playItems)
+    {
+        MoreGrid.Visibility = Visibility.Visible;
+
+        VideoListView.ItemsSource = playItems;
+    }
+
+    public void ChangedVideoListViewIndex(int index)
+    {
+        int maxIndex = VideoListView.Items.Count - 1;
+
+        if (index > maxIndex)
+        {
+            index = maxIndex;
+        }
+
+        VideoListView.SelectedIndex = index;
     }
 
     /// <summary>
@@ -57,17 +76,7 @@ public sealed partial class MediaPlayWindow : Window
     /// <param name="title"></param>
     public void ChangedWindowTitle(string title)
     {
-        if (DispatcherQueue.HasThreadAccess)
-        {
-            AppTitleTextBlock.Text = title;
-        }
-        else
-        {
-            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
-            {
-                AppTitleTextBlock.Text = title;
-            });
-        }
+        AppTitleTextBlock.Text = title;
     }
 
     /// <summary>
@@ -125,7 +134,6 @@ public sealed partial class MediaPlayWindow : Window
         //            break;
         //        }
         //}
-        
     }
 
     public static MediaPlayWindow CreateNewWindow(List<MediaPlayItem> playItems, PlayType playType, Page lastPage)

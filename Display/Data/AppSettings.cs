@@ -504,7 +504,7 @@ public class AppSettings
     {
         get
         {
-            var baseUrl = "https://x222x.me/";
+            var baseUrl = "https://x555x.me/";
             if (LocalSettings.Values["MinnanoAv_BaseUrl"] is string url)
             {
                 baseUrl = url;

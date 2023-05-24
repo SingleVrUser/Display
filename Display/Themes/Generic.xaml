@@ -9,6 +9,26 @@
     <SolidColorBrush x:Key="MediaTransportControlsPanelBackground"
                      Color="#101c1612" />
 
+    <LinearGradientBrush x:Key="TopPanelBackground"
+                         StartPoint="0.5,0"
+                         EndPoint="0.5,1"
+                         Opacity="0.5">
+        <GradientStop Color="{StaticResource MediaPlayerBackground}"
+                      Offset="0" />
+        <GradientStop Color="#00000050"
+                      Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="BottomPanelBackground"
+                         StartPoint="0.5,0"
+                         EndPoint="0.5,1"
+                         Opacity="0.5">
+        <GradientStop Color="{StaticResource MediaPlayerBackground}"
+                      Offset="1" />
+        <GradientStop Color="#00000050"
+                      Offset="0" />
+    </LinearGradientBrush>
+
     <SolidColorBrush x:Key="RightButtonBackground"
                      Color="{StaticResource MediaPlayerBackground}"
                      Opacity="0.5" />
@@ -2687,7 +2707,7 @@
                               ColumnDefinitions="*,auto"
                               RenderTransformOrigin="0.5,0.5"
                               VerticalAlignment="Top"
-                              Background="{StaticResource MediaTransportControlsPanelBackground}">
+                              Background="{StaticResource TopPanelBackground}">
 
                             <Grid.RenderTransform>
                                 <TranslateTransform x:Name="TopButtonTranslateVertical" />
@@ -2696,6 +2716,7 @@
                                        Visibility="Collapsed"
                                        Margin="10,0"
                                        Foreground="White"
+                                       Style="{StaticResource TitleTextBlockStyle}"
                                        Text="这是标题，这是标题，这是标题"
                                        VerticalAlignment="Center" />
 
@@ -2721,7 +2742,7 @@
                                         </AppBarButton.Icon>
                                     </AppBarButton>
 
-                                    <AppBarButton x:Name='ScreenshotButton'
+                                    <AppBarButton x:Name='ScreenShotButton'
                                                   Label="截图设为封面"
                                                   Visibility="Collapsed">
                                         <AppBarButton.KeyboardAccelerators>
@@ -2741,7 +2762,7 @@
 
                         <!--底部按钮-->
                         <Grid x:Name="ControlPanelGrid"
-                              Background="{ThemeResource MediaTransportControlsPanelBackground}"
+                              Background="{ThemeResource BottomPanelBackground}"
                               VerticalAlignment="Bottom"
                               RenderTransformOrigin="0.5,0.5">
 
@@ -2771,6 +2792,7 @@
                                     Visibility="Collapsed">
                                 <TextBlock x:Name="ErrorTextBlock"
                                            Style="{StaticResource CaptionTextBlockStyle}"
+                                           Foreground="White"
                                            TextWrapping="WrapWholeWords"
                                            Margin="12" />
                             </Border>
@@ -3095,10 +3117,7 @@
                                                             Symbol="FullScreen" />
                                             </AppBarButton.Icon>
                                         </AppBarButton>
-
                                     </StackPanel>
-
-
                                 </Grid>
 
                             </Border>

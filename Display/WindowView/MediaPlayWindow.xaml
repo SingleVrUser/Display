@@ -9,6 +9,7 @@
     xmlns:customcontrols="using:Display.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:Display.Models"
     mc:Ignorable="d">
     <customcontrols:CursorGrid x:Name="RootGrid">
 
@@ -77,9 +78,27 @@
 
                 <Grid x:Name="MoreGrid"
                       Grid.Column="1"
-                      Width="380"
+                      MaxWidth="380"
+                      Padding="10"
                       Visibility="Collapsed">
-                    <TextBlock Text="内容" />
+                    <ListView x:Name="VideoListView" IsEnabled="False" >
+                        <ListView.Resources>
+                            <StaticResource x:Key="ListViewItemSelectionIndicatorDisabledBrush"
+                                            ResourceKey="AccentFillColorDefaultBrush" />
+                        </ListView.Resources>
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="models:MediaPlayItem">
+                                <Grid>
+                                    <Grid.Resources>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="White"/>
+                                        </Style>
+                                    </Grid.Resources>
+                                    <TextBlock Text="{x:Bind FileNameWithoutExtension}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
                 </Grid>
             </Grid>
         </UserControl>

@@ -1972,7 +1972,7 @@ namespace Display.Data
 
         public long look_later { get; set; } = 0;
 
-        public string image_path { get; set; } = Data.Const.NoPicturePath;
+        public string image_path { get; set; } = Const.NoPicturePath;
     }
 
     public enum FailInfoShowType { like, look_later }

@@ -208,9 +208,9 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
     public VideoCoverDisplay()
     {
-        this.InitializeComponent();
+        InitializeComponent();
 
-        this.Loaded += PageLoaded;
+        Loaded += PageLoaded;
     }
 
     private void PageLoaded(object sender, RoutedEventArgs e)
@@ -232,7 +232,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             }
         }
 
-        this.Loaded -= PageLoaded;
+        Loaded -= PageLoaded;
     }
 
     /// <summary>
@@ -669,9 +669,9 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     {
         ListView selectListView = (ListView)sender;
         var clickStackPanel = (e.ClickedItem as StackPanel);
-        var selectTextBlock = clickStackPanel.Children.Where(x => x is TextBlock).First() as TextBlock;
+        var selectTextBlock = clickStackPanel.Children.First(x => x is TextBlock) as TextBlock;
         string selectOrderText = selectTextBlock.Text;
-        FontIcon lastFontIcon = clickStackPanel.Children.Where(x => x is FontIcon).Last() as FontIcon;
+        FontIcon lastFontIcon = clickStackPanel.Children.Last(x => x is FontIcon) as FontIcon;
 
         string upGlyph = "\xE014";
         string downGlyph = "\xE015";
@@ -1186,7 +1186,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             case nameof(FailLike_RadioButton):
                 if (LikeOrLookLater_failInfocollection == null)
                 {
-                    LikeOrLookLater_failInfocollection = new(FailInfoShowType.like);
+                    LikeOrLookLater_failInfocollection = new IncrementallLoadFailInfoCollection(FailInfoShowType.like);
                 }
                 else if (LikeOrLookLater_failInfocollection.ShowType != FailInfoShowType.like)
                 {
@@ -1228,9 +1228,6 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
                 break;
         }
 
-        //if (BasicGridView.Visibility == Visibility.Visible) BasicGridView.Visibility = Visibility.Collapsed;
-        //if (FailGridView.Visibility == Visibility.Collapsed) FailGridView.Visibility = Visibility.Visible;
-
         if (isShowAllFail)
         {
             //排列按钮
@@ -1256,7 +1253,6 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             //搜索框
             if (FailInfoSuggestBox.Visibility == Visibility.Visible) FailInfoSuggestBox.Visibility = Visibility.Collapsed;
         }
-
     }
 
     private async void FailItemAddToLikeButton_Click(object sender, RoutedEventArgs e)

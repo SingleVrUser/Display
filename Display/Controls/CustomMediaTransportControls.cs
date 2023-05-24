@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
+using Microsoft.UI.Dispatching;
 
 namespace Display.Controls;
 
@@ -45,7 +46,7 @@ public class CustomMediaTransportControls : MediaTransportControls
         {
             if (_likeButton == null)
             {
-                _likeButton = GetTemplateChild("IsLikeButton") as AppBarToggleButton;
+                _likeButton = GetTemplateChild("LikeButton") as AppBarToggleButton;
             }
 
             return _likeButton;
@@ -60,22 +61,22 @@ public class CustomMediaTransportControls : MediaTransportControls
         {
             if (_lookLaterButton == null)
             {
-                _lookLaterButton = GetTemplateChild("LookLaterButton") as AppBarToggleButton;
+                _lookLaterButton = GetTemplateChild("LookAfterButton") as AppBarToggleButton;
             }
 
             return _lookLaterButton;
         }
     }
 
-    private AppBarToggleButton _screenShotButton;
+    private AppBarButton _screenShotButton;
 
-    private AppBarToggleButton ScreenShotButton
+    private AppBarButton ScreenShotButton
     {
         get
         {
             if (_screenShotButton == null)
             {
-                _screenShotButton = GetTemplateChild("ScreenshotButton") as AppBarToggleButton;
+                _screenShotButton = GetTemplateChild("ScreenShotButton") as AppBarButton;
             }
 
             return _screenShotButton;
@@ -96,6 +97,23 @@ public class CustomMediaTransportControls : MediaTransportControls
             return _rightButton;
         }
     }
+
+
+    private TextBlock _titleTextBlock;
+
+    private TextBlock TitleTextBlock
+    {
+        get
+        {
+            if (_titleTextBlock == null)
+            {
+                _titleTextBlock = GetTemplateChild("TitleTextBlock") as TextBlock;
+            }
+
+            return _titleTextBlock;
+        }
+    }
+
 
     private ListView _qualityListView;
 
@@ -124,7 +142,6 @@ public class CustomMediaTransportControls : MediaTransportControls
         RightButton.Click += RightButton_Click;
     }
 
-
     public void SetLike_LookLater(bool isLike, bool lookLater)
     {
         if (LikeButton == null || LookLaterButton == null) return;
@@ -140,6 +157,13 @@ public class CustomMediaTransportControls : MediaTransportControls
 
         LikeButton.Click += LikeButton_Click;
         LookLaterButton.Click += LookLaterButton_Click;
+    }
+
+    public void SetTitle(string title)
+    {
+        if (TitleTextBlock == null) return;
+        TitleTextBlock.Text = title;
+
     }
 
     public void DisableLikeLookAfterButton()
