@@ -276,7 +276,7 @@ namespace Display
         /// <exception cref="NotImplementedException"></exception>
         private void NavView_Navigate(string navItemTag, NavigationTransitionInfo transitionInfo)
         {
-            Type _page = null;
+            Type _page;
             if (navItemTag == "settings")
             {
                 _page = typeof(SettingsPage);
@@ -289,7 +289,7 @@ namespace Display
             var preNavPageType = ContentFrame.CurrentSourcePageType;
 
             //当前页面不跳转
-            if (!(_page is null) && !Type.Equals(preNavPageType, _page))
+            if (_page is not null && preNavPageType != _page)
             {
                 ContentFrame.Navigate(_page, null, transitionInfo);
             }
@@ -364,7 +364,7 @@ namespace Display
         /// <param Name="args"></param>
         private async void SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
-            if (args.SelectedItem is string content && content.Contains("未找到"))
+            if (args.SelectedItem is string content && content.Contains("点击搜索资源"))
             {
                 // 搜索资源
                 //输入框的内容
@@ -549,14 +549,16 @@ namespace Display
         {
             // 查看是否有失败项
             var info = e?.Info;
-            if (info is not { state: true })
+            if (info is null)
             {
                 ShowTeachingTip("出现未知错误");
                 return;
             }
 
             //单链接或多链接
-            var failList = !string.IsNullOrEmpty(info.url) ? new List<AddTaskUrlInfo> { info } : info.result?.Where(x => !string.IsNullOrEmpty(x.error_msg)).ToList();
+            var failList = !string.IsNullOrEmpty(info.url)
+                ? string.IsNullOrEmpty(info.error_msg) ? null:new List<AddTaskUrlInfo> { info }
+                    :info.result?.Where(x => !string.IsNullOrEmpty(x.error_msg)).ToList();
 
             if (failList == null || failList.Count == 0)
             {

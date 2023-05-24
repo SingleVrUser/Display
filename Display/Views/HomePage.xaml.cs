@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -41,18 +42,23 @@ namespace Display.Views
             //启动缓存
             NavigationCacheMode = NavigationCacheMode.Required;
 
-            loadCover();
+            LoadCover();
+
         }
 
-        private void loadCover()
+        //private void HomePage_Loaded(object sender, RoutedEventArgs e)
+        //{
+
+        //    this.Loaded -= HomePage_Loaded;
+        //}
+
+        private void LoadCover()
         {
             //随机获取20个视频，每次启动自动获取一遍
-            foreach (var item in DataAccess.getNameAndIamgeRandom())
+            foreach (var info in DataAccess.getNameAndIamgeRandom().Select(item => new VideoCoverDisplayClass(item, 500, 300)))
             {
-                var info = new VideoCoverDisplayClass(item, 500, 300);
                 Items.Add(info);
             }
-
 
             //ImagePipsPager.DataContext = randomIamgeFlipView;
             Binding binding = new Binding() { Path = new PropertyPath("SelectedIndex"), Mode = BindingMode.TwoWay };
@@ -170,24 +176,24 @@ namespace Display.Views
             }
 
             //对上一级页面的更改做出响应，删除或添加喜欢
-            tryUpdateCoverShow();
+            TryUpdateCoverShow();
 
         }
 
-        private void tryUpdateCoverShow()
+        private void TryUpdateCoverShow()
         {
             //最近视频
-            tryUpdateVideoCoverDisplayClass(DataAccess.getNameAndIamgeRecent(), recentCoverList);
+            TryUpdateVideoCoverDisplayClass(DataAccess.getNameAndIamgeRecent(), recentCoverList);
 
             //喜欢视频
-            tryUpdateVideoCoverDisplayClass(DataAccess.getNameAndImageFromLike(), LoveCoverList);
+            TryUpdateVideoCoverDisplayClass(DataAccess.getNameAndImageFromLike(), LoveCoverList);
 
             //稍后观看
-            tryUpdateVideoCoverDisplayClass(DataAccess.getNameAndImageFromLookLater(), lookLaterList);
+            TryUpdateVideoCoverDisplayClass(DataAccess.getNameAndImageFromLookLater(), lookLaterList);
 
         }
 
-        private void tryUpdateVideoCoverDisplayClass(List<VideoInfo> videoInfos, ObservableCollection<VideoCoverDisplayClass> videoList)
+        private void TryUpdateVideoCoverDisplayClass(List<VideoInfo> videoInfos, ObservableCollection<VideoCoverDisplayClass> videoList)
         {
             //添加
             var addList = new List<VideoInfo>();
