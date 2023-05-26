@@ -8,8 +8,10 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
+using static Display.Data.FilesInfo;
 
 namespace Display.Data
 {
@@ -862,7 +864,7 @@ namespace Display.Data
         public string Name { get; set; }
         public string Cid { get; set; }
         public bool HasUnrealizedChildren { get; set; }
-        public FilesInfo.FileType Type { get; set; }
+        public FileType Type { get; set; }
         private ObservableCollection<ExplorerItem> m_children;
         public ObservableCollection<ExplorerItem> Children
         {
@@ -886,7 +888,7 @@ namespace Display.Data
         {
             get
             {
-                return FilesInfo.getFileIcon(Type);
+                return getFileIcon(Type);
             }
             set
             {
@@ -1034,6 +1036,27 @@ namespace Display.Data
                 OnPropertyChanged();
             }
         }
+        
+
+        public string NameWithoutExtension
+        {
+            get
+            {
+                string nameWithoutExtension;
+
+                if (Type == FileType.File && !string.IsNullOrEmpty(datum.ico))
+                {
+                    nameWithoutExtension = Regex.Replace(Name, $".{datum.ico}$", "", RegexOptions.IgnoreCase);
+                }
+                else
+                {
+                    nameWithoutExtension = Name;
+                }
+
+                return nameWithoutExtension;
+            }
+        }
+
         public string Cid { get; set; }
         public string Fid { get; set; }
         public FileType Type { get; set; }
@@ -1982,11 +2005,14 @@ namespace Display.Data
         public bool state { get; set; }
         public string error { get; set; }
         public string errno { get; set; }
+        public string errtype { get; set; }
         public int aid { get; set; }
         public string cid { get; set; }
         public string cname { get; set; }
         public string file_id { get; set; }
         public string file_name { get; set; }
+
+
     }
 
 

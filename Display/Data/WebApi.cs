@@ -689,6 +689,8 @@ namespace Display.Data
             {
                 var response = await Client.PostAsync(url, content);
 
+                var res = await response.Content.ReadAsStringAsync();
+
                 var result = await response.Content.ReadFromJsonAsync<MakeDirRequest>();
 
                 if (string.IsNullOrEmpty(result.error))
@@ -1965,19 +1967,28 @@ namespace Display.Data
             // 检查账号是否异常
             if (m3U8Infos.Count == 0 && strResult.Contains(Const.AccountAnomalyTip))
             {
-                var window = new CommonWindow();
-                window.Content = new BrowserPage(window, $"https://v.anxia.com/?pickcode={pickCode}&share_id=0");
-                window.Activate();
+                var window = CreateWindowToVerifyAccount();
+                
+                if (window.Content is not VerifyAccountPage page) return m3U8Infos;
 
-                var isClose = false;
-                window.Closed += async (_, _) =>
+                var isClosed = false;
+                page.VerifyAccountCompleted += async (_, iSucceeded) =>
                 {
+                    // 失败
+                    if (!iSucceeded)
+                    {
+                        isClosed = true;
+                        return;
+                    }
+
                     m3U8Infos = await GetM3U8InfoByPickCode(pickCode);
-                    isClose = true;
+                    isClosed = true;
                 };
 
+                window.Activate();
+
                 //堵塞，直到关闭输入验证码的window
-                while (!isClose)
+                while (!isClosed)
                 {
                     await Task.Delay(2000);
                 }
@@ -1991,6 +2002,22 @@ namespace Display.Data
             return m3U8Infos;
         }
 
+
+        public static Window CreateWindowToVerifyAccount()
+        {
+            var window = new CommonWindow("验证账号", 360, 560);
+            var page = new VerifyAccountPage(window);
+
+            window.Content = page;
+
+            return window;
+                ;
+        }
+
+        private static void Page_VerifyAccountCompleted(object sender, bool e)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// mpv播放

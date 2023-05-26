@@ -95,15 +95,18 @@ namespace Display
             webview.CoreWebView2.CookieManager.AddOrUpdateCookie(cookie);
         }
 
-        private Visibility isSourceUrlNull()
+        private Visibility IsSourceUrlNull()
         {
             return sourceUrl == null ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        public static VideoPlayWindow createNewWindow(string sourUrl)
+        public static VideoPlayWindow CreateNewWindow(string sourUrl)
         {
-            VideoPlayWindow newWindow = new VideoPlayWindow();
-            newWindow.sourceUrl = sourUrl;
+            var newWindow = new VideoPlayWindow
+            {
+                sourceUrl = sourUrl
+            };
+
             newWindow.Activate();
 
             return newWindow;

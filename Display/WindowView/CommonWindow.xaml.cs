@@ -17,10 +17,17 @@ namespace Display.WindowView
     {
         private const string DefaultTitle = "Display";
 
-        public CommonWindow(string title = DefaultTitle)
+        public CommonWindow(string title = DefaultTitle,int width=0,int height=0)
         {
             this.InitializeComponent();
             this.Title = title;
+
+            // 调整大小
+            if (width != 0 && height != 0)
+            {
+                this.Width = width;
+                this.Height = height;
+            }
 
             var appWindow = App.getAppWindow(this);
             appWindow.SetIcon(Path.Combine(Package.Current.InstalledLocation.Path, "Assets/pokeball.ico"));
@@ -29,9 +36,9 @@ namespace Display.WindowView
             Backdrop = new MicaSystemBackdrop();
         }
 
-        public static void CreateAndShowWindow(Page page,string title= DefaultTitle)
+        public static void CreateAndShowWindow(Page page,string title= DefaultTitle, int width = 0, int height = 0)
         {
-            var window = new CommonWindow(title)
+            var window = new CommonWindow(title, width, height)
             {
                 Content = page
             };

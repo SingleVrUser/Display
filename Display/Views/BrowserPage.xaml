@@ -7,7 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    
+
     <Grid>
         <customcontrols:Browser x:Name="Browser"/>
 
@@ -18,16 +18,13 @@
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
             Margin="10,80,10,0"
-            Click="DownButton_Click"
             ToolTipService.ToolTip="点击使用比特彗星下载，右键选择更多下载方式"
-            PointerEntered="DownButton_PointerEntered"
-            PointerExited="DownButton_PointerExited"
             CornerRadius="15"
             Opacity="0.2">
 
             <HyperlinkButton.ContextFlyout>
                 <MenuFlyout>
-                    <MenuFlyoutItem Text="Aria2下载" Click="Aria2Down_Click" />
+                    <MenuFlyoutItem x:Name="Aria2DownItem" Text="Aria2下载"/>
                 </MenuFlyout>
             </HyperlinkButton.ContextFlyout>
             

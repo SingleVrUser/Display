@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Display.Data;
+using Microsoft.Web.WebView2.Core;
+using Windows.Foundation;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -27,6 +29,7 @@ namespace Display.Controls
 
         }
 
+
         private void Webview_CoreWebView2Initialized(WebView2 sender, CoreWebView2InitializedEventArgs args)
         {
             //webview.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
@@ -41,14 +44,20 @@ namespace Display.Controls
                 var cookiesList = cookie.Split(';');
                 foreach (var cookies in cookiesList)
                 {
-                    cookie = cookies;
                     var item = cookies.Split('=');
                     string key = item[0].Trim();
                     string value = item[1].Trim();
                     AddCookie(key, value);
                 }
             }
-
+            
+            webview.CoreWebView2.WebResourceResponseReceived += CoreWebView2_WebResourceResponseReceived; ;
+        }
+        
+        public event TypedEventHandler<CoreWebView2, CoreWebView2WebResourceResponseReceivedEventArgs> WebMessageReceived;
+        private void CoreWebView2_WebResourceResponseReceived(CoreWebView2 sender, CoreWebView2WebResourceResponseReceivedEventArgs args)
+        {
+            WebMessageReceived?.Invoke(sender,args);
         }
 
         private void AddCookie(string key, string value)
@@ -57,9 +66,11 @@ namespace Display.Controls
             webview.CoreWebView2.CookieManager.AddOrUpdateCookie(cookie);
         }
 
-        private void webview_NavigationStarting(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs args)
+
+        private void webview_NavigationStarting(WebView2 sender, CoreWebView2NavigationStartingEventArgs args)
         {
             NavigationProgressBar.Visibility = Visibility.Visible;
+
         }
 
         private async void HiddenWaterMark()

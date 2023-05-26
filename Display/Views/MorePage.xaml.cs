@@ -87,7 +87,7 @@ namespace Display.Views
                     break;
                 case "浏览器":
                     var window4 = new CommonWindow();
-                    window4.Content = new BrowserPage(window4);
+                    window4.Content = new BrowserPage(window4,isShowButton:true);
                     window4.Activate();
                     break;
                 case "文件列表":
