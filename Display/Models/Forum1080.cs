@@ -63,28 +63,20 @@ namespace Display.Models
     
     public class AttmnFileInfo
     {
-        private string _name;
-        public string Name
+        public AttmnFileInfo(string path)
         {
-            get
-            {
-                if (_name != null)
-                    return _name;
-
-                return Path != null ? System.IO.Path.GetFileNameWithoutExtension(Path) : null;
-            }
-            set
-            {
-                if (_name != null && _name == value)
-                    return;
-                _name = value;
-            }
+            Path = path;
+            Name = System.IO.Path.GetFileNameWithoutExtension(Path);
         }
+
+        public string Name { get; private set; }
 
         public string Path { get; set; }
         public string QrCodeImagePath { get; set; }
         public string DetailFileContent { get; set; }
         public BaiduShareInfo BaiduShareInfo { get; set; }
+
+        public string SrtPath { get; set; }
 
         public Dictionary<string, List<string>> Links { get; set; } = new();
 
@@ -97,7 +89,6 @@ namespace Display.Models
         public string SharePassword { get; set; }
         public string ShareLinkWithPwd => $"{ShareLink}?pwd={SharePassword}";
     }
-
 
     public enum AttmnType
     {

@@ -43,7 +43,8 @@
 
         <DataTemplate x:Key="FileListTemplate"
                       x:DataType="data:FilesInfo">
-            <Grid DoubleTapped="OpenFile_DoubleTapped" Background="Transparent">
+            <Grid DoubleTapped="OpenFile_DoubleTapped"
+                  Background="Transparent">
 
                 <Grid.ContextFlyout>
                     <MenuFlyout ShouldConstrainToRootBounds="False">
@@ -63,37 +64,46 @@
 
                             <MenuFlyoutItem Text="WebView"
                                             Tag="0"
-                                            Click="PlayWithPlayerButtonClick"/>
+                                            Click="PlayWithPlayerButtonClick" />
 
                             <MenuFlyoutItem Text="PotPlayer"
                                             Tag="1"
-                                            Click="PlayWithPlayerButtonClick"/>
+                                            Click="PlayWithPlayerButtonClick" />
 
                             <MenuFlyoutItem Text="mpv"
                                             Tag="2"
-                                            Click="PlayWithPlayerButtonClick"/>
+                                            Click="PlayWithPlayerButtonClick" />
 
                             <MenuFlyoutItem Text="vlc"
                                             Tag="3"
-                                            Click="PlayWithPlayerButtonClick"/>
+                                            Click="PlayWithPlayerButtonClick" />
 
                             <MenuFlyoutItem Text="MediaElement"
                                             Tag="4"
-                                            Click="PlayWithPlayerButtonClick"/>
+                                            Click="PlayWithPlayerButtonClick" />
 
                         </MenuFlyoutSubItem>
 
-
-                        <MenuFlyoutItem Text="移动到新文件夹" Click="MoveToNewFolderItemClick">
+                        <MenuFlyoutItem Text="移动到新文件夹"
+                                        Click="MoveToNewFolderItemClick">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon FontFamily="Segoe Fluent Icons"
                                           Glyph="&#xE8DE;" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
 
-                        <MenuFlyoutItem Text="重命名" Click="RenameItemClick">
+                        <MenuFlyoutItem Text="重命名"
+                                        Click="RenameItemClick">
                             <MenuFlyoutItem.Icon>
                                 <SymbolIcon Symbol="Rename" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+
+                        <MenuFlyoutItem Text="属性"
+                                        Click="ShowInfoClick">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe Fluent Icons"
+                                          Glyph="&#xE946;" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
 
@@ -157,12 +167,12 @@
 
     </Page.Resources>
 
-    <Grid Loaded="Grid_loaded">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        
+
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="RecyStates">
 
@@ -183,14 +193,21 @@
         <ProgressBar x:Name="MyProgressBar"
                      VerticalAlignment="Top"
                      Visibility="Collapsed"
-                     IsIndeterminate="True"/>
+                     IsIndeterminate="True" />
 
-        <Grid Grid.Row="0">
+        <Grid Grid.Row="0"
+              KeyboardAcceleratorPlacementMode="Hidden">
+            <Grid.KeyboardAccelerators>
+                <KeyboardAccelerator Key="Left"
+                                     Modifiers="Control"
+                                     Invoked="GoBack_KeyboardAccelerator_Invoked" />
+            </Grid.KeyboardAccelerators>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
+
 
             <CommandBar Grid.Column="1">
                 <CommandBar.Transitions>
@@ -216,7 +233,7 @@
 
                                 <MenuFlyoutItem Text="WebView"
                                                 Tag="0"
-                                                Click="PlayWithPlayerButtonClick"/>
+                                                Click="PlayWithPlayerButtonClick" />
 
                                 <MenuFlyoutItem Text="PotPlayer"
                                                 Tag="1"
@@ -260,7 +277,7 @@
                     <AppBarButton Icon="Sort"
                                   Label="整理"
                                   Click="Sort115Button_Click"
-                                  IsEnabled="False"/>
+                                  IsEnabled="False" />
                     <AppBarButton Icon="Setting"
                                   Label="设置">
                         <AppBarButton.Flyout>
@@ -319,7 +336,23 @@
                         <BreadcrumbBarItem Content="{Binding}">
                             <BreadcrumbBarItem.ContentTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Name}" AllowDrop="True" DragOver="MetadataItem_OnDragOver" Drop="MetadataItem_OnDrop"/>
+                                    <TextBlock Text="{Binding Name}"
+                                               AllowDrop="True"
+                                               DragOver="MetadataItem_OnDragOver"
+                                               Drop="MetadataItem_OnDrop">
+                                        <TextBlock.ContextFlyout>
+                                            <MenuFlyout>
+                                                <MenuFlyoutItem Text="属性"
+                                                                Click="ShowFolderInfoClick">
+                                                    <MenuFlyoutItem.Icon>
+                                                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                                                  Glyph="&#xE946;" />
+                                                    </MenuFlyoutItem.Icon>
+                                                </MenuFlyoutItem>
+                                            </MenuFlyout>
+                                        </TextBlock.ContextFlyout>
+
+                                    </TextBlock>
                                 </DataTemplate>
                             </BreadcrumbBarItem.ContentTemplate>
                         </BreadcrumbBarItem>
@@ -330,66 +363,69 @@
         </Grid>
 
         <ListView x:Name="BaseExample"
-                      Grid.Row="1"
-                      ItemTemplate="{StaticResource FileListTemplate}"
-                      DragItemsStarting="Source_DragItemsStarting"
-                      DragItemsCompleted="Source_DragItemsCompleted"
-                      CanDragItems="True"
-                      SelectionMode="Multiple"
-                      AllowDrop="True"
-                      Drop="BaseExample_Drop"
-                      DragOver="FileMove_DragOver">
+                  Grid.Row="1"
+                  ItemTemplate="{StaticResource FileListTemplate}"
+                  SelectionMode="Multiple"
+                  CanDragItems="True"
+                  DragItemsStarting="Source_DragItemsStarting"
+                  DragItemsCompleted="Source_DragItemsCompleted"
+                  DragOver="FileMove_DragOver"
+                  AllowDrop="True"
+                  Drop="BaseExample_Drop">
 
             <interactivity:Interaction.Behaviors>
-                    <behaviors:QuickReturnHeaderBehavior />
-                </interactivity:Interaction.Behaviors>
+                <behaviors:QuickReturnHeaderBehavior />
+            </interactivity:Interaction.Behaviors>
 
-                <ListView.Header>
+            <ListView.Header>
                 <Grid MinHeight="30"
                       Background="{ThemeResource LayerFillColorDefaultBrush}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition MinWidth="50" Width="*" />
-                            <ColumnDefinition Width="200" />
-                            <ColumnDefinition Width="100" />
-                        </Grid.ColumnDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition MinWidth="50"
+                                          Width="*" />
+                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="100" />
+                    </Grid.ColumnDefinitions>
 
-                        <TextBlock Style="{StaticResource TitleText}"
-                                   Tapped="OrderBy_Tapped">
+                    <CheckBox x:Name="MultipleSelectedCheckBox" Margin="14,0" Click="SelectedMultipleFilesCheckBox_OnClick"/>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource TitleText}"
+                               Tapped="OrderBy_Tapped">
                                 <Run>名称</Run>
                                 <Run x:Name="Name_Run"
                                      FontFamily="Segoe Fluent Icons"></Run>
-                        </TextBlock>
+                    </TextBlock>
 
-                        <TextBlock Style="{StaticResource TitleText}"
-                                   Grid.Column="1"
-                                   Tapped="OrderBy_Tapped">
+                    <TextBlock Style="{StaticResource TitleText}"
+                               Grid.Column="1"
+                               Tapped="OrderBy_Tapped">
                             <Run>修改时间</Run>
                             <Run x:Name="Time_Run"
                                  FontFamily="Segoe Fluent Icons"
                                  Text="&#xE015;"></Run>
-                        </TextBlock>
+                    </TextBlock>
 
-                        <TextBlock Style="{StaticResource TitleText}"
-                                   Grid.Column="2"
-                                   Tapped="OrderBy_Tapped">
+                    <TextBlock Style="{StaticResource TitleText}"
+                               Grid.Column="2"
+                               Tapped="OrderBy_Tapped">
                             <Run>大小</Run>
                             <Run x:Name="Size_Run"
                                  FontFamily="Segoe Fluent Icons"></Run>
-                        </TextBlock>
-                    </Grid>
-                </ListView.Header>
-            </ListView>
+                    </TextBlock>
+                </Grid>
+            </ListView.Header>
+        </ListView>
 
         <Grid Grid.Row="1"
               BorderThickness="0,1,0,0"
               BorderBrush="{StaticResource CircleElevationBorderBrush}">
             <!--数量指示-->
             <customizeControls:ShowCountControl Margin="2"
-                                      CurrentCount="{x:Bind filesInfos.Count,Mode=OneWay}"
-                                      AllCount="{x:Bind filesInfos.AllCount,Mode=OneWay}"
-                                      HorizontalAlignment="Right"
-                                      VerticalAlignment="Bottom"
-                                      Clicked="ToTopButton_Click" />
+                                                CurrentCount="{x:Bind filesInfos.Count,Mode=OneWay}"
+                                                AllCount="{x:Bind filesInfos.AllCount,Mode=OneWay}"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Bottom"
+                                                Clicked="ToTopButton_Click" />
 
             <!--回收站-->
             <Grid Margin="10,30,10,45"
@@ -400,7 +436,7 @@
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="1"
-                      x:Name="RecyStationGrid"
+                      x:Name="RecycleStationGrid"
                       Visibility="Collapsed"
                       Style="{StaticResource TempGridStyle}"
                       Width="80"
@@ -408,8 +444,8 @@
                       AllowDrop="True"
                       Drop="RecycleStationGrid_Drop"
                       DragOver="DeletedFileMove_DragOver"
-                      DragEnter="RecyStationGrid_DragEnter"
-                      DragLeave="RecyStationGrid_DragLeave"
+                      DragEnter="RecycleStationGrid_DragEnter"
+                      DragLeave="RecycleStationGrid_DragLeave"
                       Background="{ThemeResource LayerFillColorDefaultBrush}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
@@ -428,13 +464,13 @@
             </Grid>
 
             <!--中转站-->
-            <Grid x:Name="TransferStation_Grid"
+            <Grid x:Name="TransferStationGrid"
                   Visibility="Collapsed"
                   Background="{ThemeResource LayerFillColorDefaultBrush}"
                   Style="{StaticResource TempGridStyle}"
                   AllowDrop="True"
-                  Drop="TransferStationGrid_Drop"
                   DragOver="TransferMove_DragOver"
+                  Drop="TransferStationGrid_Drop"
                   VerticalAlignment="Bottom"
                   HorizontalAlignment="Stretch"
                   Margin="100,5"
@@ -449,18 +485,20 @@
                            Foreground="Gray"
                            VerticalAlignment="Top" />
 
-                <HyperlinkButton Grid.Row="0" Content="清空"
+                <HyperlinkButton Grid.Row="0"
+                                 Content="清空"
                                  HorizontalAlignment="Right"
                                  VerticalAlignment="Top"
                                  Click="EmptyTransferStationButton_Click" />
 
-                <ListView x:Name="TransferStation_ListView"
+                <ListView x:Name="TransferStationListView"
                           Grid.Row="1"
                           ItemTemplate="{StaticResource TransferStationTemplate}"
                           ItemsSource="{x:Bind transferStationFiles}"
                           SelectionMode="Multiple"
                           CanDragItems="True"
-                          DragItemsStarting="FilesTransferStation_DragItemsStarting">
+                          DragItemsStarting="FilesTransferStation_DragItemsStarting"
+                          DragItemsCompleted="TransferStationListView_OnDragItemsCompleted">
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <ItemsStackPanel Orientation="Horizontal" />
@@ -471,7 +509,9 @@
             </Grid>
         </Grid>
 
-        <TeachingTip Grid.Row="0" Grid.RowSpan="2" x:Name="LightDismissTeachingTip"
+        <TeachingTip Grid.Row="0"
+                     Grid.RowSpan="2"
+                     x:Name="LightDismissTeachingTip"
                      IsLightDismissEnabled="True" />
     </Grid>
 </Page>

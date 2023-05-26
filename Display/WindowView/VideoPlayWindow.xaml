@@ -37,7 +37,7 @@
             <WebView2 x:Name="webview" Source="{x:Bind sourceUrl}" NavigationStarting="webview_NavigationStarting" NavigationCompleted="webview_NavigationCompleted"/>
 
             <!--无链接传入-->
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{x:Bind isSourceUrlNull()}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{x:Bind IsSourceUrlNull()}">
                 <TextBlock Text="网页地址为空" FontSize="20"/>
             </StackPanel>
 

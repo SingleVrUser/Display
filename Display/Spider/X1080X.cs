@@ -484,10 +484,7 @@ namespace Display.Spider
             var matchTxt = Regex.Match(txtFile.Name, @"(.*[a-z0-9])\.txt", RegexOptions.IgnoreCase);
             if (!matchTxt.Success) return null;
 
-            AttmnFileInfo attmnFileInfo = new()
-            {
-                Name = matchTxt.Groups[1].Value
-            };
+            AttmnFileInfo attmnFileInfo = new(txtPath);
 
             //读取文件
             using var sr = new StreamReader(txtFile.FullName);
@@ -500,7 +497,7 @@ namespace Display.Spider
 
         public static async Task<AttmnFileInfo> GetRarInfoFromRarPath(string rarPath)
         {
-            AttmnFileInfo attmnFileInfo = new();
+            AttmnFileInfo attmnFileInfo = new(rarPath);
 
             await using var stream = File.OpenRead(rarPath);
             using var reader = ReaderFactory.Open(stream, new ReaderOptions()
@@ -518,11 +515,11 @@ namespace Display.Spider
                     var matchTxt = Regex.Match(key, @"(.*[a-z0-9])\.txt", RegexOptions.IgnoreCase);
                     if (!matchTxt.Success) continue;
 
-                    attmnFileInfo.Name = matchTxt.Groups[1].Value;
+                    //attmnFileInfo.Name = matchTxt.Groups[1].Value;
 
                     await using var entryStream = reader.OpenEntryStream();
                     using var sr = new StreamReader(entryStream);
-                    string originalContent = await sr.ReadToEndAsync();
+                    var originalContent = await sr.ReadToEndAsync();
 
                     ParsingRarDetailContent(attmnFileInfo, originalContent);
                 }
@@ -537,53 +534,62 @@ namespace Display.Spider
                     //{
                     //    Debug.WriteLine("保存附件图片出错");
                     //}
-
-
                 }
-                //发现字幕，则生成Sha1链接
+                //发现字幕，则保存
                 else if (reader.Entry.Key.Contains("srt"))
                 {
-                    long size = reader.Entry.Size;
-                    string shareSha1Link;
-
-                    using (var destination = new MemoryStream())
+                    try
                     {
-                        //entryStream 不能 seek
-                        //所以 需要 copyto 新的 Stream
-                        await using (var entryStream = reader.OpenEntryStream())
-                        {
-                            await entryStream.CopyToAsync(destination);
-                        }
-
-                        destination.Seek(0, SeekOrigin.Begin);
-                        //前一部分Sha1
-                        int bufferSize = 128 * 1024; //每次读取的字节数
-                        byte[] buffer = new byte[bufferSize];
-                        var item = destination.Read(buffer, 0, bufferSize);
-                        Stream partStream = new MemoryStream(buffer);
-                        var hashDlg = SHA1.Create();
-
-                        byte[] hashBytes = await hashDlg.ComputeHashAsync(partStream);
-                        var partSha1 = Convert.ToHexString(hashBytes);
-
-                        //余下的Sha1
-                        destination.Seek(0, SeekOrigin.Begin);
-
-                        hashBytes = await hashDlg.ComputeHashAsync(destination);
-
-                        var allSha1 = Convert.ToHexString(hashBytes);
-
-                        shareSha1Link = $"{reader.Entry.Key}|{size}|{allSha1}|{partSha1}";
+                        string savePath = Path.Combine(AppSettings.X1080XAttmnSavePath, reader.Entry.Key);
+                        reader.WriteEntryToFile(savePath);
+                        attmnFileInfo.SrtPath = savePath;
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"保存字幕文件时出错：{ex.Message}");
                     }
 
-                    if (attmnFileInfo.Links.TryGetValue("115转存链接", out var link))
-                    {
-                        link.Add(shareSha1Link);
-                    }
-                    else
-                    {
-                        attmnFileInfo.Links.Add("115转存链接", new List<string> { shareSha1Link });
-                    }
+                    //long size = reader.Entry.Size;
+                    //string shareSha1Link;
+
+                    //using (var destination = new MemoryStream())
+                    //{
+                    //    //entryStream 不能 seek
+                    //    //所以 需要 copyto 新的 Stream
+                    //    await using (var entryStream = reader.OpenEntryStream())
+                    //    {
+                    //        await entryStream.CopyToAsync(destination);
+                    //    }
+
+                    //    destination.Seek(0, SeekOrigin.Begin);
+                    //    //前一部分Sha1
+                    //    int bufferSize = 128 * 1024; //每次读取的字节数
+                    //    byte[] buffer = new byte[bufferSize];
+                    //    var item = destination.Read(buffer, 0, bufferSize);
+                    //    Stream partStream = new MemoryStream(buffer);
+                    //    var hashDlg = SHA1.Create();
+
+                    //    byte[] hashBytes = await hashDlg.ComputeHashAsync(partStream);
+                    //    var partSha1 = Convert.ToHexString(hashBytes);
+
+                    //    //余下的Sha1
+                    //    destination.Seek(0, SeekOrigin.Begin);
+
+                    //    hashBytes = await hashDlg.ComputeHashAsync(destination);
+
+                    //    var allSha1 = Convert.ToHexString(hashBytes);
+
+                    //    shareSha1Link = $"{reader.Entry.Key}|{size}|{allSha1}|{partSha1}";
+                    //}
+
+                    //if (attmnFileInfo.Links.TryGetValue("115转存链接", out var link))
+                    //{
+                    //    link.Add(shareSha1Link);
+                    //}
+                    //else
+                    //{
+                    //    attmnFileInfo.Links.Add("115转存链接", new List<string> { shareSha1Link });
+                    //}
                 }
             }
 

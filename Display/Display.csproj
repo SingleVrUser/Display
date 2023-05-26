@@ -113,6 +113,7 @@
     <None Remove="VideoPlayWindow.xaml" />
     <None Remove="Views\BrowserPage.xaml" />
     <None Remove="Views\MorePage.xaml" />
+    <None Remove="Views\VerifyAccountPage.xaml" />
     <None Remove="WindowView\CommonWindow.xaml" />
     <None Remove="WindowView\LoginWindow.xaml" />
     <None Remove="WindowView\MediaPlayWindow.xaml" />
@@ -318,6 +319,9 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="Views\VerifyAccountPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="ContentsPage\SelectedFolderPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

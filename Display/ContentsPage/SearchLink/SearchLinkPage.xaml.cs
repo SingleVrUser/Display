@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Display.Views;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -56,7 +57,7 @@ namespace Display.ContentsPage.SearchLink
             var url = info.Url;
 
             var attachmentInfos = await X1080X.GetDownLinkFromUrl(url);
-            Debug.WriteLine($"获取到下载链接({attachmentInfos.Count})：{string.Join(",", attachmentInfos)}");
+            Debug.WriteLine($"获取到下载链接({attachmentInfos.Count})");
 
             //选择第一个不需要点数的
             var attmnInfo = attachmentInfos.FirstOrDefault(x => x.Expense == 0);
@@ -83,7 +84,7 @@ namespace Display.ContentsPage.SearchLink
                 var down115LinkList = Get115DownUrlsFromAttmnInfo(rarInfo);
                 if(down115LinkList.Count==0) return false;
 
-                return await RequestOfflineDown(down115LinkList);
+                return await RequestOfflineDown(down115LinkList,rarInfo.SrtPath);
             }else if (attmnInfo.Type == AttmnType.Txt)
             {
                 var txtPath = await X1080X.TryDownAttmn(attmnInfo.Url, attmnInfo.Name);
@@ -137,7 +138,7 @@ namespace Display.ContentsPage.SearchLink
             return noRarList.Count > 0 ? noRarList : down115LinkList;
         }
 
-        private async Task<bool> RequestOfflineDown(List<string> links)
+        private async Task<bool> RequestOfflineDown(List<string> links,string srtPath=null)
         {
             var webApi = WebApi.GlobalWebApi;
 
@@ -149,6 +150,46 @@ namespace Display.ContentsPage.SearchLink
             long.TryParse(AppSettings.SavePath115Cid, out var cid);
 
             var addTaskUrlInfo = await webApi.AddTaskUrl(links, cid, uploadInfo.user_id, offlineSpaceInfo.sign, offlineSpaceInfo.time);
+
+            // 需要验证账号
+            if (addTaskUrlInfo is { errcode: Const.AccountAnomalyCode })
+            {
+                var window = WebApi.CreateWindowToVerifyAccount();
+                
+                var result = false;
+
+                if (window.Content is not VerifyAccountPage page) return false;
+
+                var isClosed = false;
+                page.VerifyAccountCompleted += async (_, iSucceeded) =>
+                {
+                    if (!iSucceeded)
+                    {
+                        result = false;
+                        isClosed = true;
+                        return;
+                    }
+
+                    result = await RequestOfflineDown(links);
+                    isClosed = true;
+                };
+
+                window.Activate();
+
+                //堵塞，直到关闭输入验证码的window
+                while (!isClosed)
+                {
+                    await Task.Delay(2000);
+                }
+
+                return result;
+            }
+
+            // 上传字幕，如果需要
+            if (!string.IsNullOrEmpty(srtPath))
+            {
+                await Upload115.SingleUpload115.UploadTo115(srtPath, cid.ToString(), uploadInfo.user_id.ToString(), uploadInfo.userkey);
+            }
 
             return addTaskUrlInfo is { state: true };
 

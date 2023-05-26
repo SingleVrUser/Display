@@ -11,19 +11,28 @@ namespace Display.Views
 {
     public sealed partial class BrowserPage : Page
     {
-        public BrowserPage(Window window, string url= "https://115.com/?cid=0&offset=0&mode=wangpan")
+        public BrowserPage(Window window, string url= "https://115.com/?cid=0&offset=0&mode=wangpan", bool isShowButton=false)
         {
             this.InitializeComponent();
-            //NavigationCacheMode = NavigationCacheMode.Enabled;
 
             Browser.webview.Source = new Uri(url);
-
-            Browser.webview.NavigationCompleted += Webview_NavigationCompleted; ;
 
             window.Closed += (sender, args) =>
             {
                 Browser.webview.Close();
             };
+
+            //是否显示下载按钮
+            if (isShowButton)
+            {
+                DownButton.Click += DownButton_Click;
+                DownButton.PointerEntered += DownButton_PointerEntered;
+                DownButton.PointerExited += DownButton_PointerExited;
+                Aria2DownItem.Click += Aria2Down_Click;
+
+                // 加载完成后显示
+                Browser.webview.NavigationCompleted += Webview_NavigationCompleted;
+            }
         }
 
         private void Webview_NavigationCompleted(WebView2 sender, CoreWebView2NavigationCompletedEventArgs args)
@@ -34,18 +43,18 @@ namespace Display.Views
 
         private void DownButton_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            (sender as HyperlinkButton).Opacity = 1;
+            ((HyperlinkButton)sender).Opacity = 1;
         }
 
         private void DownButton_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            (sender as HyperlinkButton).Opacity = 0.2;
+            ((HyperlinkButton)sender).Opacity = 0.2;
         }
 
         WebApi webApi;
         private async void DownButton_Click(object sender, RoutedEventArgs e)
         {
-            await DownFiles(Data.WebApi.downType.bc);
+            await DownFiles(WebApi.downType.bc);
 
         }
 
@@ -96,6 +105,13 @@ namespace Display.Views
         {
 
             await DownFiles(Data.WebApi.downType.aria2);
+        }
+
+        private void GoBack_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+        {
+            if (!Browser.webview.CanGoBack) return;
+
+            Browser.webview.GoBack();
         }
     }
 

@@ -22,6 +22,8 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Display.Data;
 using Display.Views;
+using Microsoft.UI.Xaml.Input;
+using System.Security.Cryptography;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -88,15 +90,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    /// <summary>
-    /// Grid加载时调用
-    /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
-    private void Grid_loaded(object sender, RoutedEventArgs e)
-    {
-    }
-
     private void FilesInfos_GetFileInfoCompleted(object sender, GetFileInfoCompletedEventArgs e)
     {
         ChangedOrderIcon(e.orderby, e.asc);
@@ -122,6 +115,9 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
 
         await filesInfos.SetCid(cid);
+
+        // 切换目录时，全选checkBox不是选中状态
+        MultipleSelectedCheckBox.IsChecked = false;
     }
 
     private async void OpenFile_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
@@ -258,12 +254,14 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     
     private void Source_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
     {
-        RecyStationGrid.Visibility = Visibility.Visible;
+        // 显示回收站
+        RecycleStationGrid.Visibility = Visibility.Visible;
 
-        TransferStation_Grid.Visibility = Visibility.Visible;
+        // 显示中转站
+        TransferStationGrid.Visibility = Visibility.Visible;
 
+        // 添加数据
         var infos = e.Items.Cast<FilesInfo>().ToList();
-
         e.Data.Properties.Add("items", infos);
 
     }
@@ -278,21 +276,26 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         Debug.WriteLine("拖拽文件，在中转站上松开");
         if (sender is not Grid) return;
 
-        if (e.DataView.Properties.Values.FirstOrDefault() is not List<Data.FilesInfo> sourceFilesInfos) return;
+        if (e.DataView.Properties.Values.FirstOrDefault() is not List<FilesInfo> sourceFilesInfos) return;
 
 
         if (transferStationFiles == null)
         {
             transferStationFiles = new();
-            TransferStation_ListView.ItemsSource = transferStationFiles;
+            TransferStationListView.ItemsSource = transferStationFiles;
         };
 
         transferStationFiles.Add(new(sourceFilesInfos));
     }
 
+    /// <summary>
+    /// 拖拽文件，在回收站上不松开
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void DeletedFileMove_DragOver(object sender, DragEventArgs e)
     {
-        e.AcceptedOperation = DataPackageOperation.Move;
+        e.AcceptedOperation = DataPackageOperation.Link;
 
         e.DragUIOverride.Caption = "删除";
     }
@@ -312,7 +315,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         // 范围之外
         if (index == -1)
         {
-
             // 文件从中转站中拖拽过来，允许拖拽文件到此处
             if (!filesInfos.Contains(sourceFilesInfos.FirstOrDefault()))
             {
@@ -360,49 +362,55 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     /// <param name="e"></param>
     private void TransferMove_DragOver(object sender, DragEventArgs e)
     {
-        if (sender is not Grid target) return;
+        if (sender is not Grid) return;
 
         if (e.DataView.Properties.Values.FirstOrDefault() is not List<Data.FilesInfo> sourceFilesInfos) return;
 
         if (transferStationFiles == null)
         {
-            e.AcceptedOperation = DataPackageOperation.Move;
+            e.AcceptedOperation = DataPackageOperation.Link;
         }
         else
         {
             // 如果移动的文件已经在中转站了，没必要再移动了
             var sameFile = transferStationFiles.Where(item =>
             {
-                if (sourceFilesInfos.Count == item.TransferFiles.Count)
+                foreach (var file in item.TransferFiles)
                 {
-                    foreach (var file in item.TransferFiles)
-                    {
-                        if (!sourceFilesInfos.Contains(file)) return false;
-                    }
-
-                    return true;
+                    if (!sourceFilesInfos.Contains(file)) return false;
                 }
 
-                return false;
+                return true;
+
             }).FirstOrDefault();
 
             if (sameFile == null)
             {
-                e.AcceptedOperation = DataPackageOperation.Move;
+                e.AcceptedOperation = DataPackageOperation.Link;
             }
         }
 
     }
 
+    /// <summary>
+    /// 点击清空中转站
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void EmptyTransferStationButton_Click(object sender, RoutedEventArgs e)
     {
         if (transferStationFiles == null) return;
 
         transferStationFiles.Clear();
 
-        TransferStation_Grid.Visibility = Visibility.Collapsed;
+        TransferStationGrid.Visibility = Visibility.Collapsed;
     }
 
+    /// <summary>
+    /// 拖拽文件，在回收站上松开
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void RecycleStationGrid_Drop(object sender, DragEventArgs e)
     {
         if (sender is not Grid) return;
@@ -424,31 +432,37 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (result == ContentDialogResult.Primary)
         {
-            sourceFilesInfos.ForEach(item => filesInfos.Remove(item));
-
-            await WebApi.DeleteFiles(sourceFilesInfos.FirstOrDefault()?.datum.pid, sourceFilesInfos.Select(item =>
-            {
-                //文件
-                if (item.Type == FilesInfo.FileType.File)
-                    return item.Fid;
-                //文件夹
-                else
-                {
-                    return item.Cid;
-                }
-            }).ToList());
+            await Delete115Files(sourceFilesInfos);
         }
 
         VisualStateManager.GoToState(this, "NoDelete", true);
     }
 
+    /// <summary>
+    /// 删除文件
+    /// </summary>
+    /// <param name="sourceFilesInfos"></param>
+    /// <returns></returns>
+    private async Task Delete115Files(List<FilesInfo> sourceFilesInfos)
+    {
+        // 删除文件列表中的文件
+        TryRemoveFilesInExplorer(sourceFilesInfos);
 
-    private void RecyStationGrid_DragEnter(object sender, DragEventArgs e)
+        // 删除中转站中的文件
+        TryRemoveTransferFiles(sourceFilesInfos);
+
+        // 从115中删除
+        await WebApi.DeleteFiles(sourceFilesInfos.FirstOrDefault()?.datum.pid,
+            sourceFilesInfos.Select(item => item.Type == FilesInfo.FileType.File ? item.Fid : item.Cid).ToList());
+    }
+
+
+    private void RecycleStationGrid_DragEnter(object sender, DragEventArgs e)
     {
         VisualStateManager.GoToState(this, "ReadyDelete", true);
     }
 
-    private void RecyStationGrid_DragLeave(object sender, DragEventArgs e)
+    private void RecycleStationGrid_DragLeave(object sender, DragEventArgs e)
     {
         VisualStateManager.GoToState(this, "NoDelete", true);
     }
@@ -477,8 +491,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             {
                 await Move115Files(filesInfos.Cid, sourceFilesInfos);
 
+                // 在文件列表中添加
                 sourceFilesInfos.ForEach(item => filesInfos.Add(item));
-
             }
             else
             {
@@ -498,21 +512,33 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             }
 
             await Move115Files(item.Cid, sourceFilesInfos);
-
         }
 
-        //从中转站拖入的，中转站为空时隐藏
-        if (TransferStation_Grid.Visibility == Visibility.Visible && (transferStationFiles == null || transferStationFiles.Count == 0))
-        {
-            TransferStation_Grid.Visibility = Visibility.Collapsed;
-        }
     }
 
+    /// <summary>
+    /// 删除文件列表中的文件
+    /// </summary>
+    /// <param name="files"></param>
     private void TryRemoveFilesInExplorer(List<FilesInfo> files)
     {
         foreach (var item in files.Where(item => filesInfos.Contains(item)))
         {
             filesInfos.Remove(item);
+        }
+    }
+
+
+    private void TryRemoveTransferFiles(List<FilesInfo> files)
+    {
+        if (transferStationFiles == null) return;
+
+        var transferListReadyRemove = transferStationFiles.Where(item => item.TransferFiles.All(files.Contains)).ToList();
+
+        foreach (var file in transferListReadyRemove)
+        {
+            transferStationFiles.Remove(file);
+
         }
     }
 
@@ -523,25 +549,11 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     private async Task Move115Files(string pid, List<FilesInfo> files)
     {
         await WebApi.MoveFiles(pid, files.Select(item => item.Type == FilesInfo.FileType.Folder ? item.Cid : item.Fid).ToList());
-
-        //删除列表文件
-        TryRemoveFilesInExplorer(files);
-
+        
         // 从中转站列表中删除已经移动的文件
-        if (transferStationFiles != null)
-        {
-            var transferListReadyRemove = transferStationFiles.Where(item => item.TransferFiles.All(files.Contains)).ToList();
-
-            foreach (var file in transferListReadyRemove)
-            {
-                transferStationFiles.Remove(file);
-
-                Debug.WriteLine("从中转站列表中删除已经移动的文件");
-            }
-
-        }
-
+        TryRemoveTransferFiles(files);
     }
+
 
     private int GetInsertIndexInListView(ListView target, DragEventArgs e)
     {
@@ -574,25 +586,42 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private void FilesTransferStation_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
     {
-        List<Data.FilesInfo> filesInfos = new();
+        // 显示回收站
+        RecycleStationGrid.Visibility = Visibility.Visible;
 
-        foreach (TransferStationFiles item in e.Items)
+        // 添加数据
+        var infos = e.Items.Cast<TransferStationFiles>().ToList();
+        e.Data.Properties.Add("items", TransferStationFilesToFilesInfo(infos));
+    }
+
+    private List<FilesInfo> TransferStationFilesToFilesInfo(List<TransferStationFiles> srcList)
+    {
+        List<FilesInfo> infos = new();
+        foreach (TransferStationFiles item in srcList)
         {
-            filesInfos.AddRange(item.TransferFiles);
+            infos.AddRange(item.TransferFiles);
         }
 
-        e.Data.Properties.Add("items", filesInfos);
+        return infos;
     }
 
 
     private void Source_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
     {
-        RecyStationGrid.Visibility = Visibility.Collapsed;
+        // 隐藏回收站
+        RecycleStationGrid.Visibility = Visibility.Collapsed;
 
+        // 中转站为空时隐藏
         if (transferStationFiles == null || transferStationFiles.Count == 0)
         {
-            TransferStation_Grid.Visibility = Visibility.Collapsed;
+            TransferStationGrid.Visibility = Visibility.Collapsed;
         }
+
+        // 移动成功
+        if (args.DropResult != DataPackageOperation.Move) return;
+
+        // 删除文件列表
+        TryRemoveFilesInExplorer(args.Items.Cast<FilesInfo>().ToList());
     }
 
     private async void ImportDataButton_Click(object sender, RoutedEventArgs e)
@@ -844,7 +873,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     private async void MoveToNewFolderItemClick(object sender, RoutedEventArgs e)
     {
         List<FilesInfo> fileInfos;
-        string currentFolderId;
 
         // 选中文件，对当前文件操作
         if (BaseExample.SelectedItems.Count == 0)
@@ -855,18 +883,20 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             {
                 info
             };
-
-            currentFolderId = info.Cid;
+            
 
         }
         else
         {
             //获取需要整理的文件
             fileInfos = BaseExample.SelectedItems.Cast<FilesInfo>().ToList();
-            currentFolderId = fileInfos.FirstOrDefault()?.Cid;
+
+            var firstFile = fileInfos.FirstOrDefault();
         }
 
         if (fileInfos.Count == 0) return;
+
+        var currentFolderId = _units.LastOrDefault()?.Cid;
 
         var sameName = MatchHelper.GetSameFirstStringFromList(fileInfos.Select(x => string.IsNullOrEmpty(x.datum.ico) ? x.Name : x.Name.Replace($".{x.datum.ico}", "")).ToList());
 
@@ -902,9 +932,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         // 新建文件夹
         filesInfos.Insert(0, new FilesInfo(new Datum() { cid = makeDirResult.cid, n = makeDirResult.cname }));
 
-        //// 删除文件
-        //TryRemoveFilesInExplorer(fileInfos);
-
+        // 删除文件
+        TryRemoveFilesInExplorer(fileInfos);
     }
 
     private async void RenameItemClick(object sender, RoutedEventArgs e)
@@ -915,8 +944,9 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         TextBox inputTextBox = new()
         {
-            Text = info.Name,
-            PlaceholderText = info.Name
+            Text = info.NameWithoutExtension,
+            PlaceholderText = info.NameWithoutExtension,
+            SelectionStart = info.NameWithoutExtension.Length
         };
 
         ContentDialog contentDialog = new()
@@ -933,7 +963,19 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (result != ContentDialogResult.Primary) return;
 
-        var renameRequest = await WebApi.RenameFile(pid, inputTextBox.Text);
+        // 添加后缀，模仿官方
+        var inputText = inputTextBox.Text;
+        var newName = string.IsNullOrEmpty(info.datum.ico) ? inputText : $"{inputText}.{info.datum.ico}";
+
+        //没变
+        if (newName == info.Name) return;
+
+        var renameRequest = await WebApi.RenameFile(pid, newName);
+        if (renameRequest == null)
+        {
+            ShowTeachingTip("重命名失败");
+            return;
+        }
 
         var firstData = renameRequest.data.FirstOrDefault();
 
@@ -992,12 +1034,99 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         await Move115Files(item.Cid, canMoveList);
 
-        //从中转站拖入的，中转站为空时隐藏
-        if (TransferStation_Grid.Visibility == Visibility.Visible && (transferStationFiles == null || transferStationFiles.Count == 0))
+        // 移动到当前文件夹的时候，文件列表需要添加
+        var index = _units.IndexOf(item);
+        if (index == _units.Count - 1)
         {
-            TransferStation_Grid.Visibility = Visibility.Collapsed;
+            sourceFilesInfos.ForEach(x =>
+                filesInfos.Insert(0,x));
+        }
+    }
+
+    private void TransferStationListView_OnDragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+    {
+        // 隐藏回收站
+        RecycleStationGrid.Visibility = Visibility.Collapsed;
+
+        if (args.DropResult is not DataPackageOperation.Move) return;
+
+        // 移动成功，删除列表文件（如果存在）
+        var infos = args.Items.Cast<TransferStationFiles>().ToList();
+        TryRemoveFilesInExplorer(TransferStationFilesToFilesInfo(infos));
+
+        // 如果中转站为空，就隐藏（目前数量为一个，移动后将为0）
+        if (transferStationFiles.Count == 1)
+        {
+            TransferStationGrid.Visibility = Visibility.Collapsed;
         }
 
+    }
+
+
+    private void SelectedMultipleFilesCheckBox_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not CheckBox checkBox) return;
+
+        if (checkBox.IsChecked is true)
+        {
+            BaseExample.SelectAll();
+        }
+        else
+        {
+            BaseExample.SelectedItems.Clear();
+        }
+    }
+
+    private void GoBack_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (_units.Count <= 1) return;
+
+        var currentItem = _units[^2];
+        OpenFolder(currentItem.Cid);
+    }
+
+    private async void ShowInfoClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
+
+        var content = new TextBlock()
+        {
+            Text = $"Cid: {info.Cid}",
+            IsTextSelectionEnabled = true,
+            HorizontalAlignment = HorizontalAlignment.Center
+        };
+
+        var dialog = new ContentDialog()
+        {
+            XamlRoot = this.XamlRoot,
+            CloseButtonText = "返回",
+            DefaultButton = ContentDialogButton.Close,
+            Content = content
+        };
+
+        await dialog.ShowAsync();
+    }
+
+    private async void ShowFolderInfoClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem { DataContext: ExplorerItem info }) return;
+
+        var content = new TextBlock()
+        {
+            Text = $"Cid: {info.Cid}",
+            IsTextSelectionEnabled = true,
+            HorizontalAlignment = HorizontalAlignment.Center
+        };
+
+        var dialog = new ContentDialog()
+        {
+            XamlRoot = this.XamlRoot,
+            CloseButtonText = "返回",
+            DefaultButton = ContentDialogButton.Close,
+            Content = content
+        };
+
+        await dialog.ShowAsync();
     }
 }
 

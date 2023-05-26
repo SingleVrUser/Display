@@ -4,6 +4,7 @@ using Display.Data;
 using Display.Helper;
 using Display.Models;
 using Display.Views;
+using Display.WindowView;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -13,8 +14,10 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Windows.System;
 using WinUIEx;
 
@@ -547,18 +550,43 @@ namespace Display
 
         private async void DownPage_RequestCompleted(object sender, ContentsPage.OfflineDown.RequestCompletedEventArgs e)
         {
-            // 查看是否有失败项
             var info = e?.Info;
+
+            // 未知错误
             if (info is null)
             {
                 ShowTeachingTip("出现未知错误");
                 return;
             }
 
-            //单链接或多链接
-            var failList = !string.IsNullOrEmpty(info.url)
-                ? string.IsNullOrEmpty(info.error_msg) ? null:new List<AddTaskUrlInfo> { info }
-                    :info.result?.Where(x => !string.IsNullOrEmpty(x.error_msg)).ToList();
+            // 成功
+            if (info.state)
+            {
+                ShowTeachingTip("添加任务成功");
+                return;
+            }
+
+            // 需要验证账户
+            if (info.errcode == Const.AccountAnomalyCode)
+            {
+                var window = WebApi.CreateWindowToVerifyAccount();
+
+                if (window.Content is not VerifyAccountPage page) return;
+
+                page.VerifyAccountCompleted += (_, _) =>
+                {
+                    // 重新显示输入窗口
+                    CreateCloudDownContentDialog();
+                };
+
+                window.Activate();
+
+                return;
+            }
+
+            var failList = !string.IsNullOrEmpty(info.error_msg)
+                ? new List<AddTaskUrlInfo> { info } // 单链接
+                : info.result?.Where(x => !string.IsNullOrEmpty(x.error_msg)).ToList();  // 多链接
 
             if (failList == null || failList.Count == 0)
             {
@@ -600,36 +628,18 @@ namespace Display
             BasePage.ShowTeachingTip(LightDismissTeachingTip, subtitle, content);
         }
 
-        private async void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            TextBox textBox = new();
-            ContentDialog dialog = new()
+            var window = WebApi.CreateWindowToVerifyAccount();
+
+            if (window.Content is not VerifyAccountPage page) return;
+            page.VerifyAccountCompleted +=(_,isSucceeded)=>
             {
-                XamlRoot = this.RootGrid.XamlRoot,
-                PrimaryButtonText = "上传",
-                CloseButtonText = "返回",
-                Title = "输入需要上传的文件路径",
-                Content = textBox,
-                DefaultButton = ContentDialogButton.Primary
+                Debug.WriteLine($"是否成功：{isSucceeded}");
             };
 
-            var result = await dialog.ShowAsync();
 
-            if (result == ContentDialogResult.Primary)
-            {
-                var filePath = textBox.Text;
-
-                if (!File.Exists(filePath)) return;
-
-                //var upload115 = Upload115.SingleUpload115;
-
-                //var uploadInfo = await WebApi.GlobalWebApi.GetUploadInfo();
-
-                //if(uploadInfo == null) return;
-
-                //await upload115.UploadTo115(filePath, "0", uploadInfo.user_id.ToString(), uploadInfo.userkey);
-
-            }
+            window.Activate();;
         }
     }
 }
