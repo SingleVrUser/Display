@@ -342,6 +342,10 @@
                                                Drop="MetadataItem_OnDrop">
                                         <TextBlock.ContextFlyout>
                                             <MenuFlyout>
+                                                <MenuFlyoutItem Text="刷新"
+                                                                Click="RefreshFolderClick"
+                                                                Icon="Refresh"/>
+
                                                 <MenuFlyoutItem Text="属性"
                                                                 Click="ShowFolderInfoClick">
                                                     <MenuFlyoutItem.Icon>

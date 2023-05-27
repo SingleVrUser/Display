@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -45,7 +46,6 @@ public sealed partial class MainPage : Page
     private List<string> _highBitRateVideos = new();
 
     ObservableCollection<MetadataItem> _units;
-
 
     ListView LastFilesListView;
 
@@ -367,8 +367,7 @@ public sealed partial class MainPage : Page
         if (videoUrl == null) return;
 
         var menuFlyout = BuildMenuFlyout(file);
-
-
+        
         Debug.WriteLine("设置 MediaPlayerWithStreamSource");
         var mediaPlayerWithStreamSource =
             await MediaPlayerWithStreamSource.CreateMediaPlayer(videoUrl, filesInfo: file);
@@ -476,8 +475,7 @@ public sealed partial class MainPage : Page
 
         // 搜索影片信息
         CidInfos.Clear();
-
-
+        
         await FindAndShowInfosFromInternet(PlayingVideoInfos.ToList());
 
 
@@ -665,7 +663,7 @@ public sealed partial class MainPage : Page
     {
         //移除cid信息（预览图/信息）
         var removeCid = CidInfos.FirstOrDefault(item =>
-            item.truename == fileInfo.Name || item.truename == FileMatch.MatchName(fileInfo.Name)?.ToUpper());
+            item.truename == fileInfo.Name || item.truename.ToUpper() == FileMatch.MatchName(fileInfo.Name)?.ToUpper());
 
         if (removeCid != null)
         {
@@ -1099,5 +1097,17 @@ public sealed partial class MainPage : Page
         aTimer?.Stop();
 
         ProtectedCursor = null;
+    }
+
+    private void LocationFileClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
+
+        // 接着，删除资源管理器的文件，如果存在（有可能已经关掉了）
+        if (LastFilesListView.IsLoaded && LastFilesListView.ItemsSource is IncrementalLoadDatumCollection filesInfos &&
+            filesInfos.Contains(info))
+        {
+            LastFilesListView.ScrollIntoView(info, ScrollIntoViewAlignment.Leading);
+        }
     }
 }

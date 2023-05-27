@@ -219,6 +219,16 @@
                                     <ListView.ItemTemplate>
                                         <DataTemplate x:DataType="data:FilesInfo">
                                             <Grid ColumnSpacing="5">
+                                                <Grid.ContextFlyout>
+                                                    <MenuFlyout>
+                                                        <MenuFlyoutItem Text="定位" Click="LocationFileClick">
+                                                            <MenuFlyoutItem.Icon>
+                                                                <FontIcon FontFamily="Segoe Fluent Icons"
+                                                                          Glyph="&#xE81D;" />
+                                                            </MenuFlyoutItem.Icon>
+                                                        </MenuFlyoutItem>
+                                                    </MenuFlyout>
+                                                </Grid.ContextFlyout>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="auto" />
                                                     <ColumnDefinition Width="*" />
@@ -234,7 +244,8 @@
                                                 </Image>
                                                 <TextBlock Grid.Column="1"
                                                            Text="{x:Bind Name}"
-                                                           VerticalAlignment="Center" />
+                                                           VerticalAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis"/>
                                             </Grid>
                                         </DataTemplate>
                                     </ListView.ItemTemplate>
