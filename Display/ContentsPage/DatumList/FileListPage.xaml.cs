@@ -24,6 +24,8 @@ using Display.Data;
 using Display.Views;
 using Microsoft.UI.Xaml.Input;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
+using Microsoft.VisualBasic;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -151,6 +153,9 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             Name = filesInfo.Name,
             Cid = filesInfo.Cid,
         });
+
+        // 切换目录时，全选checkBox不是选中状态
+        MultipleSelectedCheckBox.IsChecked = false;
     }
 
     private void TextBlock_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
@@ -165,7 +170,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         if (BaseExample.ItemsSource is IncrementalLoadDatumCollection collection)
             BaseExample.ScrollIntoView(collection.First());
     }
-
 
     private void PlayButton_Click(object sender, RoutedEventArgs e)
     {
@@ -900,6 +904,10 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         var sameName = MatchHelper.GetSameFirstStringFromList(fileInfos.Select(x => string.IsNullOrEmpty(x.datum.ico) ? x.Name : x.Name.Replace($".{x.datum.ico}", "")).ToList());
 
+        // 移除关键词
+        sameName = Regex.Replace(sameName, "\\w+.(com|cn|xyz|la|me|net|app|cc)@", "", RegexOptions.IgnoreCase);
+        sameName = Regex.Replace(sameName, "[-_.]part$", "", RegexOptions.IgnoreCase);
+
         TextBox inputTextBox = new()
         {
             Text = sameName,
@@ -908,7 +916,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         ContentDialog contentDialog = new()
         {
-            XamlRoot = this.XamlRoot,
+            XamlRoot = XamlRoot,
             Content = inputTextBox,
             Title = "新文件夹",
             PrimaryButtonText = "确定",
@@ -1127,6 +1135,13 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         };
 
         await dialog.ShowAsync();
+    }
+
+    private void RefreshFolderClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem { DataContext: ExplorerItem info }) return;
+
+        OpenFolder(info.Cid);
     }
 }
 
