@@ -120,7 +120,7 @@ namespace Display.Data
 
                 //番号匹配
                 createTable.CommandText = "CREATE TABLE IF NOT " +
-                    $"EXISTS FileToInfo ( " +
+                    "EXISTS FileToInfo ( " +
                       "file_pickcode text," +
                       "truename text," +
                       "issuccess integer," +
@@ -418,7 +418,7 @@ namespace Display.Data
             insertCommand.Connection = db;
 
             // Use parameterized query to prevent SQL injection attacks
-            insertCommand.CommandText = $"delete from FilesInfo";
+            insertCommand.CommandText = "delete from FilesInfo";
 
             insertCommand.ExecuteNonQuery();
 
@@ -491,21 +491,41 @@ namespace Display.Data
         /// </summary>
         public static void DeleteDataInVideoInfoTable(string truename)
         {
-            using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
-            {
-                db.Open();
+            using SqliteConnection db =
+                new SqliteConnection($"Filename={dbpath}");
+            db.Open();
 
-                SqliteCommand insertCommand = new SqliteCommand();
-                insertCommand.Connection = db;
+            SqliteCommand command = new SqliteCommand();
+            command.Connection = db;
 
-                // Use parameterized query to prevent SQL injection attacks
-                insertCommand.CommandText = $"DELETE FROM VideoInfo WHERE truename == '{truename}'";
+            // Use parameterized query to prevent SQL injection attacks
+            command.CommandText = $"DELETE FROM VideoInfo WHERE truename == '{truename}'";
 
-                insertCommand.ExecuteReader();
+            command.ExecuteReader();
 
-                db.Close();
-            }
+            db.Close();
+        }
+
+        public static void DeleteDataInFilesInfoAndFileToInfo(string trueName)
+        {
+            using SqliteConnection db =
+                new SqliteConnection($"Filename={dbpath}");
+
+            db.Open();
+
+            SqliteCommand command = new SqliteCommand();
+            command.Connection = db;
+
+            // 先删除 FilesInfo
+            command.CommandText = $"DELETE FROM FilesInfo WHERE pc IN ( SELECT pc FROM FilesInfo as a INNER JOIN FileToInfo as b ON (a.pc=b.file_pickcode) WHERE b.truename == '{trueName}' COLLATE NOCASE);";
+            command.ExecuteScalar();
+
+            // 后删除中间表 FileToInfo
+            command.CommandText = $"DELETE FROM FileToInfo WHERE FileToInfo.truename == '{trueName}' COLLATE NOCASE";
+            command.ExecuteScalar();
+
+            db.Close();
+
         }
 
         /// <summary>
@@ -1376,14 +1396,13 @@ namespace Display.Data
         #region 查询
 
         /// <summary>
-        /// 通过truename查询文件列表
+        /// 通过trueName查询文件列表
         /// </summary>
         /// <returns></returns>
         public static async Task<List<Datum>> FindFileInfoByTrueName(string truename)
         {
             List<Datum> data = new List<Datum>();
 
-            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
                new SqliteConnection($"Filename={dbpath}"))
             {
@@ -2658,8 +2677,7 @@ namespace Display.Data
         public static List<Datum> GetFolderListByPid(string pid, int limit = -1)
         {
             List<Datum> data = new List<Datum>();
-
-            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
+            
             using (SqliteConnection db =
                new SqliteConnection($"Filename={dbpath}"))
             {
@@ -2806,31 +2824,30 @@ namespace Display.Data
         /// </summary>
         /// <param Name="actorName"></param>
         /// <returns></returns>
-        public static List<VideoInfo> getNameAndImageFromLookLater()
+        public static async Task<List<VideoInfo>> GetNameAndImageFromLookLater()
         {
             List<VideoInfo> data = new List<VideoInfo>();
 
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
-            using (SqliteConnection db =
-            new SqliteConnection($"Filename={dbpath}"))
+            await using SqliteConnection db =
+                new SqliteConnection($"Filename={dbpath}");
+
+            db.Open();
+
+            SqliteCommand selectCommand = new SqliteCommand();
+
+            selectCommand = new SqliteCommand
+                ($"SELECT * FROM VideoInfo WHERE look_later != 0 ORDER BY look_later DESC", db);
+
+
+            SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
+
+            while (query.Read())
             {
-                db.Open();
-
-                SqliteCommand selectCommand = new SqliteCommand();
-
-                selectCommand = new SqliteCommand
-                    ($"SELECT * FROM VideoInfo WHERE look_later != 0 ORDER BY look_later DESC", db);
-
-
-                SqliteDataReader query = selectCommand.ExecuteReader();
-
-                while (query.Read())
-                {
-                    data.Add(ConvertQueryToVideoInfo(query));
-                }
-
-                db.Close();
+                data.Add(ConvertQueryToVideoInfo(query));
             }
+
+            db.Close();
 
             return data;
         }
@@ -2840,30 +2857,28 @@ namespace Display.Data
         /// </summary>
         /// <param Name="actorName"></param>
         /// <returns></returns>
-        public static List<VideoInfo> getNameAndImageFromLike()
+        public static async Task<List<VideoInfo>> GetNameAndImageFromLike()
         {
             List<VideoInfo> data = new List<VideoInfo>();
 
-            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
-            using (SqliteConnection db =
-            new SqliteConnection($"Filename={dbpath}"))
+            using SqliteConnection db =
+                new SqliteConnection($"Filename={dbpath}");
+
+            db.Open();
+
+            SqliteCommand selectCommand = new SqliteCommand();
+
+            selectCommand = new SqliteCommand
+                ("SELECT * FROM VideoInfo WHERE is_like != 0", db);
+
+            SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
+
+            while (query.Read())
             {
-                db.Open();
-
-                SqliteCommand selectCommand = new SqliteCommand();
-
-                selectCommand = new SqliteCommand
-                    ($"SELECT * FROM VideoInfo WHERE is_like != 0", db);
-
-                SqliteDataReader query = selectCommand.ExecuteReader();
-
-                while (query.Read())
-                {
-                    data.Add(ConvertQueryToVideoInfo(query));
-                }
-
-                db.Close();
+                data.Add(ConvertQueryToVideoInfo(query));
             }
+
+            db.Close();
 
             return data;
         }
@@ -2873,29 +2888,28 @@ namespace Display.Data
         /// </summary>
         /// <param Name="actorName"></param>
         /// <returns></returns>
-        public static List<VideoInfo> getNameAndIamgeRandom()
+        public static async Task<List<VideoInfo>> GetNameAndImageRandom()
         {
             List<VideoInfo> data = new List<VideoInfo>();
 
-            using (SqliteConnection db =
-            new SqliteConnection($"Filename={dbpath}"))
+            await using SqliteConnection db =
+                new SqliteConnection($"Filename={dbpath}");
+
+            db.Open();
+
+            SqliteCommand selectCommand = new SqliteCommand();
+
+            selectCommand = new SqliteCommand
+                ($"SELECT * FROM VideoInfo ORDER BY RANDOM() LIMIT 20", db);
+
+            SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
+
+            while (query.Read())
             {
-                db.Open();
-
-                SqliteCommand selectCommand = new SqliteCommand();
-
-                selectCommand = new SqliteCommand
-                    ($"SELECT * FROM VideoInfo ORDER BY RANDOM() LIMIT 20", db);
-
-                SqliteDataReader query = selectCommand.ExecuteReader();
-
-                while (query.Read())
-                {
-                    data.Add(ConvertQueryToVideoInfo(query));
-                }
-
-                db.Close();
+                data.Add(ConvertQueryToVideoInfo(query));
             }
+
+            db.Close();
 
             return data;
         }
@@ -2905,30 +2919,28 @@ namespace Display.Data
         /// </summary>
         /// <param Name="actorName"></param>
         /// <returns></returns>
-        public static List<VideoInfo> getNameAndIamgeRecent()
+        public static async Task<List<VideoInfo>> GetNameAndIamgeRecent()
         {
             List<VideoInfo> data = new List<VideoInfo>();
 
-            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
-            using (SqliteConnection db =
-            new SqliteConnection($"Filename={dbpath}"))
+            await using SqliteConnection db =
+                new SqliteConnection($"Filename={dbpath}");
+
+            db.Open();
+
+            SqliteCommand selectCommand = new SqliteCommand();
+
+            selectCommand = new SqliteCommand
+                ($"SELECT * FROM VideoInfo ORDER BY addtime DESC LIMIT 40", db);
+
+
+            SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
+
+            while (query.Read())
             {
-                db.Open();
-
-                SqliteCommand selectCommand = new SqliteCommand();
-
-                selectCommand = new SqliteCommand
-                    ($"SELECT * FROM VideoInfo ORDER BY addtime DESC LIMIT 40", db);
-
-
-                SqliteDataReader query = selectCommand.ExecuteReader();
-
-                while (query.Read())
-                {
-                    data.Add(ConvertQueryToVideoInfo(query));
-                }
-                db.Close();
+                data.Add(ConvertQueryToVideoInfo(query));
             }
+            db.Close();
 
             return data;
         }
@@ -2967,11 +2979,11 @@ namespace Display.Data
         /// <summary>
         /// 通过文件夹的Cid回溯根目录，不包括当前文件夹
         /// </summary>
-        /// <param Name="folderCid"></param>
-        /// <returns>Cidlist: 0,……,folderCid</returns>
-        public static List<Datum> getRootByCid(string folderCid)
+        /// <param name="folderCid"></param>
+        /// <returns></returns>
+        public static List<Datum> GetRootByCid(string folderCid)
         {
-            List<Datum> ForlderToRootList = new();
+            List<Datum> folderToRootList = new();
 
             Datum upperLevelFolderInfo = new() { pid = folderCid };
 
@@ -2985,19 +2997,19 @@ namespace Display.Data
                 upperLevelFolderInfo = getUpperLevelFolderCid(upperLevelFolderInfo.pid);
 
                 if (upperLevelFolderInfo == null) break;
-
-                ForlderToRootList.Add(upperLevelFolderInfo);
+                    
+                folderToRootList.Add(upperLevelFolderInfo);
 
                 if (upperLevelFolderInfo.pid == "0")
                 {
-                    ForlderToRootList.Add(new Datum() { cid = "0", n = "根目录" });
+                    folderToRootList.Add(new Datum() { cid = "0", n = "根目录" });
                     break;
                 }
             }
 
-            ForlderToRootList.Reverse();
+            folderToRootList.Reverse();
 
-            return ForlderToRootList;
+            return folderToRootList;
         }
 
         #endregion

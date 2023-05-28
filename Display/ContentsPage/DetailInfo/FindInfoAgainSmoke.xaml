@@ -34,7 +34,7 @@
            CornerRadius="5">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
-                <VisualState x:Name="vaildUrl">
+                <VisualState x:Name="validUrl">
                     <VisualState.StateTriggers>
                         <triggers:RegexStateTrigger Value="{x:Bind SepcificUrl_TextBlock.Text, Mode=OneWay}"
                                                     Expression="[a-zA-z]+:\/\/[^\s]{5,}"

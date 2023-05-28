@@ -31,7 +31,17 @@
                        FontWeight="Bold"
                        RelativePanel.AlignBottomWithPanel="True" />
 
-            <HyperlinkButton RelativePanel.AlignRightWithPanel="True"
+
+            <HyperlinkButton RelativePanel.LeftOf="MoreButton"
+                             RelativePanel.AlignVerticalCenterWithPanel="True"
+                             Click="RefreshButton_Click"
+                             Visibility="{x:Bind RefreshButtonVisibility}">
+                <SymbolIcon Symbol="Refresh"
+                            Opacity="0.5" />
+            </HyperlinkButton>
+
+            <HyperlinkButton x:Name="MoreButton"
+                             RelativePanel.AlignRightWithPanel="True"
                              RelativePanel.AlignVerticalCenterWithPanel="True"
                              Click="MoreButton_Click"
                              Visibility="{x:Bind MoreButtonVisibility}">

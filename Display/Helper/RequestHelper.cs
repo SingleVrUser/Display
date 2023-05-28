@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using ABI.Microsoft.UI.Xaml;
 using Display.Data;
+using Display.Models;
+using Newtonsoft.Json;
+using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace Display.Helper;
 
@@ -24,7 +28,10 @@ public class RequestHelper
         {
             try
             {
-                response = await client.GetAsync(new Uri(url));
+                //设置超时时间（5s）
+                var option = new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token;
+
+                response = await client.GetAsync(new Uri(url), option);
 
                 RequestUrl = response.RequestMessage.RequestUri.ToString();
 

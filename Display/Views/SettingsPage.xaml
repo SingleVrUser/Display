@@ -639,11 +639,11 @@
                                                     RelativePanel.AlignRightWithPanel="True" />
                                         </RelativePanel>
 
-                                        <RelativePanel Margin="0,5,0,0">
+                                        <!--<RelativePanel Margin="0,5,0,0">
                                             <TextBlock Text="请求间隔" />
                                             <TextBlock Text="22~30 s"
                                                        RelativePanel.AlignRightWithPanel="True" />
-                                        </RelativePanel>
+                                        </RelativePanel>-->
                                     </StackPanel>
                                 </PivotItem>
                             </Pivot>

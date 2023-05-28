@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using System;
 using Display.Data;
 using Display.Models;
 using Display.Spider;
@@ -30,7 +31,7 @@ namespace Display.ContentsPage.SearchLink
 
             _searchContent = searchContent;
 
-            DispatcherQueue.TryEnqueue(InitLoad);
+            InitLoad();
         }
 
         private async void InitLoad()
@@ -195,5 +196,12 @@ namespace Display.ContentsPage.SearchLink
 
         }
 
+        private void OpenInBrowserClick(object sender, RoutedEventArgs e)
+        {
+            if (sender is not MenuFlyoutItem { DataContext: Forum1080SearchResult result }) return;
+
+            Windows.System.Launcher.LaunchUriAsync(new Uri(result.Url));
+
+        }
     }
 }

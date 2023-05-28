@@ -17,6 +17,7 @@ using Windows.Media.Protection.PlayReady;
 using SharpCompress.Readers;
 using static System.Int32;
 using System.Reflection.PortableExecutable;
+using Windows.System.Profile;
 
 namespace Display.Spider
 {
@@ -233,9 +234,8 @@ namespace Display.Spider
 
         public static async Task<List<Forum1080SearchResult>> GetMatchInfosFromCid(string cid)
         {
-            var searchUrl = $"{BaseUrl}search.php?searchsubmit=yes";
-
             var txt = cid.Replace('-', '+').Replace(' ', '+');
+
 
             var postValues = new Dictionary<string, string>
             {
@@ -246,21 +246,42 @@ namespace Display.Spider
                 { "mod", "forum"},
                 { "searchsubmit", "true"},
             };
-            var result = await RequestHelper.PostHtml(Client, searchUrl, postValues);
-            if (result == null) return null;
 
-            //var detailUrl = result.Item1;
-            var htmlString = result.Item2;
 
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(htmlString);
 
-            var detailInfos = GetDetailInfoFromSearchResult(cid, htmlDoc);
-            
+            List<Forum1080SearchResult> detailInfos = new();
+            var nextPageUrl = $"{BaseUrl}search.php?searchsubmit=yes";
+
+            while (!string.IsNullOrEmpty(nextPageUrl))
+            {
+                var result = await RequestHelper.PostHtml(Client, nextPageUrl, postValues);
+                if (result == null) return null;
+
+                //var detailUrl = result.Item1;
+                var htmlString = result.Item2;
+
+                var htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(htmlString);
+
+                var searchResult = GetDetailInfoFromSearchResult(cid, htmlDoc);
+
+                var currentInfos = searchResult.Item1;
+                detailInfos.AddRange(currentInfos);
+
+                nextPageUrl = searchResult.Item2;
+
+                // 有下一页
+                if (!string.IsNullOrEmpty(nextPageUrl))
+                {
+                    // 等待1~3秒
+                    await GetInfoFromNetwork.RandomTimeDelay(1, 3);
+                }
+            }
+
             return detailInfos;
         }
 
-        private static List<Forum1080SearchResult> GetDetailInfoFromSearchResult(string cid,HtmlDocument htmlDoc)
+        private static Tuple<List<Forum1080SearchResult>,string> GetDetailInfoFromSearchResult(string cid,HtmlDocument htmlDoc)
         {
             var searchResultNodes = htmlDoc.DocumentNode.SelectNodes("//li[@class='pbw']");
 
@@ -322,7 +343,17 @@ namespace Display.Spider
                 detailUrlInfos.Add(GetForum1080FromNode(pbwNode, title,detailUrl));
             }
 
-            return detailUrlInfos;
+
+
+            string nextPageUrl = string.Empty;
+            //是否有下一页
+            var nextPageNode = htmlDoc.DocumentNode.SelectSingleNode(".//a[@class='nxt']");
+            if (nextPageNode != null)
+            {
+                nextPageUrl = nextPageNode.GetAttributeValue("href", string.Empty).Replace("&amp;","&");
+            }
+
+            return new Tuple<List<Forum1080SearchResult>, string>(detailUrlInfos, nextPageUrl);
         }
 
         public static async Task<string> TryDownAttmn(string url, string name = null)

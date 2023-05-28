@@ -176,11 +176,11 @@ namespace Display.Data
             //如果最后仍然匹配不了番号，则尝试使用文件所在文件夹的名字去匹配
             if (!string.IsNullOrEmpty(file_cid))
             {
-                var FolderDatum = DataAccess.getUpperLevelFolderCid(file_cid);
+                var folderDatum = DataAccess.getUpperLevelFolderCid(file_cid);
 
-                if (!string.IsNullOrEmpty(FolderDatum.n))
+                if (!string.IsNullOrEmpty(folderDatum.n))
                 {
-                    return MatchName(FolderDatum.n);
+                    return MatchName(folderDatum.n);
                 }
             }
 

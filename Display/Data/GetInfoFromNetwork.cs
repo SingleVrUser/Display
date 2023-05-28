@@ -113,10 +113,7 @@ namespace Display.Data
             int randomSecond = new Random().Next(startSecond, endSecond);
 
             //倒计时
-            for (int i = 0; i < randomSecond; i++)
-            {
-                await Task.Delay(1000);
-            }
+            await Task.Delay(randomSecond * 1000);
         }
 
         /// <summary>

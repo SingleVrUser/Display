@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Display.Data;
+using Microsoft.UI.Dispatching;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -52,10 +53,11 @@ namespace Display.Views
         //    this.Loaded -= HomePage_Loaded;
         //}
 
-        private void LoadCover()
+        private async void LoadCover()
         {
             //随机获取20个视频，每次启动自动获取一遍
-            foreach (var info in DataAccess.getNameAndIamgeRandom().Select(item => new VideoCoverDisplayClass(item, 500, 300)))
+            var imageList = await DataAccess.GetNameAndImageRandom();
+            foreach (var info in imageList.Select(item => new VideoCoverDisplayClass(item, 500, 300)))
             {
                 Items.Add(info);
             }
@@ -79,7 +81,7 @@ namespace Display.Views
             Frame.Navigate(typeof(DetailInfoPage), coverInfo, new SuppressNavigationTransitionInfo());
         }
 
-        private void Image_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
+        private void Image_Tapped(object sender, TappedRoutedEventArgs e)
         {
             if (!(sender is Image image)) return;
 
@@ -123,7 +125,7 @@ namespace Display.Views
             }
         }
 
-        private void UpdateRandomCover_Click(object sender, RoutedEventArgs e)
+        private async void UpdateRandomCover_Click(object sender, RoutedEventArgs e)
         {
             RefreshHyperlinkButton.IsEnabled = false;
 
@@ -133,7 +135,7 @@ namespace Display.Views
             Items.Clear();
 
             //随机获取20个视频
-            foreach (var item in DataAccess.getNameAndIamgeRandom())
+            foreach (var item in await DataAccess.GetNameAndImageRandom())
             {
                 Items.Add(new VideoCoverDisplayClass(item, 500, 300));
             }
@@ -177,20 +179,6 @@ namespace Display.Views
 
             //对上一级页面的更改做出响应，删除或添加喜欢
             TryUpdateCoverShow();
-
-        }
-
-        private void TryUpdateCoverShow()
-        {
-            //最近视频
-            TryUpdateVideoCoverDisplayClass(DataAccess.getNameAndIamgeRecent(), recentCoverList);
-
-            //喜欢视频
-            TryUpdateVideoCoverDisplayClass(DataAccess.getNameAndImageFromLike(), LoveCoverList);
-
-            //稍后观看
-            TryUpdateVideoCoverDisplayClass(DataAccess.getNameAndImageFromLookLater(), lookLaterList);
-
         }
 
         private void TryUpdateVideoCoverDisplayClass(List<VideoInfo> videoInfos, ObservableCollection<VideoCoverDisplayClass> videoList)
@@ -258,6 +246,46 @@ namespace Display.Views
             Frame.Navigate(typeof(ActorInfoPage), TypesAndName);
         }
 
+        private async void RefreshNewestVideoButtonClick(object sender, RoutedEventArgs e)
+        {
+            recentCoverList.Clear();
+
+            foreach (var videoInfo in await DataAccess.GetNameAndIamgeRecent())
+            {
+                recentCoverList.Add(new VideoCoverDisplayClass(videoInfo, 500, 300));
+            }
+            
+        }
+
+        private async void RefreshLookLaterVideoButtonClick(object sender, RoutedEventArgs e)
+        {
+            lookLaterList.Clear();
+
+            foreach (var videoInfo in await DataAccess.GetNameAndImageFromLookLater())
+            {
+                lookLaterList.Add(new VideoCoverDisplayClass(videoInfo, 500, 300));
+            }
+        }
+
+        private async void RefreshLikeVideoButtonClick(object sender, RoutedEventArgs e)
+        {
+            LoveCoverList.Clear();
+
+            foreach (var videoInfo in await DataAccess.GetNameAndImageFromLike())
+            {
+                LoveCoverList.Add(new VideoCoverDisplayClass(videoInfo, 500, 300));
+            }
+        }
+
+        private async void TryUpdateCoverShow()
+        {
+            //最近视频
+            TryUpdateVideoCoverDisplayClass(await DataAccess.GetNameAndIamgeRecent(), recentCoverList);
+            //稍后观看
+            TryUpdateVideoCoverDisplayClass(await DataAccess.GetNameAndImageFromLookLater(), lookLaterList);
+            //喜欢视频
+            TryUpdateVideoCoverDisplayClass(await DataAccess.GetNameAndImageFromLike(), LoveCoverList);
+        }
     }
 
 }
