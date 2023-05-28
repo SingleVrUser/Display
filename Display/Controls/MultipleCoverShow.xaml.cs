@@ -15,13 +15,23 @@ namespace Display.Controls
     public sealed partial class MultipleCoverShow : UserControl
     {
         public static readonly DependencyProperty MoreButtonVisibilityProperty =
-            DependencyProperty.Register("MoreButtonVisibility", typeof(Visibility), typeof(ActorInfoPage), PropertyMetadata.Create(() => Visibility.Collapsed));
+            DependencyProperty.Register(nameof(MoreButtonVisibility), typeof(Visibility), typeof(ActorInfoPage), PropertyMetadata.Create(() => Visibility.Collapsed));
+        
+        public static readonly DependencyProperty RefreshButtonVisibilityProperty =
+            DependencyProperty.Register(nameof(RefreshButtonVisibility), typeof(Visibility), typeof(ActorInfoPage), PropertyMetadata.Create(() => Visibility.Collapsed));
 
         //是否显示MoreButton
         public Visibility MoreButtonVisibility
         {
-            get { return (Visibility)GetValue(MoreButtonVisibilityProperty); }
-            set { SetValue(MoreButtonVisibilityProperty, value); }
+            get => (Visibility)GetValue(MoreButtonVisibilityProperty);
+            set => SetValue(MoreButtonVisibilityProperty, value);
+        }
+
+        //是否显示RefreshButton
+        public Visibility RefreshButtonVisibility
+        {
+            get => (Visibility)GetValue(RefreshButtonVisibilityProperty);
+            set => SetValue(RefreshButtonVisibilityProperty, value);
         }
 
         public string ShowName { get; set; }
@@ -116,6 +126,12 @@ namespace Display.Controls
         private void MoreButton_Click(object sender, RoutedEventArgs e)
         {
             MoreClick?.Invoke(sender, e);
+        }
+
+        public event RoutedEventHandler RefreshClick;
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            RefreshClick?.Invoke(sender,e);
         }
     }
 }

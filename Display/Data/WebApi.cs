@@ -30,6 +30,7 @@ using HttpRequestMessage = System.Net.Http.HttpRequestMessage;
 using System.Security.Cryptography;
 using System.Xml.Linq;
 using System.Runtime.Intrinsics.Arm;
+using Display.ContentsPage.SearchLink;
 
 namespace Display.Data
 {
@@ -221,7 +222,7 @@ namespace Display.Data
                 int sendCount = 0;
                 long nowDate = DateTimeOffset.Now.ToUnixTimeSeconds();
 
-                await Task.Delay(1000);
+                await Task.Delay(1000, token);
 
                 // 一开始只有cid，先获取cid的属性
                 var cidCategory = await GetFolderCategory(cid);
@@ -317,7 +318,7 @@ namespace Display.Data
             long nowDate = DateTimeOffset.Now.ToUnixTimeSeconds();
 
             //successCount++;
-            await Task.Delay(1000);
+            await Task.Delay(1000, token);
 
             //查询下一级文件信息
             var WebFileInfo = await GetFileAsync(cid, LoadAll: true);
@@ -1104,9 +1105,11 @@ namespace Display.Data
 
             bool isSuccess = false;
 
-            var downRequest = new Browser_115_Request();
-            //UID
-            downRequest.uid = videoInfoList[0].uid;
+            var downRequest = new Browser_115_Request
+            {
+                //UID
+                uid = videoInfoList[0].uid
+            };
 
             //KEY
             if (QRCodeInfo == null)
@@ -2234,6 +2237,6 @@ namespace Display.Data
             return subFile;
 
         }
-
+        
     }
 }

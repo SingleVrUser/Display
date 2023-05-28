@@ -64,25 +64,45 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     /// </summary>
     ObservableCollection<TransferStationFiles> transferStationFiles;
 
-    ///// <summary>
-    ///// 回收站撤销文件
-    ///// </summary>
-    //List<FilesInfo> RecyFiles;
 
-    public FileListPage()
+
+    public FileListPage(string cid = "0")
     {
         this.InitializeComponent();
 
+        List<ExplorerItem> unit;
+        if (cid == "0")
+        {
+            unit = new List<ExplorerItem> { new() { Name = "根目录", Cid = "0" } };
+
+        }
+        else
+        {
+            var folderToRootList = DataAccess.GetRootByCid(cid);
+            unit = folderToRootList.Select(x => new ExplorerItem { Name = x.n,Cid = x.cid}).ToList();
+        }
+
+        InitData(unit);
+    }
+
+
+    private void InitData(List<ExplorerItem> units)
+    {
+
         MyProgressBar.Visibility = Visibility.Visible;
 
-        _units = new ObservableCollection<ExplorerItem> { new() { Name = "根目录", Cid = "0" } };
+        _units = new ObservableCollection<ExplorerItem>();
+        units.ForEach(x => _units.Add(x));
+
         MetadataControl.ItemsSource = _units;
 
-        filesInfos = new IncrementalLoadDatumCollection("0");
+        filesInfos = new IncrementalLoadDatumCollection(_units.LastOrDefault()?.Cid);
         BaseExample.ItemsSource = filesInfos;
 
         filesInfos.GetFileInfoCompleted += FilesInfos_GetFileInfoCompleted;
     }
+
+
 
     public event PropertyChangedEventHandler PropertyChanged;
 
@@ -459,8 +479,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         await WebApi.DeleteFiles(sourceFilesInfos.FirstOrDefault()?.datum.pid,
             sourceFilesInfos.Select(item => item.Type == FilesInfo.FileType.File ? item.Fid : item.Cid).ToList());
     }
-
-
+    
     private void RecycleStationGrid_DragEnter(object sender, DragEventArgs e)
     {
         VisualStateManager.GoToState(this, "ReadyDelete", true);

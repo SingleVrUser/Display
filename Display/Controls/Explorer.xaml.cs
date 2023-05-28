@@ -100,16 +100,12 @@ namespace Display.Controls
 
             //位于根目录下的文件夹
             var data = GetFilesFromItems("0", FilesInfo.FileType.Folder);
-            //var data = DataAccess.GetFolderListByPid("0");
 
             foreach (var item in data)
             {
-                //var nextFolders = DataAccess.GetFolderListByPid(item.cid);
-
-                //ObservableCollection<ExplorerItem> children = new();
                 bool hasUnrealizedChildren = DataAccess.GetFolderListByPid(item.cid, 1).Count != 0;
 
-                ExplorerItem Folders = new ExplorerItem()
+                ExplorerItem folders = new ExplorerItem()
                 {
                     Name = item.n,
                     Type = FilesInfo.FileType.Folder,
@@ -118,7 +114,7 @@ namespace Display.Controls
                     datum = item
                 };
 
-                list.Add(Folders);
+                list.Add(folders);
             }
 
             return list;
@@ -180,34 +176,9 @@ namespace Display.Controls
             }
             else
             {
-                ////从getNodeByRootNodeWithCid中获取根目录的Node
-                //TreeViewNode node = getNodeByRootNodeWithCid(FolderTreeView.RootNodes.ToList(), folderCid);
-
-                //List<ExplorerItem> dirToRootNameList = new();
-
-                //while (node != null && node.Content is ExplorerItem)
-                //{
-                //    var item = node.Content as ExplorerItem;
-                //    dirToRootNameList.Add(item);
-                //    node = node.Parent;
-                //}
-
-                //dirToRootNameList.Reverse();
-
-
-                //foreach (var info in dirToRootNameList)
-                //{
-                //    SelectFolderName.Add(new ExplorerItem()
-                //    {
-                //        Name = info.Name,
-                //        Cid = info.Cid
-
-                //    });
-                //}
-
                 //从数据库中获取根目录信息
-                List<Datum> FolderToRootList = DataAccess.getRootByCid(folderCid);
-                foreach (var info in FolderToRootList)
+                List<Datum> folderToRootList = DataAccess.GetRootByCid(folderCid);
+                foreach (var info in folderToRootList)
                 {
                     SelectFolderName.Add(new ExplorerItem()
                     {
@@ -215,7 +186,6 @@ namespace Display.Controls
                         Cid = info.cid
                     });
                 }
-
             }
 
         }

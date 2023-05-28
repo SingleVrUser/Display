@@ -18,6 +18,12 @@
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="model:Forum1080SearchResult">
                     <Grid RowDefinitions="*,auto" Row="5" Padding="10">
+                        <Grid.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="在浏览器中打开" Click="OpenInBrowserClick"/>
+                            </MenuFlyout>
+                        </Grid.ContextFlyout>
+
                         <!--标题-->
                         <TextBlock Text="{x:Bind Title}"
                                    TextWrapping="Wrap"

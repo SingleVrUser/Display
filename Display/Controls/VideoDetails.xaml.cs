@@ -19,6 +19,7 @@ using Windows.Storage.Streams;
 using Display.Data;
 using Display.Helper;
 using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
+using Display.ContentsPage.SearchLink;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -123,7 +124,7 @@ namespace Display.Controls
             {
                 var videoInfo = DataAccess.LoadOneVideoInfoByCID(resultinfo.truename);
 
-                var sampleImageListStr = videoInfo.sampleImageList;
+                var sampleImageListStr = videoInfo?.sampleImageList;
                 if (!string.IsNullOrEmpty(sampleImageListStr))
                 {
                     ThumbnailList = sampleImageListStr.Split(",").ToList();
@@ -304,7 +305,7 @@ namespace Display.Controls
             if (FindInfoAgainSmoke == null)
             {
 
-                FindInfoAgainSmoke = new(resultinfo.truename);
+                FindInfoAgainSmoke = new FindInfoAgainSmoke(resultinfo.truename);
 
                 FindInfoAgainSmoke.ConfirmClick += FindInfoAgainSmoke_ConfirmClick;
             }
@@ -591,7 +592,7 @@ namespace Display.Controls
             LightDismissTeachingTip.IsOpen = true;
         }
 
-        ContentsPage.DetailInfo.FileInfoInCidSmoke FileInfoInCidSmokePage;
+        FileInfoInCidSmoke FileInfoInCidSmokePage;
         private void MoreInfoAppBarButton_Click(object sender, RoutedEventArgs e)
         {
             SmokeGrid.Visibility = Visibility.Visible;
@@ -685,6 +686,38 @@ namespace Display.Controls
         public void CoverImageAddEnterAnimation()
         {
             Cover_Image.Transitions.Add(new EntranceThemeTransition());
+        }
+
+        private async void FindVideoAppBarButton_Click(object sender, RoutedEventArgs e)
+        {
+            var contentPage = new SearchLinkPage(resultinfo.truename);
+
+            ContentDialog dialog = new()
+            {
+                XamlRoot = XamlRoot,
+                Title = "搜索结果",
+                PrimaryButtonText = "下载选中",
+                CloseButtonText = "返回",
+                DefaultButton = ContentDialogButton.Primary,
+                Content = contentPage
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                if (string.IsNullOrEmpty(AppSettings.SavePath115Cid) ||
+                    string.IsNullOrEmpty(AppSettings.SavePath115Name))
+                {
+                    ShowTeachingTip("未设置保存路径");
+                }
+                else
+                {
+                    var isDownSuccess = await contentPage.OfflineDownSelectedLink();
+
+                    ShowTeachingTip(isDownSuccess ? "已下载到网盘中" : "下载失败");
+                }
+            }
         }
     }
 }

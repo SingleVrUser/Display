@@ -105,7 +105,18 @@
                         </AppBarButton.KeyboardAccelerators>
                     </AppBarButton>
 
+                    <AppBarButton Label="搜索资源"
+                                  Click="FindVideoAppBarButton_Click">
+                        <AppBarButton.Icon>
+                            <FontIcon FontFamily="Segoe Fluent Icons"
+                                      Glyph="&#xE95A;" />
+                        </AppBarButton.Icon>
 
+                        <AppBarButton.KeyboardAccelerators>
+                            <KeyboardAccelerator Modifiers="Control"
+                                                 Key="S" />
+                        </AppBarButton.KeyboardAccelerators>
+                    </AppBarButton>
 
                     <AppBarButton Icon="OpenFile"
                                   Label="文件信息"
@@ -115,6 +126,7 @@
                                                  Key="I" />
                         </AppBarButton.KeyboardAccelerators>
                     </AppBarButton>
+
 
                     <AppBarButton Icon="Edit"
                                   Label="编辑"

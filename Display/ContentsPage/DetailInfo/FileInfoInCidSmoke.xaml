@@ -21,12 +21,26 @@
                   CharacterSpacing="5">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="data:Datum">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <TextBlock Text="{x:Bind n}" />
+                    <Grid Padding="5"
+                          RowDefinitions="auto,auto,*"
+                          RowSpacing="3">
+
+                        <Grid.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="打开所在文件夹" Click="OpenCurrentFolderItem_OnClick">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xE8B7;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+
+                                <MenuFlyoutItem Text="删除该文件"
+                                                Click="DeleteItem_OnClick"
+                                                Icon="Delete"/>
+                            </MenuFlyout>
+                        </Grid.ContextFlyout>
+
+                        <TextBlock Grid.Row="0" Text="{x:Bind n}" />
 
                         
                         <TextBlock Grid.Row="1"
@@ -38,6 +52,10 @@
                                    HorizontalAlignment="Right"
                                    Opacity="0.5"/>
 
+                        <TextBlock Grid.Row="2">
+                            <Run Foreground="#50000000">位置: </Run>
+                            <Run Foreground="#80000000" Text="{x:Bind local:FileInfoInCidSmoke.GetFolderString(cid)}"/>
+                        </TextBlock>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
