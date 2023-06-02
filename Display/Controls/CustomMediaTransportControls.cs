@@ -157,6 +157,8 @@ public class CustomMediaTransportControls : MediaTransportControls
 
         LikeButton.Click += LikeButton_Click;
         LookLaterButton.Click += LookLaterButton_Click;
+
+        _isHandlerLikeAndLookLaterButton = true;
     }
 
     public void SetTitle(string title)

@@ -41,7 +41,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
         public Progress(List<string> cidList)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             this.cidList = cidList;
         }
@@ -50,14 +50,13 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
         {
             CommonWindow window = new CommonWindow("导入数据");
 
-            this.currentWindow = window;
+            currentWindow = window;
 
             window.SetWindowSize(500, 666);
             window.Content = this;
             window.Activate();
 
         }
-
 
         /// <summary>
         /// 从其他页面Navigate来
@@ -81,15 +80,16 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             args.Handled = true;
             var window = (sender as Window);
 
-            ContentDialog dialog = new ContentDialog();
-
-            // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
-            dialog.XamlRoot = this.XamlRoot;
-            dialog.Title = "确认";
-            dialog.PrimaryButtonText = "关闭";
-            dialog.CloseButtonText = "返回";
-            dialog.DefaultButton = ContentDialogButton.Primary;
-            dialog.Content = "关闭窗口后将取消当前任务，是否继续关闭";
+            var dialog = new ContentDialog
+            {
+                // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
+                XamlRoot = this.XamlRoot,
+                Title = "确认",
+                PrimaryButtonText = "关闭",
+                CloseButtonText = "返回",
+                DefaultButton = ContentDialogButton.Primary,
+                Content = "关闭窗口后将取消当前任务，是否继续关闭"
+            };
 
             var result = await dialog.ShowAsync();
             if (result == ContentDialogResult.Primary)
@@ -248,7 +248,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
                 List<string> folderList = FolderCategory.Select(item => item.file_name).ToList();
 
-                var page = new ContentsPage.SpiderVideoInfo.Progress(folderList, datumList);
+                var page = new SpiderVideoInfo.Progress(folderList, datumList);
                 //创建搜刮进度窗口
                 page.CreateWindow();
             }

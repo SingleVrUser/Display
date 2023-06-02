@@ -250,7 +250,7 @@ namespace Display.Views
         {
             recentCoverList.Clear();
 
-            foreach (var videoInfo in await DataAccess.GetNameAndIamgeRecent())
+            foreach (var videoInfo in await DataAccess.GetNameAndImageRecent())
             {
                 recentCoverList.Add(new VideoCoverDisplayClass(videoInfo, 500, 300));
             }
@@ -280,7 +280,7 @@ namespace Display.Views
         private async void TryUpdateCoverShow()
         {
             //最近视频
-            TryUpdateVideoCoverDisplayClass(await DataAccess.GetNameAndIamgeRecent(), recentCoverList);
+            TryUpdateVideoCoverDisplayClass(await DataAccess.GetNameAndImageRecent(), recentCoverList);
             //稍后观看
             TryUpdateVideoCoverDisplayClass(await DataAccess.GetNameAndImageFromLookLater(), lookLaterList);
             //喜欢视频

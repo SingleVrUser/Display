@@ -497,8 +497,7 @@ public sealed partial class MainPage : Page
             Debug.WriteLine($"\t_isDisposing：{_isDisposing}");
             if (_isDisposing) return;
 
-            VideoInfo cidInfo = null;
-
+            VideoInfo cidInfo;
             var name = video.Name;
             var cid = FileMatch.MatchName(name);
             if (cid == null)
@@ -604,8 +603,11 @@ public sealed partial class MainPage : Page
         // 首先，从播放列表中删除
         var fid = DeletedFileFromListAsync(fileInfo);
 
+        // 播放下一集（如果存在）
+        await TryRemoveCurrentVideoAndPlayNextVideo(fileInfo);
+
         // 然后，删除115文件
-        await webApi.DeleteFiles(fileInfo.Cid, new() { fid });
+        await webApi.DeleteFiles(fileInfo.Cid, new List<string> { fid });
 
         // 接着，删除资源管理器的文件，如果存在（有可能已经关掉了）
         if (LastFilesListView.IsLoaded && LastFilesListView.ItemsSource is IncrementalLoadDatumCollection filesInfos &&
@@ -614,8 +616,6 @@ public sealed partial class MainPage : Page
             filesInfos.Remove(fileInfo);
         }
 
-        // 最后，播放下一集（如果存在）
-        await TryRemoveCurrentVideoAndPlayNextVideo(fileInfo);
     }
 
     /// <summary>

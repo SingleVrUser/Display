@@ -247,8 +247,6 @@ namespace Display.Spider
                 { "searchsubmit", "true"},
             };
 
-
-
             List<Forum1080SearchResult> detailInfos = new();
             var nextPageUrl = $"{BaseUrl}search.php?searchsubmit=yes";
 
@@ -264,6 +262,7 @@ namespace Display.Spider
                 htmlDoc.LoadHtml(htmlString);
 
                 var searchResult = GetDetailInfoFromSearchResult(cid, htmlDoc);
+                if(searchResult==null) return null;
 
                 var currentInfos = searchResult.Item1;
                 detailInfos.AddRange(currentInfos);

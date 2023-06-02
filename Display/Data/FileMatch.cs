@@ -24,7 +24,7 @@ namespace Display.Data
             List<string> reg_replace_list =
                 new List<string> { "uur76", @"({\d}K)?\d{2,3}fps\d{0,}", @"part\d", "@18P2P", @"[^\d]\d{3,6}P", @"\[?[0-9a-z]+?\.(com|cn|xyz|la|me|net|app|cc)\]?@?",
                                 @"SE\d{2}",@"EP\d{2}", @"S\d{1,2}E\d{1,2}", @"\D[hx]26[54]", "[-_][468]k", @"h_[0-9]{3,4}",@"[a-z0-9]{15,}",
-                                @"\d+bit",@"\d{3,6}x\d{3,6}"};
+                                @"\d+bit",@"\d{3,6}x\d{3,6}", @"whole[-_\w]+$"};
             for (int i = 0; i < reg_replace_list.Count; i++)
             {
                 Regex rgx = new Regex(reg_replace_list[i], RegexOptions.IgnoreCase);
@@ -63,10 +63,10 @@ namespace Display.Data
         public static string MatchName(string src_text, string file_cid = "")
         {
             //提取文件名
-            string name = Regex.Match(src_text, @"(.*)(\.\w{3,5})?$", RegexOptions.IgnoreCase).Groups[1].Value;
+            var name = Regex.Replace(src_text, @"(\.\w{3,5}?)$", "", RegexOptions.IgnoreCase);
 
             //删除空格
-            name = src_text.Replace(" ", "_");
+            name = name.Replace(" ", "_");
 
             //转小写
             string name_lc = name.ToLower();
@@ -418,7 +418,7 @@ namespace Display.Data
                     var videoName = FileMatch.MatchName(FileName, file_info.cid);
 
                     //无论匹配与否，都存入数据库
-                    DataAccess.AddFileToInfo(file_info.pc, videoName);
+                    DataAccess.AddFileToInfo(file_info.pc, videoName, isReplace:true);
 
                     //未匹配
                     if (videoName == null)
@@ -436,7 +436,7 @@ namespace Display.Data
                     }
                     else
                     {
-                        resultList.Add(new MatchVideoResult() { status = true, OriginalName = file_info.n, statusCode = 2, message = "已添加" });
+                        resultList.Add(new MatchVideoResult() { status = true, OriginalName = file_info.n, statusCode = 2, message = "已添加"});
                     }
 
 

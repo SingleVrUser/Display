@@ -1118,8 +1118,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
     private async void LoadDstSuccessInfoCollection()
     {
-        var imgSize = this.ImageSize;
-        SuccessInfoCollection = new(imgSize.Item1, imgSize.Item2);
+        SuccessInfoCollection = new IncrementalLoadSuccessInfoCollection(ImageSize.Item1, ImageSize.Item2);
         BasicGridView.ItemsSource = SuccessInfoCollection;
 
         SuccessInfoCollection.SetOrder(SuccessListOrderBy, SuccessListIsDesc);

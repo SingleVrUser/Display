@@ -514,18 +514,18 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         StorageFile file = await storageFolder.CreateFileAsync($"{PickCode}.png", CreationCollisionOption.ReplaceExisting);
         var fileStream = await file.OpenAsync(FileAccessMode.ReadWrite);
 
-        var rendertarget = new CanvasRenderTarget(
+        var canvasRenderTarget = new CanvasRenderTarget(
                 CanvasDevice.GetSharedDevice(),
                 MediaControl.MediaPlayer.PlaybackSession.NaturalVideoWidth,
                 MediaControl.MediaPlayer.PlaybackSession.NaturalVideoHeight,
                 96);
-        MediaControl.MediaPlayer.CopyFrameToVideoSurface(rendertarget);
+        MediaControl.MediaPlayer.CopyFrameToVideoSurface(canvasRenderTarget);
 
         var targetFileStream = fileStream.AsStreamForWrite();
-        using (targetFileStream)
+        await using (targetFileStream)
         {
             var stream = targetFileStream.AsRandomAccessStream();
-            await rendertarget.SaveAsync(stream, CanvasBitmapFileFormat.Png);
+            await canvasRenderTarget.SaveAsync(stream, CanvasBitmapFileFormat.Png);
         }
 
         return file.Path;

@@ -50,7 +50,7 @@ namespace Display.Views
         {
             ProgressRing.IsActive = true;
 
-            actorinfo = new(new() { { "is_like", true }, { "prifile_path", true } });
+            actorinfo = new IncrementallLoadActorInfoCollection(new Dictionary<string, bool> { { "is_like", true }, { "prifile_path", true } });
             BasicGridView.ItemsSource = actorinfo;
             await actorinfo.LoadData();
 

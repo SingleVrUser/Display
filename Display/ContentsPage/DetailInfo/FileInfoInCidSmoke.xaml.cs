@@ -74,7 +74,9 @@ namespace Display.ContentsPage.DetailInfo
                 new List<string>() { info.fid });
 
             // 从数据库中删除
-            DataAccess.DeleteDataInFilesInfoAndFileToInfo(trueName);
+            DataAccess.DeleteDataInFilesInfoAndFileToInfo(info.pc);
+
+
         }
     }
 }

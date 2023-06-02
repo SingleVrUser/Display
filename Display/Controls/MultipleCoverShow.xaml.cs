@@ -43,61 +43,6 @@ namespace Display.Controls
             this.InitializeComponent();
         }
 
-        //private void MultipleCoverShow_Loaded(object sender, RoutedEventArgs e)
-        //{
-        //    this.Loaded -= MultipleCoverShow_Loaded;
-
-        //    ////调整大小并开始监听
-        //    //tryUpdateCoverFlipItems();
-        //    //NewAddGrid.SizeChanged += NewAddGrid_SizeChanged;
-
-        //}
-
-
-        //private void NewAddGrid_SizeChanged(object sender, SizeChangedEventArgs e)
-        //{
-        //    tryUpdateCoverFlipItems();
-        //}
-
-        ////CoverList不变的情况下，更新封面显示数量
-        //private void tryUpdateCoverFlipItems()
-        //{
-        //    if (CoverList == null) return;
-
-        //    //最大的显示数量
-        //    int count = ((int)NewAddGrid.RenderSize.Width - 20 - 3 * showCount) / 300;
-        //    //修正item间距
-        //    count = ((int)NewAddGrid.RenderSize.Width - 20 - 3 * count) / 300;
-
-        //    //什么时候更新封面
-        //    // CoverList增减 / 最适宜显示数量发生改变
-        //    if (_CoverCount != CoverList.Count || (count != showCount && count != 0))
-        //    {
-        //        showCount = count;
-
-
-        //        UpdateCoverFlipItems(showCount, CoverList);
-        //    }
-
-        //    _CoverCount = CoverList.Count;
-        //}
-
-        //private  void UpdateCoverFlipItems(int count, List<VideoCoverDisplayClass> CoverList)
-        //{
-        //    NewAddFlipItems.Clear();
-
-        //    for (int i = 0; i < CoverList.Count; i += count)
-        //    {
-        //        ObservableCollection<VideoCoverDisplayClass> NewItems = new();
-        //        for (int j = 0; j < count && i + j < CoverList.Count; j++)
-        //        {
-        //            NewItems.Add(CoverList[i + j]);
-        //        }
-        //        NewAddFlipItems.Add(new CoverFlipItems() { CoverItems = NewItems });
-        //    }
-        //}
-
-
         //点击了图片
         public event ItemClickEventHandler ItemClick;
         private void GridView_ItemClick(object sender, ItemClickEventArgs e)

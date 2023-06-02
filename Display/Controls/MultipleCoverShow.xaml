@@ -50,50 +50,39 @@
             </HyperlinkButton>
         </RelativePanel>
 
-        <Grid
-            BorderThickness="1"
+        <Grid BorderThickness="1"
               BorderBrush="{StaticResource CircleLightBorderBrush}"
-            CornerRadius="8"
-            Margin="0,5"
-            MinHeight="280">
-            <controls:AdaptiveGridView
-                    StretchContentForSingleRow="True"
-                    OneRowModeEnabled="True"
-                    ItemHeight="250"
-                    DesiredWidth="300"
-                    SelectionMode="None"
-                    ItemClick="GridView_ItemClick"
-                    IsItemClickEnabled="True"
-                    VerticalContentAlignment="Center"
-                    VerticalAlignment="Center"
-                    ItemsSource="{x:Bind CoverList}"
-                    ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                    ScrollViewer.HorizontalScrollMode="Enabled">
+              CornerRadius="8"
+              Margin="0,5"
+              MinHeight="280">
+            <controls:AdaptiveGridView StretchContentForSingleRow="True"
+                                       OneRowModeEnabled="True"
+                                       ItemHeight="250"
+                                       DesiredWidth="300"
+                                       SelectionMode="None"
+                                       ItemClick="GridView_ItemClick"
+                                       IsItemClickEnabled="True"
+                                       VerticalContentAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       ItemsSource="{x:Bind CoverList}"
+                                       ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                                       ScrollViewer.HorizontalScrollMode="Enabled">
 
                 <controls:AdaptiveGridView.ItemTemplate>
                     <DataTemplate x:DataType="data:VideoCoverDisplayClass">
-                        <Grid
-                            PointerEntered="Image_PointerEntered"
-                            PointerExited="Image_PointerExited"
-                            CornerRadius="2">
-                            <Image
-                                    x:Name="showImage"
-                                  VerticalAlignment="Center"
-                                  Source="{Binding imagepath}"
-                                  Stretch="Uniform">
-                                <!--<Image.ContextFlyout>
-                                    --><!--右键操作--><!--
-                                    <MenuFlyout>
-                                        <MenuFlyoutItem Text="移出" IsEnabled="False">
-                                            <MenuFlyoutItem.Icon>
-                                                <FontIcon Glyph="&#xEE4A;" />
-                                            </MenuFlyoutItem.Icon>
-                                        </MenuFlyoutItem>
-                                    </MenuFlyout>
-                                </Image.ContextFlyout>-->
-                            </Image>
-                        </Grid>
+                        <Border PointerEntered="Image_PointerEntered"
+                                PointerExited="Image_PointerExited"
+                                CornerRadius="2">
 
+                            <Image x:Name="showImage"
+                                   VerticalAlignment="Center"
+                                   Stretch="Uniform">
+                                <Image.Source>
+                                    <BitmapImage UriSource="{x:Bind imagepath}"
+                                                 DecodePixelWidth="300" />
+                                </Image.Source>
+                            </Image>
+                        </Border>
                     </DataTemplate>
                 </controls:AdaptiveGridView.ItemTemplate>
 
