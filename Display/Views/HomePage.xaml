@@ -133,11 +133,11 @@
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
 
-                                        <Grid CornerRadius="2"
-                                              Grid.Row="1">
-                                            <controls:ImageEx Source="{x:Bind imagepath}"
-                                                              Width="120" />
-                                        </Grid>
+                                        <controls:ImageEx Source="{x:Bind imagepath}"
+                                                          Width="120"
+                                                          DecodePixelWidth="120"
+                                                          CornerRadius="2">
+                                        </controls:ImageEx>
 
                                         <StackPanel Grid.Column="1"
                                                     VerticalAlignment="Center"

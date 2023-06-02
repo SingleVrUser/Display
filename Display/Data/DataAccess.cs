@@ -506,7 +506,7 @@ namespace Display.Data
             db.Close();
         }
 
-        public static void DeleteDataInFilesInfoAndFileToInfo(string trueName)
+        public static void DeleteDataInFilesInfoAndFileToInfo(string pc)
         {
             using SqliteConnection db =
                 new SqliteConnection($"Filename={dbpath}");
@@ -517,11 +517,14 @@ namespace Display.Data
             command.Connection = db;
 
             // 先删除 FilesInfo
-            command.CommandText = $"DELETE FROM FilesInfo WHERE pc IN ( SELECT pc FROM FilesInfo as a INNER JOIN FileToInfo as b ON (a.pc=b.file_pickcode) WHERE b.truename == '{trueName}' COLLATE NOCASE);";
+            //command.CommandText =
+            //    $"DELETE FROM FilesInfo WHERE pc IN ( SELECT pc FROM FilesInfo as a INNER JOIN FileToInfo as b ON (a.pc=b.file_pickcode) WHERE b.pc == '{pc}' COLLATE NOCASE);";
+            command.CommandText =
+                $"DELETE FROM FilesInfo WHERE pc == '{pc}' COLLATE NOCASE";
             command.ExecuteScalar();
 
             // 后删除中间表 FileToInfo
-            command.CommandText = $"DELETE FROM FileToInfo WHERE FileToInfo.truename == '{trueName}' COLLATE NOCASE";
+            command.CommandText = $"DELETE FROM FileToInfo WHERE file_pickcode == '{pc}' COLLATE NOCASE";
             command.ExecuteScalar();
 
             db.Close();
@@ -2677,7 +2680,7 @@ namespace Display.Data
         public static List<Datum> GetFolderListByPid(string pid, int limit = -1)
         {
             List<Datum> data = new List<Datum>();
-            
+
             using (SqliteConnection db =
                new SqliteConnection($"Filename={dbpath}"))
             {
@@ -2824,7 +2827,7 @@ namespace Display.Data
         /// </summary>
         /// <param Name="actorName"></param>
         /// <returns></returns>
-        public static async Task<List<VideoInfo>> GetNameAndImageFromLookLater()
+        public static async Task<List<VideoInfo>> GetNameAndImageFromLookLater(int count = 10)
         {
             List<VideoInfo> data = new List<VideoInfo>();
 
@@ -2837,7 +2840,7 @@ namespace Display.Data
             SqliteCommand selectCommand = new SqliteCommand();
 
             selectCommand = new SqliteCommand
-                ($"SELECT * FROM VideoInfo WHERE look_later != 0 ORDER BY look_later DESC", db);
+                ($"SELECT * FROM VideoInfo WHERE look_later != 0 ORDER BY look_later DESC LIMIT {count}", db);
 
 
             SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
@@ -2857,7 +2860,7 @@ namespace Display.Data
         /// </summary>
         /// <param Name="actorName"></param>
         /// <returns></returns>
-        public static async Task<List<VideoInfo>> GetNameAndImageFromLike()
+        public static async Task<List<VideoInfo>> GetNameAndImageFromLike(int count = 10)
         {
             List<VideoInfo> data = new List<VideoInfo>();
 
@@ -2869,7 +2872,7 @@ namespace Display.Data
             SqliteCommand selectCommand = new SqliteCommand();
 
             selectCommand = new SqliteCommand
-                ("SELECT * FROM VideoInfo WHERE is_like != 0", db);
+                ($"SELECT * FROM VideoInfo WHERE is_like != 0 LIMIT {count}", db);
 
             SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
 
@@ -2919,7 +2922,7 @@ namespace Display.Data
         /// </summary>
         /// <param Name="actorName"></param>
         /// <returns></returns>
-        public static async Task<List<VideoInfo>> GetNameAndIamgeRecent()
+        public static async Task<List<VideoInfo>> GetNameAndImageRecent(int count = 10)
         {
             List<VideoInfo> data = new List<VideoInfo>();
 
@@ -2931,7 +2934,7 @@ namespace Display.Data
             SqliteCommand selectCommand = new SqliteCommand();
 
             selectCommand = new SqliteCommand
-                ($"SELECT * FROM VideoInfo ORDER BY addtime DESC LIMIT 40", db);
+                ($"SELECT * FROM VideoInfo ORDER BY addtime DESC LIMIT {count}", db);
 
 
             SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
@@ -2997,7 +3000,7 @@ namespace Display.Data
                 upperLevelFolderInfo = getUpperLevelFolderCid(upperLevelFolderInfo.pid);
 
                 if (upperLevelFolderInfo == null) break;
-                    
+
                 folderToRootList.Add(upperLevelFolderInfo);
 
                 if (upperLevelFolderInfo.pid == "0")

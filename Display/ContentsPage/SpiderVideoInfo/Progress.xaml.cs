@@ -61,12 +61,12 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
         private async void ReSpiderPageLoaded(object sender, RoutedEventArgs e)
         {
-            this.Loaded -= ReSpiderPageLoaded;
+            Loaded -= ReSpiderPageLoaded;
 
             if (failDatumList == null || failDatumList.Count == 0) return;
 
             currentWindow.Closed += CurrentWindow_Closed;
-            if (matchVideoResults == null) matchVideoResults = new();
+            if (matchVideoResults == null) matchVideoResults = new List<MatchVideoResult>();
             foreach (var item in failDatumList)
             {
                 matchVideoResults.Add(new MatchVideoResult() { status = true, OriginalName = item.Datum.n, message = "匹配成功", statusCode = 1, MatchName = item.MatchName });
@@ -229,7 +229,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
         private void UpdateSpiderCartesianChart(Models.SpiderInfo.SpiderSourceName spiderSource)
         {
-            var item = CartesianChart.Series.Where(item => item.Name == spiderSource.ToString()).FirstOrDefault();
+            var item = CartesianChart.Series.FirstOrDefault(item => item.Name == spiderSource.ToString());
 
             ((ObservableValue[])item.Values)[0].Value += 1;
         }
@@ -315,7 +315,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             if (TypeInfo.data.Count != 0)
             {
-                var tmpData = TypeInfo.data.Where(x => x.name == Name).FirstOrDefault();
+                var tmpData = TypeInfo.data.FirstOrDefault(x => x.name == Name);
 
                 if (tmpData == null)
                 {
@@ -363,7 +363,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             {
                 if (item.MatchName == null)
                     continue;
-
+                
                 DataAccess.AddSpiderTask(item.MatchName, task_id);
             }
 

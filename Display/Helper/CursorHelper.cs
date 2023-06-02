@@ -1,10 +1,8 @@
 ﻿
-using System.Diagnostics;
-using System;
-using System.Runtime.InteropServices;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Input;
-using Microsoft.UI.Xaml;
+using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace Display.Helper
 {

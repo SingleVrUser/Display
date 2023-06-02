@@ -52,7 +52,7 @@
                                    HorizontalAlignment="Right"
                                    Opacity="0.5"/>
 
-                        <TextBlock Grid.Row="2">
+                        <TextBlock Grid.Row="2" TextTrimming="CharacterEllipsis">
                             <Run Foreground="#50000000">位置: </Run>
                             <Run Foreground="#80000000" Text="{x:Bind local:FileInfoInCidSmoke.GetFolderString(cid)}"/>
                         </TextBlock>
