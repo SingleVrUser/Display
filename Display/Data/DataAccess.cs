@@ -2632,11 +2632,10 @@ namespace Display.Data
             }
 
             List<Datum> data = new List<Datum>();
-
-            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
+            
             using (SqliteConnection db =
                 new SqliteConnection($"Filename={dbpath}"))
-            {
+            { 
                 db.Open();
 
                 SqliteCommand selectCommand = new SqliteCommand();
@@ -2657,10 +2656,18 @@ namespace Display.Data
                 // '%xxx%57%' 会选出 057、157、257之类的
                 foreach (var datum in tmpList)
                 {
-                    var match_result = Regex.Match(datum.n, @$"({leftName}2?).*?[-_]?0*(\d+)", RegexOptions.IgnoreCase);
-                    if (match_result.Success && match_result.Groups[2].Value == rightNumber)
-                        data.Add(datum);
-
+                    if (leftName == "FC")
+                    {
+                        var match_result = Regex.Match(datum.n, @"(FC2?)\w*[-_]?0*(\d+)", RegexOptions.IgnoreCase);
+                        if (match_result.Success && match_result.Groups[2].Value == rightNumber)
+                            data.Add(datum);
+                    }
+                    else
+                    {
+                        var match_result = Regex.Match(datum.n, @$"({leftName})[-_]?0*(\d+)", RegexOptions.IgnoreCase);
+                        if (match_result.Success && match_result.Groups[2].Value == rightNumber)
+                            data.Add(datum);
+                    }
                 }
 
                 db.Close();

@@ -108,7 +108,7 @@ namespace MediaPlayerElement_Test.Models
                 try
                 {
                     // _inputStream为空，重新获取_inputStream
-                    if (_inputStream == null)
+                    if (_inputStream == null && !_isDisposing)
                     {
                         await SendRequestAsync();
                     }
@@ -195,7 +195,7 @@ namespace MediaPlayerElement_Test.Models
 
             if (!response.IsSuccessStatusCode)
             {
-                Debug.WriteLine($"访问网页出错：{response.StatusCode}");
+                Debug.WriteLine($"访问视频出错：{response.StatusCode}");
                 CanRead = false;
                 Dispose();
                 return;
