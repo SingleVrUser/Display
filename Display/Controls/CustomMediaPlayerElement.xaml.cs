@@ -95,6 +95,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         _httpClient.Dispose();
     }
 
+
+    private bool isHanlerCurrentItemChanged = false;
     private void SetMediaPlayer()
     {
         var mediaPlaybackList = new MediaPlaybackList();
@@ -127,21 +129,19 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         }
 
         mediaPlaybackList.StartingItem = mediaPlaybackList.Items[(int)_playIndex];
-        mediaPlaybackList.CurrentItemChanged += MediaPlaybackList_CurrentItemChanged;
+
+        if (!isHanlerCurrentItemChanged)
+        {
+            mediaPlaybackList.CurrentItemChanged += MediaPlaybackList_CurrentItemChanged;
+            isHanlerCurrentItemChanged = true;
+        }
+
         var media = new MediaPlayer
         {
             Source = mediaPlaybackList,
         };
 
         MediaControl.SetMediaPlayer(media);
-
-        //var mediaPlayerWithStreamSource = await MediaPlayerWithStreamSource.CreateMediaPlayer(url, subInfo: SubInfo);
-        //var media = mediaPlayerWithStreamSource.MediaPlayer;
-
-        ////先暂停后重新设置源，避免新的源设置失败之前的还在播放
-        //if (MediaControl.MediaPlayer.Source != null && MediaControl.MediaPlayer.CurrentState == MediaPlayerState.Playing) MediaControl.MediaPlayer.Pause();
-
-        //MediaControl.SetMediaPlayer(media);
 
         // 播放时修改Slider精度
         MediaControl.MediaPlayer.MediaOpened += MediaPlayer_MediaOpened;
@@ -152,10 +152,9 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         //_currentMediaPlayerWithStreamSource?.Dispose();
         //_currentMediaPlayerWithStreamSource = mediaPlayerWithStreamSource;
     }
-
-
-
+    
     private bool _isChangedCurrentItem;
+    private bool _isBindingCurrentItem;
 
     private void MediaPlaybackList_CurrentItemChanged(MediaPlaybackList sender, CurrentMediaPlaybackItemChangedEventArgs args)
     {
@@ -238,11 +237,11 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
             mediaTransportControls.DisableScreenButton();
         }
-
     }
     
     private async void Binder_Binding(MediaBinder sender, MediaBindingEventArgs args)
     {
+        _isBindingCurrentItem = true;
         var deferral = args.GetDeferral();
 
         var content = sender.Token;
@@ -277,6 +276,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         }
 
         deferral.Complete();
+
+        _isBindingCurrentItem = false;
     }
 
     private void MediaPlayerElement_CurrentStateChanged(MediaPlaybackSession sender, object args)
@@ -324,10 +325,9 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
     private void QualityChanged(object sender, SelectionChangedEventArgs e)
     {
-        //设置currentItem时不计入改变
-        if (_isChangedCurrentItem) return;
-
-
+        //设置currentItem以及Binder_Binding时不计入改变
+        if (_isChangedCurrentItem || _isBindingCurrentItem) return;
+        
         if (sender is not ListView listView) return;
         if (listView.ItemsSource is not List<Quality> list) return;
         if (e.AddedItems.FirstOrDefault() is not Quality quality) return;
