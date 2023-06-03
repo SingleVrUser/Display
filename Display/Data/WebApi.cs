@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -24,13 +23,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Windows.Storage;
-using Aliyun.OSS.Model;
 using HttpMethod = System.Net.Http.HttpMethod;
 using HttpRequestMessage = System.Net.Http.HttpRequestMessage;
-using System.Security.Cryptography;
-using System.Xml.Linq;
-using System.Runtime.Intrinsics.Arm;
-using Display.ContentsPage.SearchLink;
 
 namespace Display.Data
 {
@@ -1736,6 +1730,40 @@ namespace Display.Data
             ApplicationData.Current.LocalSettings.Values["cookie"] = null;
         }
 
+        //public async Task<string> GetVerifyAccountInfo()
+        //{
+        //    HttpResponseMessage response;
+        //    try
+        //    {
+        //        response = await Client.GetAsync($"https://captchaapi.115.com/?ac=code&t=sign&callback=jQuery17202178075311826495_1683902571757&_={DateTimeOffset.Now.ToUnixTimeSeconds()}");
+        //    }
+        //    catch (HttpRequestException e)
+        //    {
+        //        Toast.tryToast("网络异常", "检查115登录状态时出现异常：", e.Message);
+
+        //        return null;
+        //    }
+
+        //    if (!response.IsSuccessStatusCode)
+        //    {
+        //        return null;
+        //    }
+
+        //    string strReuslt = await response.Content.ReadAsStringAsync();
+        //    strReuslt = strReuslt.Replace("jQuery17202178075311826495_1683902571757(", "");
+        //    strReuslt = strReuslt.Replace(");", "");
+
+        //    try
+        //    {
+        //        UserInfo = JsonConvert.DeserializeObject<UserInfo>(strReuslt);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine($"发生错误：{ex.Message}");
+        //    }
+        //    return null;
+        //}
+
         /// <summary>
         /// 获取下载链接
         /// </summary>
@@ -2015,11 +2043,6 @@ namespace Display.Data
 
             return window;
                 ;
-        }
-
-        private static void Page_VerifyAccountCompleted(object sender, bool e)
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>

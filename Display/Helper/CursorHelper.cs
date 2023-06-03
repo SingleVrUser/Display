@@ -54,7 +54,6 @@ namespace Display.Helper
             vLastInputInfo.cbSize = Marshal.SizeOf(vLastInputInfo);
             if (!GetLastInputInfo(ref vLastInputInfo)) return 0;
 
-            Debug.WriteLine($"Environment.TickCount:{Environment.TickCount}");
             return Environment.TickCount - vLastInputInfo.dwTime;
         }
     }

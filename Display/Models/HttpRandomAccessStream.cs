@@ -62,17 +62,18 @@ namespace MediaPlayerElement_Test.Models
 
         public void Seek(ulong position)
         {
-            if (Position != position)
-            {
-                if (_inputStream != null)
-                {
-                    _inputStream.Dispose();
-                    _inputStream = null;
-                }
+            if (Position == position) return;
 
-                Debug.WriteLine("Seek: {0:N0} -> {1:N0}", Position, position);
-                Position = position;
+            // 重置_inputStream
+            Debug.WriteLine("重置_inputStream");
+            if (_inputStream != null)
+            {
+                _inputStream.Dispose();
+                _inputStream = null;
             }
+
+            //Debug.WriteLine("Seek: {0:N0} -> {1:N0}", Position, position);
+            Position = position;
         }
 
         public void Dispose()
@@ -84,9 +85,13 @@ namespace MediaPlayerElement_Test.Models
 
             Debug.WriteLine("开始销毁_inputStream");
             _isDisposing = true;
-
+            
             _inputStream?.Dispose();
+            _inputStream = null;
+
+            Debug.WriteLine("开始销毁_client");
             _client?.Dispose();
+            _client = null;
         }
 
         public IAsyncOperationWithProgress<IBuffer, uint> ReadAsync(IBuffer buffer, uint count, InputStreamOptions options)
@@ -110,6 +115,7 @@ namespace MediaPlayerElement_Test.Models
                     // _inputStream为空，重新获取_inputStream
                     if (_inputStream == null && !_isDisposing)
                     {
+                        Debug.WriteLine("_inputStream为空,尝试从Url中获取");
                         await SendRequestAsync();
                     }
                 }
@@ -118,14 +124,14 @@ namespace MediaPlayerElement_Test.Models
                     Debug.WriteLine(ex);
                 }
 
-                if (_inputStream == null)
+                if (_inputStream == null || _isDisposing)
                 {
+                    Debug.WriteLine("尝试获取_inputStream后依旧未为空，返回默认值");
                     return default;
                 }
 
                 try
                 {
-
                     var result = await _inputStream.ReadAsync(buffer, count, options).AsTask(cancellationToken, progress).ConfigureAwait(false);
 
                     // Move position forward.
@@ -150,7 +156,7 @@ namespace MediaPlayerElement_Test.Models
 
         private async Task SendRequestAsync()
         {
-            if (_isDisposing || !CanRead)
+            if (_isDisposing || !CanRead || _client == null)
             {
                 return;
             }
@@ -170,17 +176,16 @@ namespace MediaPlayerElement_Test.Models
                 request.Headers.Add("If-Unmodified-Since", _lastModifiedHeader);
             }
 
-            if (_client == null)
-            {
-                return;
-            }
-
             HttpResponseMessage response;
+
 
             //设置超时时间5s
             var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token;
+
             try
             {
+                Debug.WriteLine("_client访问");
+
                 response = await _client.SendRequestAsync(
                     request,
                     HttpCompletionOption.ResponseHeadersRead).AsTask(cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -225,7 +230,7 @@ namespace MediaPlayerElement_Test.Models
                 ContentType = response.Content.Headers["Content-Type"];
             }
 
-            _inputStream = await response.Content.ReadAsInputStreamAsync().AsTask().ConfigureAwait(false);
+            _inputStream = await response.Content.ReadAsInputStreamAsync().AsTask(cancellationToken).ConfigureAwait(false);
         }
     }
 }
