@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -17,11 +18,16 @@ namespace Display.Views
     /// </summary>
     public sealed partial class VerifyAccountPage : Page
     {
+
+
         private string RequestUrl => $"https://captchaapi.115.com/?ac=security_code&type=web&cb=Close911_{DateTimeOffset.Now.ToUnixTimeMilliseconds()}";
 
         public bool IsSucceeded = false;
 
         private Window currentWindow;
+
+        private string sign;
+
 
         public VerifyAccountPage(Window window)
         {
@@ -39,6 +45,15 @@ namespace Display.Views
         private void Window_Closed(object sender, WindowEventArgs args)
         {
             VerifyAccountCompleted?.Invoke(this, IsSucceeded);
+        }
+
+        private string GetSign()
+        {
+            if(sign!=null) return sign;
+
+            //var result = WebApi.GlobalWebApi.GetVerifyAccountInfo();
+
+            return string.Empty;
         }
 
         public event EventHandler<bool> VerifyAccountCompleted;

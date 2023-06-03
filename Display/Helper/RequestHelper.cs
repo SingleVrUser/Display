@@ -37,7 +37,7 @@ public class RequestHelper
 
                 if (response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.Found)
                 {
-                    strResult = await response.Content.ReadAsStringAsync();
+                    strResult = await response.Content.ReadAsStringAsync(option);
                     strResult = strResult.Replace("\r", "").Replace("\n", "").Trim();
 
                     break;

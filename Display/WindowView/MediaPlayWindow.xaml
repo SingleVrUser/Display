@@ -25,31 +25,6 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!--标题栏-->
-        <Grid x:Name="AppTitleBar">
-            <Grid.Background>
-                <AcrylicBrush TintOpacity="0.7"
-                              TintLuminosityOpacity="0.9"
-                              TintColor="#201f1e"
-                              FallbackColor="SkyBlue" />
-            </Grid.Background>
-
-            <StackPanel Orientation="Horizontal"
-                        Padding="10,0"
-                        Spacing="5">
-                <Image Source="/Assets/pokeball.ico"
-                       Width="16"
-                       Height="16" />
-                <TextBlock x:Name="AppTitleTextBlock"
-                           Text="播放"
-                           TextWrapping="NoWrap"
-                           Foreground="WhiteSmoke"
-                            Opacity="0.8"
-                           VerticalAlignment="Center" />
-            </StackPanel>
-
-        </Grid>
-
         <UserControl x:Name="MyUserControl" Grid.Row="1">
 
             <Grid x:Name="VideoPlayGrid"
@@ -102,6 +77,31 @@
                 </Grid>
             </Grid>
         </UserControl>
-        
+
+        <!--标题栏-->
+        <Grid Grid.Row="0" x:Name="AppTitleBar">
+            <Grid.Background>
+                <AcrylicBrush TintOpacity="0.7"
+                              TintLuminosityOpacity="0.9"
+                              TintColor="#201f1e"
+                              FallbackColor="SkyBlue" />
+            </Grid.Background>
+
+            <StackPanel Orientation="Horizontal"
+                        Padding="10,0"
+                        Spacing="5">
+                <Image Source="/Assets/pokeball.ico"
+                       Width="16"
+                       Height="16" />
+                <TextBlock x:Name="AppTitleTextBlock"
+                           Text="播放"
+                           TextWrapping="NoWrap"
+                           Foreground="WhiteSmoke"
+                           Opacity="0.8"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+
+        </Grid>
+
     </customcontrols:CursorGrid>
 </Window>

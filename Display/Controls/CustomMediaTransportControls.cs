@@ -211,18 +211,26 @@ public class CustomMediaTransportControls : MediaTransportControls
         QualityListView.SelectionChanged += QualityListView_SelectionChanged;
     }
 
+    private bool isFirstQualityChanged;
+    private bool isSettingQuslitySource;
     public void SetQualityListSource(List<Quality> qualityItemsSource,int qualityIndex)
     {
         if (QualityListView == null) return;
 
+        isFirstQualityChanged = true;
+        isSettingQuslitySource = true;
+
         QualityListView.ItemsSource = qualityItemsSource;
+
         int maxIndex = qualityItemsSource.Count - 1;
         if (qualityIndex > maxIndex)
         {
             qualityIndex = maxIndex;
         }
-
         QualityListView.SelectedIndex = qualityIndex;
+
+        isSettingQuslitySource = false;
+
     }
 
     public void InitPlayer(DataTemplate qualityDataTemplate)
@@ -257,6 +265,14 @@ public class CustomMediaTransportControls : MediaTransportControls
 
     private void QualityListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        if (isFirstQualityChanged)
+        {
+            isFirstQualityChanged = false;
+            return;
+        }
+
+        if (isSettingQuslitySource) return;
+
         QualityChanged?.Invoke(sender, e);
     }
 
@@ -269,6 +285,7 @@ public class CustomMediaTransportControls : MediaTransportControls
     {
         LikeButtonClick?.Invoke(sender, e);
     }
+
     private void LookLaterButton_Click(object sender, RoutedEventArgs e)
     {
         LookLaterButtonClick?.Invoke(sender, e);

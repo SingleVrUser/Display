@@ -86,54 +86,21 @@ public sealed partial class MediaPlayWindow : Window
     /// <param name="args"></param>
     private void MediaPlayWindow_Closed(object sender, WindowEventArgs args)
     {
-        if (MediaControl.IsLoaded && VideoPlayGrid.Children.Contains(MediaControl))
-        {
-            MediaControl.DisposeMediaPlayer();
-            VideoPlayGrid.Children.Remove(MediaControl);
-        }
-
-        MediaControl.PointerExited -= MediaControl_OnPointerExited;
+        Debug.WriteLine("aTimer Stop");
         aTimer?.Stop();
 
-        ////上一页为详情页，生效喜欢或稍后观看的修改
-        //var newestIsLike = mediaControl.IsLike;
-        //var newestLookLater = mediaControl.LookLater;
-        //switch (_lastPage)
-        //{
-        //    case DetailInfoPage detailInfoPage:
-        //        {
-        //            if (detailInfoPage.DetailInfo.is_like != newestIsLike)
-        //                detailInfoPage.DetailInfo.is_like = newestIsLike;
+        if (MediaControl.IsLoaded && VideoPlayGrid.Children.Contains(MediaControl))
+        {
+            Debug.WriteLine("取消监听 PointerExited");
+            MediaControl.PointerEntered -= MediaControl_OnPointerEntered;
+            MediaControl.PointerExited -= MediaControl_OnPointerExited;
 
-        //            if (detailInfoPage.DetailInfo.look_later != newestLookLater)
-        //                detailInfoPage.DetailInfo.look_later = newestLookLater;
-        //            break;
-        //        }
-        //    case VideoViewPage videoViewPage:
-        //        {
-        //            var storageItem = videoViewPage._storeditem;
+            MediaControl.DisposeMediaPlayer();
 
-        //            if (videoViewPage._storeditem != null && videoViewPage._storeditem.truename == _trueName)
-        //            {
-        //                if (storageItem.is_like != newestIsLike)
-        //                    storageItem.is_like = newestIsLike;
+        }
 
-        //                if (storageItem.look_later != newestLookLater)
-        //                    storageItem.look_later = newestLookLater;
-        //            }
-
-        //            break;
-        //        }
-        //    case ActorInfoPage actorInfoPage:
-        //        {
-        //            if (actorInfoPage._storeditem.is_like != newestIsLike)
-        //                actorInfoPage._storeditem.is_like = newestIsLike;
-
-        //            if (actorInfoPage._storeditem.look_later != newestLookLater)
-        //                actorInfoPage._storeditem.look_later = newestLookLater;
-        //            break;
-        //        }
-        //}
+        Debug.WriteLine("remove MediaControl");
+        VideoPlayGrid.Children.Clear();
     }
 
     public static MediaPlayWindow CreateNewWindow(List<MediaPlayItem> playItems, PlayType playType, Page lastPage)

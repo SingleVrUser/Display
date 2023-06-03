@@ -127,12 +127,22 @@ namespace Display.Models
         public void Dispose()
         {
             Debug.WriteLine("Dispose MediaPlayerStreamSource");
+
+            // 从大到小销毁
             try
             {
-                _stream?.Dispose();
-                _ms?.Dispose();
                 MediaPlayer?.Dispose();
+                MediaPlayer = null;
+
+                _ms?.Dispose();
+                _ms = null;
+
+                _stream?.Dispose();
+                _stream = null;
+
                 _httpClient?.Dispose();
+                _httpClient = null;
+
                 Debug.WriteLine("Dispose MediaPlayerStreamSource success");
             }
             catch (Exception e)

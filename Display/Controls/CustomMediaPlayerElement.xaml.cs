@@ -49,6 +49,9 @@ public sealed partial class CustomMediaPlayerElement : UserControl
     private int _qualityIndex = 1;
     private uint _playIndex = 0;
 
+    private List<AdaptiveMediaSourceCreationResult> _adaptiveMediaSourceList;
+    private List<HttpRandomAccessStream> _httpRandomAccessStreamList;
+
     public CustomMediaPlayerElement()
     {
         this.InitializeComponent();
@@ -64,20 +67,42 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
         _httpClient = WebApi.CreateWindowWebHttpClient();
 
+        _adaptiveMediaSourceList = new List<AdaptiveMediaSourceCreationResult>();
+        _httpRandomAccessStreamList = new List<HttpRandomAccessStream>();
+
         SetMediaPlayer();
-
-
     }
 
     public void DisposeMediaPlayer()
     {
+        MediaControl.MediaPlayer.MediaOpened -= MediaPlayer_MediaOpened;
+        MediaControl.MediaPlayer.PlaybackSession.PlaybackStateChanged -= MediaPlayerElement_CurrentStateChanged;
+
         if (MediaControl.MediaPlayer.Source is MediaPlaybackList mediaPlaybackList)
         {
+            mediaPlaybackList.CurrentItemChanged -= MediaPlaybackList_CurrentItemChanged;
+
             MediaControl.MediaPlayer.Pause();
             foreach (var mediaPlayItem in mediaPlaybackList.Items)
             {
                 mediaPlayItem.Source.Dispose();
             }
+
+            foreach (var source in _adaptiveMediaSourceList)
+            {
+                source.MediaSource.Dispose();
+            }
+
+            foreach (var stream in _httpRandomAccessStreamList)
+            {
+                stream.Dispose();
+            }
+
+            MediaControl.MediaPlayer.Source = null;
+
+            // TODO 会报错
+            //MediaControl.MediaPlayer.Dispose();
+
         }
         else
         {
@@ -125,7 +150,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         {
             mediaTransportControls.IsNextTrackButtonVisible = true;
             mediaTransportControls.IsPreviousTrackButtonVisible = true;
-            mediaPlaybackList.MaxPlayedItemsToKeepOpen = 2;
+            mediaPlaybackList.AutoRepeatEnabled = true;
+            //mediaPlaybackList.MaxPlayedItemsToKeepOpen = 2;
         }
 
         mediaPlaybackList.StartingItem = mediaPlaybackList.Items[(int)_playIndex];
@@ -136,12 +162,12 @@ public sealed partial class CustomMediaPlayerElement : UserControl
             isHanlerCurrentItemChanged = true;
         }
 
-        var media = new MediaPlayer
+        var mediaPlayer = new MediaPlayer
         {
             Source = mediaPlaybackList,
         };
 
-        MediaControl.SetMediaPlayer(media);
+        MediaControl.SetMediaPlayer(mediaPlayer);
 
         // 播放时修改Slider精度
         MediaControl.MediaPlayer.MediaOpened += MediaPlayer_MediaOpened;
@@ -149,8 +175,6 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         // 播放时保持屏幕常量，暂停播放则恢复
         MediaControl.MediaPlayer.PlaybackSession.PlaybackStateChanged += MediaPlayerElement_CurrentStateChanged;
 
-        //_currentMediaPlayerWithStreamSource?.Dispose();
-        //_currentMediaPlayerWithStreamSource = mediaPlayerWithStreamSource;
     }
     
     private bool _isChangedCurrentItem;
@@ -158,7 +182,10 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
     private void MediaPlaybackList_CurrentItemChanged(MediaPlaybackList sender, CurrentMediaPlaybackItemChangedEventArgs args)
     {
+        if (args.NewItem == null) return;
+        
         Debug.WriteLine("切换播放项");
+
 
         _isChangedCurrentItem = true;
 
@@ -185,6 +212,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         });
 
         _isChangedCurrentItem = false;
+
     }
 
     private async void SetQualityList(MediaPlayItem playItem)
@@ -257,6 +285,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         {
             var result = await AdaptiveMediaSource.CreateFromUriAsync(new Uri(videoUrl), _httpClient);
 
+            _adaptiveMediaSourceList.Add(result);
+
             if (result.Status == AdaptiveMediaSourceCreationStatus.Success && result.MediaSource != null)
             {
                 args.SetAdaptiveMediaSource(result.MediaSource);
@@ -268,6 +298,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         {
             var httpClient = WebApi.CreateWindowWebHttpClient();
             var stream = await HttpRandomAccessStream.CreateAsync(httpClient, new Uri(videoUrl));
+
+            _httpRandomAccessStreamList.Add(stream);
 
             if (stream.CanRead)
             {
@@ -312,6 +344,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
     {
         DispatcherQueue.TryEnqueue(() =>
         {
+
             var transportControlsTemplateRoot = (FrameworkElement)VisualTreeHelper.GetChild(MediaControl.TransportControls, 0);
             var sliderControl = (Slider)transportControlsTemplateRoot.FindName("ProgressSlider");
             if (sliderControl != null && sender.PlaybackSession.NaturalDuration.TotalSeconds > 1000)
@@ -322,6 +355,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
             }
         });
     }
+    
 
     private void QualityChanged(object sender, SelectionChangedEventArgs e)
     {
