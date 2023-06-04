@@ -142,6 +142,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
             props.VideoProperties.Title = playItem.Title;
             props.VideoProperties.Subtitle = playItem.Description;
 
+            playItem.MediaPlaybackItem = mediaPlaybackItem;
+
             mediaPlaybackItem.ApplyDisplayProperties(props);
 
             mediaPlaybackList.Items.Add(mediaPlaybackItem);
@@ -184,9 +186,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
     private void MediaPlaybackList_CurrentItemChanged(MediaPlaybackList sender, CurrentMediaPlaybackItemChangedEventArgs args)
     {
         if (args.NewItem == null) return;
-        
-        Debug.WriteLine("切换播放项");
 
+        Debug.WriteLine("切换播放项");
 
         _isChangedCurrentItem = true;
 
@@ -196,9 +197,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         _playIndex = index;
 
         var playItem = _allMediaPlayItems[(int)index];
-
-
-
+        
         //修改
         DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, async ()=>
         {
@@ -213,38 +212,44 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
             // 设置画质列表
             SetQualityList(playItem);
-
-            // 设置字幕
-            var currentItem = sender.CurrentItem;
-            if (currentItem.TimedMetadataTracks.Count != 0) return;
-
-            var subPath = await playItem.GetOneSubFilePath();
-            if (string.IsNullOrEmpty(subPath)) return;
-
-            //加载字幕
-            var srtFile = await StorageFile.GetFileFromPathAsync(subPath);
-
-            if (srtFile != null)
-            {
-                IRandomAccessStream stream = await srtFile.OpenReadAsync();
-                var timedTextSource = TimedTextSource.CreateFromStream(stream, "Sub");
-
-                currentItem.Source.ExternalTimedTextSources.Add(timedTextSource);
-            }
-
-            // 默认加载第一个字幕
-            currentItem.TimedMetadataTracksChanged += (_, _) =>
-            {
-                if (currentItem.TimedMetadataTracks.Count == 0) return;
-
-                currentItem.TimedMetadataTracks.SetPresentationMode(0, TimedMetadataTrackPresentationMode.PlatformPresented);
-                Debug.WriteLine("设置字幕");
-            };
         });
+
 
         _isChangedCurrentItem = false;
 
     }
+
+    private static async Task TryLoadSub(MediaPlayItem playItem)
+    {
+        var mediaPlaybackItem = playItem.MediaPlaybackItem;
+        if(mediaPlaybackItem == null) return;
+
+        // 之前已添加，退出
+        if (mediaPlaybackItem.Source.ExternalTimedMetadataTracks.Count != 0) return;
+
+        var subPath = await playItem.GetOneSubFilePath();
+
+        // 不存在字幕文件，退出
+        if (string.IsNullOrEmpty(subPath) || !File.Exists(subPath)) return;
+
+        var timedTextSource = TimedTextSource.CreateFromUri(new Uri(subPath));
+        timedTextSource.Resolved += (_, eventArgs) => { eventArgs.Tracks[0].Label = "Sub"; };
+
+        Debug.WriteLine("添加字幕");
+        mediaPlaybackItem.Source.ExternalTimedTextSources.Add(timedTextSource);
+
+        mediaPlaybackItem.TimedMetadataTracksChanged += (sender, args) =>
+        {
+            Debug.WriteLine($"当前字幕数量为: {mediaPlaybackItem.TimedMetadataTracks.Count}");
+
+            if (sender.TimedMetadataTracks.Count == 0) return;
+
+            sender.TimedMetadataTracks.SetPresentationMode(0,
+                TimedMetadataTrackPresentationMode.PlatformPresented);
+            Debug.WriteLine("默认加载第一个字幕");
+        };
+    }
+
 
     private async void SetQualityList(MediaPlayItem playItem)
     {
@@ -337,6 +342,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
                 args.SetStream(stream,"video/mp4");
             }
         }
+
+        await TryLoadSub(firstOrDefault);
 
         deferral.Complete();
 

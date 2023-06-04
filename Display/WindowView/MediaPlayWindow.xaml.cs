@@ -212,7 +212,7 @@ public sealed partial class MediaPlayWindow : Window
         //鼠标状态计数器>=0的情况下鼠标可见，<0不可见，并不是直接受api函数影响而改变
         var i = CursorHelper.GetIdleTick();
 
-        Debug.WriteLine($"限制时间(ms)：{i}");
+        //Debug.WriteLine($"限制时间(ms)：{i}");
 
         if (i > 4000)
         {
