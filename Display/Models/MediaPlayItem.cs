@@ -94,6 +94,8 @@ namespace Display.Models
             return M3U8Infos;
         }
 
+        public MediaPlaybackItem MediaPlaybackItem { get; set; }
+
         public async Task<string> GetM3U8Url(int index = 0)
         {
             var m3U8Infos = await GetM3U8Urls();
