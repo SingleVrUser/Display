@@ -2658,7 +2658,7 @@ namespace Display.Data
                 {
                     if (leftName == "FC")
                     {
-                        var match_result = Regex.Match(datum.n, @"(FC2?)\w*[-_]?0*(\d+)", RegexOptions.IgnoreCase);
+                        var match_result = Regex.Match(datum.n, @"(FC2?)[-_PV]*[-_]?0*(\d+)", RegexOptions.IgnoreCase);
                         if (match_result.Success && match_result.Groups[2].Value == rightNumber)
                             data.Add(datum);
                     }

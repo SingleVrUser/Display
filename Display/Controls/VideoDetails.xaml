@@ -205,7 +205,7 @@
 
                         <Image x:FieldModifier="public"
                                x:Name="Cover_Image"
-                               Source="{x:Bind resultinfo.imagepath,Converter={StaticResource NotExistsImagePathConverter}}"
+                               Source="{x:Bind resultinfo.imagepath}"
                                HorizontalAlignment="Left"
                                VerticalAlignment="Center"
                                MaxHeight="500"/>
