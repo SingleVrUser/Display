@@ -79,7 +79,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             ShowProgress(matchVideoResults.Count);
 
             if (s_cts.IsCancellationRequested) return;
-            await SpliderVideoInfo(matchVideoResults);
+            await SpiderVideoInfo(matchVideoResults);
             if (s_cts.IsCancellationRequested) return;
 
 
@@ -99,7 +99,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             if (s_cts.IsCancellationRequested) return;
 
-            await SpliderVideoInfo(matchVideoResults);
+            await SpiderVideoInfo(matchVideoResults);
 
             if (s_cts.IsCancellationRequested) return;
 
@@ -336,7 +336,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// <summary>
         /// 开始从网络中检索视频信息
         /// </summary>
-        private async Task SpliderVideoInfo(List<MatchVideoResult> matchVideoResults)
+        private async Task SpiderVideoInfo(List<MatchVideoResult> matchVideoResults)
         {
             if (matchVideoResults == null)
                 return;
@@ -402,7 +402,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             int i = 0;
             var SpiderSourceProgress = new Progress<SpiderInfo>(progressPercent =>
             {
-                var GridViewItem = SpiderInfos.Where(item => item.SpiderSource == progressPercent.SpiderSource).FirstOrDefault();
+                var GridViewItem = SpiderInfos.FirstOrDefault(item => item.SpiderSource == progressPercent.SpiderSource);
                 //更新信息
                 GridViewItem.State = progressPercent.State;
                 GridViewItem.Message = progressPercent.Message;

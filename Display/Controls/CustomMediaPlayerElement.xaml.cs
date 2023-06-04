@@ -23,6 +23,7 @@ using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Media.Streaming.Adaptive;
 using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.System.Display;
 using Windows.Web.Http;
 
@@ -196,7 +197,10 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
         var playItem = _allMediaPlayItems[(int)index];
 
-        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, ()=>
+
+
+        //修改
+        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, async ()=>
         {
             // 修改标题
             _window.ChangedWindowTitle($"播放- {playItem.Title}");
@@ -209,6 +213,33 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
             // 设置画质列表
             SetQualityList(playItem);
+
+            // 设置字幕
+            var currentItem = sender.CurrentItem;
+            if (currentItem.TimedMetadataTracks.Count != 0) return;
+
+            var subPath = await playItem.GetOneSubFilePath();
+            if (string.IsNullOrEmpty(subPath)) return;
+
+            //加载字幕
+            var srtFile = await StorageFile.GetFileFromPathAsync(subPath);
+
+            if (srtFile != null)
+            {
+                IRandomAccessStream stream = await srtFile.OpenReadAsync();
+                var timedTextSource = TimedTextSource.CreateFromStream(stream, "Sub");
+
+                currentItem.Source.ExternalTimedTextSources.Add(timedTextSource);
+            }
+
+            // 默认加载第一个字幕
+            currentItem.TimedMetadataTracksChanged += (_, _) =>
+            {
+                if (currentItem.TimedMetadataTracks.Count == 0) return;
+
+                currentItem.TimedMetadataTracks.SetPresentationMode(0, TimedMetadataTrackPresentationMode.PlatformPresented);
+                Debug.WriteLine("设置字幕");
+            };
         });
 
         _isChangedCurrentItem = false;
