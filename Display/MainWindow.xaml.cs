@@ -10,6 +10,7 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
@@ -89,7 +90,9 @@ namespace Display
             this.Activated += Window_Activated;
 
             //Mica
-            Backdrop = new MicaSystemBackdrop();
+            //Backdrop = new MicaSystemBackdrop();
+
+            this.SystemBackdrop = new MicaBackdrop();
         }
         private void Window_Activated(object sender, WindowActivatedEventArgs args)
         {
@@ -512,7 +515,7 @@ namespace Display
             FileMatch.LaunchFolder(AppSettings.DataAccessSavePath);
         }
 
-        private async void CloudDownButtonClick(object sender, TappedRoutedEventArgs e)
+        private void CloudDownButtonClick(object sender, TappedRoutedEventArgs e)
         {
             CreateCloudDownContentDialog();
         }

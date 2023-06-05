@@ -199,7 +199,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         var playItem = _allMediaPlayItems[(int)index];
         
         //修改
-        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, async ()=>
+        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal,  ()=>
         {
             // 修改标题
             _window.ChangedWindowTitle($"播放- {playItem.Title}");
@@ -631,5 +631,190 @@ public sealed partial class CustomMediaPlayerElement : UserControl
     private void MediaTransportControls_OnRightButtonClick(object sender, RoutedEventArgs e)
     {
         RightButtonClick?.Invoke(sender,e);
+    }
+
+    private TimeSpan _changedPositionTimeSpan = TimeSpan.MinValue;
+    private double _changedVolume = double.NaN;
+
+    private System.Timers.Timer _pTimer;
+    private System.Timers.Timer _vTimer;
+    private void InitVolumeContent()
+    {
+        if (_vTimer == null)
+        {
+            _vTimer = new System.Timers.Timer(600);
+            _vTimer.Elapsed += VTimerElapsed;
+        }
+        else
+        {
+            _vTimer.Stop();
+        }
+
+        _vTimer.Start();
+
+        VisualStateManager.GoToState(this, "AdditionalContentShowState", true);
+    }
+
+
+    private void InitPositionContent()
+    {
+        if (_pTimer == null)
+        {
+            _pTimer = new System.Timers.Timer(800);
+            _pTimer.Elapsed += PTimerElapsed;
+        }
+        else
+        {
+            _pTimer.Stop();
+        }
+
+        _pTimer.Start();
+
+        VisualStateManager.GoToState(this, "AdditionalContentShowState", true);
+    }
+
+    private void VTimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        if (_changedVolume is double.NaN) return;
+
+        _vTimer.Stop();
+
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            MediaControl.MediaPlayer.Volume = _changedVolume;
+
+            _changedVolume = double.NaN;
+
+            VisualStateManager.GoToState(this, "AdditionalContentHiddenState", true);
+        });
+    }
+    private void PTimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        if (_changedPositionTimeSpan == TimeSpan.MinValue) return;
+
+        _pTimer.Stop();
+
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            MediaControl.MediaPlayer.Position = _changedPositionTimeSpan;
+
+            _changedPositionTimeSpan = TimeSpan.MinValue;
+
+            VisualStateManager.GoToState(this, "AdditionalContentHiddenState", true);
+        });
+    }
+
+
+    private void ChangedVolumeText(double step)
+    {
+        if (_changedVolume is double.NaN)
+        {
+            _changedVolume = MediaControl.MediaPlayer.Volume;
+        }
+
+        var tmpVolume = _changedVolume + step;
+        if (tmpVolume > 1)
+        {
+            _changedVolume = 1;
+        }
+        else if (tmpVolume < 0)
+        {
+            _changedVolume = 0;
+        }
+        else
+        {
+            _changedVolume = tmpVolume;
+        }
+
+        AdditionalTextBlock.Text = $"音量：{_changedVolume:P0}";
+    }
+
+
+    private const string TimeFormat = @"hh\:mm\:ss";
+    private void ChangedPositionText(int second)
+    {
+        var naturalDurationTimeSpan = MediaControl.MediaPlayer.NaturalDuration;
+        var naturalDurationString = naturalDurationTimeSpan.ToString(TimeFormat);
+
+        var currentPositionTimeSpan = MediaControl.MediaPlayer.Position;
+        var currentPositionString = MediaControl.MediaPlayer.Position.ToString(TimeFormat);
+
+        Debug.WriteLine($"总时长：{naturalDurationString}");
+
+        Debug.WriteLine($"当前位置：{currentPositionString}");
+
+        if (_changedPositionTimeSpan == TimeSpan.MinValue)
+        {
+            _changedPositionTimeSpan = currentPositionTimeSpan;
+        }
+
+        var tmpTimeSpan = _changedPositionTimeSpan.Add(TimeSpan.FromSeconds(second));
+        if (tmpTimeSpan > naturalDurationTimeSpan)
+        {
+            _changedPositionTimeSpan = naturalDurationTimeSpan;
+        }
+        else if (tmpTimeSpan < TimeSpan.Zero)
+        {
+            _changedPositionTimeSpan = TimeSpan.Zero;
+        }
+        else
+        {
+            _changedPositionTimeSpan = tmpTimeSpan;
+        }
+
+        var changedPositionTimeSpanString = _changedPositionTimeSpan.ToString(TimeFormat);
+
+        Debug.WriteLine($"修改后的位置：{changedPositionTimeSpanString}");
+
+        AdditionalTextBlock.Text = $"{changedPositionTimeSpanString} / {naturalDurationString}";
+    }
+
+    private void KeyboardAcceleratorUp_OnInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        InitVolumeContent();
+
+        ChangedVolumeText(0.05);
+    }
+
+    private void KeyboardAcceleratorDown_OnInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        InitVolumeContent();
+
+        ChangedVolumeText(-0.05);
+    }
+
+    private void KeyboardAcceleratorLeft_OnInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        InitPositionContent();
+
+        ChangedPositionText(-10);
+    }
+
+    private void KeyboardAcceleratorShiftLeft_OnInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        InitPositionContent();
+
+        ChangedPositionText(-20);
+    }
+
+    private void KeyboardAcceleratorRight_OnInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        InitPositionContent();
+
+        ChangedPositionText(10);
+    }
+
+    private void KeyboardAcceleratorShiftRight_OnInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        InitPositionContent();
+
+        ChangedPositionText(20);
+    }
+
+    private void KeyboardAcceleratorMute_OnInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (MediaControl.MediaPlayer == null) return;
+
+        MediaControl.MediaPlayer.IsMuted = !MediaControl.MediaPlayer.IsMuted;
     }
 }

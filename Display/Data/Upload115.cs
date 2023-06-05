@@ -313,7 +313,7 @@ namespace Display.Data
         }
 
 
-        private async Task<Upload115Result?> EncodeData(Dictionary<string, string> dataForm, long timeSpan, byte[] aesKey, byte[] aesIv, byte[] publicKeyBytes30)
+        private async Task<Upload115Result> EncodeData(Dictionary<string, string> dataForm, long timeSpan, byte[] aesKey, byte[] aesIv, byte[] publicKeyBytes30)
         {
             var data = string.Join("&", dataForm.Select(x => $"{x.Key}={x.Value}"));
             byte[] dataBytes = Encoding.UTF8.GetBytes(data);
@@ -350,7 +350,7 @@ namespace Display.Data
 
         }
 
-        private Upload115Result? ReceiveData(byte[] data, byte[] aesKey, byte[] aesIv)
+        private Upload115Result ReceiveData(byte[] data, byte[] aesKey, byte[] aesIv)
         {
             byte[] cipherText = new byte[data.Length - 12];
 

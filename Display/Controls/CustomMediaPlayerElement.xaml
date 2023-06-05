@@ -25,10 +25,72 @@
     </UserControl.Resources>
 
     <Grid Background="Black">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="AdditionalContentState">
+                <VisualState x:Name="AdditionalContentHiddenState">
+                    <Storyboard>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity"
+                                                       Storyboard.TargetName="AdditionalContentBorder">
+                            <EasingDoubleKeyFrame KeyTime="0"
+                                                  Value="1" />
+                            <EasingDoubleKeyFrame KeyTime="0:0:0.5"
+                                                  Value="0" />
+                        </DoubleAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="AdditionalContentBorder"
+                                                       Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0.5"
+                                                    Value="Collapsed" />
+                        </ObjectAnimationUsingKeyFrames>
+
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="AdditionalContentShowState">
+                    <Storyboard>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity"
+                                                       Storyboard.TargetName="AdditionalContentBorder">
+                            <EasingDoubleKeyFrame KeyTime="0"
+                                                  Value="0" />
+                            <EasingDoubleKeyFrame KeyTime="0:0:0.3"
+                                                  Value="1" />
+                        </DoubleAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="AdditionalContentBorder"
+                                                       Storyboard.TargetProperty="Visibility">
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0"
+                                                    Value="Visible" />
+                        </ObjectAnimationUsingKeyFrames>
+
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
         <MediaPlayerElement x:Name="MediaControl"
                             AutoPlay="True"
                             AreTransportControlsEnabled="True"
-                            DoubleTapped="MediaControl_DoubleTapped">
+                            DoubleTapped="MediaControl_DoubleTapped"
+                            KeyboardAcceleratorPlacementMode="Hidden">
+
+            <MediaPlayerElement.KeyboardAccelerators>
+                <KeyboardAccelerator Key="Up"
+                                     Invoked="KeyboardAcceleratorUp_OnInvoked" />
+                <KeyboardAccelerator Key="Down"
+                                     Invoked="KeyboardAcceleratorDown_OnInvoked" />
+                <KeyboardAccelerator Key="Left"
+                                     Invoked="KeyboardAcceleratorLeft_OnInvoked" />
+                <KeyboardAccelerator Key="Left"
+                                     Modifiers="Shift"
+                                     Invoked="KeyboardAcceleratorShiftLeft_OnInvoked" />
+                <KeyboardAccelerator Key="Right"
+                                     Invoked="KeyboardAcceleratorRight_OnInvoked" />
+                <KeyboardAccelerator Key="Right"
+                                     Modifiers="Shift"
+                                     Invoked="KeyboardAcceleratorShiftRight_OnInvoked" />
+                <KeyboardAccelerator Key="M"
+                                     Invoked="KeyboardAcceleratorMute_OnInvoked" />
+            </MediaPlayerElement.KeyboardAccelerators>
+
             <MediaPlayerElement.TransportControls>
                 <local:CustomMediaTransportControls x:Name="mediaTransportControls"
                                                     x:FieldModifier="public"
@@ -52,6 +114,22 @@
                      IsLightDismissEnabled="True"
                      PreferredPlacement="TopRight"
                      PlacementMargin="0,5,-22,0"/>
+
+        <Border x:Name="AdditionalContentBorder"
+                HorizontalAlignment="Right"
+                Background="#60000000"
+                VerticalAlignment="Top"
+                Margin="30,20"
+                CornerRadius="10"
+                Padding="10,4"
+                Visibility="Collapsed">
+
+            <TextBlock x:Name="AdditionalTextBlock"
+                       Foreground="White"
+                       FontSize="30"
+                       FontWeight="Medium"
+                       CharacterSpacing="5" />
+        </Border>
     </Grid>
     
     

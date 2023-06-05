@@ -201,7 +201,6 @@ namespace Display.ContentsPage.SearchLink
             if (sender is not MenuFlyoutItem { DataContext: Forum1080SearchResult result }) return;
 
             Windows.System.Launcher.LaunchUriAsync(new Uri(result.Url));
-
         }
     }
 }

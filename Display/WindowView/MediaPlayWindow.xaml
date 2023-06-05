@@ -42,6 +42,7 @@
                             </VisualState.Setters>
                         </VisualState>
                     </VisualStateGroup>
+
                 </VisualStateManager.VisualStateGroups>
 
                 <customcontrols:CustomMediaPlayerElement x:Name="MediaControl"
@@ -50,6 +51,8 @@
                                                          RightButtonClick="MediaControl_OnRightButtonClick"
                                                          PointerEntered="MediaControl_OnPointerEntered"
                                                          PointerExited="MediaControl_OnPointerExited"/>
+
+
 
                 <Grid x:Name="MoreGrid"
                       Grid.Column="1"
