@@ -74,6 +74,7 @@ namespace Display.Views
 
             var result = JsonConvert.DeserializeObject<Models.VerifyAccountResult>(re);
 
+            // TODO 在添加任务的异常中可用，但在播放m3u8视频的异常中无效
             if (result is not { state: true }) return;
 
             IsSucceeded = true;

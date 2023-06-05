@@ -1,9 +1,7 @@
-﻿using Microsoft.UI.Xaml;
-using System.IO;
+﻿using System.IO;
 using Windows.ApplicationModel;
-using CommunityToolkit.WinUI.UI;
 using Microsoft.UI.Xaml.Controls;
-using WinUIEx;
+using Microsoft.UI.Xaml.Media;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -33,7 +31,10 @@ namespace Display.WindowView
             appWindow.SetIcon(Path.Combine(Package.Current.InstalledLocation.Path, "Assets/pokeball.ico"));
 
             //Mica
-            Backdrop = new MicaSystemBackdrop();
+            //Backdrop = new MicaSystemBackdrop();
+
+            this.SystemBackdrop = new MicaBackdrop();
+
         }
 
         public static void CreateAndShowWindow(Page page,string title= DefaultTitle, int width = 0, int height = 0)

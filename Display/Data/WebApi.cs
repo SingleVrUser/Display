@@ -723,7 +723,6 @@ namespace Display.Data
 
             var content = new FormUrlEncodedContent(values);
 
-            HttpResponseMessage response;
             try
             {
                 await Client.PostAsync("https://webapi.115.com/files/move", content);
