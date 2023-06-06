@@ -2898,7 +2898,7 @@ namespace Display.Data
         /// </summary>
         /// <param Name="actorName"></param>
         /// <returns></returns>
-        public static async Task<List<VideoInfo>> GetNameAndImageRandom()
+        public static async Task<List<VideoInfo>> GetNameAndImageRandom(int limit = 10)
         {
             List<VideoInfo> data = new List<VideoInfo>();
 
@@ -2910,7 +2910,7 @@ namespace Display.Data
             SqliteCommand selectCommand = new SqliteCommand();
 
             selectCommand = new SqliteCommand
-                ($"SELECT * FROM VideoInfo ORDER BY RANDOM() LIMIT 20", db);
+                ($"SELECT * FROM VideoInfo ORDER BY RANDOM() LIMIT {limit}", db);
 
             SqliteDataReader query = await selectCommand.ExecuteReaderAsync();
 

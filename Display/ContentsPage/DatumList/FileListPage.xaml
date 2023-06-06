@@ -201,6 +201,9 @@
                 <KeyboardAccelerator Key="Left"
                                      Modifiers="Control"
                                      Invoked="GoBack_KeyboardAccelerator_Invoked" />
+                <KeyboardAccelerator Key="R"
+                                     Modifiers="Control"
+                                     Invoked="Refresh_KeyboardAccelerator_Invoked" />
             </Grid.KeyboardAccelerators>
 
             <Grid.ColumnDefinitions>
@@ -276,8 +279,7 @@
                 <CommandBar.SecondaryCommands>
                     <AppBarButton Icon="Sort"
                                   Label="整理"
-                                  Click="Sort115Button_Click"
-                                  IsEnabled="False" />
+                                  Click="Sort115Button_Click"/>
                     <AppBarButton Icon="Setting"
                                   Label="设置">
                         <AppBarButton.Flyout>

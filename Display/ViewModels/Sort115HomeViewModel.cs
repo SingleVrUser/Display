@@ -16,15 +16,12 @@ namespace Display.ViewModels
 
         public ObservableCollection<FilesInfo> SingleFolderSaveVideo = new();
 
-        public Sort115HomeViewModel()
-        {
-        }
-
         public void SetFolders(List<FilesInfo> folders)
         {
-            folders.ForEach(c => FoldersVideo.Add(c));
-
-            //FoldersVideo = new ObservableCollection<FilesInfo>(folders);
+            folders.ForEach(c =>
+            {
+                if (c != null) FoldersVideo.Add(c);
+            });
 
             FoldersVideo.CollectionChanged += FoldersVideo_CollectionChanged;
         }

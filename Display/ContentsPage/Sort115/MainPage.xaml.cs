@@ -25,13 +25,11 @@ public sealed partial class MainPage : Page
 {
     //private List<FetchingSourceOptions> fetchingCommonSourceList;
 
-    private readonly Sort115HomeViewModel viewModel;
-
     public MainPage(List<FilesInfo> folders)
     {
         this.InitializeComponent();
 
-        viewModel = this.DataContext as Sort115HomeViewModel;
+        var viewModel = DataContext as Sort115HomeViewModel;
         viewModel?.SetFolders(folders);
 
         ////搜刮源
@@ -48,8 +46,10 @@ public sealed partial class MainPage : Page
 
     public void CreateWindow()
     {
-        CommonWindow window = new CommonWindow("归档整理");
-        window.Content = this;
+        var window = new CommonWindow("归档整理")
+        {
+            Content = this
+        };
         window.Activate();
     }
 
@@ -119,14 +119,17 @@ public sealed partial class MainPage : Page
     {
         var dialog = new ContentDialog()
         {
-            XamlRoot = this.XamlRoot,
+            XamlRoot = XamlRoot,
             Title = "设置",
             PrimaryButtonText = "保存",
             CloseButtonText = "返回",
             DefaultButton = ContentDialogButton.Primary,
             Content = new Settings18Page(),
-            Height = 370,
-            Width = 700
+            Resources =
+            {
+                // 使用更大的 MaxWidth
+                ["ContentDialogMaxWidth"] = 700
+            }
         };
 
         var result = await dialog.ShowAsync();

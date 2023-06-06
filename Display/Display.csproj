@@ -76,6 +76,7 @@
     <None Remove="ContentsPage\FindInfoAgainSmoke.xaml" />
     <None Remove="ContentsPage\GetThumbnail.xaml" />
     <None Remove="ContentsPage\Import115DataToLocalDataAccess\InputCidManually.xaml" />
+    <None Remove="ContentsPage\InfoPage.xaml" />
     <None Remove="ContentsPage\LoginPage.xaml" />
     <None Remove="ContentsPage\OfflineDown\FailListPage.xaml" />
     <None Remove="ContentsPage\SearchLink\SearchLinkPage.xaml" />
@@ -94,6 +95,7 @@
     <None Remove="Controls\ActorImage.xaml" />
     <None Remove="Controls\Browser.xaml" />
     <None Remove="Controls\CustomAutoSuggestBox.xaml" />
+    <None Remove="Controls\CustomContentDialog.xaml" />
     <None Remove="Controls\CustomMediaPlayerElement.xaml" />
     <None Remove="Controls\Explorer.xaml" />
     <None Remove="Controls\FileAutoSuggestBox.xaml" />
@@ -319,6 +321,12 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="Controls\CustomContentDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="ContentsPage\InfoPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Views\VerifyAccountPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

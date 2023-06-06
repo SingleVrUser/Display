@@ -26,6 +26,7 @@ using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.System.Display;
 using Windows.Web.Http;
+using Display.ContentsPage;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -74,6 +75,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         SetMediaPlayer();
     }
 
+
+
     public void DisposeMediaPlayer()
     {
         MediaControl.MediaPlayer.MediaOpened -= MediaPlayer_MediaOpened;
@@ -83,27 +86,10 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         {
             mediaPlaybackList.CurrentItemChanged -= MediaPlaybackList_CurrentItemChanged;
 
-            MediaControl.MediaPlayer.Pause();
-            foreach (var mediaPlayItem in mediaPlaybackList.Items)
-            {
-                mediaPlayItem.Source.Dispose();
-            }
-
-            foreach (var source in _adaptiveMediaSourceList)
-            {
-                source.MediaSource.Dispose();
-            }
-
-            foreach (var stream in _httpRandomAccessStreamList)
-            {
-                stream.Dispose();
-            }
-
-            MediaControl.MediaPlayer.Source = null;
+            DisposeMediaPlayer(mediaPlaybackList);
 
             // TODO 会报错
             //MediaControl.MediaPlayer.Dispose();
-
         }
         else
         {
@@ -119,6 +105,27 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         //}
 
         _httpClient.Dispose();
+    }
+
+    private void DisposeMediaPlayer(MediaPlaybackList mediaPlaybackList)
+    {
+        MediaControl.MediaPlayer.Pause();
+        foreach (var mediaPlayItem in mediaPlaybackList.Items)
+        {
+            mediaPlayItem.Source.Dispose();
+        }
+
+        foreach (var source in _adaptiveMediaSourceList)
+        {
+            source.MediaSource.Dispose();
+        }
+
+        foreach (var stream in _httpRandomAccessStreamList)
+        {
+            stream.Dispose();
+        }
+
+        MediaControl.MediaPlayer.Source = null;
     }
 
 
@@ -412,11 +419,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         // 先销毁
         if (MediaControl.MediaPlayer.Source is MediaPlaybackList mediaPlaybackList)
         {
-            MediaControl.MediaPlayer.Pause();
-            foreach (var mediaPlayItem in mediaPlaybackList.Items)
-            {
-                mediaPlayItem.Source.Dispose();
-            }
+            DisposeMediaPlayer(mediaPlaybackList);
         }
 
         // 后重新设置
@@ -816,5 +819,41 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         if (MediaControl.MediaPlayer == null) return;
 
         MediaControl.MediaPlayer.IsMuted = !MediaControl.MediaPlayer.IsMuted;
+    }
+
+    private async void ShowInfoItemClick(object sender, RoutedEventArgs e)
+    {
+        var playItem = _allMediaPlayItems[(int)_playIndex];
+
+        var infos = new Dictionary<string, string>
+        {
+            {"文件名",playItem.FileName},
+            {"pid", playItem.PickCode},
+            {"分辨率",$"{MediaControl.MediaPlayer.PlaybackSession.NaturalVideoWidth} x {MediaControl.MediaPlayer.PlaybackSession.NaturalVideoHeight}"},
+            {"时长",
+                MediaControl.MediaPlayer.NaturalDuration.ToString(TimeFormat)},
+        };
+
+        if (playItem.IsRequestM3U8)
+        {
+            var m3U8Infos = await playItem.GetM3U8Infos();
+            if (m3U8Infos is { Count: > 0 })
+            {
+                foreach (var info in m3U8Infos)
+                {
+                    infos.Add($"m3u8链接({info.Name})", info.Url);
+                }
+            }
+        }
+
+        if (playItem.IsRequestOriginal)
+        {
+            infos.Add("下载链接",await playItem.GetOriginalUrl());
+        }
+
+        infos.Add("userAgent", GetInfoFromNetwork.UserAgent);
+
+        await InfoPage.ShowInContentDialog(XamlRoot, infos, "媒体信息");
+
     }
 }

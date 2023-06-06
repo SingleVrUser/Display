@@ -303,7 +303,7 @@ namespace Display.ContentsPage
                     if (m3u8InfoList.Count == 0) continue;
 
                     //缩略图画质不需要太好，选择最后一个
-                    var meu8Info = await webApi.GetM3U8Content(m3u8InfoList[m3u8InfoList.Count - 1]);
+                    var meu8Info = await webApi.GetM3U8Content(m3u8InfoList[^1]);
 
                     //总时长
                     var play_long = meu8Info.TotalSecond;

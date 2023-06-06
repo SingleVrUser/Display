@@ -57,7 +57,7 @@
                     </Grid.RowDefinitions>
                     <RelativePanel Margin="10,0,10,0">
                         <TextBlock Grid.Row="0"
-                                   Text="随机20部"
+                                   Text="随机10部"
                                    FontSize="20"
                                    FontWeight="Bold"
                                    RelativePanel.AlignVerticalCenterWithPanel="True" />
