@@ -25,6 +25,17 @@
     </UserControl.Resources>
 
     <Grid Background="Black">
+        <Grid.ContextFlyout>
+            <MenuFlyout>
+                <MenuFlyoutItem Text="媒体信息" Click="ShowInfoItemClick">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                  Glyph="&#xE946;" />
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+            </MenuFlyout>
+        </Grid.ContextFlyout>
+
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="AdditionalContentState">
                 <VisualState x:Name="AdditionalContentHiddenState">
@@ -71,7 +82,9 @@
                             AreTransportControlsEnabled="True"
                             DoubleTapped="MediaControl_DoubleTapped"
                             KeyboardAcceleratorPlacementMode="Hidden">
+            
 
+            <!--快捷方式-->
             <MediaPlayerElement.KeyboardAccelerators>
                 <KeyboardAccelerator Key="Up"
                                      Invoked="KeyboardAcceleratorUp_OnInvoked" />
@@ -131,6 +144,4 @@
                        CharacterSpacing="5" />
         </Border>
     </Grid>
-    
-    
 </UserControl>

@@ -319,7 +319,5 @@ public class Player
     public Player(WebApi.PlayMethod playerMethod)
     {
         this.PlayMethod = playerMethod;
-
-
     }
 }

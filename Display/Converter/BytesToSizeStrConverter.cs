@@ -28,7 +28,7 @@ public class BytesToSizeStrConverter : IValueConverter
         }
         else
         {
-            size = new(0);
+            size = new ByteSize(0);
         }
 
         return size.ToString("#.#");

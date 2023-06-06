@@ -52,7 +52,6 @@ namespace Display.ContentsPage
             folderInfos = new IncrementalLoadDatumCollection("0",isOnlyFolder:true);
             folderInfos.GetFileInfoCompleted += FolderInfos_GetFileInfoCompleted;
 
-            this.Loaded += SelectedFolderPage_Loaded;
 
             _myListViewPanelTemplate = Resources["ListViewPanelTemplate"] as ItemsPanelTemplate;
             _myGridViewPanelTemplate = Resources["GridViewPanelTemplate"] as ItemsPanelTemplate;
@@ -61,9 +60,24 @@ namespace Display.ContentsPage
             _myGridViewDataTemplate = Resources["GridViewDataTemplate"] as DataTemplate;
         }
 
-        private void SelectedFolderPage_Loaded(object sender, RoutedEventArgs e)
+
+        public async Task<ContentDialogResult> ShowContentDialogResult(XamlRoot xamlRoot)
         {
-            //OpenFolder("0");
+            ContentDialog dialog = new()
+            {
+                XamlRoot = xamlRoot,
+                Content = this,
+                CloseButtonText = "返回",
+                PrimaryButtonText = "保存到该目录",
+                DefaultButton = ContentDialogButton.Primary,
+                Resources =
+                {
+                    // 使用更大的 MaxWidth
+                    ["ContentDialogMaxWidth"] = 700
+                }
+            };
+
+            return await dialog.ShowAsync();
         }
 
         private void FolderInfos_GetFileInfoCompleted(object sender, GetFileInfoCompletedEventArgs e)
@@ -141,5 +155,6 @@ namespace Display.ContentsPage
         {
             CreateNewFolderGrid.Visibility = Visibility.Collapsed;
         }
+
     }
 }

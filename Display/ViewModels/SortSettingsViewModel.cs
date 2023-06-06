@@ -1,9 +1,17 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Display.ContentsPage;
 using Display.Models;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
+using System.Diagnostics;
+using Display.ContentsPage.Sort115;
+using Display.Controls;
 
 namespace Display.ViewModels
 {
-    public partial class SortSettingsViewModel : Sort115Settings
+    public partial class SortSettingsViewModel : ObservableObject
     {
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(NumNameSample))]
@@ -33,6 +41,19 @@ namespace Display.ViewModels
         [NotifyPropertyChangedFor(nameof(MultipleVideoNameSample))]
         private string _multipleVideoNameFormat = "[{番号}] {标题} {演员} {分隔符}{序号}";
 
+        public Sort115Settings Settings;
+        public void SetSettings(Sort115Settings settings)
+        {
+            Settings = settings;
+        }
+
+        private Settings18Page _currentPage;
+
+        public void SetPage(Settings18Page currentPage)
+        {
+            _currentPage = currentPage;
+        }
+
         public string NumNameSample => GetNumNameSample(NumNameFormat, NumNameFormatSelectedIndex);
         public string SingleVideoNameSample => GetSingleVideoNameSample(SingleVideoNameFormat, numName: NumNameSample);
 
@@ -59,8 +80,6 @@ namespace Display.ViewModels
                 _ => "1"
             };
 
-
-
             return GetSingleVideoNameSample(srcName, numName: numName).Replace("{分隔符}", separator)
                 .Replace("{序号}", partNum);
         }
@@ -69,12 +88,48 @@ namespace Display.ViewModels
         {
             var result = srcName.Replace("{字母}", letter)
                 .Replace("{数字}", num);
-            return (NumNameCapFormat)numNameFormatSelectedIndex switch
+            return (Sort115Settings.NumNameCapFormat)numNameFormatSelectedIndex switch
             {
-                NumNameCapFormat.Upper => result.ToUpper(),
-                NumNameCapFormat.Lower => result.ToLower(),
+                Sort115Settings.NumNameCapFormat.Upper => result.ToUpper(),
+                Sort115Settings.NumNameCapFormat.Lower => result.ToLower(),
                 _ => result
             };
         }
+
+        [RelayCommand]
+        private void ChangedSingleVideoSaveExplorerItemAsync()
+        {
+            var contentPage = new SelectedFolderPage();
+
+            var tmpContent = _currentPage.Content;
+
+            var newContentDialog = new CustomContentDialog(contentPage);
+
+            newContentDialog.PrimaryButtonClick += (_,_) =>
+            {
+                Debug.WriteLine("点击了确定");
+
+                _currentPage.Content = tmpContent;
+            };
+
+            newContentDialog.CancelButtonClick += (_,_) =>
+            {
+                Debug.WriteLine("点击了退出");
+
+                _currentPage.Content = tmpContent;
+            };
+
+
+            _currentPage.Content = newContentDialog;
+
+
+            //var result = await contentPage.ShowContentDialogResult(_currentPage.XamlRoot);
+
+            //if (result != ContentDialogResult.Primary) return;
+
+            //var explorerItem = contentPage.GetCurrentFolder();
+            //Debug.WriteLine($"当前选中：{explorerItem.Name}({explorerItem.Cid})");
+        }
+
     }
 }

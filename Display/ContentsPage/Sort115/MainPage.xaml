@@ -18,12 +18,10 @@
     </Page.DataContext>
 
     <Page.Resources>
-
         <StandardUICommand x:Name="DeleteCommand"
                            Kind="Delete"
                            Command="{x:Bind ViewModel.DeleteCommand}"
                            Description="Remove this character" />
-
 
         <StandardUICommand x:Name="DeleteFolderSaveVideoCommand"
                            Kind="Delete"
@@ -58,15 +56,6 @@
 
 
         </Style>
-
-        <!--<Style TargetType="TextBlock">
-            <Setter Property="VerticalAlignment"
-                    Value="Center" />
-            <Setter Property="HorizontalAlignment"
-                    Value="Center" />
-            <Setter Property="TextWrapping"
-                    Value="Wrap" />
-        </Style>-->
 
         <DataTemplate x:Key="FolderDataTemplate"
                       x:DataType="x:String">
@@ -135,7 +124,6 @@
                     Value="Stretch" />
         </Style>
 
-
         <Style TargetType="Grid"
                x:Key="ContentGrid">
             <Setter Property="BorderBrush"
@@ -154,604 +142,95 @@
             <Setter Property="FontSize"
                     Value="16" />
         </Style>
-        <!--<Style TargetType="controls:HeaderedContentControl">
-            <Setter Property="HorizontalContentAlignment"
-                    Value="Stretch" />
-            <Setter Property="VerticalContentAlignment"
-                    Value="Stretch" />
-
-            --><!--<Setter Property="HeaderTemplate" Value="{StaticResource HeaderContentDataTemplate}"/>--><!--
-        </Style>-->
-
-        <!--<DataTemplate x:Key="HeaderContentDataTemplate"
-                      x:DataType="x:String">
-            <TextBlock Text="{x:Bind }"
-                       FontSize="16"
-                       HorizontalAlignment="Right"
-                       Foreground="Gray" />
-
-        </DataTemplate>-->
 
     </Page.Resources>
 
     <Grid>
-        <Grid Visibility="Collapsed">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-
-            <Grid>
-                <Button HorizontalAlignment="Left"
-                        Content="返回" />
-                <TextBlock Text="搜刮源和类型 > 整理规则" />
-                <Button HorizontalAlignment="Right"
-                        Content="下一步" />
-            </Grid>
-
-            <Grid Grid.Row="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-
-                <!--18+-->
-                <controls:HeaderedContentControl HeaderTemplate="{StaticResource HeaderContentDataTemplate}"
-                                                 Header="18+"
-                                                 HorizontalContentAlignment="Stretch">
-                    <Grid Background="Gray">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="2*" />
-                            <ColumnDefinition Width="3*" />
-                        </Grid.ColumnDefinitions>
-
-                        <!--搜刮源选择--><!--
-                        <ItemsRepeater Grid.ColumnSpan="2"
-                                       ItemTemplate="{StaticResource FetchingSourceTemplate}"
-                                       ItemsSource="{x:Bind fetchingCommonSourceList}">
-                            <ItemsRepeater.Layout>
-                                <StackLayout Orientation="Horizontal"
-                                             Spacing="10" />
-                            </ItemsRepeater.Layout>
-                        </ItemsRepeater>-->
-
-                        <!--输入文件夹--><!--
-                        <Grid Grid.Row="1"
-                              Style="{StaticResource BaseGrid}">
-                            <ListView ItemsSource="{x:Bind folders}"
-                                      ItemTemplate="{StaticResource FolderDataTemplate}" />
-                        </Grid>-->
-
-                        <!--输出文件夹-->
-                        <StackPanel Style="{StaticResource BaseStackPanel}"
-                                    Grid.Row="1"
-                                    Grid.Column="1">
-                            <TextBlock Text="输出" />
-
-                            <Grid Style="{StaticResource BaseGrid}"
-                                  Padding="5">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
-
-                                <TextBlock>
-                                        <Run>文件夹1</Run>
-                                        <LineBreak />
-                                        <Run>（存放整理后的视频/图片/字幕）</Run>
-                                </TextBlock>
-
-                                <ComboBox SelectedIndex="0"
-                                          Grid.Row="1">
-                                    <ComboBoxItem  Content="按类别分类" />
-                                    <ComboBoxItem  Content="按厂商分类" />
-                                    <ComboBoxItem  Content="按演员分类" />
-                                    <ComboBoxItem  Content="按年份分类" />
-                                </ComboBox>
-                            </Grid>
-
-
-                            <Grid Style="{StaticResource BaseGrid}"
-                                  Opacity="0.2">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-
-                                <TextBlock>
-                <Run>文件夹2</Run>
-                <LineBreak />
-                <Run>（识别/搜刮失败的视频/图片/字幕）</Run>
-                                </TextBlock>
-
-                                <StackPanel Grid.Row="1"
-                                            Style="{StaticResource BaseStackPanel}">
-                                    <TextBlock Text="原样" />
-
-                                </StackPanel>
-                            </Grid>
-                        </StackPanel>
-
-                        <!--文件格式-->
-                        <Grid Grid.RowSpan="2"
-                              Grid.Column="2"
-                              Grid.ColumnSpan="2"
-                              Background="AliceBlue">
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-
-                            <!--单集视频-->
-                            <controls:HeaderedContentControl>
-                                <controls:HeaderedContentControl.Header>
-                                    <Grid>
-                                        <TextBlock Text="单集视频" />
-                                        <FontIcon FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xE946;"
-                                                  HorizontalAlignment="Right">
-                                            <ToolTipService.ToolTip>
-                                                <StackPanel Orientation="Horizontal">
-
-                                                    <TextBlock>
-                        <Run>关键词:</Run>
-                        <LineBreak />
-                        <Run>【演员名】</Run>
-                        <LineBreak />
-                        <Run>【番号】</Run>
-                        <LineBreak />
-                        <Run>【标题】</Run>
-                        <LineBreak />
-                        <Run>【多文件标记】</Run>
-                        <LineBreak />
-                                                    </TextBlock>
-
-                                                    <TextBlock>
-                        <Run>设置:</Run>
-                        <LineBreak />
-                        <Run>最多两个</Run>
-                        <LineBreak />
-                        <Run>大写</Run>
-                        <LineBreak />
-                        <Run>限定30个字符以内</Run>
-                        <LineBreak />
-                        <Run>-1/-A/-part1</Run>
-                        <LineBreak />
-                                                    </TextBlock>
-                                                </StackPanel>
-                                            </ToolTipService.ToolTip>
-                                        </FontIcon>
-                                    </Grid>
-                                </controls:HeaderedContentControl.Header>
-
-                                <StackPanel Style="{StaticResource BaseStackPanel}"
-                                            Spacing="5">
-                                    <TextBox PlaceholderText="重命名文件格式"
-                                             Text="【演员】 【番号】_【标题】"
-                                             Width="350"
-                                             Header="文件" />
-                                    <TextBlock Text="实例：xxxxx" />
-                                </StackPanel>
-                            </controls:HeaderedContentControl>
-
-                            <controls:HeaderedContentControl Header="选择规则"
-                                                             Grid.Column="1"
-                                                             Grid.RowSpan="2">
-
-
-                                <StackPanel Style="{StaticResource BaseStackPanel}">
-                                    <TextBlock>
-                                        <Run>规则</Run>
-                                        <LineBreak />
-                                        <Run>[*] 保留字幕，存放位置同视频 / 位置共存一个文件夹</Run>
-                                        <LineBreak />
-                                        <Run>[*] 保留图片，存放位置同视频 / 位置共存一个文件夹</Run>
-                                        <LineBreak />
-                                        <Run>[*] 保留文本，存放位置同视频 / 位置共存一个文件夹</Run>
-                                        <LineBreak />
-                                        <Run>[*] 单视频文件存放同一文件夹</Run>
-                                    </TextBlock>
-                                </StackPanel>
-                            </controls:HeaderedContentControl>
-
-                            <!--多集视频-->
-                            <controls:HeaderedContentControl Header="多集视频"
-                                                             Grid.Row="1">
-                                <StackPanel Style="{StaticResource BaseStackPanel}"
-                                            Spacing="5">
-                                    <TextBox PlaceholderText="重命名文件格式"
-                                             Text="【演员】 【番号】_【标题】"
-                                             Width="350"
-                                             Header="文件夹" />
-                                    <TextBlock Text="实例：xxxxx" />
-
-                                    <TextBox PlaceholderText="重命名文件格式"
-                                             Text="【演员】 【番号】_【标题】【多文件标记】"
-                                             Width="350"
-                                             Header="文件" />
-                                    <TextBlock Text="实例：xxxxx" />
-                                </StackPanel>
-                            </controls:HeaderedContentControl>
-
-                        </Grid>
-
-
-                    </Grid>
-                </controls:HeaderedContentControl>
-
-                <!--影视-->
-                <controls:HeaderedContentControl Grid.Row="1"
-                                                 HeaderTemplate="{StaticResource HeaderContentDataTemplate}"
-                                                 Header="影视">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="2*" />
-                            <ColumnDefinition Width="3*" />
-                        </Grid.ColumnDefinitions>
-
-                        <!--搜刮源选择--><!--
-                        <ItemsRepeater Grid.ColumnSpan="2"
-                                       ItemTemplate="{StaticResource FetchingSourceTemplate}"
-                                       ItemsSource="{x:Bind fetchingCommonSourceList}">
-                            <ItemsRepeater.Layout>
-                                <StackLayout Orientation="Horizontal"
-                                             Spacing="10" />
-                            </ItemsRepeater.Layout>
-                        </ItemsRepeater>-->
-
-                        <!--输入文件夹--><!--
-                        <Grid Grid.Row="1" Grid.Column="0"
-                              Style="{StaticResource BaseGrid}">
-                            <ListView ItemsSource="{x:Bind folders}"
-                                      ItemTemplate="{StaticResource FolderDataTemplate}" />
-                        </Grid>-->
-
-                        <!--输出文件夹-->
-                        <StackPanel Style="{StaticResource BaseStackPanel}"
-                                    Grid.Row="1"
-                                    Grid.Column="1">
-                            <TextBlock Text="输出" />
-
-                            <Grid Style="{StaticResource BaseGrid}"
-                                  Padding="5">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
-
-                                <TextBlock>
-                                        <Run>文件夹1</Run>
-                                        <LineBreak />
-                                        <Run>（存放整理后的视频/图片/字幕）</Run>
-                                </TextBlock>
-
-                                <ComboBox SelectedIndex="0"
-                                          Grid.Row="1">
-                                    <ComboBoxItem  Content="按类别分类" />
-                                    <ComboBoxItem  Content="按厂商分类" />
-                                    <ComboBoxItem  Content="按演员分类" />
-                                    <ComboBoxItem  Content="按年份分类" />
-                                </ComboBox>
-                            </Grid>
-
-
-                            <Grid Style="{StaticResource BaseGrid}"
-                                  Opacity="0.2">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="auto" />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-
-                                <TextBlock>
-                <Run>文件夹2</Run>
-                <LineBreak />
-                <Run>（识别/搜刮失败的视频/图片/字幕）</Run>
-                                </TextBlock>
-
-                                <StackPanel Grid.Row="1"
-                                            Style="{StaticResource BaseStackPanel}">
-                                    <TextBlock Text="原样" />
-
-                                </StackPanel>
-                            </Grid>
-                        </StackPanel>
-
-                        <!--文件格式-->
-                        <Grid Grid.RowSpan="2"
-                              Grid.Column="2"
-                              Grid.ColumnSpan="2"
-                              Background="AliceBlue">
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-
-                            <!--单集视频-->
-                            <controls:HeaderedContentControl>
-                                <controls:HeaderedContentControl.Header>
-                                    <Grid>
-                                        <TextBlock Text="单集视频" />
-                                        <FontIcon FontFamily="Segoe Fluent Icons"
-                                                  Glyph="&#xE946;"
-                                                  HorizontalAlignment="Right">
-                                            <ToolTipService.ToolTip>
-                                                <StackPanel Orientation="Horizontal">
-
-                                                    <TextBlock>
-                        <Run>关键词:</Run>
-                        <LineBreak />
-                        <Run>【演员名】</Run>
-                        <LineBreak />
-                        <Run>【番号】</Run>
-                        <LineBreak />
-                        <Run>【标题】</Run>
-                        <LineBreak />
-                        <Run>【多文件标记】</Run>
-                        <LineBreak />
-                                                    </TextBlock>
-
-                                                    <TextBlock>
-                        <Run>设置:</Run>
-                        <LineBreak />
-                        <Run>最多两个</Run>
-                        <LineBreak />
-                        <Run>大写</Run>
-                        <LineBreak />
-                        <Run>限定30个字符以内</Run>
-                        <LineBreak />
-                        <Run>-1/-A/-part1</Run>
-                        <LineBreak />
-                                                    </TextBlock>
-                                                </StackPanel>
-                                            </ToolTipService.ToolTip>
-                                        </FontIcon>
-                                    </Grid>
-                                </controls:HeaderedContentControl.Header>
-
-                                <StackPanel Style="{StaticResource BaseStackPanel}"
-                                            Spacing="5">
-                                    <TextBox PlaceholderText="重命名文件格式"
-                                             Text="【演员】 【番号】_【标题】"
-                                             Width="350"
-                                             Header="文件" />
-                                    <TextBlock Text="实例：xxxxx" />
-                                </StackPanel>
-                            </controls:HeaderedContentControl>
-
-                            <controls:HeaderedContentControl Header="选择规则"
-                                                             Grid.Column="1"
-                                                             Grid.RowSpan="2">
-
-
-                                <StackPanel Style="{StaticResource BaseStackPanel}">
-                                    <TextBlock>
-                    <Run>规则</Run>
-                    <LineBreak />
-                    <Run>[*] 保留字幕，存放位置同视频 / 位置共存一个文件夹</Run>
-                    <LineBreak />
-                    <Run>[*] 保留图片，存放位置同视频 / 位置共存一个文件夹</Run>
-                    <LineBreak />
-                    <Run>[*] 保留文本，存放位置同视频 / 位置共存一个文件夹</Run>
-                    <LineBreak />
-                    <Run>[*] 单视频文件存放同一文件夹</Run>
-                                    </TextBlock>
-                                </StackPanel>
-                            </controls:HeaderedContentControl>
-
-                            <!--多集视频-->
-                            <controls:HeaderedContentControl Header="多集视频"
-                                                             Grid.Row="1">
-                                <StackPanel Style="{StaticResource BaseStackPanel}"
-                                            Spacing="5">
-                                    <TextBox PlaceholderText="重命名文件格式"
-                                             Text="【演员】 【番号】_【标题】"
-                                             Width="350"
-                                             Header="文件夹" />
-                                    <TextBlock Text="实例：xxxxx" />
-
-                                    <TextBox PlaceholderText="重命名文件格式"
-                                             Text="【演员】 【番号】_【标题】【多文件标记】"
-                                             Width="350"
-                                             Header="文件" />
-                                    <TextBlock Text="实例：xxxxx" />
-                                </StackPanel>
-                            </controls:HeaderedContentControl>
-
-                        </Grid>
-
-
-                    </Grid>
-                </controls:HeaderedContentControl>
-
-
-            </Grid>
-
-        </Grid>
-
-        <!--<Page.DataContext>
-        <viewmodels:HomeViewModel x:Name="ViewModel" />
-    </Page.DataContext>-->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
+                <RowDefinition MinHeight="126"
+                               Height="auto" />
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
 
-            <Grid >
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
-                    <RowDefinition MinHeight="126" Height="auto" />
-                </Grid.RowDefinitions>
+            <Grid Style="{StaticResource ContentGrid}">
+                <Grid ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid HorizontalAlignment="Center"
+                          VerticalAlignment="Center">
+                        <Border BorderBrush="{StaticResource CircleBorderBrush}"
+                                Height="70"
+                                Width="70"
+                                Margin="5"
+                                CornerRadius="9"
+                                BorderThickness="1">
+                            <FontIcon FontFamily="Segoe Fluent Icons"
+                                      Glyph="&#xE8B7;"
+                                      FontSize="40"
+                                      Margin="12" />
+                        </Border>
 
-                <Grid Style="{StaticResource ContentGrid}">
-                    <Grid ColumnSpacing="10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid HorizontalAlignment="Center"
-                              VerticalAlignment="Center">
-                            <Border BorderBrush="{StaticResource CircleBorderBrush}"
-                                    Height="70"
-                                    Width="70"
-                                    Margin="5"
-                                    CornerRadius="9"
-                                    BorderThickness="1">
-                                <FontIcon FontFamily="Segoe Fluent Icons"
-                                          Glyph="&#xE8B7;"
-                                          FontSize="40"
-                                          Margin="12" />
-                            </Border>
-
-                            <TextBlock HorizontalAlignment="Right"
-                                       VerticalAlignment="Bottom"
-                                       Visibility="{x:Bind ViewModel.IsShowFolderVideoCount,Mode=OneWay}">
+                        <TextBlock HorizontalAlignment="Right"
+                                   VerticalAlignment="Bottom"
+                                   Visibility="{x:Bind ViewModel.IsShowFolderVideoCount,Mode=OneWay}">
                             <Run>x</Run>
                             <Run Text="{x:Bind ViewModel.FoldersVideo.Count, Mode=OneWay}" />
-                            </TextBlock>
-                        </Grid>
+                        </TextBlock>
+                    </Grid>
 
-                        <StackPanel Grid.Column="1"
-                                    VerticalAlignment="Center">
+                    <StackPanel Grid.Column="1"
+                                VerticalAlignment="Center">
 
-                            <TextBlock Margin="0,0,0,5"
-                                       Style="{StaticResource TitleTextBlock}">文件信息</TextBlock>
+                        <TextBlock Margin="0,0,0,5"
+                                   Style="{StaticResource TitleTextBlock}">文件信息</TextBlock>
 
-                            <controls:WrapPanel VerticalAlignment="Center"
-                                                HorizontalSpacing="20">
+                        <controls:WrapPanel VerticalAlignment="Center"
+                                            HorizontalSpacing="20">
 
-                                <TextBlock>
+                            <TextBlock>
                                 235
                                 <Run Foreground="Gray">文件夹</Run>
-                                </TextBlock>
-                                <TextBlock>26 
-                                <Run Foreground="Gray">文件</Run></TextBlock>
-                            </controls:WrapPanel>
-
-                            <TextBlock>35 MB</TextBlock>
-                        </StackPanel>
-                    </Grid>
-                </Grid>
-
-                <Grid Grid.Row="1"
-                      Style="{StaticResource ContentGrid}">
-                    <controls:HeaderedContentControl>
-                        <controls:HeaderedContentControl.Header>
-                            <TextBlock Style="{StaticResource TitleTextBlock}">输出文件夹</TextBlock>
-                        </controls:HeaderedContentControl.Header>
-
-                        <Grid>
-                            <TextBlock Style="{StaticResource LightBoldTextBlock}"
-                                       Visibility="Collapsed">
-                            拖拽整理后文件存放的文件夹到这里
                             </TextBlock>
+                            <TextBlock>26 
+                                <Run Foreground="Gray">文件</Run></TextBlock>
+                        </controls:WrapPanel>
 
-                            <GridView ItemsSource="{x:Bind ViewModel.SingleFolderSaveVideo, Mode=OneWay}"
-                                      SelectionMode="None"
-                                      Padding="5"
-                                      AllowDrop="True"
-                                      Drop="SingleFolderSaveVideoDrop"
-                                      DragOver="SingleFolderSaveVideoDragOver">
-
-                                <GridView.ItemContainerStyle>
-                                    <Style TargetType="GridViewItem">
-                                        <Setter Property="Margin"
-                                                Value="5" />
-                                    </Style>
-                                </GridView.ItemContainerStyle>
-
-
-                                <GridView.ItemTemplate>
-                                    <DataTemplate x:DataType="data:FilesInfo">
-                                        <customcontrols:FolderControl FolderName="{x:Bind Name, Mode=OneWay}"
-                                                                      DeleteCommand="{StaticResource DeleteFolderSaveVideoCommand}" />
- 
-                                    </DataTemplate>
-                                </GridView.ItemTemplate>
-
-                            </GridView>
-
-
-                        </Grid>
-                    </controls:HeaderedContentControl>
+                        <TextBlock>35 MB</TextBlock>
+                    </StackPanel>
                 </Grid>
             </Grid>
 
-            <Grid Grid.Row="0"
-                  Grid.Column="1"
-                  Style="{StaticResource ContentGrid}"
-                  Background="Transparent">
+            <Grid Grid.Row="1"
+                  Style="{StaticResource ContentGrid}">
                 <controls:HeaderedContentControl>
                     <controls:HeaderedContentControl.Header>
-                        <RelativePanel>
-                            <TextBlock Text="🈲18+"
-                                       Style="{StaticResource TitleTextBlock}"
-                                       RelativePanel.AlignLeftWithPanel="True"
-                                       RelativePanel.AlignVerticalCenterWithPanel="True"
-                                       Margin="2" />
-                            <FontIcon x:Name="VideoInfoIcon"
-                                      FontFamily="Segoe Fluent Icons"
-                                      Glyph="&#xE946;"
-                                      FontSize="15"
-                                      Foreground="Gray"
-                                      RelativePanel.LeftOf="VideoSettingsButton"
-                                      RelativePanel.AlignVerticalCenterWithPanel="True" />
-                            <Button x:Name="VideoSettingsButton"
-                                    RelativePanel.AlignRightWithPanel="True"
-                                    Margin="10,0,0,0"
-                                    Padding="5"
-                                    Click="Video18SettingsButtonClick">
-                                <FontIcon FontFamily="Segoe Fluent Icons"
-                                          Glyph="&#xE713;"
-                                          FontSize="14" />
-                            </Button>
-
-                        </RelativePanel>
+                        <TextBlock Style="{StaticResource TitleTextBlock}">输出文件夹</TextBlock>
                     </controls:HeaderedContentControl.Header>
+
                     <Grid>
                         <TextBlock Style="{StaticResource LightBoldTextBlock}"
-                                   Visibility="{x:Bind ViewModel.IsShowFolderVideoTip,Mode=OneWay}">
-                        拖拽需要整理的文件夹到这里
+                                   Visibility="Collapsed">
+                            拖拽整理后文件存放的文件夹到这里
                         </TextBlock>
 
-                        <GridView x:Name="FolderVideoGridView"
-                                  ItemsSource="{x:Bind ViewModel.FoldersVideo, Mode=OneWay}"
+                        <GridView ItemsSource="{x:Bind ViewModel.SingleFolderSaveVideo, Mode=OneWay}"
                                   SelectionMode="None"
                                   Padding="5"
-                                  CanDragItems="True"
                                   AllowDrop="True"
-                                  DragOver="FolderVideoDragOver"
-                                  Drop="FolderVideoGridView_OnDrop"
-                                  DragItemsStarting="FolderVideoDragItemStarting">
+                                  Drop="SingleFolderSaveVideoDrop"
+                                  DragOver="SingleFolderSaveVideoDragOver">
 
                             <GridView.ItemContainerStyle>
                                 <Style TargetType="GridViewItem">
@@ -763,21 +242,92 @@
 
                             <GridView.ItemTemplate>
                                 <DataTemplate x:DataType="data:FilesInfo">
-                                    <!--<TextBlock Text="{x:Bind Name}"/>-->
-                                    <customcontrols:FolderControl FolderName="{x:Bind Name}"
-                                                                  DeleteCommand="{StaticResource DeleteCommand}" />
+                                    <customcontrols:FolderControl FolderName="{x:Bind Name, Mode=OneWay}"
+                                                                  DeleteCommand="{StaticResource DeleteFolderSaveVideoCommand}" />
 
                                 </DataTemplate>
                             </GridView.ItemTemplate>
 
                         </GridView>
 
-                    </Grid>
 
+                    </Grid>
                 </controls:HeaderedContentControl>
             </Grid>
+        </Grid>
 
-            <!--<Grid Grid.Row="1"
+        <Grid Grid.Row="0"
+              Grid.Column="1"
+              Style="{StaticResource ContentGrid}"
+              Background="Transparent">
+            <controls:HeaderedContentControl>
+                <controls:HeaderedContentControl.Header>
+                    <RelativePanel>
+                        <TextBlock Text="🈲18+"
+                                   Style="{StaticResource TitleTextBlock}"
+                                   RelativePanel.AlignLeftWithPanel="True"
+                                   RelativePanel.AlignVerticalCenterWithPanel="True"
+                                   Margin="2" />
+                        <FontIcon x:Name="VideoInfoIcon"
+                                  FontFamily="Segoe Fluent Icons"
+                                  Glyph="&#xE946;"
+                                  FontSize="15"
+                                  Foreground="Gray"
+                                  RelativePanel.LeftOf="VideoSettingsButton"
+                                  RelativePanel.AlignVerticalCenterWithPanel="True" />
+                        <Button x:Name="VideoSettingsButton"
+                                RelativePanel.AlignRightWithPanel="True"
+                                Margin="10,0,0,0"
+                                Padding="5"
+                                Click="Video18SettingsButtonClick">
+                            <FontIcon FontFamily="Segoe Fluent Icons"
+                                      Glyph="&#xE713;"
+                                      FontSize="14" />
+                        </Button>
+
+                    </RelativePanel>
+                </controls:HeaderedContentControl.Header>
+                <Grid>
+                    <TextBlock Style="{StaticResource LightBoldTextBlock}"
+                               Visibility="{x:Bind ViewModel.IsShowFolderVideoTip,Mode=OneWay}">
+                        拖拽需要整理的文件夹到这里
+                    </TextBlock>
+
+                    <GridView x:Name="FolderVideoGridView"
+                              ItemsSource="{x:Bind ViewModel.FoldersVideo, Mode=OneWay}"
+                              SelectionMode="None"
+                              Padding="5"
+                              CanDragItems="True"
+                              AllowDrop="True"
+                              DragOver="FolderVideoDragOver"
+                              Drop="FolderVideoGridView_OnDrop"
+                              DragItemsStarting="FolderVideoDragItemStarting">
+
+                        <GridView.ItemContainerStyle>
+                            <Style TargetType="GridViewItem">
+                                <Setter Property="Margin"
+                                        Value="5" />
+                            </Style>
+                        </GridView.ItemContainerStyle>
+
+
+                        <GridView.ItemTemplate>
+                            <DataTemplate x:DataType="data:FilesInfo">
+                                <!--<TextBlock Text="{x:Bind Name}"/>-->
+                                <customcontrols:FolderControl FolderName="{x:Bind Name}"
+                                                              DeleteCommand="{StaticResource DeleteCommand}" />
+
+                            </DataTemplate>
+                        </GridView.ItemTemplate>
+
+                    </GridView>
+
+                </Grid>
+
+            </controls:HeaderedContentControl>
+        </Grid>
+
+        <!--<Grid Grid.Row="1"
               Grid.Column="0"
               Style="{StaticResource ContentGrid}">
             <controls:HeaderedContentControl>
@@ -803,9 +353,9 @@
                     </RelativePanel>
                 </controls:HeaderedContentControl.Header>
             </controls:HeaderedContentControl>
-        </Grid>-->
+        </Grid>
 
-            <!--<Grid Grid.Row="1"
+        <Grid Grid.Row="1"
               Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -832,8 +382,5 @@
             </Grid>
         </Grid>-->
 
-
-
-        </Grid>
     </Grid>
 </Page>

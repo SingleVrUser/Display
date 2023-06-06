@@ -1,13 +1,9 @@
-﻿using System;
+﻿using Display.Data;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media.Playback;
-using Display.Data;
-using static Display.Data.WebApi;
-using System.Xml.Linq;
-using System.Security.Cryptography;
 
 namespace Display.Models
 {
@@ -82,7 +78,7 @@ namespace Display.Models
         //    return videoUrl;
         //}
 
-        private async Task<List<m3u8Info>> GetM3U8Urls()
+        public async Task<List<m3u8Info>> GetM3U8Infos()
         {
             if (IsRequestM3U8) return M3U8Infos;
 
@@ -98,7 +94,7 @@ namespace Display.Models
 
         public async Task<string> GetM3U8Url(int index = 0)
         {
-            var m3U8Infos = await GetM3U8Urls();
+            var m3U8Infos = await GetM3U8Infos();
 
             if (m3U8Infos is not { Count: > 0 }) return null;
 
@@ -131,12 +127,12 @@ namespace Display.Models
             //先原画
             QualityInfos = new List<Quality> { new("原画", isOriginal: true) };
 
-            M3U8Infos = await _webApi.GetM3U8InfoByPickCode(PickCode);
+            var m3U8Infos = await GetM3U8Infos();
             //有m3u8
-            if (M3U8Infos is { Count: > 0 })
+            if (m3U8Infos is { Count: > 0 })
             {
                 //后m3u8
-                M3U8Infos.ForEach(item => QualityInfos.Add(new Quality(item.Name, item.Url)));
+                m3U8Infos.ForEach(item => QualityInfos.Add(new Quality(item.Name, item.Url)));
 
             }
 
@@ -147,9 +143,9 @@ namespace Display.Models
         {
             var qualities = await GetQualities();
             int maxIndex = qualities.Count - 1;
-            if (index > qualities.Count - 1)
+            if (index > maxIndex)
             {
-                index = qualities.Count - 1;
+                index = maxIndex;
             }
 
             var quality = qualities[index];
@@ -168,7 +164,7 @@ namespace Display.Models
             {
                 case AppSettings.PlayQuality.M3U8:
                 {
-                    var m3U8Infos = await GetM3U8Urls();
+                    var m3U8Infos = await GetM3U8Infos();
                     if (m3U8Infos == null || m3U8Infos.Count == 0) return await GetOriginalUrl();
 
                     return m3U8Infos.FirstOrDefault()?.Url;
@@ -203,6 +199,7 @@ namespace Display.Models
                 if (playItem.Type == FilesInfo.FileType.Folder)
                 {
                     var fileInfos = await webApi.GetFileAsync(playItem.Cid, LoadAll: true);
+                    
                     newMediaPlayItems.AddRange(
                         fileInfos.data
                             .Where(x => !string.IsNullOrEmpty(x.fid) && x.iv == 1)

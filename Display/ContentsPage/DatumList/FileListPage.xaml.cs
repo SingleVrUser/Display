@@ -1,15 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
-using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.WinUI.UI.Controls;
+using ByteSizeLib;
+using Display.Data;
 using Display.Helper;
 using Display.Models;
+using Display.Views;
 using Microsoft.UI;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
@@ -18,14 +20,9 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
-using Display.Data;
-using Display.Views;
-using Microsoft.UI.Xaml.Input;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
-using Microsoft.VisualBasic;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -64,8 +61,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     /// </summary>
     ObservableCollection<TransferStationFiles> transferStationFiles;
 
-
-
     public FileListPage(string cid = "0")
     {
         this.InitializeComponent();
@@ -79,7 +74,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         else
         {
             var folderToRootList = DataAccess.GetRootByCid(cid);
-            unit = folderToRootList.Select(x => new ExplorerItem { Name = x.n,Cid = x.cid}).ToList();
+            unit = folderToRootList.Select(x => new ExplorerItem { Name = x.n, Cid = x.cid }).ToList();
         }
 
         InitData(unit);
@@ -88,7 +83,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private void InitData(List<ExplorerItem> units)
     {
-
         MyProgressBar.Visibility = Visibility.Visible;
 
         _units = new ObservableCollection<ExplorerItem>();
@@ -118,10 +112,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         MyProgressBar.Visibility = Visibility.Collapsed;
     }
 
-    private async void OpenFolder(string cid)
+    private async Task OpenFolder(ExplorerItem currentItem)
     {
-        var currentItem = _units.FirstOrDefault(item => item.Cid == cid);
-
         //不存在，返回
         if (string.IsNullOrEmpty(currentItem?.Cid)) return;
 
@@ -136,18 +128,18 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             _units.RemoveAt(i);
         }
 
-        await filesInfos.SetCid(cid);
+        await filesInfos.SetCid(currentItem.Cid);
 
         // 切换目录时，全选checkBox不是选中状态
         MultipleSelectedCheckBox.IsChecked = false;
     }
 
-    private async void OpenFile_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
+    private async void OpenFile_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
         if (sender is not Grid { DataContext: FilesInfo info }) return;
 
         // 不是文件夹或视频就跳过
-        if(info.Type==FilesInfo.FileType.Folder) return;
+        if (info.Type == FilesInfo.FileType.Folder) return;
 
         if (info.datum.iv != 1)
         {
@@ -275,7 +267,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             }
         }
     }
-    
+
     private void Source_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
     {
         // 显示回收站
@@ -479,7 +471,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         await WebApi.DeleteFiles(sourceFilesInfos.FirstOrDefault()?.datum.pid,
             sourceFilesInfos.Select(item => item.Type == FilesInfo.FileType.File ? item.Fid : item.Cid).ToList());
     }
-    
+
     private void RecycleStationGrid_DragEnter(object sender, DragEventArgs e)
     {
         VisualStateManager.GoToState(this, "ReadyDelete", true);
@@ -572,7 +564,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     private async Task Move115Files(string pid, List<FilesInfo> files)
     {
         await WebApi.MoveFiles(pid, files.Select(item => item.Type == FilesInfo.FileType.Folder ? item.Cid : item.Fid).ToList());
-        
+
         // 从中转站列表中删除已经移动的文件
         TryRemoveTransferFiles(files);
     }
@@ -776,7 +768,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async Task DownFiles(WebApi.downType downType)
     {
-        if (BaseExample.SelectedItems is null || BaseExample.SelectedItems.Count==0)
+        if (BaseExample.SelectedItems is null || BaseExample.SelectedItems.Count == 0)
         {
             ShowTeachingTip("当前未选中文件");
             return;
@@ -827,22 +819,21 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
             // 挑选视频文件，并转换为mediaPlayItem
             var mediaPlayItems = files
-                .Where(x=> x.Type==FilesInfo.FileType.Folder || x.datum.iv == 1)
-                .Select(x => new MediaPlayItem(x.datum.pc, x.Name,x.Type, x.Cid)).ToList();
+                .Where(x => x.Type == FilesInfo.FileType.Folder || x.datum.iv == 1)
+                .Select(x => new MediaPlayItem(x.datum.pc, x.Name, x.Type, x.Cid)).ToList();
 
             await PlayVideoHelper.PlayVideo(mediaPlayItems, this.XamlRoot, lastPage: this);
 
-            return; 
+            return;
         }
 
         // 单个播放
         if (menuFlyoutItem.DataContext is not FilesInfo info) return;
 
-        if(info.Type == FilesInfo.FileType.Folder||info.datum.iv != 1) return;
+        if (info.Type == FilesInfo.FileType.Folder || info.datum.iv != 1) return;
 
         var mediaPlayItem = new MediaPlayItem(info.datum.pc, info.Name, info.Type, info.Cid);
-        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>(){ mediaPlayItem }, this.XamlRoot, lastPage: this);
-
+        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, lastPage: this);
     }
 
     private void Sort115Button_Click(object sender, RoutedEventArgs e)
@@ -877,17 +868,17 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             var files = BaseExample.SelectedItems.Cast<FilesInfo>().ToList();
 
             var mediaPlayItems = files
-                .Where(x=> x.Type==FilesInfo.FileType.Folder || x.datum.iv == 1)
+                .Where(x => x.Type == FilesInfo.FileType.Folder || x.datum.iv == 1)
                 .Select(x => new MediaPlayItem(x.datum.pc, x.Name, x.Type, x.Cid)).ToList();
             await PlayVideoHelper.PlayVideo(mediaPlayItems, this.XamlRoot, lastPage: this, playerSelection: playerSelection);
 
             return;
         }
-        
-        // 单个播放
-        if (menuFlyoutItem is not { DataContext: FilesInfo info}) return;
 
-        if(info.Type== FilesInfo.FileType.Folder || info.datum.iv != 1) return;
+        // 单个播放
+        if (menuFlyoutItem is not { DataContext: FilesInfo info }) return;
+
+        if (info.Type == FilesInfo.FileType.Folder || info.datum.iv != 1) return;
 
         var mediaPlayItem = new MediaPlayItem(info.datum.pc, info.Name, info.Type, info.Cid);
         await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this, playerSelection: playerSelection);
@@ -906,7 +897,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             {
                 info
             };
-            
+
 
         }
         else
@@ -1006,24 +997,22 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         var firstData = renameRequest.data.FirstOrDefault();
 
-        if (firstData.Key!=null)
+        if (firstData.Key != null)
         {
             info.Name = firstData.Value;
         }
     }
 
-    private void FolderBreadcrumbBar_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
+    private async void FolderBreadcrumbBar_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
     {
         if (args.Item is not ExplorerItem item) return;
-        var cid = item.Cid;
-        if (string.IsNullOrEmpty(cid)) return;
 
-        OpenFolder(cid);
+        await OpenFolder(item);
     }
 
     private void MetadataItem_OnDragOver(object sender, DragEventArgs e)
     {
-        if(sender is not TextBlock { DataContext:ExplorerItem item }) return;
+        if (sender is not TextBlock { DataContext: ExplorerItem item }) return;
 
         // 拖拽中的文件（可能多个）
         if (e.DataView.Properties.Values.FirstOrDefault() is not List<FilesInfo> sourceFilesInfos) return;
@@ -1066,7 +1055,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         if (index == _units.Count - 1)
         {
             sourceFilesInfos.ForEach(x =>
-                filesInfos.Insert(0,x));
+                filesInfos.Insert(0, x));
         }
     }
 
@@ -1086,9 +1075,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         {
             TransferStationGrid.Visibility = Visibility.Collapsed;
         }
-
     }
-
 
     private void SelectedMultipleFilesCheckBox_OnClick(object sender, RoutedEventArgs e)
     {
@@ -1104,63 +1091,72 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
     }
 
-    private void GoBack_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    private async void GoBack_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
         if (_units.Count <= 1) return;
 
         var currentItem = _units[^2];
-        OpenFolder(currentItem.Cid);
+        await OpenFolder(currentItem);
     }
 
     private async void ShowInfoClick(object sender, RoutedEventArgs e)
     {
         if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
 
-        var content = new TextBlock()
+        string title;
+
+        var infos = new Dictionary<string, string>
         {
-            Text = $"Cid: {info.Cid}",
-            IsTextSelectionEnabled = true,
-            HorizontalAlignment = HorizontalAlignment.Center
+            {"名称",info.Name }
         };
 
-        var dialog = new ContentDialog()
+        if (info.Type == FilesInfo.FileType.Folder)
         {
-            XamlRoot = this.XamlRoot,
-            CloseButtonText = "返回",
-            DefaultButton = ContentDialogButton.Close,
-            Content = content
-        };
+            infos.Add("id", info.Cid);
+            infos.Add("pickCode", info.datum.pc);
+            infos.Add("所在目录id", info.datum.pid);
 
-        await dialog.ShowAsync();
+            title = "文件夹属性";
+        }
+        else
+        {
+            infos.Add("id", info.Fid);
+            infos.Add("pickCode", info.datum.pc);
+            infos.Add("大小", ByteSize.FromBytes(info.datum.s).ToString("#.#"));
+            infos.Add("sha1", info.datum.sha);
+            infos.Add("所在目录id", info.Cid);
+
+            title = "文件属性";
+        }
+
+        await InfoPage.ShowInContentDialog(XamlRoot, infos, title);
     }
 
     private async void ShowFolderInfoClick(object sender, RoutedEventArgs e)
     {
         if (sender is not MenuFlyoutItem { DataContext: ExplorerItem info }) return;
 
-        var content = new TextBlock()
+        var infos = new Dictionary<string, string>
         {
-            Text = $"Cid: {info.Cid}",
-            IsTextSelectionEnabled = true,
-            HorizontalAlignment = HorizontalAlignment.Center
+            {"名称",info.Name },
+            {"cid",info.Cid },
         };
 
-        var dialog = new ContentDialog()
-        {
-            XamlRoot = this.XamlRoot,
-            CloseButtonText = "返回",
-            DefaultButton = ContentDialogButton.Close,
-            Content = content
-        };
-
-        await dialog.ShowAsync();
+        await InfoPage.ShowInContentDialog(XamlRoot, infos, "属性");
     }
 
-    private void RefreshFolderClick(object sender, RoutedEventArgs e)
+    private async void RefreshFolderClick(object sender, RoutedEventArgs e)
     {
         if (sender is not MenuFlyoutItem { DataContext: ExplorerItem info }) return;
 
-        OpenFolder(info.Cid);
+        await OpenFolder(info);
+    }
+
+    private async void Refresh_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        var currentFolder = _units.LastOrDefault();
+
+        await OpenFolder(currentFolder);
     }
 }
 

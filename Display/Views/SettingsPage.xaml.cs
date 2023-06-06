@@ -1036,23 +1036,11 @@ namespace Display.Views
         private async void Selected115SavePathButtonClick(object sender, RoutedEventArgs e)
         {
             var contentPage = new SelectedFolderPage();
-            ContentDialog dialog = new()
-            {
-                XamlRoot = this.XamlRoot,
-                Content = contentPage,
-                CloseButtonText = "返回",
-                PrimaryButtonText = "保存到该目录",
-                DefaultButton = ContentDialogButton.Primary,
-                Resources =
-                {
-                    // 使用更大的 MaxWidth
-                    ["ContentDialogMaxWidth"] = 700
-                }
-            };
 
-            var result = await dialog.ShowAsync();
+            var result = await contentPage.ShowContentDialogResult(XamlRoot);
 
             if (result != ContentDialogResult.Primary) return;
+
             var explorerItem = contentPage.GetCurrentFolder();
             Debug.WriteLine($"当前选中：{explorerItem.Name}({explorerItem.Cid})");
 

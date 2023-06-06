@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using Display.ViewModels;
 using Microsoft.UI.Xaml.Controls;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -15,9 +16,14 @@ namespace Display.ContentsPage.Sort115
     {
         public Settings18Page()
         {
-            this.InitializeComponent();
-        }
+            InitializeComponent();
 
+            var viewModel = DataContext as SortSettingsViewModel;
+
+            EnsureSettings();
+            viewModel?.SetSettings(Settings);
+            viewModel?.SetPage(this);
+        }
 
     }
 }

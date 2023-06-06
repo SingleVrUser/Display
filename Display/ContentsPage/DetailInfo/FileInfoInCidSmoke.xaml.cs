@@ -55,7 +55,7 @@ namespace Display.ContentsPage.DetailInfo
             if (sender is not MenuFlyoutItem { DataContext: Datum info }) return;
 
             //115删除
-            var dialog = new ContentDialog()
+            var dialog = new ContentDialog
             {
                 XamlRoot = XamlRoot,
                 Title = "确认",
@@ -75,8 +75,6 @@ namespace Display.ContentsPage.DetailInfo
 
             // 从数据库中删除
             DataAccess.DeleteDataInFilesInfoAndFileToInfo(info.pc);
-
-
         }
     }
 }
