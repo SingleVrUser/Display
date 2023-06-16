@@ -43,7 +43,6 @@ namespace Display.Controls
             }
 
             RootGrid.Children.Add(contentPage);
-
         }
 
         public event EventHandler<RoutedEventArgs> PrimaryButtonClick;

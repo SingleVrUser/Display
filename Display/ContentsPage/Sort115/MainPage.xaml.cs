@@ -11,7 +11,9 @@ using System.Diagnostics;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
 using Display.Data;
+using Display.Models;
 using SpiderInfo = Display.Models.SpiderInfo;
+using Org.BouncyCastle.Asn1.X509;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -25,12 +27,11 @@ public sealed partial class MainPage : Page
 {
     //private List<FetchingSourceOptions> fetchingCommonSourceList;
 
-    public MainPage(List<FilesInfo> folders)
+    public MainPage(List<FilesInfo> files)
     {
-        this.InitializeComponent();
+        InitializeComponent();
 
-        var viewModel = DataContext as Sort115HomeViewModel;
-        viewModel?.SetFolders(folders);
+        ViewModel.SetFiles(files);
 
         ////搜刮源
         //fetchingCommonSourceList = new List<FetchingSourceOptions>();
@@ -58,43 +59,34 @@ public sealed partial class MainPage : Page
     {
         if (!e.Data.Properties.TryGetValue("items", out var value))
         {
-            if (!e.Data.Properties.TryGetValue("folder", out value) || value is not FilesInfo folder) return;
+            if (!e.Data.Properties.TryGetValue("folder", out value) || value is not FilesInfo) return;
 
-            e.AcceptedOperation = DataPackageOperation.Move;
+            e.AcceptedOperation = DataPackageOperation.Link;
         }
-        else if (value is List<FilesInfo>)
+        else if (value is List<FilesInfo> files)
         {
-            e.AcceptedOperation = DataPackageOperation.Move;
+            if (files.All(x => x.Type == FilesInfo.FileType.File))
+            {
+                e.AcceptedOperation = DataPackageOperation.Link;
+            }
+
         }
     }
 
-    private void SingleFolderSaveVideoDrop(object sender, DragEventArgs e)
-    {
-        if (!e.Data.Properties.TryGetValue("items", out var value) || value is not List<FilesInfo> folders) return;
-
-        if (folders.Count != 1) return;
-
-        if (ViewModel.SingleFolderSaveVideo.Count > 0) ViewModel.SingleFolderSaveVideo.Clear();
-
-        ViewModel.SingleFolderSaveVideo.Add(folders.First());
-    }
-    private void FolderVideoGridView_OnDrop(object sender, DragEventArgs e)
+    private void FolderVideoListView_OnDrop(object sender, DragEventArgs e)
     {
         if (!e.Data.Properties.TryGetValue("items", out var value))
         {
             if (!e.Data.Properties.TryGetValue("folder", out value) || value is not FilesInfo folder) return;
 
-            if (!ViewModel.FoldersVideo.Contains(folder))
-                ViewModel.FoldersVideo.Add(folder);
+            if (ViewModel.SelectedFiles.All(model => model.Info != folder))
+                ViewModel.SelectedFiles.Add(new Sort115HomeModel(folder));
         }
         else if (value is List<FilesInfo> files)
         {
-            var folders = files.Where(f => f.Type == FilesInfo.FileType.Folder);
-
-            foreach (var folder in folders)
+            foreach (var info in files)
             {
-                if (!ViewModel.FoldersVideo.Contains(folder))
-                    ViewModel.FoldersVideo.Add(folder);
+                ViewModel.SelectedFiles.Add(new Sort115HomeModel(info));
             }
         }
     }
@@ -103,21 +95,21 @@ public sealed partial class MainPage : Page
     {
         if (!e.Data.Properties.TryGetValue("items", out var value)) return;
 
-        if (value is List<FilesInfo>)
+        if (value is List<FilesInfo> {Count:0})
             e.AcceptedOperation = DataPackageOperation.Link;
     }
 
     private void FolderVideoDragItemStarting(object sender, DragItemsStartingEventArgs e)
     {
-        var folder = e.Items.Cast<FilesInfo>().FirstOrDefault();
+        //var folder = e.Items.Cast<FilesInfo>().FirstOrDefault();
 
-        e.Data.Properties.Add("folder", folder);
-        e.Data.Properties.Add("source", nameof(FolderVideoGridView));
+        //e.Data.Properties.Add("folder", folder);
+        //e.Data.Properties.Add("source", nameof(FolderVideoListView));
     }
 
     private async void Video18SettingsButtonClick(object sender, RoutedEventArgs e)
     {
-        var dialog = new ContentDialog()
+        var result = await new ContentDialog()
         {
             XamlRoot = XamlRoot,
             Title = "设置",
@@ -130,9 +122,7 @@ public sealed partial class MainPage : Page
                 // 使用更大的 MaxWidth
                 ["ContentDialogMaxWidth"] = 700
             }
-        };
-
-        var result = await dialog.ShowAsync();
+        }.ShowAsync();
 
         if (result == ContentDialogResult.Primary)
         {

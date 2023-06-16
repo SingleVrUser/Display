@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using System;
 using Display.ViewModels;
 using Microsoft.UI.Xaml.Controls;
 
@@ -18,12 +19,7 @@ namespace Display.ContentsPage.Sort115
         {
             InitializeComponent();
 
-            var viewModel = DataContext as SortSettingsViewModel;
-
-            EnsureSettings();
-            viewModel?.SetSettings(Settings);
-            viewModel?.SetPage(this);
+            ViewModel.SetPage(this);
         }
-
     }
 }

@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace Display.Models
 {
-    public class Sort115Settings : ObservableObject
+    public partial class Sort115Settings : ObservableObject
     {
         public enum NumNameCapFormat
         {
@@ -30,9 +30,10 @@ namespace Display.Models
             new Tuple<string, NumNameCapFormat>("小写", NumNameCapFormat.Lower)
         };
 
-        public ExplorerItem SingleVideoSaveExplorerItem;
+        [ObservableProperty]
+        private ExplorerItem _singleVideoSaveExplorerItem;
 
-        public ExplorerItem MultipleVideoSaveExplorerItem;
-
+        [ObservableProperty]
+        private ExplorerItem _multipleVideoSaveExplorerItem;
     }
 }

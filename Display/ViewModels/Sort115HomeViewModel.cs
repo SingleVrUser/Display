@@ -1,63 +1,204 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Input;
+using Display.ContentsPage.Sort115;
 using Display.Data;
+using Display.Models;
+using System.Security.Cryptography;
 
 namespace Display.ViewModels
 {
-    public class Sort115HomeViewModel : ObservableObject
+    public partial class Sort115HomeViewModel : ObservableObject
     {
-        public ObservableCollection<FilesInfo> FoldersVideo = new();
+        public ObservableCollection<Sort115HomeModel> SelectedFiles = new();
 
-        public ObservableCollection<FilesInfo> SingleFolderSaveVideo = new();
+        public ObservableCollection<Sort115HomeModel> SingleFolderSaveVideo = new();
 
-        public void SetFolders(List<FilesInfo> folders)
+        public int FolderCount => SelectedFiles.Count(model => model.Info.Type == FilesInfo.FileType.Folder);
+
+        public int FileCount => SelectedFiles.Count(model => model.Info.Type == FilesInfo.FileType.File);
+
+        public void SetFiles(List<FilesInfo> files)
         {
-            folders.ForEach(c =>
+            foreach (var info in files.Where(info => info is { Type: FilesInfo.FileType.File }).OrderBy(info=>info.Type))
             {
-                if (c != null) FoldersVideo.Add(c);
-            });
+                SelectedFiles.Add(new Sort115HomeModel(info));
+            }
 
-            FoldersVideo.CollectionChanged += FoldersVideo_CollectionChanged;
+            SelectedFiles.CollectionChanged += SelectedFilesCollectionChanged;
         }
 
-        private void FoldersVideo_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void SelectedFilesCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            OnPropertyChanged(nameof(FolderCount));
+            OnPropertyChanged(nameof(FileCount));
+
             OnPropertyChanged(nameof(IsShowFolderVideoCount));
             OnPropertyChanged(nameof(IsShowFolderVideoTip));
         }
 
-        public ICommand DeleteCommand => new RelayCommand<string>(DeleteCommand_Executed);
-        public ICommand DeleteFolderSaveVideoCommand => new RelayCommand<string>(DeleteFolderSaveVideoCommand_Executed);
-
-        private void DeleteFolderSaveVideoCommand_Executed(string parameter)
+        [RelayCommand]
+        private void DeleteFolderSaveVideo(string parameter)
         {
             if (parameter is null) return;
 
-            var toBeDeleted = SingleFolderSaveVideo.FirstOrDefault(c => c.Name == parameter);
+            var toBeDeleted = SingleFolderSaveVideo.FirstOrDefault(c => c.Info.Name == parameter);
 
             SingleFolderSaveVideo.Remove(toBeDeleted);
         }
 
-
-        private void DeleteCommand_Executed(string parameter)
+        [RelayCommand]
+        private void Delete(string parameter)
         {
             if (parameter is null) return;
 
             Debug.WriteLine("删除该文件夹");
 
-            var toBeDeleted = FoldersVideo.FirstOrDefault(c => c.Name == parameter);
+            var toBeDeleted = SelectedFiles.FirstOrDefault(c => c.Info.Name == parameter);
 
-            FoldersVideo.Remove(toBeDeleted);
+            SelectedFiles.Remove(toBeDeleted);
         }
 
-        public Visibility IsShowFolderVideoCount => FoldersVideo.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        [RelayCommand]
+        private async void Start()
+        {
+            Debug.WriteLine("开始");
+
+            var infos = SelectedFiles.ToList();
+
+            const string matchRegex = "(\\d?[a-z]+-?\\d+)([_-]([2468]ks?([36]0fps)?)|hhb|.part)?(\\d?)(_8k)?$";
+
+
+            var settings = Settings18Page.Settings;
+
+            // 单集保存路径
+            Debug.WriteLine($"单集保存路径：{settings.SingleVideoSaveExplorerItem.Name}");
+
+            // 多集保存路径
+            Debug.WriteLine($"多集保存路径：{settings.MultipleVideoSaveExplorerItem.Name}");
+
+            var multipleDict = new Dictionary<string, List<Sort115HomeModel>>();
+            var singleList = new List<Sort115HomeModel>();
+
+            // 整理预览
+            foreach (var info in infos)
+            {
+                Debug.WriteLine($"{info.Info.Name}");
+
+                var name = info.Info.NameWithoutExtension;
+
+                var match = Regex.Match(name, matchRegex, RegexOptions.IgnoreCase);
+
+                if (match.Success)
+                {
+                    var trueName = match.Groups[1].Value;
+                    Debug.WriteLine($"  名称:{trueName}");
+                    Debug.WriteLine($"  规格:{match.Groups[3].Value}");
+
+                    info.DestinationName = match.Value;
+
+                    // 单集
+                    if (string.IsNullOrEmpty(match.Groups[^2].Value))
+                    {
+                        info.DestinationPathName = settings.SingleVideoSaveExplorerItem.Name;
+
+                        singleList.Add(info);
+                    }
+                    // 多集
+                    else
+                    {
+                        if (int.TryParse(match.Groups[^2].Value, out var num))
+                        {
+                            info.DestinationPathName = $"{settings.MultipleVideoSaveExplorerItem.Name}/{trueName}";
+
+                            Debug.WriteLine($"  当前集为：{num}");
+
+                            if (multipleDict.TryGetValue(trueName, out var lists))
+                            {
+                                lists.Add(info);
+                            }
+                            else
+                            {
+                                multipleDict[trueName] =
+                                    new List<Sort115HomeModel> { info };
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.WriteLine("  匹配失败");
+
+                    info.Status = Status.error;
+
+                }
+            }
+
+            // 正式开始整理
+
+            // 整理单集
+            var singleFids = new List<string>();
+            var webApi = WebApi.GlobalWebApi;
+
+            foreach (var info in singleList)
+            {
+                info.Status = Status.doing;
+
+                singleFids.Add(info.Info.Fid);
+
+                // 重命名
+                if (info.DestinationName == info.Info.NameWithoutExtension) continue;
+
+                var renameRequest = await webApi.RenameFile(info.Info.Fid, info.DestinationName);
+                if (renameRequest == null)
+                {
+                    info.Status = Status.error;
+                }
+
+            }
+            // 移动到
+            await webApi.MoveFiles(settings.SingleVideoSaveExplorerItem.Cid, singleFids);
+            foreach (var info in singleList.Where(info => info.Status != Status.error))
+            {
+                info.Status = Status.success;
+            }
+
+            // 整理多集
+            foreach (var item in multipleDict)
+            {
+                var folderName = item.Key;
+                var fileInfo = item.Value;
+                
+                fileInfo.ForEach(x => x.Status = Status.doing);
+
+                // 新建文件夹
+                var makeDirResult = await webApi.RequestMakeDir(settings.MultipleVideoSaveExplorerItem.Cid, folderName);
+                if (makeDirResult == null)
+                {
+                    fileInfo.ForEach(x=>x.Status = Status.error);
+                    return;
+                }
+
+                // 移动到
+                await webApi.MoveFiles(makeDirResult.cid, fileInfo.Select(x=>x.Info.Fid).ToList());
+
+                foreach (var info in fileInfo.Where(info => info.Status != Status.error))
+                {
+                    info.Status = Status.success;
+                }
+            }
+        }
+
+        public Visibility IsShowFolderVideoCount => SelectedFiles.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
 
         public Visibility IsShowFolderVideoTip => IsShowFolderVideoCount == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
     }
+
 }

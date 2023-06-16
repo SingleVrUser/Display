@@ -101,7 +101,7 @@
                                   Click="FindAppBarButton_Click">
                         <AppBarButton.KeyboardAccelerators>
                             <KeyboardAccelerator Modifiers="Control"
-                                                 Key="F" />
+                                                 Key="Q" />
                         </AppBarButton.KeyboardAccelerators>
                     </AppBarButton>
 

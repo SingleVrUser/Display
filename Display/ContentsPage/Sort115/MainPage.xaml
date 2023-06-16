@@ -8,9 +8,9 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:local="using:Display.ContentsPage.Sort115"
-      xmlns:data="using:Display.Data"
-      xmlns:viewmodels="using:Display.ViewModels"
       xmlns:customcontrols="using:Display.Controls"
+      xmlns:models="using:Display.Models"
+      xmlns:viewmodels="using:Display.ViewModels"
       mc:Ignorable="d">
 
     <Page.DataContext>
@@ -125,6 +125,18 @@
         </Style>
 
         <Style TargetType="Grid"
+               x:Key="TopGrid">
+            <Setter Property="BorderBrush"
+                    Value="{StaticResource CircleLightBorderBrush}" />
+            <Setter Property="BorderThickness"
+                    Value="0,0,0,1" />
+            <Setter Property="Margin"
+                    Value="5" />
+            <Setter Property="Padding"
+                    Value="10" />
+        </Style>
+
+        <Style TargetType="Grid"
                x:Key="ContentGrid">
             <Setter Property="BorderBrush"
                     Value="{StaticResource CircleBorderBrush}" />
@@ -137,132 +149,101 @@
             <Setter Property="Padding"
                     Value="10" />
         </Style>
+
         <Style TargetType="TextBlock"
                x:Key="TitleTextBlock">
             <Setter Property="FontSize"
                     Value="16" />
+            <Setter Property="FontWeight"
+                    Value="Medium" />
         </Style>
 
     </Page.Resources>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto" />
-                <RowDefinition MinHeight="126"
-                               Height="auto" />
-            </Grid.RowDefinitions>
-
-            <Grid Style="{StaticResource ContentGrid}">
-                <Grid ColumnSpacing="10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid HorizontalAlignment="Center"
-                          VerticalAlignment="Center">
-                        <Border BorderBrush="{StaticResource CircleBorderBrush}"
-                                Height="70"
-                                Width="70"
-                                Margin="5"
-                                CornerRadius="9"
-                                BorderThickness="1">
-                            <FontIcon FontFamily="Segoe Fluent Icons"
-                                      Glyph="&#xE8B7;"
-                                      FontSize="40"
-                                      Margin="12" />
-                        </Border>
-
-                        <TextBlock HorizontalAlignment="Right"
-                                   VerticalAlignment="Bottom"
-                                   Visibility="{x:Bind ViewModel.IsShowFolderVideoCount,Mode=OneWay}">
-                            <Run>x</Run>
-                            <Run Text="{x:Bind ViewModel.FoldersVideo.Count, Mode=OneWay}" />
-                        </TextBlock>
-                    </Grid>
-
-                    <StackPanel Grid.Column="1"
-                                VerticalAlignment="Center">
-
-                        <TextBlock Margin="0,0,0,5"
-                                   Style="{StaticResource TitleTextBlock}">文件信息</TextBlock>
-
-                        <controls:WrapPanel VerticalAlignment="Center"
-                                            HorizontalSpacing="20">
-
-                            <TextBlock>
-                                235
-                                <Run Foreground="Gray">文件夹</Run>
-                            </TextBlock>
-                            <TextBlock>26 
-                                <Run Foreground="Gray">文件</Run></TextBlock>
-                        </controls:WrapPanel>
-
-                        <TextBlock>35 MB</TextBlock>
-                    </StackPanel>
-                </Grid>
-            </Grid>
-
-            <Grid Grid.Row="1"
-                  Style="{StaticResource ContentGrid}">
-                <controls:HeaderedContentControl>
-                    <controls:HeaderedContentControl.Header>
-                        <TextBlock Style="{StaticResource TitleTextBlock}">输出文件夹</TextBlock>
-                    </controls:HeaderedContentControl.Header>
-
-                    <Grid>
-                        <TextBlock Style="{StaticResource LightBoldTextBlock}"
-                                   Visibility="Collapsed">
-                            拖拽整理后文件存放的文件夹到这里
-                        </TextBlock>
-
-                        <GridView ItemsSource="{x:Bind ViewModel.SingleFolderSaveVideo, Mode=OneWay}"
-                                  SelectionMode="None"
-                                  Padding="5"
-                                  AllowDrop="True"
-                                  Drop="SingleFolderSaveVideoDrop"
-                                  DragOver="SingleFolderSaveVideoDragOver">
-
-                            <GridView.ItemContainerStyle>
-                                <Style TargetType="GridViewItem">
-                                    <Setter Property="Margin"
-                                            Value="5" />
-                                </Style>
-                            </GridView.ItemContainerStyle>
-
-
-                            <GridView.ItemTemplate>
-                                <DataTemplate x:DataType="data:FilesInfo">
-                                    <customcontrols:FolderControl FolderName="{x:Bind Name, Mode=OneWay}"
-                                                                  DeleteCommand="{StaticResource DeleteFolderSaveVideoCommand}" />
-
-                                </DataTemplate>
-                            </GridView.ItemTemplate>
-
-                        </GridView>
-
-
-                    </Grid>
-                </controls:HeaderedContentControl>
-            </Grid>
-        </Grid>
+    <Grid RowDefinitions="auto,*"
+          ColumnDefinitions="*,*">
 
         <Grid Grid.Row="0"
-              Grid.Column="1"
+              Grid.ColumnSpan="2"
+              Style="{StaticResource TopGrid}"
+              ColumnSpacing="10"
+              ColumnDefinitions="auto,*,auto">
+
+            <Grid HorizontalAlignment="Center"
+                  VerticalAlignment="Center">
+                <Border BorderBrush="{StaticResource CircleBorderBrush}"
+                        Height="70"
+                        Width="70"
+                        Margin="5"
+                        CornerRadius="9"
+                        BorderThickness="1">
+                    <FontIcon FontFamily="Segoe Fluent Icons"
+                              Glyph="&#xE160;"
+                              FontSize="40"
+                              Margin="12" />
+                </Border>
+
+                <TextBlock HorizontalAlignment="Right"
+                           VerticalAlignment="Bottom"
+                           Visibility="{x:Bind ViewModel.IsShowFolderVideoCount,Mode=OneWay}">
+                    <Run>x</Run>
+                    <Run Text="{x:Bind ViewModel.SelectedFiles.Count, Mode=OneWay}" />
+                </TextBlock>
+            </Grid>
+
+            <StackPanel Grid.Column="1"
+                        VerticalAlignment="Center">
+
+                <TextBlock Margin="0,0,0,5"
+                           Style="{StaticResource TitleTextBlock}">文件信息</TextBlock>
+
+                <controls:WrapPanel VerticalAlignment="Center"
+                                    HorizontalSpacing="20">
+
+                    <TextBlock>
+                        <Run Text="{x:Bind ViewModel.FolderCount,Mode=OneWay}"></Run>
+                        <Run Foreground="Gray">文件夹</Run>
+                    </TextBlock>
+                    <TextBlock>
+                        <Run Text="{x:Bind ViewModel.FileCount,Mode=OneWay}"></Run>
+                        <Run Foreground="Gray">文件</Run></TextBlock>
+                </controls:WrapPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Bottom"
+                        Spacing="10">
+                <!--<StackPanel.Resources>
+                    <Style TargetType="AppBarButton">
+                        <Setter Property="" Value="True"/>
+                    </Style>
+                </StackPanel.Resources>-->
+
+                <AppBarButton Label="开始"
+                              Command="{x:Bind ViewModel.StartCommand}">
+                    <AppBarButton.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                  Glyph="&#xE76C;" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+
+                <AppBarButton Label="设置"
+                              Icon="Setting"
+                              Click="Video18SettingsButtonClick" />
+            </StackPanel>
+
+        </Grid>
+
+        <Grid Grid.Row="1"
+              Grid.Column="0"
+              Grid.ColumnSpan="2"
               Style="{StaticResource ContentGrid}"
+              Padding="0"
               Background="Transparent">
             <controls:HeaderedContentControl>
                 <controls:HeaderedContentControl.Header>
-                    <RelativePanel>
+                    <RelativePanel Padding="5">
                         <TextBlock Text="🈲18+"
                                    Style="{StaticResource TitleTextBlock}"
                                    RelativePanel.AlignLeftWithPanel="True"
@@ -273,9 +254,9 @@
                                   Glyph="&#xE946;"
                                   FontSize="15"
                                   Foreground="Gray"
-                                  RelativePanel.LeftOf="VideoSettingsButton"
+                                  RelativePanel.AlignRightWithPanel="True"
                                   RelativePanel.AlignVerticalCenterWithPanel="True" />
-                        <Button x:Name="VideoSettingsButton"
+                        <!--<Button x:Name="VideoSettingsButton"
                                 RelativePanel.AlignRightWithPanel="True"
                                 Margin="10,0,0,0"
                                 Padding="5"
@@ -283,49 +264,79 @@
                             <FontIcon FontFamily="Segoe Fluent Icons"
                                       Glyph="&#xE713;"
                                       FontSize="14" />
-                        </Button>
+                        </Button>-->
 
                     </RelativePanel>
                 </controls:HeaderedContentControl.Header>
+
                 <Grid>
                     <TextBlock Style="{StaticResource LightBoldTextBlock}"
                                Visibility="{x:Bind ViewModel.IsShowFolderVideoTip,Mode=OneWay}">
-                        拖拽需要整理的文件夹到这里
+                        拖拽需要整理的文件到这里
                     </TextBlock>
 
-                    <GridView x:Name="FolderVideoGridView"
-                              ItemsSource="{x:Bind ViewModel.FoldersVideo, Mode=OneWay}"
+                    <!--DragItemsStarting="FolderVideoDragItemStarting"-->
+                    <!--DragOver="FolderVideoDragOver"-->
+                    <ListView x:Name="FolderVideoListView"
+                              ItemsSource="{x:Bind ViewModel.SelectedFiles, Mode=OneWay}"
                               SelectionMode="None"
-                              Padding="5"
-                              CanDragItems="True"
+                              CanDragItems="False"
                               AllowDrop="True"
-                              DragOver="FolderVideoDragOver"
-                              Drop="FolderVideoGridView_OnDrop"
-                              DragItemsStarting="FolderVideoDragItemStarting">
+                              Drop="FolderVideoListView_OnDrop">
 
-                        <GridView.ItemContainerStyle>
-                            <Style TargetType="GridViewItem">
-                                <Setter Property="Margin"
-                                        Value="5" />
-                            </Style>
-                        </GridView.ItemContainerStyle>
-
-
-                        <GridView.ItemTemplate>
-                            <DataTemplate x:DataType="data:FilesInfo">
-                                <!--<TextBlock Text="{x:Bind Name}"/>-->
-                                <customcontrols:FolderControl FolderName="{x:Bind Name}"
-                                                              DeleteCommand="{StaticResource DeleteCommand}" />
-
+                        <ListView.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid Padding="12" Background="{ThemeResource SystemBaseLowColor}" ColumnDefinitions="*,200,200">
+                                    <TextBlock Text="原名称" Style="{ThemeResource CaptionTextBlockStyle}"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="目标名称"
+                                               Style="{ThemeResource CaptionTextBlockStyle}"/>
+                                    <TextBlock Grid.Column="3"
+                                               Text="目标目录" Style="{ThemeResource CaptionTextBlockStyle}"/>
+                                </Grid>
                             </DataTemplate>
-                        </GridView.ItemTemplate>
+                        </ListView.HeaderTemplate>
 
-                    </GridView>
+                        <!--<ListView.ItemContainerStyle>
+                            <Style TargetType="GridViewItem">
+                                <Setter Property="HorizontalContentAlignment"
+                                        Value="Stretch" />
+                                <Setter Property="Margin"
+                                        Value="10,5" />
+                            </Style>
+                        </ListView.ItemContainerStyle>-->
+
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="models:Sort115HomeModel">
+                                <Grid Height="48"
+                                      ColumnDefinitions="*,200,200">
+
+                                    <customcontrols:FileControl FolderName="{x:Bind Info.Name}"
+                                                                Type="{x:Bind Info.Type}"
+                                                                DeleteCommand="{StaticResource DeleteCommand}" />
+
+                                    <TextBlock Grid.Column="1"
+                                               VerticalAlignment="Center"
+                                               Style="{ThemeResource BaseTextBlockStyle}"
+                                               Text="{x:Bind DestinationName,Mode=OneWay}"/>
+
+                                    <TextBlock Grid.Column="2"
+                                               VerticalAlignment="Center"
+                                               Style="{ThemeResource BaseTextBlockStyle}"
+                                               Text="{x:Bind DestinationPathName,Mode=OneWay}"/>
+
+                                    <customcontrols:StatusShow Grid.Column="2" status="{x:Bind Status,Mode=OneWay}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+
+                    </ListView>
 
                 </Grid>
 
             </controls:HeaderedContentControl>
         </Grid>
+
 
         <!--<Grid Grid.Row="1"
               Grid.Column="0"

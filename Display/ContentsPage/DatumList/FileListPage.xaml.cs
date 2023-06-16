@@ -905,7 +905,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             //获取需要整理的文件
             fileInfos = BaseExample.SelectedItems.Cast<FilesInfo>().ToList();
 
-            var firstFile = fileInfos.FirstOrDefault();
         }
 
         if (fileInfos.Count == 0) return;

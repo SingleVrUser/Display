@@ -284,9 +284,7 @@
                                                 RelativePanel.AlignRightWithPanel="True"
                                                 IsChecked="{x:Bind data:FileMatch.isLookLater(look_later), Mode=OneWay}"
                                                 Click="LookLaterToggleButton_Click">
-                                <AppBarToggleButton.Resources>
 
-                                </AppBarToggleButton.Resources>
                                 <AppBarToggleButton.Icon>
                                     <FontIcon Glyph="&#xE13B;"
                                               Foreground="White" />

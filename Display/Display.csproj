@@ -99,7 +99,7 @@
     <None Remove="Controls\CustomMediaPlayerElement.xaml" />
     <None Remove="Controls\Explorer.xaml" />
     <None Remove="Controls\FileAutoSuggestBox.xaml" />
-    <None Remove="Controls\FolderControl.xaml" />
+    <None Remove="Controls\FileControl.xaml" />
     <None Remove="Controls\InfoListFilter.xaml" />
     <None Remove="Controls\MultipleCoverShow.xaml" />
     <None Remove="Controls\RangeSlider.xaml" />
@@ -348,7 +348,7 @@
     <Page Update="ContentsPage\Sort115\Settings18Page.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Controls\FolderControl.xaml">
+    <Page Update="Controls\FileControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <None Update="Control\FolderControl.xaml">
