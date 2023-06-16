@@ -1,5 +1,6 @@
 ﻿
 using Display.ContentsPage.SearchLink;
+using Display.Controls;
 using Display.Data;
 using Display.Helper;
 using Display.Models;
@@ -643,6 +644,13 @@ namespace Display
 
 
             window.Activate();;
+        }
+
+        private void CtrlF_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+        {
+            if (args.Element is not CustomAutoSuggestBox suggestionBox) return;
+
+            suggestionBox.Focus(FocusState.Programmatic);
         }
     }
 }

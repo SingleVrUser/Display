@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml;
 using System.Diagnostics;
 using Display.ContentsPage.Sort115;
 using Display.Controls;
+using System.Net.Http;
 
 namespace Display.ViewModels
 {
@@ -41,17 +42,16 @@ namespace Display.ViewModels
         [NotifyPropertyChangedFor(nameof(MultipleVideoNameSample))]
         private string _multipleVideoNameFormat = "[{番号}] {标题} {演员} {分隔符}{序号}";
 
-        public Sort115Settings Settings;
-        public void SetSettings(Sort115Settings settings)
-        {
-            Settings = settings;
-        }
+        private Sort115Settings _settings;
+
+        public Sort115Settings Settings => _settings ??= Settings18Page.Settings;
 
         private Settings18Page _currentPage;
 
         public void SetPage(Settings18Page currentPage)
         {
             _currentPage = currentPage;
+
         }
 
         public string NumNameSample => GetNumNameSample(NumNameFormat, NumNameFormatSelectedIndex);
@@ -97,39 +97,50 @@ namespace Display.ViewModels
         }
 
         [RelayCommand]
-        private void ChangedSingleVideoSaveExplorerItemAsync()
+        private void ChangedSingleVideoSaveExplorerItem()
         {
             var contentPage = new SelectedFolderPage();
 
+            var newContentDialog = CreateSelectedFolderDialog(contentPage);
+
+            newContentDialog.PrimaryButtonClick += (_, _) =>
+            {
+                Debug.WriteLine("点击了确定");
+                Settings.SingleVideoSaveExplorerItem = contentPage.GetCurrentFolder();
+            };
+        }
+
+        [RelayCommand]
+        private void ChangedMultipleVideoSaveExplorerItem()
+        {
+            var contentPage = new SelectedFolderPage();
+
+            var newContentDialog =  CreateSelectedFolderDialog(contentPage);
+
+            newContentDialog.PrimaryButtonClick += (_, _) =>
+            {
+                Debug.WriteLine("点击了确定");
+                Settings.MultipleVideoSaveExplorerItem = contentPage.GetCurrentFolder();
+            };
+        }
+
+        private CustomContentDialog CreateSelectedFolderDialog(SelectedFolderPage contentPage)
+        {
             var tmpContent = _currentPage.Content;
 
             var newContentDialog = new CustomContentDialog(contentPage);
 
-            newContentDialog.PrimaryButtonClick += (_,_) =>
+            var cancelHandler = new EventHandler<RoutedEventArgs>((_,_) =>
             {
-                Debug.WriteLine("点击了确定");
-
                 _currentPage.Content = tmpContent;
-            };
+            });
 
-            newContentDialog.CancelButtonClick += (_,_) =>
-            {
-                Debug.WriteLine("点击了退出");
-
-                _currentPage.Content = tmpContent;
-            };
-
+            newContentDialog.PrimaryButtonClick += cancelHandler;
+            newContentDialog.CancelButtonClick += cancelHandler;
 
             _currentPage.Content = newContentDialog;
 
-
-            //var result = await contentPage.ShowContentDialogResult(_currentPage.XamlRoot);
-
-            //if (result != ContentDialogResult.Primary) return;
-
-            //var explorerItem = contentPage.GetCurrentFolder();
-            //Debug.WriteLine($"当前选中：{explorerItem.Name}({explorerItem.Cid})");
+            return newContentDialog;
         }
-
     }
 }

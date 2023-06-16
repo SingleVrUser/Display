@@ -11,9 +11,21 @@ namespace Display.ContentsPage.Sort115
     {
         private const string SettingsFile = "sort115.xml";
 
-        public Sort115Settings Settings;
+        private static Sort115Settings _settings;
 
-        internal void EnsureSettings()
+        public static Sort115Settings Settings
+        {
+            get{
+                if (_settings == null)
+                {
+                    EnsureSettings();
+                }
+
+                return _settings;
+            }
+        }
+
+        private static void EnsureSettings()
         {
             try
             {
@@ -21,30 +33,47 @@ namespace Display.ContentsPage.Sort115
 
                 if (applicationData == null)
                 {
-                    Settings = null;
+                    _settings = null;
                 }
                 else
                 {
                     var serializer = new XmlSerializer(typeof(Sort115Settings));
-                    Settings = serializer.Deserialize(new StringReader(applicationData.ToString() ?? string.Empty)) as Sort115Settings;
+                    _settings = serializer.Deserialize(new StringReader(applicationData.ToString() ?? string.Empty)) as Sort115Settings;
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"发生错误：{ex.Message}");
+                Debug.WriteLine($"保存Sort115Settings时发生错误：{ex.Message}");
 
-                Settings = null;
+                _settings = null;
                 ApplicationData.Current.LocalSettings.Values.Remove(SettingsFile);
             }
 
-            Settings ??= new Sort115Settings();
+            _settings ??= new Sort115Settings();
 
-            Settings.PropertyChanged += Settings_PropertyChanged;
+            _settings.PropertyChanged += Settings_PropertyChanged;
         }
 
-        private void Settings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private static void Settings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            Debug.WriteLine("Settings改变了");
+            //Debug.WriteLine("Settings改变了");
+            SaveSettings();
+        }
+
+        public static void SaveSettings()
+        {
+            try
+            {
+                var serializer = new XmlSerializer(typeof(Sort115Settings));
+                var stringWriter = new StringWriter();
+                serializer.Serialize(stringWriter, Settings);
+                var applicationData = stringWriter.ToString();
+                ApplicationData.Current.LocalSettings.Values[SettingsFile] = applicationData;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"保存Sort115Settings时发生错误：{ex.Message}");
+            }
         }
     }
 }

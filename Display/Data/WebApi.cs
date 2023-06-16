@@ -709,6 +709,8 @@ namespace Display.Data
         /// <returns></returns>
         public async Task MoveFiles(string pid, List<string> fids)
         {
+            if (fids is not { Count: > 0 }) return;
+
             var values = new Dictionary<string, string>
             {
                 { "pid", pid},

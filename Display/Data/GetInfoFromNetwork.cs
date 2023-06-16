@@ -42,10 +42,6 @@ namespace Display.Data
 
         public static string UserAgent = Const.DownUserAgent;
 
-        public GetInfoFromNetwork()
-        {
-        }
-
         //public static string BuilderMediaElementUserAgent()
         //{
         //    string build = Environment.OSVersion.Version.Build.ToString();

@@ -185,10 +185,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
         private Status _status = Status.beforeStart;
         public Status Status
         {
-            get
-            {
-                return _status;
-            }
+            get => _status;
             set
             {
                 _status = value;

@@ -194,7 +194,7 @@
             </ScrollViewer>
         </PivotItem>
 
-        <PivotItem Header="存放目录">
+        <PivotItem Header="目录">
             <ScrollViewer>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -225,18 +225,28 @@
                     <!--标题-->
                     <TextBlock Grid.Row="0"
                                Grid.Column="1"
-                               Style="{StaticResource RowTextBlockStyle}">规则</TextBlock>
+                               Style="{StaticResource RowTextBlockStyle}">存放目录</TextBlock>
+
 
                     <TextBlock Grid.Row="1"
                                Grid.Column="0"
-                               Style="{StaticResource RowTextBlockStyle}">文件夹（单集）</TextBlock>
-
+                               Style="{StaticResource RowTextBlockStyle}">文件夹 (单集)</TextBlock>
                     <TextBox Grid.Row="1"
                              Grid.Column="1"
                              Text="{x:Bind ViewModel.Settings.SingleVideoSaveExplorerItem.Name,Mode=OneWay}"
+                             IsReadOnly="True"
                              Style="{StaticResource ValueTextBoxStyle}" />
+                    <Button Grid.Row="1" Grid.Column="2" Content="修改" Command="{x:Bind ViewModel.ChangedSingleVideoSaveExplorerItemCommand}"/>
 
-                    <Button Grid.Row="1" Grid.Column="2" Content="修改" Command="{x:Bind ViewModel.ChangedSingleVideoSaveExplorerItemAsyncCommand}"/>
+                    <TextBlock Grid.Row="2"
+                               Grid.Column="0"
+                               Style="{StaticResource RowTextBlockStyle}">文件夹 (多集)</TextBlock>
+                    <TextBox Grid.Row="2"
+                             Grid.Column="1"
+                             Text="{x:Bind ViewModel.Settings.MultipleVideoSaveExplorerItem.Name,Mode=OneWay}"
+                             IsReadOnly="True"
+                             Style="{StaticResource ValueTextBoxStyle}" />
+                    <Button Grid.Row="2" Grid.Column="2" Content="修改" Command="{x:Bind ViewModel.ChangedMultipleVideoSaveExplorerItemCommand}"/>
                 </Grid>
             </ScrollViewer>
         </PivotItem>

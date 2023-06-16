@@ -884,22 +884,24 @@ namespace Display.Data
 
         public Datum datum;
 
+
+        private string _iconPath;
         public string IconPath
         {
             get
             {
-                return getFileIcon(Type);
+                if (_iconPath != null) return _iconPath;
+                _iconPath = getFileIcon(Type);
+
+                return _iconPath;
             }
-            set
-            {
-                IconPath = value;
-            }
+            set => _iconPath = value;
         }
 
         private bool m_isExpanded;
         public bool IsExpanded
         {
-            get { return m_isExpanded; }
+            get => m_isExpanded;
             set
             {
                 if (m_isExpanded != value)

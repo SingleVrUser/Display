@@ -83,8 +83,9 @@ namespace MediaPlayerElement_Test.Models
                 return;
             }
 
-            Debug.WriteLine("开始销毁_inputStream");
             _isDisposing = true;
+
+            Debug.WriteLine("开始销毁_inputStream");
             
             _inputStream?.Dispose();
             _inputStream = null;
@@ -101,11 +102,11 @@ namespace MediaPlayerElement_Test.Models
                 return default;
             }
 
-            return AsyncInfo.Run<IBuffer, uint>(async (cancellationToken, progress) =>
+            var result = AsyncInfo.Run<IBuffer, uint>(async (cancellationToken, progress) =>
             {
                 if (_isDisposing)
                 {
-                    return default;
+                    return null;
                 }
 
                 progress.Report(0);
@@ -122,12 +123,15 @@ namespace MediaPlayerElement_Test.Models
                 catch (Exception ex)
                 {
                     Debug.WriteLine(ex);
+
+                    return default;
                 }
 
                 if (_inputStream == null || _isDisposing)
                 {
                     Debug.WriteLine("尝试获取_inputStream后依旧未为空，返回默认值");
-                    return default;
+
+                    return null;
                 }
 
                 try
@@ -146,6 +150,8 @@ namespace MediaPlayerElement_Test.Models
 
                 return default;
             });
+
+            return result;
         }
 
         public IAsyncOperation<bool> FlushAsync()

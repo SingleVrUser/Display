@@ -37,7 +37,14 @@
                     <customcontrols:CustomAutoSuggestBox Grid.Column="2"
                                                          HorizontalAlignment="Right"
                                                          SuggestionChosen="SuggestionChosen"
-                                                         QuerySubmitted="CustomAutoSuggestBox_QuerySubmitted" />
+                                                         QuerySubmitted="CustomAutoSuggestBox_QuerySubmitted">
+
+                        <customcontrols:CustomAutoSuggestBox.KeyboardAccelerators>
+                            <KeyboardAccelerator Key="F"
+                                                 Modifiers="Control"
+                                                 Invoked="CtrlF_Invoked" />
+                        </customcontrols:CustomAutoSuggestBox.KeyboardAccelerators>
+                    </customcontrols:CustomAutoSuggestBox>
                 </Grid>
             </DataTemplate>
         </Grid.Resources>
@@ -75,11 +82,20 @@
                        Style="{ThemeResource BodyStrongTextBlockStyle}"
                        VerticalAlignment="Center"/>
 
-            <customcontrols:CustomAutoSuggestBox x:Name="CustomAutoSuggestBox" Grid.Column="2"
+            <customcontrols:CustomAutoSuggestBox x:Name="CustomAutoSuggestBox"
+                                                 Grid.Column="2"
                                                  SuggestionChosen="SuggestionChosen"
-                                                 QuerySubmitted="CustomAutoSuggestBox_QuerySubmitted"/>
+                                                 QuerySubmitted="CustomAutoSuggestBox_QuerySubmitted">
 
-            <!--<Button Grid.Column="2" Content="测试" Click="ButtonBase_OnClick" HorizontalAlignment="Center"/>-->
+                <customcontrols:CustomAutoSuggestBox.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="F"
+                                         Modifiers="Control"
+                                         Invoked="CtrlF_Invoked" />
+                </customcontrols:CustomAutoSuggestBox.KeyboardAccelerators>
+            </customcontrols:CustomAutoSuggestBox>
+            
+
+                <!--<Button Grid.Column="2" Content="测试" Click="ButtonBase_OnClick" HorizontalAlignment="Center"/>-->
         </Grid>
 
         <NavigationView x:Name="NavView"

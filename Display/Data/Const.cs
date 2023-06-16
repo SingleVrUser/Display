@@ -14,6 +14,4 @@ public static class Const
     public const string UploadAppVersion = "25.0.6.5";
     public const string UploadUserAgent = $"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 115Browser/{UploadAppVersion}";
 
-
-
 }
