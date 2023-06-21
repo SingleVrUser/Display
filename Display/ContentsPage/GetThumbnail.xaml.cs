@@ -88,14 +88,15 @@ namespace Display.ContentsPage
                     }
                     else
                     {
-                        ContentDialog dialog = new ContentDialog();
-
-                        dialog.XamlRoot = this.XamlRoot;
-                        dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
-                        dialog.Title = "未找到训练模型";
-                        dialog.CloseButtonText = "返回";
-                        dialog.DefaultButton = ContentDialogButton.Close;
-                        dialog.Content = "未找到模型文件，需要下载指定训练模型并存放到相应路径，才能继续此操作";
+                        ContentDialog dialog = new ContentDialog
+                        {
+                            XamlRoot = XamlRoot,
+                            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+                            Title = "未找到训练模型",
+                            CloseButtonText = "返回",
+                            DefaultButton = ContentDialogButton.Close,
+                            Content = "未找到模型文件，需要下载指定训练模型并存放到相应路径，才能继续此操作"
+                        };
 
                         await dialog.ShowAsync();
 

@@ -23,6 +23,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
+using Microsoft.UI.Dispatching;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -150,7 +151,10 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         // 只有文件能双击，文件夹Click后就跳转到新页面了
         var mediaPlayItem = new MediaPlayItem(info.datum.pc, info.Name, info.Type);
-        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
+
+        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal,
+           () => _ = PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this));
+
     }
 
     private async void ChangedFolder(FilesInfo filesInfo)
@@ -434,9 +438,10 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         if (e.DataView.Properties.Values.FirstOrDefault() is not List<FilesInfo> sourceFilesInfos) return;
 
         //115删除
-        ContentDialog dialog = new ContentDialog()
+        var dialog = new ContentDialog()
         {
-            XamlRoot = this.XamlRoot,
+            XamlRoot = XamlRoot,
+            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
             Title = "确认",
             PrimaryButtonText = "删除",
             CloseButtonText = "返回",
@@ -705,14 +710,16 @@ public sealed partial class FileListPage : INotifyPropertyChanged
                 Margin = new Thickness(0, 8, 0, 0)
             });
 
-        ContentDialog dialog = new ContentDialog();
-
-        dialog.XamlRoot = this.XamlRoot;
-        dialog.Title = "确认后继续";
-        dialog.PrimaryButtonText = "继续";
-        dialog.CloseButtonText = "取消";
-        dialog.DefaultButton = ContentDialogButton.Primary;
-        dialog.Content = readyStackPanel;
+        ContentDialog dialog = new ContentDialog
+        {
+            XamlRoot = XamlRoot,
+            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+            Title = "确认后继续",
+            PrimaryButtonText = "继续",
+            CloseButtonText = "取消",
+            DefaultButton = ContentDialogButton.Primary,
+            Content = readyStackPanel
+        };
 
         var result = await dialog.ShowAsync();
 
@@ -723,7 +730,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         var dialog = new ContentDialog
         {
-            XamlRoot = this.XamlRoot,
+            XamlRoot = XamlRoot,
+            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
             Title = "确认后继续",
             PrimaryButtonText = "继续",
             CloseButtonText = "取消",
@@ -853,7 +861,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         if (sender is not MenuFlyoutItem menuFlyoutItem) return;
         if (menuFlyoutItem is not { Tag: string aTag }) return;
         if (!int.TryParse(aTag, out var playerSelection)) return;
-        await Task.Delay(1);
 
         // 多个播放
         if (menuFlyoutItem.DataContext is null)
@@ -881,7 +888,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         if (info.Type == FilesInfo.FileType.Folder || info.datum.iv != 1) return;
 
         var mediaPlayItem = new MediaPlayItem(info.datum.pc, info.Name, info.Type, info.Cid);
-        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this, playerSelection: playerSelection);
+
+        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this, playerSelection: playerSelection);
     }
 
     private async void MoveToNewFolderItemClick(object sender, RoutedEventArgs e)

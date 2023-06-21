@@ -697,15 +697,17 @@ namespace Display.ContentsPage.SpiderVideoInfo
             args.Handled = true;
             var window = (sender as Window);
 
-            ContentDialog dialog = new ContentDialog();
-
-            // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
-            dialog.XamlRoot = this.XamlRoot;
-            dialog.Title = "确认";
-            dialog.PrimaryButtonText = "关闭";
-            dialog.CloseButtonText = "返回";
-            dialog.DefaultButton = ContentDialogButton.Primary;
-            dialog.Content = "关闭窗口后将取消当前任务，是否继续关闭";
+            ContentDialog dialog = new ContentDialog
+            {
+                // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
+                XamlRoot = XamlRoot,
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+                Title = "确认",
+                PrimaryButtonText = "关闭",
+                CloseButtonText = "返回",
+                DefaultButton = ContentDialogButton.Primary,
+                Content = "关闭窗口后将取消当前任务，是否继续关闭"
+            };
 
             var result = await dialog.ShowAsync();
             if (result == ContentDialogResult.Primary)
@@ -746,15 +748,16 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// <param Name="e"></param>
         private async void askLookFailResult_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            ContentDialog dialog = new ContentDialog();
-
-            // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
-
-            dialog.XamlRoot = this.XamlRoot;
-            //dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
-            dialog.Title = "失败列表";
-            dialog.CloseButtonText = "返回";
-            dialog.DefaultButton = ContentDialogButton.Close;
+            ContentDialog dialog = new ContentDialog
+            {
+                // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
+                XamlRoot = XamlRoot,
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+                //dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
+                Title = "失败列表",
+                CloseButtonText = "返回",
+                DefaultButton = ContentDialogButton.Close
+            };
 
             var ContentGrid = new Grid();
             ContentGrid.Children.Add(new ListView() { ItemsSource = FailVideoNameList });

@@ -61,6 +61,7 @@ namespace Display.ContentsPage
             var dialog = new ContentDialog()
             {
                 XamlRoot = xamlRoot,
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
                 CloseButtonText = "返回",
                 DefaultButton = ContentDialogButton.Close,
                 Content = content

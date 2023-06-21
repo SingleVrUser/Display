@@ -528,6 +528,7 @@ namespace Display
             var contentDialog = new ContentDialog
             {
                 XamlRoot = this.RootGrid.XamlRoot,
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
                 Title = "添加链接任务",
                 PrimaryButtonText = "开始下载",
                 CloseButtonText = "取消",
@@ -602,6 +603,7 @@ namespace Display
             var contentDialog = new ContentDialog
             {
                 XamlRoot = RootGrid.XamlRoot,
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
                 Title = "下载任务失败列表",
                 PrimaryButtonText = "重试",
                 CloseButtonText = "返回",

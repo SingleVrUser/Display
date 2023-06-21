@@ -565,7 +565,6 @@ namespace Display.Data
             return items.OrderBy(i => regex.Replace(selector(i), match => match.Value.PadLeft(maxDigits, '0')), stringComparer ?? StringComparer.CurrentCulture);
         }
 
-
         public static Tuple<string, string> SpliteLeftAndRightFromCid(string cid)
         {
             string[] splitList = cid.Split(new char[] { '-', '_' });

@@ -248,16 +248,17 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                     Margin = new Thickness(0, 8, 0, 0)
                 });
 
-            ContentDialog dialog = new ContentDialog();
-
-            // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
-            dialog.XamlRoot = this.XamlRoot;
-            //dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
-            dialog.Title = "确认后继续";
-            dialog.PrimaryButtonText = "继续";
-            dialog.CloseButtonText = "取消";
-            dialog.DefaultButton = ContentDialogButton.Primary;
-            dialog.Content = readyStackPanel;
+            var dialog = new ContentDialog
+            {
+                // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
+                XamlRoot = XamlRoot,
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+                Title = "确认后继续",
+                PrimaryButtonText = "继续",
+                CloseButtonText = "取消",
+                DefaultButton = ContentDialogButton.Primary,
+                Content = readyStackPanel
+            };
 
             var result = await dialog.ShowAsync();
 
@@ -273,15 +274,16 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
         private async void deleData_Click(object sender, RoutedEventArgs e)
         {
-            ContentDialog dialog = new ContentDialog();
-
-            // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
-            dialog.XamlRoot = this.XamlRoot;
-            //dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
-            dialog.Title = "确认后继续";
-            dialog.PrimaryButtonText = "继续";
-            dialog.CloseButtonText = "取消";
-            dialog.DefaultButton = ContentDialogButton.Close;
+            var dialog = new ContentDialog
+            {
+                // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
+                XamlRoot = XamlRoot,
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+                Title = "确认后继续",
+                PrimaryButtonText = "继续",
+                CloseButtonText = "取消",
+                DefaultButton = ContentDialogButton.Close
+            };
 
             RichTextBlock TextHighlightingRichTextBlock = new();
 

@@ -127,7 +127,8 @@ namespace Display.Views
         {
             ContentDialog dialog = new ContentDialog();
 
-            dialog.XamlRoot = this.XamlRoot;
+            dialog.XamlRoot = XamlRoot;
+            dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
             dialog.Title = "确认删除";
             dialog.PrimaryButtonText = "确认";
             dialog.CloseButtonText = "返回";
@@ -207,7 +208,8 @@ namespace Display.Views
             //提醒修改数据文件
             var dialog = new ContentDialog
             {
-                XamlRoot = this.XamlRoot,
+                XamlRoot = XamlRoot,
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
                 Title = "提醒",
                 PrimaryButtonText = "修改",
                 CloseButtonText = "不修改"
@@ -258,7 +260,8 @@ namespace Display.Views
             //提醒修改数据文件
             var dialog = new ContentDialog
             {
-                XamlRoot = this.XamlRoot,
+                XamlRoot = XamlRoot,
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
                 Title = "提醒",
                 PrimaryButtonText = "修改",
                 CloseButtonText = "不修改"

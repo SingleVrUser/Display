@@ -83,7 +83,8 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             var dialog = new ContentDialog
             {
                 // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
-                XamlRoot = this.XamlRoot,
+                XamlRoot = XamlRoot,
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
                 Title = "确认",
                 PrimaryButtonText = "关闭",
                 CloseButtonText = "返回",
@@ -306,7 +307,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                 ContentDialog dialog = new ContentDialog();
 
                 // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
-                dialog.XamlRoot = this.XamlRoot;
+                dialog.XamlRoot = XamlRoot;
                 dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
                 dialog.Title = "确认";
                 dialog.PrimaryButtonText = "确认返回";

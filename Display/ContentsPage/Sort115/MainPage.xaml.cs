@@ -13,7 +13,6 @@ using Windows.ApplicationModel.DataTransfer;
 using Display.Data;
 using Display.Models;
 using SpiderInfo = Display.Models.SpiderInfo;
-using Org.BouncyCastle.Asn1.X509;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -112,6 +111,7 @@ public sealed partial class MainPage : Page
         var result = await new ContentDialog()
         {
             XamlRoot = XamlRoot,
+            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
             Title = "设置",
             PrimaryButtonText = "保存",
             CloseButtonText = "返回",
@@ -122,7 +122,7 @@ public sealed partial class MainPage : Page
                 // 使用更大的 MaxWidth
                 ["ContentDialogMaxWidth"] = 700
             }
-        }.ShowAsync();
+        }.ShowAsync(); 
 
         if (result == ContentDialogResult.Primary)
         {

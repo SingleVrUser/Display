@@ -18,6 +18,7 @@ using SharpCompress.Readers;
 using static System.Int32;
 using System.Reflection.PortableExecutable;
 using Windows.System.Profile;
+using System.Web;
 
 namespace Display.Spider
 {
@@ -171,7 +172,7 @@ namespace Display.Spider
                 var downLink = attmnA.GetAttributeValue("href", string.Empty);
                 if (string.IsNullOrEmpty(downLink)) continue;
 
-                downLink = downLink.Replace("&amp;", "&");
+                downLink = HttpUtility.HtmlDecode(downLink);
                 var name = attmnA.InnerText.Trim();
 
                 var attmnType = GetAttmnTypeFromName(name);
@@ -337,7 +338,7 @@ namespace Display.Spider
                 var detailUrl = titleNode.GetAttributeValue("href",null);
                 if(detailUrl == null) continue;
 
-                detailUrl = detailUrl.Replace("&amp;", "&");
+                detailUrl = HttpUtility.HtmlDecode(detailUrl);
 
                 detailUrlInfos.Add(GetForum1080FromNode(pbwNode, title,detailUrl));
             }
@@ -349,7 +350,7 @@ namespace Display.Spider
             var nextPageNode = htmlDoc.DocumentNode.SelectSingleNode(".//a[@class='nxt']");
             if (nextPageNode != null)
             {
-                nextPageUrl = nextPageNode.GetAttributeValue("href", string.Empty).Replace("&amp;","&");
+                nextPageUrl = HttpUtility.HtmlDecode(nextPageNode.GetAttributeValue("href", string.Empty));
             }
 
             return new Tuple<List<Forum1080SearchResult>, string>(detailUrlInfos, nextPageUrl);

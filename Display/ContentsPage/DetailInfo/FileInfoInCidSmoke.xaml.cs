@@ -58,6 +58,7 @@ namespace Display.ContentsPage.DetailInfo
             var dialog = new ContentDialog
             {
                 XamlRoot = XamlRoot,
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
                 Title = "确认",
                 PrimaryButtonText = "删除",
                 CloseButtonText = "返回",

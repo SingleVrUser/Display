@@ -211,7 +211,8 @@ namespace Display.Views
                 button.IsEnabled = true;
                 ContentDialog dialog = new ContentDialog()
                 {
-                    XamlRoot = this.XamlRoot,
+                    XamlRoot = XamlRoot,
+                    Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
                     Title = "访问出错",
                     Content = $"{baseUrl} 不可访问，请检查网络设置",
                     CloseButtonText = "返回"
