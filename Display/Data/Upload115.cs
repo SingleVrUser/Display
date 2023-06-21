@@ -21,6 +21,7 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using HttpHeaders = Aliyun.OSS.Util.HttpHeaders;
 
 namespace Display.Data
@@ -266,7 +267,7 @@ namespace Display.Data
             {
                 {"appid", "0"},
                 {"appversion", AppVer},
-                {"filename", fileName},
+                {"filename", HttpUtility.UrlEncode(fileName, Encoding.UTF8)},
                 {"filesize", fileSize.ToString()},
                 {"fileid", fileId},
                 {"target", target},

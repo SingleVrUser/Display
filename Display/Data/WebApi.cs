@@ -1138,8 +1138,10 @@ namespace Display.Data
             var uriDown = new Uri(url);
 
             // Set the option to show a warning
-            var options = new Windows.System.LauncherOptions();
-            options.DesiredRemainingView = Windows.UI.ViewManagement.ViewSizePreference.UseLess;
+            var options = new Windows.System.LauncherOptions
+            {
+                DesiredRemainingView = Windows.UI.ViewManagement.ViewSizePreference.UseLess
+            };
 
             // Launch the URI
             var success = await Windows.System.Launcher.LaunchUriAsync(uriDown, options);
@@ -2176,6 +2178,7 @@ namespace Display.Data
                 var dialog = new ContentDialog()
                 {
                     XamlRoot = xamlRoot,
+                    Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
                     Title = "播放失败",
                     CloseButtonText = "返回",
                     DefaultButton = ContentDialogButton.Close,

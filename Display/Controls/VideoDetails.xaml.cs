@@ -180,9 +180,9 @@ namespace Display.Controls
             var dialog = new ContentDialog
             {
                 // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
-                XamlRoot = this.XamlRoot,
-                Content = downDialogContent,
+                XamlRoot = XamlRoot,
                 Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+                Content = downDialogContent,
                 Title = "下载",
                 PrimaryButtonText = "下载全部",
                 SecondaryButtonText = "下载选中项",

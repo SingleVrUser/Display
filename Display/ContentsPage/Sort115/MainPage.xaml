@@ -297,15 +297,6 @@
                             </DataTemplate>
                         </ListView.HeaderTemplate>
 
-                        <!--<ListView.ItemContainerStyle>
-                            <Style TargetType="GridViewItem">
-                                <Setter Property="HorizontalContentAlignment"
-                                        Value="Stretch" />
-                                <Setter Property="Margin"
-                                        Value="10,5" />
-                            </Style>
-                        </ListView.ItemContainerStyle>-->
-
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="models:Sort115HomeModel">
                                 <Grid Height="48"

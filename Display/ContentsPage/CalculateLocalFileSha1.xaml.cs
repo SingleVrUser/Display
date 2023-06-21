@@ -35,7 +35,7 @@ namespace Display.ContentsPage
 
         private void Grid_DragOver(object sender, DragEventArgs e)
         {
-            e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Link;
+            e.AcceptedOperation = DataPackageOperation.Link;
 
             e.DragUIOverride.Caption = "拖拽开始获取sha1";
 
@@ -133,32 +133,31 @@ namespace Display.ContentsPage
             //CancellationTokenSource tokenSource = new CancellationTokenSource();
 
             //文件大小
-            System.IO.FileInfo file = new System.IO.FileInfo(filePath);
+            var file = new FileInfo(filePath);
 
             var size = file.Length;
 
-            using (var stream = File.Open(filePath, FileMode.Open))
-            {
-                //前一部分Sha1
-                int bufferSize = 128 * 1024; //每次读取的字节数
-                byte[] buffer = new byte[bufferSize];
-                var item = stream.Read(buffer, 0, bufferSize);
-                Stream partStream = new MemoryStream(buffer);
-                var hashDlg = SHA1.Create();
+            await using var stream = File.Open(filePath, FileMode.Open);
 
-                //byte[] hashBytes = await hashDlg.ComputeHashAsync(partStream, tokenSource.Token);
-                byte[] hashBytes = await hashDlg.ComputeHashAsync(partStream);
-                var partSha1 = Convert.ToHexString(hashBytes);
+            //前一部分Sha1
+            int bufferSize = 128 * 1024; //每次读取的字节数
+            byte[] buffer = new byte[bufferSize];
+            var item = stream.Read(buffer, 0, bufferSize);
+            Stream partStream = new MemoryStream(buffer);
+            var hashDlg = SHA1.Create();
 
-                //全部Sha1
-                stream.Seek(0, SeekOrigin.Begin);
-                //hashBytes = await hashDlg.ComputeHashAsync(stream, tokenSource.Token);
-                hashBytes = await hashDlg.ComputeHashAsync(stream);
+            //byte[] hashBytes = await hashDlg.ComputeHashAsync(partStream, tokenSource.Token);
+            byte[] hashBytes = await hashDlg.ComputeHashAsync(partStream);
+            var partSha1 = Convert.ToHexString(hashBytes);
 
-                var allSha1 = Convert.ToHexString(hashBytes);
+            //全部Sha1
+            stream.Seek(0, SeekOrigin.Begin);
+            //hashBytes = await hashDlg.ComputeHashAsync(stream, tokenSource.Token);
+            hashBytes = await hashDlg.ComputeHashAsync(stream);
 
-                shareSha1Link = $"115://{Path.GetFileName(filePath)}|{size}|{allSha1}|{partSha1}";
-            }
+            var allSha1 = Convert.ToHexString(hashBytes);
+
+            shareSha1Link = $"115://{Path.GetFileName(filePath)}|{size}|{allSha1}|{partSha1}";
 
             return shareSha1Link;
         }

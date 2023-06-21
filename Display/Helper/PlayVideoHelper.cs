@@ -37,6 +37,7 @@ public class PlayVideoHelper
             var dialog = new ContentDialog()
             {
                 XamlRoot = xamlRoot,
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
                 Title = "播放失败",
                 CloseButtonText = "返回",
                 DefaultButton = ContentDialogButton.Close,
