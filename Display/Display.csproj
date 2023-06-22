@@ -75,7 +75,6 @@
     <None Remove="ContentsPage\FileInfoInCidSmoke.xaml" />
     <None Remove="ContentsPage\FindInfoAgainSmoke.xaml" />
     <None Remove="ContentsPage\GetThumbnail.xaml" />
-    <None Remove="ContentsPage\Import115DataToLocalDataAccess\InputCidManually.xaml" />
     <None Remove="ContentsPage\InfoPage.xaml" />
     <None Remove="ContentsPage\LoginPage.xaml" />
     <None Remove="ContentsPage\OfflineDown\FailListPage.xaml" />
@@ -409,9 +408,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Control\TextBlockWithStressText.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="ContentsPage\Import115DataToLocalDataAccess\InputCidManually.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="ContentsPage\UpdateImagePath.xaml">

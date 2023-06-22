@@ -65,10 +65,10 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="{x:Bind sys:String.Format('选中的文件夹数量：{0}',folderNameList.Count)}" />
+                <TextBlock Text="{x:Bind sys:String.Format('选中的文件数量：{0}',_selectedFilesNameList.Count)}" />
 
                 <ListView Grid.Row="1"
-                          ItemsSource="{x:Bind folderNameList}"
+                          ItemsSource="{x:Bind _selectedFilesNameList}"
                           SelectionMode="None">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="x:String">
@@ -80,7 +80,7 @@
 
             <!--文件类型数量分析-->
             <Grid Style="{StaticResource GridWithBrush}"
-                  Grid.Column="2">
+                  Grid.Row="0" Grid.Column="2">
                 <StackPanel x:Name="FileInfoPieChart"
                             Visibility="Collapsed"
                             Padding="0,5,0,0">

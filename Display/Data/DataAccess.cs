@@ -585,40 +585,39 @@ namespace Display.Data
         /// <param Name="data"></param>
         public static async Task AddFilesInfoAsync(Datum data)
         {
-            using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+            await using var db =
+                new SqliteConnection($"Filename={dbpath}");
+
+            db.Open();
+
+            SqliteCommand insertCommand = new SqliteCommand();
+            insertCommand.Connection = db;
+
+            // Use parameterized query to prevent SQL injection attacks
+
+            List<string> keyList = new List<string>();
+            foreach (var item in data.GetType().GetProperties())
             {
-                db.Open();
+                //fl为数组，应添加进新表中，一对多。目前暂不考虑，故跳过
+                if (item.Name == "fl") continue;
 
-                SqliteCommand insertCommand = new SqliteCommand();
-                insertCommand.Connection = db;
-
-                // Use parameterized query to prevent SQL injection attacks
-
-                List<string> keyList = new List<string>();
-                foreach (var item in data.GetType().GetProperties())
-                {
-                    //fl为数组，应添加进新表中，一对多。目前暂不考虑，故跳过
-                    if (item.Name == "fl") continue;
-
-                    keyList.Add($"@{item.Name}");
-                }
-
-                //唯一值（pc）重复 则代替 （replace）
-                insertCommand.CommandText = $"INSERT OR REPLACE INTO FilesInfo VALUES ({string.Join(",", keyList)});";
-
-                foreach (var item in data.GetType().GetProperties())
-                {
-                    //fl为数组，应添加进新表中，一对多。目前暂不考虑，故跳过
-                    if (item.Name == "fl") continue;
-
-                    insertCommand.Parameters.AddWithValue("@" + item.Name, $"{item.GetValue(data)}");
-                }
-
-                await insertCommand.ExecuteNonQueryAsync();
-
-                db.Close();
+                keyList.Add($"@{item.Name}");
             }
+
+            //唯一值（pc）重复 则代替 （replace）
+            insertCommand.CommandText = $"INSERT OR REPLACE INTO FilesInfo VALUES ({string.Join(",", keyList)});";
+
+            foreach (var item in data.GetType().GetProperties())
+            {
+                //fl为数组，应添加进新表中，一对多。目前暂不考虑，故跳过
+                if (item.Name == "fl") continue;
+
+                insertCommand.Parameters.AddWithValue("@" + item.Name, $"{item.GetValue(data)}");
+            }
+
+            await insertCommand.ExecuteNonQueryAsync();
+
+            db.Close();
         }
 
         /// <summary>
@@ -2301,34 +2300,32 @@ namespace Display.Data
         {
             string pid = string.Empty;
 
-            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
-            using (SqliteConnection db =
-            new SqliteConnection($"Filename={dbpath}"))
+            using SqliteConnection db =
+                new SqliteConnection($"Filename={dbpath}");
+
+            db.Open();
+
+            var selectCommand = new SqliteCommand
+                ($"SELECT pid FROM FilesInfo WHERE pc == '{pickCode}' and te == '{timeEdit}'", db);
+
+            if (timeEdit == 0)
             {
-                db.Open();
-
-                SqliteCommand selectCommand = new SqliteCommand
-                    ($"SELECT pid FROM FilesInfo WHERE pc == '{pickCode}' and te == '{timeEdit}'", db);
-
-                if (timeEdit == 0)
-                {
-                    selectCommand = new SqliteCommand
-                        ($"SELECT pid FROM FilesInfo WHERE pc == '{pickCode}'", db);
-                }
-
-                SqliteDataReader query = selectCommand.ExecuteReader();
-
-                while (query.Read())
-                {
-                    if (query.FieldCount != 0)
-                    {
-                        pid = query["pid"] as string;
-                        break;
-                    }
-                }
-
-                db.Close();
+                selectCommand = new SqliteCommand
+                    ($"SELECT pid FROM FilesInfo WHERE pc == '{pickCode}'", db);
             }
+
+            var query = selectCommand.ExecuteReader();
+
+            while (query.Read())
+            {
+                if (query.FieldCount != 0)
+                {
+                    pid = query["pid"] as string;
+                    break;
+                }
+            }
+
+            db.Close();
 
             return pid;
         }
@@ -2788,7 +2785,8 @@ namespace Display.Data
                 //文件夹
                 if (string.IsNullOrEmpty(currentFile.fid))
                 {
-                    List<Datum> newDataList = GetListByCid(currentFile.cid);
+                    // 获取当前文件夹下所有的文件夹和文件
+                    var newDataList = GetListByCid(currentFile.cid);
 
                     var fileInFolderList = GetAllFilesInFolderList(newDataList);
 
@@ -2799,6 +2797,11 @@ namespace Display.Data
             newData.AddRange(dataList);
 
             return newData;
+        }
+
+        public static async Task<List<Datum>> GetAllFilesInFolderListAsync(List<Datum> dataList)
+        {
+            return await Task.Run(() => GetAllFilesInFolderList(dataList));
         }
 
         /// <summary>

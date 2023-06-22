@@ -198,7 +198,7 @@ namespace Display.Models
             {
                 if (playItem.Type == FilesInfo.FileType.Folder)
                 {
-                    var fileInfos = await webApi.GetFileAsync(playItem.Cid, LoadAll: true);
+                    var fileInfos = await webApi.GetFileAsync(playItem.Cid, loadAll: true);
                     
                     newMediaPlayItems.AddRange(
                         fileInfos.data

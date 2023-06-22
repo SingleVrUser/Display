@@ -135,7 +135,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
         }
 
         //创建进度窗口
-        var page = new ContentsPage.SpiderVideoInfo.Progress(failDatums);
+        var page = new Progress(failDatums);
         page.CreateWindow();
     }
 
@@ -158,26 +158,26 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
             return;
         }
 
-        //获取需要搜刮的文件
+        //获取需要搜刮的文件夹
         var tuple = GetCurrentSelectedFolder();
-        var folderNameList = tuple.Item1;
-        var datumList = tuple.Item2;
+        var selectedFilesNameList = tuple.Item1;
+        var folderList = tuple.Item2;
 
         //创建进度窗口
-        var page = new ContentsPage.SpiderVideoInfo.Progress(folderNameList, datumList);
+        var page = new Progress(selectedFilesNameList, folderList);
         page.CreateWindow();
     }
 
     private Tuple<List<string>, List<Datum>> GetCurrentSelectedFolder()
     {
-        List<string> folderNameList = new();
+        List<string> selectFilesNameList = new();
         List<Datum> datumList = new();
         foreach (var node in Explorer.FolderTreeView.SelectedNodes)
         {
             if (node.Content is not ExplorerItem explorer) continue;
 
             //文件夹
-            folderNameList.Add(explorer.Name);
+            selectFilesNameList.Add(explorer.Name);
 
             //文件夹下的文件和文件夹
             var items = Explorer.GetFilesFromItems(explorer.Cid, FilesInfo.FileType.File);
@@ -185,7 +185,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
             datumList.AddRange(items);
         }
 
-        return new Tuple<List<string>, List<Datum>>(folderNameList, datumList);
+        return new Tuple<List<string>, List<Datum>>(selectFilesNameList, datumList);
     }
 
     /// <summary>

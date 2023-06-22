@@ -258,8 +258,7 @@
                         </MenuFlyout>
                     </AppBarButton.ContextFlyout>
                 </AppBarButton>
-                <AppBarButton x:Name="ImportDataButton"
-                              Icon="Import"
+                <AppBarButton Icon="Import"
                               Label="导入"
                               Click="ImportDataButton_Click" />
                 <AppBarButton Icon="Download"

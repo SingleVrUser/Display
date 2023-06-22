@@ -1,4 +1,5 @@
-﻿using Microsoft.UI;
+﻿using ByteSizeLib;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using System;
@@ -1236,7 +1237,7 @@ namespace Display.Data
         public int hasHiddenFile { get; set; }
     }
 
-    public class FolderCategory
+    public class FileCategory
     {
         /// <summary>
         /// 文件数量（不包括文件夹）
@@ -1260,35 +1261,41 @@ namespace Display.Data
         public int file_category { get; set; }
         public ParentPath[] paths { get; set; }
 
-        public int allCount
-        {
-            get
-            {
-                return count + folder_count;
-            }
-            set
-            {
-                allCount = value;
-            }
-        }
+        public int allCount => count + folder_count;
 
-
-        public static Datum ConvertFolderToDatum(FolderCategory folderCategory, string cid)
+        public static Datum ConvertFolderToDatum(FileCategory fileCategory, string cid)
         {
             Datum datum = new()
             {
                 uid = 0,
                 aid = 1,
                 cid = cid,
-                n = folderCategory.file_name,
-                pid = folderCategory.paths[folderCategory.paths.Length - 1].file_id,
-                pc = folderCategory.pick_code,
-                t = FileMatch.ConvertInt32ToDateTime(folderCategory.utime),
-                tp = folderCategory.ptime,
-                te = folderCategory.utime,
+                n = fileCategory.file_name,
+                pid = fileCategory.paths[^1].file_id,
+                pc = fileCategory.pick_code,
+                t = FileMatch.ConvertInt32ToDateTime(fileCategory.utime),
+                tp = fileCategory.ptime,
+                te = fileCategory.utime,
             };
 
             return datum;
+        }
+
+        public FileCategory()
+        {
+
+        }
+
+        public FileCategory(Datum datum)
+        {
+            this.file_name = datum.n;
+            this.pick_code = datum.pc;
+            this.count = 1;
+            this.file_category = 1;
+            this.utime = datum.te;
+            this.ptime = datum.tp;
+            this.sha1 = datum.sha;
+            this.size = ByteSize.FromBytes(datum.s).ToString("#.#");
         }
     }
 
@@ -1304,21 +1311,14 @@ namespace Display.Data
     public class GetFilesProgressInfo
     {
         public int FolderCount { get; set; } = 0;
+
         public int FilesCount { get; set; } = 0;
-        public int AllCount
-        {
-            get
-            {
-                return FolderCount + FilesCount;
-            }
-            set
-            {
-                AllCount = value;
-            }
-        }
+
+        public int AllCount => FolderCount + FilesCount;
+
         public List<string> FailCid { get; set; } = new();
 
-        public List<Datum> addToDataAccessList = new();
+        public List<Datum> AddToDataAccessList = new();
     }
     //报告进度和状态
     public class GetFileProgessIProgress
