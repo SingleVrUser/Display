@@ -25,55 +25,37 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
     /// </summary>
     public sealed partial class Progress : Page
     {
-        WebApi webapi = WebApi.GlobalWebApi;
-        public ObservableCollection<FolderCategory> FolderCategory = new();
-        public ObservableCollection<Datum> FilesItemsSource = new();
-        List<string> cidList;
+        private List<FilesInfo> _fileInfos;
+        private WebApi webapi = WebApi.GlobalWebApi;
+        public ObservableCollection<FileCategory> FileCategoryCollection = new();
         public Status _status;
 
-        CancellationTokenSource s_cts = new();
-        Window currentWindow;
+        private CancellationTokenSource s_cts = new();
+        private Window currentWindow;
 
         public Progress()
         {
             this.InitializeComponent();
         }
 
-        public Progress(List<string> cidList)
+        public Progress(List<FilesInfo> fileInfos)
         {
             InitializeComponent();
 
-            this.cidList = cidList;
+            this._fileInfos = fileInfos;
         }
 
         public void CreateWindow()
         {
-            CommonWindow window = new CommonWindow("导入数据");
+            var window = new CommonWindow("导入数据");
 
             currentWindow = window;
 
             window.SetWindowSize(500, 666);
             window.Content = this;
             window.Activate();
-
         }
 
-        /// <summary>
-        /// 从其他页面Navigate来
-        /// </summary>
-        /// <param Name="e"></param>
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            base.OnNavigatedTo(e);
-
-            var content = e.Parameter as ContentPassBetweenPage;
-
-            cidList = content.cidList;
-
-            currentWindow = content.window;
-
-            BackButton.Visibility = Visibility.Visible;
-        }
 
         private async void CurrentWindow_Closed(object sender, WindowEventArgs args)
         {
@@ -102,62 +84,63 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             }
         }
 
-
-        private async void loadData()
+        private async void LoadData()
         {
             currentWindow.Closed += CurrentWindow_Closed;
 
-            //GetFolderCategory_Expander.Visibility = Visibility.Visible;
             GetFolderCategory_Progress.status = Status.doing;
 
             // 1.预准备，获取所有文件的全部信息（大小和数量）
             //1-1.获取数据
+            List<FilesInfo> filesWithoutRootList = new();
 
-            //cid为0（根目录）无法使用GetFolderCategory接口获取文件信息，故将0目录变为0目录下的目录
-            List<string> cidWithoutRootList = new();
-            foreach (var cid in cidList)
+            // 剔除根目录 并 获取进度
+            foreach (var info in _fileInfos)
             {
-                if (cid == "0")
+                // 文件
+                if (info.Type == FilesInfo.FileType.File)
                 {
-                    var RootFileInfo = await webapi.GetFileAsync(cid, LoadAll: true);
+                    filesWithoutRootList.Add(info);
+                    overallCount ++;
 
-                    var FoldersInfoInRoot = RootFileInfo.data;
-
-                    foreach (var info in FoldersInfoInRoot)
-                    {
-                        cidWithoutRootList.Add(info.cid);
-                    }
+                    FileCategoryCollection.Add(new FileCategory(info.datum));
                 }
+                // 文件夹
                 else
                 {
-                    cidWithoutRootList.Add(cid);
+                    //cid为0（根目录）无法使用GetFolderCategory接口获取文件信息，故将0目录变为0目录下的目录
+                    if (info.Cid == "0")
+                    {
+                        var rootFileInfo = await webapi.GetFileAsync(info.Cid, loadAll: true);
+
+                        var foldersInfoInRoot = rootFileInfo.data;
+
+                        filesWithoutRootList.AddRange(foldersInfoInRoot.Select(datum => new FilesInfo(datum)));
+                    }
+                    else
+                    {
+                        filesWithoutRootList.Add(info);
+                    }
+
+                    foreach (var folderInfo in filesWithoutRootList.Where(i=>i.Type==FilesInfo.FileType.Folder))
+                    {
+                        var item = await webapi.GetFolderCategory(folderInfo.Cid);
+
+                        //添加文件和文件夹数量
+                        overallCount += item.folder_count;
+                        overallCount += item.count;
+
+                        //更新文件夹数量
+                        folderCount += item.folder_count;
+                        FileCategoryCollection.Add(item);
+                    }
                 }
             }
-
-            foreach (var cid in cidWithoutRootList)
-            {
-                var item = await webapi.GetFolderCategory(cid);
-
-                //添加文件和文件夹数量
-                overallCount += item.folder_count;
-                overallCount += item.count;
-
-                //更新文件夹数量
-                folderCount += item.folder_count;
-                FolderCategory.Add(item);
-            }
-
-            //if (overallCount == 0)
-            //{
-            //    GetFolderCategory_Progress.status = Status.error;
-            //    return;
-            //}
 
             //1-2.显示进度
             overallProgress.Maximum = overallCount;
-            updataProgress();
+            UpdateProgress();
             GetFolderCategory_Progress.status = Status.success;
-
 
             // 2-1.显示进度
             GetInfos_Expander.Visibility = Visibility.Visible;
@@ -174,7 +157,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                 if (progressPercent.status == ProgressStatus.normal)
                 {
                     successCount = progressPercent.getFilesProgressInfo.AllCount;
-                    updataProgress();
+                    UpdateProgress();
                     cps_TextBlock.Text = $"{progressPercent.sendCountPerMinutes} 次/分钟";
                     leftTime_Run.Text = FileMatch.ConvertDoubleToDateStr(1.5 * (folderCount - progressPercent.getFilesProgressInfo.FolderCount));
                     //updateSendSpeed(progressPercent.sendCountPerSecond);
@@ -228,28 +211,28 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             });
 
             // 2.获取数据，获取所有文件的全部信息（大小和数量）
-            await webapi.GetAllFileInfoToDataAccess(cidWithoutRootList, new GetFilesProgressInfo(), s_cts.Token, progress);
+            await webapi.GetAllFileInfoToDataAccess(filesWithoutRootList, s_cts.Token, progress);
 
             if (s_cts.Token.IsCancellationRequested) return;
 
             //搜刮完成,是否自动搜刮
             if (AppSettings.ProgressOfImportDataAccess_IsStartSpiderAfterTask && overallCount != 0)
             {
-                //datum只用到其中的cid,所以只赋值cid (fid默认为空,不用理)
-                List<Datum> datumList = new();
-                cidWithoutRootList.ForEach(item => datumList.Add(new() { cid = item }));
-
+                ////datum只用到其中的cid,所以只赋值cid (fid默认为空,不用理)
+                //List<Datum> folderList = new();
+                //filesWithoutRootList.ForEach(info => folderList.Add(new Datum { cid = info.Cid }));
 
                 //提示将会开始搜刮
                 WillStartSpiderTaskTip.IsOpen = true;
 
-                await Task.Delay(3000);
+                await Task.Delay(3000, s_cts.Token);
+
+                if (s_cts.Token.IsCancellationRequested) return;
 
                 WillStartSpiderTaskTip.IsOpen = false;
 
-                List<string> folderList = FolderCategory.Select(item => item.file_name).ToList();
-
-                var page = new SpiderVideoInfo.Progress(folderList, datumList);
+                var fileNameList = FileCategoryCollection.Select(item => item.file_name).ToList();
+                var page = new SpiderVideoInfo.Progress(fileNameList, filesWithoutRootList.Select(x=>x.datum).ToList());
                 //创建搜刮进度窗口
                 page.CreateWindow();
             }
@@ -278,7 +261,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
         }
 
         //更新进度环信息
-        private void updataProgress()
+        private void UpdateProgress()
         {
             int percentProgress;
             if (overallCount == 0)
@@ -302,19 +285,20 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
         private async void BackButton_Click(object sender, RoutedEventArgs e)
         {
+            var dialog = new ContentDialog
+            {
+                // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
+                XamlRoot = XamlRoot,
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+                Title = "确认",
+                PrimaryButtonText = "确认返回",
+                CloseButtonText = "退出",
+                DefaultButton = ContentDialogButton.Close,
+                Content = "当前任务正在运行，确认返回上一页面？"
+            };
+
             if (_status == Status.doing)
             {
-                ContentDialog dialog = new ContentDialog();
-
-                // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
-                dialog.XamlRoot = XamlRoot;
-                dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
-                dialog.Title = "确认";
-                dialog.PrimaryButtonText = "确认返回";
-                dialog.CloseButtonText = "退出";
-                dialog.DefaultButton = ContentDialogButton.Close;
-                dialog.Content = "当前任务正在运行，确认返回上一页面？";
-
                 var result = await dialog.ShowAsync();
                 if (result == ContentDialogResult.Primary)
                 {
@@ -338,9 +322,9 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
         private void GetFolderCategory_Expander_Loaded(object sender, RoutedEventArgs e)
         {
-            if (cidList != null)
+            if (_fileInfos != null)
             {
-                loadData();
+                LoadData();
             }
         }
     }

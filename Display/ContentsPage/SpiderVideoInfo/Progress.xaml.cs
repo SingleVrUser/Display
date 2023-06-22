@@ -34,28 +34,30 @@ namespace Display.ContentsPage.SpiderVideoInfo
     /// </summary>
     public sealed partial class Progress : Page
     {
-        CancellationTokenSource s_cts = new();
-        List<MatchVideoResult> matchVideoResults;
-        List<string> folderNameList = new();
-        List<Datum> datumList = new();
-        List<FailDatum> failDatumList = new();
-        GetInfoFromNetwork network;
-        List<SpiderInfo> SpiderInfos;
-        List<string> FailVideoNameList;
+        private readonly CancellationTokenSource s_cts = new();
+        private readonly List<string> _selectedFilesNameList;
+        private List<Datum> _fileList = new();
+        private readonly List<FailDatum> _failDatumList = new();
+
+        private List<MatchVideoResult> _matchVideoResults;
+        private GetInfoFromNetwork network;
+        private List<SpiderInfo> SpiderInfos;
+        private List<string> FailVideoNameList;
+
         public Window currentWindow;
 
-        public Progress(List<string> folderNameList, List<Datum> datumList)
+        public Progress(List<string> selectedFilesNameList, List<Datum> fileList)
         {
             this.InitializeComponent();
-            this.folderNameList = folderNameList;
-            this.datumList = datumList;
+            this._selectedFilesNameList = selectedFilesNameList;
+            this._fileList = fileList;
             this.Loaded += PageLoaded;
         }
 
         public Progress(List<FailDatum> failDatums)
         {
             this.InitializeComponent();
-            this.failDatumList = failDatums;
+            this._failDatumList = failDatums;
             this.Loaded += ReSpiderPageLoaded;
         }
 
@@ -63,23 +65,24 @@ namespace Display.ContentsPage.SpiderVideoInfo
         {
             Loaded -= ReSpiderPageLoaded;
 
-            if (failDatumList == null || failDatumList.Count == 0) return;
+            if (_failDatumList == null || _failDatumList.Count == 0) return;
 
             currentWindow.Closed += CurrentWindow_Closed;
-            if (matchVideoResults == null) matchVideoResults = new List<MatchVideoResult>();
-            foreach (var item in failDatumList)
+            _matchVideoResults ??= new List<MatchVideoResult>();
+
+            foreach (var item in _failDatumList)
             {
-                matchVideoResults.Add(new MatchVideoResult() { status = true, OriginalName = item.Datum.n, message = "匹配成功", statusCode = 1, MatchName = item.MatchName });
+                _matchVideoResults.Add(new MatchVideoResult() { status = true, OriginalName = item.Datum.n, message = "匹配成功", statusCode = 1, MatchName = item.MatchName });
 
                 //替换数据库的数据
                 DataAccess.AddFileToInfo(item.Datum.pc, item.MatchName, isReplace: true);
             }
 
             //显示进度环
-            ShowProgress(matchVideoResults.Count);
+            ShowProgress(_matchVideoResults.Count);
 
             if (s_cts.IsCancellationRequested) return;
-            await SpiderVideoInfo(matchVideoResults);
+            await SpiderVideoInfo(_matchVideoResults);
             if (s_cts.IsCancellationRequested) return;
 
 
@@ -99,7 +102,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             if (s_cts.IsCancellationRequested) return;
 
-            await SpiderVideoInfo(matchVideoResults);
+            await SpiderVideoInfo(_matchVideoResults);
 
             if (s_cts.IsCancellationRequested) return;
 
@@ -115,33 +118,33 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// <returns></returns>
         private async Task ShowMatchResult()
         {
-            if (datumList == null) return;
+            if (_fileList == null) return;
 
             TopProgressRing.IsActive = true;
 
             //目前datumList仅有一级目录文件
             //遍历获取文件列表中所有的文件
-            await Task.Run(() => datumList = DataAccess.GetAllFilesInFolderList(datumList));
+            _fileList = await DataAccess.GetAllFilesInFolderListAsync(_fileList);
 
             //除去文件夹
-            datumList = datumList.Where(item => !string.IsNullOrEmpty(item.fid)).ToList();
+            _fileList = _fileList.Where(item => !string.IsNullOrEmpty(item.fid)).ToList();
 
             //去除重复文件
             Dictionary<string, Datum> newDictList = new();
-            datumList.ForEach(item => newDictList.TryAdd(item.pc, item));
+            _fileList.ForEach(item => newDictList.TryAdd(item.pc, item));
 
-            datumList = newDictList.Values.ToList();
+            _fileList = newDictList.Values.ToList();
 
             //显示饼状图
-            ShowFilesPieCharts(datumList);
+            ShowFilesPieCharts(_fileList);
             if (s_cts.IsCancellationRequested) return;
 
             TotalProgress_TextBlock.Text = "正则匹配番号名中……";
 
             //挑选符合条件的视频文件
-            matchVideoResults = await Task.Run(() => FileMatch.GetVideoAndMatchFile(datumList));
+            _matchVideoResults = await Task.Run(() => FileMatch.GetVideoAndMatchFile(_fileList));
 
-            int totalCount = matchVideoResults.Where(item => !string.IsNullOrEmpty(item.MatchName)).ToList().Count;
+            int totalCount = _matchVideoResults.Where(item => !string.IsNullOrEmpty(item.MatchName)).ToList().Count;
 
             //显示进度环
             ShowProgress(totalCount);

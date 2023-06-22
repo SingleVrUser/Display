@@ -57,13 +57,6 @@ namespace Display.Views
             });
             DataSource.Add(new FunctionModule()
             {
-                Name = "导入115数据",
-                IconPath = "/Assets/Svg/import_icon.svg",
-                Description = "导入115数据到本地数据库",
-                Label = "即将弃用"
-            });
-            DataSource.Add(new FunctionModule()
-            {
                 Name = "计算Sha1",
                 IconPath = "/Assets/Svg/accounting_banking_business_calculate_calculator_icon.svg",
                 Description = "计算本地文件的Sha1",
@@ -76,9 +69,6 @@ namespace Display.Views
             var clickItem = e.ClickedItem as FunctionModule;
             switch (clickItem?.Name)
             {
-                case "导入115数据":
-                    SingleFrameWindow.CreateWindow(typeof(ContentsPage.Import115DataToLocalDataAccess.MainPage));
-                    break;
                 case "搜刮信息":
                     CommonWindow.CreateAndShowWindow(new ContentsPage.SpiderVideoInfo.MainPage());
                     break;

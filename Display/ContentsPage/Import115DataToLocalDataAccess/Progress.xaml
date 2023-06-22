@@ -16,8 +16,8 @@
     
     <StackPanel Spacing="10">
         <RelativePanel>
-            <HyperlinkButton x:Name="BackButton" Width="45" Height="45" Click="BackButton_Click" Visibility="Collapsed">
-                <AnimatedIcon x:Name="SearchAnimatedIcon">
+            <HyperlinkButton Width="45" Height="45" Click="BackButton_Click" Visibility="Collapsed">
+                <AnimatedIcon>
                     <AnimatedIcon.Source>
                         <animatedvisuals:AnimatedBackVisualSource/>
                     </AnimatedIcon.Source>
@@ -57,6 +57,7 @@
         <Expander  x:Name="GetFolderCategory_Expander"
                     HorizontalAlignment="Center"
                     MinWidth="300"
+                    MaxHeight="300"
                     ExpandDirection="Down"
                     VerticalContentAlignment="Top"
                    Loaded="GetFolderCategory_Expander_Loaded">
@@ -68,7 +69,7 @@
             </Expander.Header>
 
             <ListView
-                ItemsSource="{x:Bind FolderCategory}"
+                ItemsSource="{x:Bind FileCategoryCollection}"
                 SelectionMode="None">
                 <ListView.Header>
                     <Grid ColumnSpacing="5"
@@ -87,7 +88,7 @@
                     </Grid>
                 </ListView.Header>
                 <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="data:FolderCategory">
+                    <DataTemplate x:DataType="data:FileCategory">
                         <Grid ColumnSpacing="10"
                             MinWidth="200">
                             <Grid.ColumnDefinitions>
@@ -126,50 +127,7 @@
             </Expander.Header>
 
             <Button Click="OpenSavePathButton_Click" Content="打开数据库所在目录"/>
-            <!--<ListView x:Name="BaseExample"
-                        BorderThickness="1"
-                        BorderBrush="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
-                        Width="250"
-                        MaxHeight="200"
-                        HorizontalAlignment="Left"
-                        ItemsSource="{x:Bind FilesItemsSource}">
-
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="data:Datum">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <Ellipse x:Name="Ellipse"
-                                            Grid.RowSpan="2"
-                                            Width ="32"
-                                            Height="32"
-                                            Margin="6"
-                                            VerticalAlignment="Center"
-                                            HorizontalAlignment="Center"
-                                            Fill="LightGray"/>
-                            <TextBlock Grid.Column="1"
-                                    Text="{x:Bind pc}" 
-                                    x:Phase="1"  
-                                    Style="{ThemeResource BaseTextBlockStyle}"
-                                    Margin="12,6,0,0"/>
-                            <TextBlock  Grid.Column="1"
-                                    Grid.Row="1"
-                                    Text="{x:Bind n}" 
-                                    x:Phase="2"
-                                    Style="{ThemeResource BodyTextBlockStyle}"
-                                    Margin="12,0,0,6"/>
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-
-            </ListView>-->
+            
         </Expander>
 
         <!--结果-->

@@ -16,7 +16,7 @@ public class Int32ToDateTimeStrConverter : IValueConverter
         }
         else if (value is string NumOrStringValue)
         {
-            if (!FileMatch.isNumberic1(NumOrStringValue))
+            if (!FileMatch.IsNumberic1(NumOrStringValue))
                 return NumOrStringValue;
 
             return FileMatch.ConvertInt32ToDateTime(int.Parse(NumOrStringValue));

@@ -327,7 +327,7 @@ namespace Display.Data
         /// </summary>
         /// <param Name="_string"></param>
         /// <returns></returns>
-        public static bool isNumberic1(this string _string)
+        public static bool IsNumberic1(this string _string)
         {
             if (string.IsNullOrEmpty(_string))
                 return false;

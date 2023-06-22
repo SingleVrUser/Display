@@ -135,7 +135,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         MultipleSelectedCheckBox.IsChecked = false;
     }
 
-    private async void OpenFile_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    private void OpenFile_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
         if (sender is not Grid { DataContext: FilesInfo info }) return;
 
@@ -646,32 +646,38 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async void ImportDataButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button button) return;
+        if (sender is not Button) return;
 
-        List<string> cids = new();
-        List<string> nameList = new();
+        List<FilesInfo> files = new();
+        List<string> folderList = new();
         foreach (FilesInfo item in BaseExample.SelectedItems)
         {
+            files.Add(item);
+
             if (item.Type == FilesInfo.FileType.Folder)
             {
-                cids.Add(item.Cid);
-                nameList.Add(item.Name);
+                folderList.Add(item.Name);
             }
         }
 
-        if (cids.Count == 0)
+        if (files.Count == 0)
         {
             ShowTeachingTip("当前未选中文件");
             return;
         }
 
         //确认对话框
-        var receiveResult = await ShowContentDialog(nameList);
-        if (receiveResult == ContentDialogResult.Primary)
+        var isContinue = true;
+        if (folderList.Count > 0)
         {
-            var page = new Import115DataToLocalDataAccess.Progress(cids);
-            page.CreateWindow();
+            var receiveResult = await ShowContentDialog(folderList);
+            if (receiveResult != ContentDialogResult.Primary) isContinue = false;
         }
+
+        if (!isContinue) return;
+
+        var page = new Import115DataToLocalDataAccess.Progress(files);
+        page.CreateWindow();
 
     }
 

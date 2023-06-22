@@ -17,12 +17,14 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Windows.Storage;
+using static System.Int32;
 using HttpMethod = System.Net.Http.HttpMethod;
 using HttpRequestMessage = System.Net.Http.HttpRequestMessage;
 
@@ -193,138 +195,151 @@ namespace Display.Data
 
             return result;
         }
-
-
-
+        
         /// <summary>
         /// 导入CidList获取到的所有信息到数据库
         /// </summary>
-        /// <param Name="cidList"></param>
-        /// <param Name="getFilesProgressInfo"></param>
-        /// <param Name="progress"></param>
+        /// <param name="fileInfos"></param>
+        /// <param name="token"></param>
+        /// <param name="progress"></param>
         /// <returns></returns>
-        public async Task GetAllFileInfoToDataAccess(List<string> cidList, GetFilesProgressInfo getFilesProgressInfo, CancellationToken token, IProgress<GetFileProgessIProgress> progress = null)
+        public async Task GetAllFileInfoToDataAccess(List<FilesInfo> fileInfos, CancellationToken token, IProgress<GetFileProgessIProgress> progress = null)
         {
-            foreach (var cid in cidList)
+            var getFilesProgressInfo = new GetFilesProgressInfo();
+            
+            foreach (var info in fileInfos.Where(x=>x.Type == FilesInfo.FileType.Folder))
+            {
+                if (token.IsCancellationRequested)
+                {
+                    return;
+                }
+                getFilesProgressInfo = await TryAddFolderToDataAccess(token, progress, info.Cid, getFilesProgressInfo);
+            }
+
+            foreach (var info in fileInfos.Where(x=>x.Type == FilesInfo.FileType.File))
             {
                 if (token.IsCancellationRequested)
                 {
                     return;
                 }
 
-                //统计发送请求的频率
-                int sendCount = 0;
-                long nowDate = DateTimeOffset.Now.ToUnixTimeSeconds();
+                await DataAccess.AddFilesInfoAsync(info.datum);
 
-                await Task.Delay(1000, token);
+                getFilesProgressInfo!.FilesCount++;
 
-                // 一开始只有cid，先获取cid的属性
-                var cidCategory = await GetFolderCategory(cid);
-                sendCount++;
-
-                //正常不为空，为空说明有异常
-                if (cidCategory == null)
-                {
-                    progress.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, status = ProgressStatus.error, sendCountPerMinutes = 1 });
-
-                    // 退出
-                    return;
-                }
-
-                // 获取上一次已添加文件夹的pid（如果存在，且修改时间不变；不存在的默认值为string.empty）
-                var pid = DataAccess.GetLatestFolderPid(cidCategory.pick_code, cidCategory.utime);
-
-                // 该文件已存在数据库里，且修改时间不变
-                if (!string.IsNullOrEmpty(pid) && Data.StaticData.isJumpExistsFolder)
-                {
-                    //如果修改时间未变，但移动了位置
-                    if (pid == cidCategory.paths.Last().file_id)
-                    {
-                        await DataAccess.AddFilesInfoAsync(FolderCategory.ConvertFolderToDatum(cidCategory, cid));
-                    }
-
-                    //统计上下级文件夹所含文件的数量
-                    //文件数量
-                    getFilesProgressInfo.FilesCount += cidCategory.count;
-                    //文件夹数量
-                    getFilesProgressInfo.FolderCount += cidCategory.folder_count;
-
-                    var cpm = sendCount * 60 / (DateTimeOffset.Now.ToUnixTimeSeconds() - nowDate);
-
-                    progress.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
-
-                }
-                //之前未添加或修改时间已改变
-                else
-                {
-                    //获取当前文件夹下所有文件信息和文件夹信息（从数据库或者网络）
-                    getFilesProgressInfo = await TraverseAllFileInfo(cid, getFilesProgressInfo, token, progress);
-
-                    if (getFilesProgressInfo == null) continue;
-
-                    var addToDataAccessList = getFilesProgressInfo.addToDataAccessList;
-
-                    //删除后重新添加
-                    DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(cid);
-
-                    if (addToDataAccessList.Count > 0)
-                    {
-                        //需要添加进数据库的Datum
-                        foreach (var item in addToDataAccessList)
-                        {
-                            await DataAccess.AddFilesInfoAsync(item);
-                        }
-                    }
-
-                    //不添加有错误的目录进数据库（添加数据库时会跳过已经添加过的目录，对于出现错误的目录不添加方便后续重新添加）
-                    if (getFilesProgressInfo.FailCid.Count == 0)
-                    {
-                        await DataAccess.AddFilesInfoAsync(FolderCategory.ConvertFolderToDatum(cidCategory, cid));
-                    }
-                }
+                progress?.Report(new GetFileProgessIProgress
+                    { getFilesProgressInfo = getFilesProgressInfo });
             }
 
             if (token.IsCancellationRequested)
             {
-                progress.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, status = ProgressStatus.cancel, sendCountPerMinutes = 1 });
+                progress?.Report(new GetFileProgessIProgress {status = ProgressStatus.cancel });
             }
             else
             {
                 // 完成
-                progress.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, status = ProgressStatus.done, sendCountPerMinutes = 1 });
+                progress?.Report(new GetFileProgessIProgress {status = ProgressStatus.done });
             }
 
+        }
+
+        private async Task<GetFilesProgressInfo> TryAddFolderToDataAccess(CancellationToken token, IProgress<GetFileProgessIProgress> progress, string cid,GetFilesProgressInfo getFilesProgressInfo)
+        {
+            var nowDate = DateTimeOffset.Now.ToUnixTimeSeconds();
+            await Task.Delay(1000, token);
+            // 一开始只有cid，先获取cid的属性
+            var cidCategory = await GetFolderCategory(cid);
+
+            //正常不为空，为空说明有异常
+            if (cidCategory == null)
+            {
+                progress?.Report(new GetFileProgessIProgress { getFilesProgressInfo = getFilesProgressInfo, status = ProgressStatus.error, sendCountPerMinutes = 1 });
+
+                // 退出
+                return null;
+            }
+
+            // 获取上一次已添加文件夹的pid（如果存在，且修改时间不变；不存在的默认值为string.empty）
+            var pid = DataAccess.GetLatestFolderPid(cidCategory.pick_code, cidCategory.utime);
+
+            // 该文件已存在数据库里，且修改时间不变
+            if (!string.IsNullOrEmpty(pid) && StaticData.isJumpExistsFolder)
+            {
+                //如果修改时间未变，但移动了位置
+                if (pid == cidCategory.paths.Last().file_id)
+                {
+                    await DataAccess.AddFilesInfoAsync(FileCategory.ConvertFolderToDatum(cidCategory, cid));
+                }
+
+                //统计上下级文件夹所含文件的数量
+
+                //文件数量
+                getFilesProgressInfo!.FilesCount += cidCategory.count;
+
+                //文件夹数量
+                getFilesProgressInfo!.FolderCount += cidCategory.folder_count;
+
+                var cpm = 60 / (DateTimeOffset.Now.ToUnixTimeSeconds() - nowDate);
+
+                progress?.Report(new GetFileProgessIProgress
+                    { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
+            }
+            //之前未添加或修改时间已改变
+            else
+            {
+                //获取当前文件夹下所有文件信息和文件夹信息（从数据库或者网络）
+                getFilesProgressInfo = await TraverseAllFileInfo(cid, getFilesProgressInfo, token, progress);
+                
+                var addToDataAccessList = getFilesProgressInfo.AddToDataAccessList;
+
+                //删除后重新添加
+                DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(cid);
+
+                if (addToDataAccessList.Count > 0)
+                {
+                    //需要添加进数据库的Datum
+                    foreach (var item in addToDataAccessList)
+                    {
+                        await DataAccess.AddFilesInfoAsync(item);
+                    }
+                }
+
+                //不添加有错误的目录进数据库（添加数据库时会跳过已经添加过的目录，对于出现错误的目录不添加方便后续重新添加）
+                if (getFilesProgressInfo.FailCid.Count == 0)
+                {
+                    await DataAccess.AddFilesInfoAsync(FileCategory.ConvertFolderToDatum(cidCategory, cid));
+                }
+            }
+
+            return getFilesProgressInfo;
         }
 
         /// <summary>
         /// 获取所有文件信息
         /// </summary>
-        /// <param Name="cid"></param>
-        /// <param Name="webFileInfoList"></param>
+        /// <param name="cid"></param>
+        /// <param name="getFilesProgressInfo"></param>
+        /// <param name="token"></param>
+        /// <param name="progress"></param>
         /// <returns></returns>
         public async Task<GetFilesProgressInfo> TraverseAllFileInfo(string cid, GetFilesProgressInfo getFilesProgressInfo, CancellationToken token, IProgress<GetFileProgessIProgress> progress = null)
         {
-            //var webFileInfoList = fileProgressInfo.datumList;
-            if (token.IsCancellationRequested) return null;
+            if (token.IsCancellationRequested) return getFilesProgressInfo;
 
-            //统计请求速度
-            int sendCount = 0;
-            long nowDate = DateTimeOffset.Now.ToUnixTimeSeconds();
+            var nowDate = DateTimeOffset.Now.ToUnixTimeSeconds();
 
-            //successCount++;
             await Task.Delay(1000, token);
 
             //查询下一级文件信息
-            var WebFileInfo = await GetFileAsync(cid, LoadAll: true);
-            sendCount++;
+            var webFileInfo = await GetFileAsync(cid, loadAll: true);
 
-            if (WebFileInfo.state)
+            if (webFileInfo.state)
             {
-                foreach (var item in WebFileInfo.data)
+                foreach (var item in webFileInfo.data)
                 {
                     if (token.IsCancellationRequested)
                     {
-                        return null;
+                        return getFilesProgressInfo;
                     }
 
                     //文件夹
@@ -333,7 +348,7 @@ namespace Display.Data
                         getFilesProgressInfo.FolderCount++;
 
                         //先添加文件夹后添加文件，方便删除已有文件夹中的文件
-                        getFilesProgressInfo.addToDataAccessList.Add(item);
+                        getFilesProgressInfo.AddToDataAccessList.Add(item);
 
                         //查询数据库是否存在
                         if (!string.IsNullOrEmpty(DataAccess.GetLatestFolderPid(item.pc, item.te)) && Data.StaticData.isJumpExistsFolder)
@@ -342,19 +357,17 @@ namespace Display.Data
                             //通过数据库获取
                             var datumList = DataAccess.GetAllFilesTraverse(item.cid);
 
-                            getFilesProgressInfo.addToDataAccessList.AddRange(datumList);
+                            getFilesProgressInfo.AddToDataAccessList.AddRange(datumList);
 
                             //文件数量
                             getFilesProgressInfo.FilesCount += datumList.Count;
 
-                            var cpm = sendCount * 60 / (DateTimeOffset.Now.ToUnixTimeSeconds() - nowDate);
-                            progress.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
+                            var cpm = 60 / (DateTimeOffset.Now.ToUnixTimeSeconds() - nowDate);
+                            progress?.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
                         }
                         else
                         {
                             getFilesProgressInfo = await TraverseAllFileInfo(item.cid, getFilesProgressInfo, token, progress);
-
-                            if (getFilesProgressInfo == null) continue;
                         }
                     }
                     //文件
@@ -362,10 +375,10 @@ namespace Display.Data
                     {
                         getFilesProgressInfo.FilesCount++;
 
-                        var cpm = sendCount * 60 / (DateTimeOffset.Now.ToUnixTimeSeconds() - nowDate);
-                        progress.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
+                        var cpm = 60 / (DateTimeOffset.Now.ToUnixTimeSeconds() - nowDate);
+                        progress?.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
 
-                        getFilesProgressInfo.addToDataAccessList.Add(item);
+                        getFilesProgressInfo.AddToDataAccessList.Add(item);
                     }
                 }
             }
@@ -777,17 +790,18 @@ namespace Display.Data
         /// <summary>
         /// 获取文件信息
         /// </summary>
-        /// <param Name="cid"></param>
-        /// <param Name="limit"></param>
-        /// <param Name="offset"></param>
-        /// <param Name="useApi2"></param>
-        /// <param Name="LoadAll"></param>
-        /// <param Name="orderBy"></param>
-        /// <param Name="asc"></param>
+        /// <param name="cid"></param>
+        /// <param name="limit"></param>
+        /// <param name="offset"></param>
+        /// <param name="useApi2"></param>
+        /// <param name="loadAll"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="asc"></param>
+        /// <param name="isOnlyFolder"></param>
         /// <returns></returns>
-        public async Task<WebFileInfo> GetFileAsync(string cid, int limit = 40, int offset = 0, bool useApi2 = false, bool LoadAll = false, OrderBy orderBy = OrderBy.user_ptime, int asc = 0,bool isOnlyFolder = false)
+        public async Task<WebFileInfo> GetFileAsync(string cid, int limit = 40, int offset = 0, bool useApi2 = false, bool loadAll = false, OrderBy orderBy = OrderBy.user_ptime, int asc = 0,bool isOnlyFolder = false)
         {
-            WebFileInfo WebFileInfoResult = new();
+            WebFileInfo webFileInfoResult = new();
 
             string url;
             url = !useApi2 ? $"https://webapi.115.com/files?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json" :
@@ -805,28 +819,28 @@ namespace Display.Data
             catch (AggregateException e)
             {
                 Toast.tryToast("网络异常", "获取文件信息时出现异常：", e.Message);
-                return WebFileInfoResult;
+                return webFileInfoResult;
             }
 
             if (!response.IsSuccessStatusCode)
             {
-                return WebFileInfoResult;
+                return webFileInfoResult;
             }
             var strResult = await response.Content.ReadAsStringAsync();
 
-            WebFileInfoResult = JsonConvert.DeserializeObject<WebFileInfo>(strResult);
+            webFileInfoResult = JsonConvert.DeserializeObject<WebFileInfo>(strResult);
 
             //te，tp简单用t替换，接口2没有te,tp
             if (useApi2)
             {
-                foreach (var item in WebFileInfoResult.data)
+                foreach (var item in webFileInfoResult.data)
                 {
                     //item.t 可能是 "1658999027" 也可能是 "2022-07-28 17:03"
 
                     //"1658999027"
-                    if (FileMatch.isNumberic1(item.t))
+                    if (FileMatch.IsNumberic1(item.t))
                     {
-                        int dateInt = Int32.Parse(item.t);
+                        int dateInt = Parse(item.t);
                         item.te = item.tp = dateInt;
                         item.t = FileMatch.ConvertInt32ToDateTime(dateInt);
                     }
@@ -838,17 +852,17 @@ namespace Display.Data
                 }
             }
 
-            if (WebFileInfoResult.data != null)
+            if (webFileInfoResult.data != null)
             {
-                foreach (var item in WebFileInfoResult.data)
+                foreach (var item in webFileInfoResult.data)
                 {
                     int dateInt;
                     //item.t 可能是 "1658999027" 也可能是 "2022-07-28 17:03"
 
                     //"1658999027"
-                    if (FileMatch.isNumberic1(item.t))
+                    if (item.t.IsNumberic1())
                     {
-                        dateInt = Int32.Parse(item.t);
+                        dateInt = Parse(item.t);
                         item.t = FileMatch.ConvertInt32ToDateTime(dateInt);
 
                     }
@@ -867,17 +881,17 @@ namespace Display.Data
             }
 
             //接口1出错，使用接口2
-            if (WebFileInfoResult.errNo == 20130827 && useApi2 == false)
+            if (webFileInfoResult.errNo == 20130827 && useApi2 == false)
             {
-                WebFileInfoResult = await GetFileAsync(cid, limit, offset, true, LoadAll, orderBy, asc,isOnlyFolder: isOnlyFolder);
+                webFileInfoResult = await GetFileAsync(cid, limit, offset, true, loadAll, orderBy, asc,isOnlyFolder: isOnlyFolder);
             }
             //需要加载全部，但未加载全部
-            else if (LoadAll && WebFileInfoResult.count > limit)
+            else if (loadAll && webFileInfoResult.count > limit)
             {
-                WebFileInfoResult = await GetFileAsync(cid, WebFileInfoResult.count, offset, useApi2, LoadAll, orderBy, asc);
+                webFileInfoResult = await GetFileAsync(cid, webFileInfoResult.count, offset, useApi2, loadAll, orderBy, asc);
             }
 
-            return WebFileInfoResult;
+            return webFileInfoResult;
         }
 
         public async Task<FilesShowInfo> GetFilesShowInfo(string cid)
@@ -914,16 +928,15 @@ namespace Display.Data
         /// <summary>
         /// 获取文件夹属性（含大小和数量）
         /// </summary>
-        /// <param Name="cid"></param>
-        /// <param Name="limit"></param>
+        /// <param name="cid"></param>
         /// <returns></returns>
-        public async Task<FolderCategory> GetFolderCategory(string cid)
+        public async Task<FileCategory> GetFolderCategory(string cid)
         {
-            FolderCategory webFileInfoResult = null;
+            FileCategory webFileInfoResult = null;
 
             if (cid == "0")
             {
-                return new FolderCategory() { file_name = "根目录" };
+                return new FileCategory() { file_name = "根目录" };
             }
 
             var url = $"https://webapi.115.com/category/get?cid={cid}";
@@ -951,7 +964,7 @@ namespace Display.Data
                 {
                     return null;
                 }
-                webFileInfoResult = JsonConvert.DeserializeObject<FolderCategory>(strResult);
+                webFileInfoResult = JsonConvert.DeserializeObject<FileCategory>(strResult);
             }
 
             return webFileInfoResult;
@@ -1410,7 +1423,7 @@ namespace Display.Data
                 if (string.IsNullOrEmpty(datum.fid) || (!string.IsNullOrEmpty(datum.fid) && datum.fid == "0"))
                 {
                     //获取该文件夹下的文件和文件夹
-                    WebFileInfo webFileInfo = await GetFileAsync(datum.cid, LoadAll: true);
+                    WebFileInfo webFileInfo = await GetFileAsync(datum.cid, loadAll: true);
                     if (webFileInfo.count == 0)
                     {
                         success = false;
@@ -1537,7 +1550,7 @@ namespace Display.Data
         public async void GetAllFilesTraverseAndDownByBitComet(HttpClient client, string baseUrl, Datum datum, string ua, string save_path)
         {
             //获取该文件夹下的文件和文件夹
-            WebFileInfo webFileInfo = await GetFileAsync(datum.cid, LoadAll: true);
+            WebFileInfo webFileInfo = await GetFileAsync(datum.cid, loadAll: true);
 
             foreach (var data in webFileInfo.data)
             {
