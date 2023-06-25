@@ -12,15 +12,15 @@ public class GetActorInfoFromNetwork
 {
     public static async Task<ActorInfo> SearchInfoFromMinnanoAv(string name)
     {
-        string baseUrl = AppSettings.MinnanoAvBaseUrl;
+        var baseUrl = AppSettings.MinnanoAvBaseUrl;
 
-        string url = GetInfoFromNetwork.UrlCombine(baseUrl, $"search_result.php?search_scope=actress&search_word={name}&search=+Go+");
+        var url = GetInfoFromNetwork.UrlCombine(baseUrl, $"search_result.php?search_scope=actress&search_word={name}&search=+Go+");
 
-        var Client = GetInfoFromNetwork.Client;
+        var client = GetInfoFromNetwork.CommonClient;
 
         ActorInfo actorInfo = new() { name = name };
 
-        Tuple<string, string> result = await RequestHelper.RequestHtml(Client, url);
+        Tuple<string, string> result = await RequestHelper.RequestHtml(client, url);
         if (result == null) return null;
 
         actorInfo.info_url = result.Item1;
@@ -37,7 +37,7 @@ public class GetActorInfoFromNetwork
         if (profileNodes == null) return null;
 
 
-        List<string> otherNames = new List<string>();
+        var otherNames = new List<string>();
 
         foreach (var profileNode in profileNodes)
         {

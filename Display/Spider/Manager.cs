@@ -118,7 +118,7 @@ public class Manager
     public async Task<VideoInfo> DispatchSpiderInfoByDetailUrl(string cid, string detailUrl)
     {
         //先访问detail_url，获取到标题
-        var tuple = await RequestHelper.RequestHtml(GetInfoFromNetwork.Client, detailUrl);
+        var tuple = await RequestHelper.RequestHtml(GetInfoFromNetwork.CommonClient, detailUrl);
         if (tuple == null) return null;
 
         string strResult = tuple.Item2;

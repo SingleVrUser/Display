@@ -296,7 +296,7 @@ namespace Display.Spider
 
                 var content = messageNode != null ? messageNode.InnerText.Trim() : tipNode.InnerText;
 
-                Toast.tryToast("x1080x出错", content);
+                Toast.TryToast("x1080x出错", content);
 
                 return null;
             }
@@ -408,8 +408,8 @@ namespace Display.Spider
                             // rar文件前缀: RAR!
                             var byteItems = "Rar!"u8.ToArray();
                             await using var stream = await responseMessage.Content.ReadAsStreamAsync();
-                            int bufferSize = 4;
-                            byte[] buffer = new byte[bufferSize];
+                            var bufferSize = 4;
+                            var buffer = new byte[bufferSize];
                             var _ = await stream.ReadAsync(buffer, 0, bufferSize);
 
                             stream.Seek(0, SeekOrigin.Begin);

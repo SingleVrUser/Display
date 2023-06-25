@@ -5,7 +5,6 @@ using Display.Data;
 using Display.Helper;
 using Display.Models;
 using Display.Views;
-using Display.WindowView;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -19,9 +18,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Windows.System;
-using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -169,17 +166,18 @@ namespace Display
             ("actorsView",typeof(ActorsPage)),
             ("setting",typeof(SettingsPage)),
             ("more",typeof(MorePage)),
+            ("settings",typeof(SettingsPage)),
         };
 
         /// <summary>
         /// NavView加载
         /// </summary>
-        /// <param Name="sender"></param>
-        /// <param Name="e"></param>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void NavView_Loaded(object sender, RoutedEventArgs e)
         {
             //数据文件存在
-            if (File.Exists(DataAccess.dbpath))
+            if (File.Exists(DataAccess.DbPath))
             {
                 switch (AppSettings.StartPageIndex)
                 {
@@ -257,42 +255,38 @@ namespace Display
         /// <summary>
         /// NavigationView的选择改变
         /// </summary>
-        /// <param Name="sender"></param>
-        /// <param Name="args"></param>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
+            if(args.SelectedItem == null) return;
+
+            if (_navigating) return;
+
             if (args.IsSettingsSelected)
             {
-                NavView.Header = "设置";
-                NavView.SelectedItem = (NavigationViewItem)NavView.SettingsItem;
+                //NavView.Header = "设置";
+                //NavView.SelectedItem = (NavigationViewItem)NavView.SettingsItem;
                 NavView_Navigate("settings", args.RecommendedNavigationTransitionInfo);
             }
             else
             {
-                NavView.Header = ((NavigationViewItem)NavView.SelectedItem)?.Content?.ToString();
-                NavView.SelectedItem = args.SelectedItemContainer;
+                //NavView.Header = ((NavigationViewItem)NavView.SelectedItem)?.Content?.ToString();
+                //NavView.SelectedItem = args.SelectedItemContainer;
                 var navItemTag = args.SelectedItemContainer.Tag.ToString();
                 NavView_Navigate(navItemTag, args.RecommendedNavigationTransitionInfo);
             }
-
         }
 
         /// <summary>
         /// 页面跳转
         /// </summary>
-        /// <exception cref="NotImplementedException"></exception>
+        /// <param name="navItemTag"></param>
+        /// <param name="transitionInfo"></param>
         private void NavView_Navigate(string navItemTag, NavigationTransitionInfo transitionInfo)
         {
-            Type page;
-            if (navItemTag == "settings")
-            {
-                page = typeof(SettingsPage);
-            }
-            else
-            {
-                var item = _pages.FirstOrDefault(p => p.Tag == navItemTag);
-                page = item.Page;
-            }
+            var item = _pages.FirstOrDefault(p => p.Tag == navItemTag);
+            var page = item.Page;
             var preNavPageType = ContentFrame.CurrentSourcePageType;
 
             //当前页面不跳转
@@ -300,6 +294,28 @@ namespace Display
             {
                 ContentFrame.Navigate(page, null, transitionInfo);
             }
+        }
+        private bool _navigating;
+        private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
+        {
+            _navigating = true;
+            // 可以返回就激活返回键
+            NavView.IsBackEnabled = ContentFrame.CanGoBack;
+
+            if (e.Content is SettingsPage)
+            {
+                NavView.Header = "设置";
+                NavView.SelectedItem = (NavigationViewItem)NavView.SettingsItem;
+            }
+            else if(e.Content is Page page)
+            {
+                var item = _pages.FirstOrDefault(p => page.GetType() == p.Page);
+                
+                NavView.Header = item.Tag;
+                NavView.SelectedItem = (NavigationViewItem)NavView.MenuItems.FirstOrDefault(x => x is NavigationViewItem view && (string)view.Tag == item.Tag);
+            }
+
+            _navigating = false;
         }
 
         /// <summary>
@@ -349,11 +365,7 @@ namespace Display
             TryGoBack();
         }
 
-        private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
-        {
-            // 可以返回就激活返回键
-            NavView.IsBackEnabled = ContentFrame.CanGoBack;
-        }
+
         private void GoBack_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
         {
             TryGoBack();

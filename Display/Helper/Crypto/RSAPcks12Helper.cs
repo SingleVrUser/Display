@@ -10,11 +10,12 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace Display.Helper
+namespace Display.Helper.Crypto
 {
-    public class RSAPcks12Helper
+    public class RsaPcks12Helper
     {
         #region 私钥签名公钥验签
+
         /// <summary>
         /// 签名
         /// </summary>

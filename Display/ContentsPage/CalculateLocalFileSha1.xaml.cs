@@ -59,7 +59,6 @@ namespace Display.ContentsPage
                     {
                         sha1InfoList.Add(new LocalFileSha1Info() { Name = item.Name, FullPath = item.Path, FileType = FilesInfo.FileType.Folder });
 
-
                     }
                     else if (item.IsOfType(StorageItemTypes.File))
                     {

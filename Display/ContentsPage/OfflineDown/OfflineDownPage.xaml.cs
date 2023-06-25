@@ -7,8 +7,13 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text.RegularExpressions;
 using ABI.Windows.Networking.Proximity;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
+using Display.Services.Upload;
+using Display.Views;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -66,14 +71,15 @@ namespace Display.ContentsPage.OfflineDown
         private void TextBox_OnSelectionChanged(object sender, RoutedEventArgs e)
         {
             if (sender is not TextBox textBox) return;
-            
+
             CheckLinkCount(textBox.Text);
         }
 
         private void CheckLinkCount(string content)
         {
 
-            _matchLinkCollection = Regex.Matches(content, @"((((http|https|ftp|ed2k):\/\/)|(magnet:\?xt=urn:btih:)).{3,}?)([\r\n]|$)");
+            _matchLinkCollection = Regex.Matches(content,
+                @"((((http|https|ftp|ed2k):\/\/)|(magnet:\?xt=urn:btih:)).{3,}?)([\r\n]|$)");
 
             LinksCountRun.Text = _matchLinkCollection.Count.ToString();
         }
@@ -92,14 +98,71 @@ namespace Display.ContentsPage.OfflineDown
             // 保存路径
             if (DownPathComboBox.SelectedItem is not OfflineDownPathData downPath) return;
 
-            var result = await _webApi.AddTaskUrl(links, downPath.file_id, downPath.user_id, _offlineSpaceInfo.sign, _offlineSpaceInfo.time);
+            var result = await _webApi.AddTaskUrl(links, downPath.file_id, downPath.user_id, _offlineSpaceInfo.sign,
+                _offlineSpaceInfo.time);
 
-            RequestCompleted?.Invoke(this,new RequestCompletedEventArgs(result));
+            RequestCompleted?.Invoke(this, new RequestCompletedEventArgs(result));
         }
 
         public event EventHandler<FailLoadedEventArgs> FailLoaded;
 
         public event EventHandler<RequestCompletedEventArgs> RequestCompleted;
+
+        private void UIElement_OnDragOver(object sender, DragEventArgs e)
+        {
+            //获取拖入文件信息
+            if (!e.DataView.Contains(StandardDataFormats.StorageItems)) return;
+
+            e.AcceptedOperation = DataPackageOperation.Link;
+            e.DragUIOverride.Caption = "拖拽torrent后开始任务";
+        }
+
+
+        private async void UIElement_OnDrop(object sender, DragEventArgs e)
+        {
+            //获取拖入文件信息
+            if (!e.DataView.Contains(StandardDataFormats.StorageItems)) return;
+
+            var items = await e.DataView.GetStorageItemsAsync();
+
+            var rarItems = items.Where(i => i.IsOfType(StorageItemTypes.File) && i is StorageFile { FileType: ".torrent" }).Select(x=>x as StorageFile).ToArray();
+
+            var length = rarItems.Length;
+
+            switch (length)
+            {
+                case 0:
+                    ShowTeachingTip("未发现torrent文件");
+                    return;
+                case 1:
+                    ShowTeachingTip(await WebApi.GlobalWebApi.CreateTorrentOfflineDown(rarItems.First().Path) ? "添加torrent任务成功" : "添加torrent任务失败");
+                    break;
+                default:
+                {
+                    var failCount = 0;
+                    for(var i = 0; i < length;i++)
+                    {
+                        var file = rarItems[i];
+
+                        Debug.WriteLine(file.FileType);
+
+                        if (!await WebApi.GlobalWebApi.CreateTorrentOfflineDown(file.Path)) failCount++;
+
+                        ShowTeachingTip(failCount+1 == length? $"添加torrent任务中：{i}/{length}"+ (failCount>0? "，失败数:{failCount}" : string.Empty)
+                                                                :$"添加torrent任务完成 （{length}个）" + (failCount > 0 ? "，失败数:{failCount}" : string.Empty));
+                    }
+
+                    break;
+                }
+            }
+
+            
+        }
+
+        private void ShowTeachingTip(string subtitle, string content = null)
+        {
+            BasePage.ShowTeachingTip(LightDismissTeachingTip, subtitle, content);
+        }
     }
 
     public class FailLoadedEventArgs : EventArgs

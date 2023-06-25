@@ -110,7 +110,7 @@ namespace Display.Views
             {
                 _storeditem = videoInfo;
 
-                PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, videoInfo.truename, this.XamlRoot);
+                PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, this.XamlRoot);
 
             }
         }

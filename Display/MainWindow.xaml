@@ -190,10 +190,9 @@
             <HyperlinkButton FontSize="20"
                              HorizontalAlignment="Center"
                              VerticalAlignment="Center"
-                             Content="{x:Bind data:DataAccess.dbpath}"
+                             Content="{x:Bind data:DataAccess.DbPath}"
                              Click="HyperlinkButton_Click" />
         </StackPanel>
-
 
         <TeachingTip x:Name="LightDismissTeachingTip"
                      IsLightDismissEnabled="True"

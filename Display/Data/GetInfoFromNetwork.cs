@@ -15,7 +15,7 @@ namespace Display.Data
         public static bool IsX1080XCookieVisible = true;
 
         private static HttpClient _client;
-        public static HttpClient Client
+        public static HttpClient CommonClient
         {
             get { return _client ??= CreateClient(new Dictionary<string, string> { { "user-agent", UserAgent } }); }
             set => _client = value;
@@ -87,7 +87,7 @@ namespace Display.Data
             HttpResponseMessage resp;
             try
             {
-                resp = await Client.GetAsync(checkUrl);
+                resp = await CommonClient.GetAsync(checkUrl);
             }
             catch (HttpRequestException)
             {
@@ -121,7 +121,7 @@ namespace Display.Data
         /// <param Name="isReplaceExistsImage">是否取代存在的文件，默认为否</param>
         /// <param Name="headers">需要的header，可选</param>
         /// <returns>下载后的文件路径</returns>
-        public static async Task<string> downloadFile(string url, string filePath, string fileName, bool isReplaceExistsImage = false, Dictionary<string, string> headers = null)
+        public static async Task<string> DownloadFile(string url, string filePath, string fileName, bool isReplaceExistsImage = false, Dictionary<string, string> headers = null)
         {
             string localFilename;
             if (fileName.Contains("."))
@@ -138,7 +138,7 @@ namespace Display.Data
                 }
             }
 
-            string localPath = Path.Combine(filePath, localFilename);
+            var localPath = Path.Combine(filePath, localFilename);
 
             bool isSuccessDown = false;
 
@@ -156,10 +156,10 @@ namespace Display.Data
                 {
                     foreach (var header in headers)
                     {
-                        if (Client.DefaultRequestHeaders.Contains(header.Key))
-                            Client.DefaultRequestHeaders.Remove(header.Key);
+                        if (CommonClient.DefaultRequestHeaders.Contains(header.Key))
+                            CommonClient.DefaultRequestHeaders.Remove(header.Key);
 
-                        Client.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
+                        CommonClient.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
                     }
                 }
 
@@ -167,9 +167,9 @@ namespace Display.Data
                 {
                     try
                     {
-                        byte[] fileBytes = await Client.GetByteArrayAsync(url);
+                        byte[] fileBytes = await CommonClient.GetByteArrayAsync(url);
 
-                        File.WriteAllBytes(localPath, fileBytes);
+                        await File.WriteAllBytesAsync(localPath, fileBytes);
                         isSuccessDown = true;
                         break;
                     }
@@ -185,11 +185,7 @@ namespace Display.Data
                 isSuccessDown = true;
             }
 
-            if (isSuccessDown)
-                return localPath;
-            else
-                return null;
-
+            return isSuccessDown ? localPath : null;
         }
 
     }

@@ -170,7 +170,7 @@ namespace Display.Views
             //有多集
             else
             {
-                PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, trueName, this.XamlRoot);
+                PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, this.XamlRoot);
             }
         }
 
@@ -265,7 +265,7 @@ namespace Display.Views
             //有多集
             else
             {
-                PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, name, this.XamlRoot);
+                PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, this.XamlRoot);
             }
         }
     }

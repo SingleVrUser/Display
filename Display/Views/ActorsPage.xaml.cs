@@ -346,7 +346,7 @@ namespace Display.Views
 
                         Uri infoUri = new(actorinfo.info_url);
 
-                        var prifilePath = await GetInfoFromNetwork.downloadFile(actorinfo.image_url, filePath, "face", headers: new()
+                        var prifilePath = await GetInfoFromNetwork.DownloadFile(actorinfo.image_url, filePath, "face", headers: new()
                         {
                             {"Host",infoUri.Host },
                             {"Referer", actorinfo.info_url }

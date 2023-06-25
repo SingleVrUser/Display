@@ -11,9 +11,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Org.BouncyCastle.Math;
-using Display.Helper;
+using Display.Helper.Crypto;
 
-namespace Display.Services
+namespace Display.Services.Upload
 {
     internal class UploadKey
     {
@@ -31,7 +31,7 @@ namespace Display.Services
 
         public byte[] AesKey;
         public byte[] AesIv;
-        public  byte[] ClientPublicKey;
+        public byte[] ClientPublicKey;
 
         private void GenerateClientKeyPair()
         {

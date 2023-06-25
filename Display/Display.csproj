@@ -44,7 +44,6 @@
     <Content Remove="Assets\Win32Resources.res" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="About\UpdatePlane.xaml" />
     <None Remove="app.manifest" />
     <None Remove="Assets\115favicon.ico" />
     <None Remove="Assets\115\mountain.svg" />
@@ -110,7 +109,6 @@
     <None Remove="Controls\UserInfo.xaml" />
     <None Remove="Controls\VideoCoverDisplay.xaml" />
     <None Remove="Controls\VideoDetails.xaml" />
-    <None Remove="Settings\GetVideoInfo.xaml" />
     <None Remove="Themes\Converter.xaml" />
     <None Remove="VideoPlayWindow.xaml" />
     <None Remove="Views\BrowserPage.xaml" />
@@ -295,16 +293,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Window\VideoPlay.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="About\UpdatePlane.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Settings\GetVideoInfo.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

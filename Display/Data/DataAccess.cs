@@ -14,239 +14,234 @@ namespace Display.Data
 {
     public static class DataAccess
     {
-        private const string DBNAME = "115_uwp.db";
-        public static string dbpath => NewDBPath(AppSettings.DataAccessSavePath);
+        private const string DbName = "115_uwp.db";
+        public static string DbPath => NewDBPath(AppSettings.DataAccessSavePath);
 
         /// <summary>
         /// 数据库表初始化
         /// </summary>
-        public static async Task InitializeDatabase(string DataAccess_SavePath = null)
+        public static async Task InitializeDatabase(string dataAccessSavePath = null)
         {
-            if (DataAccess_SavePath == null)
-            {
-                DataAccess_SavePath = AppSettings.DataAccessSavePath;
-            }
+            dataAccessSavePath ??= AppSettings.DataAccessSavePath;
 
-            tryCreateDBFile(DataAccess_SavePath);
+            tryCreateDBFile(dataAccessSavePath);
 
-            string newDBPath = Path.Combine(DataAccess_SavePath, DBNAME);
+            var newDbPath = Path.Combine(dataAccessSavePath, DbName);
 
             //获取文件夹，没有则创建
-            StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(AppSettings.DataAccessSavePath);
+            var folder = await StorageFolder.GetFolderFromPathAsync(AppSettings.DataAccessSavePath);
             //获取数据库文件，没有则创建
-            await folder.CreateFileAsync(DBNAME, CreationCollisionOption.OpenIfExists);
+            await folder.CreateFileAsync(DbName, CreationCollisionOption.OpenIfExists);
 
-            using (SqliteConnection db =
-               new SqliteConnection($"Filename={newDBPath}"))
+            await using var db = new SqliteConnection($"Filename={newDbPath}");
+
+            db.Open();
+
+            //文件信息
+            var tableCommand = "CREATE TABLE IF NOT " +
+                                  "EXISTS FilesInfo ( " +
+                                  "fid text," +
+                                  "uid integer," +
+                                  "aid integer," +
+                                  "cid TEXT," +
+                                  "n TEXT," +
+                                  "s integer," +
+                                  "sta integer," +
+                                  "pt TEXT," +
+                                  "pid TEXT," +
+                                  "pc TEXT," +
+                                  "p integer," +
+                                  "m integer," +
+                                  "t TEXT," +
+                                  "te integer," +
+                                  "tp integer," +
+                                  "d integer," +
+                                  "c integer," +
+                                  "sh integer," +
+                                  "e TEXT," +
+                                  "ico TEXT," +
+                                  "sha TEXT," +
+                                  "fdes TEXT," +
+                                  "q integer," +
+                                  "hdf integer," +
+                                  "fvs integer," +
+                                  "u TEXT," +
+                                  "iv integer," +
+                                  "current_time integer," +
+                                  "played_end integer," +
+                                  "last_time TEXT," +
+                                  "vdi integer," +
+                                  "play_long real," +
+                                  "PRIMARY KEY('pc')) ";
+
+            var createTable = new SqliteCommand(tableCommand, db);
+            createTable.ExecuteNonQuery();
+
+            //番号详情
+            createTable.CommandText = "CREATE TABLE IF NOT " +
+                                      $"EXISTS VideoInfo ( " +
+                                      "truename TEXT NOT NULL," +
+                                      "title TEXT," +
+                                      "releasetime TEXT," +
+                                      "lengthtime TEXT," +
+                                      "director TEXT," +
+                                      "producer TEXT," +
+                                      "publisher TEXT," +
+                                      "series TEXT," +
+                                      "category TEXT," +
+                                      "actor TEXT," +
+                                      "imageurl TEXT," +
+                                      "sampleImageList TEXT," +
+                                      "imagepath TEXT," +
+                                      "busurl TEXT," +
+                                      "look_later integer," +
+                                      "score integer," +
+                                      "is_like integer," +
+                                      "addtime integer," +
+                                      "PRIMARY KEY('truename')) ";
+
+            createTable.ExecuteNonQuery();
+
+            //是否步兵
+            createTable.CommandText = "CREATE TABLE IF NOT " +
+                                      $"EXISTS Is_Wm ( " +
+                                      "truename text," +
+                                      "is_wm integer," +
+                                      "PRIMARY KEY('truename')" +
+                                      ") ";
+            createTable.ExecuteNonQuery();
+
+            //厂商信息，如果没有则初始化并添加常用的
+            InittializeProducerInfo(createTable);
+
+            //番号匹配
+            createTable.CommandText = "CREATE TABLE IF NOT " +
+                                      "EXISTS FileToInfo ( " +
+                                      "file_pickcode text," +
+                                      "truename text," +
+                                      "issuccess integer," +
+                                      "PRIMARY KEY('file_pickcode')" +
+                                      ") ";
+            createTable.ExecuteNonQuery();
+
+            //下载历史
+            createTable.CommandText = "CREATE TABLE IF NOT " +
+                                      $"EXISTS DownHistory ( " +
+                                      "file_pickcode text," +
+                                      "file_name text," +
+                                      "true_url text," +
+                                      "ua text," +
+                                      "add_time integer," +
+                                      "PRIMARY KEY('file_pickcode','ua')" +
+                                      ") ";
+            createTable.ExecuteNonQuery();
+
+            //演员信息
+            createTable.CommandText = "CREATE TABLE IF NOT " +
+                                      $"EXISTS ActorInfo ( " +
+                                      "id INTEGER NOT NULL," +
+                                      "Name TEXT NOT NULL," +
+                                      "is_woman integer," +
+                                      "birthday text," +
+                                      "bwh text," +
+                                      "height integer," +
+                                      "works_count integer," +
+                                      "work_time text," +
+                                      "prifile_path text," +
+                                      "blog_url text," +
+                                      "is_like integer," +
+                                      "addtime integer," +
+                                      "info_url text," +
+                                      "PRIMARY KEY (id)" +
+                                      ") ";
+
+            createTable.ExecuteNonQuery();
+
+            //为ActorInfo添加info_url
+            //info_url必须在最后（插入数据的顺序）
+            createTable.CommandText = "ALTER TABLE ActorInfo ADD COLUMN info_url Text";
+
+            //可能已存在
+            try
             {
-                db.Open();
-
-                //文件信息
-                string tableCommand = "CREATE TABLE IF NOT " +
-                    "EXISTS FilesInfo ( " +
-                      "fid text," +
-                      "uid integer," +
-                      "aid integer," +
-                      "cid TEXT," +
-                      "n TEXT," +
-                      "s integer," +
-                      "sta integer," +
-                      "pt TEXT," +
-                      "pid TEXT," +
-                      "pc TEXT," +
-                      "p integer," +
-                      "m integer," +
-                      "t TEXT," +
-                      "te integer," +
-                      "tp integer," +
-                      "d integer," +
-                      "c integer," +
-                      "sh integer," +
-                      "e TEXT," +
-                      "ico TEXT," +
-                      "sha TEXT," +
-                      "fdes TEXT," +
-                      "q integer," +
-                      "hdf integer," +
-                      "fvs integer," +
-                      "u TEXT," +
-                      "iv integer," +
-                      "current_time integer," +
-                      "played_end integer," +
-                      "last_time TEXT," +
-                      "vdi integer," +
-                      "play_long real," +
-                      "PRIMARY KEY('pc')) ";
-
-                SqliteCommand createTable = new SqliteCommand(tableCommand, db);
-                createTable.ExecuteNonQuery();
-
-                //番号详情
-                createTable.CommandText = "CREATE TABLE IF NOT " +
-                    $"EXISTS VideoInfo ( " +
-                      "truename TEXT NOT NULL," +
-                      "title TEXT," +
-                      "releasetime TEXT," +
-                      "lengthtime TEXT," +
-                      "director TEXT," +
-                      "producer TEXT," +
-                      "publisher TEXT," +
-                      "series TEXT," +
-                      "category TEXT," +
-                      "actor TEXT," +
-                      "imageurl TEXT," +
-                      "sampleImageList TEXT," +
-                      "imagepath TEXT," +
-                      "busurl TEXT," +
-                      "look_later integer," +
-                      "score integer," +
-                      "is_like integer," +
-                      "addtime integer," +
-                      "PRIMARY KEY('truename')) ";
-
-                createTable.ExecuteNonQuery();
-
-                //是否步兵
-                createTable.CommandText = "CREATE TABLE IF NOT " +
-                    $"EXISTS Is_Wm ( " +
-                      "truename text," +
-                      "is_wm integer," +
-                      "PRIMARY KEY('truename')" +
-                      ") ";
-                createTable.ExecuteNonQuery();
-
-                //厂商信息，如果没有则初始化并添加常用的
-                InittializeProducerInfo(createTable);
-
-                //番号匹配
-                createTable.CommandText = "CREATE TABLE IF NOT " +
-                    "EXISTS FileToInfo ( " +
-                      "file_pickcode text," +
-                      "truename text," +
-                      "issuccess integer," +
-                      "PRIMARY KEY('file_pickcode')" +
-                      ") ";
-                createTable.ExecuteNonQuery();
-
-                //下载历史
-                createTable.CommandText = "CREATE TABLE IF NOT " +
-                    $"EXISTS DownHistory ( " +
-                      "file_pickcode text," +
-                      "file_name text," +
-                      "true_url text," +
-                      "ua text," +
-                      "add_time integer," +
-                      "PRIMARY KEY('file_pickcode','ua')" +
-                      ") ";
-                createTable.ExecuteNonQuery();
-
-                //演员信息
-                createTable.CommandText = "CREATE TABLE IF NOT " +
-                    $"EXISTS ActorInfo ( " +
-                        "id INTEGER NOT NULL," +
-                        "Name TEXT NOT NULL," +
-                        "is_woman integer," +
-                        "birthday text," +
-                        "bwh text," +
-                        "height integer," +
-                        "works_count integer," +
-                        "work_time text," +
-                        "prifile_path text," +
-                        "blog_url text," +
-                        "is_like integer," +
-                        "addtime integer," +
-                        "info_url text," +
-                        "PRIMARY KEY (id)" +
-                      ") ";
-
-                createTable.ExecuteNonQuery();
-
-                //为ActorInfo添加info_url
-                //info_url必须在最后（插入数据的顺序）
-                createTable.CommandText = "ALTER TABLE ActorInfo ADD COLUMN info_url Text";
-
-                //可能已存在
-                try
-                {
-                    createTable.ExecuteNonQuery();
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
-                }
-
-                //bwh
-                createTable.CommandText = "CREATE TABLE IF NOT " +
-                    $"EXISTS bwh ( " +
-                        "bwh text," +
-                        "bust integer," +
-                        "waist integer," +
-                        "hips integer," +
-                        "PRIMARY KEY('bwh')" +
-                      ") ";
-                createTable.ExecuteNonQuery();
-
-                //FailList_islike_looklater
-                createTable.CommandText = "CREATE TABLE IF NOT " +
-                    $"EXISTS FailList_islike_looklater ( " +
-                        "pc text," +
-                        "is_like integer," +
-                        "score integer," +
-                        "look_later integer," +
-                        "image_path text," +
-                        "PRIMARY KEY('pc')" +
-                      ") ";
-                createTable.ExecuteNonQuery();
-
-                //演员别名
-                createTable.CommandText = "CREATE TABLE IF NOT " +
-                    $"EXISTS Actor_Names ( " +
-                    "id INTEGER NOT NULL," +
-                    "Name TEXT NOT NULL," +
-                    "PRIMARY KEY('id','Name')" +
-                        ") ";
-                createTable.ExecuteNonQuery();
-
-                //演员视频中间表
-                createTable.CommandText = "CREATE TABLE IF NOT " +
-                    $"EXISTS Actor_Video ( " +
-                    "actor_id INTEGER NOT NULL," +
-                    "video_name TEXT NOT NULL," +
-                    "PRIMARY KEY('actor_id','video_name')" +
-                        ") ";
-                createTable.ExecuteNonQuery();
-
-                //搜刮记录
-                createTable.CommandText = "CREATE TABLE IF NOT " +
-                    $"EXISTS SpiderLog ( " +
-                      "task_id INTEGER," +
-                      "time text," +
-                      "done text," +
-                      "PRIMARY KEY('task_id')" +
-                      ") ";
-                createTable.ExecuteNonQuery();
-
-                //删除表（添加了搜刮源，需要重新添加）
-                createTable.CommandText = "DROP TABLE IF EXISTS SpiderTask";
-                createTable.ExecuteNonQuery();
-
-                //搜刮任务
-                createTable.CommandText = "CREATE TABLE IF NOT " +
-                    $"EXISTS SpiderTask ( " +
-                      "Name text," +
-                      "bus text," +
-                      "Jav321 text," +
-                      "Avmoo text," +
-                      "Avsox text," +
-                      "libre text," +
-                      "fc text," +
-                      "db text," +
-                      "done integer," +
-                      "tadk_id integer," +
-                      "PRIMARY KEY('Name')" +
-                      ") ";
                 createTable.ExecuteNonQuery();
             }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+
+            //bwh
+            createTable.CommandText = "CREATE TABLE IF NOT " +
+                                      $"EXISTS bwh ( " +
+                                      "bwh text," +
+                                      "bust integer," +
+                                      "waist integer," +
+                                      "hips integer," +
+                                      "PRIMARY KEY('bwh')" +
+                                      ") ";
+            createTable.ExecuteNonQuery();
+
+            //FailList_islike_looklater
+            createTable.CommandText = "CREATE TABLE IF NOT " +
+                                      $"EXISTS FailList_islike_looklater ( " +
+                                      "pc text," +
+                                      "is_like integer," +
+                                      "score integer," +
+                                      "look_later integer," +
+                                      "image_path text," +
+                                      "PRIMARY KEY('pc')" +
+                                      ") ";
+            createTable.ExecuteNonQuery();
+
+            //演员别名
+            createTable.CommandText = "CREATE TABLE IF NOT " +
+                                      $"EXISTS Actor_Names ( " +
+                                      "id INTEGER NOT NULL," +
+                                      "Name TEXT NOT NULL," +
+                                      "PRIMARY KEY('id','Name')" +
+                                      ") ";
+            createTable.ExecuteNonQuery();
+
+            //演员视频中间表
+            createTable.CommandText = "CREATE TABLE IF NOT " +
+                                      $"EXISTS Actor_Video ( " +
+                                      "actor_id INTEGER NOT NULL," +
+                                      "video_name TEXT NOT NULL," +
+                                      "PRIMARY KEY('actor_id','video_name')" +
+                                      ") ";
+            createTable.ExecuteNonQuery();
+
+            //搜刮记录
+            createTable.CommandText = "CREATE TABLE IF NOT " +
+                                      $"EXISTS SpiderLog ( " +
+                                      "task_id INTEGER," +
+                                      "time text," +
+                                      "done text," +
+                                      "PRIMARY KEY('task_id')" +
+                                      ") ";
+            createTable.ExecuteNonQuery();
+
+            //删除表（添加了搜刮源，需要重新添加）
+            createTable.CommandText = "DROP TABLE IF EXISTS SpiderTask";
+            createTable.ExecuteNonQuery();
+
+            //搜刮任务
+            createTable.CommandText = "CREATE TABLE IF NOT " +
+                                      $"EXISTS SpiderTask ( " +
+                                      "Name text," +
+                                      "bus text," +
+                                      "Jav321 text," +
+                                      "Avmoo text," +
+                                      "Avsox text," +
+                                      "libre text," +
+                                      "fc text," +
+                                      "db text," +
+                                      "done integer," +
+                                      "tadk_id integer," +
+                                      "PRIMARY KEY('Name')" +
+                                      ") ";
+            createTable.ExecuteNonQuery();
         }
 
         public static async Task UpdateDatabaseFrom14()
@@ -393,7 +388,7 @@ namespace Display.Data
 
         public static string NewDBPath(string newPath)
         {
-            return Path.Combine(newPath, DBNAME);
+            return Path.Combine(newPath, DbName);
         }
 
         public static async void tryCreateDBFile(string TargetPath)
@@ -401,7 +396,7 @@ namespace Display.Data
             //获取文件夹
             StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(TargetPath);
             //获取数据库文件，没有则创建
-            await folder.CreateFileAsync(DBNAME, CreationCollisionOption.OpenIfExists);
+            await folder.CreateFileAsync(DbName, CreationCollisionOption.OpenIfExists);
         }
 
         #region 删除
@@ -411,7 +406,7 @@ namespace Display.Data
         public static void DeleteFilesInfoTable()
         {
             using SqliteConnection db =
-                new SqliteConnection($"Filename={dbpath}");
+                new SqliteConnection($"Filename={DbPath}");
             db.Open();
 
             var insertCommand = new SqliteCommand();
@@ -428,7 +423,7 @@ namespace Display.Data
         public static void DeleteDownHistory()
         {
             using SqliteConnection db =
-                new SqliteConnection($"Filename={dbpath}");
+                new SqliteConnection($"Filename={DbPath}");
             db.Open();
 
             var insertCommand = new SqliteCommand();
@@ -448,7 +443,7 @@ namespace Display.Data
         public static void DeleteSpiderLogTable()
         {
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -470,7 +465,7 @@ namespace Display.Data
         public static void DeleteSpiderTaskTable()
         {
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -492,7 +487,7 @@ namespace Display.Data
         public static void DeleteDataInVideoInfoTable(string truename)
         {
             using SqliteConnection db =
-                new SqliteConnection($"Filename={dbpath}");
+                new SqliteConnection($"Filename={DbPath}");
             db.Open();
 
             SqliteCommand command = new SqliteCommand();
@@ -509,7 +504,7 @@ namespace Display.Data
         public static void DeleteDataInFilesInfoAndFileToInfo(string pc)
         {
             using SqliteConnection db =
-                new SqliteConnection($"Filename={dbpath}");
+                new SqliteConnection($"Filename={DbPath}");
 
             db.Open();
 
@@ -537,7 +532,7 @@ namespace Display.Data
         public static void DeleteDirectoryAndFiles_InFilesInfoTable(string cid)
         {
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -586,7 +581,7 @@ namespace Display.Data
         public static async Task AddFilesInfoAsync(Datum data)
         {
             await using var db =
-                new SqliteConnection($"Filename={dbpath}");
+                new SqliteConnection($"Filename={DbPath}");
 
             db.Open();
 
@@ -628,7 +623,7 @@ namespace Display.Data
         public static void AddFileToInfo(string pickCode, string truename, bool issuccess = false, bool isReplace = false)
         {
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -668,7 +663,7 @@ namespace Display.Data
         public static void AddVideoInfo(VideoInfo data)
         {
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -723,7 +718,7 @@ namespace Display.Data
         {
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -753,7 +748,7 @@ namespace Display.Data
         {
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -783,7 +778,7 @@ namespace Display.Data
         public static void AddOrReplaceFailList_islike_looklater(FailInfo failInfo)
         {
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -808,7 +803,7 @@ namespace Display.Data
         {
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -829,7 +824,7 @@ namespace Display.Data
         {
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -849,7 +844,7 @@ namespace Display.Data
         public static void AddOrIgnoreBwh(string bwh, int bust, int waist, int hips)
         {
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -879,7 +874,7 @@ namespace Display.Data
 
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -905,7 +900,7 @@ namespace Display.Data
             long actor_id = 0;
 
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -952,7 +947,7 @@ namespace Display.Data
 
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -983,7 +978,7 @@ namespace Display.Data
         public static void AddSpiderTask(string name, long task_id)
         {
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1025,7 +1020,7 @@ namespace Display.Data
         public static void UpdateSingleFailInfo(string pc, string key, string value)
         {
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1055,7 +1050,7 @@ namespace Display.Data
         public static void UpdateFileToInfo(string truename, bool isSuccess)
         {
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1086,7 +1081,7 @@ namespace Display.Data
         public static void UpdateActorInfo(long actorId, ActorInfo actorInfo)
         {
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1128,7 +1123,7 @@ namespace Display.Data
         public static void UpdateActorInfoIsWoman(long id, int is_woman)
         {
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1151,7 +1146,7 @@ namespace Display.Data
         public static void UpdateActorInfoPrifilePath(long id, string prifile_path)
         {
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1174,7 +1169,7 @@ namespace Display.Data
         public static void UpdateSingleDataFromVideoInfo(string truename, string key, string value)
         {
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1196,7 +1191,7 @@ namespace Display.Data
         public static void UpdateSingleDataFromActorInfo(string id, string key, string value)
         {
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1216,7 +1211,7 @@ namespace Display.Data
         public static void UpdateDataFromVideoInfo(VideoInfo videoInfo)
         {
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1299,7 +1294,7 @@ namespace Display.Data
         public static void UpdateAllImagePath(string srcPath, string dstPath)
         {
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1321,7 +1316,7 @@ namespace Display.Data
         public static void UpdateActorProfilePath(string srcPath, string dstPath)
         {
             using (SqliteConnection db =
-                   new SqliteConnection($"Filename={dbpath}"))
+                   new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1342,7 +1337,7 @@ namespace Display.Data
         public static void UpdateSpiderTask(string Name, Spider.Manager.SpiderSource SpiderSource, SpiderStates SpiderSourceStatus, bool IsAllDone = false)
         {
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1371,7 +1366,7 @@ namespace Display.Data
         public static void UpdateSpiderLogDone(long task_id)
         {
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1406,7 +1401,7 @@ namespace Display.Data
             List<Datum> data = new List<Datum>();
 
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1438,7 +1433,7 @@ namespace Display.Data
             VideoInfo data = null;
 
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1468,7 +1463,7 @@ namespace Display.Data
 
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
-              new SqliteConnection($"Filename={dbpath}"))
+              new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1506,7 +1501,7 @@ namespace Display.Data
             List<Datum> data = new List<Datum>();
 
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1529,7 +1524,7 @@ namespace Display.Data
         {
             FailInfo failInfo = null;
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1563,7 +1558,7 @@ namespace Display.Data
             List<FailInfo> data = new();
 
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1598,7 +1593,7 @@ namespace Display.Data
             string fileName = null;
 
             using (SqliteConnection db =
-                   new SqliteConnection($"Filename={dbpath}"))
+                   new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1627,7 +1622,7 @@ namespace Display.Data
             List<Datum> data = new List<Datum>();
 
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1670,7 +1665,7 @@ namespace Display.Data
             int count = 0;
 
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1716,7 +1711,7 @@ namespace Display.Data
         {
             int count = 0;
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1746,7 +1741,7 @@ namespace Display.Data
         {
             int count = 0;
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1785,7 +1780,7 @@ namespace Display.Data
 
             int count = 0;
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1828,7 +1823,7 @@ namespace Display.Data
         {
             int count = 0;
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1873,7 +1868,7 @@ namespace Display.Data
         {
             Tuple<long, long> tuple = null;
             using (SqliteConnection db =
-            new SqliteConnection($"Filename={dbpath}"))
+            new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1900,7 +1895,7 @@ namespace Display.Data
         {
             string imagePath = "";
             using (SqliteConnection db =
-            new SqliteConnection($"Filename={dbpath}"))
+            new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1927,7 +1922,7 @@ namespace Display.Data
         {
             string imagePath = "";
             using (SqliteConnection db =
-                   new SqliteConnection($"Filename={dbpath}"))
+                   new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1955,7 +1950,7 @@ namespace Display.Data
             long actor_id = -1;
 
             using (SqliteConnection db =
-            new SqliteConnection($"Filename={dbpath}"))
+            new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -1982,7 +1977,7 @@ namespace Display.Data
             string name = string.Empty;
 
             using (SqliteConnection db =
-            new SqliteConnection($"Filename={dbpath}"))
+            new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -2012,7 +2007,7 @@ namespace Display.Data
             int count = 0;
 
             using (SqliteConnection db =
-            new SqliteConnection($"Filename={dbpath}"))
+            new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -2042,7 +2037,7 @@ namespace Display.Data
             bool isDone = false;
 
             using (SqliteConnection db =
-            new SqliteConnection($"Filename={dbpath}"))
+            new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -2175,7 +2170,7 @@ namespace Display.Data
             List<VideoInfo> data = new List<VideoInfo>();
 
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -2221,7 +2216,7 @@ namespace Display.Data
             List<ActorInfo> data = new();
 
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -2266,7 +2261,7 @@ namespace Display.Data
             List<ActorInfo> data = new();
 
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -2300,7 +2295,7 @@ namespace Display.Data
             string pid = string.Empty;
 
             using SqliteConnection db =
-                new SqliteConnection($"Filename={dbpath}");
+                new SqliteConnection($"Filename={DbPath}");
 
             db.Open();
 
@@ -2340,7 +2335,7 @@ namespace Display.Data
 
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
-                new SqliteConnection($"Filename={dbpath}"))
+                new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -2382,7 +2377,7 @@ namespace Display.Data
 
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
-                new SqliteConnection($"Filename={dbpath}"))
+                new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -2433,7 +2428,7 @@ namespace Display.Data
 
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
-                new SqliteConnection($"Filename={dbpath}"))
+                new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -2466,7 +2461,7 @@ namespace Display.Data
             List<VideoInfo> data = new List<VideoInfo>();
 
             using (SqliteConnection db =
-                new SqliteConnection($"Filename={dbpath}"))
+                new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -2501,7 +2496,7 @@ namespace Display.Data
         {
             Dictionary<string, string> subDicts = new();
             using (SqliteConnection db =
-                new SqliteConnection($"Filename={dbpath}"))
+                new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -2630,7 +2625,7 @@ namespace Display.Data
             List<Datum> data = new List<Datum>();
             
             using (SqliteConnection db =
-                new SqliteConnection($"Filename={dbpath}"))
+                new SqliteConnection($"Filename={DbPath}"))
             { 
                 db.Open();
 
@@ -2685,7 +2680,7 @@ namespace Display.Data
             List<Datum> data = new List<Datum>();
 
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -2717,7 +2712,7 @@ namespace Display.Data
 
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -2749,7 +2744,7 @@ namespace Display.Data
 
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
-               new SqliteConnection($"Filename={dbpath}"))
+               new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 
@@ -2842,7 +2837,7 @@ namespace Display.Data
 
             //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             await using SqliteConnection db =
-                new SqliteConnection($"Filename={dbpath}");
+                new SqliteConnection($"Filename={DbPath}");
 
             db.Open();
 
@@ -2874,7 +2869,7 @@ namespace Display.Data
             List<VideoInfo> data = new List<VideoInfo>();
 
             using SqliteConnection db =
-                new SqliteConnection($"Filename={dbpath}");
+                new SqliteConnection($"Filename={DbPath}");
 
             db.Open();
 
@@ -2905,7 +2900,7 @@ namespace Display.Data
             List<VideoInfo> data = new List<VideoInfo>();
 
             await using SqliteConnection db =
-                new SqliteConnection($"Filename={dbpath}");
+                new SqliteConnection($"Filename={DbPath}");
 
             db.Open();
 
@@ -2936,7 +2931,7 @@ namespace Display.Data
             List<VideoInfo> data = new List<VideoInfo>();
 
             await using SqliteConnection db =
-                new SqliteConnection($"Filename={dbpath}");
+                new SqliteConnection($"Filename={DbPath}");
 
             db.Open();
 
@@ -2967,7 +2962,7 @@ namespace Display.Data
             Datum datum = new Datum();
 
             using (SqliteConnection db =
-            new SqliteConnection($"Filename={dbpath}"))
+            new SqliteConnection($"Filename={DbPath}"))
             {
                 db.Open();
 

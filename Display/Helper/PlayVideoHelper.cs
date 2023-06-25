@@ -11,13 +11,18 @@ using System.Threading.Tasks;
 using Display.Data;
 using Display.Models;
 using Display.ContentsPage.DetailInfo;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
+using System.Web;
+using static Display.Data.WebApi;
 
 namespace Display.Helper;
 
 public class PlayVideoHelper
 {
     /// <summary>
-    /// 根据指定播放器播放
+    /// 指定播放器播放
     /// </summary>
     /// <param name="playItems"></param>
     /// <param name="xamlRoot"></param>
@@ -58,15 +63,15 @@ public class PlayVideoHelper
                 break;
             //PotPlayer播放
             case 1:
-                await WebApi.GlobalWebApi.PlayVideoWithPlayer(playItems, WebApi.PlayMethod.Pot, xamlRoot);
+                await GlobalWebApi.PlayVideoWithPlayer(playItems, PlayMethod.Pot, xamlRoot);
                 break;
             //mpv播放
             case 2:
-                await WebApi.GlobalWebApi.PlayVideoWithPlayer(playItems, WebApi.PlayMethod.Mpv, xamlRoot);
+                await GlobalWebApi.PlayVideoWithPlayer(playItems, PlayMethod.Mpv, xamlRoot);
                 break;
             //vlc播放
             case 3:
-                await WebApi.GlobalWebApi.PlayVideoWithPlayer(playItems, WebApi.PlayMethod.Vlc, xamlRoot);
+                await GlobalWebApi.PlayVideoWithPlayer(playItems, PlayMethod.Vlc, xamlRoot);
                 break;
             //MediaElement播放
             case 4:
@@ -75,18 +80,156 @@ public class PlayVideoHelper
         }
     }
 
-    public static async void SubInfoListView_ItemClick(object sender, ItemClickEventArgs e)
+    /// <summary>
+    /// PotPlayer播放（原画）
+    /// </summary>
+    /// <param name="playItems"></param>
+    /// <param name="userAgent"></param>
+    /// <param name="fileName"></param>
+    /// <param name="quality"></param>
+    /// <param name="showWindow"></param>
+    /// <param name="referrerUrl"></param>
+    public static async void Play115SourceVideoWithPotPlayer(List<MediaPlayItem> playItems, string userAgent, string fileName, Const.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
     {
-        if (e.ClickedItem is not SubInfo singleVideoInfo) return;
+        var isFirst = true;
+        foreach (var mediaPlayItem in playItems)
+        {
+            var downUrl = await mediaPlayItem.GetUrl(quality);
+            var subFile = await mediaPlayItem.GetOneSubFilePath();
+            var addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty : @$" /sub=""{subFile}""";
+            var arguments = @$" ""{downUrl}"" /user_agent=""{userAgent}"" /referer=""{referrerUrl}""{addSubFile}";
 
-        if (sender is not ListView { DataContext: string trueName }) return;
-
-        var mediaPlayItem = new MediaPlayItem(singleVideoInfo.FileBelongPickCode, trueName, FilesInfo.FileType.File) { SubInfos = new List<SubInfo>(){ singleVideoInfo } };
-        await PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, lastPage: DetailInfoPage.Current);
+            if (isFirst)
+            {
+                isFirst = false;
+                arguments += " /current";
+                StartProcess(fileName, arguments, exitedHandler: (_,_) =>
+                {
+                    Debug.WriteLine("Process_Exited");
+                });
+                await Task.Delay(10000);
+            }
+            else
+            {
+                arguments += " /add";
+                StartProcess(fileName, arguments, showWindow);
+                await Task.Delay(1000);
+            }
+        }
     }
 
+    /// <summary>
+    /// mpv播放
+    /// </summary>
+    /// <param name="playItems"></param>
+    /// <param name="userAgent"></param>
+    /// <param name="fileName"></param>
+    /// <param name="quality"></param>
+    /// <param name="showWindow"></param>
+    /// <param name="referrerUrl"></param>
+    public static async void Play115SourceVideoWithMpv(List<MediaPlayItem> playItems, string userAgent, string fileName, Const.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
+    {
+        var arguments = string.Empty;
+        foreach (var mediaPlayItem in playItems)
+        {
+            var playUrl = await mediaPlayItem.GetUrl(quality);
+            var title = mediaPlayItem.Title;
+            var subFile = await mediaPlayItem.GetOneSubFilePath();
 
-    public static async void ShowSelectedVideoToPlayPage(List<Datum> multisetList, string trueName, XamlRoot xamlRoot)
+            var addTitle = string.Empty;
+            if (string.IsNullOrEmpty(title))
+            {
+                var matchTitle = Regex.Match(HttpUtility.UrlDecode(playUrl), @"/([-@.\w]+?\.\w+)\?t=");
+                if (matchTitle.Success)
+                    title = matchTitle.Groups[1].Value;
+            }
+
+            if (!string.IsNullOrEmpty(title))
+                addTitle = @$"  --title=""播放 - {title}""";
+
+            var addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty : @$" --sub-file=""{subFile}""";
+
+            arguments += " --{" + @$" ""{playUrl}"" --referrer=""{referrerUrl}"" --user-agent=""{userAgent}"" --force-media-title=""{mediaPlayItem.FileName}""{addTitle}{addSubFile}" + " --}";
+        }
+
+        StartProcess(fileName, arguments, showWindow);
+
+    }
+
+    /// <summary>
+    /// vlc播放（原画）
+    /// </summary>
+    /// <param name="playItems"></param>
+    /// <param name="userAgent"></param>
+    /// <param name="fileName"></param>
+    /// <param name="quality"></param>
+    /// <param name="showWindow"></param>
+    /// <param name="referrerUrl"></param>
+    public static async void Play115SourceVideoWithVlc(List<MediaPlayItem> playItems, string userAgent, string fileName, Const.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
+    {
+        var arguments = string.Empty;
+        foreach (var mediaPlayItem in playItems)
+        {
+            var playUrl = await mediaPlayItem.GetUrl(quality);
+            var title = mediaPlayItem.Title;
+            var subFile = await mediaPlayItem.GetOneSubFilePath();
+
+            var addTitle = string.Empty;
+            if (string.IsNullOrEmpty(title))
+            {
+                var matchTitle = Regex.Match(HttpUtility.UrlDecode(playUrl), @"/([-@.\w]+?\.\w+)\?t=");
+                if (matchTitle.Success)
+                    addTitle = matchTitle.Groups[1].Value;
+            }
+
+            if (!string.IsNullOrEmpty(title))
+            {
+                addTitle = @$" :meta-title=""{title}""";
+            }
+            var addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty : @$" :sub-file=""{subFile}""";
+
+            arguments += @$" ""{playUrl}"" :http-referrer=""{referrerUrl}"" :http-user-agent=""{userAgent}""{addTitle}{addSubFile}";
+        }
+
+        StartProcess(fileName, arguments, showWindow);
+    }
+
+    /// <summary>
+    /// 通过Process调用指定播放器
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <param name="arguments"></param>
+    /// <param name="showWindow"></param>
+    /// <param name="exitedHandler"></param>
+    private static async void StartProcess(string fileName, string arguments, bool showWindow = false, EventHandler exitedHandler = null)
+    {
+        using var process = new Process()
+        {
+            StartInfo = new ProcessStartInfo()
+            {
+                FileName = fileName,
+                Arguments = arguments,
+                UseShellExecute = false,
+                CreateNoWindow = !showWindow
+            }
+        };
+
+        if (exitedHandler != null)
+        {
+            process.Exited += exitedHandler;
+        }
+        try
+        {
+            process.Start();
+            await process.WaitForExitAsync();
+        }
+        catch (Win32Exception e)
+        {
+            Toast.TryToast("播放错误", "调用播放器时出现异常", e.Message);
+        }
+    }
+
+    public static async void ShowSelectedVideoToPlayPage(List<Datum> multisetList, XamlRoot xamlRoot)
     {
         //var multisetList = videoInfoList.ToList();
         multisetList = multisetList.OrderBy(item => item.n).ToList();

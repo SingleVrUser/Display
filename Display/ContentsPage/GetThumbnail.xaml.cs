@@ -473,7 +473,7 @@ namespace Display.ContentsPage
                 {
                     string SavePath = Path.Combine(AppSettings.ImageSavePath, thumbnail.name);
                     string SaveName = $"Thumbnail_{j}";
-                    string saveImagePath = await GetInfoFromNetwork.downloadFile(DownUrlList[j], SavePath, SaveName);
+                    string saveImagePath = await GetInfoFromNetwork.DownloadFile(DownUrlList[j], SavePath, SaveName);
 
                     if (j == 1)
                     {

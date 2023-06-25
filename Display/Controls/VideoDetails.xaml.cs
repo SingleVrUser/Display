@@ -342,7 +342,7 @@ namespace Display.Controls
             //重新下载图片
             if (!string.IsNullOrEmpty(videoInfo.imageurl))
             {
-                await GetInfoFromNetwork.downloadFile(videoInfo.imageurl, Path.Combine(AppSettings.ImageSavePath, videoInfo.truename), videoInfo.truename, true);
+                await GetInfoFromNetwork.DownloadFile(videoInfo.imageurl, Path.Combine(AppSettings.ImageSavePath, videoInfo.truename), videoInfo.truename, true);
             }
 
             //更新数据库
