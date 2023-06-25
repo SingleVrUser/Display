@@ -158,18 +158,18 @@ namespace Display.Models
             return quality.Url;
         }
 
-        public async Task<string> GetUrl(AppSettings.PlayQuality quality)
+        public async Task<string> GetUrl(Const.PlayQuality quality)
         {
             switch (quality)
             {
-                case AppSettings.PlayQuality.M3U8:
+                case Const.PlayQuality.M3U8:
                 {
                     var m3U8Infos = await GetM3U8Infos();
                     if (m3U8Infos == null || m3U8Infos.Count == 0) return await GetOriginalUrl();
 
                     return m3U8Infos.FirstOrDefault()?.Url;
                 }
-                case AppSettings.PlayQuality.Origin:
+                case Const.PlayQuality.Origin:
                     return await GetOriginalUrl();
                 default:
                     return null;

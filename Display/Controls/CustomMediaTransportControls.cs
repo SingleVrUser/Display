@@ -248,9 +248,9 @@ public class CustomMediaTransportControls : MediaTransportControls
 
         //设置播放源
         List<Player> playerItemsSource = new() {
-            new Player(WebApi.PlayMethod.vlc),
-            new Player(WebApi.PlayMethod.mpv),
-            new Player(WebApi.PlayMethod.pot)};
+            new Player(WebApi.PlayMethod.Vlc),
+            new Player(WebApi.PlayMethod.Mpv),
+            new Player(WebApi.PlayMethod.Pot)};
 
         //画质选择列表
         playerListView.ItemsSource = playerItemsSource;

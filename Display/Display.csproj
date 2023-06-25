@@ -87,6 +87,7 @@
     <None Remove="ContentsPage\spiderVideoInfo.xaml" />
     <None Remove="ContentsPage\SpiderVideoInfo\Progress.xaml" />
     <None Remove="ContentsPage\SpiderVideoInfo_ConditionalCheck.xaml" />
+    <None Remove="ContentsPage\TaskPage.xaml" />
     <None Remove="ContentsPage\UpdateAppPage.xaml" />
     <None Remove="ContentsPage\UpdateImagePath.xaml" />
     <None Remove="ContentsPage\VideoPlay - 复制.xaml" />
@@ -140,8 +141,6 @@
     <Content Include="Views\DetailInfoPage.xaml.cs" />
     <Content Include="Views\HomePage.xaml" />
     <Content Include="Views\HomePage.xaml.cs" />
-    <Content Include="Views\LoginPage.xaml" />
-    <Content Include="Views\LoginPage.xaml.cs" />
     <Content Include="Views\SettingsPage.xaml" />
     <Content Include="Views\SettingsPage.xaml.cs" />
     <Content Include="Views\VideoViewPage.xaml" />
@@ -277,9 +276,6 @@
     <Page Update="Views\HomePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Views\LoginPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Update="Views\SettingsPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -320,6 +316,9 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="ContentsPage\TaskPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Controls\CustomContentDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

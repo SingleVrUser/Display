@@ -23,7 +23,7 @@ public class AvMoo
     public static bool IsOn => AppSettings.IsUseAvMoo;
 
 
-    private static string baseUrl => AppSettings.AvMoo_BaseUrl;
+    private static string baseUrl => AppSettings.AvMooBaseUrl;
 
     public static async Task<VideoInfo> SearchInfoFromCID(string CID)
     {

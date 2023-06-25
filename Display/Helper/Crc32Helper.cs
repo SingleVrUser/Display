@@ -30,5 +30,12 @@ namespace Display.Helper
                 crc = CrcTable[(crc ^ t) & 0xff] ^ (crc >> 8);
             return ~crc;
         }
+        public static byte[] CalcCrc32(byte[] bytes)
+        {
+            var newCrc32 = Compute(bytes);
+            var newResult = BitConverter.GetBytes(newCrc32);
+
+            return newResult;
+        }
     }
 }

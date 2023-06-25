@@ -54,11 +54,11 @@ namespace Display.Views
         WebApi webApi;
         private async void DownButton_Click(object sender, RoutedEventArgs e)
         {
-            await DownFiles(WebApi.downType.bc);
+            await DownFiles(WebApi.DownType.Bc);
 
         }
 
-        private async Task DownFiles(Data.WebApi.downType downtype)
+        private async Task DownFiles(Data.WebApi.DownType downtype)
         {
             var selectedItemList = await Browser.GetSelectedItems();
 
@@ -104,7 +104,7 @@ namespace Display.Views
         private async void Aria2Down_Click(object sender, RoutedEventArgs e)
         {
 
-            await DownFiles(Data.WebApi.downType.aria2);
+            await DownFiles(Data.WebApi.DownType.Aria2);
         }
 
         private void GoBack_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)

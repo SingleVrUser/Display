@@ -30,7 +30,7 @@
                 </StackPanel>
                 <TextBlock x:Name="UserName_TextBlock" FontWeight="Bold" FontSize="20" HorizontalAlignment="Center" Text="{x:Bind userinfo.user_name,Mode=OneWay}"/>
                 <!--<TextBlock FontWeight="Bold" FontSize="20" HorizontalAlignment="Center""/>-->
-                <HyperlinkButton HorizontalAlignment="Right" Content="更新信息" Click="UpdataButton_Click"/>
+                <HyperlinkButton HorizontalAlignment="Right" Content="更新信息" Click="UpdateInfoButton_Click"/>
                 <HyperlinkButton HorizontalAlignment="Right" Content="退出登录" Click="Logout_Click"/>
 
             </StackPanel>

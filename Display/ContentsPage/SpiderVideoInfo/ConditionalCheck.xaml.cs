@@ -57,19 +57,19 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             ConditionCheckItems.Add(ImageItem);
 
-            AddSpiderMethod(AppSettings.IsUseJavBus, "访问 JavBus", AppSettings.JavBus_BaseUrl);
+            AddSpiderMethod(AppSettings.IsUseJavBus, "访问 JavBus", AppSettings.JavBusBaseUrl);
 
-            AddSpiderMethod(AppSettings.IsUseJav321, "访问 Jav321", AppSettings.Jav321_BaseUrl);
+            AddSpiderMethod(AppSettings.IsUseJav321, "访问 Jav321", AppSettings.Jav321BaseUrl);
 
-            AddSpiderMethod(AppSettings.IsUseAvMoo, "访问 AvMoo", AppSettings.AvMoo_BaseUrl);
+            AddSpiderMethod(AppSettings.IsUseAvMoo, "访问 AvMoo", AppSettings.AvMooBaseUrl);
 
-            AddSpiderMethod(AppSettings.IsUseAvSox, "访问 AvSox", AppSettings.AvSox_BaseUrl);
+            AddSpiderMethod(AppSettings.IsUseAvSox, "访问 AvSox", AppSettings.AvSoxBaseUrl);
 
-            AddSpiderMethod(AppSettings.IsUseLibreDmm, "访问 LibreDmm", AppSettings.LibreDmm_BaseUrl);
+            AddSpiderMethod(AppSettings.IsUseLibreDmm, "访问 LibreDmm", AppSettings.LibreDmmBaseUrl);
 
-            AddSpiderMethod(AppSettings.IsUseFc2Hub, "访问 Fc2hub", AppSettings.Fc2hub_BaseUrl);
+            AddSpiderMethod(AppSettings.IsUseFc2Hub, "访问 Fc2hub", AppSettings.Fc2HubBaseUrl);
 
-            AddSpiderMethod(AppSettings.IsUseJavDb, "访问 JavDB", AppSettings.JavDB_BaseUrl);
+            AddSpiderMethod(AppSettings.IsUseJavDb, "访问 JavDB", AppSettings.JavDbBaseUrl);
 
             //至少选择一个搜刮源
             if (!(AppSettings.IsUseJavBus || AppSettings.IsUseLibreDmm || AppSettings.IsUseFc2Hub || AppSettings.IsUseJavDb))

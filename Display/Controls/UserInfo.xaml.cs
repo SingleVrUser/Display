@@ -77,10 +77,10 @@ namespace Display.Controls
             return status == "Update" ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        public event RoutedEventHandler UpdateClick;
-        private void UpdataButton_Click(object sender, RoutedEventArgs e)
+        public event RoutedEventHandler UpdateInfoClick;
+        private void UpdateInfoButton_Click(object sender, RoutedEventArgs e)
         {
-            UpdateClick?.Invoke(sender, e);
+            UpdateInfoClick?.Invoke(sender, e);
         }
 
 

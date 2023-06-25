@@ -178,17 +178,6 @@
                             CloseButtonText="退出">
                         </ContentDialog>
 
-                        <!--<TeachingTip x:Name="CheckCookieTeachingTip"
-                                     Target="{x:Bind checkCookieButton}"
-                                     Title="检查Cookie"
-                                     ActionButtonContent="修改"
-                                     CloseButtonContent="退出">
-                            -->
-                        <!--<TeachingTip.IconSource>
-                                <SymbolIconSource Symbol="Refresh" />
-                            </TeachingTip.IconSource>-->
-                        <!--
-                        </TeachingTip>-->
                     </StackPanel>
                     <Button x:Name="CookieInputButton" Content="提交" HorizontalAlignment="Center" Click="CookieInputButton_Click"/>
                     <TeachingTip x:Name="CookieInputTip" Target="{x:Bind CookieInputButton}" IsLightDismissEnabled="True" />

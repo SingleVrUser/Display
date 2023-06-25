@@ -23,7 +23,7 @@ public class LibreDmm
 
     public static bool IsOn => AppSettings.IsUseLibreDmm;
 
-    private static string baseUrl => AppSettings.LibreDmm_BaseUrl;
+    private static string baseUrl => AppSettings.LibreDmmBaseUrl;
 
     public static async Task<VideoInfo> SearchInfoFromCID(string CID)
     {

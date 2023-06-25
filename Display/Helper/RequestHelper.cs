@@ -45,7 +45,7 @@ public class RequestHelper
                 //JavDb访问Fc2需要登录，如果cookie失效，就无法访问
                 else if (response.StatusCode == System.Net.HttpStatusCode.BadGateway)
                 {
-                    if (url.Contains(AppSettings.JavDB_BaseUrl))
+                    if (url.Contains(AppSettings.JavDbBaseUrl))
                         GetInfoFromNetwork.IsJavDbCookieVisible = false;
 
                     break;

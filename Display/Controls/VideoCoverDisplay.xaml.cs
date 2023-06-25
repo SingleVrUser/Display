@@ -384,7 +384,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         }
 
         //更改应用设置
-        ImageSize = new(width, height);
+        ImageSize = new Tuple<double, double>(width, height);
 
         //当前匹配的是成功
         //更新获取图片大小的值
@@ -394,28 +394,25 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         }
     }
 
-    double _imagewidth;
-    double _imageheight;
+
+    private Tuple<double, double> _imageSize;
     private Tuple<double, double> ImageSize
     {
         get
         {
-            if (_imagewidth == 0 || _imageheight == 0)
-            {
-                var imageSize = Data.AppSettings.ImageSize;
+            _imageSize ??= new Tuple<double, double>(AppSettings.ImageWidth, AppSettings.ImageHeight);
 
-                _imagewidth = imageSize.Item1;
-
-                _imageheight = imageSize.Item2;
-            }
-
-            return new(_imagewidth, _imageheight);
+            return _imageSize;
         }
         set
         {
-            this._imagewidth = value.Item1;
-            this._imageheight = value.Item2;
-            Data.AppSettings.ImageSize = value;
+            var imageWidth = value.Item1;
+            var imageHeight = value.Item2;
+
+            _imageSize = new Tuple<double, double>(imageWidth, imageHeight);
+
+            AppSettings.ImageWidth = imageWidth;
+            AppSettings.ImageHeight = imageHeight;
         }
     }
 

@@ -29,7 +29,7 @@ namespace Display.Data
                 if (_clientWithJavDBCookie == null)
                 {
                     _clientWithJavDBCookie = CreateClient(new Dictionary<string, string>() {
-                        {"cookie",AppSettings.javdb_Cookie },
+                        {"cookie",AppSettings.JavDbCookie },
                         {"user-agent" ,UserAgent}
                     });
                 }
@@ -40,7 +40,7 @@ namespace Display.Data
             set => _clientWithJavDBCookie = value;
         }
 
-        public static string UserAgent = Const.DownUserAgent;
+        public static string UserAgent = Const.DefaultSettings.Network._115.DownUserAgent;
 
         //public static string BuilderMediaElementUserAgent()
         //{

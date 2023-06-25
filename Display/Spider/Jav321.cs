@@ -23,7 +23,7 @@ public class Jav321
 
     public static bool IsOn => AppSettings.IsUseJav321;
 
-    private static string baseUrl => AppSettings.Jav321_BaseUrl;
+    private static string baseUrl => AppSettings.Jav321BaseUrl;
 
     public static async Task<VideoInfo> SearchInfoFromCID(string CID)
     {

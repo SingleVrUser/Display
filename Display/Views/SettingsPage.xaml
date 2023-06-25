@@ -62,7 +62,7 @@
         <StackPanel Orientation="Horizontal"
                     Padding="10,0">
             <customcontrols:UserInfo x:Name="UserInfoControl"
-                                     UpdateClick="UpdateButton_Click"
+                                     UpdateInfoClick="UpdateInfoButton_Click"
                                      Loginlick="LoginButton_Click"
                                      LogoutClick="LogoutButton_Click"
                                      HorizontalAlignment="Left"
@@ -354,7 +354,7 @@
                                             <TextBox x:Name="JavbusUrlTextBox"
                                                      Width="600"
                                                      RelativePanel.RightOf="JavbusUrlTextBlox"
-                                                     Text="{x:Bind data:AppSettings.JavBus_BaseUrl}" />
+                                                     Text="{x:Bind data:AppSettings.JavBusBaseUrl}" />
                                             <Button x:Name="JavbusUrlChangeButton"
                                                     Click="JavbusUrlChange_Button_Click"
                                                     Content="修改"
@@ -379,7 +379,7 @@
                                             <TextBox x:Name="Jav321UrlTextBox"
                                                      Width="600"
                                                      RelativePanel.RightOf="Jav321UrlTextBlox"
-                                                     Text="{x:Bind data:AppSettings.Jav321_BaseUrl}" />
+                                                     Text="{x:Bind data:AppSettings.Jav321BaseUrl}" />
                                             <Button x:Name="Jav321ChangeButton"
                                                     Click="Jav321Change_Button_Click"
                                                     Content="修改"
@@ -404,7 +404,7 @@
                                             <TextBox x:Name="AvMooUrlTextBox"
                                                      Width="600"
                                                      RelativePanel.RightOf="AvMooUrlTextBlox"
-                                                     Text="{x:Bind data:AppSettings.AvMoo_BaseUrl}" />
+                                                     Text="{x:Bind data:AppSettings.AvMooBaseUrl}" />
                                             <Button x:Name="AvMooUrlChangeButton"
                                                     Click="AvMooUrlChange_Button_Click"
                                                     Content="修改"
@@ -429,7 +429,7 @@
                                             <TextBox x:Name="AvSoxUrlTextBox"
                                                      Width="600"
                                                      RelativePanel.RightOf="AvSoxUrlTextBlox"
-                                                     Text="{x:Bind data:AppSettings.AvSox_BaseUrl}" />
+                                                     Text="{x:Bind data:AppSettings.AvSoxBaseUrl}" />
                                             <Button x:Name="AvSoxUrlChangeButton"
                                                     Click="AvSoxUrlChange_Button_Click"
                                                     Content="修改"
@@ -454,7 +454,7 @@
                                             <TextBox x:Name="LibreDmmTextBox"
                                                      Width="600"
                                                      RelativePanel.RightOf="LibreDmmTextBlox"
-                                                     Text="{x:Bind data:AppSettings.LibreDmm_BaseUrl}" />
+                                                     Text="{x:Bind data:AppSettings.LibreDmmBaseUrl}" />
                                             <Button x:Name="LibreDmmUrlChangeButton"
                                                     Click="LibreDmmUrlChange_Button_Click"
                                                     Content="修改"
@@ -479,7 +479,7 @@
                                             <TextBox x:Name="Fc2HubTextBox"
                                                      Width="600"
                                                      RelativePanel.RightOf="Fc2HubTextBlox"
-                                                     Text="{x:Bind data:AppSettings.Fc2hub_BaseUrl}" />
+                                                     Text="{x:Bind data:AppSettings.Fc2HubBaseUrl}" />
                                             <Button x:Name="Fc2HubUrlChangeButton"
                                                     Click="Fc2hubUrlChange_Button_Click"
                                                     Content="修改"
@@ -505,7 +505,7 @@
                                             <TextBox x:Name="JavDbUrlTextBox"
                                                      Width="600"
                                                      RelativePanel.RightOf="JavDbUrlTextBlox"
-                                                     Text="{x:Bind data:AppSettings.JavDB_BaseUrl}" />
+                                                     Text="{x:Bind data:AppSettings.JavDbBaseUrl}" />
                                             <Button x:Name="JavDbUrlChangeButton"
                                                     Click="JavDBUrlChange_Button_Click"
                                                     Content="修改"
@@ -520,7 +520,7 @@
                                             <TextBox x:Name="JavDbCookieTextBox"
                                                      Width="600"
                                                      RelativePanel.RightOf="JavDbCookieTextBlock"
-                                                     Text="{x:Bind data:AppSettings.javdb_Cookie}">
+                                                     Text="{x:Bind data:AppSettings.JavDbCookie}">
                                                 <ToolTipService.ToolTip>
                                                     <TextBlock>
                                                         访问FC内容需要登陆后的Cookie

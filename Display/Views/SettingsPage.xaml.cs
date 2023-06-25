@@ -51,22 +51,11 @@ namespace Display.Views
 
             if (!IsNullOrEmpty(AppSettings._115_Cookie) && WebApi.UserInfo == null)
             {
-                await Task.Run(async () =>
-                {
-                    var isLogin = await _webapi.UpdateLoginInfo();
-
-                    //if (isLogin)
-                    //{
-                    //    //检查一下是否为隐藏模式
-                    //    await webapi.IsHiddenModel();
-                    //}
-                });
+                await _webapi.UpdateLoginInfoAsync();
             }
 
             updateUserInfo();
             updateLoginStatus();
-
-            //infobar.IsOpen = WebApi.isEnterHiddenMode != true;
 
             DataAccessSavePathTextBox.Text = AppSettings.DataAccessSavePath;
 
@@ -144,13 +133,13 @@ namespace Display.Views
 
         }
 
-        private async void UpdateButton_Click(object sender, RoutedEventArgs e)
+        private async void UpdateInfoButton_Click(object sender, RoutedEventArgs e)
         {
             UserInfoControl.status = "Update";
-            if (await _webapi.UpdateLoginInfo())
+            if (await _webapi.UpdateLoginInfoAsync())
             {
                 updateUserInfo();
-                infobar.IsOpen = await _webapi.IsHiddenModel();
+                //infobar.IsOpen = await _webapi.IsHiddenModel();
             }
             else
             {
@@ -364,50 +353,50 @@ namespace Display.Views
 
         private void JavbusUrlChange_Button_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            AppSettings.JavBus_BaseUrl = JavbusUrlTextBox.Text;
+            AppSettings.JavBusBaseUrl = JavbusUrlTextBox.Text;
 
             ShowTeachingTip("修改完成");
         }
         private void Jav321Change_Button_Click(object sender, RoutedEventArgs e)
         {
-            AppSettings.Jav321_BaseUrl = Jav321UrlTextBox.Text;
+            AppSettings.Jav321BaseUrl = Jav321UrlTextBox.Text;
 
             ShowTeachingTip("修改完成");
         }
         private void AvMooUrlChange_Button_Click(object sender, RoutedEventArgs e)
         {
-            AppSettings.AvMoo_BaseUrl = AvMooUrlTextBox.Text;
+            AppSettings.AvMooBaseUrl = AvMooUrlTextBox.Text;
 
             ShowTeachingTip("修改完成");
         }
         private void AvSoxUrlChange_Button_Click(object sender, RoutedEventArgs e)
         {
-            AppSettings.AvSox_BaseUrl = AvSoxUrlTextBox.Text;
+            AppSettings.AvSoxBaseUrl = AvSoxUrlTextBox.Text;
 
             ShowTeachingTip("修改完成");
         }
         private void LibreDmmUrlChange_Button_Click(object sender, RoutedEventArgs e)
         {
-            AppSettings.LibreDmm_BaseUrl = LibreDmmTextBox.Text;
+            AppSettings.LibreDmmBaseUrl = LibreDmmTextBox.Text;
 
             ShowTeachingTip("修改完成");
         }
         private void Fc2hubUrlChange_Button_Click(object sender, RoutedEventArgs e)
         {
-            AppSettings.Fc2hub_BaseUrl = Fc2HubTextBox.Text;
+            AppSettings.Fc2HubBaseUrl = Fc2HubTextBox.Text;
 
             ShowTeachingTip("修改完成");
         }
         private void JavDBUrlChange_Button_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            AppSettings.JavDB_BaseUrl = JavDbUrlTextBox.Text;
+            AppSettings.JavDbBaseUrl = JavDbUrlTextBox.Text;
 
             ShowTeachingTip("修改完成");
         }
 
         private void JavDBCookieChange_Button_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            AppSettings.javdb_Cookie = JavDbCookieTextBox.Text;
+            AppSettings.JavDbCookie = JavDbCookieTextBox.Text;
 
             GetInfoFromNetwork.IsJavDbCookieVisible = true;
 

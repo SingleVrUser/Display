@@ -94,7 +94,7 @@ namespace Display
         {
             bool isNormal = true;
 
-            var dataAccessSavePath = ApplicationData.Current.LocalSettings.Values["DataAccess_SavePath"] as string;
+            var dataAccessSavePath = AppSettings.DataAccessSavePath;
 
             //首次启动
             if (string.IsNullOrEmpty(dataAccessSavePath)) return true;
@@ -103,7 +103,7 @@ namespace Display
             if (!Directory.Exists(dataAccessSavePath))
             {
                 CommonWindow window1 = new();
-                window1.Content = new TextBlock() { Text = $"数据文件存放目录不存在，请检查：{AppSettings.DataAccessSavePath}", IsTextSelectionEnabled = true, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                window1.Content = new TextBlock() { Text = $"数据文件存放目录不存在，请检查：{dataAccessSavePath}", IsTextSelectionEnabled = true, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
                 window1.Title = "出错";
                 window1.Activate();
 

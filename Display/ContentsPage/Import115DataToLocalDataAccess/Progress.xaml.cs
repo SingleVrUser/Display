@@ -216,7 +216,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             if (s_cts.Token.IsCancellationRequested) return;
 
             //搜刮完成,是否自动搜刮
-            if (AppSettings.ProgressOfImportDataAccess_IsStartSpiderAfterTask && overallCount != 0)
+            if (AppSettings.IsSpiderAfterImportDataAccess && overallCount != 0)
             {
                 ////datum只用到其中的cid,所以只赋值cid (fid默认为空,不用理)
                 //List<Datum> folderList = new();
@@ -247,7 +247,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
         private void tryToast(string title, string content)
         {
-            if (!AppSettings.ProgressOfImportDataAccess_IsToastAfterTask) return;
+            if (!AppSettings.IsToastAfterImportDataAccess) return;
 
             new ToastContentBuilder()
                 .AddArgument("action", "viewConversation")

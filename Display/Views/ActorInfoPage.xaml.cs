@@ -128,7 +128,7 @@ namespace Display.Views
             if (videoInfo.series == "fail")
             {
                 var mediaPlayItem = new MediaPlayItem(videoInfo.imageurl, videoInfo.truename, FilesInfo.FileType.File);
-                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, playType: PlayType.fail);
+                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, playType: PlayType.Fail);
                 return;
             }
 
@@ -190,7 +190,7 @@ namespace Display.Views
             if (videoPlayButton.DataContext is not Datum datum) return;
 
             var mediaPlayItem = new MediaPlayItem(datum.pc, datum.n, FilesInfo.FileType.File);
-            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.fail);
+            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.Fail);
         }
     }
 

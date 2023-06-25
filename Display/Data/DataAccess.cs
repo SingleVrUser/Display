@@ -1505,7 +1505,6 @@ namespace Display.Data
         {
             List<Datum> data = new List<Datum>();
 
-            //string dbpath = Path.Combine(AppSettings.DataAccess_SavePath, DBNAME);
             using (SqliteConnection db =
                new SqliteConnection($"Filename={dbpath}"))
             {
@@ -2553,7 +2552,7 @@ namespace Display.Data
                         return subDicts;
                     }
 
-                    var tuple = FileMatch.SpliteLeftAndRightFromCid(truename);
+                    var tuple = FileMatch.SplitLeftAndRightFromCid(truename);
                     string leftName = tuple.Item1.Replace("FC2", "FC");
                     string rightNumber = tuple.Item2;
 
@@ -2615,7 +2614,7 @@ namespace Display.Data
         /// <returns></returns>
         public static List<Datum> loadFileInfoByTruename(string truename)
         {
-            var tuple = FileMatch.SpliteLeftAndRightFromCid(truename);
+            var tuple = FileMatch.SplitLeftAndRightFromCid(truename);
 
             string leftName = tuple.Item1.Replace("FC2", "FC");
             string rightNumber = tuple.Item2;

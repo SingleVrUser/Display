@@ -51,7 +51,7 @@ namespace Display.ContentsPage
             //Task.Run(() => webapi.GetQRCodeInfo());
 
 
-            QRCodeInfo qrcodeInfo = await webapi.GetQRCodeInfo();
+            QRCodeInfo qrcodeInfo = await webapi.GetQrCodeInfo();
             if (imageGrid.Visibility == Visibility.Visible)
             {
                 imageGrid.Visibility = Visibility.Collapsed;
@@ -80,7 +80,7 @@ namespace Display.ContentsPage
                 }
 
                 //发送查询请求，可能为超长时长（服务器单次最大通讯时长30s）
-                QRCodeStatus qRCodeStatus = await webapi.GetQRCodeStatusAsync();
+                QRCodeStatus qRCodeStatus = await webapi.GetQrCodeStatusAsync();
 
                 if (qRCodeStatus.state == 1)
                 {
@@ -365,7 +365,7 @@ namespace Display.ContentsPage
             }
             else
             {
-                bool result = await webapi.tryRefreshCookie(CookieInputTextBox.Text);
+                var result = await webapi.TryRefreshCookie(CookieInputTextBox.Text);
                 //Cookie有用
                 if (result)
                 {
