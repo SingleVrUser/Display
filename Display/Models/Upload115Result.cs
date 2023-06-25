@@ -21,7 +21,7 @@ namespace Display.Models
         public string bucket { get; set; }
 
         [JsonProperty(propertyName: "object")]
-        public string _object { get; set; }
+        public string Object { get; set; }
         public Callback callback { get; set; }
     }
 

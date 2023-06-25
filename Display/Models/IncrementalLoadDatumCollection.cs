@@ -29,7 +29,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         }
     }
 
-    public WebApi.OrderBy orderby { get; private set; } = WebApi.OrderBy.user_ptime;
+    public WebApi.OrderBy orderby { get; private set; } = WebApi.OrderBy.UserPtime;
 
     public int asc { get; private set; }
 

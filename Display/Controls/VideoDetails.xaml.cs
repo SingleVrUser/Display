@@ -101,7 +101,7 @@ namespace Display.Controls
             List<string> ThumbnailList = new();
 
             //来源为本地
-            if (AppSettings.ThumbnailOrigin == (int)AppSettings.Origin.Local)
+            if (AppSettings.ThumbnailOrigin == (int)Const.Origin.Local)
             {
                 string folderFullName = Path.Combine(AppSettings.ImageSavePath, resultinfo.truename);
                 DirectoryInfo TheFolder = new DirectoryInfo(folderFullName);
@@ -120,7 +120,7 @@ namespace Display.Controls
 
             }
             //来源为网络
-            else if (AppSettings.ThumbnailOrigin == (int)AppSettings.Origin.Web)
+            else if (AppSettings.ThumbnailOrigin == (int)Const.Origin.Web)
             {
                 var videoInfo = DataAccess.LoadOneVideoInfoByCID(resultinfo.truename);
 
@@ -197,21 +197,21 @@ namespace Display.Controls
             var webApi = WebApi.GlobalWebApi;
 
             //下载方式
-            WebApi.downType downType;
+            WebApi.DownType downType;
             switch (downDialogContent.DownMethod)
             {
                 case "比特彗星":
-                    downType = WebApi.downType.bc;
+                    downType = WebApi.DownType.Bc;
                     if (AppSettings.BitCometSettings == null)
                         ShowTeachingTip("还没有完成比特彗星的设置，请移步到“设置->下载方式->BitComet”完成相关配置");
                     break;
                 case "aria2":
-                    downType = WebApi.downType.aria2;
+                    downType = WebApi.DownType.Aria2;
                     if (AppSettings.Aria2Settings == null)
                         ShowTeachingTip("还没有完成Aria2的设置，请移步到“设置->下载方式->Aria2”完成相关配置");
                     break;
                 default:
-                    downType = WebApi.downType._115;
+                    downType = WebApi.DownType._115;
                     break;
             }
 

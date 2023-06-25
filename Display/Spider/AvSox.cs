@@ -22,7 +22,7 @@ public class AvSox
 
     public static bool IsOn => AppSettings.IsUseAvSox;
 
-    private static string baseUrl => AppSettings.AvSox_BaseUrl;
+    private static string baseUrl => AppSettings.AvSoxBaseUrl;
 
     public static async Task<VideoInfo> SearchInfoFromCID(string CID)
     {

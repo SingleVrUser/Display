@@ -333,14 +333,14 @@ namespace Display.Views
             if (!string.IsNullOrEmpty(actorinfo.image_url))
             {
                 //查询本地数据库中的数据
-                var actorInfos = await DataAccess.LoadActorInfo(1, filterList: new() { $"id == '{actorId}'" });
+                var actorInfos = await DataAccess.LoadActorInfo(1, filterList: new List<string> { $"id == '{actorId}'" });
 
                 if (actorInfos != null && actorInfos.Count != 0)
                 {
                     var oldActorInfo = actorInfos.FirstOrDefault();
 
                     //数据库中无头像
-                    if (oldActorInfo.prifile_path == Data.Const.NoPicturePath)
+                    if (oldActorInfo.prifile_path == Const.Common.NoPicturePath)
                     {
                         string filePath = Path.Combine(AppSettings.ActorInfoSavePath, actorName);
 

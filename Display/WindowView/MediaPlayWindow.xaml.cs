@@ -96,7 +96,6 @@ public sealed partial class MediaPlayWindow : Window
             MediaControl.PointerExited -= MediaControl_OnPointerExited;
 
             MediaControl.DisposeMediaPlayer();
-
         }
 
         Debug.WriteLine("remove MediaControl");

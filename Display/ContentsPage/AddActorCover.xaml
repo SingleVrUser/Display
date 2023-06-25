@@ -21,7 +21,7 @@
                 CornerRadius="5"
                 PointerEntered="connectedElement_PointerEntered"
                 PointerExited="connectedElement_PointerExited">
-                <Grid Visibility="{x:Bind data:FileMatch.showIfImageNull(prifile_path),Mode=OneWay}">
+                <Grid Visibility="{x:Bind data:FileMatch.ShowIfImageNull(prifile_path),Mode=OneWay}">
                     <controls:ImageEx Source="{x:Bind prifile_path,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
 
                     <TextBlock Text="{x:Bind name}" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" TextWrapping="Wrap" Margin="5"/>
@@ -29,7 +29,7 @@
                     <customcontrols:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
                 </Grid>
 
-                <Grid Visibility="{x:Bind data:FileMatch.showIfImageENotNull(prifile_path),Mode=OneWay}">
+                <Grid Visibility="{x:Bind data:FileMatch.ShowIfImageENotNull(prifile_path),Mode=OneWay}">
                     <controls:ImageEx Margin="0,0,0,20" x:Name="ActorImage" Source="{x:Bind prifile_path,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
 
                     <StackPanel VerticalAlignment="Bottom">

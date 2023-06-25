@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -297,40 +298,39 @@ namespace Display.Data
             return result;
         }
 
-        public static TimeSpan CalculatTimeStrDiff(string dt1Str, string dt2Str)
+        public static TimeSpan CalculateTimeStrDiff(string dt1Str, string dt2Str)
         {
             if (string.IsNullOrEmpty(dt1Str) || string.IsNullOrEmpty(dt2Str)) return TimeSpan.Zero;
 
-            DateTime dt1 = Convert.ToDateTime(dt1Str);
+            var dt1 = Convert.ToDateTime(dt1Str);
 
-            DateTime dt2 = Convert.ToDateTime(dt2Str);
+            var dt2 = Convert.ToDateTime(dt2Str);
 
             if (dt2 > dt1)
             {
                 return dt2 - dt1;
             }
-            else
-            {
-                return dt1 - dt2;
-            }
+
+            return dt1 - dt2;
         }
 
         public static int ConvertDateTimeToInt32(string dateStr)
         {
-            DateTime dt1 = new DateTime(1970, 1, 1, 8, 0, 0);
-            DateTime dt2 = Convert.ToDateTime(dateStr);
+            var dt1 = new DateTime(1970, 1, 1, 8, 0, 0);
+            var dt2 = Convert.ToDateTime(dateStr);
             return Convert.ToInt32((dt2 - dt1).TotalSeconds);
         }
-
+            
         /// <summary>
         /// 字符串内容是否为数字
         /// </summary>
-        /// <param Name="_string"></param>
+        /// <param name="_string"></param>
         /// <returns></returns>
         public static bool IsNumberic1(this string _string)
         {
             if (string.IsNullOrEmpty(_string))
                 return false;
+
             foreach (char c in _string)
             {
                 if (!char.IsDigit(c))
@@ -339,27 +339,27 @@ namespace Display.Data
             return true;
         }
 
-        public static string ConvertInt32ToDateStr(int Second)
+        public static string ConvertInt32ToDateStr(int second)
         {
-            return ConvertDoubleToDateStr(Convert.ToDouble(Second));
+            return ConvertDoubleToDateStr(Convert.ToDouble(second));
         }
 
-        public static string ConvertDoubleToDateStr(double Second)
+        public static string ConvertDoubleToDateStr(double second)
         {
-            if (Second is double.NaN)
-                return Second.ToString();
+            if (second is double.NaN)
+                return second.ToString(CultureInfo.InvariantCulture);
 
             string formatStr;
 
-            if (Second < 60)
+            if (second < 60)
             {
                 formatStr = "ss'秒'";
             }
-            else if (Second < 3600)
+            else if (second < 3600)
             {
                 formatStr = "mm'分'ss'秒'";
             }
-            else if (Second < 86400)
+            else if (second < 86400)
             {
                 formatStr = "hh'小时'mm'分'ss'秒'";
             }
@@ -368,33 +368,30 @@ namespace Display.Data
                 formatStr = "dd'天'hh'小时'mm'分'ss'秒'";
             }
 
-            TimeSpan ts = TimeSpan.FromSeconds(Second);
+            TimeSpan ts = TimeSpan.FromSeconds(second);
 
             return ts.ToString(formatStr);
         }
 
-        public static string ConvertPtTimeToTotalMinute(string PtTimeStr)
+        public static string ConvertPtTimeToTotalMinute(string ptTimeStr)
         {
             int totalMinute = 0;
 
-            var match = Regex.Match(PtTimeStr, @"PT((\d+)H)?(\d+)M(\d+)S", RegexOptions.IgnoreCase);
-            if (match.Success)
+            var match = Regex.Match(ptTimeStr, @"PT((\d+)H)?(\d+)M(\d+)S", RegexOptions.IgnoreCase);
+            if (!match.Success) return ptTimeStr;
+
+            if (int.TryParse(match.Groups[2].Value, out var result))
             {
-                int result;
-                if (int.TryParse(match.Groups[2].Value, out result))
-                {
-                    totalMinute += result * 60;
-                }
-
-                if (int.TryParse(match.Groups[3].Value, out result))
-                {
-                    totalMinute += result;
-                }
-
-                return $"{totalMinute}分钟";
+                totalMinute += result * 60;
             }
 
-            return PtTimeStr;
+            if (int.TryParse(match.Groups[3].Value, out result))
+            {
+                totalMinute += result;
+            }
+
+            return $"{totalMinute}分钟";
+
         }
 
         /// <summary>
@@ -407,23 +404,23 @@ namespace Display.Data
             //根据视频信息匹配视频文件
             List<MatchVideoResult> resultList = new();
 
-            foreach (var file_info in data)
+            foreach (var fileInfo in data)
             {
-                string FileName = file_info.n;
+                var fileName = fileInfo.n;
 
                 //挑选视频文件
-                if (file_info.iv == 1)
+                if (fileInfo.iv == 1)
                 {
                     //根据视频名称匹配番号
-                    var videoName = FileMatch.MatchName(FileName, file_info.cid);
+                    var videoName = FileMatch.MatchName(fileName, fileInfo.cid);
 
                     //无论匹配与否，都存入数据库
-                    DataAccess.AddFileToInfo(file_info.pc, videoName, isReplace:true);
+                    DataAccess.AddFileToInfo(fileInfo.pc, videoName, isReplace:true);
 
                     //未匹配
                     if (videoName == null)
                     {
-                        resultList.Add(new MatchVideoResult() { status = false, OriginalName = file_info.n, statusCode = -1, message = "匹配失败" });
+                        resultList.Add(new MatchVideoResult() { status = false, OriginalName = fileInfo.n, statusCode = -1, message = "匹配失败" });
                         continue;
                     }
 
@@ -432,18 +429,18 @@ namespace Display.Data
 
                     if (existsResult == null)
                     {
-                        resultList.Add(new MatchVideoResult() { status = true, OriginalName = file_info.n, message = "匹配成功", statusCode = 1, MatchName = videoName });
+                        resultList.Add(new MatchVideoResult() { status = true, OriginalName = fileInfo.n, message = "匹配成功", statusCode = 1, MatchName = videoName });
                     }
                     else
                     {
-                        resultList.Add(new MatchVideoResult() { status = true, OriginalName = file_info.n, statusCode = 2, message = "已添加"});
+                        resultList.Add(new MatchVideoResult() { status = true, OriginalName = fileInfo.n, statusCode = 2, message = "已添加"});
                     }
 
 
                 }
                 else
                 {
-                    resultList.Add(new MatchVideoResult() { status = true, OriginalName = file_info.n, statusCode = 0, message = "跳过非视频" });
+                    resultList.Add(new MatchVideoResult() { status = true, OriginalName = fileInfo.n, statusCode = 0, message = "跳过非视频" });
                 }
             }
 
@@ -484,44 +481,32 @@ namespace Display.Data
             return cookieList;
         }
 
-        public async static void LaunchFolder(string path)
+        public static async void LaunchFolder(string path)
         {
-            StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(path);
+            var folder = await StorageFolder.GetFolderFromPathAsync(path);
             await Launcher.LaunchFolderAsync(folder);
         }
 
 
-        public async static void PlayByPotPlayer(string playUrl)
+        public static async void PlayByPotPlayer(string playUrl)
         {
-            string url = $"PotPlayer://{playUrl}";
+            var url = $"PotPlayer://{playUrl}";
             var uriDown = new Uri(url);
 
             // Set the option to show a warning
-            var options = new Windows.System.LauncherOptions();
-            options.DesiredRemainingView = Windows.UI.ViewManagement.ViewSizePreference.UseLess;
+            var options = new LauncherOptions
+            {
+                DesiredRemainingView = Windows.UI.ViewManagement.ViewSizePreference.UseLess
+            };
 
             // Launch the URI
-            var success = await Windows.System.Launcher.LaunchUriAsync(uriDown, options);
-        }
-
-        public static void PlayByVlc(string playUrl, string FileName, bool showWindow = true)
-        {
-            var process = new Process();
-
-            process.StartInfo.FileName = FileName;
-            //process.StartInfo.Arguments = @$" ""{playUrl}"" :http-referrer=""{referrerUrl}"" :http-user-agent=""{user_agnet}""";
-            process.StartInfo.Arguments = @$" ""{playUrl}""";
-            process.StartInfo.UseShellExecute = false;
-            if (!showWindow)
-            {
-                process.StartInfo.CreateNoWindow = true;
-            }
-
-            process.Start();
+            await Launcher.LaunchUriAsync(uriDown, options);
         }
 
         public static void CreateDirectoryIfNotExists(string savePath)
         {
+            if (string.IsNullOrEmpty(savePath)) return;
+
             if (!Directory.Exists(savePath))
             {
                 Directory.CreateDirectory(savePath);
@@ -529,52 +514,39 @@ namespace Display.Data
         }
 
         //临时方法
-        public static Visibility showIfImageENotNull(string imagepath)
+        public static Visibility ShowIfImageENotNull(string imagePath)
         {
-            if (imagepath == Data.Const.NoPicturePath)
-            {
-                return Visibility.Collapsed;
-            }
-            else
-            {
-                return Visibility.Visible;
-            }
+            return imagePath == Const.Common.NoPicturePath ? Visibility.Collapsed : Visibility.Visible;
+
         }
 
         //临时方法
-        public static Visibility showIfImageNull(string imagepath)
+        public static Visibility ShowIfImageNull(string imagePath)
         {
-            if (imagepath == Data.Const.NoPicturePath)
-            {
-                return Visibility.Visible;
-            }
-            else
-            {
-                return Visibility.Collapsed;
-            }
+            return imagePath == Const.Common.NoPicturePath ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public static IEnumerable<T> OrderByNatural<T>(this IEnumerable<T> items, Func<T, string> selector, StringComparer stringComparer = null)
         {
             var regex = new Regex(@"\d+", RegexOptions.Compiled);
 
-            int maxDigits = items
+            var enumerable = items.ToList();
+            var maxDigits = enumerable
                           .SelectMany(i => regex.Matches(selector(i)).Cast<Match>().Select(digitChunk => (int?)digitChunk.Value.Length))
                           .Max() ?? 0;
 
-            return items.OrderBy(i => regex.Replace(selector(i), match => match.Value.PadLeft(maxDigits, '0')), stringComparer ?? StringComparer.CurrentCulture);
+            return enumerable.OrderBy(i => regex.Replace(selector(i), match => match.Value.PadLeft(maxDigits, '0')), stringComparer ?? StringComparer.CurrentCulture);
         }
 
-        public static Tuple<string, string> SpliteLeftAndRightFromCid(string cid)
+        public static Tuple<string, string> SplitLeftAndRightFromCid(string cid)
         {
-            string[] splitList = cid.Split(new char[] { '-', '_' });
-            string leftName = splitList[0];
+            string[] splitList = cid.Split(new[] { '-', '_' });
+            var leftName = splitList[0];
 
-            string rightNumber = "";
+            var rightNumber = string.Empty;
             if (splitList.Length != 1)
             {
                 rightNumber = splitList[1];
-
             }
             else
             {

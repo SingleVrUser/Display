@@ -1,9 +1,9 @@
 ﻿
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Display.Data;
@@ -35,7 +35,7 @@ namespace Display.Controls
             //webview.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
             //var item2 = webview.ExecuteScriptAsync($"window.open('https://baidu.com','_blank');");
 
-            var cookie = (string)localSettings.Values["Cookie"];
+            var cookie = AppSettings._115_Cookie;
             //cookie不为空且可用
             if (!string.IsNullOrEmpty(cookie))
             {
@@ -45,8 +45,8 @@ namespace Display.Controls
                 foreach (var cookies in cookiesList)
                 {
                     var item = cookies.Split('=');
-                    string key = item[0].Trim();
-                    string value = item[1].Trim();
+                    var key = item[0].Trim();
+                    var value = item[1].Trim();
                     AddCookie(key, value);
                 }
             }
@@ -136,7 +136,7 @@ namespace Display.Controls
 
             if (inputElementsIdAndValueAsJsonString != "[]" && inputElementsIdAndValueAsJsonString != "0")
             {
-                selectedItemList = JsonConvert.DeserializeObject<List<SelectedItem>>(inputElementsIdAndValueAsJsonString);
+                selectedItemList = JsonSerializer.Deserialize<List<SelectedItem>>(inputElementsIdAndValueAsJsonString);
             }
 
             return selectedItemList;

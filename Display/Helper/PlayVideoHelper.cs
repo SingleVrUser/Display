@@ -25,7 +25,7 @@ public class PlayVideoHelper
     /// <param name="lastPage"></param>
     /// <param name="playerSelection"></param>
     /// <returns></returns>
-    public static async Task PlayVideo(List<MediaPlayItem> playItems, XamlRoot xamlRoot = null, CustomMediaPlayerElement.PlayType playType = CustomMediaPlayerElement.PlayType.success, Page lastPage = null, int playerSelection = -1)
+    public static async Task PlayVideo(List<MediaPlayItem> playItems, XamlRoot xamlRoot = null, CustomMediaPlayerElement.PlayType playType = CustomMediaPlayerElement.PlayType.Success, Page lastPage = null, int playerSelection = -1)
     {
         // 播放项不能为空
         var firstPlayItem = playItems?.FirstOrDefault();
@@ -58,15 +58,15 @@ public class PlayVideoHelper
                 break;
             //PotPlayer播放
             case 1:
-                await WebApi.GlobalWebApi.PlayVideoWithPlayer(playItems, WebApi.PlayMethod.pot, xamlRoot);
+                await WebApi.GlobalWebApi.PlayVideoWithPlayer(playItems, WebApi.PlayMethod.Pot, xamlRoot);
                 break;
             //mpv播放
             case 2:
-                await WebApi.GlobalWebApi.PlayVideoWithPlayer(playItems, WebApi.PlayMethod.mpv, xamlRoot);
+                await WebApi.GlobalWebApi.PlayVideoWithPlayer(playItems, WebApi.PlayMethod.Mpv, xamlRoot);
                 break;
             //vlc播放
             case 3:
-                await WebApi.GlobalWebApi.PlayVideoWithPlayer(playItems, WebApi.PlayMethod.vlc, xamlRoot);
+                await WebApi.GlobalWebApi.PlayVideoWithPlayer(playItems, WebApi.PlayMethod.Vlc, xamlRoot);
                 break;
             //MediaElement播放
             case 4:

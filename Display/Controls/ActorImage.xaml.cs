@@ -49,7 +49,7 @@ namespace Display.Controls
 
         private void tryShowActorAge(string birthday)
         {
-            if (FileMatch.CalculatTimeStrDiff(birthday, releaseTime) is TimeSpan dtDif)
+            if (FileMatch.CalculateTimeStrDiff(birthday, releaseTime) is TimeSpan dtDif)
             {
                 if (dtDif != TimeSpan.Zero)
                 {

@@ -29,7 +29,7 @@ public class JavDB
 
     public static bool IsOn => AppSettings.IsUseJavDb;
 
-    private static string baseUrl => AppSettings.JavDB_BaseUrl;
+    private static string baseUrl => AppSettings.JavDbBaseUrl;
 
     private static HttpClient _clientWithJavDBCookie;
     private static HttpClient ClientWithCookie
@@ -39,7 +39,7 @@ public class JavDB
             if (_clientWithJavDBCookie == null)
             {
                 _clientWithJavDBCookie = GetInfoFromNetwork.CreateClient(new Dictionary<string, string>() {
-                        {"cookie",AppSettings.javdb_Cookie },
+                        {"cookie",AppSettings.JavDbCookie },
                         {"user-agent" ,GetInfoFromNetwork.UserAgent}
                     });
             }
@@ -54,7 +54,7 @@ public class JavDB
     {
         var isUseCookie = CID.Contains("FC");
 
-        if (isUseCookie && string.IsNullOrEmpty(AppSettings.javdb_Cookie)) return null;
+        if (isUseCookie && string.IsNullOrEmpty(AppSettings.JavDbCookie)) return null;
 
         var detailUrl = await GetDetailUrlFromCid(CID);
 
@@ -154,7 +154,7 @@ public class JavDB
                         && currentNum.Equals(searchNum))))
             {
                 var detailUrl = searchResultNodes[i].SelectSingleNode(".//a").Attributes["href"].Value;
-                detailUrl = GetInfoFromNetwork.UrlCombine(AppSettings.JavDB_BaseUrl, detailUrl);
+                detailUrl = GetInfoFromNetwork.UrlCombine(AppSettings.JavDbBaseUrl, detailUrl);
                 result = detailUrl;
                 break;
             }

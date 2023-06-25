@@ -360,10 +360,7 @@ namespace Display.Spider
         {
             string localFilename;
 
-            //string extension = System.IO.Path.GetExtension(url);
-
-            bool isAttmn = url.Contains("attachment");
-
+            var isAttmn = url.Contains("attachment");
             if (name == null)
             {
                 //附件
@@ -409,15 +406,15 @@ namespace Display.Spider
                         if (contentDisposition == null)
                         {
                             // rar文件前缀: RAR!
-                            var byteItems = new byte[] { 82, 97, 114, 33 };
+                            var byteItems = "Rar!"u8.ToArray();
                             await using var stream = await responseMessage.Content.ReadAsStreamAsync();
                             int bufferSize = 4;
                             byte[] buffer = new byte[bufferSize];
-                            var readAsync = await stream.ReadAsync(buffer, 0, bufferSize);
+                            var _ = await stream.ReadAsync(buffer, 0, bufferSize);
 
                             stream.Seek(0, SeekOrigin.Begin);
 
-                            //不是rar前缀，认定为html，输出InnexText结果
+                            //不是rar前缀，认定为html，输出InnerText结果
                             if (!CheckEquality(buffer, byteItems))
                             {
                                 var reader = new StreamReader(stream);
@@ -458,6 +455,10 @@ namespace Display.Spider
                 {
                     var bytes = await responseMessage.Content.ReadAsByteArrayAsync();
                     await File.WriteAllBytesAsync(localPath, bytes);
+
+                    //await using var stream = await responseMessage.Content.ReadAsStreamAsync();
+                    //await using var newStream = File.Create(localPath);
+                    //await stream.CopyToAsync(newStream);
                 }
                 else
                     return null;

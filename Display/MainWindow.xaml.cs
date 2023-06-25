@@ -283,22 +283,22 @@ namespace Display
         /// <exception cref="NotImplementedException"></exception>
         private void NavView_Navigate(string navItemTag, NavigationTransitionInfo transitionInfo)
         {
-            Type _page;
+            Type page;
             if (navItemTag == "settings")
             {
-                _page = typeof(SettingsPage);
+                page = typeof(SettingsPage);
             }
             else
             {
                 var item = _pages.FirstOrDefault(p => p.Tag == navItemTag);
-                _page = item.Page;
+                page = item.Page;
             }
             var preNavPageType = ContentFrame.CurrentSourcePageType;
 
             //当前页面不跳转
-            if (_page is not null && preNavPageType != _page)
+            if (page is not null && preNavPageType != page)
             {
-                ContentFrame.Navigate(_page, null, transitionInfo);
+                ContentFrame.Navigate(page, null, transitionInfo);
             }
         }
 
@@ -423,8 +423,7 @@ namespace Display
             else
             {
                 //加载应用记录的图片默认大小
-                var imageSize = AppSettings.ImageSize;
-                var newItem = new VideoCoverDisplayClass(nowItem, imageSize.Item1, imageSize.Item2);
+                var newItem = new VideoCoverDisplayClass(nowItem, AppSettings.ImageWidth, AppSettings.ImageHeight);
                 ContentFrame.Navigate(typeof(DetailInfoPage), newItem, new SuppressNavigationTransitionInfo());
             }
         }
@@ -572,7 +571,7 @@ namespace Display
             }
 
             // 需要验证账户
-            if (info.errcode == Const.AccountAnomalyCode)
+            if (info.errcode == Const.Common.AccountAnomalyCode)
             {
                 var window = WebApi.CreateWindowToVerifyAccount();
 
@@ -653,6 +652,11 @@ namespace Display
             if (args.Element is not CustomAutoSuggestBox suggestionBox) return;
 
             suggestionBox.Focus(FocusState.Programmatic);
+        }
+
+        private void TaskButtonClick(object sender, TappedRoutedEventArgs e)
+        {
+
         }
     }
 }

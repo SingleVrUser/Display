@@ -215,13 +215,13 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         switch (run.Text)
         {
             case "名称":
-                ChangedOrder(WebApi.OrderBy.file_name, Name_Run);
+                ChangedOrder(WebApi.OrderBy.FileName, Name_Run);
                 break;
             case "修改时间":
-                ChangedOrder(WebApi.OrderBy.user_ptime, Time_Run);
+                ChangedOrder(WebApi.OrderBy.UserPtime, Time_Run);
                 break;
             case "大小":
-                ChangedOrder(WebApi.OrderBy.file_size, Size_Run);
+                ChangedOrder(WebApi.OrderBy.FileSize, Size_Run);
                 break;
         }
     }
@@ -245,13 +245,13 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         switch (orderBy)
         {
-            case WebApi.OrderBy.file_name:
+            case WebApi.OrderBy.FileName:
                 run = Name_Run;
                 break;
-            case WebApi.OrderBy.user_ptime:
+            case WebApi.OrderBy.UserPtime:
                 run = Time_Run;
                 break;
-            case WebApi.OrderBy.file_size:
+            case WebApi.OrderBy.FileSize:
                 run = Size_Run;
                 break;
             default:
@@ -767,20 +767,20 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async void DownButton_Click(object sender, RoutedEventArgs e)
     {
-        await DownFiles(WebApi.downType.bc);
+        await DownFiles(WebApi.DownType.Bc);
     }
 
     private async void Aria2Down_Click(object sender, RoutedEventArgs e)
     {
-        await DownFiles(WebApi.downType.aria2);
+        await DownFiles(WebApi.DownType.Aria2);
     }
 
     private async void Browser115Down_Click(object sender, RoutedEventArgs e)
     {
-        await DownFiles(WebApi.downType._115);
+        await DownFiles(WebApi.DownType._115);
     }
 
-    private async Task DownFiles(WebApi.downType downType)
+    private async Task DownFiles(WebApi.DownType downType)
     {
         if (BaseExample.SelectedItems is null || BaseExample.SelectedItems.Count == 0)
         {

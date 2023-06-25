@@ -33,10 +33,10 @@
                         <ColumnDefinition Width="auto" />
                     </Grid.ColumnDefinitions>
                     <ToggleButton Content="搜刮"
-                                  IsChecked="{x:Bind data:AppSettings.ProgressOfImportDataAccess_IsStartSpiderAfterTask,Mode=TwoWay}"/>
+                                  IsChecked="{x:Bind data:AppSettings.IsSpiderAfterImportDataAccess,Mode=TwoWay}"/>
                     <ToggleButton Content="通知"
                                   Grid.Column="1"
-                                  IsChecked="{x:Bind data:AppSettings.ProgressOfImportDataAccess_IsToastAfterTask,Mode=TwoWay}" />
+                                  IsChecked="{x:Bind data:AppSettings.IsToastAfterImportDataAccess,Mode=TwoWay}" />
                 </Grid>
             </StackPanel>
         </RelativePanel>

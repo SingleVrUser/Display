@@ -26,7 +26,7 @@ public class Fc2hub
 
     public static bool IsOn => AppSettings.IsUseFc2Hub;
 
-    private static string baseUrl => AppSettings.Fc2hub_BaseUrl;
+    private static string baseUrl => AppSettings.Fc2HubBaseUrl;
 
     public static async Task<VideoInfo> SearchInfoFromCID(string CID)
     {

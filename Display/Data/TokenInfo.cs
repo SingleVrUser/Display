@@ -446,7 +446,7 @@ namespace Display.Data
             {
                 string path = value;
 
-                path = !string.IsNullOrEmpty(path) ? path : Data.Const.NoPicturePath;
+                path = !string.IsNullOrEmpty(path) ? path : Const.Common.NoPicturePath;
 
                 if (_prifile_path == path) return;
 
@@ -667,7 +667,7 @@ namespace Display.Data
                 if (_imagepath == value) return;
 
                 string path = value;
-                _imagepath = !string.IsNullOrEmpty(path) ? path : Const.NoPicturePath;
+                _imagepath = !string.IsNullOrEmpty(path) ? path : Const.Common.NoPicturePath;
                 OnPropertyChanged();
             }
         }
@@ -1407,7 +1407,7 @@ namespace Display.Data
                 if (string.IsNullOrEmpty(_prifilePhotoPath))
                 {
                     //初始化
-                    _prifilePhotoPath = Data.Const.NoPicturePath;
+                    _prifilePhotoPath = Const.Common.NoPicturePath;
 
                     //检查演员图片是否存在
                     string imagePath = Path.Combine(AppSettings.ActorInfoSavePath, name, "face.jpg");
@@ -1997,7 +1997,7 @@ namespace Display.Data
 
         public long look_later { get; set; } = 0;
 
-        public string image_path { get; set; } = Const.NoPicturePath;
+        public string image_path { get; set; } = Const.Common.NoPicturePath;
     }
 
     public enum FailInfoShowType { like, look_later }
@@ -2090,7 +2090,7 @@ namespace Display.Data
 
     public class TorrentCidResult
     {
-        public string cid { get; set; }
+        public long cid { get; set; }
     }
 
     public class RenameRequest

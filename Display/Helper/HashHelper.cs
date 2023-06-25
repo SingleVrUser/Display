@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
+using System.Threading;
+using Display.Extensions;
 
 namespace Display.Helper
 {
@@ -31,6 +35,43 @@ namespace Display.Helper
             var hashBytes = hashDlg.ComputeHash(bytes);
 
             return Convert.ToHexString(hashBytes);
+        }
+
+        public static async Task<string> ComputeSha1ByStream(FileStream stream, CancellationToken cancellationToken)
+        {
+            using var sha = SHA1.Create();
+            var hash = await sha.ComputeHashAsync(stream, cancellationToken);
+            return Convert.ToHexString(hash);
+        }
+
+        public static async Task<string> ComputeSha1ByStream(FileStream stream, CancellationToken cancellationToken, IProgress<long> progress, int bufferSize = 1024 * 1024)
+        {
+            using var sha = SHA1.Create();
+
+            var hash = await sha.ComputeHashAsync(stream, cancellationToken, progress, bufferSize);
+
+            return hash == null ? null : Convert.ToHexString(hash);
+        }
+
+        public static string ComputeSha1RangeByStream(FileStream stream, string signCheck)
+        {
+            Debug.WriteLine($"需要 {signCheck} 范围的Sha1");
+
+            var ranges = signCheck.Split("-");
+            if (ranges.Length != 2) return string.Empty;
+
+            if (!long.TryParse(ranges[0], out var startIndex) || !long.TryParse(ranges[1], out var endIndex)) return string.Empty;
+
+            int bufferSize = (int)(endIndex - startIndex + 1);
+            var buffer = new byte[bufferSize];
+
+            stream.Seek(startIndex, SeekOrigin.Begin);
+            var readSize = stream.Read(buffer, 0, bufferSize);
+            if (readSize != bufferSize) Debug.WriteLine("读取的大小与要求的大小不一致，可能有问题");
+
+            using var sha = SHA1.Create();
+            var hash = sha.ComputeHash(buffer);
+            return Convert.ToHexString(hash);
         }
 
 

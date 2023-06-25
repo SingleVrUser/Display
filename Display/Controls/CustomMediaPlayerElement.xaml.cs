@@ -33,12 +33,12 @@ using Display.ContentsPage;
 
 namespace Display.Controls;
 
-public sealed partial class CustomMediaPlayerElement : UserControl
+public sealed partial class CustomMediaPlayerElement
 {
     public int IsLike;
     public int LookLater;
 
-    public enum PlayType { success, fail }
+    public enum PlayType { Success, Fail }
     public event EventHandler<RoutedEventArgs> FullWindow;
 
     private WebApi _webApi;
@@ -67,7 +67,8 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         //m3u8UrlList
         _webApi ??= WebApi.GlobalWebApi;
 
-        _httpClient = WebApi.CreateWindowWebHttpClient();
+        //_httpClient = WebApi.CreateWindowWebHttpClient();
+        _httpClient = WebApi.SingleVideoWindowWebHttpClient;
 
         _adaptiveMediaSourceList = new List<AdaptiveMediaSourceCreationResult>();
         _httpRandomAccessStreamList = new List<HttpRandomAccessStream>();
@@ -104,7 +105,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         //    _appDisplayRequest = null;
         //}
 
-        _httpClient.Dispose();
+        //_httpClient.Dispose();
     }
 
     private void DisposeMediaPlayer(MediaPlaybackList mediaPlaybackList)
@@ -128,8 +129,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
         MediaControl.MediaPlayer.Source = null;
     }
 
-
-    private bool isHanlerCurrentItemChanged = false;
+    private bool _isHandlerCurrentItemChanged = false;
     private void SetMediaPlayer()
     {
         var mediaPlaybackList = new MediaPlaybackList();
@@ -166,10 +166,10 @@ public sealed partial class CustomMediaPlayerElement : UserControl
 
         mediaPlaybackList.StartingItem = mediaPlaybackList.Items[(int)_playIndex];
 
-        if (!isHanlerCurrentItemChanged)
+        if (!_isHandlerCurrentItemChanged)
         {
             mediaPlaybackList.CurrentItemChanged += MediaPlaybackList_CurrentItemChanged;
-            isHanlerCurrentItemChanged = true;
+            _isHandlerCurrentItemChanged = true;
         }
 
         var mediaPlayer = new MediaPlayer
@@ -301,7 +301,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
             IsLike = videoInfo.is_like;
             LookLater = Convert.ToInt32(videoInfo.look_later);
 
-            isLike = this.IsLike == 1;
+            isLike = IsLike == 1;
             isLookLater = this.LookLater != 0;
 
             mediaTransportControls.SetLike_LookLater(isLike, isLookLater);
@@ -484,7 +484,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
                 DataAccess.UpdateSingleFailInfo(pickCode, "is_like", IsLike.ToString());
 
                 //需要截图
-                if (failInfo.image_path == Const.NoPicturePath || !File.Exists(failInfo.image_path))
+                if (failInfo.image_path == Const.Common.NoPicturePath || !File.Exists(failInfo.image_path))
                 {
                     var capPath = await ScreenShotAsync(pickCode);
                     DataAccess.UpdateSingleFailInfo(pickCode, "image_path", capPath);
@@ -540,7 +540,7 @@ public sealed partial class CustomMediaPlayerElement : UserControl
                 DataAccess.UpdateSingleFailInfo(pickCode, "look_later", LookLater.ToString());
 
                 //需要添加截图
-                if (failInfo.image_path == Const.NoPicturePath || !File.Exists(failInfo.image_path))
+                if (failInfo.image_path == Const.Common.NoPicturePath || !File.Exists(failInfo.image_path))
                 {
                     var capPath = await ScreenShotAsync(pickCode);
                     DataAccess.UpdateSingleFailInfo(pickCode, "image_path", capPath);

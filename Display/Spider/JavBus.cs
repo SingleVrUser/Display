@@ -25,7 +25,7 @@ public class JavBus
 
     public static bool IsOn => AppSettings.IsUseJavBus;
 
-    private static string baseUrl => AppSettings.JavBus_BaseUrl;
+    private static string baseUrl => AppSettings.JavBusBaseUrl;
 
     public static async Task<VideoInfo> SearchInfoFromCID(string CID)
     {

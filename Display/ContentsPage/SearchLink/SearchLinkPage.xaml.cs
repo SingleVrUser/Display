@@ -11,7 +11,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Display.Services;
 using Display.Views;
+using static System.Int64;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -148,12 +150,12 @@ namespace Display.ContentsPage.SearchLink
 
             var offlineSpaceInfo = await webApi.GetOfflineSpaceInfo(uploadInfo.userkey, uploadInfo.user_id);
 
-            long.TryParse(AppSettings.SavePath115Cid, out var cid);
+            TryParse(AppSettings.SavePath115Cid, out var cid);
 
             var addTaskUrlInfo = await webApi.AddTaskUrl(links, cid, uploadInfo.user_id, offlineSpaceInfo.sign, offlineSpaceInfo.time);
 
             // 需要验证账号
-            if (addTaskUrlInfo is { errcode: Const.AccountAnomalyCode })
+            if (addTaskUrlInfo is { errcode: Const.Common.AccountAnomalyCode })
             {
                 var window = WebApi.CreateWindowToVerifyAccount();
                 
@@ -189,7 +191,7 @@ namespace Display.ContentsPage.SearchLink
             // 上传字幕，如果需要
             if (!string.IsNullOrEmpty(srtPath))
             {
-                await Upload115.SingleUpload115.UploadTo115(srtPath, cid.ToString(), uploadInfo.user_id.ToString(), uploadInfo.userkey);
+                await FileUpload.SimpleUpload(srtPath, cid, uploadInfo.user_id, uploadInfo.userkey);
             }
 
             return addTaskUrlInfo is { state: true };

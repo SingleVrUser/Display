@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using Windows.Storage;
+using Display.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -50,7 +51,7 @@ namespace Display
             //var item2 = webview.ExecuteScriptAsync($"window.open('https://baidu.com','_blank');");
             webview.CoreWebView2.ContainsFullScreenElementChanged += CoreWebView2_ContainsFullScreenElementChanged;
 
-            var cookie = (string)localSettings.Values["Cookie"];
+            var cookie = AppSettings._115_Cookie;
             //cookie不为空且可用
             if (!string.IsNullOrEmpty(cookie))
             {
@@ -59,10 +60,9 @@ namespace Display
                 var cookiesList = cookie.Split(';');
                 foreach (var cookies in cookiesList)
                 {
-                    cookie = cookies;
                     var item = cookies.Split('=');
-                    string key = item[0].Trim();
-                    string value = item[1].Trim();
+                    var key = item[0].Trim();
+                    var value = item[1].Trim();
                     AddCookie(key, value);
                 }
             }

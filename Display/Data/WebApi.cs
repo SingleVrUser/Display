@@ -1,13 +1,13 @@
-﻿using Display.Helper;
+﻿using System;
+using Display.Helper;
 using Display.Models;
+using Display.Services;
 using Display.Views;
 using Display.WindowView;
 using HtmlAgilityPack;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -17,22 +17,23 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Windows.Storage;
+using Newtonsoft.Json.Linq;
 using static System.Int32;
+using Exception = System.Exception;
 using HttpMethod = System.Net.Http.HttpMethod;
 using HttpRequestMessage = System.Net.Http.HttpRequestMessage;
+using static QRCoder.PayloadGenerator;
 
 namespace Display.Data
 {
     public class WebApi
     {
-        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         private HttpClient QRCodeClient;
         public HttpClient Client;
         public static UserInfo UserInfo;
@@ -41,7 +42,7 @@ namespace Display.Data
         public static bool isEnterHiddenMode;
         public TokenInfo TokenInfo;
 
-        //string api_version = "2.0.1.7";
+        private long NowDate => DateTimeOffset.Now.ToUnixTimeSeconds();
 
         private static WebApi _webApi;
 
@@ -74,27 +75,29 @@ namespace Display.Data
         /// <summary>
         /// 更新cookie
         /// </summary>
-        /// <param Name="cookie"></param>
-        public void RefreshCookie(string cookie)
+        /// <param name="cookie"></param>
+        public void ResetCookie(string cookie)
         {
             Client.DefaultRequestHeaders.Remove("Cookie");
             Client.DefaultRequestHeaders.Add("Cookie", cookie);
         }
 
         private static Windows.Web.Http.HttpClient _windowWebHttpClient;
-        public static Windows.Web.Http.HttpClient GetVideoWindowWebHttpClient()
+        public static Windows.Web.Http.HttpClient SingleVideoWindowWebHttpClient
         {
-            if (_windowWebHttpClient != null) return _windowWebHttpClient;
+            get
+            {
+                _windowWebHttpClient ??= CreateWindowWebHttpClient();
 
-            _windowWebHttpClient = CreateWindowWebHttpClient();
-
-            return _windowWebHttpClient;
+                return _windowWebHttpClient;
+            }
         }
 
         public static Windows.Web.Http.HttpClient CreateWindowWebHttpClient()
         {
+            const string referer = "https://115.com/?cid=0&offset=0&tab=&mode=wangpan";
             var windowWebHttpClient = new Windows.Web.Http.HttpClient();
-            windowWebHttpClient.DefaultRequestHeaders.Add("Referer", "https://115.com/?cid=0&offset=0&tab=&mode=wangpan");
+            windowWebHttpClient.DefaultRequestHeaders.Add("Referer", referer);
             windowWebHttpClient.DefaultRequestHeaders.Add("User-Agent", GetInfoFromNetwork.UserAgent);
 
             return windowWebHttpClient;
@@ -104,40 +107,12 @@ namespace Display.Data
         /// 检查登录状态
         /// </summary>
         /// <returns>true - 登录，false - 未登录</returns>
-        public async Task<bool> UpdateLoginInfo()
+        public async Task<bool> UpdateLoginInfoAsync()
         {
-            bool result = false;
-            HttpResponseMessage response;
-            try
-            {
-                response = await Client.GetAsync($"https://my.115.com/?ct=ajax&ac=nav&callback=jQuery172046995607070659906_1647774910536&_={DateTimeOffset.Now.ToUnixTimeSeconds()}");
-            }
-            catch (HttpRequestException e)
-            {
-                Toast.tryToast("网络异常", "检查115登录状态时出现异常：", e.Message);
+            UserInfo = await SendAsync<UserInfo>(HttpMethod.Get,
+                $"https://my.115.com/?ct=ajax&ac=nav&_={NowDate}");
 
-                return result;
-            }
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return result;
-            }
-
-            string strReuslt = await response.Content.ReadAsStringAsync();
-            strReuslt = strReuslt.Replace("jQuery172046995607070659906_1647774910536(", "");
-            strReuslt = strReuslt.Replace(");", "");
-
-            try
-            {
-                UserInfo = JsonConvert.DeserializeObject<UserInfo>(strReuslt);
-                result = UserInfo.state;
-            }
-            catch (Exception)
-            {
-                result = false;
-            }
-            return result;
+            return UserInfo?.state == true;
         }
 
         /// <summary>
@@ -146,8 +121,7 @@ namespace Display.Data
         /// <returns></returns>
         public async Task<bool> IsHiddenModel()
         {
-            var result = false;
-
+            const string url = "https://115.com/?ac=setting&even=saveedit&is_wl_tpl=1";
             var values = new Dictionary<string, string>
                 {
                     { "last_file_type", " folder"},
@@ -155,35 +129,10 @@ namespace Display.Data
                 };
             var content = new FormUrlEncodedContent(values);
 
-            HttpResponseMessage response;
-            try
-            {
-                response = Client.PostAsync("https://115.com/?ac=setting&even=saveedit&is_wl_tpl=1", content).Result;
-            }
-            catch (AggregateException e)
-            {
-                Toast.tryToast("网络异常", "检查115隐藏状态时出现异常：", e.Message);
+            var driveSetting = await SendAsync<_115Setting>(HttpMethod.Post, url, content);
 
-                return result;
-            }
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return result;
-            }
-
-            var strResult = await response.Content.ReadAsStringAsync();
-            _115Setting DriveSetting;
-            try
-            {
-                DriveSetting = JsonConvert.DeserializeObject<_115Setting>(strResult);
-            }
-            catch
-            {
-                return result;
-            }
-
-            if (DriveSetting.data.show == "1")
+            var result = false;
+            if (driveSetting?.data.show == "1")
             {
                 result = true;
                 isEnterHiddenMode = true;
@@ -231,21 +180,16 @@ namespace Display.Data
                     { getFilesProgressInfo = getFilesProgressInfo });
             }
 
-            if (token.IsCancellationRequested)
-            {
-                progress?.Report(new GetFileProgessIProgress {status = ProgressStatus.cancel });
-            }
-            else
-            {
+            progress?.Report(token.IsCancellationRequested
+                ? new GetFileProgessIProgress { status = ProgressStatus.cancel }
                 // 完成
-                progress?.Report(new GetFileProgessIProgress {status = ProgressStatus.done });
-            }
-
+                : new GetFileProgessIProgress { status = ProgressStatus.done });
         }
 
         private async Task<GetFilesProgressInfo> TryAddFolderToDataAccess(CancellationToken token, IProgress<GetFileProgessIProgress> progress, string cid,GetFilesProgressInfo getFilesProgressInfo)
         {
-            var nowDate = DateTimeOffset.Now.ToUnixTimeSeconds();
+            var lastDate = NowDate;
+
             await Task.Delay(1000, token);
             // 一开始只有cid，先获取cid的属性
             var cidCategory = await GetFolderCategory(cid);
@@ -279,7 +223,7 @@ namespace Display.Data
                 //文件夹数量
                 getFilesProgressInfo!.FolderCount += cidCategory.folder_count;
 
-                var cpm = 60 / (DateTimeOffset.Now.ToUnixTimeSeconds() - nowDate);
+                var cpm = 60 / (NowDate - lastDate);
 
                 progress?.Report(new GetFileProgessIProgress
                     { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
@@ -326,7 +270,7 @@ namespace Display.Data
         {
             if (token.IsCancellationRequested) return getFilesProgressInfo;
 
-            var nowDate = DateTimeOffset.Now.ToUnixTimeSeconds();
+            var lastDate = NowDate;
 
             await Task.Delay(1000, token);
 
@@ -362,7 +306,7 @@ namespace Display.Data
                             //文件数量
                             getFilesProgressInfo.FilesCount += datumList.Count;
 
-                            var cpm = 60 / (DateTimeOffset.Now.ToUnixTimeSeconds() - nowDate);
+                            var cpm = 60 / (NowDate - lastDate);
                             progress?.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
                         }
                         else
@@ -375,7 +319,7 @@ namespace Display.Data
                     {
                         getFilesProgressInfo.FilesCount++;
 
-                        var cpm = 60 / (DateTimeOffset.Now.ToUnixTimeSeconds() - nowDate);
+                        var cpm = 60 / (NowDate - lastDate);
                         progress?.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
 
                         getFilesProgressInfo.AddToDataAccessList.Add(item);
@@ -393,12 +337,13 @@ namespace Display.Data
         /// <summary>
         /// 修改文件列表的排列顺序
         /// </summary>
-        /// <param Name="cid"></param>
-        /// <param Name="orderBy"></param>
-        /// <param Name="asc"></param>
+        /// <param name="cid"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="asc"></param>
         /// <returns></returns>
-        public async Task ChangedShowType(string cid, OrderBy orderBy = OrderBy.user_ptime, int asc = 0)
+        public async Task ChangedShowType(string cid, OrderBy orderBy = OrderBy.UserPtime, int asc = 0)
         {
+            const string url = "https://webapi.115.com/files/order";
             var values = new Dictionary<string, string>
                 {
                     { "user_order", orderBy.ToString()},
@@ -408,58 +353,46 @@ namespace Display.Data
                 };
             var content = new FormUrlEncodedContent(values);
 
-            HttpResponseMessage response;
-            try
-            {
-                response = await Client.PostAsync("https://webapi.115.com/files/order", content);
-            }
-            catch (AggregateException e)
-            {
-                Toast.tryToast("网络异常", "改变115排序顺序时发生异常：", e.Message);
-            }
+            var _ = await SendAsync<string>(HttpMethod.Post, url, content);
+
         }
 
         /// <summary>
         /// 删除115文件
         /// </summary>
-        /// <param Name="pid"></param>
-        /// <param Name="fids"></param>
-        /// <param Name="ignore_warn"></param>
+        /// <param name="pid"></param>
+        /// <param name="fids"></param>
+        /// <param name="ignoreWarn"></param>
         /// <returns></returns>
-        public async Task DeleteFiles(string pid, List<string> fids, int ignore_warn = 1)
+        public async Task DeleteFiles(string pid, List<string> fids, int ignoreWarn = 1)
         {
+            const string url = "https://webapi.115.com/rb/delete";
+
             var values = new Dictionary<string, string>
             {
                 { "pid", pid},
             };
 
-            for (int i = 0; i < fids.Count; i++)
+            for (var i = 0; i < fids.Count; i++)
             {
                 values.Add($"fid[{i}]", fids[i]);
             }
 
-            values.Add("ignore_warn", ignore_warn.ToString());
+            values.Add("ignore_warn", ignoreWarn.ToString());
 
             var content = new FormUrlEncodedContent(values);
 
-            HttpResponseMessage response;
-            try
-            {
-                response = await Client.PostAsync("https://webapi.115.com/rb/delete", content);
-            }
-            catch (AggregateException e)
-            {
-                Toast.tryToast("网络异常", "删除115文件时发生异常：", e.Message);
-            }
+            var _ = await SendAsync<string>(HttpMethod.Post, url, content);
         }
 
         /// <summary>
         /// 从115回收站恢复文件
         /// </summary>
-        /// <param Name="rids"></param>
+        /// <param name="rids"></param>
         /// <returns></returns>
         public async Task RevertFiles(List<string> rids)
         {
+            const string url = "https://webapi.115.com/rb/revert";
             Dictionary<string, string> values = new();
 
             for (int i = 0; i < rids.Count; i++)
@@ -469,15 +402,7 @@ namespace Display.Data
 
             var content = new FormUrlEncodedContent(values);
 
-            HttpResponseMessage response;
-            try
-            {
-                response = await Client.PostAsync("https://webapi.115.com/rb/revert", content);
-            }
-            catch (AggregateException e)
-            {
-                Toast.tryToast("网络异常", "从115回收站恢复文件时发生异常：", e.Message);
-            }
+            var _ = await SendAsync<string>(HttpMethod.Post, url, content);
         }
 
         public async Task<bool> CreateTorrentOfflineDown(string torrentPath)
@@ -507,7 +432,9 @@ namespace Display.Data
 
                 if (torrentCidInfo != null && uploadInfo != null)
                 {
-                    await Upload115.SingleUpload115.UploadTo115(torrentPath, torrentCidInfo.cid, uploadInfo.user_id.ToString(), uploadInfo.userkey);
+                    //await Upload115.SingleUpload115.UploadTo115(torrentPath, torrentCidInfo.cid, uploadInfo.user_id, uploadInfo.userkey);
+
+                    await FileUpload.SimpleUpload(torrentPath, torrentCidInfo.cid, uploadInfo.user_id, uploadInfo.userkey);
                 }
 
                 // 再次检查网盘中是否有该torrent
@@ -550,9 +477,7 @@ namespace Display.Data
 
         private async Task<AddTaskBtResult> AddTaskBt(string infoHash, string wanted, string cid, string uid, string sign,string time, string savePath="")
         {
-            var url =
-                "https://115.com/web/lixian/?ct=lixian&ac=add_task_bt";
-
+            const string url = "https://115.com/web/lixian/?ct=lixian&ac=add_task_bt";
             var values = new Dictionary<string, string>
             {
                 { "info_hash", infoHash},
@@ -566,32 +491,13 @@ namespace Display.Data
 
             var content = new FormUrlEncodedContent(values);
 
-            try
-            {
-                var response = await Client.PostAsync(url, content);
-
-                var result = await response.Content.ReadFromJsonAsync<AddTaskBtResult>();
-
-                if (result.state)
-                {
-                    return result;
-                }
-
-                Debug.WriteLine("添加torrent任务出错");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"解析115中添加torrent任务时出错:{ex.Message}");
-            }
-
-            return null;
+            return await SendAsync<AddTaskBtResult>(HttpMethod.Post,
+                url, content);
         }
 
         private async Task<TorrentInfoResult> GetTorrentInfo(string pickCode, string sha1, string uid, string sign, string time)
         {
-            var url =
-                "https://115.com/web/lixian/?ct=lixian&ac=torrent";
-
+            const string url = "https://115.com/web/lixian/?ct=lixian&ac=torrent";
             var values = new Dictionary<string, string>
             {
                 { "pickcode", pickCode},
@@ -603,76 +509,20 @@ namespace Display.Data
 
             var content = new FormUrlEncodedContent(values);
 
-            try
-            {
-                var response = await Client.PostAsync(url,content);
+            return await SendAsync<TorrentInfoResult>(HttpMethod.Post, url, content);
 
-                var result = await response.Content.ReadFromJsonAsync<TorrentInfoResult>();
-
-                if (string.IsNullOrEmpty(result?.error_msg))
-                {
-                    return result;
-                }
-
-                Debug.WriteLine($"获取torrent文件Info出错:{result?.error_msg}");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"解析115中torrent文件Info时出错:{ex.Message}");
-            }
-
-            return null;
         }
 
         private async Task<TorrentCidResult> GetTorrentCid()
         {
-            var url =
-                "http://115.com/?ct=lixian&ac=get_id&torrent=1";
+            const string url = "http://115.com/?ct=lixian&ac=get_id&torrent=1";
 
-            try
-            {
-                var response = await Client.GetAsync(url);
-
-                var result = await response.Content.ReadFromJsonAsync<TorrentCidResult>();
-
-                if (!string.IsNullOrEmpty(result?.cid))
-                {
-                    return result;
-                }
-
-                Debug.WriteLine("获取存放torrent文件的目录cid出错");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"解析115中存放torrent文件的目录cid请求时出错:{ex.Message}");
-            }
-
-            return null;
+            return await SendAsync<TorrentCidResult>(HttpMethod.Get, url);
         }
 
         private async Task<ShaSearchResult> SearchInfoBySha1(string sha1)
         {
-            var url =
-                $"https://webapi.115.com/files/shasearch?sha1={sha1}&_={DateTimeOffset.Now.ToUnixTimeSeconds()}";
-
-            try
-            {
-                var response = await Client.GetAsync(url);
-
-                var result = await response.Content.ReadFromJsonAsync<ShaSearchResult>();
-
-                if (string.IsNullOrEmpty(result.error))
-                    return result;
-
-                Debug.WriteLine($"通过sha1搜索信息出错:{result.error}");
-
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"解析115通过sha1搜索信息请求时出错:{ex.Message}");
-            }
-
-            return null;
+            return await SendAsync<ShaSearchResult>(HttpMethod.Get, $"https://webapi.115.com/files/shasearch?sha1={sha1}&_={NowDate}");
         }
 
         /// <summary>
@@ -683,35 +533,16 @@ namespace Display.Data
         /// <returns>目标cid,创建失败则为null</returns>
         public async Task<MakeDirRequest> RequestMakeDir(string pid, string name)
         {
-            var url = "https://webapi.115.com/files/add";
+            const string url = "https://webapi.115.com/files/add";
 
             var values = new Dictionary<string, string>
             {
                 { "pid", pid},
                 {"cname",name }
             };
-
             var content = new FormUrlEncodedContent(values);
 
-            try
-            {
-                var response = await Client.PostAsync(url, content);
-
-                var res = await response.Content.ReadAsStringAsync();
-
-                var result = await response.Content.ReadFromJsonAsync<MakeDirRequest>();
-
-                if (string.IsNullOrEmpty(result.error))
-                    return result;
-
-                Debug.WriteLine($"115创建文件夹出错:{result.error}");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"解析115创建文件夹请求时出错:{ex.Message}");
-            }
-
-            return null;
+            return await SendAsync<MakeDirRequest>(HttpMethod.Post, url, content);
         }
 
         /// <summary>
@@ -723,6 +554,8 @@ namespace Display.Data
         public async Task MoveFiles(string pid, List<string> fids)
         {
             if (fids is not { Count: > 0 }) return;
+
+            const string url = "https://webapi.115.com/files/move";
 
             var values = new Dictionary<string, string>
             {
@@ -738,14 +571,7 @@ namespace Display.Data
 
             var content = new FormUrlEncodedContent(values);
 
-            try
-            {
-                await Client.PostAsync("https://webapi.115.com/files/move", content);
-            }
-            catch (AggregateException e)
-            {
-                Toast.tryToast("网络异常", "移动115文件时发生异常：", e.Message);
-            }
+            await SendAsync<MakeDirRequest>(HttpMethod.Post, url, content);
         }
 
         /// <summary>
@@ -756,36 +582,19 @@ namespace Display.Data
         /// <returns></returns>
         public async Task<RenameRequest> RenameFile(string pid, string newName)
         {
+            const string url = "https://webapi.115.com/files/batch_rename";
+
             var values = new Dictionary<string, string>
             {
                 { $"files_new_name[{pid}]", newName},
-
             };
 
             var content = new FormUrlEncodedContent(values);
 
-            RenameRequest result = null;
-
-            try
-            {
-                var response = await Client.PostAsync("https://webapi.115.com/files/batch_rename", content);
-
-                result = await response.Content.ReadFromJsonAsync<RenameRequest>();
-
-                if (string.IsNullOrEmpty(result.error))
-                    return result;
-
-                Debug.WriteLine($"115重命名出错:{result.error}");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"解析115重命名请求时出错:{ex.Message}");
-            }
-
-            return result;
+            return await SendAsync<RenameRequest>(HttpMethod.Post, url, content);
         }
 
-        public enum OrderBy { file_name, file_size, user_ptime }
+        public enum OrderBy { FileName, FileSize, UserPtime }
 
         /// <summary>
         /// 获取文件信息
@@ -799,36 +608,17 @@ namespace Display.Data
         /// <param name="asc"></param>
         /// <param name="isOnlyFolder"></param>
         /// <returns></returns>
-        public async Task<WebFileInfo> GetFileAsync(string cid, int limit = 40, int offset = 0, bool useApi2 = false, bool loadAll = false, OrderBy orderBy = OrderBy.user_ptime, int asc = 0,bool isOnlyFolder = false)
+        public async Task<WebFileInfo> GetFileAsync(string cid, int limit = 40, int offset = 0, bool useApi2 = false, bool loadAll = false, OrderBy orderBy = OrderBy.UserPtime, int asc = 0,bool isOnlyFolder = false)
         {
-            WebFileInfo webFileInfoResult = new();
-
-            string url;
-            url = !useApi2 ? $"https://webapi.115.com/files?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json" :
+            var url = !useApi2 ? $"https://webapi.115.com/files?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json" :
                 //旧接口只有t，没有修改时间（te），创建时间（tp）
                 $"https://aps.115.com/natsort/files.php?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json&fc_mix=0&type=&star=&is_share=&suffix=&custom_order=";
 
             if (isOnlyFolder)
                 url += "&nf=1";
 
-            HttpResponseMessage response;
-            try
-            {
-                response = await Client.GetAsync(url);
-            }
-            catch (AggregateException e)
-            {
-                Toast.tryToast("网络异常", "获取文件信息时出现异常：", e.Message);
-                return webFileInfoResult;
-            }
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return webFileInfoResult;
-            }
-            var strResult = await response.Content.ReadAsStringAsync();
-
-            webFileInfoResult = JsonConvert.DeserializeObject<WebFileInfo>(strResult);
+            var webFileInfoResult = await SendAsync<WebFileInfo>(HttpMethod.Get, url);
+            if (webFileInfoResult == null) return null;
 
             //te，tp简单用t替换，接口2没有te,tp
             if (useApi2)
@@ -838,16 +628,16 @@ namespace Display.Data
                     //item.t 可能是 "1658999027" 也可能是 "2022-07-28 17:03"
 
                     //"1658999027"
-                    if (FileMatch.IsNumberic1(item.t))
+                    if (item.t.IsNumberic1())
                     {
-                        int dateInt = Parse(item.t);
+                        var dateInt = Parse(item.t);
                         item.te = item.tp = dateInt;
                         item.t = FileMatch.ConvertInt32ToDateTime(dateInt);
                     }
                     //"2022-07-28 17:03"
                     else
                     {
-
+                        // ignore
                     }
                 }
             }
@@ -896,33 +686,9 @@ namespace Display.Data
 
         public async Task<FilesShowInfo> GetFilesShowInfo(string cid)
         {
-            FilesShowInfo result = null;
+            var url = $"https://webapi.115.com/files?aid=1&cid={cid}&o=user_ptime&asc=0&offset=0&show_dir=1&limit=30&code=&scid=&snap=0&natsort=1&star=1&source=&format=json";
 
-            string url = $"https://webapi.115.com/files?aid=1&cid={cid}&o=user_ptime&asc=0&offset=0&show_dir=1&limit=30&code=&scid=&snap=0&natsort=1&star=1&source=&format=json";
-            HttpResponseMessage response;
-            try
-            {
-                response = await Client.GetAsync(url);
-            }
-            catch (AggregateException e)
-            {
-                Toast.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
-                return result;
-            }
-            catch (HttpRequestException e)
-            {
-                Toast.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
-                return result;
-            }
-
-            if (response.IsSuccessStatusCode)
-            {
-                var strResult = await response.Content.ReadAsStringAsync();
-
-                result = JsonConvert.DeserializeObject<FilesShowInfo>(strResult);
-            }
-
-            return result;
+            return await SendAsync<FilesShowInfo>(HttpMethod.Get, url);
         }
 
         /// <summary>
@@ -932,42 +698,57 @@ namespace Display.Data
         /// <returns></returns>
         public async Task<FileCategory> GetFolderCategory(string cid)
         {
-            FileCategory webFileInfoResult = null;
-
             if (cid == "0")
             {
-                return new FileCategory() { file_name = "根目录" };
+                return new FileCategory { file_name = "根目录" };
             }
 
-            var url = $"https://webapi.115.com/category/get?cid={cid}";
+            return await SendAsync<FileCategory>(HttpMethod.Get, $"https://webapi.115.com/category/get?cid={cid}");
+        }
+
+        private async Task<T> SendAsync<T>(HttpMethod method, string url,HttpContent content = null,T defaultValue = default)
+        {
+            var uri = new Uri(url);
+            using var request = new HttpRequestMessage(method, url)
+            {
+                RequestUri = uri,
+                Content = content
+            };
+
             HttpResponseMessage response;
             try
             {
-                response = await Client.GetAsync(url);
+                response = await Client.SendAsync(request);
+
+
             }
             catch (AggregateException e)
             {
-                Toast.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
-                return null;
+                Toast.tryToast("网络异常", $"{uri.Host}", e.Message);
+                return defaultValue;
             }
             catch (HttpRequestException e)
             {
-                Toast.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
-                return null;
+                Toast.tryToast("网络异常", $"{uri.Host}", e.Message);
+                return defaultValue;
             }
 
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode) return defaultValue;
+
+            try
             {
-                var strResult = await response.Content.ReadAsStringAsync();
+                var contentAsString = await response.Content.ReadAsStringAsync();
+                if (contentAsString is T result) return result;
 
-                if (strResult == "[]")
-                {
-                    return null;
-                }
-                webFileInfoResult = JsonConvert.DeserializeObject<FileCategory>(strResult);
+                return contentAsString == "[]" ? defaultValue : JsonConvert.DeserializeObject<T>(contentAsString);
             }
+            catch (Exception e)
+            {
+                Debug.WriteLine($"发生错误{e.Message}");
+                Toast.tryToast("格式异常", $"{nameof(T)}转换异常", e.Message);
 
-            return webFileInfoResult;
+                return defaultValue;
+            }
         }
 
         /// <summary>
@@ -976,50 +757,27 @@ namespace Display.Data
         /// <returns></returns>
         public async Task<TokenInfo> NetworkVerifyTokenAsync()
         {
-            try
+            const string url = "https://passportapi.115.com/app/1.0/web/1.0/login/qrcode";
+
+            var values = new Dictionary<string, string>
             {
-                var values = new Dictionary<string, string>
-                {
-                    { "account", QRCodeInfo.data.uid }
-                };
-                var content = new FormUrlEncodedContent(values);
+                { "account", QRCodeInfo.data.uid }
+            };
+            var content = new FormUrlEncodedContent(values);
 
-                if (QRCodeClient == null)
-                {
-                    QRCodeClient = new HttpClient();
-                }
+            TokenInfo = await SendAsync<TokenInfo>(HttpMethod.Post, url,content);
 
-                var response = QRCodeClient.PostAsync("https://passportapi.115.com/app/1.0/web/1.0/login/qrcode", content).Result;
+            if (TokenInfo.state != 1) return TokenInfo;
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    return null;
-                }
-
-                string strResult = await response.Content.ReadAsStringAsync();
-                TokenInfo = JsonConvert.DeserializeObject<TokenInfo>(strResult);
-
-                if (TokenInfo.state == 1)
-                {
-                    //存储cookie至本地
-                    List<string> CookieList = new List<string>();
-                    foreach (var item in TokenInfo.data.cookie.GetType().GetProperties())
-                    {
-                        CookieList.Add($"{item.Name}={item.GetValue(TokenInfo.data.cookie)}");
-                    }
-
-                    var cookie = string.Join(";", CookieList);
-                    localSettings.Values["cookie"] = cookie;
-
-                    Client.DefaultRequestHeaders.Add("Cookie", cookie);
-
-                }
-
-            }
-            catch (Exception)
+            //存储cookie至本地
+            var cookieList = new List<string>();
+            foreach (var item in TokenInfo.data.cookie.GetType().GetProperties())
             {
-                //TokenInfo = null;
+                cookieList.Add($"{item.Name}={item.GetValue(TokenInfo.data.cookie)}");
             }
+            var cookie = string.Join(";", cookieList);
+            AppSettings._115_Cookie = cookie;
+            Client.DefaultRequestHeaders.Add("Cookie", cookie);
 
             return TokenInfo;
         }
@@ -1028,78 +786,41 @@ namespace Display.Data
         /// 检查二维码扫描状态
         /// </summary>
         /// <returns></returns>
-        public async Task<QRCodeStatus> GetQRCodeStatusAsync()
+        public async Task<QRCodeStatus> GetQrCodeStatusAsync()
         {
-            QRCodeStatus qRCodeStatus = new QRCodeStatus();
+            var url = $"https://qrcodeapi.115.com/get/status/?uid={QRCodeInfo.data.uid}&time={QRCodeInfo.data.time}&sign={QRCodeInfo.data.sign}&_={NowDate}";
 
-            if (QRCodeClient == null)
-            {
-                QRCodeClient = new HttpClient();
-            }
-
-            string url = $"https://qrcodeapi.115.com/get/status/?uid={QRCodeInfo.data.uid}&time={QRCodeInfo.data.time}&sign={QRCodeInfo.data.sign}&_={DateTimeOffset.Now.ToUnixTimeSeconds()}";
-
-            try
-            {
-                var response = await QRCodeClient.GetAsync(url);
-                if (!response.IsSuccessStatusCode)
-                {
-                    return qRCodeStatus;
-                }
-
-                var strResult = await response.Content.ReadAsStringAsync();
-                qRCodeStatus = JsonConvert.DeserializeObject<QRCodeStatus>(strResult);
-            }
-            catch (Exception)
-            {
-                //TokenInfo = null;
-            }
-
-            return qRCodeStatus;
+            return await SendAsync<QRCodeStatus>(HttpMethod.Get, url);
         }
 
         /// <summary>
         /// 获取登录二维码信息
         /// </summary>
         /// <returns></returns>
-        public async Task<QRCodeInfo> GetQRCodeInfo()
+        public async Task<QRCodeInfo> GetQrCodeInfo()
         {
-            QRCodeInfo = new QRCodeInfo();
+            const string url = "https://qrcodeapi.115.com/api/1.0/web/1.0/token";
 
-            if (QRCodeClient == null)
-            {
-                QRCodeClient = new HttpClient();
-            }
-            var response = await Client.GetAsync("https://qrcodeapi.115.com/api/1.0/web/1.0/token");
-            if (!response.IsSuccessStatusCode)
-            {
-                return QRCodeInfo;
-            }
-
-
-            var result = await response.Content.ReadAsStringAsync();
-            QRCodeInfo = JsonConvert.DeserializeObject<QRCodeInfo>(result);
-            return QRCodeInfo;
+            return await SendAsync<QRCodeInfo>(HttpMethod.Get, url);
         }
 
-        public enum downType { _115, bc, aria2 };
-        public async Task<bool> RequestDown(List<Datum> videoInfoList, downType downType = downType._115, string savePath = null, string topFolderName = null)
+        public enum DownType { _115, Bc, Aria2 };
+        public async Task<bool> RequestDown(List<Datum> videoInfoList, DownType downType = DownType._115, string savePath = null, string topFolderName = null)
         {
-            bool success = false;
+            var success = downType switch
+            {
+                //115只支持文件
+                DownType._115 => await RequestDownBy115Browser(videoInfoList),
 
-            //115只支持文件
-            if (downType == downType._115)
-                success = await RequestDownBy115Browser(videoInfoList);
-            //BitComet支持文件和文件夹
-            else if (downType == downType.bc)
-            {
-                success = await RequestDownByBitComet(videoInfoList, GetInfoFromNetwork.UserAgent, save_path: savePath, topFolderName: topFolderName);
-            }
-            //Arai2也支持文件和文件夹
-            else if (downType == downType.aria2)
-            {
-                success = await RequestDownByAria2(videoInfoList, GetInfoFromNetwork.UserAgent, save_path: savePath, topFolderName: topFolderName);
-            }
+                //BitComet支持文件和文件夹
+                DownType.Bc => await RequestDownByBitComet(videoInfoList, GetInfoFromNetwork.UserAgent,
+                    savePath: savePath, topFolderName: topFolderName),
+
+                //Aria2也支持文件和文件夹
+                DownType.Aria2 => await RequestDownByAria2(videoInfoList, GetInfoFromNetwork.UserAgent,
+                    save_path: savePath, topFolderName: topFolderName),
+                _ => false
+            };
 
             return success;
         }
@@ -1107,12 +828,10 @@ namespace Display.Data
         /// <summary>
         /// 请求115浏览器下载
         /// </summary>
-        /// <param Name="videoInfoList"></param>
+        /// <param name="videoInfoList"></param>
+        /// <returns></returns>
         async Task<bool> RequestDownBy115Browser(List<Datum> videoInfoList)
         {
-
-            bool isSuccess = false;
-
             var downRequest = new Browser_115_Request
             {
                 //UID
@@ -1122,28 +841,31 @@ namespace Display.Data
             //KEY
             if (QRCodeInfo == null)
             {
-                await GetQRCodeInfo();
+                await GetQrCodeInfo();
             }
             downRequest.key = QRCodeInfo?.data.uid;
 
             //PARAM
-            downRequest.param = new Param_Request();
-            downRequest.param.list = new();
+            downRequest.param = new Param_Request
+            {
+                count = downRequest.param.list.Count,
+                list = new List<Down_Request>(),
+                ref_url = $"https://115.com/?cid={videoInfoList[0].cid}&offset=0&mode=wangpan"
+            };
+
             foreach (var videoInfo in videoInfoList)
             {
-                bool isdir = videoInfo.uid == 0 ? true : false;
-                downRequest.param.list.Add(new Down_Request() { n = videoInfo.n, pc = videoInfo.pc, is_dir = isdir });
+                var isDir = videoInfo.uid == 0;
+                downRequest.param.list.Add(new Down_Request() { n = videoInfo.n, pc = videoInfo.pc, is_dir = isDir });
             }
-            downRequest.param.count = downRequest.param.list.Count;
-            downRequest.param.ref_url = $"https://115.com/?cid={videoInfoList[0].cid}&offset=0&mode=wangpan";
 
-            string url = "";
-            string jsonString = JsonConvert.SerializeObject(downRequest);
+            var url = string.Empty;
+            var jsonString = JsonConvert.SerializeObject(downRequest);
 
-            JObject jObject = JObject.Parse(jsonString);
-            IEnumerable<string> nameValues = jObject
+            var jObject = JObject.Parse(jsonString);
+            var nameValues = jObject
                 .Properties()
-                .Select(x => $"{x.Name}={WebUtility.UrlEncode(x.Value.ToString().Replace(System.Environment.NewLine, string.Empty).Replace(" ", ""))}");
+                .Select(x => $"{x.Name}={WebUtility.UrlEncode(x.Value.ToString().Replace(System.Environment.NewLine, string.Empty).Replace(" ", string.Empty))}");
 
             url += "browser115://download?" + string.Join("&", nameValues);
 
@@ -1157,72 +879,60 @@ namespace Display.Data
             };
 
             // Launch the URI
-            var success = await Windows.System.Launcher.LaunchUriAsync(uriDown, options);
-
-            if (success)
-            {
-                isSuccess = true;
-                // URI launched
-            }
-            else
-            {
-                // URI launch failed
-            }
-
-            return isSuccess;
+            return await Windows.System.Launcher.LaunchUriAsync(uriDown, options);
         }
 
         /// <summary>
         /// 请求比特彗星下载
         /// </summary>
-        /// <param Name="videoInfoList"></param>
+        /// <param name="videoInfoList"></param>
+        /// <param name="ua"></param>
+        /// <param name="savePath"></param>
+        /// <param name="topFolderName"></param>
         /// <returns></returns>
-        async Task<bool> RequestDownByBitComet(List<Datum> videoInfoList, string ua, string save_path, string topFolderName = null)
+        private async Task<bool> RequestDownByBitComet(List<Datum> videoInfoList, string ua, string savePath, string topFolderName = null)
         {
-            bool success = true;
+            var success = true;
 
-            var BitCometSettings = AppSettings.BitCometSettings;
+            var bitCometSettings = AppSettings.BitCometSettings;
 
-            if (BitCometSettings == null)
+            if (bitCometSettings == null)
                 return false;
 
 
-            string baseUrl = BitCometSettings.ApiUrl;
+            var baseUrl = bitCometSettings.ApiUrl;
 
             var handler = new HttpClientHandler()
             {
                 UseDefaultCredentials = true,
-                Credentials = new NetworkCredential(BitCometSettings.UserName, BitCometSettings.Password),
+                Credentials = new NetworkCredential(bitCometSettings.UserName, bitCometSettings.Password),
             };
 
             var client = new HttpClient(handler);
 
             //存储路径
-            if (save_path == null)
-                save_path = AppSettings.BitCometSavePath;
+            savePath ??= AppSettings.BitCometSavePath;
 
             //应用设置中没有，则从比特彗星的设置中读取
-            if (string.IsNullOrEmpty(save_path))
-                save_path = await getBitCometDefaultSavePath(client, baseUrl);
+            if (string.IsNullOrEmpty(savePath))
+                savePath = await getBitCometDefaultSavePath(client, baseUrl);
 
             if (topFolderName != null)
-                save_path = Path.Combine(save_path, topFolderName);
+                savePath = Path.Combine(savePath, topFolderName);
 
-            foreach (Datum datum in videoInfoList)
+            foreach (var datum in videoInfoList)
             {
-                string pc = datum.pc;
-
                 //文件夹
                 if (string.IsNullOrEmpty(datum.fid) || (!string.IsNullOrEmpty(datum.fid) && datum.fid == "0"))
                 {
-                    string newSavePath = Path.Combine(save_path, datum.n);
+                    var newSavePath = Path.Combine(savePath, datum.n);
                     //遍历文件夹并下载
                     GetAllFilesTraverseAndDownByBitComet(client, baseUrl, datum, ua, newSavePath);
                 }
                 //文件
                 else
                 {
-                    bool isOk = await pushOneFileDownRequestToBitComet(client, baseUrl, datum, ua, save_path);
+                    var isOk = await pushOneFileDownRequestToBitComet(client, baseUrl, datum, ua, savePath);
 
                     if (!isOk)
                         success = false;
@@ -1242,37 +952,8 @@ namespace Display.Data
         public async Task<OfflineDownPathRequest> GetOfflineDownPath()
         {
             const string url = "https://webapi.115.com/offine/downpath";
-            HttpResponseMessage response;
-            try
-            {
-                response = await Client.GetAsync(url);
-            }
-            catch (AggregateException e)
-            {
-                Toast.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
-                return null;
-            }
-            catch (HttpRequestException e)
-            {
-                Toast.tryToast("网络异常", "获取文件夹属性时出现异常：", e.Message);
-                return null;
-            }
 
-            if (!response.IsSuccessStatusCode) return null;
-
-            OfflineDownPathRequest result = null;
-
-            try
-            {
-                var strResult = await response.Content.ReadAsStringAsync();
-                result = JsonConvert.DeserializeObject<OfflineDownPathRequest>(strResult);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"解析115云下载保存路径请求时出错:{ex.Message}");
-            }
-
-            return result;
+            return await SendAsync<OfflineDownPathRequest>(HttpMethod.Get, url);
         }
 
         public async Task<UploadInfo> GetUploadInfo(bool isUpdate=false)
@@ -1281,26 +962,7 @@ namespace Display.Data
 
             const string url = "https://proapi.115.com/app/uploadinfo";
 
-            var response = await Client.GetAsync(url);
-
-            try
-            {
-                var result = await response.Content.ReadFromJsonAsync<UploadInfo>();
-
-                if (string.IsNullOrEmpty(result.error))
-                {
-                    _uploadInfo = result;
-                }
-                    
-                else
-                    Debug.WriteLine($"请求115的UploadInfo时出错：{result.error}");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"解析115返回的UploadInfo请求时出错：{ex.Message}");
-            }
-
-            return _uploadInfo;
+            return await SendAsync<UploadInfo>(HttpMethod.Get, url);
         }
 
         public async Task<OfflineSpaceInfo> GetOfflineSpaceInfo(string userKey, int userId)
@@ -1309,31 +971,13 @@ namespace Display.Data
 
             var url = $"https://115.com/?ct=offline&ac=space&sign={userKey}&time={tm / 1000}&user_id={userId}&_={tm}";
 
-            var response = await Client.GetAsync(url);
-
-            try
-            {
-                var result = await response.Content.ReadFromJsonAsync<OfflineSpaceInfo>();
-
-                if (result.state)
-                    return result;
-
-                Debug.WriteLine("解析115离线任务请求时出错");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"查看115离线任务时出错：{ex.Message}");
-            }
-
-            return null;
+            return await SendAsync<OfflineSpaceInfo>(HttpMethod.Get, url);
         }
 
 
         public async Task<AddTaskUrlInfo> AddTaskUrl(List<string> linkList, long wpPathId,int uid, string sign, long time)
         {
             if (linkList.Count == 0) return null;
-
-            string url;
 
             var content = new MultipartFormDataContent
             {
@@ -1344,6 +988,7 @@ namespace Display.Data
                 { new StringContent(time.ToString()), "time"}
             };
 
+            string url;
             if (linkList.Count == 1)
             {
                 url = "https://115.com/web/lixian/?ct=lixian&ac=add_task_url";
@@ -1359,81 +1004,60 @@ namespace Display.Data
                 }
             }
 
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Content = content;
-
-            var response = await Client.SendAsync(request);
-
-            try
-            {
-                var result = await response.Content.ReadFromJsonAsync<AddTaskUrlInfo>();
-
-                return result;
-
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"发送创建115离线任务时出错：{ex.Message}");
-            }
-
-            return null;
+            return await SendAsync<AddTaskUrlInfo>(HttpMethod.Get, url, content);
         }
+
 
         /// <summary>
         /// 请求Aria2下载
         /// </summary>
-        /// <param Name="videoInfoList"></param>
+        /// <param name="videoInfoList"></param>
+        /// <param name="ua"></param>
+        /// <param name="save_path"></param>
+        /// <param name="topFolderName"></param>
         /// <returns></returns>
         async Task<bool> RequestDownByAria2(List<Datum> videoInfoList, string ua, string save_path, string topFolderName = null)
         {
-            var Aria2Settings = AppSettings.Aria2Settings;
+            var aria2Settings = AppSettings.Aria2Settings;
 
-            if (Aria2Settings == null)
-                return false;
+            if (aria2Settings == null) return false;
 
             //存储路径
-            if (string.IsNullOrEmpty(save_path))
-            {
-                save_path = AppSettings.BitCometSavePath;
-            }
+            if (string.IsNullOrEmpty(save_path)) save_path = AppSettings.BitCometSavePath;
 
             //应用设置中没有，则从Aria2的设置中读取
             if (string.IsNullOrEmpty(save_path))
-                save_path = await getAria2DefaultSavePath(Aria2Settings.ApiUrl, Aria2Settings.Password, ua);
+                save_path = await GetAria2DefaultSavePath(aria2Settings.ApiUrl, aria2Settings.Password);
 
-            if (topFolderName != null)
-                save_path = Path.Combine(save_path, topFolderName);
+            if (topFolderName != null) save_path = Path.Combine(save_path, topFolderName);
 
-            bool success = await GetAllFilesTraverseAndDownByAria2(videoInfoList, Aria2Settings.ApiUrl, Aria2Settings.Password, save_path, ua);
-
-            return success;
+            return await GetAllFilesTraverseAndDownByAria2(videoInfoList, aria2Settings.ApiUrl, aria2Settings.Password, save_path, ua);
         }
 
         public async Task<bool> GetAllFilesTraverseAndDownByAria2(List<Datum> videoInfoList, string apiUrl, string password, string save_path, string ua)
         {
-            bool success = true;
+            var success = true;
 
             Dictionary<string, string> fileList = new();
 
-            foreach (Datum datum in videoInfoList)
+            foreach (var datum in videoInfoList)
             {
-
-
                 //文件夹
                 if (string.IsNullOrEmpty(datum.fid) || (!string.IsNullOrEmpty(datum.fid) && datum.fid == "0"))
                 {
                     //获取该文件夹下的文件和文件夹
-                    WebFileInfo webFileInfo = await GetFileAsync(datum.cid, loadAll: true);
+                    var webFileInfo = await GetFileAsync(datum.cid, loadAll: true);
                     if (webFileInfo.count == 0)
                     {
                         success = false;
                         continue;
                     }
 
-                    string newSavePath = Path.Combine(save_path, datum.n);
-                    bool isOK = await GetAllFilesTraverseAndDownByAria2(webFileInfo.data.ToList(), apiUrl, password, newSavePath, ua);
+                    var newSavePath = Path.Combine(save_path, datum.n);
+                    var isOk = await GetAllFilesTraverseAndDownByAria2(webFileInfo.data.ToList(), apiUrl, password, newSavePath, ua);
 
-                    if (!isOK)
+
+                    if (!isOk)
                         success = false;
                 }
 
@@ -1461,9 +1085,9 @@ namespace Display.Data
                 foreach (var file in fileList)
                 {
 
-                    bool isOK = await pushDownRequestToAria2(apiUrl, password, new List<string>() { file.Value }, ua, save_path, file.Key);
+                    var isOk = await PushDownRequestToAria2(apiUrl, password, new List<string>() { file.Value }, ua, save_path, file.Key);
 
-                    if (!isOK)
+                    if (!isOk)
                         success = false;
                 }
             }
@@ -1474,19 +1098,19 @@ namespace Display.Data
         /// <summary>
         /// 链接只能一个一个添加，添加多个视为为同一文件的不同源
         /// </summary>
-        /// <param Name="apiUrl"></param>
-        /// <param Name="password"></param>
-        /// <param Name="urls"></param>
-        /// <param Name="ua"></param>
-        /// <param Name="save_path"></param>
+        /// <param name="apiUrl"></param>
+        /// <param name="password"></param>
+        /// <param name="urls"></param>
+        /// <param name="ua"></param>
+        /// <param name="savePath"></param>
+        /// <param name="sha1"></param>
         /// <returns></returns>
-        async Task<bool> pushDownRequestToAria2(string apiUrl, string password, List<string> urls, string ua, string save_path, string sha1 = null)
+        private static async Task<bool> PushDownRequestToAria2(string apiUrl, string password, IEnumerable<string> urls, string ua, string savePath, string sha1 = null)
         {
-            bool success = false;
 
-            save_path = save_path.Replace("\\", "/");
+            savePath = savePath.Replace("\\", "/");
 
-            string gid = sha1 != null ? sha1 : DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
+            var gid = sha1 ?? DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
 
             string myContent = "{\"jsonrpc\":\"2.0\"," +
                 "\"method\": \"aria2.addUri\"," +
@@ -1495,22 +1119,24 @@ namespace Display.Data
                             "[\"" + string.Join("\",\"", urls) + "\"]," +
                             "{\"referer\": \"https://115.com/?cid=0&offset=0&tab=&mode=wangpan\"," +
                             "\"header\": [\"User-Agent: " + ua + "\"]," +
-                            "\"dir\": \"" + save_path + "\"}]}";
+                            "\"dir\": \"" + savePath + "\"}]}";
 
-            HttpClient client = new HttpClient()
+            var client = new HttpClient()
             {
                 Timeout = TimeSpan.FromSeconds(5)
             };
-            var Content = new StringContent(myContent, Encoding.UTF8, "application/json");
+            var content = new StringContent(myContent, Encoding.UTF8, "application/json");
 
+            var success = false;
             try
             {
-                HttpResponseMessage rep = await client.PostAsync(apiUrl, Content);
+                var rep = await client.PostAsync(apiUrl, content);
 
                 if (rep.IsSuccessStatusCode)
                 {
-                    string strResult = await rep.Content.ReadAsStringAsync();
-                    Console.WriteLine(strResult);
+                    var strResult = await rep.Content.ReadAsStringAsync();
+
+                    Debug.WriteLine(strResult);
 
                     if (!string.IsNullOrWhiteSpace(strResult))
                         success = true;
@@ -1520,44 +1146,41 @@ namespace Display.Data
             {
                 success = false;
             }
+            finally
+            {
+                client.Dispose();
+            }
 
             return success;
         }
 
-        async Task<bool> pushOneFileDownRequestToBitComet(HttpClient client, string baseUrl, Datum datum, string ua, string save_path)
+        private async Task<bool> pushOneFileDownRequestToBitComet(HttpClient client, string baseUrl, Datum datum, string ua, string savePath)
         {
-            bool success = false;
-
             var urlList = await GetDownUrl(datum.pc, ua);
 
             if (urlList.Count == 0)
                 return false;
 
-            bool isOk = await pushDownRequestToBitComet(client,
+            return await PushDownRequestToBitComet(client,
                 baseUrl,
                 urlList.First().Value,
-                save_path,
+                savePath,
                 datum.n,
                 $"https://115.com/?cid={datum.cid}=0&tab=download&mode=wangpan",
                 ua);
-
-            if (isOk)
-                success = true;
-
-            return success;
         }
 
-        public async void GetAllFilesTraverseAndDownByBitComet(HttpClient client, string baseUrl, Datum datum, string ua, string save_path)
+        public async void GetAllFilesTraverseAndDownByBitComet(HttpClient client, string baseUrl, Datum datum, string ua, string savePath)
         {
             //获取该文件夹下的文件和文件夹
-            WebFileInfo webFileInfo = await GetFileAsync(datum.cid, loadAll: true);
+            var webFileInfo = await GetFileAsync(datum.cid, loadAll: true);
 
             foreach (var data in webFileInfo.data)
             {
                 //文件夹
                 if (string.IsNullOrEmpty(data.fid) || (!string.IsNullOrEmpty(data.fid) && data.fid == "0"))
                 {
-                    string newSavePath = Path.Combine(save_path, data.n);
+                    var newSavePath = Path.Combine(savePath, data.n);
                     GetAllFilesTraverseAndDownByBitComet(client, baseUrl, data, ua, newSavePath);
 
                     //延迟1s;
@@ -1566,37 +1189,35 @@ namespace Display.Data
                 //文件
                 else
                 {
-                    await pushOneFileDownRequestToBitComet(client, baseUrl, data, ua, save_path);
+                    await pushOneFileDownRequestToBitComet(client, baseUrl, data, ua, savePath);
                 }
-
             }
         }
+
+
 
         /// <summary>
         /// 向比特彗星发送下载请求
         /// </summary>
-        /// <param Name="client">带user和passwd的HttpClient</param>
-        /// <param Name="baseUrl">比特彗星接口地址</param>
-        /// <param Name="downUrl">文件下载地址</param>
-        /// <param Name="save_path">文件保存路径</param>
-        /// <param Name="filename">文件名臣</param>
-        /// <param Name="referrer">下载需要的referrer</param>
-        /// <param Name="user_agent">下载需要的user_agent</param>
-        /// <param Name="cookie">个别需要的Cookie</param>
+        /// <param name="client">带user和passwd的HttpClient</param>
+        /// <param name="baseUrl">比特彗星接口地址</param>
+        /// <param name="downUrl">文件下载地址</param>
+        /// <param name="savePath">文件保存路径</param>
+        /// <param name="filename">文件名称</param>
+        /// <param name="referrer">下载需要的referrer</param>
+        /// <param name="userAgent">下载需要的user_agent</param>
+        /// <param name="cookie">个别需要的Cookie</param>
         /// <returns></returns>
-        async Task<bool> pushDownRequestToBitComet(HttpClient client, string baseUrl, string downUrl, string save_path, string filename = "", string referrer = "", string user_agent = "", string cookie = "")
+        private static async Task<bool> PushDownRequestToBitComet(HttpClient client, string baseUrl, string downUrl, string savePath, string filename = "", string referrer = "", string userAgent = "", string cookie = "")
         {
-            bool isOk = false;
-
-
             var values = new Dictionary<string, string>
             {
                 { "url", downUrl},
-                {"save_path",save_path },
+                {"save_path",savePath },
                 {"connection","200" },
                 {"file_name",filename },
                 {"referrer",referrer },
-                {"user_agent",user_agent },
+                {"user_agent",userAgent },
                 {"cookie",cookie },
                 {"mirror_url_list",""}
             };
@@ -1604,10 +1225,7 @@ namespace Display.Data
 
             var response = await client.PostAsync(baseUrl + "/panel/task_add_httpftp_result", content);
 
-            if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
-                isOk = true;
-
-            return isOk;
+            return response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK;
         }
 
         /// <summary>
@@ -1636,16 +1254,16 @@ namespace Display.Data
             return savePath;
         }
 
-        async Task<string> getAria2DefaultSavePath(string apiUrl, string password, string ua)
+        private static async Task<string> GetAria2DefaultSavePath(string apiUrl, string password)
         {
-            string save_path = string.Empty;
+            var savePath = string.Empty;
 
-            string myContent = "{\"jsonrpc\":\"2.0\"," +
+            var myContent = "{\"jsonrpc\":\"2.0\"," +
                 "\"method\": \"aria2.getGlobalOption\"," +
                 "\"id\": " + DateTimeOffset.Now.ToUnixTimeMilliseconds() + "," +
                 "\"params\": [ \"" + password + "\"] }";
 
-            HttpClient client = new HttpClient()
+            var client = new HttpClient()
             {
                 Timeout = TimeSpan.FromSeconds(5)
             };
@@ -1653,61 +1271,64 @@ namespace Display.Data
 
             try
             {
-                HttpResponseMessage rep = await client.PostAsync(apiUrl, content);
+                var rep = await client.PostAsync(apiUrl, content);
 
                 if (rep.IsSuccessStatusCode)
                 {
-                    string strResult = await rep.Content.ReadAsStringAsync();
+                    var strResult = await rep.Content.ReadAsStringAsync();
 
-                    Aria2GlobalOptionRequest aria2GlobalOptionRequest = JsonConvert.DeserializeObject<Aria2GlobalOptionRequest>(strResult);
+                    var aria2GlobalOptionRequest =
+                        JsonConvert.DeserializeObject<Aria2GlobalOptionRequest>(strResult);
 
-                    save_path = aria2GlobalOptionRequest?.result?.dir;
+                    savePath = aria2GlobalOptionRequest?.result?.dir;
                 }
             }
             catch
             {
                 Debug.WriteLine("获取网页中比特彗星的默认存储地址时出错");
             }
+            finally
+            {
+                client.Dispose();
+            }
 
-            return save_path;
+            return savePath;
         }
 
         /// <summary>
         /// 检查Cookie是否可用后更新（Client及localSettings）
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> tryRefreshCookie(string cookie)
+        public async Task<bool> TryRefreshCookie(string cookie)
         {
-            bool result = false;
-            //先保存之前的Cookie，若Cookie无效则恢复原有Cookie
-            string currentCookie;
+            bool isSucceed;
 
-            IEnumerable<string> value;
-            bool haveCookie = Client.DefaultRequestHeaders.TryGetValues("Cookie", out value);
+            //先保存之前的Cookie，若Cookie无效则恢复原有Cookie
+            var haveCookie = Client.DefaultRequestHeaders.TryGetValues("Cookie", out var value);
             if (haveCookie)
             {
-                currentCookie = value.SingleOrDefault();
-                RefreshCookie(cookie);
+                var oldCookie = value.SingleOrDefault();
+                ResetCookie(cookie);
 
                 //使用新Cookie登录不成功，恢复默认值
-                result = await UpdateLoginInfo();
-                if (!result)
+                isSucceed = await UpdateLoginInfoAsync();
+                if (isSucceed)
                 {
-                    RefreshCookie(currentCookie);
+                    AppSettings._115_Cookie = cookie;
                 }
                 else
                 {
-                    localSettings.Values["cookie"] = cookie;
+                    ResetCookie(oldCookie);
                 }
             }
             else
             {
-                RefreshCookie(cookie);
-                result = await UpdateLoginInfo();
-                localSettings.Values["cookie"] = cookie;
+                ResetCookie(cookie);
+                isSucceed = await UpdateLoginInfoAsync();
+                AppSettings._115_Cookie = cookie;
             }
 
-            return result;
+            return isSucceed;
         }
 
         /// <summary>
@@ -1720,22 +1341,16 @@ namespace Display.Data
                 return;
             }
 
+            const string url =
+                "https://passportapi.115.com/app/1.0/web/1.0/logout/logout/?goto=https%3A%2F%2F115.com%2F";
             //退出账号
-            await Client.GetAsync("https://passportapi.115.com/app/1.0/web/1.0/logout/logout/?goto=https%3A%2F%2F115.com%2F");
+            await Client.GetAsync(url);
 
             //清空账号信息
             isEnterHiddenMode = false;
             QRCodeInfo = null;
             UserInfo = null;
             DeleteCookie();
-            //if (!response.IsSuccessStatusCode)
-            //{
-            //    return QRCodeInfo;
-            //}
-
-
-            //var result = await response.Content.ReadAsStringAsync();
-            //QRCodeInfo = JsonConvert.DeserializeObject<QRCodeInfo>(result);
         }
 
         /// <summary>
@@ -1743,7 +1358,7 @@ namespace Display.Data
         /// </summary>
         public static void DeleteCookie()
         {
-            ApplicationData.Current.LocalSettings.Values["cookie"] = null;
+            AppSettings._115_Cookie = null;
         }
 
         //public async Task<string> GetVerifyAccountInfo()
@@ -1790,7 +1405,7 @@ namespace Display.Data
         {
             Dictionary<string, string> downUrlList = new();
             
-            var tm = DateTimeOffset.Now.ToUnixTimeSeconds();
+            var tm = NowDate;
 
             if (AppSettings.IsRecordDownRequest)
             {
@@ -1815,69 +1430,46 @@ namespace Display.Data
             var url = $"http://proapi.115.com/app/chrome/downurl?t={tm}";
             var body = $"data={dataUrlEncode}";
 
-            using var httpRequest = new HttpRequestMessage(HttpMethod.Post, url);
-            httpRequest.Content = new StringContent(body);
-            httpRequest.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
-
-            HttpResponseMessage response;
-            string content;
-            try
+            var content = new StringContent(body)
             {
-                response = await Client.SendAsync(httpRequest);
-                content = await response.Content.ReadAsStringAsync();
+                Headers = { ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded") }
+            };
+
+            var downUrlBase64EncryptInfo = await SendAsync<DownUrlBase64EncryptInfo>(HttpMethod.Post, url,content);
+
+            if (downUrlBase64EncryptInfo is { state: true })
+            {
+                var base64Text = downUrlBase64EncryptInfo.data;
+
+                var srcBase64 = Convert.FromBase64String(base64Text);
+
+                var rep = m115.decode(srcBase64, keyBytes);
+
+                //JObject json = JsonConvert.DeserializeObject<JObject>(rep);
+                var json = JObject.Parse(rep);
+
+                //如使用的pc是属于文件夹，url为false
+                foreach (var children in json)
+                {
+                    var videoInfo = children.Value;
+
+                    if (!videoInfo["url"]!.HasValues) continue;
+
+                    var downUrl = videoInfo["url"]?["url"]?.ToString();
+                    downUrlList.Add(videoInfo["file_name"]?.ToString() ?? string.Empty, downUrl);
+                }
             }
-            catch
+
+            //添加下载记录
+            if (AppSettings.IsRecordDownRequest && downUrlList.Count != 0)
             {
-                return downUrlList;
-            }
-
-            if (response is { IsSuccessStatusCode: true, Content: not null })
-            {
-                DownUrlBase64EncryptInfo downUrlBase64EncryptInfo;
-                try
+                DataAccess.AddDownHistory(new DownInfo
                 {
-                    downUrlBase64EncryptInfo = JsonConvert.DeserializeObject<DownUrlBase64EncryptInfo>(content);
-                }
-                catch
-                {
-                    downUrlBase64EncryptInfo = null;
-                }
-
-                if (downUrlBase64EncryptInfo is { state: true })
-                {
-                    string base64Text = downUrlBase64EncryptInfo.data;
-
-                    byte[] srcBase64 = Convert.FromBase64String(base64Text);
-
-                    var rep = m115.decode(srcBase64, keyBytes);
-
-                    //JObject json = JsonConvert.DeserializeObject<JObject>(rep);
-                    var json = JObject.Parse(rep);
-
-                    //如使用的pc是属于文件夹，url为false
-                    foreach (var children in json)
-                    {
-                        var videoInfo = children.Value;
-
-                        if (videoInfo["url"]!.HasValues)
-                        {
-                            var downUrl = videoInfo["url"]?["url"]?.ToString();
-                            downUrlList.Add(videoInfo["file_name"]?.ToString() ?? string.Empty, downUrl);
-                        }
-                    }
-                }
-
-                //添加下载记录
-                if (AppSettings.IsRecordDownRequest && downUrlList.Count != 0)
-                {
-                    DataAccess.AddDownHistory(new()
-                    {
-                        fileName = downUrlList.First().Key,
-                        trueUrl = downUrlList.First().Value,
-                        pickCode = pickCode,
-                        ua = ua
-                    });
-                }
+                    fileName = downUrlList.First().Key,
+                    trueUrl = downUrlList.First().Value,
+                    pickCode = pickCode,
+                    ua = ua
+                });
             }
 
             return downUrlList;
@@ -1892,7 +1484,7 @@ namespace Display.Data
         /// <param name="quality"></param>
         /// <param name="showWindow"></param>
         /// <param name="referrerUrl"></param>
-        public static async void Play115SourceVideoWithPotPlayer(List<MediaPlayItem> playItems, string userAgent, string fileName, AppSettings.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
+        public static async void Play115SourceVideoWithPotPlayer(List<MediaPlayItem> playItems, string userAgent, string fileName, Const.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
         {
             var isFirst = true;
             foreach (var mediaPlayItem in playItems)
@@ -1967,17 +1559,16 @@ namespace Display.Data
 
             var lineList = strResult.Split(new char[] { '\n' });
 
-            for (int i = 0; i < lineList.Count(); i++)
+            for (var i = 0; i < lineList.Length; i++)
             {
                 var lineText = lineList[i].Trim('\r');
 
                 var re = Regex.Match(lineText, @"^#EXTINF:(\d*\.\d*),$");
-                if (re.Success)
-                {
-                    var strUrl = lineList[i + 1];
-                    var doubleSecond = Convert.ToDouble(re.Groups[1].Value);
-                    m3U8Info.ts_info_list.Add(new tsInfo() { Second = doubleSecond, Url = strUrl });
-                }
+                if (!re.Success) continue;
+
+                var strUrl = lineList[i + 1];
+                var doubleSecond = Convert.ToDouble(re.Groups[1].Value);
+                m3U8Info.ts_info_list.Add(new tsInfo() { Second = doubleSecond, Url = strUrl });
             }
 
             return m3U8Info;
@@ -1999,8 +1590,8 @@ namespace Display.Data
                 //Debug.WriteLine("获取m3u8链接失败");
             }
 
-            var lineList = strResult.Split(new char[] { '\n' });
-            for (int i = 0; i < lineList.Count(); i++)
+            var lineList = strResult.Split(new[] { '\n' });
+            for (var i = 0; i < lineList.Length; i++)
             {
                 var lineText = lineList[i].Trim('\r');
 
@@ -2012,7 +1603,7 @@ namespace Display.Data
             }
 
             // 检查账号是否异常
-            if (m3U8Infos.Count == 0 && strResult.Contains(Const.AccountAnomalyTip))
+            if (m3U8Infos.Count == 0 && strResult.Contains(Const.Common.AccountAnomalyTip))
             {
                 var window = CreateWindowToVerifyAccount();
                 
@@ -2070,7 +1661,7 @@ namespace Display.Data
         /// <param name="quality"></param>
         /// <param name="showWindow"></param>
         /// <param name="referrerUrl"></param>
-        public async void Play115SourceVideoWithMpv(List<MediaPlayItem> playItems, string userAgent, string fileName, AppSettings.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
+        public async void Play115SourceVideoWithMpv(List<MediaPlayItem> playItems, string userAgent, string fileName, Const.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
         {
             var arguments = string.Empty;
             foreach (var mediaPlayItem in playItems)
@@ -2108,7 +1699,7 @@ namespace Display.Data
         /// <param name="quality"></param>
         /// <param name="showWindow"></param>
         /// <param name="referrerUrl"></param>
-        public static async void Play115SourceVideoWithVlc(List<MediaPlayItem> playItems, string userAgent, string fileName, AppSettings.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
+        public static async void Play115SourceVideoWithVlc(List<MediaPlayItem> playItems, string userAgent, string fileName, Const.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
         {
             var arguments = string.Empty;
             foreach (var mediaPlayItem in playItems)
@@ -2137,21 +1728,7 @@ namespace Display.Data
             StartProcess(fileName, arguments,showWindow);
         }
 
-        /// <summary>
-        /// vlc播放(m3u8)
-        /// </summary>
-        /// <param name="pickCode"></param>
-        public async void PlayByVlc(string pickCode)
-        {
-            var m3U8Infos = await GetM3U8InfoByPickCode(pickCode);
-            if (m3U8Infos.Count > 0)
-            {
-                //选择最高分辨率的播放
-                FileMatch.PlayByVlc(m3U8Infos[0].Url, AppSettings.VlcExePath);
-            }
-        }
-
-        public enum PlayMethod { pot, mpv, vlc }
+        public enum PlayMethod { Pot, Mpv, Vlc }
 
         /// <summary>
         /// 原画播放
@@ -2159,6 +1736,7 @@ namespace Display.Data
         /// <param name="playItems"></param>
         /// <param name="playMethod"></param>
         /// <param name="xamlRoot"></param>
+        /// <param name="progress"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public async Task PlayVideoWithPlayer(List<MediaPlayItem> playItems, PlayMethod playMethod, XamlRoot xamlRoot, IProgress<int> progress = null)
@@ -2169,15 +1747,15 @@ namespace Display.Data
             //检查播放器设置
             switch (playMethod)
             {
-                case PlayMethod.pot:
+                case PlayMethod.Pot:
                     savePath = AppSettings.PotPlayerExePath;
                     ua = GetInfoFromNetwork.UserAgent;
                     break;
-                case PlayMethod.mpv:
+                case PlayMethod.Mpv:
                     savePath = AppSettings.MpvExePath;
                     ua = GetInfoFromNetwork.UserAgent;
                     break;
-                case PlayMethod.vlc:
+                case PlayMethod.Vlc:
                     savePath = AppSettings.VlcExePath;
                     ua = GetInfoFromNetwork.UserAgent;
                     break;
@@ -2203,12 +1781,12 @@ namespace Display.Data
                 return;
             }
 
-            var quality = (AppSettings.PlayQuality)AppSettings.DefaultPlayQuality;
+            var quality = (Const.PlayQuality)AppSettings.DefaultPlayQuality;
 
             //打开一层文件夹并添加可播放文件到List中
             playItems = await MediaPlayItem.OpenFolderThenInsertVideoFileToMediaPlayItem(playItems, GlobalWebApi);
 
-            for (int i = 0; i < playItems.Count; i++)
+            for (var i = 0; i < playItems.Count; i++)
             {
                 var playItem = playItems[i];
 
@@ -2230,13 +1808,13 @@ namespace Display.Data
             //检查播放方式
             switch (playMethod)
             {
-                case PlayMethod.pot:
+                case PlayMethod.Pot:
                     Play115SourceVideoWithPotPlayer(playItems, userAgent: ua, savePath, quality, true);
                     break;
-                case PlayMethod.mpv:
+                case PlayMethod.Mpv:
                     Play115SourceVideoWithMpv(playItems, userAgent: ua, savePath, quality, false);
                     break;
-                case PlayMethod.vlc:
+                case PlayMethod.Vlc:
                     //vlc不支持带“; ”的user-agent
                     Play115SourceVideoWithVlc(playItems, userAgent: ua, savePath, quality, false);
                     break;
@@ -2269,7 +1847,7 @@ namespace Display.Data
 
             var subUrl = subUrlList.First().Value;
 
-            subFile = await GetInfoFromNetwork.downloadFile(subUrl, subSavePath, fileName, false, new()
+            subFile = await GetInfoFromNetwork.downloadFile(subUrl, subSavePath, fileName, false, new Dictionary<string, string>
             {
                 {"User-Agent", ua }
             });

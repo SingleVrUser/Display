@@ -1,64 +1,38 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.IO;
+﻿using System.IO;
+using System.Text.Json;
 using Windows.Storage;
+using DefaultValue = Display.Data.Const.DefaultSettings;
 
 namespace Display.Data;
 
 public class AppSettings
 {
-    public static ApplicationDataContainer LocalSettings => ApplicationData.Current.LocalSettings;
-
+    /// <summary>
+    /// 图片宽度
+    /// </summary>
+    public static double ImageWidth
+    {
+        get => Helper.Settings.GetValue(nameof(ImageWidth), DefaultValue.Ui.ImageSize.Width);
+        set => Helper.Settings.SetValue(nameof(ImageWidth), value);
+    }
 
     /// <summary>
-    /// 展示页的图片大小
+    /// 图片高度
     /// </summary>
-    public static Tuple<double, double> ImageSize
+    public static double ImageHeight
     {
-        get
-        {
-            var composite = (ApplicationDataCompositeValue)LocalSettings.Values["ImageSize"];
-
-            double width;
-            double height;
-
-            if (composite != null && composite.ContainsKey("ImageWidth") && composite["ImageWidth"] is double tmp)
-                width = tmp;
-            else
-                width = 500;
-
-            if (composite != null && composite.ContainsKey("ImageHeight") && composite["ImageHeight"] is double tmp2)
-                height = tmp2;
-            else
-                height = 300;
-
-
-            return new Tuple<double, double>(width, height);
-        }
-        set
-        {
-            var composite = new ApplicationDataCompositeValue();
-            composite["ImageWidth"] = value.Item1;
-            composite["ImageHeight"] = value.Item2;
-            LocalSettings.Values["ImageSize"] = composite;
-        }
+        get => Helper.Settings.GetValue(nameof(ImageHeight), DefaultValue.Ui.ImageSize.Height);
+        set => Helper.Settings.SetValue(nameof(ImageHeight), value);
     }
+
 
     /// <summary>
     /// 是否动态调整图片大小
     /// </summary>
     public static bool IsAutoAdjustImageSize
     {
-        get
-        {
-            bool check = true;
-            if (LocalSettings.Values["IsAutoAdjustImageSize"] is bool value)
-            {
-                check = value;
-            }
-            return check;
-        }
-        set => LocalSettings.Values["IsAutoAdjustImageSize"] = value;
+        get => Helper.Settings.GetValue(nameof(IsAutoAdjustImageSize), DefaultValue.Ui.IsAutoAdjustImageSize);
+        set => Helper.Settings.SetValue(nameof(IsAutoAdjustImageSize), value);
     }
 
     /// <summary>
@@ -66,51 +40,17 @@ public class AppSettings
     /// </summary>
     public static bool IsUpdatedDataAccessFrom014
     {
-        get
-        {
-            bool isUpdated = false;
-            if (LocalSettings.Values["IsUpdatedDataAccessFrom014"] is bool value)
-            {
-                isUpdated = value;
-            }
-            return isUpdated;
-        }
-        set => LocalSettings.Values["IsUpdatedDataAccessFrom014"] = value;
+        get => Helper.Settings.GetValue(nameof(IsUpdatedDataAccessFrom014), DefaultValue.App.IsUpdatedDataAccessFrom014);
+        set => Helper.Settings.SetValue(nameof(IsUpdatedDataAccessFrom014), value);
     }
-
-    /// <summary>
-    /// 视频默认播放单视频
-    /// </summary>
-    public static bool IsDefaultPlaySingleVideo
-    {
-        get
-        {
-            bool isDefaultPlaySingleVideo = false;
-            if (LocalSettings.Values["IsDefaultPlaySingleVideo"] is bool value)
-            {
-                isDefaultPlaySingleVideo = value;
-            }
-            return isDefaultPlaySingleVideo;
-        }
-        set => LocalSettings.Values["IsDefaultPlaySingleVideo"] = value;
-    }
-
 
     /// <summary>
     /// 是否自动播放视频
     /// </summary>
     public static bool IsAutoPlayInVideoDisplay
     {
-        get
-        {
-            var isAutoPlayVideo = false;
-            if (LocalSettings.Values["IsAutoPlayInVideoDisplay"] is bool value)
-            {
-                isAutoPlayVideo = value;
-            }
-            return isAutoPlayVideo;
-        }
-        set => LocalSettings.Values["IsAutoPlayInVideoDisplay"] = value;
+        get => Helper.Settings.GetValue(nameof(IsAutoPlayInVideoDisplay), DefaultValue.Player.VideoDisplay.IsAutoPlay);
+        set => Helper.Settings.SetValue(nameof(IsAutoPlayInVideoDisplay), value);
     }
 
     /// <summary>
@@ -118,16 +58,8 @@ public class AppSettings
     /// </summary>
     public static double AutoPlayPositionPercentage
     {
-        get
-        {
-            var positionPercentage = 33.0;
-            if (LocalSettings.Values["AutoPlayPositionPercentage"] is double value)
-            {
-                positionPercentage = value;
-            }
-            return positionPercentage;
-        }
-        set => LocalSettings.Values["AutoPlayPositionPercentage"] = value;
+        get => Helper.Settings.GetValue(nameof(AutoPlayPositionPercentage), DefaultValue.Player.VideoDisplay.AutoPlayPositionPercentage);
+        set => Helper.Settings.SetValue(nameof(AutoPlayPositionPercentage), value);
     }
 
 
@@ -136,35 +68,17 @@ public class AppSettings
     /// </summary>
     public static double MaxVideoPlayCount
     {
-        get
-        {
-            var count = 1.0;
-            if (LocalSettings.Values["MaxVideoPlayCount"] is double value)
-            {
-                count = value;
-            }
-            return count;
-        }
-        set => LocalSettings.Values["MaxVideoPlayCount"] = value;
+        get => Helper.Settings.GetValue(nameof(MaxVideoPlayCount), DefaultValue.Player.VideoDisplay.MaxVideoPlayCount);
+        set => Helper.Settings.SetValue(nameof(MaxVideoPlayCount), value);
     }
-
-
 
     /// <summary>
     /// 是否检查更新
     /// </summary>
     public static bool IsCheckUpdate
     {
-        get
-        {
-            bool check = true;
-            if (LocalSettings.Values["IsCheckUpdate"] is bool value)
-            {
-                check = value;
-            }
-            return check;
-        }
-        set => LocalSettings.Values["IsCheckUpdate"] = value;
+        get => Helper.Settings.GetValue(nameof(IsCheckUpdate), DefaultValue.App.IsCheckUpdate);
+        set => Helper.Settings.SetValue(nameof(IsCheckUpdate), value);
     }
 
     /// <summary>
@@ -172,8 +86,8 @@ public class AppSettings
     /// </summary>
     public static string IgnoreUpdateAppVersion
     {
-        get => (string)LocalSettings.Values["IgnoreUpdateAppVersion"];
-        set => LocalSettings.Values["IgnoreUpdateAppVersion"] = value;
+        get => Helper.Settings.GetValue(nameof(IgnoreUpdateAppVersion), DefaultValue.App.IgnoreUpdateAppVersion);
+        set => Helper.Settings.SetValue(nameof(IgnoreUpdateAppVersion), value);
     }
 
     /// <summary>
@@ -181,61 +95,27 @@ public class AppSettings
     /// </summary>
     public static bool IsNavigationViewPaneOpen
     {
-        get
-        {
-            bool _value = false;
-            if (LocalSettings.Values["IsNavigationViewPaneOpen"] is bool value)
-            {
-                _value = value;
-            }
-            return _value;
-        }
-        set => LocalSettings.Values["IsNavigationViewPaneOpen"] = value;
+        get => Helper.Settings.GetValue(nameof(IsNavigationViewPaneOpen), DefaultValue.Ui.MainWindow.IsNavigationViewPaneOpen);
+        set => Helper.Settings.SetValue(nameof(IsNavigationViewPaneOpen), value);
     }
 
     /// <summary>
     /// 115导入数据库 进程界面 的 任务完成后通知
     /// </summary>
-    public static bool ProgressOfImportDataAccess_IsToastAfterTask
+    public static bool IsToastAfterImportDataAccess
     {
-        get
-        {
-            bool isToast = false;
-
-            if (LocalSettings.Values["ProgressOfImportDataAccess_IsToastAfterTask"] is bool value)
-            {
-                isToast = value;
-            }
-
-            return isToast;
-        }
-        set
-        {
-            LocalSettings.Values["ProgressOfImportDataAccess_IsToastAfterTask"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(IsToastAfterImportDataAccess), DefaultValue.Handle.IsToastAfterImportDataAccess);
+        set => Helper.Settings.SetValue(nameof(IsToastAfterImportDataAccess), value);
     }
 
     /// <summary>
     /// 115导入数据库 进程界面 的 任务完成后 开始搜刮任务
     /// </summary>
     /// 
-    public static bool ProgressOfImportDataAccess_IsStartSpiderAfterTask
+    public static bool IsSpiderAfterImportDataAccess
     {
-        get
-        {
-            bool isStart = true;
-
-            if (LocalSettings.Values["ProgressOfImportDataAccess_IsStartSpiderAfterTask"] is bool value)
-            {
-                isStart = value;
-            }
-
-            return isStart;
-        }
-        set
-        {
-            LocalSettings.Values["ProgressOfImportDataAccess_IsStartSpiderAfterTask"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(IsSpiderAfterImportDataAccess), DefaultValue.Handle.IsSpiderAfterImportDataAccess);
+        set => Helper.Settings.SetValue(nameof(IsSpiderAfterImportDataAccess), value);
     }
 
     /// <summary>
@@ -243,184 +123,97 @@ public class AppSettings
     /// </summary>
     public static string _115_Cookie
     {
-        get
-        {
-            return LocalSettings.Values["Cookie"] as string;
-        }
-        set
-        {
-            LocalSettings.Values["Cookie"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(_115_Cookie), DefaultValue.Network.Cookie._115);
+        set => Helper.Settings.SetValue(nameof(_115_Cookie), value);
     }
 
-    #region 搜刮源设置
-
-    /// <summary>
-    /// LibreDmm网址
-    /// </summary>
-    /// 
-    private static string _libreDmm_BaseUrl = "https://www.Libredmm.com/";
-
-    public static string LibreDmm_BaseUrl
+    public static string LibreDmmBaseUrl
     {
-        get
-        {
-            var BaseUrl = LocalSettings.Values["LibreDmm_BaseUrl"] as string;
-            if (string.IsNullOrEmpty(BaseUrl))
-            {
-                BaseUrl = _libreDmm_BaseUrl;
-            }
-            return BaseUrl;
-        }
-        set
-        {
-            LocalSettings.Values["LibreDmm_BaseUrl"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(LibreDmmBaseUrl), DefaultValue.Network.BaseUrl.LibreDmm);
+        set => Helper.Settings.SetValue(nameof(LibreDmmBaseUrl), value);
     }
 
     /// <summary>
     /// JavBus网址
     /// </summary>
     /// 
-    private static string _javBus_BaseUrl = "https://www.Javbus.com/";
-    public static string JavBus_BaseUrl
+    public static string JavBusBaseUrl
     {
-        get
-        {
-            var localJavBusBaseUrl = LocalSettings.Values["JavBus_BaseUrl"] as string;
-            if (string.IsNullOrEmpty(localJavBusBaseUrl))
-            {
-                localJavBusBaseUrl = _javBus_BaseUrl;
-            }
-            return localJavBusBaseUrl;
-        }
-        set
-        {
-            LocalSettings.Values["JavBus_BaseUrl"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(JavBusBaseUrl), DefaultValue.Network.BaseUrl.JavBus);
+        set => Helper.Settings.SetValue(nameof(JavBusBaseUrl), value);
     }
 
     /// <summary>
     /// AvMoo网址
     /// </summary>
     /// 
-    private static string _avmoo_BaseUrl = "https://Avmoo.click/";
-    public static string AvMoo_BaseUrl
+    public static string AvMooBaseUrl
     {
-        get
-        {
-            var url = LocalSettings.Values["AvMoo_BaseUrl"] as string;
-            if (string.IsNullOrEmpty(url))
-            {
-                url = _avmoo_BaseUrl;
-            }
-            return url;
-        }
-        set
-        {
-            LocalSettings.Values["AvMoo_BaseUrl"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(AvMooBaseUrl), DefaultValue.Network.BaseUrl.AvMoo);
+        set => Helper.Settings.SetValue(nameof(AvMooBaseUrl), value);
     }
 
     /// <summary>
     /// AvSox网址
     /// </summary>
     /// 
-    private static string _avsox_BaseUrl = "https://Avsox.click/";
-    public static string AvSox_BaseUrl
+    public static string AvSoxBaseUrl
     {
-        get
-        {
-            var url = LocalSettings.Values["AvSox_BaseUrl"] as string;
-            if (string.IsNullOrEmpty(url))
-            {
-                url = _avsox_BaseUrl;
-            }
-            return url;
-        }
-        set
-        {
-            LocalSettings.Values["AvSox_BaseUrl"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(AvSoxBaseUrl), DefaultValue.Network.BaseUrl.AvSox);
+        set => Helper.Settings.SetValue(nameof(AvSoxBaseUrl), value);
     }
 
     /// <summary>
     /// Jav321网址
     /// </summary>
     /// 
-    private static string _jav321_BaseUrl = "https://www.Jav321.com/";
-    public static string Jav321_BaseUrl
+    public static string Jav321BaseUrl
     {
-        get
-        {
-            var url = LocalSettings.Values["Jav321_BaseUrl"] as string;
-            if (string.IsNullOrEmpty(url))
-            {
-                url = _jav321_BaseUrl;
-            }
-            return url;
-        }
-        set
-        {
-            LocalSettings.Values["Jav321_BaseUrl"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(Jav321BaseUrl), DefaultValue.Network.BaseUrl.Jav321);
+        set => Helper.Settings.SetValue(nameof(Jav321BaseUrl), value);
     }
 
     /// <summary>
     /// JavDB网址
     /// </summary>
-    private static string _javDB_BaseUrl = "https://Javdb.com/";
-    public static string JavDB_BaseUrl
+    public static string JavDbBaseUrl
     {
-        get
-        {
-            var localJavDBBaseUrl = LocalSettings.Values["JavDB_BaseUrl"] as string;
-            if (string.IsNullOrEmpty(localJavDBBaseUrl))
-            {
-                localJavDBBaseUrl = _javDB_BaseUrl;
-            }
-            return localJavDBBaseUrl;
-        }
-        set
-        {
-            LocalSettings.Values["JavDB_BaseUrl"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(JavDbBaseUrl), DefaultValue.Network.BaseUrl.JavDb);
+        set => Helper.Settings.SetValue(nameof(JavDbBaseUrl), value);
     }
 
     /// <summary>
     /// Fc2hub网址
     /// </summary>
-    private static string _fc2hub_BaseUrl = "https://fc2hub.com/";
-    public static string Fc2hub_BaseUrl
+    public static string Fc2HubBaseUrl
     {
-        get
-        {
-            var url = LocalSettings.Values["Fc2hub_BaseUrl"] as string;
-            if (string.IsNullOrEmpty(url))
-            {
-                url = _fc2hub_BaseUrl;
-            }
-            return url;
-        }
-        set
-        {
-            LocalSettings.Values["Fc2hub_BaseUrl"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(Fc2HubBaseUrl), DefaultValue.Network.BaseUrl.Fc2Hub);
+        set => Helper.Settings.SetValue(nameof(Fc2HubBaseUrl), value);
+    }
+
+    /// <summary>
+    /// minnano-av网址
+    /// </summary>
+    /// 
+    public static string MinnanoAvBaseUrl
+    {
+        get => Helper.Settings.GetValue(nameof(MinnanoAvBaseUrl), DefaultValue.Network.BaseUrl.MinnanoAv);
+        set => Helper.Settings.SetValue(nameof(MinnanoAvBaseUrl), value);
+    }
+
+    public static string X1080XBaseUrl
+    {
+        get => Helper.Settings.GetValue(nameof(X1080XBaseUrl), DefaultValue.Network.BaseUrl.X080X);
+        set => Helper.Settings.SetValue(nameof(X1080XBaseUrl), value);
     }
 
     /// <summary>
     /// JavDB的Cookie，查询FC信息需要
     /// </summary>
-    public static string javdb_Cookie
+    public static string JavDbCookie
     {
-        get
-        {
-            return LocalSettings.Values["javDB_Cookie"] as string;
-        }
-        set
-        {
-            LocalSettings.Values["javDB_Cookie"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(JavDbCookie), DefaultValue.Network.Cookie.JavDb);
+        set => Helper.Settings.SetValue(nameof(JavDbCookie), value);
     }
     
     /// <summary>
@@ -428,117 +221,35 @@ public class AppSettings
     /// </summary>
     public static string X1080XCookie
     {
-        get => LocalSettings.Values["X1080XCookie"] as string;
-        set => LocalSettings.Values["X1080XCookie"] = value;
+        get => Helper.Settings.GetValue(nameof(X1080XCookie), DefaultValue.Network.Cookie.X1080X);
+        set => Helper.Settings.SetValue(nameof(X1080XCookie), value);
     }
 
-
     /// <summary>
-    /// JavDB的Cookie，查询FC信息需要
+    /// x1080x的UA
     /// </summary>
     public static string X1080XUa
     {
-        get => LocalSettings.Values["X1080XUa"] as string;
-        set => LocalSettings.Values["X1080XUa"] = value;
-    }
-
-
-    #endregion
-
-
-    #region 获取演员信息
-
-
-    private static int? _getActorInfoLastIndex;
-
-    public static int GetActorInfoLastIndex
-    {
-        get
-        {
-            if (_getActorInfoLastIndex != null)
-            {
-                return (int)_getActorInfoLastIndex;
-            }
-            else if (LocalSettings.Values["GetActorInfoLastIndex"] is int index)
-            {
-                _getActorInfoLastIndex = index;
-                return index;
-            }
-            else
-            {
-                return -1;
-            }
-        }
-        set
-        {
-            LocalSettings.Values["GetActorInfoLastIndex"] = value;
-            _getActorInfoLastIndex = value;
-        }
+        get => Helper.Settings.GetValue(nameof(X1080XUa), DefaultValue.Network.X1080X.UserAgent);
+        set => Helper.Settings.SetValue(nameof(X1080XUa), value);
     }
 
     /// <summary>
-    /// minnano-av网址
+    /// 记录获取演员信息的进度
     /// </summary>
-    /// 
-    private const string _minnanoAv_BaseUrl = "http://www.minnano-av.com/";
-
-    public static string MinnanoAvBaseUrl
+    public static int GetActorInfoLastIndex
     {
-        get
-        {
-            var BaseUrl = LocalSettings.Values["MinnanoAv_BaseUrl"] as string;
-            if (string.IsNullOrEmpty(BaseUrl))
-            {
-                BaseUrl = _minnanoAv_BaseUrl;
-            }
-            return BaseUrl;
-        }
-        set
-        {
-            LocalSettings.Values["MinnanoAv_BaseUrl"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(GetActorInfoLastIndex), DefaultValue.Network.GetActorInfoLastIndex);
+        set => Helper.Settings.SetValue(nameof(GetActorInfoLastIndex), value);
     }
-
-
-    public static string X1080XBaseUrl
-    {
-        get
-        {
-            var baseUrl = "https://x555x.me/";
-            if (LocalSettings.Values["MinnanoAv_BaseUrl"] is string url)
-            {
-                baseUrl = url;
-            }
-
-            return baseUrl;
-        }
-        set => LocalSettings.Values["MinnanoAv_BaseUrl"] = value;
-    }
-
-
-
-    #endregion
-
 
     /// <summary>
     /// 图片保存地址
     /// </summary>
     public static string ImageSavePath
     {
-        get
-        {
-            string savePath = LocalSettings.Values["ImageSave_Path"] as string;
-            if (string.IsNullOrEmpty(savePath))
-            {
-                savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "Image");
-                FileMatch.CreateDirectoryIfNotExists(savePath);
-            }
-            return savePath;
-        }
-        set
-        {
-            LocalSettings.Values["ImageSave_Path"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(ImageSavePath), DefaultValue.App.SavePath.Image);
+        set => Helper.Settings.SetValue(nameof(ImageSavePath), value);
     }
 
     /// <summary>
@@ -546,90 +257,43 @@ public class AppSettings
     /// </summary>
     public static string SubSavePath
     {
-        get
-        {
-            string savePath = LocalSettings.Values["SubSave_Path"] as string;
-            if (string.IsNullOrEmpty(savePath))
-            {
-                savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "Sub");
-                FileMatch.CreateDirectoryIfNotExists(savePath);
-            }
-            return savePath;
-        }
-        set
-        {
-            LocalSettings.Values["SubSave_Path"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(SubSavePath), DefaultValue.App.SavePath.Sub);
+        set => Helper.Settings.SetValue(nameof(SubSavePath), value);
     }
 
     /// <summary>
-    /// 图片保存地址
+    /// 演员信息保存地址
     /// </summary>
     public static string ActorInfoSavePath
     {
-        get
-        {
-            string savePath = LocalSettings.Values["ActorInfo_SavePath"] as string;
-            if (string.IsNullOrEmpty(savePath))
-            {
-                savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "Actor");
-                FileMatch.CreateDirectoryIfNotExists(savePath);
-            }
-            return savePath;
-        }
-        set
-        {
-            LocalSettings.Values["ActorInfo_SavePath"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(ActorInfoSavePath), DefaultValue.App.SavePath.Actor);
+        set => Helper.Settings.SetValue(nameof(ActorInfoSavePath), value);
     }
 
     public static string X1080XAttmnSavePath
     {
-        get
-        {
-            string savePath = LocalSettings.Values["X1080XAttmnSavePath"] as string;
-            if (string.IsNullOrEmpty(savePath))
-            {
-                savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "Attmn");
-                FileMatch.CreateDirectoryIfNotExists(savePath);
-            }
-            return savePath;
-        }
+        get => Helper.Settings.GetValue(nameof(X1080XAttmnSavePath), DefaultValue.App.SavePath.Attmn);
+        set => Helper.Settings.SetValue(nameof(X1080XAttmnSavePath), value);
+    }
+
+    public static string DataSavePath
+    {
+        get => Helper.Settings.GetValue(nameof(DataSavePath), DefaultValue.App.SavePath.Data);
+        set => Helper.Settings.SetValue(nameof(DataSavePath), value);
     }
 
     /// <summary>
     /// 演员头像仓库文件保存地址
     /// </summary>
-    public static string ActorFileTreeSavePath
-    {
-        get
-        {
-            string savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "Data");
-            FileMatch.CreateDirectoryIfNotExists(savePath);
-            string filePath = Path.Combine(savePath, "Filetree.json");
-
-            return filePath;
-        }
-    }
+    public static string ActorFileTreeSavePath => Path.Combine(DataSavePath, "Filetree.json");
 
     /// <summary>
     /// 数据文件存储地址
     /// </summary>
     public static string DataAccessSavePath
     {
-        get
-        {
-            string savePath = LocalSettings.Values["DataAccess_SavePath"] as string;
-            if (string.IsNullOrEmpty(savePath))
-            {
-                savePath = ApplicationData.Current.LocalFolder.Path;
-            }
-            return savePath;
-        }
-        set
-        {
-            LocalSettings.Values["DataAccess_SavePath"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(DataAccessSavePath), DefaultValue.App.SavePath.DataAccess);
+        set => Helper.Settings.SetValue(nameof(DataAccessSavePath), value);
     }
 
     /// <summary>
@@ -637,14 +301,8 @@ public class AppSettings
     /// </summary>
     public static int StartPageIndex
     {
-        get
-        {
-            return Convert.ToInt32(LocalSettings.Values["StartPageIndex"]);
-        }
-        set
-        {
-            LocalSettings.Values["StartPageIndex"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(StartPageIndex), DefaultValue.Ui.MainWindow.StartPageIndex);
+        set => Helper.Settings.SetValue(nameof(StartPageIndex), value);
     }
 
     /// <summary>
@@ -652,21 +310,8 @@ public class AppSettings
     /// </summary>
     public static bool IsUseJavDb
     {
-        get
-        {
-            bool useJavDB = false;
-
-            if (LocalSettings.Values["isUseJavDB"] is bool value)
-            {
-                useJavDB = value;
-            }
-
-            return useJavDB;
-        }
-        set
-        {
-            LocalSettings.Values["isUseJavDB"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(IsUseJavDb), DefaultValue.Network.Open.JavDb);
+        set => Helper.Settings.SetValue(nameof(IsUseJavDb), value);
     }
 
     /// <summary>
@@ -674,20 +319,8 @@ public class AppSettings
     /// </summary>
     public static bool IsUseJavBus
     {
-        get
-        {
-            bool useJavBus = true;
-
-            if (LocalSettings.Values["isUseJavBus"] is bool value)
-            {
-                useJavBus = value;
-            }
-            return useJavBus;
-        }
-        set
-        {
-            LocalSettings.Values["isUseJavBus"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(IsUseJavBus), DefaultValue.Network.Open.JavBus);
+        set => Helper.Settings.SetValue(nameof(IsUseJavBus), value);
     }
 
     /// <summary>
@@ -695,20 +328,8 @@ public class AppSettings
     /// </summary>
     public static bool IsUseAvMoo
     {
-        get
-        {
-            bool useJavBus = true;
-
-            if (LocalSettings.Values["isUseAvMoo"] is bool value)
-            {
-                useJavBus = value;
-            }
-            return useJavBus;
-        }
-        set
-        {
-            LocalSettings.Values["isUseAvMoo"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(IsUseAvMoo), DefaultValue.Network.Open.AvMoo);
+        set => Helper.Settings.SetValue(nameof(IsUseAvMoo), value);
     }
 
     /// <summary>
@@ -716,20 +337,8 @@ public class AppSettings
     /// </summary>
     public static bool IsUseAvSox
     {
-        get
-        {
-            bool useJavBus = true;
-
-            if (LocalSettings.Values["isUseAvSox"] is bool value)
-            {
-                useJavBus = value;
-            }
-            return useJavBus;
-        }
-        set
-        {
-            LocalSettings.Values["isUseAvSox"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(IsUseAvSox), DefaultValue.Network.Open.AvSox);
+        set => Helper.Settings.SetValue(nameof(IsUseAvSox), value);
     }
 
     /// <summary>
@@ -737,20 +346,8 @@ public class AppSettings
     /// </summary>
     public static bool IsUseJav321
     {
-        get
-        {
-            bool useJavBus = true;
-
-            if (LocalSettings.Values["isUseJav321"] is bool value)
-            {
-                useJavBus = value;
-            }
-            return useJavBus;
-        }
-        set
-        {
-            LocalSettings.Values["isUseJav321"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(IsUseJav321), DefaultValue.Network.Open.Jav321);
+        set => Helper.Settings.SetValue(nameof(IsUseJav321), value);
     }
 
     /// <summary>
@@ -758,20 +355,8 @@ public class AppSettings
     /// </summary>
     public static bool IsUseFc2Hub
     {
-        get
-        {
-            bool isUse = true;
-
-            if (LocalSettings.Values["isUseFc2Hub"] is bool value)
-            {
-                isUse = value;
-            }
-            return isUse;
-        }
-        set
-        {
-            LocalSettings.Values["isUseFc2Hub"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(IsUseFc2Hub), DefaultValue.Network.Open.Fc2Hub);
+        set => Helper.Settings.SetValue(nameof(IsUseFc2Hub), value);
     }
 
     /// <summary>
@@ -779,20 +364,8 @@ public class AppSettings
     /// </summary>
     public static bool IsUseLibreDmm
     {
-        get
-        {
-            bool isUse = true;
-
-            if (LocalSettings.Values["isUseLibreDmm"] is bool value)
-            {
-                isUse = value;
-            }
-            return isUse;
-        }
-        set
-        {
-            LocalSettings.Values["isUseLibreDmm"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(IsUseLibreDmm), DefaultValue.Network.Open.LibreDmm);
+        set => Helper.Settings.SetValue(nameof(IsUseLibreDmm), value);
     }
 
 
@@ -801,59 +374,26 @@ public class AppSettings
     /// </summary>
     public static bool IsUseX1080X
     {
-        get
-        {
-            var isUse = false;
-
-            if (LocalSettings.Values["IsUseX1080X"] is bool value)
-            {
-                isUse = value;
-            }
-            return isUse;
-        }
-        set => LocalSettings.Values["IsUseX1080X"] = value;
+        get => Helper.Settings.GetValue(nameof(IsUseX1080X), DefaultValue.Network.Open.X1080X);
+        set => Helper.Settings.SetValue(nameof(IsUseX1080X), value);
     }
 
     public static string VlcExePath
     {
-        get
-        {
-            var savePath = LocalSettings.Values["VlcExePath"];
-            if (savePath == null)
-            {
-                savePath = "vlc";
-                LocalSettings.Values["VlcExePath"] = savePath;
-            }
-            return savePath.ToString();
-        }
-        set
-        {
-            LocalSettings.Values["VlcExePath"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(VlcExePath), DefaultValue.Player.ExePath.Vlc);
+        set => Helper.Settings.SetValue(nameof(VlcExePath), value);
     }
 
     public static string MpvExePath
     {
-        get
-        {
-            var savePath = LocalSettings.Values["MpvExePath"];
-            if (savePath == null)
-            {
-                savePath = "mpv";
-                LocalSettings.Values["MpvExePath"] = savePath;
-            }
-            return savePath.ToString();
-        }
-        set
-        {
-            LocalSettings.Values["MpvExePath"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(MpvExePath), DefaultValue.Player.ExePath.Mpv);
+        set => Helper.Settings.SetValue(nameof(MpvExePath), value);
     }
 
     public static string PotPlayerExePath
     {
-        get => LocalSettings.Values["PotPlayerExePath"] as string;
-        set => LocalSettings.Values["PotPlayerExePath"] = value;
+        get => Helper.Settings.GetValue(nameof(PotPlayerExePath), DefaultValue.Player.ExePath.PotPlayer);
+        set => Helper.Settings.SetValue(nameof(PotPlayerExePath), value);
     }
 
     /// <summary>
@@ -861,42 +401,16 @@ public class AppSettings
     /// </summary>
     public static int PlayerSelection
     {
-        get
-        {
-            int playerSelection = 0;
-
-            if (LocalSettings.Values["PlayerSelection"] is int value)
-            {
-                playerSelection = value;
-            }
-            return playerSelection;
-        }
-        set
-        {
-            LocalSettings.Values["PlayerSelection"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(PlayerSelection), DefaultValue.Player.Selection);
+        set => Helper.Settings.SetValue(nameof(PlayerSelection), value);
     }
 
 
-    public enum PlayQuality
-    {
-        M3U8 = 0,
-        Origin = 1
-    }
 
     public static int DefaultPlayQuality
     {
-        get
-        {
-            var quality = PlayQuality.M3U8;
-
-            if (LocalSettings.Values["DefaultPlayQuality"] is int value)
-            {
-                quality = (PlayQuality)value;
-            }
-            return (int)quality;
-        }
-        set => LocalSettings.Values["DefaultPlayQuality"] = value;
+        get => Helper.Settings.GetValue(nameof(DefaultPlayQuality), DefaultValue.Player.DefaultQuality);
+        set => Helper.Settings.SetValue(nameof(DefaultPlayQuality), value);
     }
 
     /// <summary>
@@ -904,17 +418,8 @@ public class AppSettings
     /// </summary>
     public static bool IsFindSub
     {
-        get
-        {
-            var isUse = true;
-
-            if (LocalSettings.Values["IsFindSub"] is bool value)
-            {
-                isUse = value;
-            }
-            return isUse;
-        }
-        set => LocalSettings.Values["IsFindSub"] = value;
+        get => Helper.Settings.GetValue(nameof(IsFindSub), DefaultValue.Network._115.IsFindSub);
+        set => Helper.Settings.SetValue(nameof(IsFindSub), value);
     }
 
     /// <summary>
@@ -922,20 +427,8 @@ public class AppSettings
     /// </summary>
     public static bool IsRecordDownRequest
     {
-        get
-        {
-            bool isUse = true;
-
-            if (LocalSettings.Values["IsRecordDownRequest"] is bool value)
-            {
-                isUse = value;
-            }
-            return isUse;
-        }
-        set
-        {
-            LocalSettings.Values["IsRecordDownRequest"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(IsRecordDownRequest), DefaultValue.Network._115.IsRecordDownRequest);
+        set => Helper.Settings.SetValue(nameof(IsRecordDownRequest), value);
     }
 
     /// <summary>
@@ -943,232 +436,73 @@ public class AppSettings
     /// </summary>
     public static double DownUrlOverdueTime
     {
-        get
-        {
-            double OverdueTime = 86400.0;
-
-            if (LocalSettings.Values["DownUrlOverdueTime"] is double value)
-            {
-                OverdueTime = value;
-            }
-            return OverdueTime;
-        }
-        set
-        {
-            LocalSettings.Values["DownUrlOverdueTime"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(DownUrlOverdueTime), DefaultValue.Network._115.DownUrlOverdueTime);
+        set => Helper.Settings.SetValue(nameof(DownUrlOverdueTime), value);
     }
 
-
-
-    public enum Origin { Local = 0, Web = 1 }
     /// <summary>
     /// 缩略图的显示来源
     /// </summary>
     public static int ThumbnailOrigin
     {
-        get
-        {
-            var thumbnailOrigin = LocalSettings.Values["ThumbnailOrigin"];
-            if (thumbnailOrigin == null)
-            {
-                return (int)Origin.Web;
-            }
-            else
-            {
-                return (int)thumbnailOrigin;
-            }
-        }
-        set => LocalSettings.Values["ThumbnailOrigin"] = value;
+        get => Helper.Settings.GetValue(nameof(ThumbnailOrigin), DefaultValue.Ui.ThumbnailOrigin);
+        set => Helper.Settings.SetValue(nameof(ThumbnailOrigin), value);
     }
 
 
     //默认下载方式
     public static string DefaultDownMethod
     {
-        get
-        {
-            var DefaultDownMethod = LocalSettings.Values["DefaultDownMethod"];
-
-            if (DefaultDownMethod == null)
-            {
-                return "115";
-            }
-            else
-            {
-                return DefaultDownMethod.ToString();
-            }
-        }
-        set
-        {
-            LocalSettings.Values["DefaultDownMethod"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(DefaultDownMethod), DefaultValue.Network._115.DefaultDownMethod);
+        set => Helper.Settings.SetValue(nameof(DefaultDownMethod), value);
     }
 
     public static DownApiSettings BitCometSettings
     {
-        get
-        {
-            var BitCometSettingsStr = LocalSettings.Values["BitCometSettings"];
-
-            if (BitCometSettingsStr == null)
-            {
-                return null;
-            }
-            else
-            {
-                DownApiSettings bitCometSettings = null;
-                try
-                {
-                    bitCometSettings = JsonConvert.DeserializeObject<DownApiSettings>(BitCometSettingsStr.ToString());
-                }
-                catch
-                {
-                    //转换失败
-                }
-
-                return bitCometSettings;
-            }
-        }
-        set
-        {
-            LocalSettings.Values["BitCometSettings"] = JsonConvert.SerializeObject(value);
-        }
+        get => Helper.Settings.GetValue<DownApiSettings>(nameof(BitCometSettings));
+        set => Helper.Settings.SetValue(nameof(BitCometSettings), value);
     }
 
     public static string BitCometSavePath
     {
-        get
-        {
-            var BitCometSavePath = LocalSettings.Values["BitCometSavePath"];
-
-            if (BitCometSavePath == null)
-            {
-                return null;
-            }
-            else
-            {
-                return BitCometSavePath.ToString();
-            }
-        }
-        set
-        {
-            LocalSettings.Values["BitCometSavePath"] = value;
-        }
-
+        get => Helper.Settings.GetValue(nameof(BitCometSavePath), DefaultValue.App.SavePath.BitCometDown);
+        set => Helper.Settings.SetValue(nameof(BitCometSavePath), value);
     }
 
     public static DownApiSettings Aria2Settings
     {
-        get
-        {
-            var Aria2SettingsStr = LocalSettings.Values["Aria2Settings"];
-
-            if (Aria2SettingsStr == null)
-            {
-                return null;
-            }
-            else
-            {
-                DownApiSettings Aria2Settings = null;
-                try
-                {
-                    Aria2Settings = JsonConvert.DeserializeObject<DownApiSettings>(Aria2SettingsStr.ToString());
-                }
-                catch
-                {
-                    //转换失败
-                }
-
-                return Aria2Settings;
-            }
-        }
-        set
-        {
-            LocalSettings.Values["Aria2Settings"] = JsonConvert.SerializeObject(value);
-        }
+        get => Helper.Settings.GetValue<DownApiSettings>(nameof(Aria2Settings));
+        set => Helper.Settings.SetValue(nameof(Aria2Settings), value);
     }
 
     public static string Aria2SavePath
     {
-        get
-        {
-            var aria2SavePath = LocalSettings.Values["Aria2SavePath"];
-
-            return aria2SavePath?.ToString();
-        }
-        set => LocalSettings.Values["Aria2SavePath"] = value;
+        get => Helper.Settings.GetValue(nameof(Aria2SavePath), DefaultValue.App.SavePath.Aria2);
+        set => Helper.Settings.SetValue(nameof(Aria2SavePath), value);
     }
-
-
-    //展示页设置
-    private static bool? _isShowFailListInDisplay;
+    
     /// <summary>
     /// 展示匹配失败的列表?
     /// </summary>
     public static bool IsShowFailListInDisplay
     {
-        get
-        {
-            if (_isShowFailListInDisplay != null)
-            {
-                return (bool)_isShowFailListInDisplay;
-            }
-
-            bool isShow = false;
-
-            if (LocalSettings.Values["IsShowFailListInDisplay"] is bool value)
-            {
-                _isShowFailListInDisplay = value;
-                isShow = value;
-            }
-
-            return isShow;
-        }
-        set
-        {
-            if (_isShowFailListInDisplay == value) return;
-
-            _isShowFailListInDisplay = value;
-            LocalSettings.Values["IsShowFailListInDisplay"] = value;
-        }
+        get => Helper.Settings.GetValue(nameof(IsShowFailListInDisplay), DefaultValue.Ui.IsShowFailListInDisplay);
+        set => Helper.Settings.SetValue(nameof(IsShowFailListInDisplay), value);
     }
-    /// <summary>
-    /// 增量加载展示页内容
-    /// </summary>
-    public static bool IsIncrementalShowInDisplay
-    {
-        get
-        {
-            bool isEnable = true;
-
-            if (LocalSettings.Values["IsIncrementalShowInDisplay"] is bool value)
-            {
-                isEnable = value;
-            }
-
-            return isEnable;
-        }
-        set
-        {
-            LocalSettings.Values["IsIncrementalShowInDisplay"] = value;
-        }
-    }
-
 
     public static string SavePath115Name
     {
-        get => LocalSettings.Values["SavePath115Name"]?.ToString();
-        set => LocalSettings.Values["SavePath115Name"] = value;
+        get => Helper.Settings.GetValue(nameof(SavePath115Name), DefaultValue.Network._115.SavePathName);
+        set => Helper.Settings.SetValue(nameof(SavePath115Name), value);
     }
 
     public static string SavePath115Cid
     {
-        get => LocalSettings.Values["SavePath115Cid"]?.ToString();
-        set => LocalSettings.Values["SavePath115Cid"] = value;
+        get => Helper.Settings.GetValue(nameof(SavePath115Cid), DefaultValue.Network._115.SavePathCid);
+        set => Helper.Settings.SetValue(nameof(SavePath115Cid), value);
     }
-}
 
+}
 
 public class DownApiSettings
 {
@@ -1176,3 +510,4 @@ public class DownApiSettings
     public string Password { get; set; }
     public string ApiUrl { get; set; }
 }
+
