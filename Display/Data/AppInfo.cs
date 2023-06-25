@@ -10,7 +10,7 @@ namespace Display.Data;
 
 public static class AppInfo
 {
-    private static readonly string LatestReleaseUrl = "https://api.github.com/repos/SingleVrUser/Display/releases/latest";
+    private const string LatestReleaseUrl = "https://api.github.com/repos/SingleVrUser/Display/releases/latest";
 
     /// <summary>
     /// 包版本（x.x.x）
@@ -39,7 +39,7 @@ public static class AppInfo
     {
         GitHubInfo.ReleaseInfo result = null;
 
-        var client = GetInfoFromNetwork.Client;
+        var client = GetInfoFromNetwork.CommonClient;
 
         //设置超时时间（5s）
         var option = new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token;
@@ -49,7 +49,7 @@ public static class AppInfo
             var req = await client.GetAsync(LatestReleaseUrl, option);
             if (req.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                var content = await req.Content.ReadAsStringAsync();
+                var content = await req.Content.ReadAsStringAsync(option);
                 result = JsonConvert.DeserializeObject<GitHubInfo.ReleaseInfo>(content);
             }
         }

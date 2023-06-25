@@ -19,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Display.Data;
+using static System.String;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -66,15 +67,17 @@ namespace Display.ContentsPage
                 _storedItem = container.Content as ActorInfo;
                 animation = BasicGridView.PrepareConnectedAnimation("forwardAnimation", _storedItem, "connectedElement");
 
+                animation.Completed += Animation_Completed1;
             }
-            var actorInfo = e.ClickedItem as ActorInfo;
 
-            string filePath = AppSettings.ActorFileTreeSavePath;
+            if (e.ClickedItem is not ActorInfo actorInfo) return;
+
+            var filePath = AppSettings.ActorFileTreeSavePath;
 
             if (isCheckGit)
             {
                 progress_TextBlock.Text = "正在获取GFriend仓库信息……";
-                if (!await tryUpdateFileTree(filePath))
+                if (!await TryUpdateFileTree(filePath))
                 {
                     progress_TextBlock.Text = "获取GFriend仓库信息失败!";
                     return;
@@ -84,23 +87,20 @@ namespace Display.ContentsPage
                 isCheckGit = false;
             }
 
-            var ImageUrlList = GetImageUrlListFromFileTreeAsync(actorInfo.name, filePath: filePath);
+            var imageUrlList = GetImageUrlListFromFileTreeAsync(actorInfo.name, filePath: filePath);
 
             ShowImageList.Clear();
 
-            foreach (var imagePath in ImageUrlList)
+            foreach (var imagePath in imageUrlList)
             {
                 ShowImageList.Add(imagePath);
             }
 
-            ShoeActorName.Text = (e.ClickedItem as ActorInfo).name;
+            ShoeActorName.Text = actorInfo?.name;
             SmokeGrid.Visibility = Visibility.Visible;
 
-            animation.Completed += Animation_Completed1;
-
-            animation.TryStart(destinationElement);
-
-            progress_TextBlock.Text = string.Empty;
+            animation?.TryStart(destinationElement);
+            progress_TextBlock.Text = Empty;
         }
 
         //防止动画开始时，双击触发退出事件
@@ -113,12 +113,12 @@ namespace Display.ContentsPage
         //JObject json;
         private List<string> GetImageUrlListFromFileTreeAsync(string actorName, int maxCount = -1, string filePath = null)
         {
-            if (string.IsNullOrEmpty(filePath))
+            if (IsNullOrEmpty(filePath))
             {
                 filePath = AppSettings.ActorFileTreeSavePath;
             }
 
-            List<string> result = getImageUrlFormFileTree(filePath, actorName, maxCount);
+            List<string> result = GetImageUrlFormFileTree(filePath, actorName, maxCount);
 
             return result;
         }
@@ -146,12 +146,12 @@ namespace Display.ContentsPage
 
             actorinfo.HasMoreItems = false;
 
-            updateGridViewShow();
+            UpdateGridViewShow();
 
             var startTime = DateTimeOffset.Now;
 
             //进度
-            var progress = new Progress<progressClass>(info =>
+            var progress = new Progress<ProgressClass>(info =>
             {
                 if (!progress_TextBlock.IsLoaded)
                 {
@@ -159,69 +159,71 @@ namespace Display.ContentsPage
                     return;
                 }
 
-                progress_TextBlock.Text = info.text;
+                progress_TextBlock.Text = info.Text;
 
-                if (info.index == -1)
+                if (info.Index == -1)
                 {
                     return;
                 }
 
-                var item = actorinfo[info.index];
+                var item = actorinfo[info.Index];
 
-                item.Status = info.status;
+                item.Status = info.Status;
 
                 if (item.Status == Status.error)
                 {
                     failList.Add(item.name);
                 }
 
-                if (!string.IsNullOrEmpty(info.imagePath))
+                if (!IsNullOrEmpty(info.ImagePath))
                 {
-                    item.prifile_path = info.imagePath;
+                    item.prifile_path = info.ImagePath;
                 }
 
                 //完成
-                if (item.Status != Status.doing && actorinfo.Count == info.index + 1)
+                if (item.Status != Status.doing && actorinfo.Count == info.Index + 1)
                 {
                     progress_TextBlock.Text = $"任务已完成，耗时{FileMatch.ConvertDoubleToDateStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
                 }
             });
 
-            await Task.Run(() => getActorCoverByGit(actorinfo.ToList(), progress, s_cts));
+            await Task.Run(() => GetActorCoverByGit(actorinfo.ToList(), progress, s_cts));
 
             BasicGridView.ItemClick += BasicGridView_ItemClick;
 
         }
 
-        private async Task getActorCoverByGit(List<ActorInfo> actorinfos, IProgress<progressClass> progress, CancellationTokenSource s_cts)
+        private async Task GetActorCoverByGit(List<ActorInfo> actorInfos, IProgress<ProgressClass> progress, CancellationTokenSource cts)
         {
             string filePath = AppSettings.ActorFileTreeSavePath;
 
             if (isCheckGit)
             {
-                progress.Report(new progressClass() { text = "正在获取GFriend仓库信息……" });
+                progress.Report(new ProgressClass() { Text = "正在获取GFriend仓库信息……" });
 
-                if (!await tryUpdateFileTree(filePath))
+                if (!await TryUpdateFileTree(filePath))
                 {
-                    progress.Report(new progressClass() { text = "获取GFriend仓库信息失败!" });
+                    progress.Report(new ProgressClass() { Text = "获取GFriend仓库信息失败!" });
                     return;
                 }
 
                 isCheckGit = false;
             }
 
-            for (int i = 0; i < actorinfos.Count; i++)
+            for (int i = 0; i < actorInfos.Count; i++)
             {
-                if (s_cts.IsCancellationRequested)
+                if (cts.IsCancellationRequested)
                 {
                     break;
                 }
 
-                progressClass progressinfo = new();
-                progressinfo.index = i;
-                progressinfo.status = Status.doing;
+                ProgressClass progressInfo = new()
+                {
+                    Index = i,
+                    Status = Status.doing
+                };
 
-                var item = actorinfos[i];
+                var item = actorInfos[i];
 
                 //演员名
                 var actorName = item.name;
@@ -230,38 +232,38 @@ namespace Display.ContentsPage
 
                 string indexText = $"【{i + 1}/{actorinfo.Count}】 ";
 
-                progressinfo.text = $"{indexText}{actorName}";
+                progressInfo.Text = $"{indexText}{actorName}";
 
-                progress.Report(progressinfo);
+                progress.Report(progressInfo);
 
                 var imageSavePath = System.IO.Path.Combine(AppSettings.ActorInfoSavePath, actorName, "face.jpg");
 
                 if (!File.Exists(imageSavePath))
                 {
-                    string ImageUrl = string.Empty;
-                    var ImageUrlList = GetImageUrlListFromFileTreeAsync(actorName, 1);
-                    if (ImageUrlList.Count > 0) ImageUrl = ImageUrlList[0];
+                    string imageUrl = Empty;
+                    var imageUrlList = GetImageUrlListFromFileTreeAsync(actorName, 1);
+                    if (imageUrlList.Count > 0) imageUrl = imageUrlList[0];
 
-                    if (string.IsNullOrEmpty(ImageUrl))
+                    if (IsNullOrEmpty(imageUrl))
                     {
-                        progressinfo.status = Status.error;
-                        progress.Report(progressinfo);
+                        progressInfo.Status = Status.error;
+                        progress.Report(progressInfo);
                         continue;
                     }
 
-                    var downResult = await DownFile(ImageUrl, imageSavePath);
+                    var downResult = await DownFile(imageUrl, imageSavePath);
 
                     if (!downResult)
                     {
-                        progressinfo.status = Status.error;
-                        progress.Report(progressinfo);
+                        progressInfo.Status = Status.error;
+                        progress.Report(progressInfo);
                         continue;
                     }
                 }
 
-                progressinfo.imagePath = imageSavePath;
-                progressinfo.status = Status.beforeStart;
-                progress.Report(progressinfo);
+                progressInfo.ImagePath = imageSavePath;
+                progressInfo.Status = Status.beforeStart;
+                progress.Report(progressInfo);
 
                 var actorId = DataAccess.GetActorIdByName(actorName);
                 if (actorId != -1)
@@ -273,18 +275,18 @@ namespace Display.ContentsPage
 
         }
 
-        private List<string> getImageUrlFormFileTree(string filePath, string actorName, int maxCount)
+        private static List<string> GetImageUrlFormFileTree(string filePath, string actorName, int maxCount)
         {
             List<string> urlList = new();
 
-            string key = String.Empty;
-            string path = String.Empty;
+            string key = Empty;
+            string path = Empty;
 
             foreach (var line in File.ReadLines(filePath))
             {
                 var content = line.Trim();
 
-                if (string.IsNullOrEmpty(key))
+                if (IsNullOrEmpty(key))
                 {
                     var matchKey = Regex.Match(content, "\"(.*)\":");
 
@@ -295,7 +297,7 @@ namespace Display.ContentsPage
                 }
                 else
                 {
-                    if (string.IsNullOrEmpty(path))
+                    if (IsNullOrEmpty(path))
                     {
                         var matchPath = Regex.Match(content, "\"(.*)\":");
 
@@ -307,7 +309,7 @@ namespace Display.ContentsPage
                         {
                             if (content.Contains('}'))
                             {
-                                key = string.Empty;
+                                key = Empty;
                             }
                         }
                     }
@@ -339,7 +341,7 @@ namespace Display.ContentsPage
                         {
                             if (content.Contains('}'))
                             {
-                                path = string.Empty;
+                                path = Empty;
                             }
                         }
                     }
@@ -355,7 +357,7 @@ namespace Display.ContentsPage
         /// <param Name="name"></param>
         /// <param Name="count"></param>
         /// <returns></returns>
-        private List<string> getImageUrlFormFileTreeContent(JObject json, string name, int count)
+        private List<string> GetImageUrlFormFileTreeContent(JObject json, string name, int count)
         {
             List<string> imageUrlList = new();
 
@@ -364,7 +366,7 @@ namespace Display.ContentsPage
             {
                 if (getNum == count) break;
 
-                var Path1 = item.Key;
+                var path1 = item.Key;
 
                 if (!item.Value.HasValues) continue;
 
@@ -374,7 +376,7 @@ namespace Display.ContentsPage
                 {
                     if (getNum == count) break;
 
-                    var Path2 = item2.Key;
+                    var path2 = item2.Key;
 
                     if (!item2.Value.HasValues) continue;
 
@@ -390,7 +392,7 @@ namespace Display.ContentsPage
 
                         if (Path3.Contains(name))
                         {
-                            string imagePath = Path.Combine(Path1, Path2, value3);
+                            string imagePath = Path.Combine(path1, path2, value3);
                             string imageUrl = $"https://raw.githubusercontent.com/gfriends/gfriends/master/{imagePath}";
                             imageUrlList.Add(imageUrl);
                             getNum++;
@@ -402,10 +404,10 @@ namespace Display.ContentsPage
             return imageUrlList;
         }
 
-        private async Task<bool> tryUpdateFileTree(string filePath)
+        private async Task<bool> TryUpdateFileTree(string filePath)
         {
-            bool result = true;
-            bool isNeedDownFile = false;
+            var result = true;
+            var isNeedDownFile = false;
 
             if (!File.Exists(filePath))
             {
@@ -420,7 +422,7 @@ namespace Display.ContentsPage
                 var dateStr = await GetGitUpdateDateStr();
 
                 //获取到最新时间
-                if (!string.IsNullOrEmpty(dateStr))
+                if (!IsNullOrEmpty(dateStr))
                 {
                     var gitUpdateDate = Convert.ToDateTime(dateStr);
 
@@ -433,8 +435,8 @@ namespace Display.ContentsPage
 
             if (isNeedDownFile)
             {
-                string FiletreeDownUrl = @"https://raw.githubusercontent.com/gfriends/gfriends/master/Filetree.json";
-                result = await DownFile(FiletreeDownUrl, filePath, true);
+                const string filetreeDownUrl = @"https://raw.githubusercontent.com/gfriends/gfriends/master/Filetree.json";
+                result = await DownFile(filetreeDownUrl, filePath, true);
             }
 
             return result;
@@ -446,66 +448,69 @@ namespace Display.ContentsPage
         /// <returns></returns>
         private async Task<string> GetGitUpdateDateStr()
         {
-            var Client = GetInfoFromNetwork.Client;
+            var client = GetInfoFromNetwork.CommonClient;
 
-            string UpdateDateStr = string.Empty;
+            const string gitInfoUrl = @"https://api.github.com/repos/gfriends/gfriends";
 
-            string gitInfoUrl = @"https://api.github.com/repos/gfriends/gfriends";
+            string updateDateStr = Empty;
 
             HttpResponseMessage resp;
             string strResult;
             try
             {
-                resp = await Client.GetAsync(gitInfoUrl);
+                resp = await client.GetAsync(gitInfoUrl);
                 strResult = await resp.Content.ReadAsStringAsync();
             }
             catch (HttpRequestException)
             {
-                return UpdateDateStr;
+                return updateDateStr;
             }
 
             if (resp.IsSuccessStatusCode)
             {
                 JObject json = JsonConvert.DeserializeObject<JObject>(strResult);
-                UpdateDateStr = json["updated_at"].ToString();
+                updateDateStr = json["updated_at"]?.ToString();
             }
 
-            return UpdateDateStr;
+            return updateDateStr;
         }
 
-        HttpClient Client;
-        private async Task<bool> DownFile(string downurl, string filePath, bool isNeedReplace = false)
+        HttpClient _client;
+        private async Task<bool> DownFile(string url, string filePath, bool isNeedReplace = false)
         {
-            if (Client == null) Client = GetInfoFromNetwork.Client;
+            if (string.IsNullOrEmpty(filePath)) return false;
+
+            _client ??= GetInfoFromNetwork.CommonClient;
 
             var directoryName = Path.GetDirectoryName(filePath);
-            if (!File.Exists(directoryName))
+            if (!IsNullOrEmpty(directoryName) && !File.Exists(directoryName))
             {
                 Directory.CreateDirectory(directoryName);
             }
 
-            if (!File.Exists(filePath) || isNeedReplace)
-            {
-                try
-                {
-                    var rep = await Client.GetAsync(HttpUtility.UrlPathEncode(downurl));
-                    if (rep.IsSuccessStatusCode)
-                    {
-                        byte[] imageBytes = await rep.Content.ReadAsByteArrayAsync();
-                        File.WriteAllBytes(filePath, imageBytes);
-                    }
-                    else
-                    {
-                        return false;
-                    }
+            if (File.Exists(filePath) && !isNeedReplace) return true;
 
-                }
-                catch
+            try
+            {
+                var rep = await _client.GetAsync(HttpUtility.UrlPathEncode(url));
+                if (rep.IsSuccessStatusCode)
                 {
-                    return false;
+                    //var imageBytes = await rep.Content.ReadAsByteArrayAsync();
+                    //await File.WriteAllBytesAsync(filePath, imageBytes);
+
+                    await using var stream = await rep.Content.ReadAsStreamAsync();
+                    await using var newStream = File.Create(filePath);
+                    await stream.CopyToAsync(newStream);
+
+                    return true;
                 }
             }
-            return true;
+            catch
+            {
+                // ignore
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -513,7 +518,7 @@ namespace Display.ContentsPage
         /// 只保留选中项
         /// 退出选择模式
         /// </summary>
-        private void updateGridViewShow()
+        private void UpdateGridViewShow()
         {
             List<ActorInfo> actorList = new();
 
@@ -555,30 +560,30 @@ namespace Display.ContentsPage
 
                 progress_TextBlock.Text = $"{actorName} - 获取演员参演的视频";
                 //获取演员参演的视频
-                var VideoList = DataAccess.loadVideoInfoByActor(actorName);
+                var videoList = DataAccess.loadVideoInfoByActor(actorName);
 
                 //progress_TextBlock.Text = $"{actorName} - 获取演员参演的视频 - 成功";
 
 
                 progress_TextBlock.Text = $"{actorName} - 挑选单体作品（非VR）";
-                var VideoInfoList = VideoList.Where(x => x.actor == actorName && !x.category.Contains("VR") && !x.series.Contains("VR")).ToList();
+                var videoInfoList = videoList.Where(x => x.actor == actorName && !x.category.Contains("VR") && !x.series.Contains("VR")).ToList();
 
                 //无单体作品，跳过
-                if (VideoInfoList.Count == 0)
+                if (videoInfoList.Count == 0)
                 {
                     progress_TextBlock.Text = $"{actorName} - 无单体作品 - 跳过";
                     item.Status = Status.success;
                     continue;
                 }
 
-                var videoPlayUrl = string.Empty;
-                Datum videofileListCanPlay = null;
-                for (int i = 0; i < VideoInfoList.Count && videoPlayUrl == string.Empty; i++)
+                var videoPlayUrl = Empty;
+                Datum videoFileListCanPlay = null;
+                for (var i = 0; i < videoInfoList.Count && videoPlayUrl == Empty; i++)
                 {
-                    var FirstVideoInfo = VideoInfoList[i];
+                    var firstVideoInfo = videoInfoList[i];
 
                     //视频名称
-                    var videoName = FirstVideoInfo.truename;
+                    var videoName = firstVideoInfo.truename;
 
                     progress_TextBlock.Text = $"{actorName} - {videoName} - 挑选单体作品 - {videoName}";
 
@@ -588,21 +593,21 @@ namespace Display.ContentsPage
                     progress_TextBlock.Text = $"{actorName} - {videoName} - 挑选单体作品中能在线看的";
 
                     //挑选能在线观看的视频
-                    videofileListCanPlay = videoFileList.FirstOrDefault(x => x.vdi != 0);
+                    videoFileListCanPlay = videoFileList.FirstOrDefault(x => x.vdi != 0);
 
                     //全部未转码失败视频，跳过
-                    if (videofileListCanPlay == null)
+                    if (videoFileListCanPlay == null)
                     {
                         progress_TextBlock.Text = $"{actorName} - {videoName} - 在线视频转码未完成 - 跳过";
                         continue;
                     }
 
-                    progress_TextBlock.Text = $"{actorName} - {videoName} - 挑选单体作品中能在线看的 - {videofileListCanPlay.n}";
+                    progress_TextBlock.Text = $"{actorName} - {videoName} - 挑选单体作品中能在线看的 - {videoFileListCanPlay.n}";
 
                     //获取视频的PickCode
-                    var pickCode = videofileListCanPlay.pc;
+                    var pickCode = videoFileListCanPlay.pc;
 
-                    progress_TextBlock.Text = $"{actorName} - {videoName} - {videofileListCanPlay.n} - 获取视频播放地址";
+                    progress_TextBlock.Text = $"{actorName} - {videoName} - {videoFileListCanPlay.n} - 获取视频播放地址";
 
                     //获取播放地址
                     var m3U8InfoList = await webApi.GetM3U8InfoByPickCode(pickCode);
@@ -610,7 +615,7 @@ namespace Display.ContentsPage
                     //文件不存在或已删除
                     if (m3U8InfoList.Count == 0)
                     {
-                        progress_TextBlock.Text = $"{actorName} - {videoName} - {videofileListCanPlay.n} - 文件不存在或已删除";
+                        progress_TextBlock.Text = $"{actorName} - {videoName} - {videoFileListCanPlay.n} - 文件不存在或已删除";
                         continue;
                     }
                     //成功
@@ -621,17 +626,17 @@ namespace Display.ContentsPage
                 }
 
                 //无符合条件的视频，跳过
-                if (videoPlayUrl == string.Empty)
+                if (videoPlayUrl == Empty)
                 {
                     progress_TextBlock.Text = $"{actorName} - 未找到符合条件的视频";
                     item.Status = Status.error;
                     continue;
                 }
 
-                string SavePath = Path.Combine(AppSettings.ActorInfoSavePath, actorName);
-                string imageName = "face";
+                var savePath = Path.Combine(AppSettings.ActorInfoSavePath, actorName);
+                var imageName = "face";
 
-                string imagePath = Path.Combine(SavePath, $"{imageName}.jpg");
+                var imagePath = Path.Combine(savePath, $"{imageName}.jpg");
                 if (File.Exists(imagePath))
                 {
                     item.prifile_path = imagePath;
@@ -640,11 +645,11 @@ namespace Display.ContentsPage
                 }
                 else
                 {
-                    progress_TextBlock.Text = $"{actorName} - {videofileListCanPlay.n} - 从视频中获取演员头像 - 女（可信度>0.99）";
+                    progress_TextBlock.Text = $"{actorName} - {videoFileListCanPlay?.n} - 从视频中获取演员头像 - 女（可信度>0.99）";
 
-                    var progressInfo = await getActorFaceByVideoPlayUrl(actorName, videoPlayUrl, 1, SavePath, imageName);
+                    var progressInfo = await GetActorFaceByVideoPlayUrl(actorName, videoPlayUrl, 1, savePath, imageName);
 
-                    if (!string.IsNullOrEmpty(progressInfo.imagePath))
+                    if (!IsNullOrEmpty(progressInfo.imagePath))
                     {
                         item.prifile_path = progressInfo.imagePath;
 
@@ -662,7 +667,7 @@ namespace Display.ContentsPage
             progress_TextBlock.Text = $"总耗时：{FileMatch.ConvertDoubleToDateStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
         }
 
-        private async Task<progressInfo> getActorFaceByVideoPlayUrl(string actorName, string url, int Task_Count, string SavePath, string imageName, bool isShowWindow = true)
+        private static async Task<progressInfo> GetActorFaceByVideoPlayUrl(string actorName, string url, int Task_Count, string SavePath, string imageName, bool isShowWindow = true)
         {
             //var faceImagePath = string.Empty;
 
@@ -677,19 +682,19 @@ namespace Display.ContentsPage
 
             //int Task_Count = 20;
 
-            var frames_num = openCV.getTotalFrameCount(url);
-            if (frames_num == 0) return progressInfo;
+            var framesNum = openCV.getTotalFrameCount(url);
+            if (framesNum == 0) return progressInfo;
 
             //跳过开头
-            int startJumpFrame_num = 1000;
+            const int startJumpFrameNum = 1000;
 
             //跳过结尾
             int endJumpFrame_num = 0;
 
-            var actualEndFrame = frames_num - endJumpFrame_num;
+            var actualEndFrame = framesNum - endJumpFrame_num;
 
             //平均长度
-            var averageLength = (int)(actualEndFrame - startJumpFrame_num) / Task_Count;
+            var averageLength = (int)(actualEndFrame - startJumpFrameNum) / Task_Count;
 
             //Progress_TextBlock.Text = $"{AllProgressBar.Value}/{Task_Count}";
             //AllProgressBar.Visibility = Visibility.Visible;
@@ -742,7 +747,7 @@ namespace Display.ContentsPage
 
             double length = 100 * 100;
 
-            await Task.Run(() => openCV.Task_GenderByVideo(url, startJumpFrame_num, length, isShowWindow, progress, SavePath, imageName));
+            await Task.Run(() => openCV.Task_GenderByVideo(url, startJumpFrameNum, length, isShowWindow, progress, SavePath, imageName));
 
             //var startTime = DateTimeOffset.Now;
             //for (double start_frame = startJumpFrame_num; start_frame + averageLength <= actualEndFrame; start_frame += averageLength)
@@ -802,16 +807,9 @@ namespace Display.ContentsPage
             SmokeCancelGrid.Tapped -= SmokeCancelGrid_Tapped;
         }
 
-        private Visibility isShowFailList(ObservableCollection<string> List)
+        private static Visibility IsShowFailList(ObservableCollection<string> List)
         {
-            if (List.Count > 0)
-            {
-                return Visibility.Visible;
-            }
-            else
-            {
-                return Visibility.Collapsed;
-            }
+            return List.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
@@ -819,19 +817,20 @@ namespace Display.ContentsPage
             FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
         }
 
-        private class progressClass
+        private class ProgressClass
         {
-            public int index { get; set; } = -1;
-            public string imagePath { get; set; }
-            public string text { get; set; }
-            public Status status { get; set; }
+            public int Index { get; set; } = -1;
+            public string ImagePath { get; set; }
+            public string Text { get; set; }
+            public Status Status { get; set; }
         }
 
         private void modifyToggleSwitch_Toggled(object sender, RoutedEventArgs e)
         {
-            var toggleswitch = sender as ToggleSwitch;
+            if (sender is not ToggleSwitch toggleSwitch) return;
+
             //添加模式
-            if (toggleswitch.IsOn)
+            if (toggleSwitch.IsOn)
             {
                 StartButton.IsEnabled = true;
                 selectedCheckBox.Visibility = Visibility.Visible;
@@ -855,11 +854,12 @@ namespace Display.ContentsPage
 
         private async void ModifyActorImage_Click(object sender, RoutedEventArgs e)
         {
-            var imageUrl = (sender as HyperlinkButton).DataContext as string;
+            if (sender is not HyperlinkButton { DataContext: string imageUrl }) return;
+
             string actorName = ShoeActorName.Text;
 
             string savePath = Path.Combine(AppSettings.ActorInfoSavePath, actorName);
-            await GetInfoFromNetwork.downloadFile(imageUrl, savePath, "face", true);
+            await GetInfoFromNetwork.DownloadFile(imageUrl, savePath, "face", true);
 
             foreach (var item in actorinfo)
             {

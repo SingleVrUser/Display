@@ -1,45 +1,43 @@
-﻿using System;
-using Display.Helper;
+﻿using Display.Helper;
+using Display.Helper.Crypto;
 using Display.Models;
-using Display.Services;
+using Display.Services.Upload;
 using Display.Views;
 using Display.WindowView;
 using HtmlAgilityPack;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using Windows.Storage;
-using Newtonsoft.Json.Linq;
 using static System.Int32;
 using Exception = System.Exception;
 using HttpMethod = System.Net.Http.HttpMethod;
 using HttpRequestMessage = System.Net.Http.HttpRequestMessage;
-using static QRCoder.PayloadGenerator;
+using Display.Extensions;
 
 namespace Display.Data
 {
     public class WebApi
     {
-        private HttpClient QRCodeClient;
-        public HttpClient Client;
         public static UserInfo UserInfo;
-        public static QRCodeInfo QRCodeInfo;
+        public static QRCodeInfo QrCodeInfo;
         private static UploadInfo _uploadInfo;
-        public static bool isEnterHiddenMode;
+        public static bool IsEnterHiddenMode;
+
+        public HttpClient Client;
         public TokenInfo TokenInfo;
 
         private long NowDate => DateTimeOffset.Now.ToUnixTimeSeconds();
@@ -61,15 +59,19 @@ namespace Display.Data
         /// </summary>
         public void InitializeInternet()
         {
-            Client = GetInfoFromNetwork.CreateClient(new Dictionary<string, string> { { "user-agent", GetInfoFromNetwork.UserAgent } });
+
+            var headers = new Dictionary<string, string> { { "user-agent", GetInfoFromNetwork.UserAgent }};
 
             var cookie = AppSettings._115_Cookie;
-
             //cookie不为空且可用
             if (!string.IsNullOrEmpty(cookie))
             {
-                Client.DefaultRequestHeaders.Add("Cookie", cookie);
+                headers["Cookie"] = cookie;
             }
+
+            Client = GetInfoFromNetwork.CreateClient(headers);
+
+
         }
 
         /// <summary>
@@ -109,7 +111,7 @@ namespace Display.Data
         /// <returns>true - 登录，false - 未登录</returns>
         public async Task<bool> UpdateLoginInfoAsync()
         {
-            UserInfo = await SendAsync<UserInfo>(HttpMethod.Get,
+            UserInfo = await Client.SendAsync<UserInfo>(HttpMethod.Get,
                 $"https://my.115.com/?ct=ajax&ac=nav&_={NowDate}");
 
             return UserInfo?.state == true;
@@ -129,17 +131,17 @@ namespace Display.Data
                 };
             var content = new FormUrlEncodedContent(values);
 
-            var driveSetting = await SendAsync<_115Setting>(HttpMethod.Post, url, content);
+            var driveSetting = await Client.SendAsync<_115Setting>(HttpMethod.Post, url, content);
 
             var result = false;
             if (driveSetting?.data.show == "1")
             {
                 result = true;
-                isEnterHiddenMode = true;
+                IsEnterHiddenMode = true;
             }
             else
             {
-                isEnterHiddenMode = false;
+                IsEnterHiddenMode = false;
             }
 
             return result;
@@ -353,7 +355,7 @@ namespace Display.Data
                 };
             var content = new FormUrlEncodedContent(values);
 
-            var _ = await SendAsync<string>(HttpMethod.Post, url, content);
+            var _ = await Client.SendAsync<string>(HttpMethod.Post, url, content);
 
         }
 
@@ -382,7 +384,7 @@ namespace Display.Data
 
             var content = new FormUrlEncodedContent(values);
 
-            var _ = await SendAsync<string>(HttpMethod.Post, url, content);
+            var _ = await Client.SendAsync<string>(HttpMethod.Post, url, content);
         }
 
         /// <summary>
@@ -402,7 +404,7 @@ namespace Display.Data
 
             var content = new FormUrlEncodedContent(values);
 
-            var _ = await SendAsync<string>(HttpMethod.Post, url, content);
+            var _ = await Client.SendAsync<string>(HttpMethod.Post, url, content);
         }
 
         public async Task<bool> CreateTorrentOfflineDown(string torrentPath)
@@ -425,7 +427,7 @@ namespace Display.Data
             var uploadInfo = await GetUploadInfo();
 
             // 无该信息
-            if (info == null)
+            if (info is not { state: true })
             {
                 // 获取种子文件应该存放的目录cid
                 var torrentCidInfo = await GetTorrentCid();
@@ -442,7 +444,7 @@ namespace Display.Data
             }
 
             // 上传后仍然为空
-            if (info == null || uploadInfo == null)  return false;
+            if (info is not { state: true } || uploadInfo == null)  return false;
 
             var offlineSpaceInfo = await GetOfflineSpaceInfo(uploadInfo.userkey, uploadInfo.user_id);
 
@@ -453,7 +455,7 @@ namespace Display.Data
             if(torrentInfo == null) return false;
 
             // 最小大小,10 MB
-            long minSize = 10485760;
+            const long minSize = 10485760;
             List<int> selectedIndexList = new();
             for (var i = 0; i < torrentInfo.torrent_filelist_web.Length; i++)
             {
@@ -491,7 +493,7 @@ namespace Display.Data
 
             var content = new FormUrlEncodedContent(values);
 
-            return await SendAsync<AddTaskBtResult>(HttpMethod.Post,
+            return await Client.SendAsync<AddTaskBtResult>(HttpMethod.Post,
                 url, content);
         }
 
@@ -509,7 +511,7 @@ namespace Display.Data
 
             var content = new FormUrlEncodedContent(values);
 
-            return await SendAsync<TorrentInfoResult>(HttpMethod.Post, url, content);
+            return await Client.SendAsync<TorrentInfoResult>(HttpMethod.Post, url, content);
 
         }
 
@@ -517,12 +519,12 @@ namespace Display.Data
         {
             const string url = "http://115.com/?ct=lixian&ac=get_id&torrent=1";
 
-            return await SendAsync<TorrentCidResult>(HttpMethod.Get, url);
+            return await Client.SendAsync<TorrentCidResult>(HttpMethod.Get, url);
         }
 
         private async Task<ShaSearchResult> SearchInfoBySha1(string sha1)
         {
-            return await SendAsync<ShaSearchResult>(HttpMethod.Get, $"https://webapi.115.com/files/shasearch?sha1={sha1}&_={NowDate}");
+            return await Client.SendAsync<ShaSearchResult>(HttpMethod.Get, $"https://webapi.115.com/files/shasearch?sha1={sha1}&_={NowDate}");
         }
 
         /// <summary>
@@ -542,7 +544,7 @@ namespace Display.Data
             };
             var content = new FormUrlEncodedContent(values);
 
-            return await SendAsync<MakeDirRequest>(HttpMethod.Post, url, content);
+            return await Client.SendAsync<MakeDirRequest>(HttpMethod.Post, url, content);
         }
 
         /// <summary>
@@ -571,7 +573,7 @@ namespace Display.Data
 
             var content = new FormUrlEncodedContent(values);
 
-            await SendAsync<MakeDirRequest>(HttpMethod.Post, url, content);
+            await Client.SendAsync<MakeDirRequest>(HttpMethod.Post, url, content);
         }
 
         /// <summary>
@@ -591,7 +593,7 @@ namespace Display.Data
 
             var content = new FormUrlEncodedContent(values);
 
-            return await SendAsync<RenameRequest>(HttpMethod.Post, url, content);
+            return await Client.SendAsync<RenameRequest>(HttpMethod.Post, url, content);
         }
 
         public enum OrderBy { FileName, FileSize, UserPtime }
@@ -617,7 +619,7 @@ namespace Display.Data
             if (isOnlyFolder)
                 url += "&nf=1";
 
-            var webFileInfoResult = await SendAsync<WebFileInfo>(HttpMethod.Get, url);
+            var webFileInfoResult = await Client.SendAsync<WebFileInfo>(HttpMethod.Get, url);
             if (webFileInfoResult == null) return null;
 
             //te，tp简单用t替换，接口2没有te,tp
@@ -678,7 +680,7 @@ namespace Display.Data
             //需要加载全部，但未加载全部
             else if (loadAll && webFileInfoResult.count > limit)
             {
-                webFileInfoResult = await GetFileAsync(cid, webFileInfoResult.count, offset, useApi2, loadAll, orderBy, asc);
+                webFileInfoResult = await GetFileAsync(cid, webFileInfoResult.count, offset, useApi2, true, orderBy, asc);
             }
 
             return webFileInfoResult;
@@ -688,7 +690,7 @@ namespace Display.Data
         {
             var url = $"https://webapi.115.com/files?aid=1&cid={cid}&o=user_ptime&asc=0&offset=0&show_dir=1&limit=30&code=&scid=&snap=0&natsort=1&star=1&source=&format=json";
 
-            return await SendAsync<FilesShowInfo>(HttpMethod.Get, url);
+            return await Client.SendAsync<FilesShowInfo>(HttpMethod.Get, url);
         }
 
         /// <summary>
@@ -703,53 +705,51 @@ namespace Display.Data
                 return new FileCategory { file_name = "根目录" };
             }
 
-            return await SendAsync<FileCategory>(HttpMethod.Get, $"https://webapi.115.com/category/get?cid={cid}");
+            return await Client.SendAsync<FileCategory>(HttpMethod.Get, $"https://webapi.115.com/category/get?cid={cid}");
         }
 
-        private async Task<T> SendAsync<T>(HttpMethod method, string url,HttpContent content = null,T defaultValue = default)
-        {
-            var uri = new Uri(url);
-            using var request = new HttpRequestMessage(method, url)
-            {
-                RequestUri = uri,
-                Content = content
-            };
+        //private async Task<T> SendAsync<T>(HttpMethod method, string url,HttpContent content = null,T defaultValue = default)
+        //{
+        //    var uri = new Uri(url);
+        //    using var request = new HttpRequestMessage(method, url)
+        //    {
+        //        RequestUri = uri,
+        //        Content = content
+        //    };
 
-            HttpResponseMessage response;
-            try
-            {
-                response = await Client.SendAsync(request);
+        //    HttpResponseMessage response;
+        //    try
+        //    {
+        //        response = await Client.SendAsync(request);
+        //    }
+        //    catch (AggregateException e)
+        //    {
+        //        Toast.TryToast("网络异常", $"{uri.Host}", e.Message);
+        //        return defaultValue;
+        //    }
+        //    catch (HttpRequestException e)
+        //    {
+        //        Toast.TryToast("网络异常", $"{uri.Host}", e.Message);
+        //        return defaultValue;
+        //    }
 
+        //    if (!response.IsSuccessStatusCode) return defaultValue;
 
-            }
-            catch (AggregateException e)
-            {
-                Toast.tryToast("网络异常", $"{uri.Host}", e.Message);
-                return defaultValue;
-            }
-            catch (HttpRequestException e)
-            {
-                Toast.tryToast("网络异常", $"{uri.Host}", e.Message);
-                return defaultValue;
-            }
+        //    try
+        //    {
+        //        var contentAsString = await response.Content.ReadAsStringAsync();
+        //        if (contentAsString is T result) return result;
 
-            if (!response.IsSuccessStatusCode) return defaultValue;
+        //        return contentAsString == "[]" ? defaultValue : JsonConvert.DeserializeObject<T>(contentAsString);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Debug.WriteLine($"发生错误{e.Message}");
+        //        Toast.TryToast("格式异常", $"{nameof(T)}转换异常", e.Message);
 
-            try
-            {
-                var contentAsString = await response.Content.ReadAsStringAsync();
-                if (contentAsString is T result) return result;
-
-                return contentAsString == "[]" ? defaultValue : JsonConvert.DeserializeObject<T>(contentAsString);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine($"发生错误{e.Message}");
-                Toast.tryToast("格式异常", $"{nameof(T)}转换异常", e.Message);
-
-                return defaultValue;
-            }
-        }
+        //        return defaultValue;
+        //    }
+        //}
 
         /// <summary>
         /// 检查二维码登录验证状态，若登录成功则存储cookie;
@@ -761,11 +761,11 @@ namespace Display.Data
 
             var values = new Dictionary<string, string>
             {
-                { "account", QRCodeInfo.data.uid }
+                { "account", QrCodeInfo.data.uid }
             };
             var content = new FormUrlEncodedContent(values);
 
-            TokenInfo = await SendAsync<TokenInfo>(HttpMethod.Post, url,content);
+            TokenInfo = await Client.SendAsync<TokenInfo>(HttpMethod.Post, url,content);
 
             if (TokenInfo.state != 1) return TokenInfo;
 
@@ -788,9 +788,10 @@ namespace Display.Data
         /// <returns></returns>
         public async Task<QRCodeStatus> GetQrCodeStatusAsync()
         {
-            var url = $"https://qrcodeapi.115.com/get/status/?uid={QRCodeInfo.data.uid}&time={QRCodeInfo.data.time}&sign={QRCodeInfo.data.sign}&_={NowDate}";
+            var url = $"https://qrcodeapi.115.com/get/status/?uid={QrCodeInfo.data.uid}&time={QrCodeInfo.data.time}&sign={QrCodeInfo.data.sign}&_={NowDate}";
 
-            return await SendAsync<QRCodeStatus>(HttpMethod.Get, url);
+            
+            return await Client.SendAsync<QRCodeStatus>(HttpMethod.Get, url);
         }
 
         /// <summary>
@@ -801,7 +802,8 @@ namespace Display.Data
         {
             const string url = "https://qrcodeapi.115.com/api/1.0/web/1.0/token";
 
-            return await SendAsync<QRCodeInfo>(HttpMethod.Get, url);
+            QrCodeInfo = await Client.SendAsync<QRCodeInfo>(HttpMethod.Get, url);
+            return QrCodeInfo;
         }
 
         public enum DownType { _115, Bc, Aria2 };
@@ -839,11 +841,11 @@ namespace Display.Data
             };
 
             //KEY
-            if (QRCodeInfo == null)
+            if (QrCodeInfo == null)
             {
                 await GetQrCodeInfo();
             }
-            downRequest.key = QRCodeInfo?.data.uid;
+            downRequest.key = QrCodeInfo?.data.uid;
 
             //PARAM
             downRequest.param = new Param_Request
@@ -953,7 +955,7 @@ namespace Display.Data
         {
             const string url = "https://webapi.115.com/offine/downpath";
 
-            return await SendAsync<OfflineDownPathRequest>(HttpMethod.Get, url);
+            return await Client.SendAsync<OfflineDownPathRequest>(HttpMethod.Get, url);
         }
 
         public async Task<UploadInfo> GetUploadInfo(bool isUpdate=false)
@@ -961,8 +963,8 @@ namespace Display.Data
             if (!isUpdate && _uploadInfo != null) return _uploadInfo;
 
             const string url = "https://proapi.115.com/app/uploadinfo";
-
-            return await SendAsync<UploadInfo>(HttpMethod.Get, url);
+            _uploadInfo = await Client.SendAsync<UploadInfo>(HttpMethod.Get, url);;
+            return _uploadInfo;
         }
 
         public async Task<OfflineSpaceInfo> GetOfflineSpaceInfo(string userKey, int userId)
@@ -971,7 +973,7 @@ namespace Display.Data
 
             var url = $"https://115.com/?ct=offline&ac=space&sign={userKey}&time={tm / 1000}&user_id={userId}&_={tm}";
 
-            return await SendAsync<OfflineSpaceInfo>(HttpMethod.Get, url);
+            return await Client.SendAsync<OfflineSpaceInfo>(HttpMethod.Get, url);
         }
 
 
@@ -1004,7 +1006,7 @@ namespace Display.Data
                 }
             }
 
-            return await SendAsync<AddTaskUrlInfo>(HttpMethod.Get, url, content);
+            return await Client.SendAsync<AddTaskUrlInfo>(HttpMethod.Get, url, content);
         }
 
 
@@ -1347,8 +1349,8 @@ namespace Display.Data
             await Client.GetAsync(url);
 
             //清空账号信息
-            isEnterHiddenMode = false;
-            QRCodeInfo = null;
+            IsEnterHiddenMode = false;
+            QrCodeInfo = null;
             UserInfo = null;
             DeleteCookie();
         }
@@ -1420,7 +1422,7 @@ namespace Display.Data
             }
 
             string src = $"{{\"pickcode\":\"{pickCode}\"}}";
-            var item = m115.encode(src, tm);
+            var item = M115.Encode(src, tm);
             byte[] data = item.Item1;
             byte[] keyBytes = item.Item2;
 
@@ -1435,7 +1437,7 @@ namespace Display.Data
                 Headers = { ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded") }
             };
 
-            var downUrlBase64EncryptInfo = await SendAsync<DownUrlBase64EncryptInfo>(HttpMethod.Post, url,content);
+            var downUrlBase64EncryptInfo = await Client.SendAsync<DownUrlBase64EncryptInfo>(HttpMethod.Post, url,content);
 
             if (downUrlBase64EncryptInfo is { state: true })
             {
@@ -1443,7 +1445,7 @@ namespace Display.Data
 
                 var srcBase64 = Convert.FromBase64String(base64Text);
 
-                var rep = m115.decode(srcBase64, keyBytes);
+                var rep = M115.Decode(srcBase64, keyBytes);
 
                 //JObject json = JsonConvert.DeserializeObject<JObject>(rep);
                 var json = JObject.Parse(rep);
@@ -1475,68 +1477,7 @@ namespace Display.Data
             return downUrlList;
         }
 
-        /// <summary>
-        /// PotPlayer播放（原画）
-        /// </summary>
-        /// <param name="playItems"></param>
-        /// <param name="userAgent"></param>
-        /// <param name="fileName"></param>
-        /// <param name="quality"></param>
-        /// <param name="showWindow"></param>
-        /// <param name="referrerUrl"></param>
-        public static async void Play115SourceVideoWithPotPlayer(List<MediaPlayItem> playItems, string userAgent, string fileName, Const.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
-        {
-            var isFirst = true;
-            foreach (var mediaPlayItem in playItems)
-            {
-                var downUrl = await mediaPlayItem.GetUrl(quality);
-                var subFile = await mediaPlayItem.GetOneSubFilePath();
-                var addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty : @$" /sub=""{subFile}""";
-                var arguments = @$" ""{downUrl}"" /user_agent=""{userAgent}"" /referer=""{referrerUrl}""{addSubFile}";
 
-                if (isFirst)
-                {
-                    isFirst = false;
-                    arguments += " /current";
-                    StartProcess(fileName, arguments, exitedHandler: Process_Exited);
-                    await Task.Delay(10000);
-                }
-                else
-                {
-                    arguments += " /add";
-                    StartProcess(fileName, arguments, showWindow);
-                    await Task.Delay(1000);
-                }
-            }
-        }
-
-        private static async void StartProcess(string fileName, string arguments, bool showWindow = false,EventHandler exitedHandler = null)
-        {
-            using var process = new Process();
-            process.StartInfo.FileName = fileName;
-            process.StartInfo.Arguments = arguments;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = !showWindow;
-            if (exitedHandler != null)
-            {
-                process.Exited += exitedHandler;
-            }
-            try
-            {
-                process.Start();
-                await process.WaitForExitAsync();
-            }
-            catch (Win32Exception e)
-            {
-                Toast.tryToast("播放错误", "调用播放器时出现异常", e.Message);
-            }
-
-        }
-
-        private static void Process_Exited(object sender, EventArgs e)
-        {
-            Debug.WriteLine("Process_Exited");
-        }
 
         /// <summary>
         /// 解析m3u8内容
@@ -1652,81 +1593,7 @@ namespace Display.Data
                 ;
         }
 
-        /// <summary>
-        /// mpv播放
-        /// </summary>
-        /// <param name="playItems"></param>
-        /// <param name="userAgent"></param>
-        /// <param name="fileName"></param>
-        /// <param name="quality"></param>
-        /// <param name="showWindow"></param>
-        /// <param name="referrerUrl"></param>
-        public async void Play115SourceVideoWithMpv(List<MediaPlayItem> playItems, string userAgent, string fileName, Const.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
-        {
-            var arguments = string.Empty;
-            foreach (var mediaPlayItem in playItems)
-            {
-                var playUrl = await mediaPlayItem.GetUrl(quality);
-                var title = mediaPlayItem.Title;
-                var subFile = await mediaPlayItem.GetOneSubFilePath();
 
-                var addTitle = string.Empty;
-                if (string.IsNullOrEmpty(title))
-                {
-                    var matchTitle = Regex.Match(HttpUtility.UrlDecode(playUrl), @"/([-@.\w]+?\.\w+)\?t=");
-                    if (matchTitle.Success)
-                        title = matchTitle.Groups[1].Value;
-                }
-
-                if(!string.IsNullOrEmpty(title))
-                    addTitle = @$"  --title=""播放 - {title}""";
-
-                var addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty : @$" --sub-file=""{subFile}""";
-
-                arguments += " --{" + @$" ""{playUrl}"" --referrer=""{referrerUrl}"" --user-agent=""{userAgent}"" --force-media-title=""{mediaPlayItem.FileName}""{addTitle}{addSubFile}" + " --}";
-            }
-
-            StartProcess(fileName, arguments, showWindow);
-
-        }
-
-        /// <summary>
-        /// vlc播放（原画）
-        /// </summary>
-        /// <param name="playItems"></param>
-        /// <param name="userAgent"></param>
-        /// <param name="fileName"></param>
-        /// <param name="quality"></param>
-        /// <param name="showWindow"></param>
-        /// <param name="referrerUrl"></param>
-        public static async void Play115SourceVideoWithVlc(List<MediaPlayItem> playItems, string userAgent, string fileName, Const.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
-        {
-            var arguments = string.Empty;
-            foreach (var mediaPlayItem in playItems)
-            {
-                var playUrl = await mediaPlayItem.GetUrl(quality);
-                var title = mediaPlayItem.Title;
-                var subFile = await mediaPlayItem.GetOneSubFilePath();
-
-                var addTitle = string.Empty;
-                if (string.IsNullOrEmpty(title))
-                {
-                    var matchTitle = Regex.Match(HttpUtility.UrlDecode(playUrl), @"/([-@.\w]+?\.\w+)\?t=");
-                    if (matchTitle.Success)
-                        addTitle = matchTitle.Groups[1].Value;
-                }
-
-                if (!string.IsNullOrEmpty(title))
-                {
-                    addTitle = @$" :meta-title=""{title}""";
-                }
-                var addSubFile = string.IsNullOrEmpty(subFile) ? string.Empty : @$" :sub-file=""{subFile}""";
-
-                arguments += @$" ""{playUrl}"" :http-referrer=""{referrerUrl}"" :http-user-agent=""{userAgent}""{addTitle}{addSubFile}";
-            }
-
-            StartProcess(fileName, arguments,showWindow);
-        }
 
         public enum PlayMethod { Pot, Mpv, Vlc }
 
@@ -1809,14 +1676,14 @@ namespace Display.Data
             switch (playMethod)
             {
                 case PlayMethod.Pot:
-                    Play115SourceVideoWithPotPlayer(playItems, userAgent: ua, savePath, quality, true);
+                    PlayVideoHelper.Play115SourceVideoWithPotPlayer(playItems, userAgent: ua, savePath, quality, true);
                     break;
                 case PlayMethod.Mpv:
-                    Play115SourceVideoWithMpv(playItems, userAgent: ua, savePath, quality, false);
+                    PlayVideoHelper.Play115SourceVideoWithMpv(playItems, userAgent: ua, savePath, quality, false);
                     break;
                 case PlayMethod.Vlc:
                     //vlc不支持带“; ”的user-agent
-                    Play115SourceVideoWithVlc(playItems, userAgent: ua, savePath, quality, false);
+                    PlayVideoHelper.Play115SourceVideoWithVlc(playItems, userAgent: ua, savePath, quality, false);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(playMethod), playMethod, null);
@@ -1847,7 +1714,7 @@ namespace Display.Data
 
             var subUrl = subUrlList.First().Value;
 
-            subFile = await GetInfoFromNetwork.downloadFile(subUrl, subSavePath, fileName, false, new Dictionary<string, string>
+            subFile = await GetInfoFromNetwork.DownloadFile(subUrl, subSavePath, fileName, false, new Dictionary<string, string>
             {
                 {"User-Agent", ua }
             });

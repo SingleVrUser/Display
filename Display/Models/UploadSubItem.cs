@@ -7,8 +7,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Display.Services;
 using CommunityToolkit.Mvvm.Input;
+using Display.Services.Upload;
 
 namespace Display.Models
 {

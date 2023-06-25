@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Display.Helper
+namespace Display.Helper.Crypto
 {
     public static class Crc32Helper
     {
@@ -18,7 +18,7 @@ namespace Display.Helper
             {
                 var crc = i;
                 for (var j = 8; j > 0; --j)
-                    crc = (crc & 1) == 1 ? poly ^ (crc >> 1) : crc >> 1;
+                    crc = (crc & 1) == 1 ? poly ^ crc >> 1 : crc >> 1;
                 CrcTable[i] = crc;
             }
         }
@@ -27,7 +27,7 @@ namespace Display.Helper
         {
             var crc = uint.MaxValue;
             foreach (var t in bytes)
-                crc = CrcTable[(crc ^ t) & 0xff] ^ (crc >> 8);
+                crc = CrcTable[(crc ^ t) & 0xff] ^ crc >> 8;
             return ~crc;
         }
         public static byte[] CalcCrc32(byte[] bytes)

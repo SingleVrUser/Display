@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Display.Extensions;
 
-namespace Display.Helper
+namespace Display.Helper.Crypto
 {
     public static class HashHelper
     {

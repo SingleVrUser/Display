@@ -110,7 +110,7 @@ namespace Display
                 isNormal = false;
             }
             //数据文件不存在
-            else if (!File.Exists(DataAccess.dbpath))
+            else if (!File.Exists(DataAccess.DbPath))
             {
                 DataAccess.tryCreateDBFile(dataAccessSavePath);
 

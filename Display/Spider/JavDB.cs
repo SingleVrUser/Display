@@ -303,7 +303,7 @@ public class JavDB
         string SavePath = AppSettings.ImageSavePath;
         string filePath = Path.Combine(SavePath, CID);
         videoInfo.imageurl = ImageUrl;
-        videoInfo.imagepath = await GetInfoFromNetwork.downloadFile(ImageUrl, filePath, CID);
+        videoInfo.imagepath = await GetInfoFromNetwork.DownloadFile(ImageUrl, filePath, CID);
 
         //样品图片
         var preview_imagesSingesNode = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class,'preview-images')]");

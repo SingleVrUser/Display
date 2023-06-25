@@ -74,7 +74,7 @@ namespace Display.ContentsPage
                     break;
                 }
                 //二维码已更新
-                else if (qrcodeInfo.data.uid != WebApi.QRCodeInfo.data.uid)
+                else if (qrcodeInfo.data.uid != WebApi.QrCodeInfo.data.uid)
                 {
                     return;
                 }

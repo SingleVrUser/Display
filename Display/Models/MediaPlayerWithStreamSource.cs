@@ -7,9 +7,9 @@ using Windows.Media.Playback;
 using Display.Data;
 using Windows.Media.Core;
 using Windows.Media.Streaming.Adaptive;
-using Display.Helper;
 using System.Text;
 using HttpClient = Windows.Web.Http.HttpClient;
+using Display.Helper.Encode;
 
 namespace Display.Models
 {

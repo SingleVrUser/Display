@@ -155,7 +155,7 @@
 
             <ToggleSwitch x:Name="modifyToggleSwitch" Toggled="modifyToggleSwitch_Toggled" OnContent="添加" OffContent="修改" RelativePanel.AlignRightWithPanel="True" MinWidth="0" Margin="10,0,0,0" IsOn="True"/>
 
-            <StackPanel Visibility="{x:Bind isShowFailList(failList),Mode=OneWay}" Orientation="Horizontal" RelativePanel.LeftOf="modifyToggleSwitch" RelativePanel.AlignVerticalCenterWithPanel="True">
+            <StackPanel Visibility="{x:Bind local:AddActorCover.IsShowFailList(failList),Mode=OneWay}" Orientation="Horizontal" RelativePanel.LeftOf="modifyToggleSwitch" RelativePanel.AlignVerticalCenterWithPanel="True">
                 <HyperlinkButton Content="失败列表" Click="HyperlinkButton_Click">
                     <FlyoutBase.AttachedFlyout>
                         <Flyout>

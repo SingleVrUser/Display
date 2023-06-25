@@ -1,6 +1,6 @@
 ﻿using Display.Data;
 using Display.Extensions;
-using Display.Helper;
+using Display.Helper.Crypto;
 using Display.Models;
 using Newtonsoft.Json.Linq;
 using System;
@@ -14,9 +14,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Display.Services
+namespace Display.Services.Upload
 {
-    internal class FileUpload: UploadBase
+    internal class FileUpload : UploadBase
     {
         private const string AppVer = Const.DefaultSettings.Network._115.UploadAppVersion;
 
@@ -146,6 +146,17 @@ namespace Display.Services
             return await UploadFile();
         }
 
+        /// <summary>
+        /// 暂停后重新开始上传
+        /// </summary>
+        /// <returns></returns>
+        public async Task Resume()
+        {
+            await _aliyunOss.Init();
+
+            await StartUpload();
+        }
+
         public override void Pause()
         {
             _aliyunOss?.Pause();
@@ -157,7 +168,6 @@ namespace Display.Services
 
             State = UploadState.Canceled;
         }
-
 
         public async Task<bool> UploadFile()
         {
@@ -266,7 +276,7 @@ namespace Display.Services
             return null;
         }
 
-        private static async Task<Upload115Result> GetUpload115Result(Dictionary<string, string> dataForm, long timeSpan, byte[] aesKey, byte[] aesIv, byte[] clientPublicKey,CancellationToken token)
+        private static async Task<Upload115Result> GetUpload115Result(Dictionary<string, string> dataForm, long timeSpan, byte[] aesKey, byte[] aesIv, byte[] clientPublicKey, CancellationToken token)
         {
             var sendData = UploadEncryptHelper.GetData(dataForm, aesKey, aesIv);
             var kec = UploadEncryptHelper.GetKEc(clientPublicKey, timeSpan);
@@ -280,7 +290,7 @@ namespace Display.Services
                 }
             };
 
-            var response = await Client.SendAsync(request,token);
+            var response = await Client.SendAsync(request, token);
 
             if (!response.IsSuccessStatusCode) return null;
 
@@ -314,16 +324,15 @@ namespace Display.Services
 
             return await StartUpload();
         }
+
         private async Task<bool> StartUpload()
         {
             var result = await _aliyunOss.Start();
 
-            // 成功
-            if (result) await DisposeAsync();
-            else if (State == UploadState.Faulted) await DisposeAsync();
+            if (State is UploadState.Succeed or UploadState.Faulted) await DisposeAsync();
 
             return result;
         }
-        
+
     }
 }

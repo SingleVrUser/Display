@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Display.Services
+namespace Display.Services.Upload
 {
-    internal abstract class UploadBase:IUpload<bool>
+    internal abstract class UploadBase : IUpload<bool>
     {
         private long _position;
         private long _length;

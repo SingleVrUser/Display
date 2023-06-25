@@ -188,7 +188,7 @@ public class Jav321
             string SavePath = AppSettings.ImageSavePath;
             string filePath = Path.Combine(SavePath, cid);
             videoInfo.imageurl = ImageUrl;
-            videoInfo.imagepath = await GetInfoFromNetwork.downloadFile(ImageUrl, filePath, cid);
+            videoInfo.imagepath = await GetInfoFromNetwork.DownloadFile(ImageUrl, filePath, cid);
         }
         //（接受无封面）
 

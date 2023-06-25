@@ -1,24 +1,14 @@
 ﻿using Display.Models;
-using Org.BouncyCastle.Asn1.Sec;
-using Org.BouncyCastle.Crypto.Agreement;
-using Org.BouncyCastle.Crypto.Generators;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Security;
+using K4os.Compression.LZ4;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using Org.BouncyCastle.Math;
-using K4os.Compression.LZ4;
-using Newtonsoft.Json;
-using Microsoft.UI.Xaml.Controls;
 
-namespace Display.Helper
+namespace Display.Helper.Crypto
 {
     internal static class UploadEncryptHelper
     {
@@ -71,7 +61,7 @@ namespace Display.Helper
             aes.Padding = PaddingMode.None;
 
             using var decryption = aes.CreateDecryptor(aes.Key, aes.IV);
-            
+
             return decryption.TransformFinalBlock(cipherText, 0, cipherText.Length); ;
         }
 
@@ -147,7 +137,7 @@ namespace Display.Helper
             return s;
         }
 
-        public static string GetToken(string fileId, long fileSize, string signKey, string signVal, long timeSpan, int userId, string userIdMd5,string appVer)
+        public static string GetToken(string fileId, long fileSize, string signKey, string signVal, long timeSpan, int userId, string userIdMd5, string appVer)
         {
             // token(md5格式)
             var token = $"{Md5Salt}{fileId}{fileSize}{signKey}{signVal}{userId}{timeSpan}{userIdMd5}{appVer}";

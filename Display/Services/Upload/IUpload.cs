@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Display.Services
+namespace Display.Services.Upload
 {
     internal interface IUpload<T> : IDisposable, IAsyncDisposable
     {

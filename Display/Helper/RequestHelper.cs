@@ -1,15 +1,10 @@
-﻿using System;
+﻿using Display.Data;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ABI.Microsoft.UI.Xaml;
-using Display.Data;
-using Display.Models;
-using Newtonsoft.Json;
-using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace Display.Helper;
 
@@ -18,11 +13,10 @@ public class RequestHelper
     public static async Task<Tuple<string, string>> RequestHtml(HttpClient client, string url, int maxRequestCount = 5)
     {
         // 访问
-        HttpResponseMessage response;
-        string strResult = string.Empty;
+        var strResult = string.Empty;
 
         Tuple<string, string> tuple = null;
-        string RequestUrl = string.Empty;
+        var requestUrl = string.Empty;
 
         for (int i = 0; i < maxRequestCount; i++)
         {
@@ -31,9 +25,9 @@ public class RequestHelper
                 //设置超时时间（5s）
                 var option = new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token;
 
-                response = await client.GetAsync(new Uri(url), option);
+                var response = await client.GetAsync(new Uri(url), option);
 
-                RequestUrl = response.RequestMessage.RequestUri.ToString();
+                requestUrl = response.RequestMessage?.RequestUri?.ToString();
 
                 if (response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.Found)
                 {
@@ -42,8 +36,9 @@ public class RequestHelper
 
                     break;
                 }
+
                 //JavDb访问Fc2需要登录，如果cookie失效，就无法访问
-                else if (response.StatusCode == System.Net.HttpStatusCode.BadGateway)
+                if (response.StatusCode == System.Net.HttpStatusCode.BadGateway)
                 {
                     if (url.Contains(AppSettings.JavDbBaseUrl))
                         GetInfoFromNetwork.IsJavDbCookieVisible = false;
@@ -60,8 +55,8 @@ public class RequestHelper
             }
         }
 
-        if (!string.IsNullOrEmpty(RequestUrl) && !string.IsNullOrEmpty(strResult))
-            tuple = new(RequestUrl, strResult);
+        if (!string.IsNullOrEmpty(requestUrl) && !string.IsNullOrEmpty(strResult))
+            tuple = new Tuple<string, string>(requestUrl, strResult);
 
         return tuple;
     }
@@ -69,8 +64,7 @@ public class RequestHelper
     public static async Task<Tuple<string, string>> PostHtml(HttpClient client, string url, Dictionary<string, string> values, int maxRequestCount = 5)
     {
         // 访问
-        HttpResponseMessage response;
-        string strResult = string.Empty;
+        var strResult = string.Empty;
 
         Tuple<string, string> tuple = null;
 
@@ -78,13 +72,13 @@ public class RequestHelper
 
         var content = new FormUrlEncodedContent(values);
 
-        for (int i = 0; i < maxRequestCount; i++)
+        for (var i = 0; i < maxRequestCount; i++)
         {
             try
             {
-                response = client.PostAsync(url, content).Result;
+                var response = client.PostAsync(url, content).Result;
 
-                requestUrl = response.RequestMessage.RequestUri.ToString();
+                requestUrl = response.RequestMessage?.RequestUri?.ToString();
 
                 if (!response.IsSuccessStatusCode) continue;
 
@@ -104,7 +98,7 @@ public class RequestHelper
         }
 
         if (!string.IsNullOrEmpty(requestUrl) && !string.IsNullOrEmpty(strResult))
-            tuple = new(requestUrl, strResult);
+            tuple = new Tuple<string, string>(requestUrl, strResult);
 
         return tuple;
     }
@@ -122,4 +116,6 @@ public class RequestHelper
 
         return email;
     }
+
+
 }

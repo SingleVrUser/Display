@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace Display.Helper
+namespace Display.Helper.Encode
 {
     public class FileEncodingHelper
     {

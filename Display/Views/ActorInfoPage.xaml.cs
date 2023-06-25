@@ -169,7 +169,7 @@ namespace Display.Views
                 //    Content = newPage
                 //};
 
-                PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, videoInfo.truename, this.XamlRoot);
+                PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, XamlRoot);
             }
         }
 
@@ -180,7 +180,7 @@ namespace Display.Views
             if (sender is not ListView { DataContext: string trueName }) return;
             
             var mediaPlayItem = new MediaPlayItem(singleVideoInfo.pc, trueName, FilesInfo.FileType.File);
-            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
+            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, XamlRoot, lastPage: this);
         }
 
         private async void SingleVideoPlayClick(object sender, RoutedEventArgs e)
