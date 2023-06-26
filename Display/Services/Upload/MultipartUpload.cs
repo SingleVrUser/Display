@@ -117,9 +117,9 @@ namespace Display.Services.Upload
 
             Stream.Seek(position, SeekOrigin.Begin);
 
-            int readSize = (int)_partSize;
+            var readSize = (int)_partSize;
             var isSucceed = true;
-            for (int i = CurrentCompletedPartNum + 1; i <= _partCount; i++)
+            for (var i = CurrentCompletedPartNum + 1; i <= _partCount; i++)
             {
                 if (Token.IsCancellationRequested) return null;
 

@@ -107,8 +107,10 @@ namespace Display.Models
                     Content = "上传失败";
                     UploadButtonVisibility = Visibility.Collapsed;
                     ProgressShowError = true;
-                    Running = false;
+
+                    // Running在后，Running改变后有Action
                     IsFinish = true;
+                    Running = false;
                     break;
                 case UploadState.Succeed:
                     Debug.WriteLine("上传成功");
@@ -117,8 +119,10 @@ namespace Display.Models
                     UploadButtonVisibility = Visibility.Collapsed;
                     PauseButtonVisibility = Visibility.Collapsed;
                     DeleteButtonVisibility = Visibility.Visible;
-                    Running = false;
+
+                    // Running在后，Running改变后有Action
                     IsFinish = true;
+                    Running = false;
                     break;
             }
         }
@@ -168,7 +172,6 @@ namespace Display.Models
             }
         }
         public event Action<bool> RunChanged;
-
 
         public event Action<FileUploadResult> UploadFinish;
 
