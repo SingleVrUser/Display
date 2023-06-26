@@ -89,7 +89,7 @@ public sealed partial class MainPage : Page
         //var maxPlayCount = AppSettings.IsDefaultPlaySingleVideo ? 1 : MaxCanPlayCount;
         var maxPlayCount = MaxCanPlayCount;
 
-        var videoList = filesInfos.Where(item => item.Type == FilesInfo.FileType.File && item.datum.iv == 1)
+        var videoList = filesInfos.Where(item => item.Type == FilesInfo.FileType.File && item.IsVideo)
             .Take(maxPlayCount).ToList();
         var videoCount = videoList.Count;
 
@@ -299,9 +299,9 @@ public sealed partial class MainPage : Page
     private async Task<string> GetVideoUrl(FilesInfo file)
     {
         string videoUrl = null;
-        var pickCode = file.datum.pc;
+        var pickCode = file.PickCode;
         //转码成功，可以用m3u8
-        if (file.datum.vdi != 0)
+        if (file.Datum.vdi != 0)
         {
             var m3U8Infos = await webApi.GetM3U8InfoByPickCode(pickCode);
 
@@ -399,7 +399,7 @@ public sealed partial class MainPage : Page
 
             if (sender.PlaybackSession.NaturalVideoHeight > 2000)
             {
-                _highBitRateVideos.Add(file.datum.pc);
+                _highBitRateVideos.Add(file.PickCode);
             }
 
             DispatcherQueue.TryEnqueue(() =>
@@ -625,7 +625,7 @@ public sealed partial class MainPage : Page
 
         // 文件 fid
         // 文件夹 cid
-        var fid = isFile ? fileInfo.Fid : fileInfo.Cid;
+        var fid = fileInfo.Id;
 
         //移除播放列表
         if (FilesInfos.Contains(fileInfo)) FilesInfos.Remove(fileInfo);
@@ -640,7 +640,7 @@ public sealed partial class MainPage : Page
         // 文件夹
         else
         {
-            var playList = PlayingVideoInfos.Where(info => info.Cid == fileInfo.Cid).ToList();
+            var playList = PlayingVideoInfos.Where(info => info.Id == fid).ToList();
 
             playList.ForEach(info =>
             {
@@ -685,9 +685,9 @@ public sealed partial class MainPage : Page
                 Debug.WriteLine("Remove mediaPlayerElement succeed");
             }
 
-            if (_highBitRateVideos.Contains(oldMediaPlayerWithStreamSource.FilesInfo.datum.pc))
+            if (_highBitRateVideos.Contains(oldMediaPlayerWithStreamSource.FilesInfo.PickCode))
             {
-                _highBitRateVideos.Remove(oldMediaPlayerWithStreamSource.FilesInfo.datum.pc);
+                _highBitRateVideos.Remove(oldMediaPlayerWithStreamSource.FilesInfo.PickCode);
             }
 
             Debug.WriteLine("成功移除正在播放的视频");
@@ -737,8 +737,8 @@ public sealed partial class MainPage : Page
 
             filesInfo.ForEach(item => filesInfos.Remove(item));
 
-            await webApi.DeleteFiles(filesInfo.FirstOrDefault()?.datum.pid,
-                filesInfo.Select(item => item.Fid).ToList());
+            await webApi.DeleteFiles(filesInfo.FirstOrDefault()?.Cid,
+                filesInfo.Select(item => item.Id).ToList());
         }
     }
 
@@ -796,7 +796,7 @@ public sealed partial class MainPage : Page
         FilesInfos.Clear();
         foreach (var info in filesInfos)
         {
-            //if (info.Type == FilesInfo.FileType.File && info.datum.iv == 1)
+            //if (info.Type == FilesInfo.FileType.File && info.IsVideo)
 
             FilesInfos.Add(info);
         }
@@ -877,7 +877,7 @@ public sealed partial class MainPage : Page
     private MediaPlayerElement GetFirstElementPlayPickCode(string pc)
     {
         var media = Video_UniformGrid.Children.FirstOrDefault(item =>
-            ((item as MediaPlayerElement)?.Tag as MediaPlayerWithStreamSource)?.FilesInfo.datum.pc == pc);
+            ((item as MediaPlayerElement)?.Tag as MediaPlayerWithStreamSource)?.FilesInfo.PickCode == pc);
         if (media == null || media is not MediaPlayerElement mediaPlayerElement) return null;
 
         return mediaPlayerElement;
@@ -890,17 +890,17 @@ public sealed partial class MainPage : Page
     private async Task TryRemoveCurrentVideoAndPlayNextVideo(FilesInfo removeFileInfo)
     {
         // 即将删除的视频所属控件
-        var mediaPlayerElement = GetFirstElementPlayPickCode(removeFileInfo.datum.pc);
+        var mediaPlayerElement = GetFirstElementPlayPickCode(removeFileInfo.PickCode);
 
         if (mediaPlayerElement == null) return;
 
         //正在播放的文件的pc
         var playingPcList = Video_UniformGrid.Children.Select(element =>
-            ((element as MediaPlayerElement)?.Tag as MediaPlayerWithStreamSource)?.FilesInfo.datum.pc).ToList();
+            ((element as MediaPlayerElement)?.Tag as MediaPlayerWithStreamSource)?.FilesInfo.PickCode).ToList();
 
         // 挑选播放列表中不是正在播放的视频
         // 删除的一般只有一个，只取一个
-        var videoInfo = FilesInfos.FirstOrDefault(item => item.datum.iv == 1 && !playingPcList.Contains(item.datum.pc));
+        var videoInfo = FilesInfos.FirstOrDefault(item => item.IsVideo && !playingPcList.Contains(item.PickCode));
 
         if (videoInfo != null)
         {
@@ -1019,7 +1019,7 @@ public sealed partial class MainPage : Page
         if (sender is not MenuFlyoutItem { DataContext: FilesInfo fileInfo }) return;
 
         //获取正在播放该视频的控件
-        var oldMediaElement = GetFirstElementPlayPickCode(fileInfo.datum.pc);
+        var oldMediaElement = GetFirstElementPlayPickCode(fileInfo.PickCode);
         if (oldMediaElement == null) return;
 
         if (oldMediaElement.Tag is not MediaPlayerWithStreamSource oldMediaPlayerWithStreamSource) return;

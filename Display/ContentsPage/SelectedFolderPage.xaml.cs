@@ -87,14 +87,14 @@ namespace Display.ContentsPage
 
             foreach (var path in folderInfos.WebPaths)
             {
-                explorerItems.Add(new ExplorerItem { Name = path.name, Cid = path.cid });
+                explorerItems.Add(new ExplorerItem { Name = path.name, Id = path.cid });
             }
         }
 
         private void FolderBreadcrumbBar_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
         {
             if (args.Item is not ExplorerItem item) return;
-            var cid = item.Cid;
+            var cid = item.Id;
             if (string.IsNullOrEmpty(cid)) return;
 
             OpenFolder(cid);
@@ -142,7 +142,7 @@ namespace Display.ContentsPage
             var currentFolder = GetCurrentFolder();
             if (currentFolder != null)
             {
-                var makeDirResult = await WebApi.GlobalWebApi.RequestMakeDir(currentFolder.Cid, NewCreateFolderTextBox.Text);
+                var makeDirResult = await WebApi.GlobalWebApi.RequestMakeDir(currentFolder.Id, NewCreateFolderTextBox.Text);
                 if (makeDirResult == null) return;
 
                 folderInfos.Insert(0, new FilesInfo(new Datum() { cid = makeDirResult.cid, n = makeDirResult.cname }));

@@ -108,7 +108,7 @@ namespace Display.ContentsPage.OfflineDown
 
         public event EventHandler<RequestCompletedEventArgs> RequestCompleted;
 
-        private void UIElement_OnDragOver(object sender, DragEventArgs e)
+        private void RootGrid_OnDragOver(object sender, DragEventArgs e)
         {
             //获取拖入文件信息
             if (!e.DataView.Contains(StandardDataFormats.StorageItems)) return;
@@ -118,7 +118,7 @@ namespace Display.ContentsPage.OfflineDown
         }
 
 
-        private async void UIElement_OnDrop(object sender, DragEventArgs e)
+        private async void RootGrid_OnDrop(object sender, DragEventArgs e)
         {
             //获取拖入文件信息
             if (!e.DataView.Contains(StandardDataFormats.StorageItems)) return;

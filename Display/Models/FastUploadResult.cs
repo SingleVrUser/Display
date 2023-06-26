@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Display.Models
 {
-    public class Upload115Result
+    public class FastUploadResult
     {
         public string request { get; set; }
         public int status { get; set; }

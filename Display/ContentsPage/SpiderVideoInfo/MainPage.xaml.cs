@@ -180,7 +180,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
             selectFilesNameList.Add(explorer.Name);
 
             //文件夹下的文件和文件夹
-            var items = Explorer.GetFilesFromItems(explorer.Cid, FilesInfo.FileType.File);
+            var items = Explorer.GetFilesFromItems(explorer.Id, FilesInfo.FileType.File);
 
             datumList.AddRange(items);
         }
@@ -198,7 +198,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
         var itemInfo = e.ClickedItem as FilesInfo;
 
         if (FileInfoShow_Grid.Visibility == Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
-        SelectedDatum = itemInfo.datum;
+        SelectedDatum = itemInfo.Datum;
     }
 
     /// <summary>
@@ -324,7 +324,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
         if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
 
-        var mediaPlayItem = new MediaPlayItem(info.datum.pc, info.Name, FilesInfo.FileType.File);
+        var mediaPlayItem = new MediaPlayItem(info.PickCode, info.Name, FilesInfo.FileType.File);
         await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
     }
 
@@ -337,7 +337,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
         await Task.Delay(1);
 
 
-        var mediaPlayItem = new MediaPlayItem(info.datum.pc, info.Name, FilesInfo.FileType.File);
+        var mediaPlayItem = new MediaPlayItem(info.PickCode, info.Name, FilesInfo.FileType.File);
         await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this, playerSelection: playerSelection);
     }
 }

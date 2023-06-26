@@ -136,7 +136,7 @@ namespace Display.ViewModels
                 {
                     Debug.WriteLine("  匹配失败");
 
-                    info.Status = Status.error;
+                    info.Status = Status.Error;
 
                 }
             }
@@ -149,25 +149,25 @@ namespace Display.ViewModels
 
             foreach (var info in singleList)
             {
-                info.Status = Status.doing;
+                info.Status = Status.Doing;
 
-                singleFids.Add(info.Info.Fid);
+                singleFids.Add(info.Info.Id);
 
                 // 重命名
                 if (info.DestinationName == info.Info.NameWithoutExtension) continue;
 
-                var renameRequest = await webApi.RenameFile(info.Info.Fid, info.DestinationName);
+                var renameRequest = await webApi.RenameFile(info.Info.Id, info.DestinationName);
                 if (renameRequest == null)
                 {
-                    info.Status = Status.error;
+                    info.Status = Status.Error;
                 }
 
             }
             // 移动到
-            await webApi.MoveFiles(settings.SingleVideoSaveExplorerItem.Cid, singleFids);
-            foreach (var info in singleList.Where(info => info.Status != Status.error))
+            await webApi.MoveFiles(settings.SingleVideoSaveExplorerItem.Id, singleFids);
+            foreach (var info in singleList.Where(info => info.Status != Status.Error))
             {
-                info.Status = Status.success;
+                info.Status = Status.Success;
             }
 
             // 整理多集
@@ -176,22 +176,22 @@ namespace Display.ViewModels
                 var folderName = item.Key;
                 var fileInfo = item.Value;
                 
-                fileInfo.ForEach(x => x.Status = Status.doing);
+                fileInfo.ForEach(x => x.Status = Status.Doing);
 
                 // 新建文件夹
-                var makeDirResult = await webApi.RequestMakeDir(settings.MultipleVideoSaveExplorerItem.Cid, folderName);
+                var makeDirResult = await webApi.RequestMakeDir(settings.MultipleVideoSaveExplorerItem.Id, folderName);
                 if (makeDirResult == null)
                 {
-                    fileInfo.ForEach(x=>x.Status = Status.error);
+                    fileInfo.ForEach(x=>x.Status = Status.Error);
                     return;
                 }
 
                 // 移动到
-                await webApi.MoveFiles(makeDirResult.cid, fileInfo.Select(x=>x.Info.Fid).ToList());
+                await webApi.MoveFiles(makeDirResult.cid, fileInfo.Select(x=>x.Info.Id).ToList());
 
-                foreach (var info in fileInfo.Where(info => info.Status != Status.error))
+                foreach (var info in fileInfo.Where(info => info.Status != Status.Error))
                 {
-                    info.Status = Status.success;
+                    info.Status = Status.Success;
                 }
             }
         }

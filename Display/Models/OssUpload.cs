@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Display.Models
+﻿namespace Display.Models
 {
-    internal class MultipartUploadResult
+    public class OssUploadResult
     {
         public bool state { get; set; }
         public string message { get; set; }
         public int code { get; set; }
-        public Data data { get; set; }
+        public OssUploadResultData data { get; set; }
 
         public override string ToString()
         {
@@ -19,8 +13,7 @@ namespace Display.Models
         }
     }
 
-
-    public class Data
+    public class OssUploadResultData
     {
         public string pick_code { get; set; }
         public int file_size { get; set; }
@@ -32,7 +25,6 @@ namespace Display.Models
         public string cid { get; set; }
         public int is_video { get; set; }
     }
-
 
 
 }

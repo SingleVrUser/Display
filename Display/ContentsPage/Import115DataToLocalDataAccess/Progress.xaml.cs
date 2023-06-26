@@ -88,7 +88,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
         {
             currentWindow.Closed += CurrentWindow_Closed;
 
-            GetFolderCategory_Progress.status = Status.doing;
+            GetFolderCategory_Progress.status = Status.Doing;
 
             // 1.预准备，获取所有文件的全部信息（大小和数量）
             //1-1.获取数据
@@ -103,7 +103,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                     filesWithoutRootList.Add(info);
                     overallCount ++;
 
-                    FileCategoryCollection.Add(new FileCategory(info.datum));
+                    FileCategoryCollection.Add(new FileCategory(info.Datum));
                 }
                 // 文件夹
                 else
@@ -140,11 +140,11 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             //1-2.显示进度
             overallProgress.Maximum = overallCount;
             UpdateProgress();
-            GetFolderCategory_Progress.status = Status.success;
+            GetFolderCategory_Progress.status = Status.Success;
 
             // 2-1.显示进度
             GetInfos_Expander.Visibility = Visibility.Visible;
-            GetInfos_Progress.status = Status.doing;
+            GetInfos_Progress.status = Status.Doing;
             LeftTimeTip_TextBlock.Visibility = Visibility.Visible;
             UpdateLayout();
 
@@ -168,7 +168,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                     //全部完成
                     if (successCount == overallCount)
                     {
-                        GetInfos_Progress.status = Status.success;
+                        GetInfos_Progress.status = Status.Success;
 
                         //通知
                         tryToast("任务已完成", $"{overallCount}条数据添加进数据库 👏");
@@ -176,7 +176,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                     else
                     {
                         Fail_Expander.Visibility = Visibility.Visible;
-                        GetInfos_Progress.status = Status.pause;
+                        GetInfos_Progress.status = Status.Pause;
 
                         Fail_Expander.IsExpanded = true;
 
@@ -203,7 +203,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                 else
                 {
                     ErrorTeachingTip.IsOpen = true;
-                    GetInfos_Progress.status = Status.error;
+                    GetInfos_Progress.status = Status.Error;
                 }
 
                 _status = GetInfos_Progress.status;
@@ -232,7 +232,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                 WillStartSpiderTaskTip.IsOpen = false;
 
                 var fileNameList = FileCategoryCollection.Select(item => item.file_name).ToList();
-                var page = new SpiderVideoInfo.Progress(fileNameList, filesWithoutRootList.Select(x=>x.datum).ToList());
+                var page = new SpiderVideoInfo.Progress(fileNameList, filesWithoutRootList.Select(x=>x.Datum).ToList());
                 //创建搜刮进度窗口
                 page.CreateWindow();
             }
@@ -297,7 +297,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                 Content = "当前任务正在运行，确认返回上一页面？"
             };
 
-            if (_status == Status.doing)
+            if (_status == Status.Doing)
             {
                 var result = await dialog.ShowAsync();
                 if (result == ContentDialogResult.Primary)

@@ -222,7 +222,7 @@ namespace Display.Views
                         Directory.Delete(savePath, true);
                     }
 
-                    DetailInfo.isDeleted = Visibility.Visible;
+                    DetailInfo.IsDeleted = Visibility.Visible;
 
                     if (Frame.CanGoBack)
                     {

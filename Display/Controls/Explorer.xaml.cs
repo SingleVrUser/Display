@@ -109,7 +109,7 @@ namespace Display.Controls
                 {
                     Name = item.n,
                     Type = FilesInfo.FileType.Folder,
-                    Cid = item.cid,
+                    Id = item.cid,
                     HasUnrealizedChildren = hasUnrealizedChildren,
                     datum = item
                 };
@@ -129,7 +129,7 @@ namespace Display.Controls
         private void TreeView_ItemInvoked(TreeView sender, TreeViewItemInvokedEventArgs args)
         {
             var content = ((args.InvokedItem as TreeViewNode).Content as ExplorerItem);
-            var cid = content.Cid;
+            var cid = content.Id;
 
             //避免重复点击
             if (cid == _lastInvokedCid) return;
@@ -170,7 +170,7 @@ namespace Display.Controls
                 SelectFolderName.Add(new ExplorerItem()
                 {
                     Name = "根目录",
-                    Cid = "0"
+                    Id = "0"
 
                 });
             }
@@ -183,7 +183,7 @@ namespace Display.Controls
                     SelectFolderName.Add(new ExplorerItem()
                     {
                         Name = info.n,
-                        Cid = info.cid
+                        Id = info.cid
                     });
                 }
             }
@@ -212,7 +212,7 @@ namespace Display.Controls
                 foreach (TreeViewNode node in Nodechildrens)
                 {
                     //Content
-                    if (((ExplorerItem)node.Content).Cid == folderCid)
+                    if (((ExplorerItem)node.Content).Id == folderCid)
                     {
                         targertNode = node;
                         break;
@@ -265,12 +265,12 @@ namespace Display.Controls
 
                 if (_markShowPartFolderItemList.Count > 0)
                 {
-                    var currentCid = (args.Node.Content as ExplorerItem).Cid;
+                    var currentCid = (args.Node.Content as ExplorerItem).Id;
                     foreach (var item in _markShowPartFolderItemList)
                     {
                         //找到之前未加载完成的记录，
                         //即之前加载过了，无需重复加载
-                        if ((item.InsertNode.Content as ExplorerItem).Cid == currentCid)
+                        if ((item.InsertNode.Content as ExplorerItem).Id == currentCid)
                         {
                             ShowNumTextBlock.Visibility = Visibility.Visible;
                             ShowNumTip.Text = $"{item.ShowNum}/{item.LastFolderItem.Count}";
@@ -326,7 +326,7 @@ namespace Display.Controls
             }
             else
             {
-                itemsList = GetFilesFromItems(folder.Cid, FilesInfo.FileType.Folder);
+                itemsList = GetFilesFromItems(folder.Id, FilesInfo.FileType.Folder);
                 //itemsList = DataAccess.GetFolderListByPid(folder.Cid);
             }
 
@@ -392,7 +392,7 @@ namespace Display.Controls
                     {
                         Name = videoInfo.n,
                         Type = FilesInfo.FileType.Folder,
-                        Cid = videoInfo.cid,
+                        Id = videoInfo.cid,
                         datum = videoInfo
                     },
                     HasUnrealizedChildren = newNodeDict.Value,
@@ -513,7 +513,7 @@ namespace Display.Controls
                     while (SelectFolderName.Count > args.Index + 1)
                     {
                         SelectFolderName.RemoveAt(SelectFolderName.Count - 1);
-                        tryUpdataFolderInfo(item.Cid);
+                        tryUpdataFolderInfo(item.Id);
                     }
                 }
             }
@@ -533,12 +533,12 @@ namespace Display.Controls
         //点击了详情页的列表
         private void FilesInfoListView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var itemInfo = e.ClickedItem as FilesInfo;
+            if (e.ClickedItem is not FilesInfo itemInfo) return;
 
             //文件夹
-            if (string.IsNullOrEmpty(itemInfo.Fid))
+            if (itemInfo.Type == FilesInfo.FileType.Folder)
             {
-                tryUpdataFolderInfo(itemInfo.Cid);
+                tryUpdataFolderInfo(itemInfo.Id);
             }
 
             ItemClick?.Invoke(sender, e);
@@ -563,7 +563,7 @@ namespace Display.Controls
             var result = await dialog.ShowAsync();
             if (result == ContentDialogResult.Primary)
             {
-                deletedNodeAndDataAccessByCid(FolderTreeView.RootNodes, item.Cid);
+                deletedNodeAndDataAccessByCid(FolderTreeView.RootNodes, item.Id);
 
             }
         }
@@ -572,7 +572,7 @@ namespace Display.Controls
         {
             foreach (TreeViewNode node in Nodechildrens)
             {
-                if (((ExplorerItem)node.Content).Cid == cid)
+                if (((ExplorerItem)node.Content).Id == cid)
                 {
                     Nodechildrens.Remove(node);
                     DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(cid);

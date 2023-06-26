@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Windows.System;
+using Display.ContentsPage;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -46,7 +47,7 @@ namespace Display
         /// </summary>
         private void SetStyle()
         {
-            _appwindow = App.getAppWindow(this);
+            _appwindow = App.GetAppWindow(this);
 
             _appwindow.SetIcon(Path.Combine(Windows.ApplicationModel.Package.Current.InstalledLocation.Path, "Assets/pokeball.ico"));
 
@@ -265,14 +266,10 @@ namespace Display
 
             if (args.IsSettingsSelected)
             {
-                //NavView.Header = "设置";
-                //NavView.SelectedItem = (NavigationViewItem)NavView.SettingsItem;
                 NavView_Navigate("settings", args.RecommendedNavigationTransitionInfo);
             }
             else
             {
-                //NavView.Header = ((NavigationViewItem)NavView.SelectedItem)?.Content?.ToString();
-                //NavView.SelectedItem = args.SelectedItemContainer;
                 var navItemTag = args.SelectedItemContainer.Tag.ToString();
                 NavView_Navigate(navItemTag, args.RecommendedNavigationTransitionInfo);
             }
@@ -379,8 +376,8 @@ namespace Display
         /// <summary>
         /// 搜索框中的选项被选中
         /// </summary>
-        /// <param Name="sender"></param>
-        /// <param Name="args"></param>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private async void SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
             if (args.SelectedItem is string content && content.Contains("点击搜索资源"))
@@ -390,33 +387,11 @@ namespace Display
                 var searchContent = sender.Text;
                 if (string.IsNullOrEmpty(searchContent)) return;
 
-                var contentPage = new SearchLinkPage(searchContent);
+                var contentResult = await SearchLinkPage.ShowInContentDialog(searchContent, RootGrid.XamlRoot);
 
-                ContentDialog dialog = new()
+                if (!string.IsNullOrEmpty(contentResult))
                 {
-                    XamlRoot = RootGrid.XamlRoot,
-                    Title = "搜索结果",
-                    PrimaryButtonText = "下载选中",
-                    CloseButtonText = "返回",
-                    DefaultButton = ContentDialogButton.Primary,
-                    Content = contentPage
-                };
-
-                var result = await dialog.ShowAsync();
-
-                if (result == ContentDialogResult.Primary)
-                {
-                    if (string.IsNullOrEmpty(AppSettings.SavePath115Cid) ||
-                        string.IsNullOrEmpty(AppSettings.SavePath115Name))
-                    {
-                        ShowTeachingTip("未设置保存路径");
-                    }
-                    else
-                    {
-                        var isDownSuccess = await contentPage.OfflineDownSelectedLink();
-
-                        ShowTeachingTip(isDownSuccess ? "已下载到网盘中" : "下载失败");
-                    }
+                    ShowTeachingTip(contentResult);
                 }
 
                 return;
@@ -668,7 +643,7 @@ namespace Display
 
         private void TaskButtonClick(object sender, TappedRoutedEventArgs e)
         {
-
+            TaskPage.ShowSingleWindow();
         }
     }
 }

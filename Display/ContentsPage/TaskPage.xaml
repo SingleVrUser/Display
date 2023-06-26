@@ -9,8 +9,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:Display.Models"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    mc:Ignorable="d">
 
     <Page.Resources>
         <Style TargetType="FontIcon"
@@ -179,6 +178,8 @@
 
                             <StackPanel Grid.Column="2"
                                         Grid.RowSpan="3">
+
+                                <!--恢复下载-->
                                 <HyperlinkButton Visibility="{x:Bind UploadButtonVisibility,Mode=OneWay}"
                                                  Command="{x:Bind ResumeCommand}"
                                                  Margin="0">
@@ -187,6 +188,7 @@
                                               Style="{StaticResource CommonFontIconStyle}" />
                                 </HyperlinkButton>
 
+                                <!--暂停-->
                                 <HyperlinkButton Visibility="{x:Bind PauseButtonVisibility,Mode=OneWay}"
                                                  Command="{x:Bind PauseCommand}">
                                     <FontIcon FontFamily="Segoe Fluent Icons"
@@ -194,6 +196,7 @@
                                               Style="{StaticResource CommonFontIconStyle}" />
                                 </HyperlinkButton>
 
+                                <!--删除-->
                                 <HyperlinkButton Visibility="{x:Bind DeleteButtonVisibility,Mode=OneWay}"
                                                  Command="{x:Bind DeleteAsyncCommand}">
                                     <FontIcon FontFamily="Segoe Fluent Icons"

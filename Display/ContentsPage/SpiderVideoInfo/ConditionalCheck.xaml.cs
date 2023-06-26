@@ -105,7 +105,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             bool isAllSuccess = true;
             foreach (var item in ConditionCheckItems)
             {
-                item.Status = Status.doing;
+                item.Status = Status.Doing;
 
                 if (item.CheckUrl.Contains("http"))
                 {
@@ -114,11 +114,11 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     //网络有用
                     if (isUseful)
                     {
-                        item.Status = Status.success;
+                        item.Status = Status.Success;
                     }
                     else
                     {
-                        item.Status = Status.error;
+                        item.Status = Status.Error;
                         isAllSuccess = false;
                     }
                 }
@@ -128,11 +128,11 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     bool isExistsImageSavePath = Directory.Exists(item.CheckUrl);
                     if (isExistsImageSavePath)
                     {
-                        item.Status = Status.success;
+                        item.Status = Status.Success;
                     }
                     else
                     {
-                        item.Status = Status.error;
+                        item.Status = Status.Error;
                     }
                 }
 
@@ -140,11 +140,11 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             if (isAllSuccess)
             {
-                tryUpdateLastPageStatus(Status.success);
+                tryUpdateLastPageStatus(Status.Success);
             }
             else
             {
-                tryUpdateLastPageStatus(Status.error);
+                tryUpdateLastPageStatus(Status.Error);
                 Error_TextBlock.Visibility = Visibility.Visible;
             }
 
@@ -182,7 +182,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
         public string Condition { get; set; }
         public string CheckUrl { get; set; }
 
-        private Status _status = Status.beforeStart;
+        private Status _status = Status.BeforeStart;
         public Status Status
         {
             get => _status;

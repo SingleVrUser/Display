@@ -159,7 +159,6 @@
                                         Icon="Sort"
                                         Tapped="TaskButtonClick">
                     </NavigationViewItem>
-
                 </StackPanel>
             </NavigationView.PaneFooter>
 

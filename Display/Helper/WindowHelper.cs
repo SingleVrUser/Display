@@ -50,10 +50,10 @@ namespace Display.Helper
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        public static void ShowWindow(Window window)
+        public static void SetForegroundWindow(Window window)
         {
             // Bring the window to the foreground... first get the window handle...
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+            var hwnd = WindowNative.GetWindowHandle(window);
 
             // Restore window if minimized... requires DLL import above
             ShowWindow(hwnd, 0x00000009);

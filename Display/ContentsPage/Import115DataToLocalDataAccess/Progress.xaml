@@ -64,7 +64,7 @@
             <Expander.Header>
                 <RelativePanel MinWidth="200">
                     <TextBlock Text="获取数量" RelativePanel.AlignVerticalCenterWithPanel="True"/>
-                    <customcontrols:StatusShow x:Name="GetFolderCategory_Progress" status="doing" RelativePanel.AlignRightWithPanel="True"/>
+                    <customcontrols:StatusShow x:Name="GetFolderCategory_Progress" status="Doing" RelativePanel.AlignRightWithPanel="True"/>
                 </RelativePanel>
             </Expander.Header>
 
@@ -122,7 +122,7 @@
                             <TextBlock>请求速度（次/分钟）</TextBlock>
                         </ToolTipService.ToolTip>
                     </TextBlock>
-                    <customcontrols:StatusShow x:Name="GetInfos_Progress" status="doing" RelativePanel.AlignRightWithPanel="True"/>
+                    <customcontrols:StatusShow x:Name="GetInfos_Progress" status="Doing" RelativePanel.AlignRightWithPanel="True"/>
                 </RelativePanel>
             </Expander.Header>
 

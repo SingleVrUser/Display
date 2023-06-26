@@ -145,7 +145,7 @@ namespace Display.Helper.Crypto
             return tokenMd5;
         }
 
-        public static Upload115Result DecryptReceiveData(byte[] data, byte[] aesKey, byte[] aesIv)
+        public static FastUploadResult DecryptReceiveData(byte[] data, byte[] aesKey, byte[] aesIv)
         {
             var cipherText = new byte[data.Length - 12];
 
@@ -195,7 +195,7 @@ namespace Display.Helper.Crypto
 
             Debug.WriteLine($"最终结果: {content}");
 
-            var upload115Result = JsonConvert.DeserializeObject<Upload115Result>(content);
+            var upload115Result = JsonConvert.DeserializeObject<FastUploadResult>(content);
 
             return upload115Result;
         }

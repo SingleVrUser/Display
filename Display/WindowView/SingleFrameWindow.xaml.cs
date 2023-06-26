@@ -18,7 +18,7 @@ namespace Display.WindowView
             this.InitializeComponent();
 
             this.Title = "Display";
-            var appwindow = App.getAppWindow(this);
+            var appwindow = App.GetAppWindow(this);
             appwindow.SetIcon(Path.Combine(Package.Current.InstalledLocation.Path, "Assets/pokeball.ico"));
         }
 

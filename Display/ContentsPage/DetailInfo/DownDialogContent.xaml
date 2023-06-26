@@ -15,7 +15,7 @@
         <RelativePanel>
             <StackPanel Orientation="Horizontal" Spacing="10" RelativePanel.AlignRightWithPanel="True">
                 <TextBlock Text="下载方式" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <DropDownButton x:Name="DownMethodSelect_DropDownButton" Content="{x:Bind DownMethod,Mode=OneWay}">
+                <DropDownButton Content="{x:Bind DownMethod,Mode=OneWay}">
                     <DropDownButton.Flyout>
                         <MenuFlyout Placement="Bottom">
                             <MenuFlyoutItem Text="115" Click="Select_115"/>

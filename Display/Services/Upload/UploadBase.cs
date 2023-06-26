@@ -68,7 +68,7 @@ namespace Display.Services.Upload
 
         public abstract Task Stop();
 
-        public bool Running => State is UploadState.Initializing or UploadState.FastUploading or UploadState.MultipartUploading;
+        public bool Running => State is UploadState.Initializing or UploadState.FastUploading or UploadState.OssUploading;
 
         public event Action<long> PositionCallback;
         public event Action<int> ProgressChanged;
