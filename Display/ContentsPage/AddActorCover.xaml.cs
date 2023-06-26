@@ -170,7 +170,7 @@ namespace Display.ContentsPage
 
                 item.Status = info.Status;
 
-                if (item.Status == Status.error)
+                if (item.Status == Status.Error)
                 {
                     failList.Add(item.name);
                 }
@@ -181,7 +181,7 @@ namespace Display.ContentsPage
                 }
 
                 //完成
-                if (item.Status != Status.doing && actorinfo.Count == info.Index + 1)
+                if (item.Status != Status.Doing && actorinfo.Count == info.Index + 1)
                 {
                     progress_TextBlock.Text = $"任务已完成，耗时{FileMatch.ConvertDoubleToDateStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
                 }
@@ -220,7 +220,7 @@ namespace Display.ContentsPage
                 ProgressClass progressInfo = new()
                 {
                     Index = i,
-                    Status = Status.doing
+                    Status = Status.Doing
                 };
 
                 var item = actorInfos[i];
@@ -246,7 +246,7 @@ namespace Display.ContentsPage
 
                     if (IsNullOrEmpty(imageUrl))
                     {
-                        progressInfo.Status = Status.error;
+                        progressInfo.Status = Status.Error;
                         progress.Report(progressInfo);
                         continue;
                     }
@@ -255,14 +255,14 @@ namespace Display.ContentsPage
 
                     if (!downResult)
                     {
-                        progressInfo.Status = Status.error;
+                        progressInfo.Status = Status.Error;
                         progress.Report(progressInfo);
                         continue;
                     }
                 }
 
                 progressInfo.ImagePath = imageSavePath;
-                progressInfo.Status = Status.beforeStart;
+                progressInfo.Status = Status.BeforeStart;
                 progress.Report(progressInfo);
 
                 var actorId = DataAccess.GetActorIdByName(actorName);
@@ -553,7 +553,7 @@ namespace Display.ContentsPage
             //获取链接
             foreach (var item in actorinfo)
             {
-                item.Status = Status.doing;
+                item.Status = Status.Doing;
 
                 //演员名
                 var actorName = item.name;
@@ -572,7 +572,7 @@ namespace Display.ContentsPage
                 if (videoInfoList.Count == 0)
                 {
                     progress_TextBlock.Text = $"{actorName} - 无单体作品 - 跳过";
-                    item.Status = Status.success;
+                    item.Status = Status.Success;
                     continue;
                 }
 
@@ -629,7 +629,7 @@ namespace Display.ContentsPage
                 if (videoPlayUrl == Empty)
                 {
                     progress_TextBlock.Text = $"{actorName} - 未找到符合条件的视频";
-                    item.Status = Status.error;
+                    item.Status = Status.Error;
                     continue;
                 }
 
@@ -660,7 +660,7 @@ namespace Display.ContentsPage
                     }
                 }
 
-                item.Status = Status.beforeStart;
+                item.Status = Status.BeforeStart;
             }
 
             //结束

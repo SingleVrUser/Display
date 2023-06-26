@@ -235,9 +235,9 @@
                     <Grid x:Name="showImage">
                         <controls:ImageEx x:Name="CoverImage" Stretch="UniformToFill"
                                           Source="{x:Bind imagepath,Mode=OneWay}"
-                                          Width="{x:Bind imagewidth,Mode=OneWay}"
+                                          Width="{x:Bind ImageWidth,Mode=OneWay}"
                                           Height="{x:Bind imageheight,Mode=OneWay}"
-                                          DecodePixelWidth="{x:Bind imagewidth,Converter={StaticResource DoubleToInt32Converter},Mode=OneWay}"
+                                          DecodePixelWidth="{x:Bind ImageWidth,Converter={StaticResource DoubleToInt32Converter},Mode=OneWay}"
                                           DecodePixelHeight="{x:Bind imageheight,Converter={StaticResource DoubleToInt32Converter},Mode=OneWay}"/>
 
                         <RelativePanel>
@@ -270,7 +270,7 @@
                     <!--可操作按钮-->
                     <Grid Visibility="Collapsed"
                           Background="{StaticResource OperableGridBackground}"
-                          Width="{x:Bind imagewidth,Mode=OneWay}"
+                          Width="{x:Bind ImageWidth,Mode=OneWay}"
                           Height="{x:Bind imageheight,Mode=OneWay}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
@@ -388,7 +388,7 @@
                     </Grid>
 
                     <!--是否已删除-->
-                    <Grid Visibility="{x:Bind isDeleted,Mode=OneWay}">
+                    <Grid Visibility="{x:Bind IsDeleted,Mode=OneWay}">
                         <Grid.Background>
                             <SolidColorBrush Color="{ThemeResource SystemChromeAltHighColor}"
                                              Opacity="0.8" />
@@ -405,7 +405,7 @@
                 <Grid HorizontalAlignment="Center"
                       Margin="0,5,0,0"
                       Grid.Row="1"
-                      MaxWidth="{x:Bind imagewidth,Mode=OneWay}">
+                      MaxWidth="{x:Bind ImageWidth,Mode=OneWay}">
 
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
@@ -492,13 +492,13 @@
                     <Grid x:Name="showImage"
                           BorderThickness="2"
                           Padding="5">
-                        <Image MinWidth="{x:Bind imagewidth,Mode=OneWay}"
+                        <Image MinWidth="{x:Bind ImageWidth,Mode=OneWay}"
                                MinHeight="{x:Bind imageheight,Mode=OneWay}">
 
                         </Image>
                         <TextBlock Text="{x:Bind truename}"
                                    TextWrapping="Wrap"
-                                   MaxWidth="{x:Bind imagewidth,Mode=OneWay}" />
+                                   MaxWidth="{x:Bind ImageWidth,Mode=OneWay}" />
                     </Grid>
 
                     <!--可操作按钮-->
@@ -531,7 +531,7 @@
                 <Grid HorizontalAlignment="Center"
                       Margin="0,5,0,0"
                       Grid.Row="1"
-                      MaxWidth="{x:Bind imagewidth,Mode=OneWay}">
+                      MaxWidth="{x:Bind ImageWidth,Mode=OneWay}">
 
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />

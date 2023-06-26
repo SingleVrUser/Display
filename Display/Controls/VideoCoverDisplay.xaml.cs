@@ -379,7 +379,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         for (int i = 0; i < SuccessInfoCollection.Count; i++)
         {
-            SuccessInfoCollection[i].imagewidth = width;
+            SuccessInfoCollection[i].ImageWidth = width;
             SuccessInfoCollection[i].imageheight = height;
         }
 

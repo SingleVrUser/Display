@@ -17,7 +17,7 @@ namespace Display.Models
         private string _destinationPathName;
 
         [ObservableProperty]
-        private Status _status = Status.beforeStart;
+        private Status _status = Status.BeforeStart;
 
         public Sort115HomeModel(FilesInfo info)
         {

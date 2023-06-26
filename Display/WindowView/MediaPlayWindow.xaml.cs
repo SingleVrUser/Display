@@ -38,7 +38,7 @@ public sealed partial class MediaPlayWindow : Window
 
         _lastPage = lastPage;
 
-        _appwindow = App.getAppWindow(this);
+        _appwindow = App.GetAppWindow(this);
 
         MediaControl.InitLoad(playItems, this);
 

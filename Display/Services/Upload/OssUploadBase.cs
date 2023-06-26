@@ -3,15 +3,25 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Display.Helper;
 using HttpHeaders = Display.Data.Const.HttpHeaders;
+using System.Threading;
+using System.IO;
 
 namespace Display.Services.Upload
 {
-    internal class OssUploadBase
+    internal abstract class OssUploadBase:IDisposable
     {
-        protected readonly Uri EndpointUri;
+        private const string Endpoint = "http://oss-cn-shenzhen.aliyuncs.com";
+
+        private static string Data => DateTime.UtcNow.ToString(@"ddd, dd MMM yyyy HH:mm:ss G\MT",
+            CultureInfo.InvariantCulture);
+
         protected readonly HttpClient Client;
+        protected readonly FileStream Stream;
+        protected readonly Uri EndpointUri;
+        protected readonly long FileSize;
         protected readonly string AccessKeyId;
         protected readonly string AccessKeySecret;
         protected readonly string CallbackBase64;
@@ -21,38 +31,24 @@ namespace Display.Services.Upload
         protected readonly string SecurityToken;
         protected readonly string BaseUrl;
 
-        private static string Data => DateTime.UtcNow.ToString(@"ddd, dd MMM yyyy HH:mm:ss G\MT",
-            CultureInfo.InvariantCulture);
+        protected readonly CancellationTokenSource Cts = new();
+        protected CancellationToken Token => Cts.Token;
 
-        protected OssUploadBase(HttpClient client, string endpoint, string accessKeyId, string accessKeySecret, string securityToken, string bucketName, string objectName, string callbackBase64, string callbackVarBase64)
+        protected OssUploadBase(HttpClient client, FileStream stream, OssToken ossToken, FastUploadResult fastUploadResult)
         {
             Client = client;
-            EndpointUri = new Uri(endpoint);
-            AccessKeyId = accessKeyId;
-            AccessKeySecret = accessKeySecret;
-            SecurityToken = securityToken;
+            Stream = stream;
+            FileSize = stream.Length;
 
-            CallbackBase64 = callbackBase64;
-            CallbackVarBase64 = callbackVarBase64;
-            BucketName = bucketName;
-            ObjectName = objectName;
-
-            BaseUrl = $"http://{BucketName}.{EndpointUri.Authority}/{ObjectName}";
-        }
-
-        protected OssUploadBase(HttpClient client, string endpoint, OssToken ossToken, Upload115Result upload115Result)
-        {
-            Client = client;
-            EndpointUri = new Uri(endpoint);
-
+            EndpointUri = new Uri(Endpoint);
             AccessKeyId = ossToken.AccessKeyId;
             AccessKeySecret = ossToken.AccessKeySecret;
             SecurityToken = ossToken.SecurityToken;
 
-            CallbackBase64 = upload115Result.callback.callback;
-            CallbackVarBase64 = upload115Result.callback.callback_var;
-            BucketName = upload115Result.bucket;
-            ObjectName = upload115Result.Object;
+            CallbackBase64 = fastUploadResult.callback.callback;
+            CallbackVarBase64 = fastUploadResult.callback.callback_var;
+            BucketName = fastUploadResult.bucket;
+            ObjectName = fastUploadResult.Object;
 
             BaseUrl = $"http://{BucketName}.{EndpointUri.Authority}/{ObjectName}";
         }
@@ -79,6 +75,18 @@ namespace Display.Services.Upload
             }
 
             return request;
+        }
+
+        public abstract Task<OssUploadResult> Start();
+
+        public abstract void Stop();
+
+        public void Dispose()
+        {
+            Cts.Cancel();
+            Cts.Dispose();
+
+            GC.SuppressFinalize(this);
         }
     }
 }

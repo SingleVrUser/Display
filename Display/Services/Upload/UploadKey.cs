@@ -1,17 +1,11 @@
-﻿using Org.BouncyCastle.Asn1.Sec;
+﻿using Display.Helper.Crypto;
+using Org.BouncyCastle.Asn1.Sec;
+using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Agreement;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Security;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using Org.BouncyCastle.Math;
-using Display.Helper.Crypto;
 
 namespace Display.Services.Upload
 {

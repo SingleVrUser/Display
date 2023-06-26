@@ -12,8 +12,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Runtime;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -692,14 +690,14 @@ namespace Display.Views
             if (bitCometSettings == null)
                 return;
 
-            BitCometCheckStatus.status = Status.doing;
+            BitCometCheckStatus.status = Status.Doing;
 
             bool isOK = await IsBitCometSettingOK(bitCometSettings.UserName, bitCometSettings.Password, bitCometSettings.ApiUrl);
 
             if (isOK)
-                BitCometCheckStatus.status = Status.success;
+                BitCometCheckStatus.status = Status.Success;
             else
-                BitCometCheckStatus.status = Status.error;
+                BitCometCheckStatus.status = Status.Error;
 
         }
 
@@ -782,7 +780,7 @@ namespace Display.Views
         {
             var bitCometSavePath = AppSettings.BitCometSavePath;
 
-            if (bitCometSavePath == null)
+            if (string.IsNullOrEmpty(bitCometSavePath))
                 return;
             FileMatch.LaunchFolder(bitCometSavePath);
         }
@@ -820,14 +818,14 @@ namespace Display.Views
             if (aria2Settings == null)
                 return;
 
-            Aria2CheckStatus.status = Status.doing;
+            Aria2CheckStatus.status = Status.Doing;
 
             bool isOK = await IsAriannaSettingOK(aria2Settings.Password, aria2Settings.ApiUrl);
 
             if (isOK)
-                Aria2CheckStatus.status = Status.success;
+                Aria2CheckStatus.status = Status.Success;
             else
-                Aria2CheckStatus.status = Status.error;
+                Aria2CheckStatus.status = Status.Error;
         }
 
         private void Aria2tSettingsSave_Click(object sender, RoutedEventArgs e)
@@ -1034,13 +1032,13 @@ namespace Display.Views
             if (result != ContentDialogResult.Primary) return;
 
             var explorerItem = contentPage.GetCurrentFolder();
-            Debug.WriteLine($"当前选中：{explorerItem.Name}({explorerItem.Cid})");
+            Debug.WriteLine($"当前选中：{explorerItem.Name}({explorerItem.Id})");
 
             AppSettings.SavePath115Name = explorerItem.Name;
-            AppSettings.SavePath115Cid = explorerItem.Cid;
+            AppSettings.SavePath115Cid = explorerItem.Id;
 
             SavePath115NameTextBlock.Text = explorerItem.Name;
-            SavePath115CidTextBlock.Text = explorerItem.Cid;
+            SavePath115CidTextBlock.Text = explorerItem.Id;
 
             ShowTeachingTip("设置成功");
         }

@@ -160,7 +160,6 @@
             </Grid>
 
 
-
             <customecontrol:MultipleCoverShow Grid.Row="1"
                                               ShowName="最新视频"
                                               CoverList="{x:Bind recentCoverList}"

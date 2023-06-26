@@ -13,6 +13,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using static System.String;
+using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace Display.Services.Upload
 {
@@ -21,7 +23,7 @@ namespace Display.Services.Upload
         private const string AppVer = Const.DefaultSettings.Network._115.UploadAppVersion;
 
         private static HttpClient _client;
-        public static HttpClient Client
+        private static HttpClient Client
         {
             get
             {
@@ -31,7 +33,7 @@ namespace Display.Services.Upload
 
                 var cookie = AppSettings._115_Cookie;
                 //cookie不为空且可用
-                if (!string.IsNullOrEmpty(cookie))
+                if (!IsNullOrEmpty(cookie))
                 {
                     headers.Add("Cookie", cookie);
                 }
@@ -42,18 +44,20 @@ namespace Display.Services.Upload
             }
         }
 
-        private readonly string _path;
         private readonly FileInfo _fileInfo;
         private readonly string _fileSizeString;
         private readonly FileStream _stream;
         private readonly long _saveFolderCid;
         private readonly CancellationTokenSource _source = new();
 
-        private CancellationToken Token => _source.Token;
         private int _userId;
         private string _userKey;
         private string _totalSha1;
         private bool _isInitSucceed;
+        private AliyunOss _aliyunOss;
+        private CancellationToken Token => _source.Token;
+
+        public FileUploadResult FileUploadResult;
 
         public override void Dispose()
         {
@@ -68,6 +72,8 @@ namespace Display.Services.Upload
         {
             _source?.Cancel();
             _source?.Dispose();
+            _aliyunOss?.Dispose();
+
             var result = _stream?.DisposeAsync() ?? ValueTask.CompletedTask;
             GC.SuppressFinalize(this);
 
@@ -76,13 +82,19 @@ namespace Display.Services.Upload
 
         public FileUpload(string path, long cid, int userId = 0, string userKey = "")
         {
-            _path = path;
             _saveFolderCid = cid;
             _userId = userId;
             _userKey = userKey;
 
-            _fileInfo = new FileInfo(_path);
+            _fileInfo = new FileInfo(path);
             if (!_fileInfo.Exists) return;
+
+            FileUploadResult = new FileUploadResult
+            {
+                Name = _fileInfo.Name,
+                FileSize = _fileInfo.Length,
+                Cid = cid
+            };
 
             Position = 0;
             _fileSizeString = _fileInfo.Length.ToByteSizeString();
@@ -106,74 +118,29 @@ namespace Display.Services.Upload
             await fileUpload.Start();
         }
 
-        private bool IsGetUploadInfo => _userId != 0 && !string.IsNullOrEmpty(_userKey);
+        private bool IsGetUploadInfo => _userId != 0 && !IsNullOrEmpty(_userKey);
 
-        public override async Task Init()
-        {
-            State = UploadState.Initializing;
 
-            // 获取 _userId 和 _userKey
-            if (!IsGetUploadInfo)
-            {
-                var uploadInfo = await WebApi.GlobalWebApi.GetUploadInfo();
-                _userId = uploadInfo.user_id;
-                _userKey = uploadInfo.userkey;
-            }
-
-            // 计算本地Sha1
-            _totalSha1 = await HashHelper.ComputeSha1ByStream(_stream, Token, progress: new Progress<long>(i =>
-                {
-                    Content = $"{i.ToByteSizeString()}/{_fileSizeString}";
-                }
-            ));
-
-            if (string.IsNullOrEmpty(_totalSha1))
-            {
-                State = UploadState.Canceled;
-            }
-            else
-            {
-                Length = _fileInfo.Length;
-                State = UploadState.Initialized;
-                _isInitSucceed = true;
-            }
-        }
-
-        public override async Task<bool> Start()
-        {
-            if (!_isInitSucceed) return false;
-
-            return await UploadFile();
-        }
-
-        /// <summary>
-        /// 暂停后重新开始上传
-        /// </summary>
-        /// <returns></returns>
-        public async Task Resume()
-        {
-            await _aliyunOss.Init();
-
-            await StartUpload();
-        }
-
-        public override void Pause()
-        {
-            _aliyunOss?.Pause();
-        }
-
-        public override async Task Stop()
-        {
-            await DisposeAsync();
-
-            State = UploadState.Canceled;
-        }
-
-        public async Task<bool> UploadFile()
+        private async Task<bool> UploadFile()
         {
             var upload115Result = await UploadByFastUpload();
 
-            if (upload115Result == null) return State == UploadState.Succeed;
+            // 秒传失败或者没获取到需要的参数
+            if (State == UploadState.Faulted || upload115Result == null)
+            {
+                return false;
+            }
+
+            // 秒传成功
+            var uploadResult = State == UploadState.Succeed;
+            if (uploadResult)
+            {
+                FileUploadResult.PickCode = upload115Result.pickcode;
+                FileUploadResult.Success = true;
+                return true;
+            }
+
+            // 秒传未完成但获取到了需要的参数
 
             //转换callback、callbackVar为base64格式
             upload115Result.callback.callback =
@@ -181,10 +148,17 @@ namespace Display.Services.Upload
             upload115Result.callback.callback_var =
                 Convert.ToBase64String(Encoding.Default.GetBytes(upload115Result.callback.callback_var));
 
-            return await UploadByAliyunOss(upload115Result);
+            var ossUploadResult = await UploadByAliyunOss(upload115Result);
+            uploadResult = State == UploadState.Succeed;
+            if (!uploadResult) return false;
+
+            FileUploadResult.SetFromOssUploadResult(ossUploadResult);
+            FileUploadResult.Success = true;
+
+            return true;
         }
 
-        private async Task<Upload115Result> UploadByFastUpload()
+        private async Task<FastUploadResult> UploadByFastUpload()
         {
             State = UploadState.FastUploading;
 
@@ -196,8 +170,8 @@ namespace Display.Services.Upload
             var fileName = _fileInfo.Name;
             var fileSize = _fileInfo.Length;
             var fileId = _totalSha1;
-            var signKey = string.Empty;
-            var signVal = string.Empty;
+            var signKey = Empty;
+            var signVal = Empty;
             var sign = UploadEncryptHelper.GetSign(_userId, fileId, target, _userKey);
             var userIdMd5 = HashHelper.ComputeMd5ByContent(_userId.ToString()).ToLower();
 
@@ -220,16 +194,16 @@ namespace Display.Services.Upload
                 dataForm["t"] = timeSpan.ToString();
                 dataForm["token"] = UploadEncryptHelper.GetToken(fileId, fileSize, signKey, signVal, timeSpan, _userId, userIdMd5, AppVer);
 
-                if (!string.IsNullOrEmpty(signKey) && !string.IsNullOrEmpty(signVal))
+                if (!IsNullOrEmpty(signKey) && !IsNullOrEmpty(signVal))
                 {
                     dataForm["sign_key"] = signKey;
                     dataForm["sign_val"] = signVal;
                 }
 
-                Upload115Result upload115Result;
+                FastUploadResult fastUploadResult;
                 try
                 {
-                    upload115Result = await GetUpload115Result(dataForm, timeSpan, aesKey, aesIv, clientPublicKey, Token);
+                    fastUploadResult = await GetUpload115Result(dataForm, timeSpan, aesKey, aesIv, clientPublicKey, Token);
                 }
                 catch (Exception ex)
                 {
@@ -237,46 +211,46 @@ namespace Display.Services.Upload
                     break;
                 }
 
-                if (upload115Result == null)
+                if (fastUploadResult == null)
                 {
                     Debug.WriteLine("可能是解密出错");
                     continue;
                 }
 
-                if (string.IsNullOrEmpty(upload115Result.sign_key) || string.IsNullOrEmpty(upload115Result.sign_check))
+                if (IsNullOrEmpty(fastUploadResult.sign_key) || IsNullOrEmpty(fastUploadResult.sign_check))
                 {
                     // 不能秒传，需要上传
-                    if (!string.IsNullOrEmpty(upload115Result.Object))
+                    if (!IsNullOrEmpty(fastUploadResult.Object))
                     {
                         // 使用AliyunOss上传
-                        return upload115Result;
+                        return fastUploadResult;
                     }
 
                     // 秒传成功
-                    if (upload115Result.status == 2)
+                    if (fastUploadResult.status == 2)
                     {
                         Position = _fileInfo.Length;
                         State = UploadState.Succeed;
+                        return fastUploadResult;
                     }
                     else
                     {
-                        Debug.WriteLine($"上传时发生错误：{upload115Result.statusmsg}");
+                        Debug.WriteLine($"上传时发生错误：{fastUploadResult.statusmsg}");
                         State = UploadState.Faulted;
                     }
 
                     return null;
                 }
 
-                signKey = upload115Result.sign_key;
-
-                signVal = HashHelper.ComputeSha1RangeByStream(_stream, upload115Result.sign_check);
+                signKey = fastUploadResult.sign_key;
+                signVal = HashHelper.ComputeSha1RangeByStream(_stream, fastUploadResult.sign_check);
             }
 
             State = UploadState.Faulted;
             return null;
         }
 
-        private static async Task<Upload115Result> GetUpload115Result(Dictionary<string, string> dataForm, long timeSpan, byte[] aesKey, byte[] aesIv, byte[] clientPublicKey, CancellationToken token)
+        private static async Task<FastUploadResult> GetUpload115Result(Dictionary<string, string> dataForm, long timeSpan, byte[] aesKey, byte[] aesIv, byte[] clientPublicKey, CancellationToken token)
         {
             var sendData = UploadEncryptHelper.GetData(dataForm, aesKey, aesIv);
             var kec = UploadEncryptHelper.GetKEc(clientPublicKey, timeSpan);
@@ -299,12 +273,11 @@ namespace Display.Services.Upload
             return UploadEncryptHelper.DecryptReceiveData(contentBytes, aesKey: aesKey, aesIv: aesIv);
         }
 
-        private AliyunOss _aliyunOss;
-        private async Task<bool> UploadByAliyunOss(Upload115Result upload115Result)
+        private async Task<OssUploadResult> UploadByAliyunOss(FastUploadResult fastUploadResult)
         {
             if (_aliyunOss == null)
             {
-                _aliyunOss = new AliyunOss(Client, _stream, upload115Result, progress: new Progress<long>(
+                _aliyunOss = new AliyunOss(Client, _stream, fastUploadResult, progress: new Progress<long>(
                     p =>
                     {
                         Position = p;
@@ -313,7 +286,7 @@ namespace Display.Services.Upload
 
                 _aliyunOss.StateChanged += state =>
                 {
-                    if (state is not (UploadState.Initialized or UploadState.Initialized))
+                    if (state is not (UploadState.Initializing or UploadState.Initialized))
                     {
                         State = state;
                     }
@@ -325,7 +298,7 @@ namespace Display.Services.Upload
             return await StartUpload();
         }
 
-        private async Task<bool> StartUpload()
+        private async Task<OssUploadResult> StartUpload()
         {
             var result = await _aliyunOss.Start();
 
@@ -334,5 +307,102 @@ namespace Display.Services.Upload
             return result;
         }
 
+        /// <summary>
+        /// 获取上传所需的用户信息，计算本地Sha1
+        /// </summary>
+        /// <returns></returns>
+        public override async Task Init()
+        {
+            State = UploadState.Initializing;
+
+            // 获取 _userId 和 _userKey
+            if (!IsGetUploadInfo)
+            {
+                var uploadInfo = await WebApi.GlobalWebApi.GetUploadInfo();
+                _userId = uploadInfo.user_id;
+                _userKey = uploadInfo.userkey;
+            }
+
+            // 计算本地Sha1
+            _totalSha1 = await HashHelper.ComputeSha1ByStream(_stream, Token, progress: new Progress<long>(i =>
+                {
+                    Content = $"{i.ToByteSizeString()}/{_fileSizeString}";
+                }
+            ));
+
+            if (IsNullOrEmpty(_totalSha1))
+            {
+                State = UploadState.Canceled;
+            }
+            else
+            {
+                Length = _fileInfo.Length;
+                State = UploadState.Initialized;
+                _isInitSucceed = true;
+            }
+        }
+
+        public override async Task<bool> Start()
+        {
+            if (!_isInitSucceed) return false;
+
+            return await UploadFile();
+        }
+
+        public override void Pause()
+        {
+            _aliyunOss?.Pause();
+        }
+
+        /// <summary>
+        /// 暂停后重新开始上传
+        /// </summary>
+        /// <returns></returns>
+        public async Task Resume()
+        {
+            await _aliyunOss.Init();
+
+            await StartUpload();
+        }
+
+        public override async Task Stop()
+        {
+            await DisposeAsync();
+
+            State = UploadState.Canceled;
+        }
+    }
+
+
+    public class FileUploadResult
+    {
+        public string Id;
+        public string Name;
+        public long FileSize;
+        public long Cid;
+        public string PickCode;
+        public string Sha1;
+        public bool Success;
+        public string ThumbUrl;
+        public int Aid;
+        public bool IsVideo;
+        public FilesInfo.FileType Type = FilesInfo.FileType.File;
+        public int Time = (int)DateTimeOffset.Now.ToUnixTimeSeconds();
+
+        public void SetFromOssUploadResult(OssUploadResult uploadResult)
+        {
+            var data = uploadResult?.data;
+            if (data == null) return;
+
+            PickCode = data.pick_code;
+            FileSize = data.file_size;
+            Id = data.file_id;
+            ThumbUrl = data.thumb_url;
+            Sha1 = data.sha1;
+            Aid = data.aid;
+            Name = data.file_name;
+            long.TryParse(data.cid, out Cid);
+            IsVideo = data.is_video == 1;
+        }
     }
 }

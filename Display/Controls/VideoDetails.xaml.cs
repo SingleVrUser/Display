@@ -85,7 +85,8 @@ namespace Display.Controls
                     FontFamily = new FontFamily("霞鹜文楷"),
                     Content = content,
                     BorderThickness = new Thickness(0.5),
-                    Background = Application.Current.Resources["CardBackgroundFillColorDefaultBrush"] as SolidColorBrush,
+                    Background =
+                        Application.Current.Resources["CardBackgroundFillColorDefaultBrush"] as SolidColorBrush,
 
                 };
                 button.Click += LabelButtonOnClick;
@@ -149,6 +150,7 @@ namespace Display.Controls
 
         // 点击了演员更多页
         public event RoutedEventHandler ActorClick;
+
         private void ActorButtonOnClick(object sender, RoutedEventArgs args)
         {
             ActorClick?.Invoke(sender, args);
@@ -156,6 +158,7 @@ namespace Display.Controls
 
         // 点击了标签更多页
         public event RoutedEventHandler LabelClick;
+
         private void LabelButtonOnClick(object sender, RoutedEventArgs args)
         {
             LabelClick?.Invoke(sender, args);
@@ -163,6 +166,7 @@ namespace Display.Controls
 
         //点击播放键
         public event RoutedEventHandler VideoPlayClick;
+
         private void VideoPlay_Click(object sender, RoutedEventArgs args)
         {
             VideoPlayClick?.Invoke(sender, args);
@@ -299,6 +303,7 @@ namespace Display.Controls
         }
 
         ContentsPage.DetailInfo.FindInfoAgainSmoke FindInfoAgainSmoke;
+
         private void FindAppBarButton_Click(object sender, RoutedEventArgs e)
         {
             //第一次启动FindInfoAgainSmoke
@@ -342,7 +347,8 @@ namespace Display.Controls
             //重新下载图片
             if (!string.IsNullOrEmpty(videoInfo.imageurl))
             {
-                await GetInfoFromNetwork.DownloadFile(videoInfo.imageurl, Path.Combine(AppSettings.ImageSavePath, videoInfo.truename), videoInfo.truename, true);
+                await GetInfoFromNetwork.DownloadFile(videoInfo.imageurl,
+                    Path.Combine(AppSettings.ImageSavePath, videoInfo.truename), videoInfo.truename, true);
             }
 
             //更新数据库
@@ -407,7 +413,8 @@ namespace Display.Controls
         {
             if (!destinationImageElement.IsLoaded) return;
 
-            ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("backwardsAnimation", destinationImageElement);
+            ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView()
+                .PrepareToAnimate("backwardsAnimation", destinationImageElement);
             SmokeGrid.Children.Remove(destinationImageElement);
 
             // Collapse the smoke when the animation completes.
@@ -429,6 +436,7 @@ namespace Display.Controls
         }
 
         private string _storedItem;
+
         private void ThumbnailGridView_ItemClick(object sender, ItemClickEventArgs e)
         {
             ConnectedAnimation animation = null;
@@ -437,7 +445,8 @@ namespace Display.Controls
             {
                 _storedItem = container.Content as string;
 
-                animation = ThumbnailGridView.PrepareConnectedAnimation("forwardAnimation", _storedItem, "Thumbnail_Image");
+                animation = ThumbnailGridView.PrepareConnectedAnimation("forwardAnimation", _storedItem,
+                    "Thumbnail_Image");
             }
 
             string imagePath = e.ClickedItem as string;
@@ -502,6 +511,7 @@ namespace Display.Controls
         }
 
         public event RoutedEventHandler DeleteClick;
+
         private void DeletedAppBarButton_Click(object sender, RoutedEventArgs e)
         {
             DeleteClick?.Invoke(sender, e);
@@ -593,6 +603,7 @@ namespace Display.Controls
         }
 
         FileInfoInCidSmoke FileInfoInCidSmokePage;
+
         private void MoreInfoAppBarButton_Click(object sender, RoutedEventArgs e)
         {
             SmokeGrid.Visibility = Visibility.Visible;
@@ -612,7 +623,8 @@ namespace Display.Controls
                 SmokeGrid.Children.Remove(FileInfoInCidSmokePage);
             }
 
-            SmokeCancelGrid.Tapped -= FileInfoInCidSmokeCancelGrid_Tapped; ;
+            SmokeCancelGrid.Tapped -= FileInfoInCidSmokeCancelGrid_Tapped;
+            ;
 
         }
 
@@ -630,6 +642,7 @@ namespace Display.Controls
 
         //点击封面
         public event TappedEventHandler CoverTapped;
+
         private void Cover_Tapped(object sender, TappedRoutedEventArgs e)
         {
             CoverTapped?.Invoke(sender, e);
@@ -690,33 +703,11 @@ namespace Display.Controls
 
         private async void FindVideoAppBarButton_Click(object sender, RoutedEventArgs e)
         {
-            var contentPage = new SearchLinkPage(resultinfo.truename);
+            var contentResult = await SearchLinkPage.ShowInContentDialog(resultinfo.truename, XamlRoot);
 
-            ContentDialog dialog = new()
+            if (!string.IsNullOrEmpty(contentResult))
             {
-                XamlRoot = XamlRoot,
-                Title = "搜索结果",
-                PrimaryButtonText = "下载选中",
-                CloseButtonText = "返回",
-                DefaultButton = ContentDialogButton.Primary,
-                Content = contentPage
-            };
-
-            var result = await dialog.ShowAsync();
-
-            if (result == ContentDialogResult.Primary)
-            {
-                if (string.IsNullOrEmpty(AppSettings.SavePath115Cid) ||
-                    string.IsNullOrEmpty(AppSettings.SavePath115Name))
-                {
-                    ShowTeachingTip("未设置保存路径");
-                }
-                else
-                {
-                    var isDownSuccess = await contentPage.OfflineDownSelectedLink();
-
-                    ShowTeachingTip(isDownSuccess ? "已下载到网盘中" : "下载失败");
-                }
+                ShowTeachingTip(contentResult);
             }
         }
     }

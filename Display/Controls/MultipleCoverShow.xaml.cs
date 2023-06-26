@@ -40,7 +40,7 @@ namespace Display.Controls
 
         public MultipleCoverShow()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         //点击了图片

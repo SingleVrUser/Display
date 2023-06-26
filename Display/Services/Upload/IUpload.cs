@@ -46,7 +46,7 @@ namespace Display.Services.Upload
         Initialized,
 
         FastUploading,
-        MultipartUploading,
+        OssUploading,
 
         Paused,
         Faulted,

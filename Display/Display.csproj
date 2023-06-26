@@ -24,6 +24,7 @@
     <PackageIcon>SmallTile.scale-125.png</PackageIcon>
     <Win32Resource>App.res</Win32Resource>
     <LangVersion>11</LangVersion>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     

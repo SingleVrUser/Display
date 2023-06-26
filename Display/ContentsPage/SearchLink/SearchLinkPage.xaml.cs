@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Display.Views;
 using static System.Int64;
 using Display.Services.Upload;
+using static SkiaSharp.HarfBuzz.SKShaper;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -32,8 +33,45 @@ namespace Display.ContentsPage.SearchLink
             this.InitializeComponent();
 
             _searchContent = searchContent;
+        }
 
-            InitLoad();
+        public static async Task<string> ShowInContentDialog(string searchContent, XamlRoot xamlRoot)
+        {
+            var page = new SearchLinkPage(searchContent);
+            ContentDialog dialog = new()
+            {
+                XamlRoot = xamlRoot,
+                Title = "搜索结果",
+                PrimaryButtonText = "下载选中",
+                CloseButtonText = "返回",
+                DefaultButton = ContentDialogButton.Primary,
+                Content = page
+            };
+
+            dialog.Opened += (_, _) =>
+            {
+                page.InitLoad();
+            };
+
+            var result = await dialog.ShowAsync();
+
+            string contentResult = null;
+            if (result == ContentDialogResult.Primary)
+            {
+                if (string.IsNullOrEmpty(AppSettings.SavePath115Cid) ||
+                    string.IsNullOrEmpty(AppSettings.SavePath115Name))
+                {
+                    contentResult = "未设置保存路径";
+                }
+                else
+                {
+                    var isDownSuccess = await page.OfflineDownSelectedLink();
+
+                    contentResult = isDownSuccess ? "已下载到网盘中" : "下载失败";
+                }
+            }
+
+            return contentResult;
         }
 
         private async void InitLoad()

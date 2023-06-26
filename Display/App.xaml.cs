@@ -1,4 +1,6 @@
 ﻿
+using Display.Data;
+using Display.Helper;
 using Display.Notifications;
 using Display.WindowView;
 using Microsoft.UI;
@@ -7,11 +9,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
-using Windows.Storage;
-using Display.ContentsPage;
-using Display.Data;
-using Display.Helper;
 using WinRT.Interop;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -29,7 +26,7 @@ namespace Display
         /// </summary>
         public static Window AppMainWindow;
 
-        private static NotificationManager notificationManager;
+        private static NotificationManager _notificationManager;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -39,7 +36,7 @@ namespace Display
         {
             this.InitializeComponent();
 
-            notificationManager = new NotificationManager();
+            _notificationManager = new NotificationManager();
 
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 
@@ -50,7 +47,7 @@ namespace Display
             //删除获取演员信息的进度通知
             NotificationManager.RemoveGetActorInfoProgessToast();
 
-            notificationManager.Unregister();
+            _notificationManager.Unregister();
         }
 
         /// <summary>
@@ -84,7 +81,7 @@ namespace Display
         {
             AppMainWindow = new MainWindow();
 
-            notificationManager.Init();
+            _notificationManager.Init();
 
             AppMainWindow.Activate();
         }
@@ -126,11 +123,11 @@ namespace Display
             return isNormal;
         }
 
-        public static AppWindow getAppWindow(Window window)
+        public static AppWindow GetAppWindow(Window window)
         {
             // 获取当前窗口句柄
-            IntPtr _windowHandle = WindowNative.GetWindowHandle(window);
-            WindowId windowId = Win32Interop.GetWindowIdFromWindow(_windowHandle);
+            var windowHandle = WindowNative.GetWindowHandle(window);
+            var windowId = Win32Interop.GetWindowIdFromWindow(windowHandle);
 
             return AppWindow.GetFromWindowId(windowId);
         }
@@ -139,10 +136,8 @@ namespace Display
         {
             if (AppMainWindow != null)
             {
-                WindowHelper.ShowWindow(AppMainWindow);
+                WindowHelper.SetForegroundWindow(AppMainWindow);
             }
         }
-
-
     }
 }

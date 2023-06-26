@@ -1,4 +1,5 @@
 ﻿using ByteSizeLib;
+using Display.Services.Upload;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
@@ -467,7 +468,7 @@ namespace Display.Data
 
         public int video_count { get; set; }
 
-        private Status _status = Status.beforeStart;
+        private Status _status = Status.BeforeStart;
         public Status Status
         {
             get
@@ -781,7 +782,7 @@ namespace Display.Data
 
             //图片大小
             this.imageheight = imgheight;
-            this.imagewidth = imgwidth;
+            this.ImageWidth = imgwidth;
         }
 
         public string realeaseYear { get; set; }
@@ -789,7 +790,7 @@ namespace Display.Data
         public string ShowLabel { get; set; }
 
         private Visibility _isDeleted = Visibility.Collapsed;
-        public Visibility isDeleted
+        public Visibility IsDeleted
         {
             get => _isDeleted;
             set
@@ -799,16 +800,13 @@ namespace Display.Data
             }
         }
 
-        private double _imagewidth;
-        public double imagewidth
+        private double _imageWidth;
+        public double ImageWidth
         {
-            get
-            {
-                return _imagewidth;
-            }
+            get => _imageWidth;
             set
             {
-                _imagewidth = value;
+                _imageWidth = value;
                 OnPropertyChanged();
             }
         }
@@ -863,20 +861,13 @@ namespace Display.Data
         public event PropertyChangedEventHandler PropertyChanged;
         //public enum ExplorerItemType { Folder, File };
         public string Name { get; set; }
-        public string Cid { get; set; }
+        public string Id { get; set; }
         public bool HasUnrealizedChildren { get; set; }
         public FileType Type { get; set; }
         private ObservableCollection<ExplorerItem> m_children;
         public ObservableCollection<ExplorerItem> Children
         {
-            get
-            {
-                if (m_children == null)
-                {
-                    m_children = new ObservableCollection<ExplorerItem>();
-                }
-                return m_children;
-            }
+            get => m_children ??= new ObservableCollection<ExplorerItem>();
             set
             {
                 m_children = value;
@@ -892,7 +883,7 @@ namespace Display.Data
             get
             {
                 if (_iconPath != null) return _iconPath;
-                _iconPath = getFileIcon(Type);
+                _iconPath = GetFileIconFromType(Type);
 
                 return _iconPath;
             }
@@ -916,15 +907,13 @@ namespace Display.Data
         private bool m_isSelected;
         public bool IsSelected
         {
-            get { return m_isSelected; }
+            get => m_isSelected;
 
             set
             {
-                if (m_isSelected != value)
-                {
-                    m_isSelected = value;
-                    NotifyPropertyChanged("IsSelected");
-                }
+                if (m_isSelected == value) return;
+                m_isSelected = value;
+                NotifyPropertyChanged(nameof(IsSelected));
             }
 
         }
@@ -943,46 +932,84 @@ namespace Display.Data
     /// </summary>
     public class FilesInfo : INotifyPropertyChanged
     {
-        public FilesInfo()
-        {
+        public readonly Datum Datum;
+        public readonly string Id;
+        public readonly string Cid;
+        public readonly string PickCode;
+        public readonly FileType Type;
+        public readonly string IconPath;
+        public readonly bool IsVideo;
+        public readonly bool NoId;
 
+        public FilesInfo(FileUploadResult result)
+        {
+            Name = result.Name;
+            Id = result.Id;
+            Cid = result.Cid.ToString();
+            PickCode = result.PickCode;
+            Type = result.Type;
+            IsVideo = result.IsVideo;
+            NoId = string.IsNullOrEmpty(Id);
+
+            IconPath = GetPathFromFileType(Name.Split(".")[^1]);
+
+            // TODO 应该逐渐抛弃Datum
+            //var isFile = Type == FileType.File;
+            //Datum = new Datum
+            //{
+            //    fid = isFile ? result.Id : string.Empty,
+            //    cid = isFile ? result.Cid.ToString() : result.Id,
+            //    pid = isFile ? string.Empty : result.Cid.ToString(),
+            //    n = result.Name,
+            //    s = result.FileSize,
+            //    pc = result.PickCode,
+            //    sha = result.Sha1,
+            //    u = result.ThumbUrl,
+            //    aid = result.Aid,
+            //    iv = result.IsVideo ? 1 : 0,
+            //    te = result.Time,
+            //    tp = result.Time,
+            //    t = FileMatch.ConvertInt32ToDateTime(result.Time)
+            //};
         }
+
         public FilesInfo(Datum data)
         {
-            this.datum = data;
+            Datum = data;
 
             Name = data.n;
-            Cid = data.cid;
-            Fid = data.fid;
 
             IconPath = "ms-appx:///Assets/115/file_type/other/unknown.svg";
             //文件夹
             if (string.IsNullOrEmpty(data.fid))
             {
                 Type = FileType.Folder;
+                Id = data.cid;
+                Cid = data.pid;
+                PickCode = data.pc;
+
                 IconPath = "ms-appx:///Assets/115/file_type/folder/folder.svg";
             }
             else
             {
                 Type = FileType.File;
+                Id = data.fid;
+                Cid = data.cid;
+                PickCode = data.pc;
 
                 //视频文件
                 if (data.iv == 1)
                 {
-                    string video_quality = GetVideoQualityFromVdi(data.vdi);
+                    IsVideo = true;
+                    var videoQuality = GetVideoQualityFromVdi(data.vdi);
 
-                    if (video_quality != null)
-                    {
-                        IconPath = $"ms-appx:///Assets/115/file_type/video_quality/{video_quality}.svg";
-                    }
-                    else
-                    {
-                        IconPath = "ms-appx:///Assets/115/file_type/video/video.svg";
-                    }
+                    IconPath = videoQuality != null ? $"ms-appx:///Assets/115/file_type/video_quality/{videoQuality}.svg"
+                                                    : "ms-appx:///Assets/115/file_type/video/video.svg";
+
                 }
                 else if (!string.IsNullOrEmpty(data.ico))
                 {
-                    var tmpIcoPath = getPathFromFileType(data.ico);
+                    var tmpIcoPath = GetPathFromFileType(data.ico);
                     if (tmpIcoPath != null)
                     {
                         IconPath = tmpIcoPath;
@@ -990,9 +1017,8 @@ namespace Display.Data
                 }
             }
 
+            NoId = string.IsNullOrEmpty(Id);
         }
-
-        public Datum datum;
 
         public static string GetVideoQualityFromVdi(int vdi)
         {
@@ -1027,8 +1053,6 @@ namespace Display.Data
             return video_quality;
         }
 
-        public enum FileType { Folder, File };
-
         private string _name;
         public string Name
         {
@@ -1039,42 +1063,29 @@ namespace Display.Data
                 OnPropertyChanged();
             }
         }
-        
 
+        private string _nameWithoutExtension;
         public string NameWithoutExtension
         {
             get
             {
-                string nameWithoutExtension;
+                if (_nameWithoutExtension != null) return _nameWithoutExtension;
 
-                if (Type == FileType.File && !string.IsNullOrEmpty(datum.ico))
+                if (Type == FileType.File && !string.IsNullOrEmpty(Datum.ico))
                 {
-                    nameWithoutExtension = Regex.Replace(Name, $".{datum.ico}$", "", RegexOptions.IgnoreCase);
+                    _nameWithoutExtension = Regex.Replace(Name, $".{Datum.ico}$", "", RegexOptions.IgnoreCase);
                 }
                 else
                 {
-                    nameWithoutExtension = Name;
+                    _nameWithoutExtension = Name;
                 }
 
-                return nameWithoutExtension;
+                return _nameWithoutExtension;
             }
         }
-
-        public string Cid { get; set; }
-        public string Fid { get; set; }
-        public FileType Type { get; set; }
-        public string IconPath { get; set; }
-
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        public static string GetPathFromFileType(string ico)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public static string getPathFromFileType(string ico)
-        {
-            string IconPath = "ms-appx:///Assets/115/file_type/other/unknown.svg";
+            var iconPath = "ms-appx:///Assets/115/file_type/other/unknown.svg";
             var fileType = new Dictionary<string, Dictionary<string, List<string>>>()
             {
                 { "application", new Dictionary<string, List<string>>(){
@@ -1173,12 +1184,12 @@ namespace Display.Data
                     {
                         if (key3 == ico)
                         {
-                            string tmpPath = $"Assets/115/file_type/{key}/{key2}.svg";
+                            var tmpPath = $"Assets/115/file_type/{key}/{key2}.svg";
 
                             if (!File.Exists(Path.Combine(Package.Current.InstalledLocation.Path, tmpPath)))
-                                IconPath = $"ms-appx:///Assets/115/file_type/{key}/{key}.svg";
+                                iconPath = $"ms-appx:///Assets/115/file_type/{key}/{key}.svg";
                             else
-                                IconPath = $"ms-appx:///{tmpPath}";
+                                iconPath = $"ms-appx:///{tmpPath}";
 
 
                             isMatch = true;
@@ -1188,34 +1199,41 @@ namespace Display.Data
                 }
             }
 
-            return IconPath;
+            return iconPath;
         }
 
-
-        public static string getFileIcon(FileType fileType)
+        public static string GetFileIconFromType(FileType fileType)
         {
-            string IconUrl = "ms-appx:///Assets/115/file_type/other/unknown.svg";
+            var iconUrl = "ms-appx:///Assets/115/file_type/other/unknown.svg";
 
             switch (fileType)
             {
                 case FileType.Folder:
-                    IconUrl = "ms-appx:///Assets/115/file_type/folder/folder.svg";
+                    iconUrl = "ms-appx:///Assets/115/file_type/folder/folder.svg";
                     break;
                 case FileType.File:
-                    IconUrl = "ms-appx:///Assets/115/file_type/other/unknown.svg";
+                    iconUrl = "ms-appx:///Assets/115/file_type/other/unknown.svg";
                     break;
 
             }
 
-            return IconUrl;
+            return iconUrl;
         }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+
+        public enum FileType { Folder, File };
     }
 
     /// <summary>
     /// 状态
     /// </summary>
-    public enum Status { doing, success, error, pause, beforeStart };
+    public enum Status { Doing, Success, Error, Pause, BeforeStart };
 
     /// <summary>
     /// 浏览器选择项
@@ -1426,7 +1444,7 @@ namespace Display.Data
             }
         }
 
-        private Status _status = Status.beforeStart;
+        private Status _status = Status.BeforeStart;
         public Status Status
         {
             get
@@ -1529,7 +1547,7 @@ namespace Display.Data
 
         public List<string> thumbnailDownUrlList = new();
 
-        private Status _status = Status.beforeStart;
+        private Status _status = Status.BeforeStart;
         public Status Status
         {
             get

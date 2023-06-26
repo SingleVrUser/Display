@@ -18,31 +18,31 @@ namespace Display.Controls
                 SetValue(statusProperty, value);
                 switch (value)
                 {
-                    case Status.beforeStart:
+                    case Status.BeforeStart:
                         doing_status.Visibility = Visibility.Visible;
                         doing_status.IsIndeterminate = false;
                         success_status.Visibility = Visibility.Collapsed;
                         error_status.Visibility = Visibility.Collapsed;
                         break;
-                    case Status.doing:
+                    case Status.Doing:
                         doing_status.Visibility = Visibility.Visible;
                         doing_status.IsIndeterminate = true;
                         success_status.Visibility = Visibility.Collapsed;
                         error_status.Visibility = Visibility.Collapsed;
                         break;
-                    case Status.success:
+                    case Status.Success:
                         doing_status.Visibility = Visibility.Collapsed;
                         success_status.Visibility = Visibility.Visible;
                         error_status.Visibility = Visibility.Collapsed;
                         break;
-                    case Status.pause:
+                    case Status.Pause:
                         doing_status.Visibility = Visibility.Visible;
                         doing_status.IsIndeterminate = false;
                         doing_status.Value = 50;
                         success_status.Visibility = Visibility.Collapsed;
                         error_status.Visibility = Visibility.Collapsed;
                         break;
-                    case Status.error:
+                    case Status.Error:
                         doing_status.Visibility = Visibility.Collapsed;
                         success_status.Visibility = Visibility.Collapsed;
                         error_status.Visibility = Visibility.Visible;

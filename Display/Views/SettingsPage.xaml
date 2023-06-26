@@ -769,21 +769,20 @@
                                                                            Margin="5,0" />
                                             </StackPanel>
 
-                                            <Button x:Name="BitCometCheckButton"
-                                                    Click="BitCometSettingsCheck_Click"
-                                                    Content="检查"
-                                                    RelativePanel.LeftOf="BitCometSaveButton" />
-                                            <Button x:Name="BitCometSaveButton"
-                                                    Click="BitCometSettingsSave_Click"
-                                                    Content="保存"
-                                                    HorizontalAlignment="Center"
-                                                    RelativePanel.AlignRightWithPanel="True" />
+                                            <StackPanel Orientation="Horizontal"
+                                                        Spacing="5"
+                                                        RelativePanel.AlignRightWithPanel="True">
+                                                <Button Click="BitCometSettingsCheck_Click"
+                                                        Content="检查"/>
+                                                <Button Click="BitCometSettingsSave_Click"
+                                                        Content="保存"
+                                                        HorizontalAlignment="Center"/>
+                                            </StackPanel>
                                         </RelativePanel>
 
                                         <RelativePanel Padding="50,0">
                                             <StackPanel Orientation="Horizontal">
-                                                <TextBlock x:Name="BitCometSavePathTextBlox"
-                                                           VerticalAlignment="Center"
+                                                <TextBlock VerticalAlignment="Center"
                                                            Margin="0,0,10,0">保存路径</TextBlock>
                                                 <TextBox x:Name="BitCometSavePathTextBox"
                                                          Width="570"
@@ -791,16 +790,14 @@
                                             </StackPanel>
 
                                             <StackPanel RelativePanel.AlignRightWithPanel="True"
-                                                        Orientation="Horizontal">
-
+                                                        Orientation="Horizontal"
+                                                        Spacing="5">
                                                 <Button Click="BitCometSavePathChange_Click"
                                                         Content="修改" />
                                                 <Button Click="BitCometSavePathClear_Click"
                                                         Content="删除" />
                                                 <Button Click="BitCometSavePathOpen_Click"
-                                                        Content="打开路径"
-                                                        x:Name="BitCometSavePathButton"
-                                                        Margin="3,0,0,0" />
+                                                        Content="打开路径"/>
                                             </StackPanel>
                                         </RelativePanel>
 
@@ -846,15 +843,14 @@
                                             </StackPanel>
 
                                             <StackPanel RelativePanel.AlignRightWithPanel="True"
-                                                        Orientation="Horizontal">
+                                                        Orientation="Horizontal"
+                                                        Spacing="5">
                                                 <Button Click="Aria2SavePathChange_Click"
                                                         Content="修改" />
                                                 <Button Click="Aria2SavePathClear_Click"
                                                         Content="删除" />
                                                 <Button Click="Aria2SavePathOpen_Click"
-                                                        Content="打开路径"
-                                                        x:Name="Aria2SavePathButton"
-                                                        Margin="3,0,0,0" />
+                                                        Content="打开路径"/>
                                             </StackPanel>
                                         </RelativePanel>
 

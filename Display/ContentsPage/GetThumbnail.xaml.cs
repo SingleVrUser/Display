@@ -131,7 +131,7 @@ namespace Display.ContentsPage
 
                 item.Status = info.status;
 
-                if (item.Status == Status.error)
+                if (item.Status == Status.Error)
                 {
                     failList.Add(item.name);
                 }
@@ -142,7 +142,7 @@ namespace Display.ContentsPage
                 }
 
                 //完成
-                if (item.Status != Status.doing && thumbnailInfo.Count == info.index + 1)
+                if (item.Status != Status.Doing && thumbnailInfo.Count == info.index + 1)
                 {
                     progress_TextBlock.Text = $"任务已完成，耗时{FileMatch.ConvertDoubleToDateStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
                 }
@@ -175,7 +175,7 @@ namespace Display.ContentsPage
 
                 item.Status = info.status;
 
-                if (item.Status == Status.error)
+                if (item.Status == Status.Error)
                 {
                     failList.Add(item.name);
                 }
@@ -186,7 +186,7 @@ namespace Display.ContentsPage
                 }
 
                 //完成
-                if (item.Status != Status.doing && thumbnailInfo.Count == info.index + 1)
+                if (item.Status != Status.Doing && thumbnailInfo.Count == info.index + 1)
                 {
                     progress_TextBlock.Text = $"任务已完成，耗时{FileMatch.ConvertDoubleToDateStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
                 }
@@ -225,7 +225,7 @@ namespace Display.ContentsPage
             {
                 progressClass progressinfo = new();
                 progressinfo.index = i;
-                progressinfo.status = Status.doing;
+                progressinfo.status = Status.Doing;
 
                 overallProgress.Report(progressinfo);
 
@@ -245,7 +245,7 @@ namespace Display.ContentsPage
                 {
                     progressinfo.text = $"{startText} - 缩略图已存在，跳过该项目";
                     progressinfo.imagePath = existsPath;
-                    progressinfo.status = Status.beforeStart;
+                    progressinfo.status = Status.BeforeStart;
                     overallProgress.Report(progressinfo);
                     continue;
                 };
@@ -254,7 +254,7 @@ namespace Display.ContentsPage
                 if (getThumbnailFromWebVideoSetting.IsJumpVrVideo && thumbnailinfos[i].isVr)
                 {
                     progressinfo.text = $"{startText} - 跳过VR";
-                    progressinfo.status = Status.beforeStart;
+                    progressinfo.status = Status.BeforeStart;
                     overallProgress.Report(progressinfo);
                     continue;
                 }
@@ -411,7 +411,7 @@ namespace Display.ContentsPage
 
                 }
 
-                progressinfo.status = Status.beforeStart;
+                progressinfo.status = Status.BeforeStart;
                 overallProgress.Report(progressinfo);
 
             }
@@ -460,7 +460,7 @@ namespace Display.ContentsPage
             {
                 progressClass progressinfo = new();
                 progressinfo.index = i;
-                progressinfo.status = Status.doing;
+                progressinfo.status = Status.Doing;
 
                 var thumbnail = thumbnailinfos[i];
                 var DownUrlList = thumbnail.thumbnailDownUrlList;
@@ -484,12 +484,12 @@ namespace Display.ContentsPage
 
                 if (string.IsNullOrEmpty(imagePath))
                 {
-                    progressinfo.status = Status.error;
+                    progressinfo.status = Status.Error;
                 }
                 else
                 {
                     progressinfo.imagePath = imagePath;
-                    progressinfo.status = Status.beforeStart;
+                    progressinfo.status = Status.BeforeStart;
                 }
 
                 progress.Report(progressinfo);

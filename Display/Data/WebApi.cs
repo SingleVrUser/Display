@@ -174,7 +174,7 @@ namespace Display.Data
                     return;
                 }
 
-                await DataAccess.AddFilesInfoAsync(info.datum);
+                await DataAccess.AddFilesInfoAsync(info.Datum);
 
                 getFilesProgressInfo!.FilesCount++;
 

@@ -1,22 +1,18 @@
-﻿using Display.Models;
+﻿using Display.Extensions;
+using Display.Helper.Encode;
+using Display.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
-using Display.Helper.Encode;
-using HttpHeaders = Display.Data.Const.HttpHeaders ;
-using Display.Extensions;
+using HttpHeaders = Display.Data.Const.HttpHeaders;
 
 namespace Display.Services.Upload
 {
-    internal class MultipartUpload : OssUploadBase, IDisposable
+    internal class MultipartUpload : OssUploadBase
     {
         private const int MaxPartCount = 999;
         public const long NormalPartSize = 16777216;
@@ -24,32 +20,15 @@ namespace Display.Services.Upload
         private long _partSize = NormalPartSize;
         private long _partCount = 1;
 
-        private readonly FileStream _stream;
-        private readonly long _fileSize;
-
         private readonly IProgress<long> _progress;
         public readonly List<string> ETagList;
-
-        private readonly CancellationTokenSource _cts = new();
-        private CancellationToken Token => _cts.Token;
 
         private string _uploadId;
         private int CurrentCompletedPartNum => ETagList.Count;
 
-        public MultipartUpload(HttpClient client, FileStream stream, string endpoint, string accessKeyId, string accessKeySecret, string securityToken, string bucketName, string objectName, string callbackBase64, string callbackVarBase64, IProgress<long> progress, List<string> eTagList)
-            : base(client, endpoint, accessKeyId, accessKeySecret, securityToken, bucketName, objectName, callbackBase64, callbackVarBase64)
+        public MultipartUpload(HttpClient client, FileStream stream, OssToken ossToken, FastUploadResult fastUploadResult, IProgress<long> progress, List<string> eTagList)
+            : base(client, stream, ossToken, fastUploadResult)
         {
-            _stream = stream;
-            _fileSize = stream.Length;
-            _progress = progress;
-            ETagList = eTagList;
-        }
-
-        public MultipartUpload(HttpClient client, FileStream stream, string endpoint, OssToken ossToken, Upload115Result upload115Result, IProgress<long> progress, List<string> eTagList)
-            : base(client, endpoint, ossToken, upload115Result)
-        {
-            _stream = stream;
-            _fileSize = stream.Length;
             _progress = progress;
             ETagList = eTagList;
         }
@@ -63,15 +42,15 @@ namespace Display.Services.Upload
         public Tuple<long, long> GetPartSizeAndCount()
         {
             // 文件大小小于16M
-            if (_fileSize < _partSize)
+            if (FileSize < _partSize)
             {
                 _partCount = 1;
             }
             else
             {
                 // 向上取整
-                _partCount = _fileSize / _partSize;
-                if (_fileSize % _partSize != 0)
+                _partCount = FileSize / _partSize;
+                if (FileSize % _partSize != 0)
                 {
                     _partCount++;
                 }
@@ -82,8 +61,8 @@ namespace Display.Services.Upload
                     _partCount = MaxPartCount;
 
                     // 向上取整
-                    _partSize = _fileSize / _partCount;
-                    if (_fileSize % _partCount != 0)
+                    _partSize = FileSize / _partCount;
+                    if (FileSize % _partCount != 0)
                     {
                         _partSize++;
                     }
@@ -91,11 +70,6 @@ namespace Display.Services.Upload
             }
 
             return new Tuple<long, long>(_partSize, _partCount);
-        }
-
-        public void SetUploadId(string uploadId)
-        {
-            _uploadId = uploadId;
         }
 
         public async Task<string> GetUploadId()
@@ -114,6 +88,7 @@ namespace Display.Services.Upload
 
                 _uploadId = xmlDoc.DocumentElement.SelectSingleNode("UploadId")?.InnerText;
 
+                // 成功获取UploadId
                 if (!string.IsNullOrEmpty(_uploadId))
                 {
                     return _uploadId;
@@ -126,29 +101,31 @@ namespace Display.Services.Upload
                 Debug.WriteLine($"上传出错：{ex.Message}");
             }
 
+
+            Dispose();
             return null;
         }
 
-
-        public void Pause()
+        public void SetUploadId(string uploadId)
         {
-            Dispose();
+            _uploadId = uploadId;
         }
 
-        public async Task<bool> Start()
+        public override async Task<OssUploadResult> Start()
         {
             var position = CurrentCompletedPartNum * _partSize;
 
-            _stream.Seek(position, SeekOrigin.Begin);
+            Stream.Seek(position, SeekOrigin.Begin);
 
             int readSize = (int)_partSize;
+            var isSucceed = true;
             for (int i = CurrentCompletedPartNum + 1; i <= _partCount; i++)
             {
-                if (Token.IsCancellationRequested) return false;
+                if (Token.IsCancellationRequested) return null;
 
                 if (i == _partCount)
                 {
-                    readSize = (int)(_fileSize % _partSize);
+                    readSize = (int)(FileSize % _partSize);
                 }
 
                 var url = $"{BaseUrl}?partNumber={i}&uploadId={_uploadId}";
@@ -156,9 +133,9 @@ namespace Display.Services.Upload
                 {
                     var currentPosition = position + p;
                     _progress?.Report(currentPosition);
-                    Debug.WriteLine($"本地文件大小：{_fileSize} 上传大小：{currentPosition}  当前进度为:{(double)currentPosition / _fileSize:P}");
+                    //Debug.WriteLine($"本地文件大小：{FileSize} 上传大小：{currentPosition}  当前进度为:{(double)currentPosition / FileSize:P}");
                 });
-                var subStream = new SubStream(_stream, 0, readSize, progress);
+                var subStream = new SubStream(Stream, 0, readSize, progress);
 
                 var content = new StreamContent(subStream)
                 {
@@ -175,22 +152,32 @@ namespace Display.Services.Upload
                     position += readSize;
 
                     ETagList.Add(etag);
-                    Debug.WriteLine($"分片{i} 上传成功, ETag:{etag}");
+                    //Debug.WriteLine($"分片{i} 上传成功, ETag:{etag}");
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"上传出错：{ex.Message}");
-
-                    return false;
+                    isSucceed = false;
+                    break;
                 }
             }
 
-            Debug.WriteLine("分片上传完成");
+            if (isSucceed)
+            {
+                Debug.WriteLine("分片上传完成");
+                return await End();
+            }
 
-            return await End();
+            Dispose();
+            return null;
         }
 
-        private async Task<bool> End()
+        public override void Stop()
+        {
+            Dispose();
+        }
+
+        private async Task<OssUploadResult> End()
         {
             var headers = new Dictionary<string, string>()
             {
@@ -204,16 +191,15 @@ namespace Display.Services.Upload
             var content = new StreamContent(xmlStream);
             var request = CreateRequest(HttpMethod.Post, url, headers, content);
 
-            if (Token.IsCancellationRequested) return false;
+            if (Token.IsCancellationRequested) return null;
 
-            var isSucceed = false;
+            OssUploadResult result = null;
             try
             {
-                var result = await Client.SendAsync<MultipartUploadResult>(request, Token);
+                result = await Client.SendAsync<OssUploadResult>(request, Token);
 
                 Debug.WriteLine($"上传结果：{result}");
 
-                isSucceed = result.state;
             }
             catch (Exception ex)
             {
@@ -224,7 +210,8 @@ namespace Display.Services.Upload
                 await xmlStream.DisposeAsync();
             }
 
-            return isSucceed;
+            Dispose();
+            return result;
         }
 
         private XmlDocument CreateCompleteMultipartUploadContent()
@@ -252,12 +239,5 @@ namespace Display.Services.Upload
             return xml;
         }
 
-        public void Dispose()
-        {
-            _cts.Cancel();
-            _cts.Dispose();
-
-            GC.SuppressFinalize(this);
-        }
     }
 }
