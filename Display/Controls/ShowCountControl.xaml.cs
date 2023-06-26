@@ -7,20 +7,20 @@ namespace Display.Controls;
 public sealed partial class ShowCountControl : UserControl
 {
     public static readonly DependencyProperty CurrentCountProperty =
-            DependencyProperty.Register("CurrentCount", typeof(int), typeof(ShowCountControl), null);
+            DependencyProperty.Register(nameof(CurrentCount), typeof(int), typeof(ShowCountControl), null);
     public static readonly DependencyProperty AllCountProperty =
-            DependencyProperty.Register("AllCount", typeof(int), typeof(ShowCountControl), null);
+            DependencyProperty.Register(nameof(AllCount), typeof(int), typeof(ShowCountControl), null);
 
 
     public int CurrentCount
     {
-        get { return (int)GetValue(CurrentCountProperty); }
-        set { SetValue(CurrentCountProperty, value); }
+        get => (int)GetValue(CurrentCountProperty);
+        set => SetValue(CurrentCountProperty, value);
     }
     public int AllCount
     {
-        get { return (int)GetValue(AllCountProperty); }
-        set { SetValue(AllCountProperty, value); }
+        get => (int)GetValue(AllCountProperty);
+        set => SetValue(AllCountProperty, value);
     }
 
     public ShowCountControl()

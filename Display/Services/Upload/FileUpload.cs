@@ -128,6 +128,7 @@ namespace Display.Services.Upload
             // 秒传失败或者没获取到需要的参数
             if (State == UploadState.Faulted || upload115Result == null)
             {
+                await DisposeAsync();
                 return false;
             }
 
@@ -137,6 +138,8 @@ namespace Display.Services.Upload
             {
                 FileUploadResult.PickCode = upload115Result.pickcode;
                 FileUploadResult.Success = true;
+                
+                await DisposeAsync();
                 return true;
             }
 
@@ -154,7 +157,6 @@ namespace Display.Services.Upload
 
             FileUploadResult.SetFromOssUploadResult(ossUploadResult);
             FileUploadResult.Success = true;
-
             return true;
         }
 
@@ -302,6 +304,7 @@ namespace Display.Services.Upload
         {
             var result = await _aliyunOss.Start();
 
+            // 完成或失败后释放
             if (State is UploadState.Succeed or UploadState.Faulted) await DisposeAsync();
 
             return result;

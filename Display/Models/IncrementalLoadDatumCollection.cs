@@ -2,10 +2,12 @@
 using Microsoft.UI.Xaml.Data;
 using System;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Display.Data;
+using OpenCvSharp.Flann;
 
 namespace Display.Models;
 
@@ -18,16 +20,31 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
     private int _allCount;
     public int AllCount
     {
-        get => this._allCount;
+        get => _allCount;
         private set
         {
-            if (this._allCount == value) return;
+            if (_allCount == value) return;
 
-            this._allCount = value;
+            _allCount = value;
 
             OnPropertyChanged(new PropertyChangedEventArgs(nameof(AllCount)));
         }
     }
+
+    public new void Insert(int index, FilesInfo item)
+    {
+        //base.InsertItem(index, item);
+        base.Insert(index, item);
+        AllCount++;
+    }
+
+    public new void Remove(FilesInfo item)
+    {
+        //base.RemoveItem(item);
+        base.Remove(item);
+        AllCount--;
+    }
+
 
     public WebApi.OrderBy orderby { get; private set; } = WebApi.OrderBy.UserPtime;
 
@@ -70,7 +87,8 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
     public async Task<int> LoadData(int limit = 40, int offset = 0)
     {
         var filesInfo = await GetFilesInfoAsync(limit, offset);
-        if (AllCount != filesInfo.count) AllCount = filesInfo.count;
+
+        AllCount = filesInfo.count;
 
         if (filesInfo.data == null)
         {

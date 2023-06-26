@@ -490,7 +490,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         TryRemoveTransferFiles(sourceFilesInfos);
 
         // 从115中删除
-        await WebApi.DeleteFiles(sourceFilesInfos.FirstOrDefault()?.Datum.pid,
+        await WebApi.DeleteFiles(sourceFilesInfos.FirstOrDefault()?.Cid,
             sourceFilesInfos.Select(item => item.Id).ToList());
     }
 
@@ -537,7 +537,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
                     if (currentFolderCid != CurrentExplorerItem.Id) return;
 
                     // 上传成功后更新UI
-                    FilesInfos.Add(new FilesInfo(result));
+                    FilesInfos.Insert(0,new FilesInfo(result));
                 });
             }
 
