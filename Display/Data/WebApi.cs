@@ -239,7 +239,7 @@ namespace Display.Data
                 var addToDataAccessList = getFilesProgressInfo.AddToDataAccessList;
 
                 //删除后重新添加
-                DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(cid);
+                DataAccess.DeleteAllDirectoryAndFiles_InFilesInfoTable(cid);
 
                 if (addToDataAccessList.Count > 0)
                 {
