@@ -7,7 +7,7 @@ public class IsVideoToBoolConverter : IValueConverter
 {
     public Object Convert(object value, Type targetType, object parameter, string language)
     {
-        if (value is int result && result == 1)
+        if (value is 1)
         {
             return true;
         }

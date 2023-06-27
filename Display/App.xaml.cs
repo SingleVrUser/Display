@@ -109,13 +109,7 @@ namespace Display
             //数据文件不存在
             else if (!File.Exists(DataAccess.DbPath))
             {
-                DataAccess.tryCreateDBFile(dataAccessSavePath);
-
-                //CommonWindow window1 = new();
-                //window1.Content = new TextBlock() { Text = $"数据文件不存在，请检查：{DataAccess.dbpath}", IsTextSelectionEnabled = true, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
-                //window1.Title = "出错";
-                //window1.Activate();
-                //isNormal = false;
+                DataAccess.TryCreateDbFile(dataAccessSavePath);
             }
             // TODO
             // 数据文件格式有误

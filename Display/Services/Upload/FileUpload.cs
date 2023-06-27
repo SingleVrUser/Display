@@ -379,7 +379,7 @@ namespace Display.Services.Upload
 
     public class FileUploadResult
     {
-        public string Id;
+        public long Id;
         public string Name;
         public long FileSize;
         public long Cid;
@@ -404,7 +404,7 @@ namespace Display.Services.Upload
             Sha1 = data.sha1;
             Aid = data.aid;
             Name = data.file_name;
-            long.TryParse(data.cid, out Cid);
+            Cid = data.cid;
             IsVideo = data.is_video == 1;
         }
     }

@@ -45,13 +45,6 @@ namespace Display.ViewModels
              SequentialStart();
         }
 
-        public void AddUploadTask(string filePath, string cid, Action<FileUploadResult> finishAction = null)
-        {
-            if (!long.TryParse(cid, out var uploadId)) return;
-
-            AddUploadTask(filePath, uploadId, finishAction);
-        }
-
         /// <summary>
         /// 分配上传任务
         /// </summary>

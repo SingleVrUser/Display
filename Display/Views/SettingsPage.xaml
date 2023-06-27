@@ -146,10 +146,10 @@
                             <StackPanel Padding="50,0"
                                         Spacing="10">
                                 <RelativePanel>
-                                    <TextBox x:Name="Cookie_TextBox"
+                                    <PasswordBox x:Name="CookieBox"
                                              MinWidth="100"
                                              MaxWidth="600"
-                                             Text="{x:Bind data:AppSettings._115_Cookie}" />
+                                             Password="{x:Bind data:AppSettings._115_Cookie}"/>
                                     <StackPanel Orientation="Horizontal"
                                                 RelativePanel.AlignRightWithPanel="True"
                                                 Spacing="5">
@@ -163,6 +163,8 @@
                                                 </TextBlock>
                                             </ToolTipService.ToolTip>
                                         </Button>
+                                        <ToggleButton Content="显示"
+                                                Click="Show115CookieButtonClick" />
                                     </StackPanel>
                                 </RelativePanel>
 
@@ -760,9 +762,9 @@
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock Margin="0,0,10,0"
                                                            VerticalAlignment="Center">远程下载接口</TextBlock>
-                                                <TextBox PlaceholderText="http://用户名:密码@IP地址:监听端口，例:http://admin:123@127.0.0.1:1235"
+                                                <TextBox x:Name="BitCometDownApiTextBox"
+                                                         PlaceholderText="http://用户名:密码@IP地址:监听端口，例:http://admin:123@127.0.0.1:1235"
                                                          Text="{x:Bind data:AppSettings.BitCometSettings.ApiUrl}"
-                                                         x:Name="BitCometDownApiTextBox"
                                                          Width="540" />
                                                 <customcontrols:StatusShow HorizontalAlignment="Right"
                                                                            x:Name="BitCometCheckStatus"

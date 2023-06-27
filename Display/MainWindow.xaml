@@ -94,8 +94,7 @@
                 </customcontrols:CustomAutoSuggestBox.KeyboardAccelerators>
             </customcontrols:CustomAutoSuggestBox>
             
-
-                <!--<Button Grid.Column="2" Content="测试" Click="ButtonBase_OnClick" HorizontalAlignment="Center"/>-->
+            <!--<Button Grid.Column="2" Content="测试" Click="ButtonBase_OnClick" HorizontalAlignment="Center"/>-->
         </Grid>
 
         <NavigationView x:Name="NavView"

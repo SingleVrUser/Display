@@ -69,7 +69,7 @@ public sealed partial class MainPage : Page
         filesInfos.ForEach(item => FilesInfos.Add(item));
 
         _units = new ObservableCollection<MetadataItem>()
-            { new MetadataItem { Label = "播放列表", Command = OpenFolderCommand, CommandParameter = "0" } };
+            { new() { Label = "播放列表", Command = OpenFolderCommand, CommandParameter = 0 } };
         metadataControl.Items = _units;
         webApi = WebApi.GlobalWebApi;
 
@@ -120,7 +120,7 @@ public sealed partial class MainPage : Page
 
                         // 挑选视频数量
                         var videoInFolder = filesInfo.data
-                            .Where(item => !string.IsNullOrEmpty(item.fid) && item.iv == 1).Take(leftCount).ToList();
+                            .Where(item => item.fid!=null && item.iv == 1).Take(leftCount).ToList();
                         var videoInFolderCount = videoInFolder.Count;
 
                         if (videoInFolderCount <= 0) continue;
@@ -143,14 +143,14 @@ public sealed partial class MainPage : Page
         }
     }
 
-    private RelayCommand<string> _openFolderCommand;
+    private RelayCommand<long> _openFolderCommand;
 
-    private RelayCommand<string> OpenFolderCommand =>
-        _openFolderCommand ??= new RelayCommand<string>(OpenFolder);
+    private RelayCommand<long> OpenFolderCommand =>
+        _openFolderCommand ??= new RelayCommand<long>(OpenFolder);
 
-    private async void OpenFolder(string cid)
+    private async void OpenFolder(long cid)
     {
-        var currentItem = _units.FirstOrDefault(item => item.CommandParameter.ToString() == cid);
+        var currentItem = _units.FirstOrDefault(item => (long)item.CommandParameter == cid);
 
         //不存在，返回
         if (currentItem.CommandParameter == null) return;
@@ -314,7 +314,7 @@ public sealed partial class MainPage : Page
         // 视频未转码，尝试获取直链
         else
         {
-            var downUrlList = await webApi.GetDownUrl(pickCode, GetInfoFromNetwork.UserAgent);
+            var downUrlList = await webApi.GetDownUrl(pickCode, GetInfoFromNetwork.DownUserAgent);
 
             if (downUrlList.Count > 0)
             {
@@ -598,12 +598,13 @@ public sealed partial class MainPage : Page
     {
         // 首先，从播放列表中删除
         var fid = DeletedFileFromListAsync(fileInfo);
+        if (fid == null) return;
 
         // 播放下一集（如果存在）
         await TryRemoveCurrentVideoAndPlayNextVideo(fileInfo);
 
         // 然后，删除115文件
-        await webApi.DeleteFiles(fileInfo.Cid, new List<string> { fid });
+        await webApi.DeleteFiles(fileInfo.Cid, new[] { (long)fid });
 
         // 接着，删除资源管理器的文件，如果存在（有可能已经关掉了）
         if (LastFilesListView.IsLoaded && LastFilesListView.ItemsSource is IncrementalLoadDatumCollection filesInfos &&
@@ -619,7 +620,7 @@ public sealed partial class MainPage : Page
     /// </summary>
     /// <param name="fileInfo"></param>
     /// <returns></returns>
-    private string DeletedFileFromListAsync(FilesInfo fileInfo)
+    private long? DeletedFileFromListAsync(FilesInfo fileInfo)
     {
         var isFile = fileInfo.Type == FilesInfo.FileType.File;
 
@@ -715,33 +716,6 @@ public sealed partial class MainPage : Page
 
         return await dialog.ShowAsync();
     }
-
-    private async Task DeletedFilesFromListView(ListView listView, ObservableCollection<FilesInfo> filesInfos)
-    {
-        //检查选中的文件或文件夹
-        if (listView.SelectedItems.FirstOrDefault() is not FilesInfo) return;
-
-        List<FilesInfo> filesInfo = new();
-        foreach (var item in listView.SelectedItems)
-        {
-            filesInfo.Add((FilesInfo)item);
-        }
-
-        if (filesInfo.Count == 0) return;
-
-        var result = await TipDeletedFiles();
-
-        if (result == ContentDialogResult.Primary)
-        {
-            Debug.WriteLine("删除");
-
-            filesInfo.ForEach(item => filesInfos.Remove(item));
-
-            await webApi.DeleteFiles(filesInfo.FirstOrDefault()?.Cid,
-                filesInfo.Select(item => item.Id).ToList());
-        }
-    }
-
 
     private void InfoGridVisibilityButton_Click(object sender, RoutedEventArgs e)
     {

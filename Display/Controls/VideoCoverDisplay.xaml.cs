@@ -1264,7 +1264,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         if (failInfo == null)
         {
-            DataAccess.AddOrReplaceFailList_islike_looklater(new()
+            DataAccess.AddOrReplaceFailList_Islike_Looklater(new()
             {
                 pc = pickCode,
                 is_like = 1
@@ -1300,7 +1300,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         if (failInfo == null)
         {
-            DataAccess.AddOrReplaceFailList_islike_looklater(new()
+            DataAccess.AddOrReplaceFailList_Islike_Looklater(new()
             {
                 pc = pickCode,
                 look_later = 1

@@ -33,24 +33,24 @@ namespace Display.Controls
 
         public Explorer()
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             TreeViewDataSource = GetRootFolder();
             foreach (var item in TreeViewDataSource)
             {
-                TreeViewNode Node = new TreeViewNode()
+                var node = new TreeViewNode()
                 {
                     Content = item,
                     HasUnrealizedChildren = item.HasUnrealizedChildren,
                     IsExpanded = item.IsExpanded
                 };
-                FolderTreeView.RootNodes.Add(Node);
+                FolderTreeView.RootNodes.Add(node);
             }
 
             FileInSelectFolder = new ObservableCollection<FilesInfo>();
             SelectFolderName = new ObservableCollection<ExplorerItem>();
 
-            tryUpdataFolderInfo("0");
+            tryUpdataFolderInfo(0);
         }
 
 
@@ -60,7 +60,7 @@ namespace Display.Controls
         /// <param name="folderCid"></param>
         /// <param name="outType"></param>
         /// <returns></returns>
-        public List<Datum> GetFilesFromItems(string folderCid, FilesInfo.FileType outType)
+        public List<Datum> GetFilesFromItems(long folderCid, FilesInfo.FileType outType)
         {
             List<Datum> items;
 
@@ -86,8 +86,7 @@ namespace Display.Controls
 
             if (outType == FilesInfo.FileType.Folder)
             {
-                var itamsdfs = items.Where(x => string.IsNullOrEmpty(x.fid));
-                items = items.Where(x => string.IsNullOrEmpty(x.fid)).ToList();
+                items = items.Where(x => x.fid == null).ToList();
             }
 
             return items;
@@ -99,7 +98,7 @@ namespace Display.Controls
             var list = new ObservableCollection<ExplorerItem>();
 
             //位于根目录下的文件夹
-            var data = GetFilesFromItems("0", FilesInfo.FileType.Folder);
+            var data = GetFilesFromItems(0, FilesInfo.FileType.Folder);
 
             foreach (var item in data)
             {
@@ -123,7 +122,7 @@ namespace Display.Controls
         /// <summary>
         /// 点击了TreeView选项
         /// </summary>
-        private string _lastInvokedCid = "";
+        private long _lastInvokedCid = -1;
 
         public event TypedEventHandler<TreeView, TreeViewItemInvokedEventArgs> ItemInvoked;
         private void TreeView_ItemInvoked(TreeView sender, TreeViewItemInvokedEventArgs args)
@@ -133,8 +132,8 @@ namespace Display.Controls
 
             //避免重复点击
             if (cid == _lastInvokedCid) return;
-            else _lastInvokedCid = cid;
 
+            _lastInvokedCid = cid;
             tryUpdataFolderInfo(cid);
 
             ItemInvoked?.Invoke(sender, args);
@@ -145,7 +144,7 @@ namespace Display.Controls
         /// 根据cid更新右侧的信息（显示目录 和 文件详情）
         /// </summary>
         /// <param Name="folderCid"></param>
-        private void tryUpdataFolderInfo(string folderCid)
+        private void tryUpdataFolderInfo(long folderCid)
         {
             var items = GetFilesFromItems(folderCid, FilesInfo.FileType.File);
 
@@ -162,16 +161,15 @@ namespace Display.Controls
         /// 更新详细信息的目录
         /// </summary>
         /// <param Name="folderCid"></param>
-        private void tryUpdateFolder(string folderCid)
+        private void tryUpdateFolder(long folderCid)
         {
-            if (folderCid == "0")
+            if (folderCid == 0)
             {
                 SelectFolderName.Clear();
                 SelectFolderName.Add(new ExplorerItem()
                 {
                     Name = "根目录",
-                    Id = "0"
-
+                    Id = 0
                 });
             }
             else
@@ -196,20 +194,19 @@ namespace Display.Controls
         /// <param Name="rootNodes"></param>
         /// <param Name="folderCid"></param>
         /// <returns></returns>
-        private TreeViewNode getNodeByRootNodeWithCid(List<TreeViewNode> rootNodes, string folderCid)
+        private TreeViewNode getNodeByRootNodeWithCid(List<TreeViewNode> rootNodes, long folderCid)
         {
             //不存在Cid未零的Node
-            if (folderCid == "0") return null;
+            if (folderCid == 0) return null;
 
             TreeViewNode targertNode = null;
 
-            List<TreeViewNode> Nodechildrens = rootNodes;
+            var childrenNode = rootNodes;
 
-
-            while (targertNode == null && Nodechildrens.Count != 0)
+            while (targertNode == null && childrenNode.Count != 0)
             {
                 List<TreeViewNode> tmpChildrenNode = new();
-                foreach (TreeViewNode node in Nodechildrens)
+                foreach (TreeViewNode node in childrenNode)
                 {
                     //Content
                     if (((ExplorerItem)node.Content).Id == folderCid)
@@ -218,15 +215,13 @@ namespace Display.Controls
                         break;
                     }
                     //Children
-                    else
+
+                    foreach (var cnode in node.Children)
                     {
-                        foreach (var cnode in node.Children)
-                        {
-                            tmpChildrenNode.Add(cnode);
-                        }
+                        tmpChildrenNode.Add(cnode);
                     }
                 }
-                Nodechildrens = tmpChildrenNode;
+                childrenNode = tmpChildrenNode;
             }
 
             return targertNode;
@@ -494,7 +489,7 @@ namespace Display.Controls
                 // Home is special case.
                 if (args.Index == 0)
                 {
-                    tryUpdataFolderInfo("0");
+                    tryUpdataFolderInfo(0);
                 }
                 // Go back to the clicked item.
                 else
@@ -538,7 +533,9 @@ namespace Display.Controls
             //文件夹
             if (itemInfo.Type == FilesInfo.FileType.Folder)
             {
-                tryUpdataFolderInfo(itemInfo.Id);
+                if (itemInfo.Id == null) return;
+
+                tryUpdataFolderInfo((long)itemInfo.Id);
             }
 
             ItemClick?.Invoke(sender, e);
@@ -568,7 +565,7 @@ namespace Display.Controls
             }
         }
 
-        private void deletedNodeAndDataAccessByCid(IList<TreeViewNode> Nodechildrens, string cid)
+        private void deletedNodeAndDataAccessByCid(IList<TreeViewNode> Nodechildrens, long cid)
         {
             foreach (TreeViewNode node in Nodechildrens)
             {

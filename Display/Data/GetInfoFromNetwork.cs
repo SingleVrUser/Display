@@ -17,7 +17,7 @@ namespace Display.Data
         private static HttpClient _client;
         public static HttpClient CommonClient
         {
-            get { return _client ??= CreateClient(new Dictionary<string, string> { { "user-agent", UserAgent } }); }
+            get { return _client ??= CreateClient(new Dictionary<string, string> { { "user-agent", DownUserAgent } }); }
             set => _client = value;
         }
 
@@ -30,7 +30,7 @@ namespace Display.Data
                 {
                     _clientWithJavDBCookie = CreateClient(new Dictionary<string, string>() {
                         {"cookie",AppSettings.JavDbCookie },
-                        {"user-agent" ,UserAgent}
+                        {"user-agent" ,DownUserAgent}
                     });
                 }
 
@@ -40,7 +40,7 @@ namespace Display.Data
             set => _clientWithJavDBCookie = value;
         }
 
-        public static string UserAgent = Const.DefaultSettings.Network._115.DownUserAgent;
+        public static string DownUserAgent = Const.DefaultSettings.Network._115.DownUserAgent;
 
         //public static string BuilderMediaElementUserAgent()
         //{

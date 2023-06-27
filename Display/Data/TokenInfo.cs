@@ -129,21 +129,21 @@ namespace Display.Data
     /// </summary>
     public class StoreDatum
     {
-        public string Cid { get; set; }
+        public long Cid { get; set; }
         public List<Datum> DatumList { get; set; }
     }
 
     public class Datum
     {
-        public string fid { get; set; }
+        public long? fid { get; set; }
+        public long? pid { get; set; }
+        public long cid { get; set; }
         public long uid { get; set; }
         public int aid { get; set; }
-        public string cid { get; set; }
         public string n { get; set; }
         public long s { get; set; }
         public int sta { get; set; }
         public string pt { get; set; }
-        public string pid { get; set; }
         public string pc { get; set; }
         public int p { get; set; }
         public int m { get; set; }
@@ -186,7 +186,7 @@ namespace Display.Data
     {
         public string name { get; set; }
         public object aid { get; set; }
-        public string cid { get; set; }
+        public long cid { get; set; }
         public object pid { get; set; }
         public object isp { get; set; }
         public string p_cid { get; set; }
@@ -858,10 +858,8 @@ namespace Display.Data
     /// </summary>
     public class ExplorerItem : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        //public enum ExplorerItemType { Folder, File };
         public string Name { get; set; }
-        public string Id { get; set; }
+        public long Id { get; set; }
         public bool HasUnrealizedChildren { get; set; }
         public FileType Type { get; set; }
         private ObservableCollection<ExplorerItem> m_children;
@@ -875,7 +873,6 @@ namespace Display.Data
         }
 
         public Datum datum;
-
 
         private string _iconPath;
         public string IconPath
@@ -918,6 +915,7 @@ namespace Display.Data
 
         }
 
+        public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(string propertyName)
         {
             if (PropertyChanged != null)
@@ -933,8 +931,8 @@ namespace Display.Data
     public class FilesInfo : INotifyPropertyChanged
     {
         public readonly Datum Datum;
-        public readonly string Id;
-        public readonly string Cid;
+        public readonly long? Id;
+        public readonly long Cid;
         public readonly string PickCode;
         public readonly FileType Type;
         public readonly string IconPath;
@@ -945,11 +943,11 @@ namespace Display.Data
         {
             Name = result.Name;
             Id = result.Id;
-            Cid = result.Cid.ToString();
+            Cid = result.Cid;
             PickCode = result.PickCode;
             Type = result.Type;
             IsVideo = result.IsVideo;
-            NoId = string.IsNullOrEmpty(Id);
+            NoId = Id !=null;
 
             IconPath = GetPathFromFileType(Name.Split(".")[^1]);
 
@@ -981,16 +979,16 @@ namespace Display.Data
 
             IconPath = "ms-appx:///Assets/115/file_type/other/unknown.svg";
             //文件夹
-            if (string.IsNullOrEmpty(data.fid))
+            if (data.fid == null && data.pid!=null)
             {
                 Type = FileType.Folder;
                 Id = data.cid;
-                Cid = data.pid;
+                Cid = (long)data.pid;
                 PickCode = data.pc;
 
                 IconPath = "ms-appx:///Assets/115/file_type/folder/folder.svg";
             }
-            else
+            else if(data.fid != null)
             {
                 Type = FileType.File;
                 Id = data.fid;
@@ -1017,7 +1015,7 @@ namespace Display.Data
                 }
             }
 
-            NoId = string.IsNullOrEmpty(Id);
+            NoId = Id < 0;
         }
 
         public static string GetVideoQualityFromVdi(int vdi)
@@ -1240,14 +1238,14 @@ namespace Display.Data
     /// </summary>
     public class SelectedItem
     {
-        public string id { get; set; }
+        public long id { get; set; }
         public string name { get; set; }
         public int file_count { get; set; }
         public int folder_count { get; set; }
         public string size { get; set; }
         public string pick_code { get; set; }
         public int file_type { get; set; }
-        public string file_id { get; set; }
+        public long file_id { get; set; }
 
         /// <summary>
         /// 是否有隐藏文件，有为1，无为0
@@ -1281,7 +1279,7 @@ namespace Display.Data
 
         public int allCount => count + folder_count;
 
-        public static Datum ConvertFolderToDatum(FileCategory fileCategory, string cid)
+        public static Datum ConvertFolderToDatum(FileCategory fileCategory, long cid)
         {
             Datum datum = new()
             {
@@ -1319,7 +1317,7 @@ namespace Display.Data
 
     public class ParentPath
     {
-        public string file_id { get; set; }
+        public long file_id { get; set; }
         public string file_name { get; set; }
     }
 
@@ -1334,7 +1332,7 @@ namespace Display.Data
 
         public int AllCount => FolderCount + FilesCount;
 
-        public List<string> FailCid { get; set; } = new();
+        public List<long?> FailCid { get; set; } = new();
 
         public List<Datum> AddToDataAccessList = new();
     }
@@ -2027,7 +2025,7 @@ namespace Display.Data
         public string errno { get; set; }
         public string errtype { get; set; }
         public int aid { get; set; }
-        public string cid { get; set; }
+        public long cid { get; set; }
         public string cname { get; set; }
         public string file_id { get; set; }
         public string file_name { get; set; }

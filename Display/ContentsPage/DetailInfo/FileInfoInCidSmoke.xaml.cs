@@ -35,10 +35,10 @@ namespace Display.ContentsPage.DetailInfo
             InfosListView.ItemsSource = videoInfos;
         }
 
-        public static string GetFolderString(string folderCid)
+        public static string GetFolderString(long folderCid)
         {
             //从数据库中获取根目录信息
-            List<Datum> folderToRootList = DataAccess.GetRootByCid(folderCid);
+            var folderToRootList = DataAccess.GetRootByCid(folderCid);
 
             return string.Join(" > ", folderToRootList.Select(x=>x.n));
         }
@@ -53,6 +53,10 @@ namespace Display.ContentsPage.DetailInfo
         private async void DeleteItem_OnClick(object sender, RoutedEventArgs e)
         {
             if (sender is not MenuFlyoutItem { DataContext: Datum info }) return;
+
+            if (info.fid == null) return;
+
+            var fileId = (long)info.fid;
 
             //115删除
             var dialog = new ContentDialog
@@ -72,7 +76,7 @@ namespace Display.ContentsPage.DetailInfo
 
             // 从115中删除 
             await WebApi.GlobalWebApi.DeleteFiles(info.cid,
-                new List<string>() { info.fid });
+                new[] { fileId });
 
             // 从数据库中删除
             DataAccess.DeleteDataInFilesInfoAndFileToInfo(info.pc);

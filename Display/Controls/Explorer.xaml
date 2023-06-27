@@ -9,7 +9,6 @@
     xmlns:data="using:Display.Data"
     mc:Ignorable="d">
     <Control.Resources>
-
         <!--ListView 的 文件 DataTemplate-->
         <DataTemplate x:Key="FileInSelectFolderTemplate" x:DataType="data:FilesInfo">
             <ListViewItem>

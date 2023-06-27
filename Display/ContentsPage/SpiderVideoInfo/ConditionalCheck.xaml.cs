@@ -157,10 +157,10 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// </summary>
         private void tryUpdateLastPageStatus(Status status)
         {
-            if (lastPage != null)
-            {
-                lastPage.LoginCheck.status = status;
-            }
+            //if (lastPage != null)
+            //{
+            //    lastPage.LoginCheck.status = status;
+            //}
         }
         private void ClickOne_Click(object sender, RoutedEventArgs e)
         {

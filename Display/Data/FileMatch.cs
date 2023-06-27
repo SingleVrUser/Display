@@ -61,7 +61,7 @@ namespace Display.Data
         /// </summary>
         /// <param name="src_text"></param>
         /// <returns></returns>
-        public static string MatchName(string src_text, string file_cid = "")
+        public static string MatchName(string src_text, long? file_cid = null)
         {
             //提取文件名
             var name = Regex.Replace(src_text, @"(\.\w{3,5}?)$", "", RegexOptions.IgnoreCase);
@@ -175,9 +175,9 @@ namespace Display.Data
             }
 
             //如果最后仍然匹配不了番号，则尝试使用文件所在文件夹的名字去匹配
-            if (!string.IsNullOrEmpty(file_cid))
+            if (file_cid!=null)
             {
-                var folderDatum = DataAccess.getUpperLevelFolderCid(file_cid);
+                var folderDatum = DataAccess.GetUpperLevelFolderCid((long)file_cid);
 
                 if (!string.IsNullOrEmpty(folderDatum.n))
                 {

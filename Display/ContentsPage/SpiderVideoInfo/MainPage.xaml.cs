@@ -24,8 +24,8 @@ namespace Display.ContentsPage.SpiderVideoInfo;
 /// </summary>
 public sealed partial class MainPage : Page, INotifyPropertyChanged
 {
-    private Models.IncrementalLoadFailSpiderInfoCollection _failList;
-    Models.IncrementalLoadFailSpiderInfoCollection FailList
+    private IncrementalLoadFailSpiderInfoCollection _failList;
+    private IncrementalLoadFailSpiderInfoCollection FailList
     {
         get => _failList;
         set
@@ -103,16 +103,16 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     /// <param Name="e"></param>
     private void StartMatchName_ButtonClick(object sender, RoutedEventArgs e)
     {
-        //从本地数据库中搜刮
-        if (localData_RadioButton.IsChecked == true)
-        {
-            SpiderFromLocalData();
-        }
-        //从失败列表中搜刮（带匹配名称）
-        else
-        {
-            SpiderFromFailList();
-        }
+        ////从本地数据库中搜刮
+        //if (localData_RadioButton.IsChecked == true)
+        //{
+        //    SpiderFromLocalData();
+        //}
+        ////从失败列表中搜刮（带匹配名称）
+        //else
+        //{
+        //    SpiderFromFailList();
+        //}
     }
 
     /// <summary>
@@ -141,9 +141,9 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
 
     private void ShowTeachingTip(string content, FrameworkElement target = null)
     {
-        SelectNull_TeachingtTip.Target = target != null ? target : StartMatchNameButton;
-        SelectNull_TeachingtTip.Subtitle = content;
-        SelectNull_TeachingtTip.IsOpen = true;
+        //SelectNull_TeachingtTip.Target = target != null ? target : StartMatchNameButton;
+        //SelectNull_TeachingtTip.Subtitle = content;
+        //SelectNull_TeachingtTip.IsOpen = true;
     }
 
     /// <summary>
@@ -151,12 +151,12 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     /// </summary>
     private void SpiderFromLocalData()
     {
-        //检查是否有选中文件
-        if (Explorer.FolderTreeView.SelectedNodes.Count == 0)
-        {
-            ShowTeachingTip("没有选择文件夹，请选择后继续");
-            return;
-        }
+        ////检查是否有选中文件
+        //if (Explorer.FolderTreeView.SelectedNodes.Count == 0)
+        //{
+        //    ShowTeachingTip("没有选择文件夹，请选择后继续");
+        //    return;
+        //}
 
         //获取需要搜刮的文件夹
         var tuple = GetCurrentSelectedFolder();
@@ -172,18 +172,18 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
         List<string> selectFilesNameList = new();
         List<Datum> datumList = new();
-        foreach (var node in Explorer.FolderTreeView.SelectedNodes)
-        {
-            if (node.Content is not ExplorerItem explorer) continue;
+        //foreach (var node in Explorer.FolderTreeView.SelectedNodes)
+        //{
+        //    if (node.Content is not ExplorerItem explorer) continue;
 
-            //文件夹
-            selectFilesNameList.Add(explorer.Name);
+        //    //文件夹
+        //    selectFilesNameList.Add(explorer.Name);
 
-            //文件夹下的文件和文件夹
-            var items = Explorer.GetFilesFromItems(explorer.Id, FilesInfo.FileType.File);
+        //    //文件夹下的文件和文件夹
+        //    var items = Explorer.GetFilesFromItems(explorer.Id, FilesInfo.FileType.File);
 
-            datumList.AddRange(items);
-        }
+        //    datumList.AddRange(items);
+        //}
 
         return new Tuple<List<string>, List<Datum>>(selectFilesNameList, datumList);
     }
@@ -197,8 +197,8 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
         var itemInfo = e.ClickedItem as FilesInfo;
 
-        if (FileInfoShow_Grid.Visibility == Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
-        SelectedDatum = itemInfo.Datum;
+        //if (FileInfoShow_Grid.Visibility == Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
+        //SelectedDatum = itemInfo.Datum;
     }
 
     /// <summary>
@@ -210,8 +210,8 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
         var content = ((args.InvokedItem as TreeViewNode).Content as ExplorerItem);
 
-        if (FileInfoShow_Grid.Visibility == Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
-        SelectedDatum = content.datum;
+        //if (FileInfoShow_Grid.Visibility == Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
+        //SelectedDatum = content.datum;
     }
 
     /// <summary>
@@ -224,9 +224,9 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
         if (e.AddedItems.Count != 1)
             return;
 
-        if (FileInfoShow_Grid.Visibility == Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
+        //if (FileInfoShow_Grid.Visibility == Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
 
-        SelectedDatum = (e.AddedItems[0] as FailDatum).Datum;
+        //SelectedDatum = (e.AddedItems[0] as FailDatum).Datum;
     }
 
     /// <summary>
@@ -255,56 +255,56 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
 
     private async void ChangedFailListType(ComboBoxItem comboBoxItem)
     {
-        if (FailListView.ItemsSource == null)
-        {
-            FailList = new();
-        }
-        else if (FailList.Count != 0)
-        {
-            FailList.Clear();
-        }
+        //if (FailListView.ItemsSource == null)
+        //{
+        //    FailList = new();
+        //}
+        //else if (FailList.Count != 0)
+        //{
+        //    FailList.Clear();
+        //}
 
-        switch (comboBoxItem.Name)
-        {
-            //正则匹配失败
-            case nameof(ShowMatcFail_ComboBoxItem):
-                FailList.SetShowType(FailType.MatchFail);
-                await FailList.LoadData();
-                break;
-            //搜刮失败
-            case nameof(ShowSpiderFail_ComboBoxItem):
-                FailList.SetShowType(FailType.SpiderFail);
-                await FailList.LoadData();
-                break;
-            //所有
-            default:
-                FailList.SetShowType(FailType.All);
-                await FailList.LoadData();
-                break;
-        }
+        //switch (comboBoxItem.Name)
+        //{
+        //    //正则匹配失败
+        //    case nameof(ShowMatcFail_ComboBoxItem):
+        //        FailList.SetShowType(FailType.MatchFail);
+        //        await FailList.LoadData();
+        //        break;
+        //    //搜刮失败
+        //    case nameof(ShowSpiderFail_ComboBoxItem):
+        //        FailList.SetShowType(FailType.SpiderFail);
+        //        await FailList.LoadData();
+        //        break;
+        //    //所有
+        //    default:
+        //        FailList.SetShowType(FailType.All);
+        //        await FailList.LoadData();
+        //        break;
+        //}
     }
 
     private void ShowData_RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (e.AddedItems[0] is RadioButton radioButton)
-        {
-            switch (radioButton.Name)
-            {
-                //本地数据库
-                case nameof(localData_RadioButton):
-                    FailShowTypeComboBox.SelectionChanged -= FailTypeComboBoxChanged;
-                    break;
-                //搜刮失败
-                case nameof(matchFail_RadioButton):
-                    if (FailShowTypeComboBox.SelectionBoxItem == null)
-                    {
-                        ChangedFailListType(ShowAllFail_ComboBoxItem);
-                    }
+        //if (e.AddedItems[0] is RadioButton radioButton)
+        //{
+        //    switch (radioButton.Name)
+        //    {
+        //        //本地数据库
+        //        case nameof(localData_RadioButton):
+        //            FailShowTypeComboBox.SelectionChanged -= FailTypeComboBoxChanged;
+        //            break;
+        //        //搜刮失败
+        //        case nameof(matchFail_RadioButton):
+        //            if (FailShowTypeComboBox.SelectionBoxItem == null)
+        //            {
+        //                ChangedFailListType(ShowAllFail_ComboBoxItem);
+        //            }
 
-                    FailShowTypeComboBox.SelectionChanged += FailTypeComboBoxChanged;
-                    break;
-            }
-        }
+        //            FailShowTypeComboBox.SelectionChanged += FailTypeComboBoxChanged;
+        //            break;
+        //    }
+        //}
     }
 
     private async void PlayWithPlayerButtonClick(object sender, RoutedEventArgs e)

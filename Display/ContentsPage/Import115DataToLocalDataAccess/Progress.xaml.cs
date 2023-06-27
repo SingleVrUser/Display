@@ -109,7 +109,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                 else
                 {
                     //cid为0（根目录）无法使用GetFolderCategory接口获取文件信息，故将0目录变为0目录下的目录
-                    if (info.Cid == "0")
+                    if (info.Cid == 0)
                     {
                         var rootFileInfo = await webapi.GetFileAsync(info.Cid, loadAll: true);
 

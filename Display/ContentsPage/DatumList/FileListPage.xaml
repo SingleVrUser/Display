@@ -494,6 +494,6 @@
         <TeachingTip Grid.Row="0"
                      Grid.RowSpan="2"
                      x:Name="LightDismissTeachingTip"
-                     IsLightDismissEnabled="True" />
+                     IsLightDismissEnabled="True"/>
     </Grid>
 </Page>

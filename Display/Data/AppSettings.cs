@@ -1,6 +1,5 @@
 ﻿using System.IO;
-using System.Text.Json;
-using Windows.Storage;
+using System.Runtime.CompilerServices;
 using DefaultValue = Display.Data.Const.DefaultSettings;
 
 namespace Display.Data;
@@ -12,8 +11,8 @@ public class AppSettings
     /// </summary>
     public static double ImageWidth
     {
-        get => Helper.Settings.GetValue(nameof(ImageWidth), DefaultValue.Ui.ImageSize.Width);
-        set => Helper.Settings.SetValue(nameof(ImageWidth), value);
+        get => GetValue(DefaultValue.Ui.ImageSize.Width);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -21,18 +20,17 @@ public class AppSettings
     /// </summary>
     public static double ImageHeight
     {
-        get => Helper.Settings.GetValue(nameof(ImageHeight), DefaultValue.Ui.ImageSize.Height);
-        set => Helper.Settings.SetValue(nameof(ImageHeight), value);
+        get => GetValue(DefaultValue.Ui.ImageSize.Height);
+        set => SetValue(value);
     }
-
 
     /// <summary>
     /// 是否动态调整图片大小
     /// </summary>
     public static bool IsAutoAdjustImageSize
     {
-        get => Helper.Settings.GetValue(nameof(IsAutoAdjustImageSize), DefaultValue.Ui.IsAutoAdjustImageSize);
-        set => Helper.Settings.SetValue(nameof(IsAutoAdjustImageSize), value);
+        get => GetValue(DefaultValue.Ui.IsAutoAdjustImageSize);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -40,8 +38,8 @@ public class AppSettings
     /// </summary>
     public static bool IsUpdatedDataAccessFrom014
     {
-        get => Helper.Settings.GetValue(nameof(IsUpdatedDataAccessFrom014), DefaultValue.App.IsUpdatedDataAccessFrom014);
-        set => Helper.Settings.SetValue(nameof(IsUpdatedDataAccessFrom014), value);
+        get => GetValue(DefaultValue.App.IsUpdatedDataAccessFrom014);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -49,8 +47,8 @@ public class AppSettings
     /// </summary>
     public static bool IsAutoPlayInVideoDisplay
     {
-        get => Helper.Settings.GetValue(nameof(IsAutoPlayInVideoDisplay), DefaultValue.Player.VideoDisplay.IsAutoPlay);
-        set => Helper.Settings.SetValue(nameof(IsAutoPlayInVideoDisplay), value);
+        get => GetValue(DefaultValue.Player.VideoDisplay.IsAutoPlay);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -58,8 +56,8 @@ public class AppSettings
     /// </summary>
     public static double AutoPlayPositionPercentage
     {
-        get => Helper.Settings.GetValue(nameof(AutoPlayPositionPercentage), DefaultValue.Player.VideoDisplay.AutoPlayPositionPercentage);
-        set => Helper.Settings.SetValue(nameof(AutoPlayPositionPercentage), value);
+        get => GetValue(DefaultValue.Player.VideoDisplay.AutoPlayPositionPercentage);
+        set => SetValue(value);
     }
 
 
@@ -68,8 +66,8 @@ public class AppSettings
     /// </summary>
     public static double MaxVideoPlayCount
     {
-        get => Helper.Settings.GetValue(nameof(MaxVideoPlayCount), DefaultValue.Player.VideoDisplay.MaxVideoPlayCount);
-        set => Helper.Settings.SetValue(nameof(MaxVideoPlayCount), value);
+        get => GetValue(DefaultValue.Player.VideoDisplay.MaxVideoPlayCount);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -77,8 +75,8 @@ public class AppSettings
     /// </summary>
     public static bool IsCheckUpdate
     {
-        get => Helper.Settings.GetValue(nameof(IsCheckUpdate), DefaultValue.App.IsCheckUpdate);
-        set => Helper.Settings.SetValue(nameof(IsCheckUpdate), value);
+        get => GetValue(DefaultValue.App.IsCheckUpdate);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -86,8 +84,8 @@ public class AppSettings
     /// </summary>
     public static string IgnoreUpdateAppVersion
     {
-        get => Helper.Settings.GetValue(nameof(IgnoreUpdateAppVersion), DefaultValue.App.IgnoreUpdateAppVersion);
-        set => Helper.Settings.SetValue(nameof(IgnoreUpdateAppVersion), value);
+        get => GetValue(DefaultValue.App.IgnoreUpdateAppVersion);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -95,8 +93,8 @@ public class AppSettings
     /// </summary>
     public static bool IsNavigationViewPaneOpen
     {
-        get => Helper.Settings.GetValue(nameof(IsNavigationViewPaneOpen), DefaultValue.Ui.MainWindow.IsNavigationViewPaneOpen);
-        set => Helper.Settings.SetValue(nameof(IsNavigationViewPaneOpen), value);
+        get => GetValue(DefaultValue.Ui.MainWindow.IsNavigationViewPaneOpen);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -104,8 +102,8 @@ public class AppSettings
     /// </summary>
     public static bool IsToastAfterImportDataAccess
     {
-        get => Helper.Settings.GetValue(nameof(IsToastAfterImportDataAccess), DefaultValue.Handle.IsToastAfterImportDataAccess);
-        set => Helper.Settings.SetValue(nameof(IsToastAfterImportDataAccess), value);
+        get => GetValue(DefaultValue.Handle.IsToastAfterImportDataAccess);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -114,8 +112,8 @@ public class AppSettings
     /// 
     public static bool IsSpiderAfterImportDataAccess
     {
-        get => Helper.Settings.GetValue(nameof(IsSpiderAfterImportDataAccess), DefaultValue.Handle.IsSpiderAfterImportDataAccess);
-        set => Helper.Settings.SetValue(nameof(IsSpiderAfterImportDataAccess), value);
+        get => GetValue(DefaultValue.Handle.IsSpiderAfterImportDataAccess);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -123,14 +121,14 @@ public class AppSettings
     /// </summary>
     public static string _115_Cookie
     {
-        get => Helper.Settings.GetValue(nameof(_115_Cookie), DefaultValue.Network.Cookie._115);
-        set => Helper.Settings.SetValue(nameof(_115_Cookie), value);
+        get => GetValue(DefaultValue.Network.Cookie._115);
+        set => SetValue(value);
     }
 
     public static string LibreDmmBaseUrl
     {
-        get => Helper.Settings.GetValue(nameof(LibreDmmBaseUrl), DefaultValue.Network.BaseUrl.LibreDmm);
-        set => Helper.Settings.SetValue(nameof(LibreDmmBaseUrl), value);
+        get => GetValue(DefaultValue.Network.BaseUrl.LibreDmm);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -139,8 +137,8 @@ public class AppSettings
     /// 
     public static string JavBusBaseUrl
     {
-        get => Helper.Settings.GetValue(nameof(JavBusBaseUrl), DefaultValue.Network.BaseUrl.JavBus);
-        set => Helper.Settings.SetValue(nameof(JavBusBaseUrl), value);
+        get => GetValue(DefaultValue.Network.BaseUrl.JavBus);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -149,8 +147,8 @@ public class AppSettings
     /// 
     public static string AvMooBaseUrl
     {
-        get => Helper.Settings.GetValue(nameof(AvMooBaseUrl), DefaultValue.Network.BaseUrl.AvMoo);
-        set => Helper.Settings.SetValue(nameof(AvMooBaseUrl), value);
+        get => GetValue(DefaultValue.Network.BaseUrl.AvMoo);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -159,8 +157,8 @@ public class AppSettings
     /// 
     public static string AvSoxBaseUrl
     {
-        get => Helper.Settings.GetValue(nameof(AvSoxBaseUrl), DefaultValue.Network.BaseUrl.AvSox);
-        set => Helper.Settings.SetValue(nameof(AvSoxBaseUrl), value);
+        get => GetValue(DefaultValue.Network.BaseUrl.AvSox);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -169,8 +167,8 @@ public class AppSettings
     /// 
     public static string Jav321BaseUrl
     {
-        get => Helper.Settings.GetValue(nameof(Jav321BaseUrl), DefaultValue.Network.BaseUrl.Jav321);
-        set => Helper.Settings.SetValue(nameof(Jav321BaseUrl), value);
+        get => GetValue(DefaultValue.Network.BaseUrl.Jav321);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -178,8 +176,8 @@ public class AppSettings
     /// </summary>
     public static string JavDbBaseUrl
     {
-        get => Helper.Settings.GetValue(nameof(JavDbBaseUrl), DefaultValue.Network.BaseUrl.JavDb);
-        set => Helper.Settings.SetValue(nameof(JavDbBaseUrl), value);
+        get => GetValue(DefaultValue.Network.BaseUrl.JavDb);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -187,8 +185,8 @@ public class AppSettings
     /// </summary>
     public static string Fc2HubBaseUrl
     {
-        get => Helper.Settings.GetValue(nameof(Fc2HubBaseUrl), DefaultValue.Network.BaseUrl.Fc2Hub);
-        set => Helper.Settings.SetValue(nameof(Fc2HubBaseUrl), value);
+        get => GetValue(DefaultValue.Network.BaseUrl.Fc2Hub);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -197,14 +195,14 @@ public class AppSettings
     /// 
     public static string MinnanoAvBaseUrl
     {
-        get => Helper.Settings.GetValue(nameof(MinnanoAvBaseUrl), DefaultValue.Network.BaseUrl.MinnanoAv);
-        set => Helper.Settings.SetValue(nameof(MinnanoAvBaseUrl), value);
+        get => GetValue(DefaultValue.Network.BaseUrl.MinnanoAv);
+        set => SetValue(value);
     }
 
     public static string X1080XBaseUrl
     {
-        get => Helper.Settings.GetValue(nameof(X1080XBaseUrl), DefaultValue.Network.BaseUrl.X080X);
-        set => Helper.Settings.SetValue(nameof(X1080XBaseUrl), value);
+        get => GetValue(DefaultValue.Network.BaseUrl.X080X);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -212,17 +210,17 @@ public class AppSettings
     /// </summary>
     public static string JavDbCookie
     {
-        get => Helper.Settings.GetValue(nameof(JavDbCookie), DefaultValue.Network.Cookie.JavDb);
-        set => Helper.Settings.SetValue(nameof(JavDbCookie), value);
+        get => GetValue(DefaultValue.Network.Cookie.JavDb);
+        set => SetValue(value);
     }
-    
+
     /// <summary>
     /// x1080x的Cookie，搜索信息需要
     /// </summary>
     public static string X1080XCookie
     {
-        get => Helper.Settings.GetValue(nameof(X1080XCookie), DefaultValue.Network.Cookie.X1080X);
-        set => Helper.Settings.SetValue(nameof(X1080XCookie), value);
+        get => GetValue(DefaultValue.Network.Cookie.X1080X);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -230,8 +228,8 @@ public class AppSettings
     /// </summary>
     public static string X1080XUa
     {
-        get => Helper.Settings.GetValue(nameof(X1080XUa), DefaultValue.Network.X1080X.UserAgent);
-        set => Helper.Settings.SetValue(nameof(X1080XUa), value);
+        get => GetValue(DefaultValue.Network.X1080X.UserAgent);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -239,8 +237,8 @@ public class AppSettings
     /// </summary>
     public static int GetActorInfoLastIndex
     {
-        get => Helper.Settings.GetValue(nameof(GetActorInfoLastIndex), DefaultValue.Network.GetActorInfoLastIndex);
-        set => Helper.Settings.SetValue(nameof(GetActorInfoLastIndex), value);
+        get => GetValue(DefaultValue.Network.GetActorInfoLastIndex);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -248,8 +246,8 @@ public class AppSettings
     /// </summary>
     public static string ImageSavePath
     {
-        get => Helper.Settings.GetValue(nameof(ImageSavePath), DefaultValue.App.SavePath.Image);
-        set => Helper.Settings.SetValue(nameof(ImageSavePath), value);
+        get => GetValue(DefaultValue.App.SavePath.Image);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -257,8 +255,8 @@ public class AppSettings
     /// </summary>
     public static string SubSavePath
     {
-        get => Helper.Settings.GetValue(nameof(SubSavePath), DefaultValue.App.SavePath.Sub);
-        set => Helper.Settings.SetValue(nameof(SubSavePath), value);
+        get => GetValue(DefaultValue.App.SavePath.Sub);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -266,20 +264,20 @@ public class AppSettings
     /// </summary>
     public static string ActorInfoSavePath
     {
-        get => Helper.Settings.GetValue(nameof(ActorInfoSavePath), DefaultValue.App.SavePath.Actor);
-        set => Helper.Settings.SetValue(nameof(ActorInfoSavePath), value);
+        get => GetValue(DefaultValue.App.SavePath.Actor);
+        set => SetValue(value);
     }
 
     public static string X1080XAttmnSavePath
     {
-        get => Helper.Settings.GetValue(nameof(X1080XAttmnSavePath), DefaultValue.App.SavePath.Attmn);
-        set => Helper.Settings.SetValue(nameof(X1080XAttmnSavePath), value);
+        get => GetValue(DefaultValue.App.SavePath.Attmn);
+        set => SetValue(value);
     }
 
     public static string DataSavePath
     {
-        get => Helper.Settings.GetValue(nameof(DataSavePath), DefaultValue.App.SavePath.Data);
-        set => Helper.Settings.SetValue(nameof(DataSavePath), value);
+        get => GetValue(DefaultValue.App.SavePath.Data);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -292,8 +290,8 @@ public class AppSettings
     /// </summary>
     public static string DataAccessSavePath
     {
-        get => Helper.Settings.GetValue(nameof(DataAccessSavePath), DefaultValue.App.SavePath.DataAccess);
-        set => Helper.Settings.SetValue(nameof(DataAccessSavePath), value);
+        get => GetValue(DefaultValue.App.SavePath.DataAccess);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -301,8 +299,8 @@ public class AppSettings
     /// </summary>
     public static int StartPageIndex
     {
-        get => Helper.Settings.GetValue(nameof(StartPageIndex), DefaultValue.Ui.MainWindow.StartPageIndex);
-        set => Helper.Settings.SetValue(nameof(StartPageIndex), value);
+        get => GetValue(DefaultValue.Ui.MainWindow.StartPageIndex);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -310,8 +308,8 @@ public class AppSettings
     /// </summary>
     public static bool IsUseJavDb
     {
-        get => Helper.Settings.GetValue(nameof(IsUseJavDb), DefaultValue.Network.Open.JavDb);
-        set => Helper.Settings.SetValue(nameof(IsUseJavDb), value);
+        get => GetValue(DefaultValue.Network.Open.JavDb);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -319,8 +317,8 @@ public class AppSettings
     /// </summary>
     public static bool IsUseJavBus
     {
-        get => Helper.Settings.GetValue(nameof(IsUseJavBus), DefaultValue.Network.Open.JavBus);
-        set => Helper.Settings.SetValue(nameof(IsUseJavBus), value);
+        get => GetValue(DefaultValue.Network.Open.JavBus);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -328,8 +326,8 @@ public class AppSettings
     /// </summary>
     public static bool IsUseAvMoo
     {
-        get => Helper.Settings.GetValue(nameof(IsUseAvMoo), DefaultValue.Network.Open.AvMoo);
-        set => Helper.Settings.SetValue(nameof(IsUseAvMoo), value);
+        get => GetValue(DefaultValue.Network.Open.AvMoo);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -337,8 +335,8 @@ public class AppSettings
     /// </summary>
     public static bool IsUseAvSox
     {
-        get => Helper.Settings.GetValue(nameof(IsUseAvSox), DefaultValue.Network.Open.AvSox);
-        set => Helper.Settings.SetValue(nameof(IsUseAvSox), value);
+        get => GetValue(DefaultValue.Network.Open.AvSox);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -346,8 +344,8 @@ public class AppSettings
     /// </summary>
     public static bool IsUseJav321
     {
-        get => Helper.Settings.GetValue(nameof(IsUseJav321), DefaultValue.Network.Open.Jav321);
-        set => Helper.Settings.SetValue(nameof(IsUseJav321), value);
+        get => GetValue(DefaultValue.Network.Open.Jav321);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -355,8 +353,8 @@ public class AppSettings
     /// </summary>
     public static bool IsUseFc2Hub
     {
-        get => Helper.Settings.GetValue(nameof(IsUseFc2Hub), DefaultValue.Network.Open.Fc2Hub);
-        set => Helper.Settings.SetValue(nameof(IsUseFc2Hub), value);
+        get => GetValue(DefaultValue.Network.Open.Fc2Hub);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -364,8 +362,8 @@ public class AppSettings
     /// </summary>
     public static bool IsUseLibreDmm
     {
-        get => Helper.Settings.GetValue(nameof(IsUseLibreDmm), DefaultValue.Network.Open.LibreDmm);
-        set => Helper.Settings.SetValue(nameof(IsUseLibreDmm), value);
+        get => GetValue(DefaultValue.Network.Open.LibreDmm);
+        set => SetValue(value);
     }
 
 
@@ -374,26 +372,26 @@ public class AppSettings
     /// </summary>
     public static bool IsUseX1080X
     {
-        get => Helper.Settings.GetValue(nameof(IsUseX1080X), DefaultValue.Network.Open.X1080X);
-        set => Helper.Settings.SetValue(nameof(IsUseX1080X), value);
+        get => GetValue(DefaultValue.Network.Open.X1080X);
+        set => SetValue(value);
     }
 
     public static string VlcExePath
     {
-        get => Helper.Settings.GetValue(nameof(VlcExePath), DefaultValue.Player.ExePath.Vlc);
-        set => Helper.Settings.SetValue(nameof(VlcExePath), value);
+        get => GetValue(DefaultValue.Player.ExePath.Vlc);
+        set => SetValue(value);
     }
 
     public static string MpvExePath
     {
-        get => Helper.Settings.GetValue(nameof(MpvExePath), DefaultValue.Player.ExePath.Mpv);
-        set => Helper.Settings.SetValue(nameof(MpvExePath), value);
+        get => GetValue(DefaultValue.Player.ExePath.Mpv);
+        set => SetValue(value);
     }
 
     public static string PotPlayerExePath
     {
-        get => Helper.Settings.GetValue(nameof(PotPlayerExePath), DefaultValue.Player.ExePath.PotPlayer);
-        set => Helper.Settings.SetValue(nameof(PotPlayerExePath), value);
+        get => GetValue(DefaultValue.Player.ExePath.PotPlayer);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -401,16 +399,16 @@ public class AppSettings
     /// </summary>
     public static int PlayerSelection
     {
-        get => Helper.Settings.GetValue(nameof(PlayerSelection), DefaultValue.Player.Selection);
-        set => Helper.Settings.SetValue(nameof(PlayerSelection), value);
+        get => GetValue(DefaultValue.Player.Selection);
+        set => SetValue(value);
     }
 
 
 
     public static int DefaultPlayQuality
     {
-        get => Helper.Settings.GetValue(nameof(DefaultPlayQuality), DefaultValue.Player.DefaultQuality);
-        set => Helper.Settings.SetValue(nameof(DefaultPlayQuality), value);
+        get => GetValue(DefaultValue.Player.DefaultQuality);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -418,8 +416,8 @@ public class AppSettings
     /// </summary>
     public static bool IsFindSub
     {
-        get => Helper.Settings.GetValue(nameof(IsFindSub), DefaultValue.Network._115.IsFindSub);
-        set => Helper.Settings.SetValue(nameof(IsFindSub), value);
+        get => GetValue(DefaultValue.Network._115.IsFindSub);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -427,8 +425,8 @@ public class AppSettings
     /// </summary>
     public static bool IsRecordDownRequest
     {
-        get => Helper.Settings.GetValue(nameof(IsRecordDownRequest), DefaultValue.Network._115.IsRecordDownRequest);
-        set => Helper.Settings.SetValue(nameof(IsRecordDownRequest), value);
+        get => GetValue(DefaultValue.Network._115.IsRecordDownRequest);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -436,8 +434,8 @@ public class AppSettings
     /// </summary>
     public static double DownUrlOverdueTime
     {
-        get => Helper.Settings.GetValue(nameof(DownUrlOverdueTime), DefaultValue.Network._115.DownUrlOverdueTime);
-        set => Helper.Settings.SetValue(nameof(DownUrlOverdueTime), value);
+        get => GetValue(DefaultValue.Network._115.DownUrlOverdueTime);
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -445,63 +443,74 @@ public class AppSettings
     /// </summary>
     public static int ThumbnailOrigin
     {
-        get => Helper.Settings.GetValue(nameof(ThumbnailOrigin), DefaultValue.Ui.ThumbnailOrigin);
-        set => Helper.Settings.SetValue(nameof(ThumbnailOrigin), value);
+        get => GetValue(DefaultValue.Ui.ThumbnailOrigin);
+        set => SetValue(value);
     }
 
 
     //默认下载方式
     public static string DefaultDownMethod
     {
-        get => Helper.Settings.GetValue(nameof(DefaultDownMethod), DefaultValue.Network._115.DefaultDownMethod);
-        set => Helper.Settings.SetValue(nameof(DefaultDownMethod), value);
+        get => GetValue(DefaultValue.Network._115.DefaultDownMethod);
+        set => SetValue(value);
     }
 
     public static DownApiSettings BitCometSettings
     {
-        get => Helper.Settings.GetValue<DownApiSettings>(nameof(BitCometSettings));
-        set => Helper.Settings.SetValue(nameof(BitCometSettings), value);
+        get => GetValue<DownApiSettings>();
+        set => SetValue(value);
     }
 
     public static string BitCometSavePath
     {
-        get => Helper.Settings.GetValue(nameof(BitCometSavePath), DefaultValue.App.SavePath.BitCometDown);
-        set => Helper.Settings.SetValue(nameof(BitCometSavePath), value);
+        get => GetValue(DefaultValue.App.SavePath.BitCometDown);
+        set => SetValue(value);
     }
 
     public static DownApiSettings Aria2Settings
     {
-        get => Helper.Settings.GetValue<DownApiSettings>(nameof(Aria2Settings));
-        set => Helper.Settings.SetValue(nameof(Aria2Settings), value);
+        get => GetValue<DownApiSettings>();
+        set => SetValue(value);
     }
 
     public static string Aria2SavePath
     {
-        get => Helper.Settings.GetValue(nameof(Aria2SavePath), DefaultValue.App.SavePath.Aria2);
-        set => Helper.Settings.SetValue(nameof(Aria2SavePath), value);
+        get => GetValue(DefaultValue.App.SavePath.Aria2);
+        set => SetValue(value);
     }
-    
+
     /// <summary>
     /// 展示匹配失败的列表?
     /// </summary>
     public static bool IsShowFailListInDisplay
     {
-        get => Helper.Settings.GetValue(nameof(IsShowFailListInDisplay), DefaultValue.Ui.IsShowFailListInDisplay);
-        set => Helper.Settings.SetValue(nameof(IsShowFailListInDisplay), value);
+        get => GetValue(DefaultValue.Ui.IsShowFailListInDisplay);
+        set => SetValue(value);
     }
 
     public static string SavePath115Name
     {
-        get => Helper.Settings.GetValue(nameof(SavePath115Name), DefaultValue.Network._115.SavePathName);
-        set => Helper.Settings.SetValue(nameof(SavePath115Name), value);
+        get => GetValue(DefaultValue.Network._115.SavePathName);
+        set => SetValue(value);
     }
 
-    public static string SavePath115Cid
+    public static long SavePath115Cid
     {
-        get => Helper.Settings.GetValue(nameof(SavePath115Cid), DefaultValue.Network._115.SavePathCid);
-        set => Helper.Settings.SetValue(nameof(SavePath115Cid), value);
+        get => GetValue(DefaultValue.Network._115.SavePathCid);
+        set => SetValue(value);
     }
 
+    private static T GetValue<T>(T defaultValue = default, [CallerMemberName] string propertyName = null)
+    {
+        return string.IsNullOrEmpty(propertyName) ? defaultValue : Helper.Settings.GetValue(propertyName, defaultValue);
+    }
+
+    private static void SetValue<T>(T value, [CallerMemberName] string propertyName = null)
+    {
+        if (string.IsNullOrEmpty(propertyName)) return;
+
+        Helper.Settings.SetValue(propertyName, value);
+    }
 }
 
 public class DownApiSettings

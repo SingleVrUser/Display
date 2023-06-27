@@ -15,7 +15,7 @@ namespace Display.Models
         public string PickCode;
         public string Title;
         public string Description;
-        public string Cid;
+        public long Cid;
         public List<m3u8Info> M3U8Infos;
 
         public FilesInfo.FileType Type;
@@ -42,7 +42,7 @@ namespace Display.Models
         public bool IsRequestM3U8 = false;
         public bool IsRequestOriginal = false;
 
-        public MediaPlayItem(string pickCode, string fileName, FilesInfo.FileType type, string cid = "")
+        public MediaPlayItem(string pickCode, string fileName, FilesInfo.FileType type, long? cid = null)
         {
             PickCode = pickCode;
             FileName = fileName;
@@ -52,7 +52,11 @@ namespace Display.Models
             TrueName = FileMatch.MatchName(FileNameWithoutExtension)?.ToUpper();
             Title = FileNameWithoutExtension;
             Type = type;
-            Cid = cid;
+
+            if (cid != null)
+            {
+                Cid = (long)cid;
+            }
 
             if (!AppSettings.IsFindSub || string.IsNullOrEmpty(pickCode) || type==FilesInfo.FileType.Folder) return;
 
@@ -113,7 +117,7 @@ namespace Display.Models
                 return OriginalUrl;
             }
 
-            var downUrlList = await _webApi.GetDownUrl(PickCode, GetInfoFromNetwork.UserAgent);
+            var downUrlList = await _webApi.GetDownUrl(PickCode, GetInfoFromNetwork.DownUserAgent);
             IsRequestOriginal = true;
 
             OriginalUrl = downUrlList.FirstOrDefault().Value;
@@ -202,7 +206,7 @@ namespace Display.Models
                     
                     newMediaPlayItems.AddRange(
                         fileInfos.data
-                            .Where(x => !string.IsNullOrEmpty(x.fid) && x.iv == 1)
+                            .Where(x => x.fid!=null && x.iv == 1)
                             .Select(x => new MediaPlayItem(x.pc, x.n, FilesInfo.FileType.File)));
                 }
                 else
