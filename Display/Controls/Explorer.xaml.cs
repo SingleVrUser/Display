@@ -572,7 +572,7 @@ namespace Display.Controls
                 if (((ExplorerItem)node.Content).Id == cid)
                 {
                     Nodechildrens.Remove(node);
-                    DataAccess.DeleteAllDirectroyAndFiles_InfilesInfoTabel(cid);
+                    DataAccess.DeleteAllDirectoryAndFiles_InFilesInfoTable(cid);
                     return;
                 }
                 var nodeChildrens = node.Children;

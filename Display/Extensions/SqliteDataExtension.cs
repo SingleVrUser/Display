@@ -15,7 +15,6 @@ namespace Display.Extensions
 {
     internal static class SQLiteDataExtension
     {
-
         public static T GetNullableValue<T>(this SqliteDataReader reader, string key,T defaultValue=default)
         {   
             var obj = reader[key];
@@ -27,40 +26,30 @@ namespace Display.Extensions
 
             // 可为空
             var nullable = underlyingType != null;
+
+            var trueType = nullable ? underlyingType : type;
+
             var result = defaultValue;
-            if (!nullable)
+            if (trueType == typeof(string))
+            {   
+                result = (T)obj;
+            }
+            else if (trueType == typeof(long))
             {
-                if (type == typeof(string))
+                if (isNullOrEmpty && nullable)
                 {
-                    result = (T)obj;
+                    result = default;
                 }
-                else if (type == typeof(long))
+                else if (long.TryParse(stringFormat, out var longResult))
                 {
-                    if (isNullOrEmpty)
-                    {
-                        result = defaultValue;
-                    }
-                    else
-                    {
-                        result = (T)obj;
-                    }
+                    result = (T)(object)longResult;
                 }
             }
-            else
+            else if (trueType == typeof(int))
             {
-                if (underlyingType == typeof(string))
+                if (int.TryParse(stringFormat, out var intResult))
                 {
-                    result = (T)obj;
-                }else if (underlyingType == typeof(long))
-                {
-                    if (isNullOrEmpty)
-                    {
-                        result = default;
-                    }
-                    else
-                    {
-                        result = (T)obj;
-                    }
+                    result = (T)(object)intResult;
                 }
             }
 

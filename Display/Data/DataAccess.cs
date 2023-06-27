@@ -1,25 +1,16 @@
 ﻿using Display.Extensions;
 using Microsoft.Data.Sqlite;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
-using CommunityToolkit.WinUI.UI.Controls.TextToolbarSymbols;
-using static System.Int32;
-using System.Xml.Linq;
-using LiveChartsCore.SkiaSharpView.Painting;
-using Windows.Media;
-using System.Dynamic;
-using static Display.ContentsPage.SpiderVideoInfo.FileStatistics;
-using SkiaSharp;
 using static Display.Spider.Manager;
+using static System.Int32;
 
 namespace Display.Data
 {
@@ -28,7 +19,7 @@ namespace Display.Data
         private const string DbName = "115_uwp.db";
         public static string DbPath => NewDbPath(AppSettings.DataAccessSavePath);
 
-        public static string ConnectionString => ConnectionString;
+        public static string ConnectionString => $"Filename={DbPath}";
 
         public static string NewDbPath(string newPath)
         {
@@ -2813,11 +2804,11 @@ namespace Display.Data
             if (reader.FieldCount == 0) return dataInfo;
 
             dataInfo.fid = reader.GetNullableValue<long?>("fid");
-            dataInfo.pid = (reader["pid"] as string).ToNullableLong();
-            dataInfo.cid = Convert.ToInt64(reader["cid"]);
-            dataInfo.uid = Convert.ToInt64(reader["uid"]);
+            dataInfo.pid = reader.GetNullableValue<long?>("pid");
+            dataInfo.cid = reader.GetNullableValue<long>("cid");
+            dataInfo.uid = reader.GetNullableValue<long>("uid");
 
-            dataInfo.aid = Convert.ToInt32(reader["aid"]);
+            dataInfo.aid = reader.GetNullableValue<int>("aid");
             dataInfo.n = reader["n"] as string;
             dataInfo.s = Convert.ToInt64(reader["s"]);
             dataInfo.sta = Convert.ToInt32(reader["sta"]);
