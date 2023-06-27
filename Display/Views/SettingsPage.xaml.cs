@@ -3,6 +3,7 @@ using Display.Data;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Media;
 using Newtonsoft.Json;
@@ -112,22 +113,22 @@ namespace Display.Views
 
         private async void DeleteCookieButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            ContentDialog dialog = new ContentDialog();
-
-            dialog.XamlRoot = XamlRoot;
-            dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
-            dialog.Title = "确认删除";
-            dialog.PrimaryButtonText = "确认";
-            dialog.CloseButtonText = "返回";
-            dialog.DefaultButton = ContentDialogButton.Close;
-            dialog.Content = "点击确认后将删除应用中存储的Cookie";
+            ContentDialog dialog = new ContentDialog
+            {
+                XamlRoot = XamlRoot,
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+                Title = "确认删除",
+                PrimaryButtonText = "确认",
+                CloseButtonText = "返回",
+                DefaultButton = ContentDialogButton.Close,
+                Content = "点击确认后将删除应用中存储的Cookie"
+            };
 
             var result = await dialog.ShowAsync();
-            if (result == ContentDialogResult.Primary)
-            {
-                WebApi.DeleteCookie();
-                Cookie_TextBox.Text = null;
-            }
+            if (result != ContentDialogResult.Primary) return;
+
+            WebApi.DeleteCookie();
+            CookieBox.Password = null;
 
         }
 
@@ -450,12 +451,12 @@ namespace Display.Views
                     var result = await dialog.ShowAsync();
                     if (result == ContentDialogResult.Primary)
                     {
-                        var dstDBFilepath = DataAccess.NewDBPath(folder.Path);
+                        var dstDBFilepath = DataAccess.NewDbPath(folder.Path);
 
                         var textFileExists = "数据文件已存在，未复制原数据文件";
                         if (!File.Exists(dstDBFilepath))
                         {
-                            File.Copy(DataAccess.NewDBPath(lastDBSavePath), dstDBFilepath, false);
+                            File.Copy(DataAccess.NewDbPath(lastDBSavePath), dstDBFilepath, false);
                             textFileExists = "原数据文件已复制到指定目录";
                         }
 
@@ -484,33 +485,31 @@ namespace Display.Views
         //导出Cookies
         private async void ExportCookieButton(object sender, RoutedEventArgs e)
         {
-
-            var coookieText = Cookie_TextBox.Text;
-            if (IsNullOrEmpty(coookieText))
+            var cookies = CookieBox.Password;
+            if (IsNullOrEmpty(cookies))
             {
                 ShowTeachingTip("输入为空");
                 return;
             }
 
-            var exportCookieList = FileMatch.ExportCookies(coookieText);
+            var exportCookieList = FileMatch.ExportCookies(cookies);
 
             //创建一个数据包
-            DataPackage dataPackage = new DataPackage();
+            var dataPackage = new DataPackage();
             //设置创建包里的文本内容
-            string ClipboardText = System.Text.Json.JsonSerializer.Serialize(exportCookieList);
-            dataPackage.SetText(ClipboardText);
+            var clipboardText = System.Text.Json.JsonSerializer.Serialize(exportCookieList);
+            dataPackage.SetText(clipboardText);
 
             //把数据包放到剪贴板里
             Clipboard.SetContent(dataPackage);
 
 
-            DataPackageView dataPackageView = Clipboard.GetContent();
-            string text = await dataPackageView.GetTextAsync();
-            if (text == ClipboardText)
-            {
-                LightDismissTeachingTip.Subtitle = "已添加到剪贴板";
-                LightDismissTeachingTip.IsOpen = true;
-            }
+            var dataPackageView = Clipboard.GetContent();
+            var text = await dataPackageView.GetTextAsync();
+            if (text != clipboardText) return;
+
+            LightDismissTeachingTip.Subtitle = "已添加到剪贴板";
+            LightDismissTeachingTip.IsOpen = true;
 
         }
 
@@ -675,7 +674,7 @@ namespace Display.Views
 
         private void BitCometSettingsSave_Click(object sender, RoutedEventArgs e)
         {
-            DownApiSettings bitCometSettings = checkBitCometSettingsFormat(BitCometDownApiTextBox.Text);
+            var bitCometSettings = CheckBitCometSettingsFormat(BitCometDownApiTextBox.Text);
 
             if (bitCometSettings == null)
                 return;
@@ -685,23 +684,19 @@ namespace Display.Views
 
         private async void BitCometSettingsCheck_Click(object sender, RoutedEventArgs e)
         {
-            DownApiSettings bitCometSettings = checkBitCometSettingsFormat(BitCometDownApiTextBox.Text);
+            var bitCometSettings = CheckBitCometSettingsFormat(BitCometDownApiTextBox.Text);
 
             if (bitCometSettings == null)
                 return;
 
             BitCometCheckStatus.status = Status.Doing;
 
-            bool isOK = await IsBitCometSettingOK(bitCometSettings.UserName, bitCometSettings.Password, bitCometSettings.ApiUrl);
+            var isOk = await IsBitCometSettingOK(bitCometSettings.UserName, bitCometSettings.Password, bitCometSettings.ApiUrl);
 
-            if (isOK)
-                BitCometCheckStatus.status = Status.Success;
-            else
-                BitCometCheckStatus.status = Status.Error;
-
+            BitCometCheckStatus.status = isOk ? Status.Success : Status.Error;
         }
 
-        private DownApiSettings checkBitCometSettingsFormat(string fullApiUrl)
+        private DownApiSettings CheckBitCometSettingsFormat(string fullApiUrl)
         {
             DownApiSettings bitCometSettings = new();
 
@@ -991,7 +986,7 @@ namespace Display.Views
 
         private void ClearDownRecordButton_Click(object sender, RoutedEventArgs e)
         {
-            DataAccess.DeleteDownHistory();
+            DataAccess.DeleteTable(DataAccess.TableName.DownHistory);
 
             ShowTeachingTip("已清空");
         }
@@ -1035,17 +1030,19 @@ namespace Display.Views
             Debug.WriteLine($"当前选中：{explorerItem.Name}({explorerItem.Id})");
 
             AppSettings.SavePath115Name = explorerItem.Name;
+
             AppSettings.SavePath115Cid = explorerItem.Id;
 
             SavePath115NameTextBlock.Text = explorerItem.Name;
-            SavePath115CidTextBlock.Text = explorerItem.Id;
+            SavePath115CidTextBlock.Text = explorerItem.Id.ToString();
 
             ShowTeachingTip("设置成功");
         }
 
         private async void Save115SavePathButtonClick(object sender, RoutedEventArgs e)
         {
-            var cid = SavePath115CidTextBlock.Text;
+            if(!long.TryParse(SavePath115CidTextBlock.Text,out var cid)) return;
+
             var cidInfo = await _webapi.GetFolderCategory(cid);
 
             if (cidInfo != null)
@@ -1060,6 +1057,13 @@ namespace Display.Views
             {
                 ShowTeachingTip("保存失败");
             }
+        }
+
+        private void Show115CookieButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (sender is not ToggleButton button) return;
+
+            CookieBox.PasswordRevealMode = button.IsChecked == true ? PasswordRevealMode.Visible : PasswordRevealMode.Hidden;
         }
     }
 }

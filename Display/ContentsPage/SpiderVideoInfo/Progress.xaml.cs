@@ -127,7 +127,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             _fileList = await DataAccess.GetAllFilesInFolderListAsync(_fileList);
 
             //除去文件夹
-            _fileList = _fileList.Where(item => !string.IsNullOrEmpty(item.fid)).ToList();
+            _fileList = _fileList.Where(item => item.fid!=null).ToList();
 
             //去除重复文件
             Dictionary<string, Datum> newDictList = new();
@@ -256,7 +256,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             foreach (var info in datumList)
             {
                 //文件夹，暂不统计
-                if (info.fid == "")
+                if (info.fid == null)
                 {
 
                 }
@@ -501,8 +501,8 @@ namespace Display.ContentsPage.SpiderVideoInfo
             //DataAccess.UpdateSpiderLogDone(task_id);
 
             //删除SpiderTask和SpiderLog表中的所有数据
-            DataAccess.DeleteSpiderLogTable();
-            DataAccess.DeleteSpiderTaskTable();
+            DataAccess.DeleteTable(DataAccess.TableName.SpiderTask);
+            DataAccess.DeleteTable(DataAccess.TableName.SpiderLog);
 
         }
 

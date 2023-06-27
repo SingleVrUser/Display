@@ -45,11 +45,11 @@ namespace Display.ContentsPage
 
         public SelectedFolderPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             explorerItems = new ObservableCollection<ExplorerItem>();
 
-            folderInfos = new IncrementalLoadDatumCollection("0",isOnlyFolder:true);
+            folderInfos = new IncrementalLoadDatumCollection(0,isOnlyFolder:true);
             folderInfos.GetFileInfoCompleted += FolderInfos_GetFileInfoCompleted;
 
 
@@ -95,12 +95,11 @@ namespace Display.ContentsPage
         {
             if (args.Item is not ExplorerItem item) return;
             var cid = item.Id;
-            if (string.IsNullOrEmpty(cid)) return;
 
             OpenFolder(cid);
         }
 
-        private async void OpenFolder(string cid)
+        private async void OpenFolder(long cid)
         {
             await folderInfos.SetCid(cid);
         }

@@ -11,16 +11,16 @@ public class MatchHelper
         return (int1 - int2).ToString();
     }
 
-    public static string GetSameFirstStringFromList(List<string> list)
+    public static string GetSameFirstStringFromList(IReadOnlyCollection<string> list)
     {
         var sameContent = string.Empty;
 
-        if (list == null || list.Count <1) return sameContent;
+        if (!list.Any()) return string.Empty;
 
         var firstStr = list.First();
         if (list.Count == 1) return firstStr;
 
-        var otherContent = list.Skip(1).ToList();
+        var otherContent = list.Skip(1).ToArray();
 
         var isSame = true;
         HashSet<string> matchList = new();
@@ -44,7 +44,9 @@ public class MatchHelper
             }
         }
 
+        if (matchList.Count == 0 && !string.IsNullOrEmpty(sameContent)) return sameContent;
+
         sameContent = matchList.MaxBy(x => x.Length);
-        return sameContent;
+        return sameContent ?? string.Empty;
     }
 }

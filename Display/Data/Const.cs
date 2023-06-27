@@ -13,6 +13,11 @@ public static class Const
         public const string AccountAnomalyTip = "\\u8bf7\\u9a8c\\u8bc1\\u8d26\\u53f7";
     }
 
+    public static class Info
+    {
+        public static readonly string[] WmProducer = { "CATCHEYE", "東京熱", "スカイハイエンターテインメント", "HEYZO", "FC2-PPV", "カリビアンコム( Caribbeancom )", "天然むすめ( 10musume )", "一本道( 1pondo )", "ピンクパンチャー", "トラトラトラ", "スーパーモデルメディア", "キャットウォーク", "Gachinco", "スタジオテリヤキ", "フェアリー", "カリビアンコム", "ClimaxZipang", "パコパコママ", "Tokyo-Hot", "SkyHigh", "ファンタドリーム", "一本道", "天然むすめ" };
+    }
+
     public static class HttpHeaders
     {
         public const string Authorization = "Authorization";
@@ -98,8 +103,8 @@ public static class Const
 
                 public const string DefaultDownMethod = "115";
 
-                public const string SavePathName = "";
-                public const string SavePathCid = "";
+                public const string SavePathName = "根目录";
+                public const long SavePathCid = 0;
             }
 
             public static class BaseUrl
@@ -186,13 +191,6 @@ public static class Const
 
     }
 
-    public enum PlayQuality
-    {
-        M3U8 = 0,
-        Origin = 1
-    }
-    public enum Origin { Local = 0, Web = 1 }
-
     public class DownApiSettings
     {
         public string UserName { get; set; }
@@ -200,4 +198,16 @@ public static class Const
         public string ApiUrl { get; set; }
     }
 
+
+
+    #region Enum
+
+    public enum PlayQuality
+    {
+        M3U8 = 0,
+        Origin = 1
+    }
+    public enum Origin { Local = 0, Web = 1 }
+
+    #endregion
 }

@@ -1,20 +1,21 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
-using System;
 using Display.Data;
 using Display.Models;
+using Display.Services.Upload;
 using Display.Spider;
+using Display.Views;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Display.Views;
 using static System.Int64;
-using Display.Services.Upload;
-using static SkiaSharp.HarfBuzz.SKShaper;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -24,19 +25,62 @@ namespace Display.ContentsPage.SearchLink
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class SearchLinkPage : Page
+    public sealed partial class SearchLinkPage : Page, INotifyPropertyChanged
     {
         private readonly string _searchContent;
 
+        private static long _lastRequestTime;
+        private const int SpacingSecond = 15;
+
+        private static long NowDate => DateTimeOffset.Now.ToUnixTimeSeconds();
+
         public SearchLinkPage(string searchContent)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             _searchContent = searchContent;
         }
 
+        private long _leftTime;
+
+        private long LeftTime
+        {
+            get => _leftTime;
+            set
+            {
+                if (_leftTime == value) return;
+                _leftTime = value;
+
+                OnPropertyChanged();
+            }
+        }
+
+        private Visibility IsShowTimeCountdown(long time)
+        {
+            return time == 0 ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        public async Task StartCountdownIfNecessary()
+        {
+            // 第一次
+            if(_lastRequestTime == 0) return;
+
+            // 与上次等待间隙不足15s，则等待（1s余量）
+            var leftSecond = SpacingSecond - NowDate + _lastRequestTime + 1;
+            if (leftSecond <= 0) return;
+
+            LeftTime = leftSecond;
+            for (var i = 1; i <= leftSecond; i++)
+            {
+                await Task.Delay(1000);
+                LeftTime = leftSecond - i;
+            }
+        }
+
         public static async Task<string> ShowInContentDialog(string searchContent, XamlRoot xamlRoot)
         {
+            var cid = AppSettings.SavePath115Cid;
+
             var page = new SearchLinkPage(searchContent);
             ContentDialog dialog = new()
             {
@@ -48,34 +92,22 @@ namespace Display.ContentsPage.SearchLink
                 Content = page
             };
 
-            dialog.Opened += (_, _) =>
+            dialog.Opened += async (_, _) =>
             {
+                await page.StartCountdownIfNecessary();
                 page.InitLoad();
             };
 
             var result = await dialog.ShowAsync();
+            if (result != ContentDialogResult.Primary) return null;
 
-            string contentResult = null;
-            if (result == ContentDialogResult.Primary)
-            {
-                if (string.IsNullOrEmpty(AppSettings.SavePath115Cid) ||
-                    string.IsNullOrEmpty(AppSettings.SavePath115Name))
-                {
-                    contentResult = "未设置保存路径";
-                }
-                else
-                {
-                    var isDownSuccess = await page.OfflineDownSelectedLink();
-
-                    contentResult = isDownSuccess ? "已下载到网盘中" : "下载失败";
-                }
-            }
-
-            return contentResult;
+            return await page.OfflineDownSelectedLink(cid) ? "已下载到网盘中" : "下载失败";
         }
 
         private async void InitLoad()
         {
+            _lastRequestTime = NowDate;
+
             var links =  await X1080X.GetMatchInfosFromCid(_searchContent);
 
             if (links is { Count: > 0 })
@@ -91,12 +123,11 @@ namespace Display.ContentsPage.SearchLink
             MyProgressBar.Visibility = Visibility.Collapsed;
         }
 
-        public async Task<bool> OfflineDownSelectedLink()
+        public async Task<bool> OfflineDownSelectedLink(long cid)
         {
             if (LinksListView.SelectedItem is not Forum1080SearchResult info) return false;
 
             var url = info.Url;
-
             var attachmentInfos = await X1080X.GetDownLinkFromUrl(url);
             Debug.WriteLine($"获取到下载链接({attachmentInfos.Count})");
 
@@ -108,7 +139,7 @@ namespace Display.ContentsPage.SearchLink
             // 磁力
             if (attmnInfo.Type == AttmnType.Magnet)
             {
-                return await RequestOfflineDown(new List<string>() { attmnInfo.Url });
+                return await RequestOfflineDown(cid,new List<string> { attmnInfo.Url });
             }
             else if (attmnInfo.Type == AttmnType.Rar)
             {
@@ -125,7 +156,7 @@ namespace Display.ContentsPage.SearchLink
                 var down115LinkList = Get115DownUrlsFromAttmnInfo(rarInfo);
                 if(down115LinkList.Count==0) return false;
 
-                return await RequestOfflineDown(down115LinkList,rarInfo.SrtPath);
+                return await RequestOfflineDown(cid, down115LinkList, rarInfo.SrtPath);
             }else if (attmnInfo.Type == AttmnType.Txt)
             {
                 var txtPath = await X1080X.TryDownAttmn(attmnInfo.Url, attmnInfo.Name);
@@ -138,14 +169,14 @@ namespace Display.ContentsPage.SearchLink
                 var down115LinkList = Get115DownUrlsFromAttmnInfo(txtInfo);
                 if (down115LinkList.Count == 0) return false;
 
-                return await RequestOfflineDown(down115LinkList);
+                return await RequestOfflineDown(cid, down115LinkList);
             }else if (attmnInfo.Type == AttmnType.Torrent)
             {
                 var torrentPath = await X1080X.TryDownAttmn(attmnInfo.Url, attmnInfo.Name);
                 if (torrentPath == null) return false;
                 Debug.WriteLine($"附件已保存到：{torrentPath}");
 
-                return await WebApi.GlobalWebApi.CreateTorrentOfflineDown(torrentPath);
+                return await WebApi.GlobalWebApi.CreateTorrentOfflineDown(cid, torrentPath);
             }
 
             return true;
@@ -179,7 +210,7 @@ namespace Display.ContentsPage.SearchLink
             return noRarList.Count > 0 ? noRarList : down115LinkList;
         }
 
-        private async Task<bool> RequestOfflineDown(List<string> links,string srtPath=null)
+        private async Task<bool> RequestOfflineDown(long cid, List<string> links,string srtPath=null)
         {
             var webApi = WebApi.GlobalWebApi;
 
@@ -187,9 +218,7 @@ namespace Display.ContentsPage.SearchLink
             if (uploadInfo == null) return false;
 
             var offlineSpaceInfo = await webApi.GetOfflineSpaceInfo(uploadInfo.userkey, uploadInfo.user_id);
-
-            TryParse(AppSettings.SavePath115Cid, out var cid);
-
+            
             var addTaskUrlInfo = await webApi.AddTaskUrl(links, cid, uploadInfo.user_id, offlineSpaceInfo.sign, offlineSpaceInfo.time);
 
             // 需要验证账号
@@ -211,7 +240,7 @@ namespace Display.ContentsPage.SearchLink
                         return;
                     }
 
-                    result = await RequestOfflineDown(links);
+                    result = await RequestOfflineDown(cid, links);
                     isClosed = true;
                 };
 
@@ -242,5 +271,13 @@ namespace Display.ContentsPage.SearchLink
 
             Windows.System.Launcher.LaunchUriAsync(new Uri(result.Url));
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
     }
 }

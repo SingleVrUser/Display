@@ -50,13 +50,13 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
 
     public int asc { get; private set; }
 
-    public string Cid { get; set; }
+    public long Cid { get; set; }
 
     private bool IsOnlyFolder { get; set; }
 
-    public IncrementalLoadDatumCollection(string cid,bool isOnlyFolder = false)
+    public IncrementalLoadDatumCollection(long cid,bool isOnlyFolder = false)
     {
-        this.Cid = cid;
+        Cid = cid;
         webApi = WebApi.GlobalWebApi;
         IsOnlyFolder = isOnlyFolder;
     }
@@ -107,9 +107,9 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
     }
 
 
-    public async Task SetCid(string cid)
+    public async Task SetCid(long cid)
     {
-        this.Cid = cid;
+        Cid = cid;
         Clear();
 
         //当目录为空时，HasMoreItems==True无法激活查询服务，需要手动LoadData

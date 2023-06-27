@@ -20,6 +20,7 @@ using System.IO;
 using System.Linq;
 using Windows.System;
 using Display.ContentsPage;
+using Windows.Foundation;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -615,23 +616,23 @@ namespace Display
             ShowTeachingTip(e.Message);
         }
 
-        private void ShowTeachingTip(string subtitle, string content = null)
+        private void ShowTeachingTip(string subtitle, string actionContent = null)
         {
-            BasePage.ShowTeachingTip(LightDismissTeachingTip, subtitle, content);
+            BasePage.ShowTeachingTip(LightDismissTeachingTip, subtitle, actionContent);
+        }
+
+        private void ShowTeachingTip(string subtitle,
+            string actionContent, TypedEventHandler<TeachingTip, object> actionButtonClick)
+        {
+            BasePage.ShowTeachingTip(LightDismissTeachingTip, subtitle, actionContent, actionButtonClick);
         }
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            var window = WebApi.CreateWindowToVerifyAccount();
-
-            if (window.Content is not VerifyAccountPage page) return;
-            page.VerifyAccountCompleted +=(_,isSucceeded)=>
+            ShowTeachingTip("It's easier than ever to see control samples in both light and dark theme!", "测试", (_,_) =>
             {
-                Debug.WriteLine($"是否成功：{isSucceeded}");
-            };
-
-
-            window.Activate();;
+                Debug.WriteLine("成功调用");
+            });
         }
 
         private void CtrlF_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)

@@ -42,6 +42,7 @@ namespace Display.Services.Upload
 
     internal enum UploadState
     {
+        None,
         Initializing,
         Initialized,
 

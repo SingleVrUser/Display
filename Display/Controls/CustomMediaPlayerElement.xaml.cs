@@ -470,7 +470,7 @@ public sealed partial class CustomMediaPlayerElement
             if (failInfo == null)
             {
                 var capPath = await ScreenShotAsync(pickCode);
-                DataAccess.AddOrReplaceFailList_islike_looklater(new()
+                DataAccess.AddOrReplaceFailList_Islike_Looklater(new()
                 {
                     pc = pickCode,
                     is_like = IsLike,
@@ -526,7 +526,7 @@ public sealed partial class CustomMediaPlayerElement
             if (failInfo == null)
             {
                 var capPath = await ScreenShotAsync(pickCode);
-                DataAccess.AddOrReplaceFailList_islike_looklater(new()
+                DataAccess.AddOrReplaceFailList_Islike_Looklater(new()
                 {
                     pc = pickCode,
                     look_later = LookLater,
@@ -567,7 +567,7 @@ public sealed partial class CustomMediaPlayerElement
 
         if (failInfo == null)
         {
-            DataAccess.AddOrReplaceFailList_islike_looklater(new()
+            DataAccess.AddOrReplaceFailList_Islike_Looklater(new()
             {
                 pc = pickCode,
                 image_path = capPath
@@ -851,7 +851,7 @@ public sealed partial class CustomMediaPlayerElement
             infos.Add("下载链接",await playItem.GetOriginalUrl());
         }
 
-        infos.Add("userAgent", GetInfoFromNetwork.UserAgent);
+        infos.Add("userAgent", GetInfoFromNetwork.DownUserAgent);
 
         await InfoPage.ShowInContentDialog(XamlRoot, infos, "媒体信息");
 

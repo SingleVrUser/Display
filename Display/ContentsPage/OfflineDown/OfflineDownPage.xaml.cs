@@ -14,6 +14,8 @@ using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Display.Services.Upload;
 using Display.Views;
+using Windows.Foundation;
+using Display.WindowView;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -77,7 +79,6 @@ namespace Display.ContentsPage.OfflineDown
 
         private void CheckLinkCount(string content)
         {
-
             _matchLinkCollection = Regex.Matches(content,
                 @"((((http|https|ftp|ed2k):\/\/)|(magnet:\?xt=urn:btih:)).{3,}?)([\r\n]|$)");
 
@@ -120,49 +121,78 @@ namespace Display.ContentsPage.OfflineDown
 
         private async void RootGrid_OnDrop(object sender, DragEventArgs e)
         {
-            //获取拖入文件信息
+            // 获取拖入文件信息
             if (!e.DataView.Contains(StandardDataFormats.StorageItems)) return;
+
+            // 获取保存路径
+            if (DownPathComboBox.SelectedItem is not OfflineDownPathData downPath) return;
 
             var items = await e.DataView.GetStorageItemsAsync();
 
             var rarItems = items.Where(i => i.IsOfType(StorageItemTypes.File) && i is StorageFile { FileType: ".torrent" }).Select(x=>x as StorageFile).ToArray();
 
             var length = rarItems.Length;
-
+            
+            var isSucceed = false;
+            string content;
             switch (length)
             {
                 case 0:
-                    ShowTeachingTip("未发现torrent文件");
-                    return;
-                case 1:
-                    ShowTeachingTip(await WebApi.GlobalWebApi.CreateTorrentOfflineDown(rarItems.First().Path) ? "添加torrent任务成功" : "添加torrent任务失败");
+                    content = "未发现torrent文件";
                     break;
+                // 单个torrent
+                case 1:
+                    isSucceed = await WebApi.GlobalWebApi.CreateTorrentOfflineDown(downPath.file_id, rarItems.First().Path);
+                    content = isSucceed ? "添加torrent任务成功" : "添加torrent任务失败";
+
+                    break;
+                // 多个
                 default:
                 {
                     var failCount = 0;
-                    for(var i = 0; i < length;i++)
+                    for(var i = 1; i <= length;i++)
                     {
                         var file = rarItems[i];
 
                         Debug.WriteLine(file.FileType);
 
-                        if (!await WebApi.GlobalWebApi.CreateTorrentOfflineDown(file.Path)) failCount++;
+                        ShowTeachingTip($"添加torrent任务中：{i}/{length}" + (failCount > 0 ? "，失败数:{failCount}" : string.Empty));
 
-                        ShowTeachingTip(failCount+1 == length? $"添加torrent任务中：{i}/{length}"+ (failCount>0? "，失败数:{failCount}" : string.Empty)
-                                                                :$"添加torrent任务完成 （{length}个）" + (failCount > 0 ? "，失败数:{failCount}" : string.Empty));
+                        if (!await WebApi.GlobalWebApi.CreateTorrentOfflineDown(downPath.file_id, file.Path)) failCount++;
                     }
 
+                    isSucceed = length != failCount;
+                    content = $"添加torrent任务完成 （{length}个）" + (failCount > 0 ? "，失败数:{failCount}" : string.Empty);
                     break;
                 }
             }
 
-            
+            // 有成功项的话，添加打开目录的按钮
+            if (isSucceed)
+            {
+                ShowTeachingTip(content, "打开所在目录", (_, _) =>
+                {
+                    // 打开所在目录
+                    CommonWindow.CreateAndShowWindow(new DatumList.FileListPage(downPath.file_id));
+                });
+            }
+            else
+            {
+                ShowTeachingTip(content);
+            }
         }
 
         private void ShowTeachingTip(string subtitle, string content = null)
         {
             BasePage.ShowTeachingTip(LightDismissTeachingTip, subtitle, content);
         }
+
+        private void ShowTeachingTip(string subtitle,
+            string actionContent, TypedEventHandler<TeachingTip, object> actionButtonClick)
+        {
+            BasePage.ShowTeachingTip(LightDismissTeachingTip, subtitle, actionContent, actionButtonClick);
+        }
+
     }
 
     public class FailLoadedEventArgs : EventArgs

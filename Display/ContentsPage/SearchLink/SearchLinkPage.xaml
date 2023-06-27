@@ -44,5 +44,22 @@
         <TextBlock x:Name="WithoutResultTextBlock"
                    Grid.Row="2"
                    HorizontalAlignment="Center" Text="无结果" FontWeight="Bold" Visibility="Collapsed"/>
+
+        <StackPanel Grid.Row="1"
+                    Visibility="{x:Bind IsShowTimeCountdown(LeftTime),Mode=OneWay}"
+                    Spacing="3">
+
+            <StackPanel.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                </Style>
+            </StackPanel.Resources>
+
+            <TextBlock>根据论坛的限制，距离下次请求还需要</TextBlock>
+            <TextBlock>
+                <Run Text="{x:Bind LeftTime,Mode=OneWay}" Foreground="OrangeRed" FontSize="20"/>
+                <Run> 秒</Run>
+            </TextBlock>
+        </StackPanel>
     </Grid>
 </Page>

@@ -25,37 +25,37 @@ namespace Display.Views
 
         private void OnLoaded()
         {
-            DataSource.Add(new FunctionModule()
+            DataSource.Add(new FunctionModule
             {
                 Name = "文件列表",
                 IconPath = "/Assets/Svg/file_alt_icon.svg",
                 Description = "115中的文件列表"
             });
-            DataSource.Add(new FunctionModule()
+            DataSource.Add(new FunctionModule
             {
                 Name = "搜刮信息",
                 IconPath = "/Assets/Svg/find_internet_magnifier_search_security_icon.svg",
                 Description = "搜刮本地数据库中视频对应的信息"
             });
-            DataSource.Add(new FunctionModule()
+            DataSource.Add(new FunctionModule
             {
                 Name = "演员头像",
                 IconPath = "/Assets/Svg/face_male_man_portrait_icon.svg",
                 Description = "从gfriends仓库中获取演员头像"
             });
-            DataSource.Add(new FunctionModule()
+            DataSource.Add(new FunctionModule
             {
                 Name = "缩略图",
                 IconPath = "/Assets/Svg/image_icon.svg",
                 Description = "获取视频缩略图"
             });
-            DataSource.Add(new FunctionModule()
+            DataSource.Add(new FunctionModule
             {
                 Name = "浏览器",
                 IconPath = "/Assets/Svg/explorer_internet_logo_logos_icon.svg",
                 Description = "115网页版，并附加下载选项"
             });
-            DataSource.Add(new FunctionModule()
+            DataSource.Add(new FunctionModule
             {
                 Name = "计算Sha1",
                 IconPath = "/Assets/Svg/accounting_banking_business_calculate_calculator_icon.svg",

@@ -60,7 +60,7 @@ namespace Display.Data
         public void InitializeInternet()
         {
 
-            var headers = new Dictionary<string, string> { { "user-agent", GetInfoFromNetwork.UserAgent }};
+            var headers = new Dictionary<string, string> { { "user-agent", GetInfoFromNetwork.DownUserAgent } };
 
             var cookie = AppSettings._115_Cookie;
             //cookie不为空且可用
@@ -100,7 +100,7 @@ namespace Display.Data
             const string referer = "https://115.com/?cid=0&offset=0&tab=&mode=wangpan";
             var windowWebHttpClient = new Windows.Web.Http.HttpClient();
             windowWebHttpClient.DefaultRequestHeaders.Add("Referer", referer);
-            windowWebHttpClient.DefaultRequestHeaders.Add("User-Agent", GetInfoFromNetwork.UserAgent);
+            windowWebHttpClient.DefaultRequestHeaders.Add("User-Agent", GetInfoFromNetwork.DownUserAgent);
 
             return windowWebHttpClient;
         }
@@ -146,7 +146,7 @@ namespace Display.Data
 
             return result;
         }
-        
+
         /// <summary>
         /// 导入CidList获取到的所有信息到数据库
         /// </summary>
@@ -157,8 +157,8 @@ namespace Display.Data
         public async Task GetAllFileInfoToDataAccess(List<FilesInfo> fileInfos, CancellationToken token, IProgress<GetFileProgessIProgress> progress = null)
         {
             var getFilesProgressInfo = new GetFilesProgressInfo();
-            
-            foreach (var info in fileInfos.Where(x=>x.Type == FilesInfo.FileType.Folder))
+
+            foreach (var info in fileInfos.Where(x => x.Type == FilesInfo.FileType.Folder))
             {
                 if (token.IsCancellationRequested)
                 {
@@ -167,7 +167,7 @@ namespace Display.Data
                 getFilesProgressInfo = await TryAddFolderToDataAccess(token, progress, info.Cid, getFilesProgressInfo);
             }
 
-            foreach (var info in fileInfos.Where(x=>x.Type == FilesInfo.FileType.File))
+            foreach (var info in fileInfos.Where(x => x.Type == FilesInfo.FileType.File))
             {
                 if (token.IsCancellationRequested)
                 {
@@ -179,7 +179,7 @@ namespace Display.Data
                 getFilesProgressInfo!.FilesCount++;
 
                 progress?.Report(new GetFileProgessIProgress
-                    { getFilesProgressInfo = getFilesProgressInfo });
+                { getFilesProgressInfo = getFilesProgressInfo });
             }
 
             progress?.Report(token.IsCancellationRequested
@@ -188,7 +188,7 @@ namespace Display.Data
                 : new GetFileProgessIProgress { status = ProgressStatus.done });
         }
 
-        private async Task<GetFilesProgressInfo> TryAddFolderToDataAccess(CancellationToken token, IProgress<GetFileProgessIProgress> progress, string cid,GetFilesProgressInfo getFilesProgressInfo)
+        private async Task<GetFilesProgressInfo> TryAddFolderToDataAccess(CancellationToken token, IProgress<GetFileProgessIProgress> progress, long cid, GetFilesProgressInfo getFilesProgressInfo)
         {
             var lastDate = NowDate;
 
@@ -209,7 +209,7 @@ namespace Display.Data
             var pid = DataAccess.GetLatestFolderPid(cidCategory.pick_code, cidCategory.utime);
 
             // 该文件已存在数据库里，且修改时间不变
-            if (!string.IsNullOrEmpty(pid) && StaticData.isJumpExistsFolder)
+            if (pid>=0 && StaticData.isJumpExistsFolder)
             {
                 //如果修改时间未变，但移动了位置
                 if (pid == cidCategory.paths.Last().file_id)
@@ -228,14 +228,14 @@ namespace Display.Data
                 var cpm = 60 / (NowDate - lastDate);
 
                 progress?.Report(new GetFileProgessIProgress
-                    { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
+                { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
             }
             //之前未添加或修改时间已改变
             else
             {
                 //获取当前文件夹下所有文件信息和文件夹信息（从数据库或者网络）
                 getFilesProgressInfo = await TraverseAllFileInfo(cid, getFilesProgressInfo, token, progress);
-                
+
                 var addToDataAccessList = getFilesProgressInfo.AddToDataAccessList;
 
                 //删除后重新添加
@@ -268,7 +268,7 @@ namespace Display.Data
         /// <param name="token"></param>
         /// <param name="progress"></param>
         /// <returns></returns>
-        public async Task<GetFilesProgressInfo> TraverseAllFileInfo(string cid, GetFilesProgressInfo getFilesProgressInfo, CancellationToken token, IProgress<GetFileProgessIProgress> progress = null)
+        public async Task<GetFilesProgressInfo> TraverseAllFileInfo(long? cid, GetFilesProgressInfo getFilesProgressInfo, CancellationToken token, IProgress<GetFileProgessIProgress> progress = null)
         {
             if (token.IsCancellationRequested) return getFilesProgressInfo;
 
@@ -289,7 +289,7 @@ namespace Display.Data
                     }
 
                     //文件夹
-                    if (item.fid == null)
+                    if (item.fid == default)
                     {
                         getFilesProgressInfo.FolderCount++;
 
@@ -297,7 +297,7 @@ namespace Display.Data
                         getFilesProgressInfo.AddToDataAccessList.Add(item);
 
                         //查询数据库是否存在
-                        if (!string.IsNullOrEmpty(DataAccess.GetLatestFolderPid(item.pc, item.te)) && Data.StaticData.isJumpExistsFolder)
+                        if (DataAccess.GetLatestFolderPid(item.pc, item.te)>=0 && Data.StaticData.isJumpExistsFolder)
                         {
                             //统计下级文件夹所含文件的数量
                             //通过数据库获取
@@ -343,13 +343,13 @@ namespace Display.Data
         /// <param name="orderBy"></param>
         /// <param name="asc"></param>
         /// <returns></returns>
-        public async Task ChangedShowType(string cid, OrderBy orderBy = OrderBy.UserPtime, int asc = 0)
+        public async Task ChangedShowType(long cid, OrderBy orderBy = OrderBy.UserPtime, int asc = 0)
         {
             const string url = "https://webapi.115.com/files/order";
             var values = new Dictionary<string, string>
                 {
                     { "user_order", orderBy.ToString()},
-                    {"file_id", cid },
+                    {"file_id", cid.ToString() },
                     {"user_asc",asc.ToString() },
                     {"fc_mix","0" },
                 };
@@ -362,22 +362,22 @@ namespace Display.Data
         /// <summary>
         /// 删除115文件
         /// </summary>
-        /// <param name="pid"></param>
+        /// <param name="cid"></param>
         /// <param name="fids"></param>
         /// <param name="ignoreWarn"></param>
         /// <returns></returns>
-        public async Task DeleteFiles(string pid, List<string> fids, int ignoreWarn = 1)
+        public async Task DeleteFiles(long cid, long[] fids, int ignoreWarn = 1)
         {
             const string url = "https://webapi.115.com/rb/delete";
 
             var values = new Dictionary<string, string>
             {
-                { "pid", pid},
+                { "pid", cid.ToString()},
             };
 
-            for (var i = 0; i < fids.Count; i++)
+            for (var i = 0; i < fids.Length; i++)
             {
-                values.Add($"fid[{i}]", fids[i]);
+                values.Add($"fid[{i}]", fids[i].ToString());
             }
 
             values.Add("ignore_warn", ignoreWarn.ToString());
@@ -407,7 +407,7 @@ namespace Display.Data
             var _ = await Client.SendAsync<string>(HttpMethod.Post, url, content);
         }
 
-        public async Task<bool> CreateTorrentOfflineDown(string torrentPath)
+        public async Task<bool> CreateTorrentOfflineDown(long cid, string torrentPath)
         {
             var torrentFile = new FileInfo(torrentPath);
             if (torrentFile.Length > 2097152)
@@ -444,7 +444,7 @@ namespace Display.Data
             }
 
             // 上传后仍然为空
-            if (info is not { state: true } || uploadInfo == null)  return false;
+            if (info is not { state: true } || uploadInfo == null) return false;
 
             var offlineSpaceInfo = await GetOfflineSpaceInfo(uploadInfo.userkey, uploadInfo.user_id);
 
@@ -452,7 +452,7 @@ namespace Display.Data
             var torrentInfo = await GetTorrentInfo(info.data.pick_code, info.sha1, info.user_id.ToString(), offlineSpaceInfo.sign,
                 offlineSpaceInfo.time.ToString());
 
-            if(torrentInfo == null) return false;
+            if (torrentInfo == null) return false;
 
             // 最小大小,10 MB
             const long minSize = 10485760;
@@ -468,16 +468,16 @@ namespace Display.Data
             }
 
             // 添加任务
-            var taskInfo = await AddTaskBt(torrentInfo.info_hash,string.Join(",",selectedIndexList),AppSettings.SavePath115Cid,uploadInfo.user_id.ToString(),offlineSpaceInfo.sign,offlineSpaceInfo.time.ToString());
+            var taskInfo = await AddTaskBt(torrentInfo.info_hash, string.Join(",", selectedIndexList), cid, uploadInfo.user_id.ToString(), offlineSpaceInfo.sign, offlineSpaceInfo.time.ToString());
 
-            if(taskInfo == null) return false;
+            if (taskInfo == null) return false;
 
             Debug.WriteLine("添加任务成功");
 
             return true;
         }
 
-        private async Task<AddTaskBtResult> AddTaskBt(string infoHash, string wanted, string cid, string uid, string sign,string time, string savePath="")
+        private async Task<AddTaskBtResult> AddTaskBt(string infoHash, string wanted, long cid, string uid, string sign, string time, string savePath = "")
         {
             const string url = "https://115.com/web/lixian/?ct=lixian&ac=add_task_bt";
             var values = new Dictionary<string, string>
@@ -485,7 +485,7 @@ namespace Display.Data
                 { "info_hash", infoHash},
                 {"wanted",wanted },
                 {"savepath",savePath },
-                {"wp_path_id",cid },
+                {"wp_path_id",cid.ToString() },
                 {"uid",uid },
                 {"sign",sign },
                 {"time",time }
@@ -530,16 +530,16 @@ namespace Display.Data
         /// <summary>
         /// 请求创建文件夹
         /// </summary>
-        /// <param name="pid">在当前pid下创建文件夹</param>
+        /// <param name="cid">在当前pid下创建文件夹</param>
         /// <param name="name">文件夹名称</param>
         /// <returns>目标cid,创建失败则为null</returns>
-        public async Task<MakeDirRequest> RequestMakeDir(string pid, string name)
+        public async Task<MakeDirRequest> RequestMakeDir(long cid, string name)
         {
             const string url = "https://webapi.115.com/files/add";
 
             var values = new Dictionary<string, string>
             {
-                { "pid", pid},
+                { "pid", cid.ToString()},
                 {"cname",name }
             };
             var content = new FormUrlEncodedContent(values);
@@ -553,22 +553,23 @@ namespace Display.Data
         /// <param Name="pid"></param>
         /// <param Name="fids"></param>
         /// <returns></returns>
-        public async Task MoveFiles(string pid, List<string> fids)
+        public async Task MoveFiles(long cid, long?[] ids)
         {
-            if (fids is not { Count: > 0 }) return;
+            ids = ids.Where(id => id != null).ToArray();
+
+            if (ids is not { Length: > 0 }) return;
 
             const string url = "https://webapi.115.com/files/move";
 
             var values = new Dictionary<string, string>
             {
-                { "pid", pid},
-                { "move_proid", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}_-{new Random().Next(1,99)}_0"},
-
+                { "pid", cid.ToString()},
+                { "move_proid", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}_-{new Random().Next(1,99)}_0"}
             };
 
-            for (var i = 0; i < fids.Count; i++)
+            for (var i = 0; i < ids.Length; i++)
             {
-                values.Add($"fid[{i}]", fids[i]);
+                values.Add($"fid[{i}]", ids[i].ToString());
             }
 
             var content = new FormUrlEncodedContent(values);
@@ -582,13 +583,15 @@ namespace Display.Data
         /// <param Name="pid"></param>
         /// <param Name="fids"></param>
         /// <returns></returns>
-        public async Task<RenameRequest> RenameFile(string pid, string newName)
+        public async Task<RenameRequest> RenameFile(long? id, string newName)
         {
+            if (id == null) return null;
+
             const string url = "https://webapi.115.com/files/batch_rename";
 
             var values = new Dictionary<string, string>
             {
-                { $"files_new_name[{pid}]", newName},
+                { $"files_new_name[{id}]", newName},
             };
 
             var content = new FormUrlEncodedContent(values);
@@ -610,7 +613,7 @@ namespace Display.Data
         /// <param name="asc"></param>
         /// <param name="isOnlyFolder"></param>
         /// <returns></returns>
-        public async Task<WebFileInfo> GetFileAsync(string cid, int limit = 40, int offset = 0, bool useApi2 = false, bool loadAll = false, OrderBy orderBy = OrderBy.UserPtime, int asc = 0,bool isOnlyFolder = false)
+        public async Task<WebFileInfo> GetFileAsync(long? cid, int limit = 40, int offset = 0, bool useApi2 = false, bool loadAll = false, OrderBy orderBy = OrderBy.UserPtime, int asc = 0, bool isOnlyFolder = false)
         {
             var url = !useApi2 ? $"https://webapi.115.com/files?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json" :
                 //旧接口只有t，没有修改时间（te），创建时间（tp）
@@ -675,7 +678,7 @@ namespace Display.Data
             //接口1出错，使用接口2
             if (webFileInfoResult.errNo == 20130827 && useApi2 == false)
             {
-                webFileInfoResult = await GetFileAsync(cid, limit, offset, true, loadAll, orderBy, asc,isOnlyFolder: isOnlyFolder);
+                webFileInfoResult = await GetFileAsync(cid, limit, offset, true, loadAll, orderBy, asc, isOnlyFolder: isOnlyFolder);
             }
             //需要加载全部，但未加载全部
             else if (loadAll && webFileInfoResult.count > limit)
@@ -686,7 +689,7 @@ namespace Display.Data
             return webFileInfoResult;
         }
 
-        public async Task<FilesShowInfo> GetFilesShowInfo(string cid)
+        public async Task<FilesShowInfo> GetFilesShowInfo(long cid)
         {
             var url = $"https://webapi.115.com/files?aid=1&cid={cid}&o=user_ptime&asc=0&offset=0&show_dir=1&limit=30&code=&scid=&snap=0&natsort=1&star=1&source=&format=json";
 
@@ -698,9 +701,9 @@ namespace Display.Data
         /// </summary>
         /// <param name="cid"></param>
         /// <returns></returns>
-        public async Task<FileCategory> GetFolderCategory(string cid)
+        public async Task<FileCategory> GetFolderCategory(long cid)
         {
-            if (cid == "0")
+            if (cid == 0)
             {
                 return new FileCategory { file_name = "根目录" };
             }
@@ -765,7 +768,7 @@ namespace Display.Data
             };
             var content = new FormUrlEncodedContent(values);
 
-            TokenInfo = await Client.SendAsync<TokenInfo>(HttpMethod.Post, url,content);
+            TokenInfo = await Client.SendAsync<TokenInfo>(HttpMethod.Post, url, content);
 
             if (TokenInfo.state != 1) return TokenInfo;
 
@@ -790,7 +793,7 @@ namespace Display.Data
         {
             var url = $"https://qrcodeapi.115.com/get/status/?uid={QrCodeInfo.data.uid}&time={QrCodeInfo.data.time}&sign={QrCodeInfo.data.sign}&_={NowDate}";
 
-            
+
             return await Client.SendAsync<QRCodeStatus>(HttpMethod.Get, url);
         }
 
@@ -815,11 +818,11 @@ namespace Display.Data
                 DownType._115 => await RequestDownBy115Browser(videoInfoList),
 
                 //BitComet支持文件和文件夹
-                DownType.Bc => await RequestDownByBitComet(videoInfoList, GetInfoFromNetwork.UserAgent,
+                DownType.Bc => await RequestDownByBitComet(videoInfoList, GetInfoFromNetwork.DownUserAgent,
                     savePath: savePath, topFolderName: topFolderName),
 
                 //Aria2也支持文件和文件夹
-                DownType.Aria2 => await RequestDownByAria2(videoInfoList, GetInfoFromNetwork.UserAgent,
+                DownType.Aria2 => await RequestDownByAria2(videoInfoList, GetInfoFromNetwork.DownUserAgent,
                     save_path: savePath, topFolderName: topFolderName),
                 _ => false
             };
@@ -901,7 +904,6 @@ namespace Display.Data
             if (bitCometSettings == null)
                 return false;
 
-
             var baseUrl = bitCometSettings.ApiUrl;
 
             var handler = new HttpClientHandler()
@@ -917,7 +919,7 @@ namespace Display.Data
 
             //应用设置中没有，则从比特彗星的设置中读取
             if (string.IsNullOrEmpty(savePath))
-                savePath = await getBitCometDefaultSavePath(client, baseUrl);
+                savePath = await GetBitCometDefaultSavePath(client, baseUrl);
 
             if (topFolderName != null)
                 savePath = Path.Combine(savePath, topFolderName);
@@ -925,7 +927,7 @@ namespace Display.Data
             foreach (var datum in videoInfoList)
             {
                 //文件夹
-                if (string.IsNullOrEmpty(datum.fid) || (!string.IsNullOrEmpty(datum.fid) && datum.fid == "0"))
+                if (datum.fid is null)
                 {
                     var newSavePath = Path.Combine(savePath, datum.n);
                     //遍历文件夹并下载
@@ -940,7 +942,7 @@ namespace Display.Data
                         success = false;
                 }
             }
-
+            client.Dispose();
             return success;
         }
 
@@ -958,12 +960,12 @@ namespace Display.Data
             return await Client.SendAsync<OfflineDownPathRequest>(HttpMethod.Get, url);
         }
 
-        public async Task<UploadInfo> GetUploadInfo(bool isUpdate=false)
+        public async Task<UploadInfo> GetUploadInfo(bool isUpdate = false)
         {
             if (!isUpdate && _uploadInfo != null) return _uploadInfo;
 
             const string url = "https://proapi.115.com/app/uploadinfo";
-            _uploadInfo = await Client.SendAsync<UploadInfo>(HttpMethod.Get, url);;
+            _uploadInfo = await Client.SendAsync<UploadInfo>(HttpMethod.Get, url); ;
             return _uploadInfo;
         }
 
@@ -977,7 +979,7 @@ namespace Display.Data
         }
 
 
-        public async Task<AddTaskUrlInfo> AddTaskUrl(List<string> linkList, long wpPathId,int uid, string sign, long time)
+        public async Task<AddTaskUrlInfo> AddTaskUrl(List<string> linkList, long wpPathId, int uid, string sign, long time)
         {
             if (linkList.Count == 0) return null;
 
@@ -1045,7 +1047,7 @@ namespace Display.Data
             foreach (var datum in videoInfoList)
             {
                 //文件夹
-                if (string.IsNullOrEmpty(datum.fid) || (!string.IsNullOrEmpty(datum.fid) && datum.fid == "0"))
+                if (datum.fid == null)
                 {
                     //获取该文件夹下的文件和文件夹
                     var webFileInfo = await GetFileAsync(datum.cid, loadAll: true);
@@ -1180,7 +1182,7 @@ namespace Display.Data
             foreach (var data in webFileInfo.data)
             {
                 //文件夹
-                if (string.IsNullOrEmpty(data.fid) || (!string.IsNullOrEmpty(data.fid) && data.fid == "0"))
+                if (data.fid == null)
                 {
                     var newSavePath = Path.Combine(savePath, data.n);
                     GetAllFilesTraverseAndDownByBitComet(client, baseUrl, data, ua, newSavePath);
@@ -1236,7 +1238,7 @@ namespace Display.Data
         /// <param Name="client"></param>
         /// <param Name="baseUrl"></param>
         /// <returns></returns>
-        async Task<string> getBitCometDefaultSavePath(HttpClient client, string baseUrl)
+        private async Task<string> GetBitCometDefaultSavePath(HttpClient client, string baseUrl)
         {
             string savePath = null;
 
@@ -1244,7 +1246,7 @@ namespace Display.Data
 
             if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
             {
-                HtmlDocument htmlDoc = new HtmlDocument();
+                var htmlDoc = new HtmlDocument();
                 htmlDoc.LoadHtml(await response.Content.ReadAsStringAsync());
 
                 var savePathNode = htmlDoc.DocumentNode.SelectSingleNode("//input[@id='save_path']");
@@ -1406,7 +1408,7 @@ namespace Display.Data
         public async Task<Dictionary<string, string>> GetDownUrl(string pickCode, string ua)
         {
             Dictionary<string, string> downUrlList = new();
-            
+
             var tm = NowDate;
 
             if (AppSettings.IsRecordDownRequest)
@@ -1437,7 +1439,7 @@ namespace Display.Data
                 Headers = { ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded") }
             };
 
-            var downUrlBase64EncryptInfo = await Client.SendAsync<DownUrlBase64EncryptInfo>(HttpMethod.Post, url,content);
+            var downUrlBase64EncryptInfo = await Client.SendAsync<DownUrlBase64EncryptInfo>(HttpMethod.Post, url, content);
 
             if (downUrlBase64EncryptInfo is { state: true })
             {
@@ -1547,7 +1549,7 @@ namespace Display.Data
             if (m3U8Infos.Count == 0 && strResult.Contains(Const.Common.AccountAnomalyTip))
             {
                 var window = CreateWindowToVerifyAccount();
-                
+
                 if (window.Content is not VerifyAccountPage page) return m3U8Infos;
 
                 var isClosed = false;
@@ -1590,7 +1592,7 @@ namespace Display.Data
             window.Content = page;
 
             return window;
-                ;
+            ;
         }
 
 
@@ -1616,20 +1618,20 @@ namespace Display.Data
             {
                 case PlayMethod.Pot:
                     savePath = AppSettings.PotPlayerExePath;
-                    ua = GetInfoFromNetwork.UserAgent;
+                    ua = GetInfoFromNetwork.DownUserAgent;
                     break;
                 case PlayMethod.Mpv:
                     savePath = AppSettings.MpvExePath;
-                    ua = GetInfoFromNetwork.UserAgent;
+                    ua = GetInfoFromNetwork.DownUserAgent;
                     break;
                 case PlayMethod.Vlc:
                     savePath = AppSettings.VlcExePath;
-                    ua = GetInfoFromNetwork.UserAgent;
+                    ua = GetInfoFromNetwork.DownUserAgent;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(playMethod), playMethod, null);
             }
-            
+
             //播放路径检查选择
             if (string.IsNullOrEmpty(savePath))
             {
@@ -1660,7 +1662,7 @@ namespace Display.Data
                 // 获取下载链接
                 await playItem.GetUrl(quality);
                 Debug.WriteLine("成功获取");
-                
+
                 // 下载字幕
                 var subPath = await playItem.GetOneSubFilePath();
 
@@ -1689,12 +1691,12 @@ namespace Display.Data
                     throw new ArgumentOutOfRangeException(nameof(playMethod), playMethod, null);
             }
         }
-        
+
         public async Task<string> TryDownSubFile(string fileName, string pickCode)
         {
             //为预防字幕文件没有具体名称，只有数字，更改字幕文件名为 pickCode+字幕文件名
             fileName = $"{pickCode}_{fileName}";
-            
+
             if (string.IsNullOrEmpty(pickCode)) return null;
             var subSavePath = AppSettings.SubSavePath;
             var subFile = Path.Combine(subSavePath, fileName);
@@ -1703,7 +1705,7 @@ namespace Display.Data
             if (File.Exists(subFile))
                 return subFile;
 
-            var ua = GetInfoFromNetwork.UserAgent;
+            var ua = GetInfoFromNetwork.DownUserAgent;
 
             //不存在则获取下载链接并下载
             var subUrlList = await GetDownUrl(pickCode, ua);
@@ -1722,6 +1724,6 @@ namespace Display.Data
             return subFile;
 
         }
-        
+
     }
 }

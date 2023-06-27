@@ -144,19 +144,21 @@ namespace Display.ViewModels
             // 正式开始整理
 
             // 整理单集
-            var singleFids = new List<string>();
+            var singleFids = new List<long?>();
             var webApi = WebApi.GlobalWebApi;
 
             foreach (var info in singleList)
             {
                 info.Status = Status.Doing;
 
-                singleFids.Add(info.Info.Id);
+                var id = info.Info.Id;
+
+                singleFids.Add(id);
 
                 // 重命名
                 if (info.DestinationName == info.Info.NameWithoutExtension) continue;
 
-                var renameRequest = await webApi.RenameFile(info.Info.Id, info.DestinationName);
+                var renameRequest = await webApi.RenameFile(id, info.DestinationName);
                 if (renameRequest == null)
                 {
                     info.Status = Status.Error;
@@ -164,7 +166,7 @@ namespace Display.ViewModels
 
             }
             // 移动到
-            await webApi.MoveFiles(settings.SingleVideoSaveExplorerItem.Id, singleFids);
+            await webApi.MoveFiles(settings.SingleVideoSaveExplorerItem.Id, singleFids.ToArray());
             foreach (var info in singleList.Where(info => info.Status != Status.Error))
             {
                 info.Status = Status.Success;
@@ -187,7 +189,7 @@ namespace Display.ViewModels
                 }
 
                 // 移动到
-                await webApi.MoveFiles(makeDirResult.cid, fileInfo.Select(x=>x.Info.Id).ToList());
+                await webApi.MoveFiles(makeDirResult.cid, fileInfo.Select(x=>x.Info.Id).ToArray());
 
                 foreach (var info in fileInfo.Where(info => info.Status != Status.Error))
                 {

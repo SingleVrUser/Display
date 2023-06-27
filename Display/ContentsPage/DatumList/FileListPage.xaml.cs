@@ -64,14 +64,14 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     /// </summary>
     private ObservableCollection<TransferStationFiles> _transferStationFiles;
 
-    public FileListPage(string cid = "0")
+    public FileListPage(long cid = 0)
     {
         this.InitializeComponent();
 
         List<ExplorerItem> unit;
-        if (cid == "0")
+        if (cid == 0)
         {
-            unit = new List<ExplorerItem> { new() { Name = "根目录", Id = "0" } };
+            unit = new List<ExplorerItem> { new() { Name = "根目录", Id = 0 } };
 
         }
         else
@@ -93,7 +93,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         MetadataControl.ItemsSource = _units;
 
-        FilesInfos = new IncrementalLoadDatumCollection(CurrentExplorerItem?.Id);
+        FilesInfos = new IncrementalLoadDatumCollection(CurrentExplorerItem?.Id ?? 0);
         BaseExample.ItemsSource = FilesInfos;
 
         FilesInfos.GetFileInfoCompleted += FilesInfos_GetFileInfoCompleted;
@@ -118,7 +118,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     private async Task OpenFolder(ExplorerItem currentItem)
     {
         //不存在，返回
-        if (string.IsNullOrEmpty(currentItem?.Id)) return;
+        if (currentItem?.Id == null) return;
 
         //删除选中路径后面的路径
         var index = _units.IndexOf(currentItem);
@@ -164,12 +164,16 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         //跳过文件
         if (filesInfo.Type == FilesInfo.FileType.File) return;
 
-        await FilesInfos.SetCid(filesInfo.Id);
+        if (filesInfo.Id == null) return;
+
+        var id = (long)filesInfo.Id;
+
+        await FilesInfos.SetCid(id);
 
         _units.Add(new ExplorerItem
         {
             Name = filesInfo.Name,
-            Id = filesInfo.Id,
+            Id = id,
         });
 
         // 切换目录时，全选checkBox不是选中状态
@@ -489,9 +493,12 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         // 删除中转站中的文件
         TryRemoveTransferFiles(sourceFilesInfos);
 
+        var cid = sourceFilesInfos.First().Cid;
+
         // 从115中删除
-        await WebApi.DeleteFiles(sourceFilesInfos.FirstOrDefault()?.Cid,
-            sourceFilesInfos.Select(item => item.Id).ToList());
+        await WebApi.DeleteFiles((long)cid,
+            sourceFilesInfos.Where(item=>item.Id!=null).Select(item => (long)item.Id).ToArray());
+
     }
 
     private void RecycleStationGrid_DragEnter(object sender, DragEventArgs e)
@@ -518,7 +525,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         {
             await HandleFileDrop(e, target, sourceFilesInfos);
         }
-        else if(e.DataView.Contains(StandardDataFormats.StorageItems))
+        else if (e.DataView.Contains(StandardDataFormats.StorageItems))
         {
             var items = await e.DataView.GetStorageItemsAsync();
 
@@ -528,16 +535,17 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
             // 标记当前文件夹，避免切换文件夹后才上传成功导致的错误文件（UI）添加，影响显示
             var currentFolderCid = CurrentExplorerItem.Id;
+
             foreach (var storageFile in storageFiles)
             {
-                UploadViewModel.Instance.AddUploadTask(storageFile.Path,CurrentExplorerItem?.Id, result =>
+                UploadViewModel.Instance.AddUploadTask(storageFile.Path, currentFolderCid, result =>
                 {
                     if (!result.Success) return;
 
                     if (currentFolderCid != CurrentExplorerItem.Id) return;
 
                     // 上传成功后更新UI
-                    FilesInfos.Insert(0,new FilesInfo(result));
+                    FilesInfos.Insert(0, new FilesInfo(result));
                 });
             }
 
@@ -597,7 +605,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private void TryRemoveTransferFiles(ICollection<FilesInfo> files)
     {
-        if (_transferStationFiles is not {Count:>0}) return;
+        if (_transferStationFiles is not { Count: > 0 }) return;
 
         var transferListReadyRemove = _transferStationFiles.Where(item => item.TransferFiles.All(files.Contains)).ToList();
 
@@ -611,10 +619,10 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     /// 移动115文件
     /// </summary>
     /// <returns></returns>
-    private async Task Move115Files(string pid, List<FilesInfo> files)
+    private async Task Move115Files(long cid, List<FilesInfo> files)
     {
-        await WebApi.MoveFiles(pid, files.Select(item => item.Id).ToList());
-
+        await WebApi.MoveFiles(cid, files.Select(item => item.Id).ToArray());
+            
         // 从中转站列表中删除已经移动的文件
         TryRemoveTransferFiles(files);
     }
@@ -806,7 +814,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (result == ContentDialogResult.Primary)
         {
-            DataAccess.DeleteFilesInfoTable();
+            DataAccess.DeleteTable(DataAccess.TableName.FilesInfo); ;
         }
     }
 
@@ -852,7 +860,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
 
         //BitComet只需要cid,n,pc三个值
-        bool isSuccess = await WebApi.RequestDown(videoInfos, downType);
+        var isSuccess = await WebApi.RequestDown(videoInfos, downType);
 
         if (!isSuccess)
             ShowTeachingTip("请求下载失败");
@@ -948,7 +956,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     private async void MoveToNewFolderItemClick(object sender, RoutedEventArgs e)
     {
         List<FilesInfo> fileInfos;
-
         // 选中文件，对当前文件操作
         if (BaseExample.SelectedItems.Count == 0)
         {
@@ -970,13 +977,17 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (fileInfos.Count == 0) return;
 
-        var currentFolderId = CurrentExplorerItem?.Id;
+        var currentFolderId = CurrentExplorerItem.Id;
 
-        var sameName = MatchHelper.GetSameFirstStringFromList(fileInfos.Select(x => string.IsNullOrEmpty(x.Datum.ico) ? x.Name : x.Name.Replace($".{x.Datum.ico}", "")).ToList());
+        // 移除前缀
+        var infos = fileInfos.Select(x =>
+                            Regex.Replace(x.NameWithoutExtension, "\\w+.(com|cn|xyz|la|me|net|app|cc)@", string.Empty, RegexOptions.IgnoreCase))
+                            .ToArray();
 
-        // 移除关键词
-        sameName = Regex.Replace(sameName, "\\w+.(com|cn|xyz|la|me|net|app|cc)@", "", RegexOptions.IgnoreCase);
-        sameName = Regex.Replace(sameName, "[-_.]part$", "", RegexOptions.IgnoreCase);
+        var sameName = MatchHelper.GetSameFirstStringFromList(infos);
+
+        // 移除后缀
+        sameName = Regex.Replace(sameName, "[-_.]part$", string.Empty, RegexOptions.IgnoreCase);
 
         TextBox inputTextBox = new()
         {
@@ -1018,8 +1029,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
 
-        var pid = info.Id;
-
         TextBox inputTextBox = new()
         {
             Text = info.NameWithoutExtension,
@@ -1048,7 +1057,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         //没变
         if (newName == info.Name) return;
 
-        var renameRequest = await WebApi.RenameFile(pid, newName);
+        var renameRequest = await WebApi.RenameFile(info.Id, newName);
         if (renameRequest == null)
         {
             ShowTeachingTip("重命名失败");
@@ -1094,7 +1103,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
     }
 
-    private static List<FilesInfo> GetFilesInfosExceptInCid(string cid, List<FilesInfo> infos)
+    private static List<FilesInfo> GetFilesInfosExceptInCid(long cid, List<FilesInfo> infos)
     {
         return infos.Where(x => x.Cid != cid).ToList();
     }
@@ -1172,19 +1181,19 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (info.Type == FilesInfo.FileType.Folder)
         {
-            infos.Add("id", info.Id);
+            infos.Add("id", info.Id.ToString());
             infos.Add("pickCode", info.PickCode);
-            infos.Add("所在目录id", info.Cid);
+            infos.Add("所在目录id", info.Cid.ToString());
 
             title = "文件夹属性";
         }
         else
         {
-            infos.Add("id", info.Id);
+            infos.Add("id", info.Id.ToString());
             infos.Add("pickCode", info.PickCode);
             infos.Add("大小", ByteSize.FromBytes(info.Datum.s).ToString("#.#"));
             infos.Add("sha1", info.Datum.sha);
-            infos.Add("所在目录id", info.Cid);
+            infos.Add("所在目录id", info.Cid.ToString());
 
             title = "文件属性";
         }
@@ -1199,7 +1208,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         var infos = new Dictionary<string, string>
         {
             {"名称",info.Name },
-            {"cid",info.Id },
+            {"cid",info.Id.ToString() },
         };
 
         await InfoPage.ShowInContentDialog(XamlRoot, infos, "属性");
