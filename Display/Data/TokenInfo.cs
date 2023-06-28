@@ -3,6 +3,7 @@ using Display.Services.Upload;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,6 +11,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
@@ -135,41 +137,128 @@ namespace Display.Data
 
     public class Datum
     {
-        public long? fid { get; set; }
-        public long? pid { get; set; }
-        public long cid { get; set; }
-        public long uid { get; set; }
-        public int aid { get; set; }
-        public string n { get; set; }
-        public long s { get; set; }
-        public int sta { get; set; }
-        public string pt { get; set; }
-        public string pc { get; set; }
-        public int p { get; set; }
-        public int m { get; set; }
-        public string t { get; set; }
-        public int te { get; set; }
-        public int tp { get; set; }
-        public int d { get; set; }
-        public int c { get; set; }
-        public int sh { get; set; }
-        public string e { get; set; }
-        public string ico { get; set; }
-        public string sha { get; set; }
-        public string fdes { get; set; }
-        public int q { get; set; }
-        public int hdf { get; set; }
-        public int fvs { get; set; }
-        public Fl[] fl { get; set; }
-        public string u { get; set; }
-        public int iv { get; set; }
-        public int current_time { get; set; }
-        public int played_end { get; set; }
-        public string last_time { get; set; }
-        public int vdi { get; set; }
-        public double play_long { get; set; }
+        [JsonProperty(propertyName: "fid")]
+        public long? Fid { get; set; }
 
-        public override string ToString() => n;
+
+        [JsonProperty(propertyName: "pid")]
+        public long? Pid { get; set; }
+
+
+        [JsonProperty(propertyName: "cid")]
+        public long Cid { get; set; }
+
+        [JsonProperty(propertyName: "uid")]
+        public long Uid { get; set; }
+
+
+        [JsonProperty(propertyName: "aid")]
+        public int Aid { get; set; }
+
+        [JsonProperty(propertyName: "n")]
+        public string Name { get; set; }
+
+        [JsonProperty(propertyName: "s")]
+        public long Size { get; set; }
+
+        [JsonProperty(propertyName: "sta")]
+        public int Sta { get; set; }
+
+
+        [JsonProperty(propertyName: "pt")]
+        public string Pt { get; set; }
+
+        [JsonProperty(propertyName: "pc")]
+        public string PickCode { get; set; }
+
+
+        [JsonProperty(propertyName: "p")]
+        public int P { get; set; }
+
+
+        [JsonProperty(propertyName: "m")]
+        public int M { get; set; }
+
+        [JsonProperty(propertyName: "t")]
+        public string Time { get; set; }
+
+
+        [JsonProperty(propertyName: "te")]
+        public int TimeEdit { get; set; }
+
+        [JsonProperty(propertyName: "tp")]
+        public int TimeProduce { get; set; }
+
+        [JsonProperty(propertyName: "d")]
+        public int D { get; set; }
+
+        [JsonProperty(propertyName: "c")]
+        public int C { get; set; }
+
+
+        [JsonProperty(propertyName: "sh")]
+        public int Sh { get; set; }
+
+        [JsonProperty(propertyName: "e")]
+        public string E { get; set; }
+
+
+        [JsonProperty(propertyName: "ico")]
+        public string Ico { get; set; }
+
+
+        [JsonProperty(propertyName: "sha")]
+        public string Sha { get; set; }
+
+
+        [JsonProperty(propertyName: "fdes")]
+        public string Fdes { get; set; }
+
+
+        [JsonProperty(propertyName: "q")]
+        public int Q { get; set; }
+
+
+        [JsonProperty(propertyName: "hdf")]
+        public int Hdf { get; set; }
+
+
+        [JsonProperty(propertyName: "fvs")]
+        public int Fvs { get; set; }
+
+
+        [JsonProperty(propertyName: "fl")]
+        public Fl[] Fl { get; set; }
+
+
+        [JsonProperty(propertyName: "u")]
+        public string U { get; set; }
+
+
+        [JsonProperty(propertyName: "iv")]
+        public int Iv { get; set; }
+
+
+        [JsonProperty(propertyName: "current_time")]
+        public int CurrentTime { get; set; }
+
+
+        [JsonProperty(propertyName: "played_end")]
+        public int PlayedEnd { get; set; }
+
+
+        [JsonProperty(propertyName: "last_time")]
+        public string LastTime { get; set; }
+
+
+        [JsonProperty(propertyName: "vdi")]
+        public int Vdi { get; set; }
+
+
+        [JsonProperty(propertyName: "play_long")]
+        public double PlayLong { get; set; }
+
+        public override string ToString() => Name;
     }
 
     public class Fl
@@ -418,28 +507,44 @@ namespace Display.Data
 
     public class ActorInfo : INotifyPropertyChanged
     {
+        [JsonProperty(propertyName: "id")]
         public int id { get; set; }
 
-        public string initials => string.Empty + name.FirstOrDefault();
-
+        [JsonProperty(propertyName: "name")]
         public string name { set; get; }
 
         public List<string> otherNames { get; set; }
 
+        [JsonProperty(propertyName: "is_woman")]
         public int is_woman { set; get; } = 1;
 
+        [JsonProperty(propertyName: "birthday")]
         public string birthday { set; get; } = string.Empty;
+        
+        [JsonProperty(propertyName: "bwh")]
         public string bwh { set; get; } = string.Empty;
 
+        [JsonProperty(propertyName: "bust")]
         public int bust { set; get; }
+
+        [JsonProperty(propertyName: "waist")]
         public int waist { set; get; }
+
+        [JsonProperty(propertyName: "hips")]
         public int hips { set; get; }
 
+        [JsonProperty(propertyName: "height")]
         public int height { set; get; }
+
+        [JsonProperty(propertyName: "works_count")]
         public int works_count { set; get; }
+
+        [JsonProperty(propertyName: "work_time")]
         public string work_time { set; get; } = string.Empty;
 
         private string _prifile_path { set; get; } = string.Empty;
+
+        [JsonProperty(propertyName: "prifile_path")]
         public string prifile_path
         {
             get => _prifile_path;
@@ -457,24 +562,28 @@ namespace Display.Data
             }
         }
 
+        [JsonProperty(propertyName: "blog_url")]
+        public string blog_url { set; get; } = string.Empty;
+
+        [JsonProperty(propertyName: "info_url")]
+        public string info_url { get; set; } = string.Empty;
+
+        [JsonProperty(propertyName: "is_like")]
+        public int is_like { set; get; } = 0;
+
+        [JsonProperty(propertyName: "addtime")]
+        public long addtime { set; get; } = DateTimeOffset.Now.ToUnixTimeSeconds();
+
+        [JsonProperty(propertyName: "video_count")]
+        public int video_count { get; set; }
 
         public string image_url { get; set; }
 
-        public string blog_url { set; get; } = string.Empty;
-        public int is_like { set; get; } = 0;
-        public long addtime { set; get; } = DateTimeOffset.Now.ToUnixTimeSeconds();
-
-        public string info_url { get; set; } = string.Empty;
-
-        public int video_count { get; set; }
-
         private Status _status = Status.BeforeStart;
+
         public Status Status
         {
-            get
-            {
-                return _status;
-            }
+            get => _status;
             set
             {
                 _status = value;
@@ -483,6 +592,7 @@ namespace Display.Data
         }
 
         private string _genderInfo;
+        
         public string genderInfo
         {
             get
@@ -496,7 +606,9 @@ namespace Display.Data
             }
         }
 
+        
         private string _ageInfo;
+
         public string ageInfo
         {
             get
@@ -509,6 +621,8 @@ namespace Display.Data
                 OnPropertyChanged();
             }
         }
+
+        public string initials => string.Empty + name.FirstOrDefault();
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string propertyName = "")
@@ -532,14 +646,14 @@ namespace Display.Data
         //魔改
         public VideoInfo(Datum failDatum)
         {
-            this.truename = failDatum.n;
+            this.truename = failDatum.Name;
             this.imagepath = "ms-appx:///Assets/Fail.jpg";
             this.series = "fail";
-            this.releasetime = failDatum.t;
-            this.imageurl = failDatum.pc;
-            this.look_later = failDatum.s;
-            this.busurl = failDatum.pc;
-            this.category = failDatum.ico;
+            this.releasetime = failDatum.Time;
+            this.imageurl = failDatum.PickCode;
+            this.look_later = failDatum.Size;
+            this.busurl = failDatum.PickCode;
+            this.category = failDatum.Ico;
         }
 
 
@@ -733,10 +847,10 @@ namespace Display.Data
 
         public VideoCoverDisplayClass(VideoInfo videoinfo, double imgwidth, double imgheight)
         {
-            foreach (var VideoInfoItem in videoinfo.GetType().GetProperties())
+            foreach (var videoInfoItem in videoinfo.GetType().GetProperties())
             {
-                var key = VideoInfoItem.Name;
-                var value = VideoInfoItem.GetValue(videoinfo);
+                var key = videoInfoItem.Name;
+                var value = videoInfoItem.GetValue(videoinfo);
 
                 var newItem = this.GetType().GetProperty(key);
                 newItem.SetValue(this, value);
@@ -975,39 +1089,39 @@ namespace Display.Data
         {
             Datum = data;
 
-            Name = data.n;
+            Name = data.Name;
 
             IconPath = "ms-appx:///Assets/115/file_type/other/unknown.svg";
             //文件夹
-            if (data.fid == null && data.pid!=null)
+            if (data.Fid == null && data.Pid!=null)
             {
                 Type = FileType.Folder;
-                Id = data.cid;
-                Cid = (long)data.pid;
-                PickCode = data.pc;
+                Id = data.Cid;
+                Cid = (long)data.Pid;
+                PickCode = data.PickCode;
 
                 IconPath = "ms-appx:///Assets/115/file_type/folder/folder.svg";
             }
-            else if(data.fid != null)
+            else if(data.Fid != null)
             {
                 Type = FileType.File;
-                Id = data.fid;
-                Cid = data.cid;
-                PickCode = data.pc;
+                Id = data.Fid;
+                Cid = data.Cid;
+                PickCode = data.PickCode;
 
                 //视频文件
-                if (data.iv == 1)
+                if (data.Iv == 1)
                 {
                     IsVideo = true;
-                    var videoQuality = GetVideoQualityFromVdi(data.vdi);
+                    var videoQuality = GetVideoQualityFromVdi(data.Vdi);
 
                     IconPath = videoQuality != null ? $"ms-appx:///Assets/115/file_type/video_quality/{videoQuality}.svg"
                                                     : "ms-appx:///Assets/115/file_type/video/video.svg";
 
                 }
-                else if (!string.IsNullOrEmpty(data.ico))
+                else if (!string.IsNullOrEmpty(data.Ico))
                 {
-                    var tmpIcoPath = GetPathFromFileType(data.ico);
+                    var tmpIcoPath = GetPathFromFileType(data.Ico);
                     if (tmpIcoPath != null)
                     {
                         IconPath = tmpIcoPath;
@@ -1069,9 +1183,9 @@ namespace Display.Data
             {
                 if (_nameWithoutExtension != null) return _nameWithoutExtension;
 
-                if (Type == FileType.File && !string.IsNullOrEmpty(Datum.ico))
+                if (Type == FileType.File && !string.IsNullOrEmpty(Datum.Ico))
                 {
-                    _nameWithoutExtension = Regex.Replace(Name, $".{Datum.ico}$", "", RegexOptions.IgnoreCase);
+                    _nameWithoutExtension = Regex.Replace(Name, $".{Datum.Ico}$", "", RegexOptions.IgnoreCase);
                 }
                 else
                 {
@@ -1283,15 +1397,15 @@ namespace Display.Data
         {
             Datum datum = new()
             {
-                uid = 0,
-                aid = 1,
-                cid = cid,
-                n = fileCategory.file_name,
-                pid = fileCategory.paths[^1].file_id,
-                pc = fileCategory.pick_code,
-                t = FileMatch.ConvertInt32ToDateTime(fileCategory.utime),
-                tp = fileCategory.ptime,
-                te = fileCategory.utime,
+                Uid = 0,
+                Aid = 1,
+                Cid = cid,
+                Name = fileCategory.file_name,
+                Pid = fileCategory.paths[^1].file_id,
+                PickCode = fileCategory.pick_code,
+                Time = FileMatch.ConvertInt32ToDateTime(fileCategory.utime),
+                TimeProduce = fileCategory.ptime,
+                TimeEdit = fileCategory.utime,
             };
 
             return datum;
@@ -1304,14 +1418,14 @@ namespace Display.Data
 
         public FileCategory(Datum datum)
         {
-            this.file_name = datum.n;
-            this.pick_code = datum.pc;
+            this.file_name = datum.Name;
+            this.pick_code = datum.PickCode;
             this.count = 1;
             this.file_category = 1;
-            this.utime = datum.te;
-            this.ptime = datum.tp;
-            this.sha1 = datum.sha;
-            this.size = ByteSize.FromBytes(datum.s).ToString("#.#");
+            this.utime = datum.TimeEdit;
+            this.ptime = datum.TimeProduce;
+            this.sha1 = datum.Sha;
+            this.size = ByteSize.FromBytes(datum.Size).ToString("#.#");
         }
     }
 
@@ -1790,11 +1904,21 @@ namespace Display.Data
     //下载链接历史
     public class DownInfo
     {
-        public string pickCode { get; set; }
-        public string fileName { get; set; }
-        public string trueUrl { get; set; }
-        public string ua { get; set; }
-        public long addTime { get; set; } = DateTimeOffset.Now.ToUnixTimeSeconds();
+        [JsonProperty(propertyName: "file_pickcode")]
+        public string PickCode { get; set; }
+
+
+        [JsonProperty(propertyName: "file_name")]
+        public string FileName { get; set; }
+
+        [JsonProperty(propertyName: "true_url")]
+        public string TrueUrl { get; set; }
+
+        [JsonProperty(propertyName: "ua")]
+        public string Ua { get; set; }
+
+        [JsonProperty(propertyName: "add_time")]
+        public long AddTime { get; set; } = DateTimeOffset.Now.ToUnixTimeSeconds();
     }
 
 
@@ -2003,17 +2127,23 @@ namespace Display.Data
 
     public class FailInfo
     {
-        public string pc { get; set; }
+        [JsonProperty(propertyName: "pc")]
+        public string PickCode { get; set; }
 
-        public Datum datum { get; set; }
+        [JsonProperty(propertyName: "is_like")]
+        public int IsLike { get; set; } = 0;
 
-        public int is_like { get; set; } = 0;
+        [JsonProperty(propertyName: "score")]
+        public double Score { get; set; } = -1;
 
-        public double score { get; set; } = -1;
+        [JsonProperty(propertyName: "look_later")]
+        public long LookLater { get; set; } = 0;
 
-        public long look_later { get; set; } = 0;
+        [JsonProperty(propertyName: "image_path")]
+        public string ImagePath { get; set; } = Const.Common.NoPicturePath;
 
-        public string image_path { get; set; } = Const.Common.NoPicturePath;
+        [JsonProperty(propertyName: nameof(Datum))]
+        public Datum Datum { get; set; }
     }
 
     public enum FailInfoShowType { like, look_later }

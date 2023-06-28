@@ -120,7 +120,7 @@ public sealed partial class MainPage : Page
 
                         // 挑选视频数量
                         var videoInFolder = filesInfo.data
-                            .Where(item => item.fid!=null && item.iv == 1).Take(leftCount).ToList();
+                            .Where(item => item.Fid!=null && item.Iv == 1).Take(leftCount).ToList();
                         var videoInFolderCount = videoInFolder.Count;
 
                         if (videoInFolderCount <= 0) continue;
@@ -301,7 +301,7 @@ public sealed partial class MainPage : Page
         string videoUrl = null;
         var pickCode = file.PickCode;
         //转码成功，可以用m3u8
-        if (file.Datum.vdi != 0)
+        if (file.Datum.Vdi != 0)
         {
             var m3U8Infos = await webApi.GetM3U8InfoByPickCode(pickCode);
 

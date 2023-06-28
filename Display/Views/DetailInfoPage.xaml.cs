@@ -164,7 +164,7 @@ namespace Display.Views
             //一集
             else if (videoInfoList.Count == 1)
             {
-                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].pc, trueName, FilesInfo.FileType.File);
+                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].PickCode, trueName, FilesInfo.FileType.File);
                 await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
             }
             //有多集
@@ -258,7 +258,7 @@ namespace Display.Views
             else if (videoInfoList.Count == 1)
             {
 
-                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].pc, name, FilesInfo.FileType.File);
+                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].PickCode, name, FilesInfo.FileType.File);
                 await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
             }
 

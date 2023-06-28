@@ -591,7 +591,7 @@
                     <Border x:Name="showImage"
                             CornerRadius="5"
                             HorizontalAlignment="Center">
-                        <Image Source="{x:Bind image_path}"
+                        <Image Source="{x:Bind ImagePath}"
                                MaxHeight="300" />
                     </Border>
 
@@ -608,7 +608,7 @@
                             <AppBarToggleButton IsCompact="True"
                                                 ToolTipService.ToolTip="稍后观看"
                                                 RelativePanel.AlignRightWithPanel="True"
-                                                IsChecked="{x:Bind data:FileMatch.isLookLater(look_later)}"
+                                                IsChecked="{x:Bind data:FileMatch.isLookLater(LookLater)}"
                                                 Click="FailLookLaterToggleButton_Click">
                                 <AppBarToggleButton.Resources>
 
@@ -655,7 +655,7 @@
                                     <AppBarButton.Flyout>
                                         <Flyout>
                                             <RatingControl Caption="评分"
-                                                           Value="{x:Bind score}"
+                                                           Value="{x:Bind Score}"
                                                            ValueChanged="FailRatingControl_ValueChanged">
                                                 <RatingControl.Resources>
                                                     <SolidColorBrush x:Key="RatingControlSelectedForeground"
@@ -672,7 +672,7 @@
                                 <!--标记为喜欢-->
                                 <AppBarToggleButton ToolTipService.ToolTip="喜欢"
                                                     IsCompact="True"
-                                                    IsChecked="{x:Bind data:FileMatch.isLike(is_like)}"
+                                                    IsChecked="{x:Bind data:FileMatch.isLike(IsLike)}"
                                                     Click="FailLikeToggleButton_Click">
                                     <FontIcon Glyph="&#xE006;" />
                                 </AppBarToggleButton>
@@ -697,7 +697,7 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Column="0"
-                               Text="{x:Bind datum.n}"
+                               Text="{x:Bind Datum.Name}"
                                TextTrimming="CharacterEllipsis" />
 
                     <!--评分-->
@@ -750,18 +750,18 @@
                     <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="{x:Bind n}"
+                <TextBlock Text="{x:Bind Name}"
                            Grid.ColumnSpan="2"
                            TextTrimming="CharacterEllipsis" />
 
                 <TextBlock Grid.Row="1"
                            Grid.Column="1"
-                           Text="{x:Bind s,Converter={StaticResource BytesToSizeStrConverter}}"
+                           Text="{x:Bind Size,Converter={StaticResource BytesToSizeStrConverter}}"
                            Opacity="0.5" />
 
                 <TextBlock Grid.Row="1"
                            Grid.Column="0"
-                           Text="{x:Bind t}"
+                           Text="{x:Bind Time}"
                            TextTrimming="CharacterEllipsis"
                            Opacity="0.5" />
 

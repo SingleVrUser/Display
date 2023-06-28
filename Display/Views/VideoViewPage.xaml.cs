@@ -43,13 +43,13 @@ namespace Display.Views
             string title;
             if (videoPlayGrid.DataContext is Datum datum)
             {
-                pickCode = datum.pc;
-                title = datum.n;
+                pickCode = datum.PickCode;
+                title = datum.Name;
             }
             else if (videoPlayGrid.DataContext is FailInfo failInfo)
             {
-                pickCode = failInfo.pc;
-                title = failInfo.datum.n;
+                pickCode = failInfo.PickCode;
+                title = failInfo.Datum.Name;
             }
             else
             {
@@ -101,7 +101,7 @@ namespace Display.Views
             {
                 _storeditem = videoInfo;
 
-                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].pc, videoInfo.truename, FilesInfo.FileType.File);
+                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].PickCode, videoInfo.truename, FilesInfo.FileType.File);
                 await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
                 ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             }
@@ -122,7 +122,7 @@ namespace Display.Views
             if (sender is not ListView { DataContext: string trueName }) return;
 
 
-            var mediaPlayItem = new MediaPlayItem(singleVideoInfo.pc, trueName, FilesInfo.FileType.File);
+            var mediaPlayItem = new MediaPlayItem(singleVideoInfo.PickCode, trueName, FilesInfo.FileType.File);
             await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
         }
 

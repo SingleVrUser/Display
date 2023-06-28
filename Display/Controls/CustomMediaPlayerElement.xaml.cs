@@ -284,8 +284,8 @@ public sealed partial class CustomMediaPlayerElement
             }
             else
             {
-                IsLike = failInfo.is_like;
-                LookLater = Convert.ToInt32(failInfo.look_later);
+                IsLike = failInfo.IsLike;
+                LookLater = Convert.ToInt32(failInfo.LookLater);
 
                 isLike = IsLike == 1;
                 isLookLater = LookLater != 0;
@@ -472,9 +472,9 @@ public sealed partial class CustomMediaPlayerElement
                 var capPath = await ScreenShotAsync(pickCode);
                 DataAccess.AddOrReplaceFailList_Islike_Looklater(new()
                 {
-                    pc = pickCode,
-                    is_like = IsLike,
-                    image_path = capPath
+                    PickCode = pickCode,
+                    IsLike = IsLike,
+                    ImagePath = capPath
                 });
 
                 if (IsLike == 1) ShowTeachingTip("已添加进喜欢");
@@ -484,7 +484,7 @@ public sealed partial class CustomMediaPlayerElement
                 DataAccess.UpdateSingleFailInfo(pickCode, "is_like", IsLike.ToString());
 
                 //需要截图
-                if (failInfo.image_path == Const.Common.NoPicturePath || !File.Exists(failInfo.image_path))
+                if (failInfo.ImagePath == Const.Common.NoPicturePath || !File.Exists(failInfo.ImagePath))
                 {
                     var capPath = await ScreenShotAsync(pickCode);
                     DataAccess.UpdateSingleFailInfo(pickCode, "image_path", capPath);
@@ -528,9 +528,9 @@ public sealed partial class CustomMediaPlayerElement
                 var capPath = await ScreenShotAsync(pickCode);
                 DataAccess.AddOrReplaceFailList_Islike_Looklater(new()
                 {
-                    pc = pickCode,
-                    look_later = LookLater,
-                    image_path = capPath
+                    PickCode = pickCode,
+                    LookLater = LookLater,
+                    ImagePath = capPath
                 });
 
                 if (LookLater != 0) ShowTeachingTip("已添加进稍后观看");
@@ -540,7 +540,7 @@ public sealed partial class CustomMediaPlayerElement
                 DataAccess.UpdateSingleFailInfo(pickCode, "look_later", LookLater.ToString());
 
                 //需要添加截图
-                if (failInfo.image_path == Const.Common.NoPicturePath || !File.Exists(failInfo.image_path))
+                if (failInfo.ImagePath == Const.Common.NoPicturePath || !File.Exists(failInfo.ImagePath))
                 {
                     var capPath = await ScreenShotAsync(pickCode);
                     DataAccess.UpdateSingleFailInfo(pickCode, "image_path", capPath);
@@ -567,10 +567,10 @@ public sealed partial class CustomMediaPlayerElement
 
         if (failInfo == null)
         {
-            DataAccess.AddOrReplaceFailList_Islike_Looklater(new()
+            DataAccess.AddOrReplaceFailList_Islike_Looklater(new FailInfo
             {
-                pc = pickCode,
-                image_path = capPath
+                PickCode = pickCode,
+                ImagePath = capPath
             });
         }
         else

@@ -502,9 +502,9 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         if (Button.DataContext is not FailInfo info) return;
 
-        info.is_like = (bool)Button.IsChecked ? 1 : 0;
+        info.IsLike = (bool)Button.IsChecked ? 1 : 0;
 
-        DataAccess.UpdateSingleFailInfo(info.pc, "is_like", info.is_like.ToString());
+        DataAccess.UpdateSingleFailInfo(info.PickCode, "is_like", info.IsLike.ToString());
     }
 
     /// <summary>
@@ -529,9 +529,9 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         if (Button.DataContext is not FailInfo info) return;
 
-        info.look_later = (bool)Button.IsChecked ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
+        info.LookLater = (bool)Button.IsChecked ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
 
-        DataAccess.UpdateSingleFailInfo(info.pc, "look_later", info.look_later.ToString());
+        DataAccess.UpdateSingleFailInfo(info.PickCode, "look_later", info.LookLater.ToString());
     }
 
     /// <summary>
@@ -553,9 +553,9 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     {
         if (sender.DataContext is not FailInfo Info) return;
 
-        string score_str = Info.score == 0 ? "-1" : sender.Value.ToString();
+        string score_str = Info.Score == 0 ? "-1" : sender.Value.ToString();
 
-        DataAccess.UpdateSingleFailInfo(Info.pc, "score", score_str);
+        DataAccess.UpdateSingleFailInfo(Info.PickCode, "score", score_str);
     }
 
     public event RoutedEventHandler SingleVideoPlayClick;
@@ -1258,7 +1258,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         if (item.DataContext is not Datum datum) return;
 
-        string pickCode = datum.pc;
+        string pickCode = datum.PickCode;
 
         var failInfo = await DataAccess.LoadSingleFailInfo(pickCode);
 
@@ -1266,8 +1266,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         {
             DataAccess.AddOrReplaceFailList_Islike_Looklater(new()
             {
-                pc = pickCode,
-                is_like = 1
+                PickCode = pickCode,
+                IsLike = 1
             });
             ShowTeachingTip("已添加进喜欢");
         }
@@ -1275,7 +1275,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         //标记为喜欢
         else
         {
-            switch (failInfo.is_like)
+            switch (failInfo.IsLike)
             {
                 case 0:
                     DataAccess.UpdateSingleFailInfo(pickCode, "is_like", "1");
@@ -1294,7 +1294,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         if (item.DataContext is not Datum datum) return;
 
-        string pickCode = datum.pc;
+        string pickCode = datum.PickCode;
 
         var failInfo = await DataAccess.LoadSingleFailInfo(pickCode);
 
@@ -1302,8 +1302,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         {
             DataAccess.AddOrReplaceFailList_Islike_Looklater(new()
             {
-                pc = pickCode,
-                look_later = 1
+                PickCode = pickCode,
+                LookLater = 1
             });
             ShowTeachingTip("已添加进稍后观看");
         }
@@ -1312,7 +1312,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         else
         {
 
-            switch (failInfo.look_later)
+            switch (failInfo.LookLater)
             {
                 case 0:
                     DataAccess.UpdateSingleFailInfo(pickCode, "look_later", "1");

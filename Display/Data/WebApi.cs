@@ -289,7 +289,7 @@ namespace Display.Data
                     }
 
                     //文件夹
-                    if (item.fid == default)
+                    if (item.Fid == default)
                     {
                         getFilesProgressInfo.FolderCount++;
 
@@ -297,11 +297,11 @@ namespace Display.Data
                         getFilesProgressInfo.AddToDataAccessList.Add(item);
 
                         //查询数据库是否存在
-                        if (DataAccess.GetLatestFolderPid(item.pc, item.te)>=0 && Data.StaticData.isJumpExistsFolder)
+                        if (DataAccess.GetLatestFolderPid(item.PickCode, item.TimeEdit)>=0 && Data.StaticData.isJumpExistsFolder)
                         {
                             //统计下级文件夹所含文件的数量
                             //通过数据库获取
-                            var datumList = DataAccess.GetAllFilesTraverse(item.cid);
+                            var datumList = DataAccess.GetAllFilesTraverse(item.Cid);
 
                             getFilesProgressInfo.AddToDataAccessList.AddRange(datumList);
 
@@ -313,7 +313,7 @@ namespace Display.Data
                         }
                         else
                         {
-                            getFilesProgressInfo = await TraverseAllFileInfo(item.cid, getFilesProgressInfo, token, progress);
+                            getFilesProgressInfo = await TraverseAllFileInfo(item.Cid, getFilesProgressInfo, token, progress);
                         }
                     }
                     //文件
@@ -633,11 +633,11 @@ namespace Display.Data
                     //item.t 可能是 "1658999027" 也可能是 "2022-07-28 17:03"
 
                     //"1658999027"
-                    if (item.t.IsNumberic1())
+                    if (item.Time.IsNumberic1())
                     {
-                        var dateInt = Parse(item.t);
-                        item.te = item.tp = dateInt;
-                        item.t = FileMatch.ConvertInt32ToDateTime(dateInt);
+                        var dateInt = Parse(item.Time);
+                        item.TimeEdit = item.TimeProduce = dateInt;
+                        item.Time = FileMatch.ConvertInt32ToDateTime(dateInt);
                     }
                     //"2022-07-28 17:03"
                     else
@@ -655,21 +655,21 @@ namespace Display.Data
                     //item.t 可能是 "1658999027" 也可能是 "2022-07-28 17:03"
 
                     //"1658999027"
-                    if (item.t.IsNumberic1())
+                    if (item.Time.IsNumberic1())
                     {
-                        dateInt = Parse(item.t);
-                        item.t = FileMatch.ConvertInt32ToDateTime(dateInt);
+                        dateInt = Parse(item.Time);
+                        item.Time = FileMatch.ConvertInt32ToDateTime(dateInt);
 
                     }
                     //"2022-07-28 17:03"
                     else
                     {
-                        dateInt = FileMatch.ConvertDateTimeToInt32(item.t);
+                        dateInt = FileMatch.ConvertDateTimeToInt32(item.Time);
                     }
 
                     if (useApi2)
                     {
-                        item.te = item.tp = dateInt;
+                        item.TimeEdit = item.TimeProduce = dateInt;
                     }
                 }
 
@@ -840,7 +840,7 @@ namespace Display.Data
             var downRequest = new Browser_115_Request
             {
                 //UID
-                uid = videoInfoList[0].uid
+                uid = videoInfoList[0].Uid
             };
 
             //KEY
@@ -855,13 +855,13 @@ namespace Display.Data
             {
                 count = downRequest.param.list.Count,
                 list = new List<Down_Request>(),
-                ref_url = $"https://115.com/?cid={videoInfoList[0].cid}&offset=0&mode=wangpan"
+                ref_url = $"https://115.com/?cid={videoInfoList[0].Cid}&offset=0&mode=wangpan"
             };
 
             foreach (var videoInfo in videoInfoList)
             {
-                var isDir = videoInfo.uid == 0;
-                downRequest.param.list.Add(new Down_Request() { n = videoInfo.n, pc = videoInfo.pc, is_dir = isDir });
+                var isDir = videoInfo.Uid == 0;
+                downRequest.param.list.Add(new Down_Request() { n = videoInfo.Name, pc = videoInfo.PickCode, is_dir = isDir });
             }
 
             var url = string.Empty;
@@ -927,9 +927,9 @@ namespace Display.Data
             foreach (var datum in videoInfoList)
             {
                 //文件夹
-                if (datum.fid is null)
+                if (datum.Fid is null)
                 {
-                    var newSavePath = Path.Combine(savePath, datum.n);
+                    var newSavePath = Path.Combine(savePath, datum.Name);
                     //遍历文件夹并下载
                     GetAllFilesTraverseAndDownByBitComet(client, baseUrl, datum, ua, newSavePath);
                 }
@@ -1047,17 +1047,17 @@ namespace Display.Data
             foreach (var datum in videoInfoList)
             {
                 //文件夹
-                if (datum.fid == null)
+                if (datum.Fid == null)
                 {
                     //获取该文件夹下的文件和文件夹
-                    var webFileInfo = await GetFileAsync(datum.cid, loadAll: true);
+                    var webFileInfo = await GetFileAsync(datum.Cid, loadAll: true);
                     if (webFileInfo.count == 0)
                     {
                         success = false;
                         continue;
                     }
 
-                    var newSavePath = Path.Combine(save_path, datum.n);
+                    var newSavePath = Path.Combine(save_path, datum.Name);
                     var isOk = await GetAllFilesTraverseAndDownByAria2(webFileInfo.data.ToList(), apiUrl, password, newSavePath, ua);
 
 
@@ -1069,7 +1069,7 @@ namespace Display.Data
                 else
                 {
                     //一般只有一个
-                    var downUrlList = await GetDownUrl(datum.pc, ua);
+                    var downUrlList = await GetDownUrl(datum.PickCode, ua);
                     if (downUrlList.Count == 0)
                     {
                         success = false;
@@ -1079,7 +1079,7 @@ namespace Display.Data
                     ////用来标记aria2的任务id，如果没有就用时间戳代替
                     //string aria2TaskId = datum.pc != null? datum.pc : DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
 
-                    fileList.Add(datum.pc, downUrlList.FirstOrDefault().Value);
+                    fileList.Add(datum.PickCode, downUrlList.FirstOrDefault().Value);
                 }
             }
 
@@ -1160,7 +1160,7 @@ namespace Display.Data
 
         private async Task<bool> pushOneFileDownRequestToBitComet(HttpClient client, string baseUrl, Datum datum, string ua, string savePath)
         {
-            var urlList = await GetDownUrl(datum.pc, ua);
+            var urlList = await GetDownUrl(datum.PickCode, ua);
 
             if (urlList.Count == 0)
                 return false;
@@ -1169,22 +1169,22 @@ namespace Display.Data
                 baseUrl,
                 urlList.First().Value,
                 savePath,
-                datum.n,
-                $"https://115.com/?cid={datum.cid}=0&tab=download&mode=wangpan",
+                datum.Name,
+                $"https://115.com/?cid={datum.Cid}=0&tab=download&mode=wangpan",
                 ua);
         }
 
         public async void GetAllFilesTraverseAndDownByBitComet(HttpClient client, string baseUrl, Datum datum, string ua, string savePath)
         {
             //获取该文件夹下的文件和文件夹
-            var webFileInfo = await GetFileAsync(datum.cid, loadAll: true);
+            var webFileInfo = await GetFileAsync(datum.Cid, loadAll: true);
 
             foreach (var data in webFileInfo.data)
             {
                 //文件夹
-                if (data.fid == null)
+                if (data.Fid == null)
                 {
-                    var newSavePath = Path.Combine(savePath, data.n);
+                    var newSavePath = Path.Combine(savePath, data.Name);
                     GetAllFilesTraverseAndDownByBitComet(client, baseUrl, data, ua, newSavePath);
 
                     //延迟1s;
@@ -1416,9 +1416,9 @@ namespace Display.Data
                 var downUrlInfo = DataAccess.GetDownHistoryByPcAndUa(pickCode, ua);
 
                 //检查链接是否失效
-                if (downUrlInfo != null && (tm - downUrlInfo.addTime) < AppSettings.DownUrlOverdueTime)
+                if (downUrlInfo != null && (tm - downUrlInfo.AddTime) < AppSettings.DownUrlOverdueTime)
                 {
-                    downUrlList.Add(downUrlInfo.fileName, downUrlInfo.trueUrl);
+                    downUrlList.Add(downUrlInfo.FileName, downUrlInfo.TrueUrl);
                     return downUrlList;
                 }
             }
@@ -1469,10 +1469,10 @@ namespace Display.Data
             {
                 DataAccess.AddDownHistory(new DownInfo
                 {
-                    fileName = downUrlList.First().Key,
-                    trueUrl = downUrlList.First().Value,
-                    pickCode = pickCode,
-                    ua = ua
+                    FileName = downUrlList.First().Key,
+                    TrueUrl = downUrlList.First().Value,
+                    PickCode = pickCode,
+                    Ua = ua
                 });
             }
 

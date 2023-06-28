@@ -77,10 +77,10 @@ namespace Display.Views
                 foreach (var item in selectedItemList)
                 {
                     Datum datum = new();
-                    datum.cid = item.id;
-                    datum.n = item.name;
-                    datum.pc = item.pick_code;
-                    datum.fid = item.file_id;
+                    datum.Cid = item.id;
+                    datum.Name = item.name;
+                    datum.PickCode = item.pick_code;
+                    datum.Fid = item.file_id;
                     videoinfos.Add(datum);
                 }
 

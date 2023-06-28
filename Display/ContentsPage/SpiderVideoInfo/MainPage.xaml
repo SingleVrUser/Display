@@ -15,7 +15,6 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="{StaticResource InfoColumnWidth}" />
-
         </Grid.ColumnDefinitions>
 
         <Grid Grid.ColumnSpan="2">
@@ -39,7 +38,6 @@
                     <AppBarButton Icon="Find"
                                   Label="搜刮"
                                   ToolTipService.ToolTip="搜刮"
-                                  x:Name="StartMatchNameButton"
                                   Click="StartMatchName_ButtonClick" />
                     <AppBarButton Icon="BrowsePhotos"
                                   Label="分析"
@@ -56,7 +54,7 @@
 
 
                     <TextBlock VerticalAlignment="Center"
-                               Visibility="{x:Bind matchFail_RadioButton.IsChecked,Mode=OneWay}"
+                               Visibility="{x:Bind MatchFailRadioButton.IsChecked,Mode=OneWay}"
                                HorizontalAlignment="Right"
                                Margin="0,0,20,0">
                         
@@ -72,12 +70,12 @@
                     <ComboBox x:Name="FailShowTypeComboBox"
                               MinWidth="100"
                               VerticalAlignment="Center"
-                              Visibility="{x:Bind matchFail_RadioButton.IsChecked,Mode=OneWay}"
+                              Visibility="{x:Bind MatchFailRadioButton.IsChecked,Mode=OneWay}"
                               SelectedIndex="0"
                               Grid.Column="1">
-                        <ComboBoxItem Content="所有" />
-                        <ComboBoxItem Content="正则匹配失败" />
-                        <ComboBoxItem Content="搜刮失败" />
+                        <ComboBoxItem x:Name="ShowAllFailComboBoxItem" Content="所有" />
+                        <ComboBoxItem x:Name="ShowMatchFailComboBoxItem" Content="正则匹配失败" />
+                        <ComboBoxItem x:Name="ShowSpiderFailComboBoxItem" Content="搜刮失败" />
                     </ComboBox>
 
                     <RadioButtons SelectedIndex="0"
@@ -85,13 +83,13 @@
                                   MaxColumns="2"
                                   CharacterSpacing="30"
                                   SelectionChanged="ShowData_RadioButtons_SelectionChanged">
-                        <RadioButton x:Name="localData_RadioButton"
+                        <RadioButton x:Name="LocalDataRadioButton"
                                      Content="&#xE9F9;"
                                      FontSize="20"
                                      HorizontalContentAlignment="Center"
                                      Style="{StaticResource RadioButtonCustomizeStyle}"
                                      ToolTipService.ToolTip="本地数据库" />
-                        <RadioButton x:Name="matchFail_RadioButton"
+                        <RadioButton x:Name="MatchFailRadioButton"
                                      Content="&#xF45E;"
                                      FontSize="20"
                                      HorizontalContentAlignment="Center"
@@ -109,13 +107,13 @@
                 <customControls:Explorer x:Name="Explorer"
                                          ItemClick="ExplorerItemClick"
                                          ItemInvoked="TreeView_ItemInvoked"
-                                         Visibility="{x:Bind localData_RadioButton.IsChecked,Mode=OneWay}"
+                                         Visibility="{x:Bind LocalDataRadioButton.IsChecked,Mode=OneWay}"
                                          PlayVideoClick="Explorer_OnPlayVideoClick"
                                          PlayWithPlayerClick="Explorer_OnPlayWithPlayerClick"/>
 
                 <!--失败列表-->
                 <Grid x:Name="FailListGrid"
-                      Visibility="{x:Bind matchFail_RadioButton.IsChecked,Mode=OneWay}">
+                      Visibility="{x:Bind MatchFailRadioButton.IsChecked,Mode=OneWay}">
                     <ListView x:Name="FailListView"
                               SelectionChanged="FailListView_SelectionChanged"
                               ItemsSource="{x:Bind FailList,Mode=OneWay}">
@@ -123,7 +121,7 @@
                             <DataTemplate x:DataType="data:FailDatum">
                                 <Grid>
 
-                                    <TextBlock Text="{x:Bind Datum.n}" />
+                                    <TextBlock Text="{x:Bind Datum.Name}" />
 
                                     <TextBox PlaceholderText="番号"
                                              HorizontalAlignment="Right"
@@ -221,165 +219,165 @@
 
                             <TextBlock Grid.Row="0"
                                        Style="{StaticResource TitleTextBlock}">文件ID</TextBlock>
-                            <TextBlock Grid.Row="1"
+                            <TextBlock Grid.Row="1" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">用户ID</TextBlock>
-                            <TextBlock Grid.Row="2"
+                            <TextBlock Grid.Row="2" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">aid</TextBlock>
-                            <TextBlock Grid.Row="3"
+                            <TextBlock Grid.Row="3" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">文件夹ID</TextBlock>
-                            <TextBlock Grid.Row="4"
+                            <TextBlock Grid.Row="4" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">名称</TextBlock>
-                            <TextBlock Grid.Row="5"
+                            <TextBlock Grid.Row="5" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">大小</TextBlock>
-                            <TextBlock Grid.Row="6"
+                            <TextBlock Grid.Row="6" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">sta</TextBlock>
-                            <TextBlock Grid.Row="7"
+                            <TextBlock Grid.Row="7" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">pt</TextBlock>
-                            <TextBlock Grid.Row="8"
+                            <TextBlock Grid.Row="8" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">pid</TextBlock>
-                            <TextBlock Grid.Row="9"
+                            <TextBlock Grid.Row="9" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">选取代码</TextBlock>
-                            <TextBlock Grid.Row="10"
+                            <TextBlock Grid.Row="10" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">p</TextBlock>
-                            <TextBlock Grid.Row="11"
+                            <TextBlock Grid.Row="11" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">是否收藏</TextBlock>
-                            <TextBlock Grid.Row="12"
+                            <TextBlock Grid.Row="12" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">时间</TextBlock>
-                            <TextBlock Grid.Row="13"
+                            <TextBlock Grid.Row="13" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">修改时间</TextBlock>
-                            <TextBlock Grid.Row="14"
+                            <TextBlock Grid.Row="14" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">创建时间</TextBlock>
-                            <TextBlock Grid.Row="15"
+                            <TextBlock Grid.Row="15" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">d</TextBlock>
-                            <TextBlock Grid.Row="16"
+                            <TextBlock Grid.Row="16" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">c</TextBlock>
-                            <TextBlock Grid.Row="17"
+                            <TextBlock Grid.Row="17" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">sh</TextBlock>
-                            <TextBlock Grid.Row="18"
+                            <TextBlock Grid.Row="18" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">e</TextBlock>
-                            <TextBlock Grid.Row="19"
+                            <TextBlock Grid.Row="19" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">图标</TextBlock>
-                            <TextBlock Grid.Row="20"
+                            <TextBlock Grid.Row="20" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">sha</TextBlock>
-                            <TextBlock Grid.Row="21"
+                            <TextBlock Grid.Row="21" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">备注内容</TextBlock>
-                            <TextBlock Grid.Row="22"
+                            <TextBlock Grid.Row="22" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">q</TextBlock>
-                            <TextBlock Grid.Row="23"
+                            <TextBlock Grid.Row="23" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">是否隐藏</TextBlock>
-                            <TextBlock Grid.Row="24"
+                            <TextBlock Grid.Row="24" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">是否备注</TextBlock>
-                            <TextBlock Grid.Row="25"
+                            <TextBlock Grid.Row="25" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">缩略图地址</TextBlock>
-                            <TextBlock Grid.Row="26"
+                            <TextBlock Grid.Row="26" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">是否为视频</TextBlock>
-                            <TextBlock Grid.Row="27"
+                            <TextBlock Grid.Row="27" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">播放进度</TextBlock>
-                            <TextBlock Grid.Row="28"
+                            <TextBlock Grid.Row="28" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">是否播放完毕</TextBlock>
-                            <TextBlock Grid.Row="29"
+                            <TextBlock Grid.Row="29" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">最后一次播放时间</TextBlock>
-                            <TextBlock Grid.Row="30"
+                            <TextBlock Grid.Row="30" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">视频分辨率</TextBlock>
-                            <TextBlock Grid.Row="31"
+                            <TextBlock Grid.Row="31" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">视频时长</TextBlock>
 
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                                   Grid.Row="0"
-                                                                  StringValue="{x:Bind SelectedDatum.fid,Mode=OneWay}" />
+                                                                  StringValue="{x:Bind SelectedDatum.Fid,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="1"
-                                                           StringValue="{x:Bind SelectedDatum.uid,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Uid,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="2"
-                                                           StringValue="{x:Bind SelectedDatum.aid,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Aid,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="3"
-                                                           StringValue="{x:Bind SelectedDatum.cid,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Cid,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="4"
-                                                           StringValue="{x:Bind SelectedDatum.n,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Name,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="5"
-                                                           StringValue="{x:Bind SelectedDatum.s,Converter={StaticResource BytesToSizeStrConverter},Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Size,Converter={StaticResource BytesToSizeStrConverter},Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="6"
-                                                           StringValue="{x:Bind SelectedDatum.sta,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Sta,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="7"
-                                                           StringValue="{x:Bind SelectedDatum.pt,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Pt,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="8"
-                                                           StringValue="{x:Bind SelectedDatum.pid,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Pid,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="9"
-                                                           StringValue="{x:Bind SelectedDatum.pc,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.PickCode,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="10"
-                                                           StringValue="{x:Bind SelectedDatum.p,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.P,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="11"
-                                                           StringValue="{x:Bind SelectedDatum.m,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.M,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="12"
-                                                           StringValue="{x:Bind SelectedDatum.t,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Time,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="13"
-                                                           StringValue="{x:Bind SelectedDatum.te,Converter={StaticResource Int32ToDateTimeStrConverter},Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.TimeEdit,Converter={StaticResource Int32ToDateTimeStrConverter},Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="14"
-                                                           StringValue="{x:Bind SelectedDatum.tp,Converter={StaticResource Int32ToDateTimeStrConverter},Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.TimeProduce,Converter={StaticResource Int32ToDateTimeStrConverter},Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="15"
-                                                           StringValue="{x:Bind SelectedDatum.d,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.D,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="16"
-                                                           StringValue="{x:Bind SelectedDatum.c,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.C,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="17"
-                                                           StringValue="{x:Bind SelectedDatum.sh,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Sh,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="18"
-                                                           StringValue="{x:Bind SelectedDatum.e,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.E,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="19"
-                                                           StringValue="{x:Bind SelectedDatum.ico,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Ico,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="20"
-                                                           StringValue="{x:Bind SelectedDatum.sha,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Sha,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="21"
-                                                           StringValue="{x:Bind SelectedDatum.fdes,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Fdes,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="22"
-                                                           StringValue="{x:Bind SelectedDatum.q,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Q,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="23"
-                                                           StringValue="{x:Bind SelectedDatum.hdf,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Hdf,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="24"
-                                                           StringValue="{x:Bind SelectedDatum.fvs,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Fvs,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="25"
-                                                           StringValue="{x:Bind SelectedDatum.u,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.U,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="26"
-                                                           StringValue="{x:Bind SelectedDatum.iv,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Iv,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="27"
-                                                           StringValue="{x:Bind data:FileMatch.ConvertInt32ToDateStr(SelectedDatum.current_time),Mode=OneWay}" />
+                                                           StringValue="{x:Bind data:FileMatch.ConvertInt32ToDateStr(SelectedDatum.CurrentTime),Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="28"
-                                                           StringValue="{x:Bind SelectedDatum.played_end,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.PlayedEnd,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="29"
-                                                           StringValue="{x:Bind SelectedDatum.last_time,Converter={StaticResource Int32ToDateTimeStrConverter},Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.LastTime,Converter={StaticResource Int32ToDateTimeStrConverter},Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="30"
-                                                           StringValue="{x:Bind SelectedDatum.vdi,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Vdi,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="31"
-                                                           StringValue="{x:Bind data:FileMatch.ConvertDoubleToDateStr(SelectedDatum.play_long),Mode=OneWay}" />
+                                                           StringValue="{x:Bind data:FileMatch.ConvertDoubleToDateStr(SelectedDatum.PlayLong),Mode=OneWay}" />
                         </Grid>
                     </ScrollViewer>
 
@@ -405,8 +403,8 @@
             <Expander.Header>
                 <Grid>
                     <customControls:TextBlockWithLongText StringValue="检查环境"
-                                                          IsFirstTextSelectionEnabled="False" />
-                    <TextBlock x:FieldModifier="public" x:Name="status_TextBlock"
+                                                          IsFirstTextSelectionEnabled="False"/>
+                    <TextBlock x:FieldModifier="public" x:Name="StatusTextBlock"
                        HorizontalAlignment="Right"
                        Style="{StaticResource CaptionTextBlockStyle}"/>
                     <customControls:StatusShow x:FieldModifier="public"
@@ -416,8 +414,7 @@
             </Expander.Header>
         </Expander>
 
-        <TeachingTip Grid.Column="0" x:Name="SelectNull_TeachingtTip"
-                     PreferredPlacement="BottomLeft"
+        <TeachingTip Grid.Column="0" x:Name="SelectNullTeachingTip"
                      IsLightDismissEnabled="True" />
     </Grid>
 

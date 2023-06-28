@@ -72,10 +72,10 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             foreach (var item in _failDatumList)
             {
-                _matchVideoResults.Add(new MatchVideoResult() { status = true, OriginalName = item.Datum.n, message = "匹配成功", statusCode = 1, MatchName = item.MatchName });
+                _matchVideoResults.Add(new MatchVideoResult() { status = true, OriginalName = item.Datum.Name, message = "匹配成功", statusCode = 1, MatchName = item.MatchName });
 
                 //替换数据库的数据
-                DataAccess.AddFileToInfo(item.Datum.pc, item.MatchName, isReplace: true);
+                DataAccess.AddFileToInfo(item.Datum.PickCode, item.MatchName, isReplace: true);
             }
 
             //显示进度环
@@ -127,11 +127,11 @@ namespace Display.ContentsPage.SpiderVideoInfo
             _fileList = await DataAccess.GetAllFilesInFolderListAsync(_fileList);
 
             //除去文件夹
-            _fileList = _fileList.Where(item => item.fid!=null).ToList();
+            _fileList = _fileList.Where(item => item.Fid!=null).ToList();
 
             //去除重复文件
             Dictionary<string, Datum> newDictList = new();
-            _fileList.ForEach(item => newDictList.TryAdd(item.pc, item));
+            _fileList.ForEach(item => newDictList.TryAdd(item.PickCode, item));
 
             _fileList = newDictList.Values.ToList();
 
@@ -256,37 +256,37 @@ namespace Display.ContentsPage.SpiderVideoInfo
             foreach (var info in datumList)
             {
                 //文件夹，暂不统计
-                if (info.fid == null)
+                if (info.Fid == null)
                 {
 
                 }
                 //视频文件
-                else if (info.iv == 1)
+                else if (info.Iv == 1)
                 {
-                    string video_qulity = FilesInfo.GetVideoQualityFromVdi(info.vdi);
+                    string video_qulity = FilesInfo.GetVideoQualityFromVdi(info.Vdi);
 
                     UpdateFileStaticstics(info, VideoInfo, video_qulity);
                 }
                 //其他文件
                 else
                 {
-                    switch (info.ico)
+                    switch (info.Ico)
                     {
                         //字幕
                         case "ass" or "srt" or "ssa":
-                            UpdateFileStaticstics(info, SubInfo, info.ico);
+                            UpdateFileStaticstics(info, SubInfo, info.Ico);
                             break;
                         //种子
                         case "torrent":
-                            UpdateFileStaticstics(info, TorrentInfo, info.ico);
+                            UpdateFileStaticstics(info, TorrentInfo, info.Ico);
                             break;
                         //图片
                         case "gif" or "bmp" or "tiff" or "exif" or "jpg" or "png" or "raw" or "svg":
-                            UpdateFileStaticstics(info, ImageInfo, info.ico);
+                            UpdateFileStaticstics(info, ImageInfo, info.Ico);
                             break;
                         //音频
                         case "ape" or "wav" or "midi" or "mid" or "flac" or "aac" or "m4a" or "ogg" or "amr":
-                            UpdateFileStaticstics(info, AudioInfo, info.ico);
+                            UpdateFileStaticstics(info, AudioInfo, info.Ico);
                             break;
                             //case "7z" or "cab" or "dmg" or "iso" or "rar" or "zip":
                             //    UpdateFileStaticstics(info, ArchiveInfo, info.ico);
@@ -296,11 +296,11 @@ namespace Display.ContentsPage.SpiderVideoInfo
             }
 
             CountPercentPieChart.Series = new ISeries[] {
-                new PieSeries<double> { Values = new List<double> { VideoInfo.count }, Pushout = 5, Name = "视频"},
-                new PieSeries<double> { Values = new List<double> { AudioInfo.count }, Pushout = 0, Name = "音频"},
-                new PieSeries<double> { Values = new List<double> { SubInfo.count }, Pushout = 0, Name = "字幕"},
-                new PieSeries<double> { Values = new List<double> { TorrentInfo.count }, Pushout = 0, Name = "种子"},
-                new PieSeries<double> { Values = new List<double> { ImageInfo.count }, Pushout = 0, Name = "图片"}
+                new PieSeries<double> { Values = new List<double> { VideoInfo.Count }, Pushout = 5, Name = "视频"},
+                new PieSeries<double> { Values = new List<double> { AudioInfo.Count }, Pushout = 0, Name = "音频"},
+                new PieSeries<double> { Values = new List<double> { SubInfo.Count }, Pushout = 0, Name = "字幕"},
+                new PieSeries<double> { Values = new List<double> { TorrentInfo.Count }, Pushout = 0, Name = "种子"},
+                new PieSeries<double> { Values = new List<double> { ImageInfo.Count }, Pushout = 0, Name = "图片"}
             };
 
         }
@@ -313,26 +313,26 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// <param Name="Name"></param>
         private void UpdateFileStaticstics(Datum DataInfo, FileStatistics TypeInfo, string Name)
         {
-            TypeInfo.size += DataInfo.s;
-            TypeInfo.count++;
+            TypeInfo.Size += DataInfo.Size;
+            TypeInfo.Count++;
 
             if (TypeInfo.data.Count != 0)
             {
-                var tmpData = TypeInfo.data.FirstOrDefault(x => x.name == Name);
+                var tmpData = TypeInfo.data.FirstOrDefault(x => x.Name == Name);
 
                 if (tmpData == null)
                 {
-                    TypeInfo.data.Add(new FileStatistics.Data() { name = Name, count = 1, size = DataInfo.s });
+                    TypeInfo.data.Add(new FileStatistics.Data() { Name = Name, Count = 1, Size = DataInfo.Size });
                 }
                 else
                 {
-                    tmpData.size += DataInfo.s;
-                    tmpData.count++;
+                    tmpData.Size += DataInfo.Size;
+                    tmpData.Count++;
                 }
             }
             else
             {
-                TypeInfo.data.Add(new FileStatistics.Data() { name = Name, count = 1, size = DataInfo.s });
+                TypeInfo.data.Add(new FileStatistics.Data() { Name = Name, Count = 1, Size = DataInfo.Size });
             }
         }
 

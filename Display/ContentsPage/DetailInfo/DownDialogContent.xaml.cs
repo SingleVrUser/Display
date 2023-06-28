@@ -37,8 +37,8 @@ namespace Display.ContentsPage.DetailInfo
             foreach (var videoInfo in videoInfoList)
             {
                 CheckBox NewCheckBox = new();
-                NewCheckBox.Content = videoInfo.n;
-                NewCheckBox.Name = videoInfo.pc;
+                NewCheckBox.Content = videoInfo.Name;
+                NewCheckBox.Name = videoInfo.PickCode;
                 ContentStackPanel.Children.Add(NewCheckBox);
             }
         }

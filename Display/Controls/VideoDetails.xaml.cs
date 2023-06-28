@@ -177,7 +177,7 @@ namespace Display.Controls
             string name = resultinfo.truename;
             var videoinfoList = DataAccess.loadFileInfoByTruename(name);
 
-            videoinfoList = videoinfoList.OrderBy(item => item.n).ToList();
+            videoinfoList = videoinfoList.OrderBy(item => item.Name).ToList();
 
             var downDialogContent = new DownDialogContent(videoinfoList);
 
@@ -248,7 +248,7 @@ namespace Display.Controls
                         CheckBox fileBox = item as CheckBox;
                         if (fileBox.IsChecked == true)
                         {
-                            var selectVideoInfo = videoinfoList.FirstOrDefault(x => x.pc == fileBox.Name);
+                            var selectVideoInfo = videoinfoList.FirstOrDefault(x => x.PickCode == fileBox.Name);
                             if (selectVideoInfo != null)
                             {
                                 downVideoInfoList.Add(selectVideoInfo);

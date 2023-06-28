@@ -593,7 +593,7 @@ namespace Display.ContentsPage
                     progress_TextBlock.Text = $"{actorName} - {videoName} - 挑选单体作品中能在线看的";
 
                     //挑选能在线观看的视频
-                    videoFileListCanPlay = videoFileList.FirstOrDefault(x => x.vdi != 0);
+                    videoFileListCanPlay = videoFileList.FirstOrDefault(x => x.Vdi != 0);
 
                     //全部未转码失败视频，跳过
                     if (videoFileListCanPlay == null)
@@ -602,12 +602,12 @@ namespace Display.ContentsPage
                         continue;
                     }
 
-                    progress_TextBlock.Text = $"{actorName} - {videoName} - 挑选单体作品中能在线看的 - {videoFileListCanPlay.n}";
+                    progress_TextBlock.Text = $"{actorName} - {videoName} - 挑选单体作品中能在线看的 - {videoFileListCanPlay.Name}";
 
                     //获取视频的PickCode
-                    var pickCode = videoFileListCanPlay.pc;
+                    var pickCode = videoFileListCanPlay.PickCode;
 
-                    progress_TextBlock.Text = $"{actorName} - {videoName} - {videoFileListCanPlay.n} - 获取视频播放地址";
+                    progress_TextBlock.Text = $"{actorName} - {videoName} - {videoFileListCanPlay.Name} - 获取视频播放地址";
 
                     //获取播放地址
                     var m3U8InfoList = await webApi.GetM3U8InfoByPickCode(pickCode);
@@ -615,7 +615,7 @@ namespace Display.ContentsPage
                     //文件不存在或已删除
                     if (m3U8InfoList.Count == 0)
                     {
-                        progress_TextBlock.Text = $"{actorName} - {videoName} - {videoFileListCanPlay.n} - 文件不存在或已删除";
+                        progress_TextBlock.Text = $"{actorName} - {videoName} - {videoFileListCanPlay.Name} - 文件不存在或已删除";
                         continue;
                     }
                     //成功
@@ -645,7 +645,7 @@ namespace Display.ContentsPage
                 }
                 else
                 {
-                    progress_TextBlock.Text = $"{actorName} - {videoFileListCanPlay?.n} - 从视频中获取演员头像 - 女（可信度>0.99）";
+                    progress_TextBlock.Text = $"{actorName} - {videoFileListCanPlay?.Name} - 从视频中获取演员头像 - 女（可信度>0.99）";
 
                     var progressInfo = await GetActorFaceByVideoPlayUrl(actorName, videoPlayUrl, 1, savePath, imageName);
 

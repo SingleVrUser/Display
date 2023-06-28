@@ -144,7 +144,7 @@ namespace Display.ContentsPage
                 var makeDirResult = await WebApi.GlobalWebApi.RequestMakeDir(currentFolder.Id, NewCreateFolderTextBox.Text);
                 if (makeDirResult == null) return;
 
-                folderInfos.Insert(0, new FilesInfo(new Datum() { cid = makeDirResult.cid, n = makeDirResult.cname }));
+                folderInfos.Insert(0, new FilesInfo(new Datum() { Cid = makeDirResult.cid, Name = makeDirResult.cname }));
             }
 
             CreateNewFolderGrid.Visibility = Visibility.Collapsed;

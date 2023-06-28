@@ -232,7 +232,7 @@ public class PlayVideoHelper
     public static async void ShowSelectedVideoToPlayPage(List<Datum> multisetList, XamlRoot xamlRoot)
     {
         //var multisetList = videoInfoList.ToList();
-        multisetList = multisetList.OrderBy(item => item.n).ToList();
+        multisetList = multisetList.OrderBy(item => item.Name).ToList();
 
         var newPage = new SelectVideoToPlay(multisetList);
 
