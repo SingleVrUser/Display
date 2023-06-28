@@ -15,7 +15,7 @@
                   IsItemClickEnabled="True">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="data:Datum">
-                    <TextBlock Text="{x:Bind n}"
+                    <TextBlock Text="{x:Bind Name}"
                                TextWrapping="Wrap" />
                 </DataTemplate>
             </ListView.ItemTemplate>

@@ -263,7 +263,7 @@ namespace Display.ContentsPage
                 var videoInfoList = DataAccess.loadFileInfoByTruename(name);
 
                 //检查视频是否已转码
-                var videofileListAfterDecode = videoInfoList.Where(x => x.vdi != 0).ToList();
+                var videofileListAfterDecode = videoInfoList.Where(x => x.Vdi != 0).ToList();
 
                 progressinfo.text = $"{startText} - 获取到视频（总数：{videoInfoList.Count}，转码完成数：{videofileListAfterDecode.Count}）";
                 overallProgress.Report(progressinfo);
@@ -278,7 +278,7 @@ namespace Display.ContentsPage
                 for (int j = 0; j < videofileListAfterDecode.Count; j++)
                 {
                     var videoInfo = videofileListAfterDecode[j];
-                    var m3u8InfoList = await webApi.GetM3U8InfoByPickCode(videoInfo.pc);
+                    var m3u8InfoList = await webApi.GetM3U8InfoByPickCode(videoInfo.PickCode);
                     if (m3u8InfoList.Count > 0)
                     {
                         ////总帧数计算
@@ -289,7 +289,7 @@ namespace Display.ContentsPage
                         //videoToThumbnail.play_long += videoInfo.play_long;
 
                         //添加到pickCodeList中
-                        videoToThumbnail.pickCodeList.Add(videoInfo.pc);
+                        videoToThumbnail.pickCodeList.Add(videoInfo.PickCode);
                     }
                 }
 

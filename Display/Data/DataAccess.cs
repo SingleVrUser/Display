@@ -1,5 +1,6 @@
 ﻿using Display.Extensions;
 using Microsoft.Data.Sqlite;
+using OpenCvSharp.Aruco;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -9,6 +10,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
+using static Display.ContentsPage.SpiderVideoInfo.FileStatistics;
 using static Display.Spider.Manager;
 using static System.Int32;
 
@@ -436,16 +438,14 @@ namespace Display.Data
         /// </summary>
         /// <param name="command"></param>
         /// <param name="parameterCollection"></param>
-        private static void ExecuteNonQueryWithParameters(string command, List<SqliteParameter> parameterCollection)
+        private static void ExecuteNonQueryWithParameters(string command, IEnumerable<SqliteParameter> parameterCollection)
         {
-            using var db = new SqliteConnection(ConnectionString); 
+            using var db = new SqliteConnection(ConnectionString);  
 
-            db.Open();  
+            db.Open();
 
-            var sqliteCommand = new SqliteCommand(command, db)
-            {
-                Parameters = { parameterCollection }
-            };
+            var sqliteCommand = new SqliteCommand(command, db);
+            sqliteCommand.Parameters.AddRange(parameterCollection);
 
             sqliteCommand.ExecuteNonQuery(); 
 
@@ -532,9 +532,9 @@ namespace Display.Data
 
             foreach (var file in files)
             {
-                if (!cidList.Contains(file.cid))
+                if (!cidList.Contains(file.Cid))
                 {
-                    cidList.Add(file.cid);
+                    cidList.Add(file.Cid);
                 }
             }
             foreach (var cidFolder in cidList)
@@ -664,11 +664,11 @@ namespace Display.Data
 
             var parameters = new List<SqliteParameter>
             {
-                new("@file_pickcode", data.pickCode),
-                new("@file_name", data.fileName),
-                new("@true_url", data.trueUrl),
-                new("@ua", data.ua),
-                new("@add_time", data.addTime)
+                new("@file_pickcode", data.PickCode),
+                new("@file_name", data.FileName),
+                new("@true_url", data.TrueUrl),
+                new("@ua", data.Ua),
+                new("@add_time", data.AddTime)
             };
             ExecuteNonQueryWithParameters(commandText, parameters);
         }
@@ -702,11 +702,11 @@ namespace Display.Data
 
             var parameters = new List<SqliteParameter>
             {
-                new("@pc", failInfo.pc),
-                new("@is_like", failInfo.is_like),
-                new("@score", failInfo.score),
-                new("@look_later", failInfo.look_later),
-                new("@image_path", failInfo.image_path)
+                new("@pc", failInfo.PickCode),
+                new("@is_like", failInfo.IsLike),
+                new("@score", failInfo.Score),
+                new("@look_later", failInfo.LookLater),
+                new("@image_path", failInfo.ImagePath)
             };
             ExecuteNonQueryWithParameters(commandText, parameters);
         }
@@ -784,9 +784,9 @@ namespace Display.Data
             {
                 Connection = db
             };
-            
+
             //插入新记录
-            command.CommandText = $"INSERT INTO ActorInfo VALUES (NULL,@Name,@is_woman,@birthday,@bwh,@height,@works_count,@work_time,@prifile_path,@blog_url,@is_like,@addtime,@info_url);";
+            command.CommandText = "INSERT INTO ActorInfo VALUES (NULL,@Name,@is_woman,@birthday,@bwh,@height,@works_count,@work_time,@prifile_path,@blog_url,@is_like,@addtime,@info_url);";
             command.Parameters.AddWithValue("@Name", actorInfo.name);
             command.Parameters.AddWithValue("@is_woman", actorInfo.is_woman);
             command.Parameters.AddWithValue("@birthday", actorInfo.birthday);
@@ -1248,7 +1248,7 @@ namespace Display.Data
 
                 if (query.Read())
                 {
-                    failInfo = tryCovertQueryToFailInfo(query);
+                    failInfo = TryCovertQueryToFailInfo(query);
                 }
                 //无结果
                 else
@@ -1292,7 +1292,7 @@ namespace Display.Data
 
                 while (query.Read())
                 {
-                    data.Add(tryCovertQueryToFailInfo(query));
+                    data.Add(TryCovertQueryToFailInfo(query));
                 }
 
                 db.Close();
@@ -1954,7 +1954,7 @@ namespace Display.Data
                 }
 
                 SqliteCommand Command = new SqliteCommand
-                    ($"SELECT ActorInfo.*,bwh.bust,bwh.waist,bwh.hips,COUNT(id) FROM ActorInfo LEFT JOIN Actor_Video ON Actor_Video.actor_id = ActorInfo.id LEFT JOIN bwh ON ActorInfo.bwh = bwh.bwh{filterStr} GROUP BY id{orderStr} LIMIT {limit} offset {offset}", db);
+                    ($"SELECT ActorInfo.*,bwh.bust,bwh.waist,bwh.hips,COUNT(id) as video_count FROM ActorInfo LEFT JOIN Actor_Video ON Actor_Video.actor_id = ActorInfo.id LEFT JOIN bwh ON ActorInfo.bwh = bwh.bwh{filterStr} GROUP BY id{orderStr} LIMIT {limit} offset {offset}", db);
 
                 SqliteDataReader query = await Command.ExecuteReaderAsync();
 
@@ -1979,7 +1979,7 @@ namespace Display.Data
                 db.Open();
 
                 SqliteCommand Command = new SqliteCommand
-                    ($"SELECT actors.*,bwh.bust,bwh.waist,bwh.hips, COUNT(id)  FROM ( SELECT ActorInfo.* FROM ActorInfo, VideoInfo, Actor_Video WHERE VideoInfo.truename == '{videoName}' AND VideoInfo.truename == Actor_Video.video_name AND Actor_Video.actor_id == ActorInfo.id ) AS actors LEFT JOIN Actor_Video ON Actor_Video.actor_id = actors.id LEFT JOIN bwh ON actors.bwh = bwh.bwh GROUP BY id", db);
+                    ($"SELECT actors.*,bwh.bust,bwh.waist,bwh.hips, COUNT(id) as video_count FROM ( SELECT ActorInfo.* FROM ActorInfo, VideoInfo, Actor_Video WHERE VideoInfo.truename == '{videoName}' AND VideoInfo.truename == Actor_Video.video_name AND Actor_Video.actor_id == ActorInfo.id ) AS actors LEFT JOIN Actor_Video ON Actor_Video.actor_id = actors.id LEFT JOIN bwh ON actors.bwh = bwh.bwh GROUP BY id", db);
 
                 SqliteDataReader query = await Command.ExecuteReaderAsync();
 
@@ -2362,13 +2362,13 @@ namespace Display.Data
                 {
                     if (leftName == "FC")
                     {
-                        var match_result = Regex.Match(datum.n, @"(FC2?)[-_PV]*[-_]?0*(\d+)", RegexOptions.IgnoreCase);
+                        var match_result = Regex.Match(datum.Name, @"(FC2?)[-_PV]*[-_]?0*(\d+)", RegexOptions.IgnoreCase);
                         if (match_result.Success && match_result.Groups[2].Value == rightNumber)
                             data.Add(datum);
                     }
                     else
                     {
-                        var match_result = Regex.Match(datum.n, @$"({leftName})[-_]?0*(\d+)", RegexOptions.IgnoreCase);
+                        var match_result = Regex.Match(datum.Name, @$"({leftName})[-_]?0*(\d+)", RegexOptions.IgnoreCase);
                         if (match_result.Success && match_result.Groups[2].Value == rightNumber)
                             data.Add(datum);
                     }
@@ -2378,7 +2378,7 @@ namespace Display.Data
             }
 
             //进一步筛选
-            data = data.Where(x => Regex.Match(x.n, @$"[^a-z]{leftName}[^a-z]|^{leftName}[^a-z]", RegexOptions.IgnoreCase).Success).ToList();
+            data = data.Where(x => Regex.Match(x.Name, @$"[^a-z]{leftName}[^a-z]|^{leftName}[^a-z]", RegexOptions.IgnoreCase).Success).ToList();
 
             return data;
         }
@@ -2465,7 +2465,7 @@ namespace Display.Data
 
                 while (query.Read())
                 {
-                    data = tryCovertQueryToDownHistory(query);
+                    data = TryCovertQueryToDownHistory(query);
                 }
 
                 db.Close();
@@ -2486,10 +2486,10 @@ namespace Display.Data
             foreach (var currentFile in dataList)
             {
                 //文件夹
-                if (currentFile.fid == default)
+                if (currentFile.Fid == default)
                 {
                     // 获取当前文件夹下所有的文件夹和文件
-                    var newDataList = GetListByCid(currentFile.cid);
+                    var newDataList = GetListByCid(currentFile.Cid);
 
                     var fileInFolderList = GetAllFilesInFolderList(newDataList);
 
@@ -2526,9 +2526,9 @@ namespace Display.Data
             foreach (Datum datum in datumList)
             {
                 //文件夹
-                if (datum.fid == default)
+                if (datum.Fid == default)
                 {
-                    AllDatumList = GetAllFilesTraverse(datum.cid, AllDatumList);
+                    AllDatumList = GetAllFilesTraverse(datum.Cid, AllDatumList);
                 }
             }
 
@@ -2698,9 +2698,9 @@ namespace Display.Data
         {
             List<Datum> folderToRootList = new();
 
-            Datum upperLevelFolderInfo = new() { pid = folderCid };
+            Datum upperLevelFolderInfo = new() { Pid = folderCid };
 
-            if (upperLevelFolderInfo.pid == null) return null;
+            if (upperLevelFolderInfo.Pid == null) return null;
 
             const int maxDepth = 30;
 
@@ -2709,15 +2709,15 @@ namespace Display.Data
 
             for (int i = 0; i < maxDepth; i++)
             {
-                upperLevelFolderInfo = GetUpperLevelFolderCid((long)upperLevelFolderInfo.pid);
+                upperLevelFolderInfo = GetUpperLevelFolderCid((long)upperLevelFolderInfo.Pid);
 
                 if (upperLevelFolderInfo == null) break;
 
                 folderToRootList.Add(upperLevelFolderInfo);
 
-                if (upperLevelFolderInfo.pid == 0)
+                if (upperLevelFolderInfo.Pid == 0)
                 {
-                    folderToRootList.Add(new Datum() { cid =0, n = "根目录" });
+                    folderToRootList.Add(new Datum() { Cid =0, Name = "根目录" });
                     break;
                 }
             }
@@ -2764,34 +2764,38 @@ namespace Display.Data
         /// <summary>
         /// 转换数据库查询结果到ActorInfo格式
         /// </summary>
-        /// <param Name="query"></param>
+        /// <param name="reader"></param>
         /// <returns></returns>
         private static ActorInfo ConvertQueryToActorInfo(SqliteDataReader reader)
         {
-            ActorInfo dataInfo = new()
-            {
-                id = Convert.ToInt32(reader["id"]),
-                name = reader["Name"] as string,
-                is_woman = Convert.ToInt32(reader["is_woman"]),
-                birthday = reader["birthday"] as string,
-                bwh = reader["bwh"] as string,
-                height = reader["height"] is not long ? 0 : Convert.ToInt32(reader["height"]),
-                works_count = Convert.ToInt32(reader["works_count"]),
-                work_time = reader["work_time"] as string,
-                prifile_path = reader["prifile_path"] as string,
-                blog_url = reader["blog_url"] as string,
-                info_url = reader["info_url"] as string,
-                is_like = reader["is_like"] is not long ? 0 : Convert.ToInt32(reader["is_like"]),
-                addtime = Convert.ToInt64(reader["addtime"]),
-                bust = reader["bust"] is not long ? 0 : Convert.ToInt32(reader["bust"]),
-                waist = reader["waist"] is not long ? 0 : Convert.ToInt32(reader["waist"]),
-                hips = reader["hips"] is not long ? 0 : Convert.ToInt32(reader["hips"]),
-                video_count = Convert.ToInt32(reader["COUNT(id)"])
-            };
+            //ActorInfo dataInfo = new()
+            //{
+            //    id = reader.GetInt32("id"),
+            //    name = reader.GetString("name"),
+            //    is_woman = Convert.ToInt32(reader["is_woman"]),
+            //    birthday = reader["birthday"] as string,
+            //    bwh = reader["bwh"] as string,
+            //    height = reader["height"] is not long ? 0 : Convert.ToInt32(reader["height"]),
+            //    works_count = Convert.ToInt32(reader["works_count"]),
+            //    work_time = reader["work_time"] as string,
+            //    prifile_path = reader["prifile_path"] as string,
+            //    blog_url = reader["blog_url"] as string,
+            //    info_url = reader["info_url"] as string,
+            //    is_like = reader["is_like"] is not long ? 0 : Convert.ToInt32(reader["is_like"]),
+            //    addtime = Convert.ToInt64(reader["addtime"]),
+            //    bust = reader["bust"] is not long ? 0 : Convert.ToInt32(reader["bust"]),
+            //    waist = reader["waist"] is not long ? 0 : Convert.ToInt32(reader["waist"]),
+            //    hips = reader["hips"] is not long ? 0 : Convert.ToInt32(reader["hips"]),
+            //    video_count = Convert.ToInt32(reader["video_count"])
+            //};
 
-            return dataInfo;
+            var data = reader.FieldCount == 0 ? null : reader.Export<ActorInfo>();
+
+
+
+            return data;
         }
-
+        
         /// <summary>
         /// 转换数据库查询结果到Datum格式
         /// </summary>
@@ -2799,88 +2803,31 @@ namespace Display.Data
         /// <returns></returns>
         private static Datum TryCovertQueryToDatum(SqliteDataReader reader)
         {
-            var dataInfo = new Datum();
+            ////当fid为空时，返回默认值0，不符合要求
+            //dataInfo.fid = reader.GetFieldValue<long?>(reader.GetOrdinal("fid"));
 
-            if (reader.FieldCount == 0) return dataInfo;
 
-            dataInfo.fid = reader.GetNullableValue<long?>("fid");
-            dataInfo.pid = reader.GetNullableValue<long?>("pid");
-            dataInfo.cid = reader.GetNullableValue<long>("cid");
-            dataInfo.uid = reader.GetNullableValue<long>("uid");
-
-            dataInfo.aid = reader.GetNullableValue<int>("aid");
-            dataInfo.n = reader["n"] as string;
-            dataInfo.s = Convert.ToInt64(reader["s"]);
-            dataInfo.sta = Convert.ToInt32(reader["sta"]);
-            dataInfo.pt = reader["pt"] as string;
-            dataInfo.pc = reader["pc"] as string;
-            dataInfo.p = Convert.ToInt32(reader["p"]);
-            dataInfo.m = Convert.ToInt32(reader["m"]);
-            dataInfo.t = reader["t"] as string;
-            dataInfo.te = Convert.ToInt32(reader["te"]);
-            dataInfo.tp = Convert.ToInt32(reader["tp"]);
-            dataInfo.d = Convert.ToInt32(reader["d"]);
-            dataInfo.c = Convert.ToInt32(reader["c"]);
-            dataInfo.sh = Convert.ToInt32(reader["sh"]);
-            dataInfo.e = reader["e"] as string;
-            dataInfo.ico = reader["ico"] as string;
-            dataInfo.sha = reader["sha"] as string;
-            dataInfo.fdes = reader["fdes"] as string;
-            dataInfo.q = Convert.ToInt32(reader["q"]);
-            dataInfo.hdf = Convert.ToInt32(reader["hdf"]);
-            dataInfo.u = reader["u"] as string;
-            dataInfo.iv = Convert.ToInt32(reader["iv"]);
-            dataInfo.current_time = Convert.ToInt32(reader["current_time"]);
-            dataInfo.played_end = Convert.ToInt32(reader["played_end"]);
-            dataInfo.last_time = reader["last_time"] as string;
-            dataInfo.vdi = Convert.ToInt32(reader["vdi"]);
-            dataInfo.play_long = Convert.ToSingle(reader["play_long"]);
-
-            return dataInfo;
-
+            return reader.FieldCount == 0 ? null : reader.Export<Datum>();
         }
 
         /// <summary>
         /// 添加数据库查询结果到DownInfo格式
         /// </summary>
-        /// <param Name="query"></param>
+        /// <param name="reader"></param>
         /// <returns></returns>
-        private static DownInfo tryCovertQueryToDownHistory(SqliteDataReader query)
+        private static DownInfo TryCovertQueryToDownHistory(SqliteDataReader reader)
         {
-            DownInfo downInfo = new();
-
-            if (query.FieldCount == 0) return downInfo;
-
-            downInfo.pickCode = query["file_pickcode"] as string;
-            downInfo.fileName = query["file_name"] as string;
-            downInfo.trueUrl = query["true_url"] as string;
-            downInfo.ua = query["ua"] as string;
-            downInfo.addTime = Convert.ToInt64(query["add_time"]);
-
-            return downInfo;
+            return reader.FieldCount == 0 ? null : reader.Export<DownInfo>();
         }
 
         /// <summary>
         /// 添加数据库查询结果到FailInfo格式
         /// </summary>
-        /// <param Name="query"></param>
+        /// <param name="reader"></param>
         /// <returns></returns>
-        private static FailInfo tryCovertQueryToFailInfo(SqliteDataReader query)
+        private static FailInfo TryCovertQueryToFailInfo(SqliteDataReader reader)
         {
-            FailInfo info = new();
-
-            if (query.FieldCount == 0) return info;
-
-            info.datum = TryCovertQueryToDatum(query);
-
-            info.pc = info.datum.pc;
-            info.is_like = Convert.ToInt32(query["is_like"]);
-            info.score = Convert.ToSingle(query["score"]);
-            info.look_later = Convert.ToInt64(query["look_later"]);
-            info.image_path = query["image_path"] as string;
-
-
-            return info;
+            return reader.FieldCount == 0 ? null : reader.Export<FailInfo>();
         }
 
         #endregion

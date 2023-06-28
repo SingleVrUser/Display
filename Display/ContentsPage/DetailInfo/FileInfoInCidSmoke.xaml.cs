@@ -40,23 +40,23 @@ namespace Display.ContentsPage.DetailInfo
             //从数据库中获取根目录信息
             var folderToRootList = DataAccess.GetRootByCid(folderCid);
 
-            return string.Join(" > ", folderToRootList.Select(x=>x.n));
+            return string.Join(" > ", folderToRootList.Select(x=>x.Name));
         }
 
         private void OpenCurrentFolderItem_OnClick(object sender, RoutedEventArgs e)
         {
             if (sender is not MenuFlyoutItem { DataContext: Datum info }) return;
 
-            CommonWindow.CreateAndShowWindow(new DatumList.FileListPage(info.cid));
+            CommonWindow.CreateAndShowWindow(new DatumList.FileListPage(info.Cid));
         }
 
         private async void DeleteItem_OnClick(object sender, RoutedEventArgs e)
         {
             if (sender is not MenuFlyoutItem { DataContext: Datum info }) return;
 
-            if (info.fid == null) return;
+            if (info.Fid == null) return;
 
-            var fileId = (long)info.fid;
+            var fileId = (long)info.Fid;
 
             //115删除
             var dialog = new ContentDialog
@@ -75,11 +75,11 @@ namespace Display.ContentsPage.DetailInfo
             if (result != ContentDialogResult.Primary) return;
 
             // 从115中删除 
-            await WebApi.GlobalWebApi.DeleteFiles(info.cid,
+            await WebApi.GlobalWebApi.DeleteFiles(info.Cid,
                 new[] { fileId });
 
             // 从数据库中删除
-            DataAccess.DeleteDataInFilesInfoAndFileToInfo(info.pc);
+            DataAccess.DeleteDataInFilesInfoAndFileToInfo(info.PickCode);
         }
     }
 }

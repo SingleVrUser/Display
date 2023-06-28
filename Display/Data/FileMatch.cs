@@ -179,9 +179,9 @@ namespace Display.Data
             {
                 var folderDatum = DataAccess.GetUpperLevelFolderCid((long)file_cid);
 
-                if (!string.IsNullOrEmpty(folderDatum.n))
+                if (!string.IsNullOrEmpty(folderDatum.Name))
                 {
-                    return MatchName(folderDatum.n);
+                    return MatchName(folderDatum.Name);
                 }
             }
 
@@ -263,7 +263,7 @@ namespace Display.Data
                     //从另外的表中查找
                     case "失败" or "fail":
                         var failItems = await DataAccess.LoadFailFileInfoWithDatum(n: keywords, limit: limit);
-                        failItems.ForEach(item => dicts.TryAdd(item.n, new(item)));
+                        failItems.ForEach(item => dicts.TryAdd(item.Name, new(item)));
                         continue;
                     default:
                         trueType = "truename";
@@ -406,21 +406,21 @@ namespace Display.Data
 
             foreach (var fileInfo in data)
             {
-                var fileName = fileInfo.n;
+                var fileName = fileInfo.Name;
 
                 //挑选视频文件
-                if (fileInfo.iv == 1)
+                if (fileInfo.Iv == 1)
                 {
                     //根据视频名称匹配番号
-                    var videoName = FileMatch.MatchName(fileName, fileInfo.cid);
+                    var videoName = FileMatch.MatchName(fileName, fileInfo.Cid);
 
                     //无论匹配与否，都存入数据库
-                    DataAccess.AddFileToInfo(fileInfo.pc, videoName, isReplace:true);
+                    DataAccess.AddFileToInfo(fileInfo.PickCode, videoName, isReplace:true);
 
                     //未匹配
                     if (videoName == null)
                     {
-                        resultList.Add(new MatchVideoResult() { status = false, OriginalName = fileInfo.n, statusCode = -1, message = "匹配失败" });
+                        resultList.Add(new MatchVideoResult() { status = false, OriginalName = fileInfo.Name, statusCode = -1, message = "匹配失败" });
                         continue;
                     }
 
@@ -429,18 +429,18 @@ namespace Display.Data
 
                     if (existsResult == null)
                     {
-                        resultList.Add(new MatchVideoResult() { status = true, OriginalName = fileInfo.n, message = "匹配成功", statusCode = 1, MatchName = videoName });
+                        resultList.Add(new MatchVideoResult() { status = true, OriginalName = fileInfo.Name, message = "匹配成功", statusCode = 1, MatchName = videoName });
                     }
                     else
                     {
-                        resultList.Add(new MatchVideoResult() { status = true, OriginalName = fileInfo.n, statusCode = 2, message = "已添加"});
+                        resultList.Add(new MatchVideoResult() { status = true, OriginalName = fileInfo.Name, statusCode = 2, message = "已添加"});
                     }
 
 
                 }
                 else
                 {
-                    resultList.Add(new MatchVideoResult() { status = true, OriginalName = fileInfo.n, statusCode = 0, message = "跳过非视频" });
+                    resultList.Add(new MatchVideoResult() { status = true, OriginalName = fileInfo.Name, statusCode = 0, message = "跳过非视频" });
                 }
             }
 

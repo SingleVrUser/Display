@@ -77,7 +77,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         else
         {
             var folderToRootList = DataAccess.GetRootByCid(cid);
-            unit = folderToRootList.Select(x => new ExplorerItem { Name = x.n, Id = x.cid }).ToList();
+            unit = folderToRootList.Select(x => new ExplorerItem { Name = x.Name, Id = x.Cid }).ToList();
         }
 
         InitData(unit);
@@ -851,10 +851,10 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
             Datum datum = new()
             {
-                cid = fileInfo.Cid,
-                n = fileInfo.Name,
-                pc = fileInfo.PickCode,
-                fid = fileInfo.Id
+                Cid = fileInfo.Cid,
+                Name = fileInfo.Name,
+                PickCode = fileInfo.PickCode,
+                Fid = fileInfo.Id
             };
             videoInfos.Add(datum);
         }
@@ -1019,7 +1019,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         // 更新UI
         // 新建文件夹
-        FilesInfos.Insert(0, new FilesInfo(new Datum() { cid = makeDirResult.cid, n = makeDirResult.cname }));
+        FilesInfos.Insert(0, new FilesInfo(new Datum() { Cid = makeDirResult.cid, Name = makeDirResult.cname }));
 
         // 删除文件
         TryRemoveFilesInExplorer(fileInfos);
@@ -1052,7 +1052,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         // 添加后缀，模仿官方
         var inputText = inputTextBox.Text;
-        var newName = string.IsNullOrEmpty(info.Datum.ico) ? inputText : $"{inputText}.{info.Datum.ico}";
+        var newName = string.IsNullOrEmpty(info.Datum.Ico) ? inputText : $"{inputText}.{info.Datum.Ico}";
 
         //没变
         if (newName == info.Name) return;
@@ -1191,8 +1191,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         {
             infos.Add("id", info.Id.ToString());
             infos.Add("pickCode", info.PickCode);
-            infos.Add("大小", ByteSize.FromBytes(info.Datum.s).ToString("#.#"));
-            infos.Add("sha1", info.Datum.sha);
+            infos.Add("大小", ByteSize.FromBytes(info.Datum.Size).ToString("#.#"));
+            infos.Add("sha1", info.Datum.Sha);
             infos.Add("所在目录id", info.Cid.ToString());
 
             title = "文件属性";

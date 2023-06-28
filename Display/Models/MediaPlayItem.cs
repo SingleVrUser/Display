@@ -206,8 +206,8 @@ namespace Display.Models
                     
                     newMediaPlayItems.AddRange(
                         fileInfos.data
-                            .Where(x => x.fid!=null && x.iv == 1)
-                            .Select(x => new MediaPlayItem(x.pc, x.n, FilesInfo.FileType.File)));
+                            .Where(x => x.Fid!=null && x.Iv == 1)
+                            .Select(x => new MediaPlayItem(x.PickCode, x.Name, FilesInfo.FileType.File)));
                 }
                 else
                 {

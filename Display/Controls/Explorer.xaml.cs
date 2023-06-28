@@ -71,7 +71,7 @@ namespace Display.Controls
                 items = DataAccess.GetListByCid(folderCid);
 
                 //排序
-                items = items.OrderByDescending(x => x.te).ToList();
+                items = items.OrderByDescending(x => x.TimeEdit).ToList();
 
                 StoreDataList.Add(new StoreDatum()
                 {
@@ -86,7 +86,7 @@ namespace Display.Controls
 
             if (outType == FilesInfo.FileType.Folder)
             {
-                items = items.Where(x => x.fid == null).ToList();
+                items = items.Where(x => x.Fid == null).ToList();
             }
 
             return items;
@@ -102,13 +102,13 @@ namespace Display.Controls
 
             foreach (var item in data)
             {
-                bool hasUnrealizedChildren = DataAccess.GetFolderListByPid(item.cid, 1).Count != 0;
+                bool hasUnrealizedChildren = DataAccess.GetFolderListByPid(item.Cid, 1).Count != 0;
 
                 ExplorerItem folders = new ExplorerItem()
                 {
-                    Name = item.n,
+                    Name = item.Name,
                     Type = FilesInfo.FileType.Folder,
-                    Id = item.cid,
+                    Id = item.Cid,
                     HasUnrealizedChildren = hasUnrealizedChildren,
                     datum = item
                 };
@@ -180,8 +180,8 @@ namespace Display.Controls
                 {
                     SelectFolderName.Add(new ExplorerItem()
                     {
-                        Name = info.n,
-                        Id = info.cid
+                        Name = info.Name,
+                        Id = info.Cid
                     });
                 }
             }
@@ -236,7 +236,7 @@ namespace Display.Controls
             FileInSelectFolder.Clear();
 
             //排序
-            items = items.OrderByDescending(x => x.pid).ToList();
+            items = items.OrderByDescending(x => x.Pid).ToList();
 
             foreach (var file in items)
             {
@@ -385,9 +385,9 @@ namespace Display.Controls
                 {
                     Content = new ExplorerItem()
                     {
-                        Name = videoInfo.n,
+                        Name = videoInfo.Name,
                         Type = FilesInfo.FileType.Folder,
-                        Id = videoInfo.cid,
+                        Id = videoInfo.Cid,
                         datum = videoInfo
                     },
                     HasUnrealizedChildren = newNodeDict.Value,
@@ -432,7 +432,7 @@ namespace Display.Controls
                 i++;
                 progress.Report(i);
                 //检查下级是否还有文件夹
-                bool hasUnrealizedChildren = DataAccess.GetFolderListByPid(folderInfo.cid, 1).Count != 0;
+                bool hasUnrealizedChildren = DataAccess.GetFolderListByPid(folderInfo.Cid, 1).Count != 0;
 
                 Node_HasUnrealizedChildren_Dict.Add(folderInfo, hasUnrealizedChildren);
 

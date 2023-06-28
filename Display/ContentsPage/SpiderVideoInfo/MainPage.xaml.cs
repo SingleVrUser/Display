@@ -12,6 +12,7 @@ using Display.Data;
 using HarfBuzzSharp;
 using System.Threading.Tasks;
 using Display.Models;
+using Display.Views;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -56,12 +57,12 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     public event PropertyChangedEventHandler PropertyChanged;
     public void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
-        this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     public MainPage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
     }
 
     /// <summary>
@@ -71,29 +72,24 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     /// <param Name="args"></param>
     private void Expander_Expanding(Expander sender, ExpanderExpandingEventArgs args)
     {
-        if (!(sender is Expander expander)) return;
-
-        if ((expander.Content as ConditionalCheck) == null)
+        if (sender.Content as ConditionalCheck == null)
         {
-            expander.Content = new ContentsPage.SpiderVideoInfo.ConditionalCheck(this);
+            sender.Content = new ConditionalCheck(this);
         }
 
-        expander.SetValue(Grid.ColumnProperty, 0);
-        expander.SetValue(Grid.ColumnSpanProperty, 2);
+        sender.SetValue(Grid.ColumnProperty, 0);
+        sender.SetValue(Grid.ColumnSpanProperty, 2);
     }
-
 
     /// <summary>
     /// 关闭Expander
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="args"></param>
+    /// <param name="sender"></param>
+    /// <param name="args"></param>
     private void Expander_Collapsed(Expander sender, ExpanderCollapsedEventArgs args)
     {
-        if (!(sender is Expander expander)) return;
-
-        expander.SetValue(Grid.ColumnProperty, 1);
-        expander.SetValue(Grid.ColumnSpanProperty, 1);
+        sender.SetValue(Grid.ColumnProperty, 1);
+        sender.SetValue(Grid.ColumnSpanProperty, 1);
     }
 
     /// <summary>
@@ -103,16 +99,16 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     /// <param Name="e"></param>
     private void StartMatchName_ButtonClick(object sender, RoutedEventArgs e)
     {
-        ////从本地数据库中搜刮
-        //if (localData_RadioButton.IsChecked == true)
-        //{
-        //    SpiderFromLocalData();
-        //}
-        ////从失败列表中搜刮（带匹配名称）
-        //else
-        //{
-        //    SpiderFromFailList();
-        //}
+        //从本地数据库中搜刮
+        if (LocalDataRadioButton.IsChecked == true)
+        {
+            SpiderFromLocalData();
+        }
+        //从失败列表中搜刮（带匹配名称）
+        else
+        {
+            SpiderFromFailList();
+        }
     }
 
     /// <summary>
@@ -139,11 +135,9 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
         page.CreateWindow();
     }
 
-    private void ShowTeachingTip(string content, FrameworkElement target = null)
+    private void ShowTeachingTip(string content)
     {
-        //SelectNull_TeachingtTip.Target = target != null ? target : StartMatchNameButton;
-        //SelectNull_TeachingtTip.Subtitle = content;
-        //SelectNull_TeachingtTip.IsOpen = true;
+        BasePage.ShowTeachingTip(SelectNullTeachingTip,content);
     }
 
     /// <summary>
@@ -151,12 +145,12 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     /// </summary>
     private void SpiderFromLocalData()
     {
-        ////检查是否有选中文件
-        //if (Explorer.FolderTreeView.SelectedNodes.Count == 0)
-        //{
-        //    ShowTeachingTip("没有选择文件夹，请选择后继续");
-        //    return;
-        //}
+        //检查是否有选中文件
+        if (Explorer.FolderTreeView.SelectedNodes.Count == 0)
+        {
+            ShowTeachingTip("没有选择文件，请选择后继续");
+            return;
+        }
 
         //获取需要搜刮的文件夹
         var tuple = GetCurrentSelectedFolder();
@@ -172,18 +166,18 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
         List<string> selectFilesNameList = new();
         List<Datum> datumList = new();
-        //foreach (var node in Explorer.FolderTreeView.SelectedNodes)
-        //{
-        //    if (node.Content is not ExplorerItem explorer) continue;
+        foreach (var node in Explorer.FolderTreeView.SelectedNodes)
+        {
+            if (node.Content is not ExplorerItem explorer) continue;
 
-        //    //文件夹
-        //    selectFilesNameList.Add(explorer.Name);
+            //文件夹
+            selectFilesNameList.Add(explorer.Name);
 
-        //    //文件夹下的文件和文件夹
-        //    var items = Explorer.GetFilesFromItems(explorer.Id, FilesInfo.FileType.File);
+            //文件夹下的文件和文件夹
+            var items = Explorer.GetFilesFromItems(explorer.Id, FilesInfo.FileType.File);
 
-        //    datumList.AddRange(items);
-        //}
+            datumList.AddRange(items);
+        }
 
         return new Tuple<List<string>, List<Datum>>(selectFilesNameList, datumList);
     }
@@ -195,10 +189,10 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     /// <param Name="e"></param>
     private void ExplorerItemClick(object sender, ItemClickEventArgs e)
     {
-        var itemInfo = e.ClickedItem as FilesInfo;
+        if (e.ClickedItem is not FilesInfo itemInfo) return;
 
-        //if (FileInfoShow_Grid.Visibility == Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
-        //SelectedDatum = itemInfo.Datum;
+        if (FileInfoShow_Grid.Visibility == Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
+        SelectedDatum = itemInfo.Datum;
     }
 
     /// <summary>
@@ -208,10 +202,10 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     /// <param Name="args"></param>
     private void TreeView_ItemInvoked(TreeView sender, TreeViewItemInvokedEventArgs args)
     {
-        var content = ((args.InvokedItem as TreeViewNode).Content as ExplorerItem);
+        if (args.InvokedItem is not TreeViewNode{Content:ExplorerItem content}) return;
 
-        //if (FileInfoShow_Grid.Visibility == Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
-        //SelectedDatum = content.datum;
+        if (FileInfoShow_Grid.Visibility == Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
+        SelectedDatum = content.datum;
     }
 
     /// <summary>
@@ -229,22 +223,6 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
         //SelectedDatum = (e.AddedItems[0] as FailDatum).Datum;
     }
 
-    /// <summary>
-    /// 点击视频按钮播放
-    /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
-    private async void VideoPlayButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (SelectedDatum == null) return;
-
-        ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Wait);
-
-        var mediaPlayItem = new MediaPlayItem(SelectedDatum.pc, SelectedDatum.n, FilesInfo.FileType.File);
-        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
-        ProtectedCursor = null;
-    }
-
     private void FailTypeComboBoxChanged(object sender, SelectionChangedEventArgs e)
     {
         if (e.AddedItems[0] is ComboBoxItem comboBoxItem)
@@ -255,69 +233,56 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
 
     private async void ChangedFailListType(ComboBoxItem comboBoxItem)
     {
-        //if (FailListView.ItemsSource == null)
-        //{
-        //    FailList = new();
-        //}
-        //else if (FailList.Count != 0)
-        //{
-        //    FailList.Clear();
-        //}
+        if (FailListView.ItemsSource == null)
+        {
+            FailList = new();
+        }
+        else if (FailList.Count != 0)
+        {
+            FailList.Clear();
+        }
 
-        //switch (comboBoxItem.Name)
-        //{
-        //    //正则匹配失败
-        //    case nameof(ShowMatcFail_ComboBoxItem):
-        //        FailList.SetShowType(FailType.MatchFail);
-        //        await FailList.LoadData();
-        //        break;
-        //    //搜刮失败
-        //    case nameof(ShowSpiderFail_ComboBoxItem):
-        //        FailList.SetShowType(FailType.SpiderFail);
-        //        await FailList.LoadData();
-        //        break;
-        //    //所有
-        //    default:
-        //        FailList.SetShowType(FailType.All);
-        //        await FailList.LoadData();
-        //        break;
-        //}
+        switch (comboBoxItem.Name)
+        {
+            //正则匹配失败
+            case nameof(ShowMatchFailComboBoxItem):
+                FailList.SetShowType(FailType.MatchFail);
+                await FailList.LoadData();
+                break;
+            //搜刮失败
+            case nameof(ShowSpiderFailComboBoxItem):
+                FailList.SetShowType(FailType.SpiderFail);
+                await FailList.LoadData();
+                break;
+            //所有
+            default:
+                FailList.SetShowType(FailType.All);
+                await FailList.LoadData();
+                break;
+        }
     }
 
     private void ShowData_RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        //if (e.AddedItems[0] is RadioButton radioButton)
-        //{
-        //    switch (radioButton.Name)
-        //    {
-        //        //本地数据库
-        //        case nameof(localData_RadioButton):
-        //            FailShowTypeComboBox.SelectionChanged -= FailTypeComboBoxChanged;
-        //            break;
-        //        //搜刮失败
-        //        case nameof(matchFail_RadioButton):
-        //            if (FailShowTypeComboBox.SelectionBoxItem == null)
-        //            {
-        //                ChangedFailListType(ShowAllFail_ComboBoxItem);
-        //            }
+        if (e.AddedItems[0] is RadioButton radioButton)
+        {
+            switch (radioButton.Name)
+            {
+                //本地数据库
+                case nameof(LocalDataRadioButton):
+                    FailShowTypeComboBox.SelectionChanged -= FailTypeComboBoxChanged;
+                    break;
+                //搜刮失败
+                case nameof(MatchFailRadioButton):
+                    if (FailShowTypeComboBox.SelectionBoxItem == null)
+                    {
+                        ChangedFailListType(ShowAllFailComboBoxItem);
+                    }
 
-        //            FailShowTypeComboBox.SelectionChanged += FailTypeComboBoxChanged;
-        //            break;
-        //    }
-        //}
-    }
-
-    private async void PlayWithPlayerButtonClick(object sender, RoutedEventArgs e)
-    {
-        if (sender is not MenuFlyoutItem { Tag: string aTag }) return;
-        if (!int.TryParse(aTag, out var playerSelection)) return;
-        if (SelectedDatum == null) return;
-
-        await Task.Delay(1);
-
-
-        var mediaPlayItem = new MediaPlayItem(SelectedDatum.pc, SelectedDatum.n, FilesInfo.FileType.File);
-        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this, playerSelection: playerSelection);
+                    FailShowTypeComboBox.SelectionChanged += FailTypeComboBoxChanged;
+                    break;
+            }
+        }
     }
 
     private async void Explorer_OnPlayVideoClick(object sender, RoutedEventArgs e)
@@ -342,12 +307,12 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     }
 }
 
-public class SplideInfoProgress
+public class SpiderInfoProgress
 {
-    public VideoInfo videoInfo { get; set; }
-    public MatchVideoResult matchResult { get; set; }
+    public VideoInfo VideoInfo { get; set; }
+    public MatchVideoResult MatchResult { get; set; }
 
-    public int index { get; set; } = 0;
+    public int Index { get; set; } = 0;
 }
 
 public enum FileFormat { Video, Subtitles, Torrent, Image, Audio, Archive }
@@ -356,21 +321,21 @@ public class FileStatistics
 {
     public FileStatistics(FileFormat name)
     {
-        type = name;
-        size = 0;
-        count = 0;
+        Type = name;
+        Size = 0;
+        Count = 0;
         data = new();
     }
 
-    public FileFormat type { get; set; }
-    public long size { get; set; }
-    public int count { get; set; }
+    public FileFormat Type { get; set; }
+    public long Size { get; set; }
+    public int Count { get; set; }
     public List<Data> data { get; set; }
 
     public class Data
     {
-        public string name { get; set; }
-        public int count { get; set; } = 0;
-        public long size { get; set; } = 0;
+        public string Name { get; set; }
+        public int Count { get; set; } = 0;
+        public long Size { get; set; } = 0;
     }
 }

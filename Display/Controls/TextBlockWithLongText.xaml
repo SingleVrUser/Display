@@ -14,8 +14,7 @@
     </UserControl.Resources>
 
     <Grid>
-        <TextBlock x:Name="LongTextBlock"
-                   Text="{x:Bind StringValue,Mode=OneWay}"
+        <TextBlock Text="{x:Bind StringValue,Mode=OneWay}"
                    TextTrimming="CharacterEllipsis"
                    IsTextSelectionEnabled="{x:Bind IsFirstTextSelectionEnabled}">
             <TextBlock.ContextFlyout>

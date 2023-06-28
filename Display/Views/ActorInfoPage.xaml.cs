@@ -146,7 +146,7 @@ namespace Display.Views
             }
             else if (videoInfoList.Count == 1)
             {
-                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].pc, videoInfo.truename, FilesInfo.FileType.File);
+                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].PickCode, videoInfo.truename, FilesInfo.FileType.File);
                 await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
             }
 
@@ -179,7 +179,7 @@ namespace Display.Views
 
             if (sender is not ListView { DataContext: string trueName }) return;
             
-            var mediaPlayItem = new MediaPlayItem(singleVideoInfo.pc, trueName, FilesInfo.FileType.File);
+            var mediaPlayItem = new MediaPlayItem(singleVideoInfo.PickCode, trueName, FilesInfo.FileType.File);
             await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, XamlRoot, lastPage: this);
         }
 
@@ -189,7 +189,7 @@ namespace Display.Views
 
             if (videoPlayButton.DataContext is not Datum datum) return;
 
-            var mediaPlayItem = new MediaPlayItem(datum.pc, datum.n, FilesInfo.FileType.File);
+            var mediaPlayItem = new MediaPlayItem(datum.PickCode, datum.Name, FilesInfo.FileType.File);
             await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.Fail);
         }
     }
