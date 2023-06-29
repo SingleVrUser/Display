@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -343,18 +344,18 @@ namespace Display.Data
         /// <param name="orderBy"></param>
         /// <param name="asc"></param>
         /// <returns></returns>
-        public async Task ChangedShowType(long cid, OrderBy orderBy = OrderBy.UserPtime, int asc = 0)
+        public async Task ChangedShowType(long cid, OrderBy orderBy = OrderBy.UserProduceTime, int asc = 0)
         {
             const string url = "https://webapi.115.com/files/order";
             var values = new Dictionary<string, string>
                 {
-                    { "user_order", orderBy.ToString()},
+                    { "user_order", orderBy.GetDescription()},
                     {"file_id", cid.ToString() },
                     {"user_asc",asc.ToString() },
                     {"fc_mix","0" },
                 };
             var content = new FormUrlEncodedContent(values);
-
+                
             var _ = await Client.SendAsync<string>(HttpMethod.Post, url, content);
 
         }
@@ -596,7 +597,17 @@ namespace Display.Data
             return await Client.SendAsync<RenameRequest>(HttpMethod.Post, url, content);
         }
 
-        public enum OrderBy { FileName, FileSize, UserPtime }
+        public enum OrderBy
+        {
+            [Description("file_name")]
+            FileName,
+
+            [Description("file_size")]
+            FileSize,
+
+            [Description("user_ptime")]
+            UserProduceTime
+        }
 
         /// <summary>
         /// 获取文件信息
@@ -610,11 +621,11 @@ namespace Display.Data
         /// <param name="asc"></param>
         /// <param name="isOnlyFolder"></param>
         /// <returns></returns>
-        public async Task<WebFileInfo> GetFileAsync(long? cid, int limit = 40, int offset = 0, bool useApi2 = false, bool loadAll = false, OrderBy orderBy = OrderBy.UserPtime, int asc = 0, bool isOnlyFolder = false)
+        public async Task<WebFileInfo> GetFileAsync(long? cid, int limit = 40, int offset = 0, bool useApi2 = false, bool loadAll = false, OrderBy orderBy = OrderBy.UserProduceTime, int asc = 0, bool isOnlyFolder = false)
         {
-            var url = !useApi2 ? $"https://webapi.115.com/files?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json" :
+            var url = !useApi2 ? $"https://webapi.115.com/files?aid=1&cid={cid}&o={orderBy.GetDescription()}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json" :
                 //旧接口只有t，没有修改时间（te），创建时间（tp）
-                $"https://aps.115.com/natsort/files.php?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json&fc_mix=0&type=&star=&is_share=&suffix=&custom_order=";
+                $"https://aps.115.com/natsort/files.php?aid=1&cid={cid}&o={orderBy.GetDescription()}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json&fc_mix=0&type=&star=&is_share=&suffix=&custom_order=";
 
             if (isOnlyFolder)
                 url += "&nf=1";

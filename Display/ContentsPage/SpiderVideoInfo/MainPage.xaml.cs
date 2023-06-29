@@ -13,6 +13,7 @@ using HarfBuzzSharp;
 using System.Threading.Tasks;
 using Display.Models;
 using Display.Views;
+using Display.Models.IncrementalCollection;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

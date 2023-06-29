@@ -1,5 +1,4 @@
-﻿
-using Display.Data;
+﻿using Display.Data;
 using Microsoft.UI.Xaml.Data;
 using SharpCompress;
 using System;
@@ -8,7 +7,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
 
-namespace Display.Models;
+namespace Display.Models.IncrementalCollection;
 
 public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCoverDisplayClass>, ISupportIncrementalLoading
 {
@@ -60,8 +59,8 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
 
     public void SetImageSize(double imgwidth, double imgheight)
     {
-        this.imageWidth = imgwidth;
-        this.imageHeight = imgheight;
+        imageWidth = imgwidth;
+        imageHeight = imgheight;
     }
 
     public void SetFilter(List<string> filterConditionList, string filterKeywords, bool isFuzzyQueryActor)

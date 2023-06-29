@@ -1,5 +1,4 @@
-﻿using Display.Models;
-using Microsoft.UI.Input;
+﻿using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -15,6 +14,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Display.Data;
 using SharpCompress;
+using Display.Models.IncrementalCollection;
 
 namespace Display.Controls;
 
@@ -161,8 +161,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// 显示的数据
     /// 用于增量显示，失败列表（喜欢/稍后观看）
     /// </summary>
-    private IncrementallLoadFailInfoCollection _likeOrLookLaterFailInfoCollection;
-    public IncrementallLoadFailInfoCollection LikeOrLookLaterFailInfoCollection
+    private IncrementalLoadFailInfoCollection _likeOrLookLaterFailInfoCollection;
+    public IncrementalLoadFailInfoCollection LikeOrLookLaterFailInfoCollection
     {
         get => _likeOrLookLaterFailInfoCollection;
         set
@@ -941,7 +941,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         {
             if (FailGridView.ItemsSource is IncrementalLoadFailDatumInfoCollection allFailCollection)
                 FailGridView.ScrollIntoView(allFailCollection.First());
-            else if (FailGridView.ItemsSource is IncrementallLoadFailInfoCollection failCollection)
+            else if (FailGridView.ItemsSource is IncrementalLoadFailInfoCollection failCollection)
                 FailGridView.ScrollIntoView(failCollection.First());
         }
         else
@@ -1171,7 +1171,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             case nameof(FailLike_RadioButton):
                 if (LikeOrLookLaterFailInfoCollection == null)
                 {
-                    LikeOrLookLaterFailInfoCollection = new IncrementallLoadFailInfoCollection(FailInfoShowType.like);
+                    LikeOrLookLaterFailInfoCollection = new IncrementalLoadFailInfoCollection(FailInfoShowType.like);
                 }
                 else if (LikeOrLookLaterFailInfoCollection.ShowType != FailInfoShowType.like)
                 {

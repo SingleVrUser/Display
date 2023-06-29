@@ -6,6 +6,7 @@ using CommunityToolkit.WinUI.UI.Controls;
 using Display.Data;
 using Display.Helper;
 using Display.Models;
+using Display.Models.IncrementalCollection;
 using Display.WindowView;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;

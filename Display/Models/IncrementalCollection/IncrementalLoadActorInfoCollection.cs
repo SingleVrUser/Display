@@ -8,23 +8,23 @@ using Windows.Foundation;
 using Display.Data;
 using SharpCompress;
 
-namespace Display.Models;
+namespace Display.Models.IncrementalCollection;
 
-public class IncrementallLoadActorInfoCollection : ObservableCollection<ActorInfo>, ISupportIncrementalLoading
+public class IncrementalLoadActorInfoCollection : ObservableCollection<ActorInfo>, ISupportIncrementalLoading
 {
     public bool HasMoreItems { get; set; } = true;
 
     public int AllCount { get; private set; }
 
-    public Dictionary<string, bool> orderByList { get; private set; }
+    public Dictionary<string, bool> OrderByList { get; private set; }
 
-    public List<string> filterList { get; private set; }
+    public List<string> FilterList { get; private set; }
 
-    public bool isDsc { get; private set; }
+    public bool IsDsc { get; private set; }
 
-    public IncrementallLoadActorInfoCollection(Dictionary<string, bool> orderByList, int defaultAddCount = 40)
+    public IncrementalLoadActorInfoCollection(Dictionary<string, bool> orderByList, int defaultAddCount = 40)
     {
-        this._defaultAddCount = defaultAddCount;
+        _defaultAddCount = defaultAddCount;
 
         SetOrder(orderByList);
     }
@@ -33,17 +33,17 @@ public class IncrementallLoadActorInfoCollection : ObservableCollection<ActorInf
     {
         System.Diagnostics.Debug.WriteLine($"加载{offset}-{offset + limit} 中……");
 
-        var ActorInfos = await DataAccess.Get.GetActorInfo(limit, offset, orderByList, filterList);
+        var actorInfos = await DataAccess.Get.GetActorInfo(limit, offset, OrderByList, FilterList);
 
         if (Count == 0)
         {
-            this.AllCount = DataAccess.Get.GetCountOfActorInfo(filterList);
-            System.Diagnostics.Debug.WriteLine($"总数量:{this.AllCount}");
+            AllCount = DataAccess.Get.GetCountOfActorInfo(FilterList);
+            System.Diagnostics.Debug.WriteLine($"总数量:{AllCount}");
 
             System.Diagnostics.Debug.WriteLine($"HasMoreItems:{HasMoreItems}");
         }
 
-        ActorInfos.ForEach(Add);
+        actorInfos.ForEach(Add);
 
         if (AllCount <= Count)
         {
@@ -51,19 +51,19 @@ public class IncrementallLoadActorInfoCollection : ObservableCollection<ActorInf
             System.Diagnostics.Debug.WriteLine("记载完毕");
         }
 
-        return ActorInfos.Length;
+        return actorInfos.Length;
     }
 
     public void SetFilter(List<string> filterList)
     {
-        this.filterList = filterList;
+        FilterList = filterList;
         Clear();
         if (!HasMoreItems) HasMoreItems = true;
     }
 
     public void SetOrder(Dictionary<string, bool> orderBy)
     {
-        this.orderByList = orderBy;
+        OrderByList = orderBy;
     }
 
     public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
@@ -71,11 +71,10 @@ public class IncrementallLoadActorInfoCollection : ObservableCollection<ActorInf
         return InnerLoadMoreItemsAsync(count).AsAsyncOperation();
     }
 
-    private readonly int _defaultAddCount = 30;
+    private readonly int _defaultAddCount;
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        int getCount = await LoadData(_defaultAddCount, Count);
-
+        var getCount = await LoadData(_defaultAddCount, Count);
 
         return new LoadMoreItemsResult
         {

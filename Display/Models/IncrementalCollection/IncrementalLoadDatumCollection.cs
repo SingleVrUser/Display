@@ -1,18 +1,18 @@
-﻿
-using Display.Data;
+﻿using Display.Data;
 using Microsoft.UI.Xaml.Data;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Display.Extensions;
 
-namespace Display.Models;
+namespace Display.Models.IncrementalCollection;
 
 public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, ISupportIncrementalLoading
 {
     private WebApi WebApi { get; set; }
-        
+
     public bool HasMoreItems { get; private set; } = true;
 
     private int _allCount;
@@ -36,7 +36,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         get => _isNull;
         set
         {
-            if(_isNull == value) return;
+            if (_isNull == value) return;
 
             _isNull = value;
 
@@ -58,7 +58,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         AllCount--;
     }
 
-    public WebApi.OrderBy OrderBy { get; private set; } = WebApi.OrderBy.UserPtime;
+    public WebApi.OrderBy OrderBy { get; private set; } = WebApi.OrderBy.UserProduceTime;
 
     public int Asc { get; private set; }
 
@@ -66,7 +66,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
 
     private bool IsOnlyFolder { get; set; }
 
-    public IncrementalLoadDatumCollection(long cid,bool isOnlyFolder = false)
+    public IncrementalLoadDatumCollection(long cid, bool isOnlyFolder = false)
     {
         Cid = cid;
         WebApi = WebApi.GlobalWebApi;
@@ -80,13 +80,14 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         //查询该目录的排列方式
         var filesShowMethod = await WebApi.GetFilesShowInfo(Cid);
 
-        WebApi.OrderBy order;
-        Enum.TryParse(filesShowMethod.order, out order);
-        if (this.OrderBy != order) this.OrderBy = order;
+        //Enum.TryParse(filesShowMethod.order, out WebApi.OrderBy order);
+        var order = filesShowMethod.order.ParseEnumByDescription<WebApi.OrderBy>();
+
+        if (OrderBy != order) OrderBy = order;
 
         Asc = filesShowMethod.is_asc;
 
-        var filesInfo = await WebApi.GetFileAsync(Cid, limit, offset, orderBy: OrderBy, asc: Asc,isOnlyFolder:IsOnlyFolder);
+        var filesInfo = await WebApi.GetFileAsync(Cid, limit, offset, orderBy: OrderBy, asc: Asc, isOnlyFolder: IsOnlyFolder);
         WebPaths = filesInfo.path;
         AllCount = filesInfo.count;
 
@@ -143,8 +144,8 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
 
     public async Task SetOrder(WebApi.OrderBy orderBy, int asc)
     {
-        this.OrderBy = orderBy;
-        this.Asc = asc;
+        OrderBy = orderBy;
+        Asc = asc;
         await WebApi.ChangedShowType(Cid, orderBy, asc);
         await SetCid(Cid);
     }
