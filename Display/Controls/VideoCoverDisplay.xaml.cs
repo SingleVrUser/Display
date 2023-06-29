@@ -21,22 +21,19 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 {
     //标题
     public static readonly DependencyProperty TitleProperty =
-        DependencyProperty.Register("Title", typeof(string), typeof(VideoCoverDisplay), null);
+        DependencyProperty.Register(nameof(Title), typeof(string), typeof(VideoCoverDisplay), null);
 
     //显示的是匹配成功的还是失败的
     public static readonly DependencyProperty IsShowFailListViewProperty =
-        DependencyProperty.Register("IsShowFailListView", typeof(bool), typeof(VideoCoverDisplay), null);
+        DependencyProperty.Register(nameof(IsShowFailListView), typeof(bool), typeof(VideoCoverDisplay), null);
 
     public static readonly DependencyProperty IsShowSearchListViewProperty =
-        DependencyProperty.Register("IsShowSearchListView", typeof(bool), typeof(VideoCoverDisplay), PropertyMetadata.Create(() => false));
+        DependencyProperty.Register(nameof(IsShowSearchListView), typeof(bool), typeof(VideoCoverDisplay), PropertyMetadata.Create(() => false));
 
-    private bool IsShowSucAndFailSwitchButton
-    {
-        get => !IsShowSearchListView;
-    }
+    private bool IsShowSucAndFailSwitchButton => !IsShowSearchListView;
 
     private ActorInfo _actorInfo;
-    public ActorInfo actorInfo
+    public ActorInfo ActorInfo
     {
         get => _actorInfo;
         set
@@ -52,7 +49,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     }
 
     private bool _isShowHeaderCover = false;
-    public bool isShowHeaderCover
+    public bool IsShowHeaderCover
     {
         get => _isShowHeaderCover;
         set
@@ -70,24 +67,21 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// </summary>
     public string Title
     {
-        get { return (string)GetValue(TitleProperty); }
-        set { SetValue(TitleProperty, value); }
+        get => (string)GetValue(TitleProperty);
+        set => SetValue(TitleProperty, value);
     }
 
     /// <summary>
     /// 是否显示成功列表
     /// </summary>
-    private bool IsShowSuccessListView
-    {
-        get => !IsShowFailListView;
-    }
+    private bool IsShowSuccessListView => !IsShowFailListView;
 
     /// <summary>
     /// 当前显示失败列表
     /// </summary>
     public bool IsShowFailListView
     {
-        get { return (bool)GetValue(IsShowFailListViewProperty); }
+        get => (bool)GetValue(IsShowFailListViewProperty);
         set
         {
             if (IsShowFailListView == value) return;
@@ -104,18 +98,18 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// </summary>
     public bool IsShowSearchListView
     {
-        get { return (bool)GetValue(IsShowSearchListViewProperty); }
-        set { SetValue(IsShowSearchListViewProperty, value); }
+        get => (bool)GetValue(IsShowSearchListViewProperty);
+        set => SetValue(IsShowSearchListViewProperty, value);
     }
 
     /// <summary>
     /// 切换排序Flyout(成功或失败)
     /// </summary>
-    /// <param Name="IsShowSuccessFlyout"></param>
-    private void ChangedOrderButtonFlyout(bool IsShowSuccessFlyout)
+    /// <param name="isShowSuccessFlyout"></param>
+    private void ChangedOrderButtonFlyout(bool isShowSuccessFlyout)
     {
         //显示成功的排序
-        if (IsShowSuccessFlyout)
+        if (isShowSuccessFlyout)
         {
             OrderButton.Flyout = this.Resources["SuccessOrderFlyout"] as Flyout;
         }
@@ -146,16 +140,16 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// 显示的数据
     /// 用于增量显示，失败列表（全部）
     /// </summary>
-    private IncrementalLoadFailDatumInfoCollection _allfailInfocollection;
+    private IncrementalLoadFailDatumInfoCollection _allFailInfoCollection;
     public IncrementalLoadFailDatumInfoCollection AllFailInfoCollection
     {
-        get => _allfailInfocollection;
+        get => _allFailInfoCollection;
         set
         {
-            if (_allfailInfocollection == value)
+            if (_allFailInfoCollection == value)
                 return;
 
-            _allfailInfocollection = value;
+            _allFailInfoCollection = value;
 
             OnPropertyChanged();
         }
@@ -166,16 +160,15 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// 显示的数据
     /// 用于增量显示，失败列表（喜欢/稍后观看）
     /// </summary>
-    private IncrementallLoadFailInfoCollection _likeOrLookLater_failInfocollection;
-    public IncrementallLoadFailInfoCollection LikeOrLookLater_failInfocollection
+    private IncrementallLoadFailInfoCollection _likeOrLookLaterFailInfoCollection;
+    public IncrementallLoadFailInfoCollection LikeOrLookLaterFailInfoCollection
     {
-        get => _likeOrLookLater_failInfocollection;
+        get => _likeOrLookLaterFailInfoCollection;
         set
         {
-            if (_likeOrLookLater_failInfocollection == value)
-                return;
+            if (_likeOrLookLaterFailInfoCollection == value) return;
 
-            _likeOrLookLater_failInfocollection = value;
+            _likeOrLookLaterFailInfoCollection = value;
 
             OnPropertyChanged();
         }
@@ -192,19 +185,19 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// 图片的最小值
     /// 与Slider对应
     /// </summary>
-    private double SliderMinValue = 200;
+    private const double SliderMinValue = 200;
 
     /// <summary>
     /// 图片的最大值
     /// 与Slider对应
     /// </summary>
-    private double SliderMaxValue = 900;
+    private const double SliderMaxValue = 900;
 
-    private bool isFuzzyQueryActor = true;
+    private bool _isFuzzyQueryActor = true;
 
-    List<string> filterConditionList;
-    Dictionary<string, string> filterRanges;
-    string filterKeywords;
+    private List<string> _filterConditionList;
+    private Dictionary<string, string> _filterRanges;
+    private string _filterKeywords;
 
     public VideoCoverDisplay()
     {
@@ -222,14 +215,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         else
         {
             //展示的是失败列表
-            if (IsShowFailListView)
-            {
-                ShowType_RadioButtons.SelectedIndex = 1;
-            }
-            else
-            {
-                ShowType_RadioButtons.SelectedIndex = 0;
-            }
+            ShowType_RadioButtons.SelectedIndex = IsShowFailListView ? 1 : 0;
         }
 
         Loaded -= PageLoaded;
@@ -242,7 +228,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     {
         bool isShowHeaderCover = false;
 
-        this.isFuzzyQueryActor = isFuzzyQueryActor;
+        _isFuzzyQueryActor = isFuzzyQueryActor;
 
         if (types.Count == 1)
         {
@@ -267,11 +253,11 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
                     // 准确查询演员，一般来源于详情页和演员页
                     if (!isFuzzyQueryActor)
                     {
-                        var actorinfos = await DataAccess.LoadActorInfo(filterList: new() { $"Name == '{ShowName}'" });
+                        var actorInfos = await DataAccess.LoadActorInfo(filterList: new() { $"Name == '{ShowName}'" });
 
-                        if (actorinfos.Count != 0)
+                        if (actorInfos.Count != 0)
                         {
-                            actorInfo = actorinfos.FirstOrDefault();
+                            ActorInfo = actorInfos.FirstOrDefault();
 
                             isShowHeaderCover = true;
                         }
@@ -290,10 +276,10 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             Title = ShowName;
         }
 
-        this.isShowHeaderCover = isShowHeaderCover;
+        this.IsShowHeaderCover = isShowHeaderCover;
 
-        filterConditionList = types;
-        filterKeywords = ShowName;
+        _filterConditionList = types;
+        _filterKeywords = ShowName;
         IsShowFailListView = false;
         trySwitchToSuccessView();
     }
@@ -304,12 +290,12 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// 经验（(padding + 4 或 5)*2）
     /// ( 4 + 5 )*2
     /// </summary>
-    double HorizontalPadding = 18;
+    private const double HorizontalPadding = 18;
 
     /// <summary>
     /// 标记Slider的值
     /// </summary>
-    double markSliderValue;
+    private double _markSliderValue;
 
     /// <summary>
     /// Slider值改变后，调整图片大小
@@ -318,7 +304,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <param Name="e"></param>
     private void Slider_valueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
-        markSliderValue = e.NewValue;
+        _markSliderValue = e.NewValue;
 
         //动态调整图片大小
         if (IsAutoAdjustImageSize_ToggleButton.IsChecked == true)
@@ -335,33 +321,33 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 动态调整图片大小
     /// </summary>
-    /// <param Name="GridWidth"></param>
-    /// <param Name="AdjustSliderValue"></param>
-    private void AutoAdjustImageSize(double GridWidth = -1, bool AdjustSliderValue = false)
+    /// <param name="gridWidth"></param>
+    /// <param name="adjustSliderValue"></param>
+    private void AutoAdjustImageSize(double gridWidth = -1, bool adjustSliderValue = false)
     {
         //失败列表不调整
         if (IsShowFailListView) return;
 
-        if (GridWidth == -1)
-            GridWidth = BasicGridView.ActualWidth;
+        if (gridWidth == -1)
+            gridWidth = BasicGridView.ActualWidth;
 
-        var ImageCountPerRow = Math.Floor(GridWidth / (markSliderValue + HorizontalPadding));
-        if (ImageCountPerRow <= 0) ImageCountPerRow = 1;
+        var imageCountPerRow = Math.Floor(gridWidth / (_markSliderValue + HorizontalPadding));
+        if (imageCountPerRow <= 0) imageCountPerRow = 1;
         //System.Diagnostics.Debug.WriteLine($"每行图片数量：{ImageCountPerRow}");
 
-        double newImageWidth = GridWidth / ImageCountPerRow - HorizontalPadding;
+        var newImageWidth = gridWidth / imageCountPerRow - HorizontalPadding;
         //System.Diagnostics.Debug.WriteLine($"推算出的图片宽度应为：{newImageWidth}");
 
         //必须要在一定范围内（Slider的最大最小值）
-        if (SliderMinValue <= newImageWidth && newImageWidth <= SliderMaxValue)
+        if (newImageWidth is >= SliderMinValue and <= SliderMaxValue)
         {
             // SliderValue的0.5~1.5倍
             // 又或者，每行图片最大为1的话，可以缩小到最小值
-            if ((markSliderValue * 0.5 <= newImageWidth && newImageWidth <= markSliderValue * 1.5) || ImageCountPerRow == 1)
+            if ((_markSliderValue * 0.5 <= newImageWidth && newImageWidth <= _markSliderValue * 1.5) || imageCountPerRow == 1)
             {
                 AdjustImageSize(newImageWidth);
 
-                if (AdjustSliderValue) AdjustSliderValueOnly(newImageWidth);
+                if (adjustSliderValue) AdjustSliderValueOnly(newImageWidth);
 
             }
         }
@@ -370,17 +356,17 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 固定值调整图片大小
     /// </summary>
-    /// <param Name="width"></param>
+    /// <param name="width"></param>
     private void AdjustImageSize(double width)
     {
         if (SuccessInfoCollection == null) return;
 
         var height = width / 3 * 2;
 
-        for (int i = 0; i < SuccessInfoCollection.Count; i++)
+        foreach (var t in SuccessInfoCollection)
         {
-            SuccessInfoCollection[i].ImageWidth = width;
-            SuccessInfoCollection[i].imageheight = height;
+            t.ImageWidth = width;
+            t.imageheight = height;
         }
 
         //更改应用设置
@@ -436,21 +422,21 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 鼠标移出在Grid，隐藏可操作按钮
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void Grid_PointerExited(object sender, PointerRoutedEventArgs e)
     {
         if (!(sender is Grid grid)) return;
 
-        if (grid.Children[1] is not Grid CollapsedGrid) return;
+        if (grid.Children[1] is not Grid collapsedGrid) return;
 
-        CollapsedGrid.Visibility = Visibility.Collapsed;
+        collapsedGrid.Visibility = Visibility.Collapsed;
 
     }
 
     private void FailImageGrid_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        if (!(sender is Grid grid)) return;
+        if (sender is not Grid grid) return;
         grid.Children[1].Visibility = Visibility.Visible;
 
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
@@ -878,7 +864,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         var imgSize = ImageSize;
 
         SuccessInfoCollection = new(imgSize.Item1, imgSize.Item2);
-        SuccessInfoCollection.SetFilter(filterConditionList, filterKeywords, isFuzzyQueryActor);
+        SuccessInfoCollection.SetFilter(_filterConditionList, _filterKeywords, _isFuzzyQueryActor);
         await SuccessInfoCollection.LoadData();
 
         BasicGridView.ItemsSource = SuccessInfoCollection;
@@ -887,7 +873,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         if (BasicGridView.Visibility == Visibility.Collapsed) BasicGridView.Visibility = Visibility.Visible;
 
         //初始化Slider的值
-        markSliderValue = imgSize.Item1;
+        _markSliderValue = imgSize.Item1;
         ImageSizeChangeSlider.Value = imgSize.Item1;
 
         //开始监听调整图片大小的Slider
@@ -1063,26 +1049,26 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             switch (sender.Tag)
             {
                 case "Year":
-                    if (filterRanges == null)
-                        filterRanges = new();
-                    filterRanges["Year"] = InfosFilter.Year;
+                    if (_filterRanges == null)
+                        _filterRanges = new();
+                    _filterRanges["Year"] = InfosFilter.Year;
                     break;
                 case "Score":
-                    if (filterRanges == null)
-                        filterRanges = new();
-                    filterRanges["Score"] = InfosFilter.Score.ToString();
+                    if (_filterRanges == null)
+                        _filterRanges = new();
+                    _filterRanges["Score"] = InfosFilter.Score.ToString();
                     break;
                 case "Type":
-                    if (filterRanges == null)
-                        filterRanges = new();
-                    filterRanges["Type"] = InfosFilter.Type;
+                    if (_filterRanges == null)
+                        _filterRanges = new();
+                    _filterRanges["Type"] = InfosFilter.Type;
                     break;
             }
         }
         //取消选中
         else
         {
-            filterRanges.Remove(sender.Tag.ToString());
+            _filterRanges.Remove(sender.Tag.ToString());
         }
 
         LoadDstSuccessInfoCollection();
@@ -1090,27 +1076,27 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
     private void InfoListFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (!(sender is RadioButtons radioButtons)) return;
-        if (!(radioButtons.SelectedItem is RadioButton radioButton)) return;
+        if (sender is not RadioButtons radioButtons) return;
+        if (radioButtons.SelectedItem is not RadioButton radioButton) return;
 
-        var Key = radioButtons.Tag.ToString();
-        var Value = radioButton.Tag != null ? radioButton.Tag.ToString() : radioButton.Content.ToString();
-        if (filterRanges == null)
-            filterRanges = new();
+        var key = radioButtons.Tag.ToString();
+        if (string.IsNullOrEmpty(key)) return;
 
-        filterRanges[Key] = Value;
+        var value = radioButton.Tag != null ? radioButton.Tag.ToString() : radioButton.Content.ToString();
+        _filterRanges ??= new Dictionary<string, string>();
+
+        _filterRanges[key] = value;
 
         LoadDstSuccessInfoCollection();
     }
 
     private void InfoListFilter_TextChanged(object sender, TextChangedEventArgs e)
     {
-        var Key = "Year";
-        var Value = InfosFilter.Year;
-        if (filterRanges == null)
-            filterRanges = new();
+        const string key = "Year";
+        var value = InfosFilter.Year;
+        _filterRanges ??= new Dictionary<string, string>();
 
-        filterRanges[Key] = Value;
+        _filterRanges[key] = value;
         LoadDstSuccessInfoCollection();
     }
 
@@ -1120,18 +1106,16 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         BasicGridView.ItemsSource = SuccessInfoCollection;
 
         SuccessInfoCollection.SetOrder(SuccessListOrderBy, SuccessListIsDesc);
-        SuccessInfoCollection.SetRange(filterRanges);
-        SuccessInfoCollection.SetFilter(filterConditionList, filterKeywords, isFuzzyQueryActor);
+        SuccessInfoCollection.SetRange(_filterRanges);
+        SuccessInfoCollection.SetFilter(_filterConditionList, _filterKeywords, _isFuzzyQueryActor);
         await SuccessInfoCollection.LoadData();
     }
 
     private void Filter_ToggleButton_Unchecked(object sender, RoutedEventArgs e)
     {
-        if (filterRanges == null) return;
-        else if (filterRanges.Count == 0) return;
-        else
-            filterRanges = null;
+        if (_filterRanges is not {Count:>0}) return;
 
+        _filterRanges = null;
         InfosFilter.UncheckAllToggleSplitButton();
         LoadDstSuccessInfoCollection();
     }
@@ -1142,21 +1126,23 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         if (isLikeButton.Tag is not int actorId) return;
 
-        var is_like = (bool)isLikeButton.IsChecked ? 1 : 0;
+        if (isLikeButton.IsChecked == null) return;
 
-        DataAccess.UpdateSingleDataFromActorInfo(actorId.ToString(), "is_like", is_like.ToString());
+        var isLike = (bool)isLikeButton.IsChecked ? 1 : 0;
+
+        DataAccess.UpdateSingleDataFromActorInfo(actorId.ToString(), "is_like", isLike.ToString());
     }
 
     private void ChangedHyperlink()
     {
-        if (!string.IsNullOrEmpty(actorInfo.blog_url))
+        if (!string.IsNullOrEmpty(ActorInfo.BlogUrl))
         {
-            blog_HyperLink.NavigateUri = new Uri(actorInfo.blog_url);
+            blog_HyperLink.NavigateUri = new Uri(ActorInfo.BlogUrl);
         }
 
-        if (!string.IsNullOrEmpty(actorInfo.info_url))
+        if (!string.IsNullOrEmpty(ActorInfo.InfoUrl))
         {
-            info_HyperLink.NavigateUri = new Uri(actorInfo.info_url);
+            info_HyperLink.NavigateUri = new Uri(ActorInfo.InfoUrl);
         }
     }
 
@@ -1181,30 +1167,30 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         {
             //喜欢
             case nameof(FailLike_RadioButton):
-                if (LikeOrLookLater_failInfocollection == null)
+                if (LikeOrLookLaterFailInfoCollection == null)
                 {
-                    LikeOrLookLater_failInfocollection = new IncrementallLoadFailInfoCollection(FailInfoShowType.like);
+                    LikeOrLookLaterFailInfoCollection = new IncrementallLoadFailInfoCollection(FailInfoShowType.like);
                 }
-                else if (LikeOrLookLater_failInfocollection.ShowType != FailInfoShowType.like)
+                else if (LikeOrLookLaterFailInfoCollection.ShowType != FailInfoShowType.like)
                 {
-                    LikeOrLookLater_failInfocollection.SetShowType(FailInfoShowType.like);
+                    LikeOrLookLaterFailInfoCollection.SetShowType(FailInfoShowType.like);
                 }
-                FailGridView.ItemsSource = LikeOrLookLater_failInfocollection;
+                FailGridView.ItemsSource = LikeOrLookLaterFailInfoCollection;
 
                 isShowAllFail = false;
 
                 break;
             //稍后观看
             case nameof(FailLookLater_RadioButton):
-                if (LikeOrLookLater_failInfocollection == null)
+                if (LikeOrLookLaterFailInfoCollection == null)
                 {
-                    LikeOrLookLater_failInfocollection = new(FailInfoShowType.look_later);
+                    LikeOrLookLaterFailInfoCollection = new(FailInfoShowType.look_later);
                 }
-                else if (LikeOrLookLater_failInfocollection.ShowType != FailInfoShowType.look_later)
+                else if (LikeOrLookLaterFailInfoCollection.ShowType != FailInfoShowType.look_later)
                 {
-                    LikeOrLookLater_failInfocollection.SetShowType(FailInfoShowType.look_later);
+                    LikeOrLookLaterFailInfoCollection.SetShowType(FailInfoShowType.look_later);
                 }
-                FailGridView.ItemsSource = LikeOrLookLater_failInfocollection;
+                FailGridView.ItemsSource = LikeOrLookLaterFailInfoCollection;
 
                 isShowAllFail = false;
 
@@ -1238,7 +1224,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             if (FailInfoSuggestBox.Visibility == Visibility.Collapsed) FailInfoSuggestBox.Visibility = Visibility.Visible;
 
         }
-        else if (!isShowAllFail)
+        else
         {
             //排列按钮
             if (OrderButton.Visibility == Visibility.Visible) OrderButton.Visibility = Visibility.Collapsed;
@@ -1258,13 +1244,13 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         if (item.DataContext is not Datum datum) return;
 
-        string pickCode = datum.PickCode;
+        var pickCode = datum.PickCode;
 
-        var failInfo = await DataAccess.LoadSingleFailInfo(pickCode);
+        var failInfo = DataAccess.LoadSingleFailInfo(pickCode);
 
         if (failInfo == null)
         {
-            DataAccess.AddOrReplaceFailList_Islike_Looklater(new()
+            DataAccess.AddOrReplaceFailList_IsLike_LookLater(new FailInfo
             {
                 PickCode = pickCode,
                 IsLike = 1
@@ -1294,13 +1280,13 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         if (item.DataContext is not Datum datum) return;
 
-        string pickCode = datum.PickCode;
+        var pickCode = datum.PickCode;
 
-        var failInfo = await DataAccess.LoadSingleFailInfo(pickCode);
+        var failInfo = DataAccess.LoadSingleFailInfo(pickCode);
 
         if (failInfo == null)
         {
-            DataAccess.AddOrReplaceFailList_Islike_Looklater(new()
+            DataAccess.AddOrReplaceFailList_IsLike_LookLater(new()
             {
                 PickCode = pickCode,
                 LookLater = 1

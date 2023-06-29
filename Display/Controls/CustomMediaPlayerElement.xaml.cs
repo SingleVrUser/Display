@@ -275,7 +275,7 @@ public sealed partial class CustomMediaPlayerElement
         // 先判断是否为成功，后判断是否为失败
         if(videoInfo == null)
         {
-            var failInfo = await playItem.GetFailInfo();
+            var failInfo = playItem.GetFailInfo();
 
             if (failInfo == null)
             {
@@ -465,12 +465,12 @@ public sealed partial class CustomMediaPlayerElement
         {
             Debug.WriteLine($"数据库不存在该数据:{trueName}");
 
-            var failInfo = await playItem.GetFailInfo();
+            var failInfo = playItem.GetFailInfo();
 
             if (failInfo == null)
             {
                 var capPath = await ScreenShotAsync(pickCode);
-                DataAccess.AddOrReplaceFailList_Islike_Looklater(new()
+                DataAccess.AddOrReplaceFailList_IsLike_LookLater(new()
                 {
                     PickCode = pickCode,
                     IsLike = IsLike,
@@ -521,12 +521,12 @@ public sealed partial class CustomMediaPlayerElement
             if (LookLater != 0) ShowTeachingTip("已添加进稍后观看");
         }else
         {
-            var failInfo = await playItem.GetFailInfo();
+            var failInfo = playItem.GetFailInfo();
 
             if (failInfo == null)
             {
                 var capPath = await ScreenShotAsync(pickCode);
-                DataAccess.AddOrReplaceFailList_Islike_Looklater(new()
+                DataAccess.AddOrReplaceFailList_IsLike_LookLater(new()
                 {
                     PickCode = pickCode,
                     LookLater = LookLater,
@@ -561,13 +561,13 @@ public sealed partial class CustomMediaPlayerElement
         var playItem = _allMediaPlayItems[(int)_playIndex];
         var pickCode = playItem.PickCode;
 
-        var failInfo = await DataAccess.LoadSingleFailInfo(pickCode);
+        var failInfo = DataAccess.LoadSingleFailInfo(pickCode);
 
         var capPath = await ScreenShotAsync(pickCode);
 
         if (failInfo == null)
         {
-            DataAccess.AddOrReplaceFailList_Islike_Looklater(new FailInfo
+            DataAccess.AddOrReplaceFailList_IsLike_LookLater(new FailInfo
             {
                 PickCode = pickCode,
                 ImagePath = capPath

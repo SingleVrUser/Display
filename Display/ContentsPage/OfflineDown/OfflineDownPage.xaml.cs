@@ -142,9 +142,7 @@ namespace Display.ContentsPage.OfflineDown
                     break;
                 // 单个torrent
                 case 1:
-                    isSucceed = await WebApi.GlobalWebApi.CreateTorrentOfflineDown(downPath.file_id, rarItems.First().Path);
-                    content = isSucceed ? "添加torrent任务成功" : "添加torrent任务失败";
-
+                    (isSucceed,content) = await WebApi.GlobalWebApi.CreateTorrentOfflineDown(downPath.file_id, rarItems.First().Path);
                     break;
                 // 多个
                 default:
@@ -158,7 +156,10 @@ namespace Display.ContentsPage.OfflineDown
 
                         ShowTeachingTip($"添加torrent任务中：{i}/{length}" + (failCount > 0 ? "，失败数:{failCount}" : string.Empty));
 
-                        if (!await WebApi.GlobalWebApi.CreateTorrentOfflineDown(downPath.file_id, file.Path)) failCount++;
+                        var (isCurrentSucceed, _)= await WebApi.GlobalWebApi.CreateTorrentOfflineDown(
+                            downPath.file_id, file.Path);
+                                
+                        if (!isCurrentSucceed) failCount++;
                     }
 
                     isSucceed = length != failCount;

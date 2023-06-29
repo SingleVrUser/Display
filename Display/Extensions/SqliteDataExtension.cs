@@ -1,29 +1,20 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using Display.Data;
+using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using Display.Data;
-using System.Xml.Linq;
-using ABI.Windows.Devices.Printers;
+using System.Runtime.CompilerServices;
 
 namespace Display.Extensions
 {
     internal static class SQLiteDataExtension
     {
-        /// <summary>
-        /// 获取key对应类型的值，key必须与Filed名称一致
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="reader"></param>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        private static T GetNullableFieldValue<T>(this SqliteDataReader reader, string key)
+        public static T GetNullableAndStructValue<T>(this object obj)
         {
-            var obj = reader[key];
+            if (obj == null)
+                return default;
+
             var stringFormat = obj.ToString();
 
             var type = typeof(T);
@@ -37,7 +28,7 @@ namespace Display.Extensions
             {
                 return default;
             }
-            
+
             var trueType = nullable ? underlyingType : type;
 
             object finalValue = null;
@@ -60,10 +51,33 @@ namespace Display.Extensions
 
             return (T)finalValue;
 
-            //// 不可靠, 结果为空时异常
-            //var stringFormat = reader.GetString(key);
-            //// 同上
-            //return reader.GetFieldValue<T>(key);
+        }
+
+        /// <summary>
+        /// 获取key对应类型的值，key必须与Filed名称一致
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="reader"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private static T GetNullableFieldValue<T>(this SqliteDataReader reader, string key)
+        {
+            var obj = reader[key];
+
+            return obj.GetNullableAndStructValue<T>();
+        }
+
+        /// <summary>
+        /// 获取reader对应的值，用于Filed只有一个的时候
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public static T GetNullableFieldValue<T>(this SqliteDataReader reader)
+        {
+            var obj = reader.GetValue(0);
+
+            return obj.GetNullableAndStructValue<T>();
         }
 
         /// <summary>
@@ -78,7 +92,7 @@ namespace Display.Extensions
             foreach (var propertyInfo in data.GetType().GetProperties())
             {
                 // 获取属性对应表字段的名称
-                var name = propertyInfo.Name;
+                //var name = propertyInfo.Name;
                 var attrs = propertyInfo.GetCustomAttributes().OfType<JsonPropertyAttribute>().ToArray();
 
                 if (attrs.Length == 0 || attrs.First().PropertyName is null) continue;
@@ -111,6 +125,11 @@ namespace Display.Extensions
                     propertyInfo.SetValue(data, reader.Export<Datum>());
                 }
             }
+
+            ////// 不可靠, 结果为空时异常
+            //var stringFormat = reader.GetString(key);
+            ////// 同上
+            //return reader.GetFieldValue<T>(key);
 
             return data;
         }

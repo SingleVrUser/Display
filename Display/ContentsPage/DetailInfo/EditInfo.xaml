@@ -38,17 +38,17 @@
                       x:DataType="data:ActorInfo">
             <StackPanel Orientation="Horizontal">
                 <Border CornerRadius="9999"
-                        Background="{x:Bind name, Converter={StaticResource NameToColorConverter}}"
+                        Background="{x:Bind Name, Converter={StaticResource NameToColorConverter}}"
                         Width="20"
                         Height="20">
-                    <TextBlock Text="{x:Bind initials}"
+                    <TextBlock Text="{x:Bind Initials}"
                                Foreground="White"
                                FontSize="10"
                                FontWeight="Semibold"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center" />
                 </Border>
-                <TextBlock Text="{x:Bind name}"
+                <TextBlock Text="{x:Bind Name}"
                            Padding="4,0,0,0" />
             </StackPanel>
         </DataTemplate>

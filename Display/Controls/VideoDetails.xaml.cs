@@ -63,7 +63,7 @@ namespace Display.Controls
                 var actor = actorList[i];
                 var actorImageControl = new Controls.ActorImage(actor, resultinfo.releasetime);
 
-                if (!string.IsNullOrEmpty(actor.name))
+                if (!string.IsNullOrEmpty(actor.Name))
                     actorImageControl.Click += ActorButtonOnClick;
 
                 ActorStackPanel.Children.Insert(i, actorImageControl);
@@ -99,22 +99,22 @@ namespace Display.Controls
 
             //缩略图
             //检查缩略图是否存在
-            List<string> ThumbnailList = new();
+            List<string> thumbnailList = new();
 
             //来源为本地
             if (AppSettings.ThumbnailOrigin == (int)Const.Origin.Local)
             {
-                string folderFullName = Path.Combine(AppSettings.ImageSavePath, resultinfo.truename);
-                DirectoryInfo TheFolder = new DirectoryInfo(folderFullName);
+                var folderFullName = Path.Combine(AppSettings.ImageSavePath, resultinfo.truename);
+                var theFolder = new DirectoryInfo(folderFullName);
 
-                if (TheFolder.Exists)
+                if (theFolder.Exists)
                 {
                     //文件
-                    foreach (FileInfo NextFile in TheFolder.GetFiles())
+                    foreach (var nextFile in theFolder.GetFiles())
                     {
-                        if (NextFile.Name.Contains("Thumbnail_"))
+                        if (nextFile.Name.Contains("Thumbnail_"))
                         {
-                            ThumbnailList.Add(NextFile.FullName);
+                            thumbnailList.Add(nextFile.FullName);
                         }
                     }
                 }
@@ -128,14 +128,14 @@ namespace Display.Controls
                 var sampleImageListStr = videoInfo?.sampleImageList;
                 if (!string.IsNullOrEmpty(sampleImageListStr))
                 {
-                    ThumbnailList = sampleImageListStr.Split(",").ToList();
+                    thumbnailList = sampleImageListStr.Split(",").ToList();
                 }
             }
 
-            if (ThumbnailList.Count > 0)
+            if (thumbnailList.Count > 0)
             {
-                ThumbnailList = ThumbnailList.OrderByNatural(emp => emp.ToString()).ToList();
-                ThumbnailGridView.ItemsSource = ThumbnailList;
+                thumbnailList = thumbnailList.OrderByNatural(emp => emp.ToString()).ToList();
+                ThumbnailGridView.ItemsSource = thumbnailList;
                 ThumbnailStackPanel.Visibility = Visibility;
             }
 

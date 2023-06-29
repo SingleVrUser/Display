@@ -13,7 +13,7 @@ public class MatchHelper
 
     public static string GetSameFirstStringFromList(IReadOnlyCollection<string> list)
     {
-        var sameContent = string.Empty;
+        string sameContent = null;
 
         if (!list.Any()) return string.Empty;
 
@@ -28,7 +28,7 @@ public class MatchHelper
         {
             if (!isSame)
             {
-                sameContent = string.Empty;
+                sameContent = null;
             }
             var tmp = sameContent + c;
 
@@ -38,7 +38,7 @@ public class MatchHelper
             {
                 sameContent = tmp;
             }
-            else
+            else if(!string.IsNullOrEmpty(sameContent))
             {
                 matchList.Add(sameContent);
             }

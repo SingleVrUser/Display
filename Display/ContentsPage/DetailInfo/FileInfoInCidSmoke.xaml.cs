@@ -30,7 +30,7 @@ namespace Display.ContentsPage.DetailInfo
 
         private async void PageLoad(object sender, RoutedEventArgs e)
         {
-            var videoInfos = await DataAccess.FindFileInfoByTrueName(trueName);
+            var videoInfos = await DataAccess.FindFileInfoByTrueName(trueName, null);
 
             InfosListView.ItemsSource = videoInfos;
         }

@@ -101,7 +101,7 @@ namespace Display.Views
 
         private void GoToActorInfo(ActorInfo actorinfo)
         {
-            Tuple<List<string>, string, bool> TypeAndName = new(new() { "actor" }, actorinfo.name, false);
+            Tuple<List<string>, string, bool> TypeAndName = new(new() { "actor" }, actorinfo.Name, false);
             Frame.Navigate(typeof(ActorInfoPage), TypeAndName);
         }
 
@@ -291,7 +291,7 @@ namespace Display.Views
                 var info = infos[i];
 
                 //有数据说明已经搜索过了
-                if (!string.IsNullOrEmpty(info.bwh))
+                if (!string.IsNullOrEmpty(info.Bwh))
                 {
                     System.Diagnostics.Debug.WriteLine($"{i} 已经搜索过了");
                     await Notifications.ToastGetActorInfoWithProgressBar.AddValue(i + 1, allCount);
@@ -312,7 +312,7 @@ namespace Display.Views
 
         public static async Task<ActorInfo> GetActorInfo(ActorInfo info)
         {
-            var actorName = info.name;
+            var actorName = info.Name;
 
             //跳过无效名称
             if (string.IsNullOrEmpty(actorName)) return null;
@@ -324,13 +324,13 @@ namespace Display.Views
             var actorinfo = await GetActorInfoFromNetwork.SearchInfoFromMinnanoAv(actorName);
             if (actorinfo == null) return null;
 
-            var actorId = DataAccess.GetActorIdByName(actorName);
+            var actorId = DataAccess.CheckIdInActor_Names(actorName);
             if (actorId == -1) return null;
 
             DataAccess.UpdateActorInfo(actorId, actorinfo);
 
             //获取到的信息有头像
-            if (!string.IsNullOrEmpty(actorinfo.image_url))
+            if (!string.IsNullOrEmpty(actorinfo.ImageUrl))
             {
                 //查询本地数据库中的数据
                 var actorInfos = await DataAccess.LoadActorInfo(1, filterList: new List<string> { $"id == '{actorId}'" });
@@ -340,27 +340,27 @@ namespace Display.Views
                     var oldActorInfo = actorInfos.FirstOrDefault();
 
                     //数据库中无头像
-                    if (oldActorInfo.prifile_path == Const.Common.NoPicturePath)
+                    if (oldActorInfo.ProfilePath == Const.Common.NoPicturePath)
                     {
                         string filePath = Path.Combine(AppSettings.ActorInfoSavePath, actorName);
 
-                        Uri infoUri = new(actorinfo.info_url);
+                        Uri infoUri = new(actorinfo.InfoUrl);
 
-                        var prifilePath = await GetInfoFromNetwork.DownloadFile(actorinfo.image_url, filePath, "face", headers: new()
+                        var prifilePath = await GetInfoFromNetwork.DownloadFile(actorinfo.ImageUrl, filePath, "face", headers: new()
                         {
                             {"Host",infoUri.Host },
-                            {"Referer", actorinfo.info_url }
+                            {"Referer", actorinfo.InfoUrl }
                         });
 
                         //更新头像
-                        DataAccess.UpdateActorInfoPrifilePath(actorId, prifilePath);
+                        DataAccess.UpdateActorInfoProfilePath(actorId, prifilePath);
 
-                        actorinfo.prifile_path = prifilePath;
+                        actorinfo.ProfilePath = prifilePath;
                     }
                     //数据库中有头像
                     else
                     {
-                        actorinfo.prifile_path = oldActorInfo.prifile_path;
+                        actorinfo.ProfilePath = oldActorInfo.ProfilePath;
                     }
 
                 }
@@ -369,18 +369,18 @@ namespace Display.Views
 
             //更新别名
             //别名
-            if (actorinfo.otherNames != null && actorinfo.otherNames.Count > 0)
+            if (actorinfo.OtherNames != null && actorinfo.OtherNames.Count > 0)
             {
-                foreach (var otherName in actorinfo.otherNames)
+                foreach (var otherName in actorinfo.OtherNames)
                 {
                     DataAccess.AddOrIgnoreActor_Names(actorId, otherName);
                 }
             }
 
             //更新bwh
-            if (!string.IsNullOrEmpty(actorinfo.bwh))
+            if (!string.IsNullOrEmpty(actorinfo.Bwh))
             {
-                DataAccess.AddOrIgnoreBwh(actorinfo.bwh, actorinfo.bust, actorinfo.waist, actorinfo.hips);
+                DataAccess.AddOrIgnoreBwh(actorinfo.Bwh, actorinfo.Bust, actorinfo.Waist, actorinfo.Hips);
             }
 
             return actorinfo;

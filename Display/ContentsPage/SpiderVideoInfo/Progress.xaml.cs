@@ -485,7 +485,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             {
                 if (item.SpiderSource == Models.SpiderInfo.SpiderSourceName.Local) continue;
 
-                tasks.Add(Task.Run(() => CreadSpiderTask(item.SpiderSource, progress)));
+                tasks.Add(Task.Run(() => CreateSpiderTask(item.SpiderSource, progress)));
             }
 
             //等待任务完成
@@ -514,10 +514,8 @@ namespace Display.ContentsPage.SpiderVideoInfo
         /// </summary>
         /// <param Name="spiderSourceName"></param>
         /// <returns></returns>
-        private async Task CreadSpiderTask(Models.SpiderInfo.SpiderSourceName spiderSourceName, IProgress<SpiderInfo> progress)
+        private async Task CreateSpiderTask(Models.SpiderInfo.SpiderSourceName spiderSourceName, IProgress<SpiderInfo> progress)
         {
-            string name = null;
-            VideoInfo resultInfo;
             Manager.SpiderSource spiderSource = new(spiderSourceName);
 
             var spiderManager = Manager.Current;
@@ -525,13 +523,14 @@ namespace Display.ContentsPage.SpiderVideoInfo
             SpiderInfo currentSpiderInfo;
             while (true)
             {
-                resultInfo = null;
+                VideoInfo resultInfo = null;
                 if (s_cts.IsCancellationRequested) return;
 
+                string name = null;
                 lock (myLock)
                 {
                     //查询待搜刮的name
-                    name = DataAccess.GetOneSpiderTask(spiderSource);
+                    name = DataAccess.GetOneSpiderTask(spiderSource,null);
 
                     if (!string.IsNullOrEmpty(name))
                     {
@@ -544,12 +543,14 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
                 if (string.IsNullOrEmpty(name))
                 {
-                    currentSpiderInfo = new(spiderSourceName, name);
-                    currentSpiderInfo.State = SpiderStates.doing;
-                    currentSpiderInfo.Message = "等待分配任务";
+                    currentSpiderInfo = new(spiderSourceName, name)
+                    {
+                        State = SpiderStates.doing,
+                        Message = "等待分配任务"
+                    };
                     progress.Report(currentSpiderInfo);
 
-                    bool isExistCurrentSpiderTask = true;
+                    var isExistCurrentSpiderTask = true;
 
                     //循环查询，最多100次
                     for (int i = 0; i < 100; i++)
@@ -569,7 +570,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                             lock (myLock)
                             {
                                 //再次查询待搜刮的name
-                                name = DataAccess.GetOneSpiderTask(spiderSource);
+                                name = DataAccess.GetOneSpiderTask(spiderSource, null);
                             }
 
                             //查询到了，退出循环，开始任务
@@ -592,7 +593,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 var result = DataAccess.SelectTrueName(name);
 
                 //如果数据库已存在该数据，直接从数据库中读取
-                if (result.Count != 0)
+                if (result.Length != 0)
                 {
                     currentSpiderInfo = new(Models.SpiderInfo.SpiderSourceName.Local, name);
                     currentSpiderInfo.State = SpiderStates.doing;
@@ -628,8 +629,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     await GetInfoFromNetwork.RandomTimeDelay(spiderSource.DelayRanges.Item1, spiderSource.DelayRanges.Item2);
 
                     // 添加搜刮信息到数据库（只有从搜刮源查找到的才添加）
-                    if (resultInfo != null)
-                        DataAccess.AddVideoInfo(resultInfo);
+                    if (resultInfo != null) await DataAccess.AddVideoInfo_ActorInfo_IsWmAsync(resultInfo);
 
                 }
 

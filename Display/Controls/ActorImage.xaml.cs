@@ -27,10 +27,10 @@ namespace Display.Controls
             this.releaseTime = releaseTime;
 
             //是否可点击
-            if (string.IsNullOrEmpty(actorInfo.name)) return;
+            if (string.IsNullOrEmpty(actorInfo.Name)) return;
 
             //是否喜欢
-            if (actorInfo.is_like == 1)
+            if (actorInfo.IsLike == 1)
             {
                 LikeFontIcon.Visibility = Visibility.Visible;
             }
@@ -44,7 +44,7 @@ namespace Display.Controls
             RootGrid.PointerExited += Grid_PointerExited;
 
             //显示作品时年龄
-            tryShowActorAge(actorInfo.birthday);
+            tryShowActorAge(actorInfo.Birthday);
         }
 
         private void tryShowActorAge(string birthday)
@@ -92,7 +92,7 @@ namespace Display.Controls
                     break;
             }
 
-            DataAccess.UpdateSingleDataFromActorInfo(ActorInfo.id.ToString(), "is_like", is_like.ToString());
+            DataAccess.UpdateSingleDataFromActorInfo(ActorInfo.Id.ToString(), "is_like", is_like.ToString());
         }
 
         private async void GetInfoMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
@@ -107,13 +107,13 @@ namespace Display.Controls
             }
 
             //更新头像
-            if (!string.IsNullOrEmpty(newInfo.prifile_path))
+            if (!string.IsNullOrEmpty(newInfo.ProfilePath))
             {
-                ActorInfo.prifile_path = newInfo.prifile_path;
+                ActorInfo.ProfilePath = newInfo.ProfilePath;
             }
 
             //更新年龄
-            tryShowActorAge(newInfo.birthday);
+            tryShowActorAge(newInfo.Birthday);
 
             GetActorInfoProgressRing.Visibility = Visibility.Collapsed;
         }
