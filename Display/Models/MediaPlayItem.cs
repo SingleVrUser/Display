@@ -22,9 +22,9 @@ namespace Display.Models
 
         private FailInfo _failInfo;
 
-        public async Task<FailInfo> GetFailInfo()
+        public FailInfo GetFailInfo()
         {
-            return _failInfo ??= await DataAccess.LoadSingleFailInfo(PickCode);
+            return _failInfo ??= DataAccess.LoadSingleFailInfo(PickCode);
         }
 
         private VideoInfo _videoInfo;

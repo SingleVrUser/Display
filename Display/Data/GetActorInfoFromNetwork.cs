@@ -18,12 +18,12 @@ public class GetActorInfoFromNetwork
 
         var client = GetInfoFromNetwork.CommonClient;
 
-        ActorInfo actorInfo = new() { name = name };
+        ActorInfo actorInfo = new() { Name = name };
 
         Tuple<string, string> result = await RequestHelper.RequestHtml(client, url);
         if (result == null) return null;
 
-        actorInfo.info_url = result.Item1;
+        actorInfo.InfoUrl = result.Item1;
 
         string htmlString = result.Item2;
 
@@ -60,34 +60,34 @@ public class GetActorInfoFromNetwork
                     if (match.Success)
                     {
                         Console.WriteLine($"生年月日：{match.Groups[0].Value}");
-                        actorInfo.birthday = match.Groups[0].Value;
+                        actorInfo.Birthday = match.Groups[0].Value;
                     }
                     break;
                 case "サイズ":
                     match = Regex.Match(value, @"T(\d*) / B(\d*).* / W(\d*) / H(\d*)");
                     if (match.Success)
                     {
-                        actorInfo.height = string.IsNullOrEmpty(match.Groups[1].Value) ? 0 : Convert.ToInt32(match.Groups[1].Value);
-                        actorInfo.bust = string.IsNullOrEmpty(match.Groups[2].Value) ? 0 : Convert.ToInt32(match.Groups[2].Value);
-                        actorInfo.waist = string.IsNullOrEmpty(match.Groups[3].Value) ? 0 : Convert.ToInt32(match.Groups[3].Value);
-                        actorInfo.hips = string.IsNullOrEmpty(match.Groups[4].Value) ? 0 : Convert.ToInt32(match.Groups[4].Value);
+                        actorInfo.Height = string.IsNullOrEmpty(match.Groups[1].Value) ? 0 : Convert.ToInt32(match.Groups[1].Value);
+                        actorInfo.Bust = string.IsNullOrEmpty(match.Groups[2].Value) ? 0 : Convert.ToInt32(match.Groups[2].Value);
+                        actorInfo.Waist = string.IsNullOrEmpty(match.Groups[3].Value) ? 0 : Convert.ToInt32(match.Groups[3].Value);
+                        actorInfo.Hips = string.IsNullOrEmpty(match.Groups[4].Value) ? 0 : Convert.ToInt32(match.Groups[4].Value);
 
-                        actorInfo.bwh = $"{actorInfo.bust}_{actorInfo.waist}_{actorInfo.hips}";
+                        actorInfo.Bwh = $"{actorInfo.Bust}_{actorInfo.Waist}_{actorInfo.Hips}";
                     }
                     break;
                 case "AV出演期間":
                     Console.WriteLine($"出演时间：{value}");
-                    actorInfo.work_time = value;
+                    actorInfo.WorkTime = value;
                     break;
                 case "ブログ":
                     Console.WriteLine($"博客：{value}");
-                    actorInfo.blog_url = value;
+                    actorInfo.BlogUrl = value;
                     break;
             }
         }
 
         Console.WriteLine($"別名：{string.Join(",", otherNames)}");
-        actorInfo.otherNames = otherNames;
+        actorInfo.OtherNames = otherNames;
 
         var thumNode = htmlDoc.DocumentNode.SelectSingleNode("/html/body/section/section/section/div[@class='act-area']/div[@class='thumb']/img");
         if (thumNode != null)
@@ -98,7 +98,7 @@ public class GetActorInfoFromNetwork
 
             if (!string.IsNullOrEmpty(img_url))
             {
-                actorInfo.image_url = $"{AppSettings.MinnanoAvBaseUrl}{img_url}";
+                actorInfo.ImageUrl = $"{AppSettings.MinnanoAvBaseUrl}{img_url}";
             }
         }
 

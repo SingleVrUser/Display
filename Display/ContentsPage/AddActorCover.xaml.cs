@@ -87,7 +87,7 @@ namespace Display.ContentsPage
                 isCheckGit = false;
             }
 
-            var imageUrlList = GetImageUrlListFromFileTreeAsync(actorInfo.name, filePath: filePath);
+            var imageUrlList = GetImageUrlListFromFileTreeAsync(actorInfo.Name, filePath: filePath);
 
             ShowImageList.Clear();
 
@@ -96,7 +96,7 @@ namespace Display.ContentsPage
                 ShowImageList.Add(imagePath);
             }
 
-            ShoeActorName.Text = actorInfo?.name;
+            ShoeActorName.Text = actorInfo?.Name;
             SmokeGrid.Visibility = Visibility.Visible;
 
             animation?.TryStart(destinationElement);
@@ -172,12 +172,12 @@ namespace Display.ContentsPage
 
                 if (item.Status == Status.Error)
                 {
-                    failList.Add(item.name);
+                    failList.Add(item.Name);
                 }
 
                 if (!IsNullOrEmpty(info.ImagePath))
                 {
-                    item.prifile_path = info.ImagePath;
+                    item.ProfilePath = info.ImagePath;
                 }
 
                 //完成
@@ -226,7 +226,7 @@ namespace Display.ContentsPage
                 var item = actorInfos[i];
 
                 //演员名
-                var actorName = item.name;
+                var actorName = item.Name;
 
                 if (actorName.Contains("?")) continue;
 
@@ -265,11 +265,11 @@ namespace Display.ContentsPage
                 progressInfo.Status = Status.BeforeStart;
                 progress.Report(progressInfo);
 
-                var actorId = DataAccess.GetActorIdByName(actorName);
+                var actorId = DataAccess.CheckIdInActor_Names(actorName);
                 if (actorId != -1)
                 {
                     //更新数据库
-                    DataAccess.UpdateActorInfoPrifilePath(actorId, imageSavePath);
+                    DataAccess.UpdateActorInfoProfilePath(actorId, imageSavePath);
                 }
             }
 
@@ -556,7 +556,7 @@ namespace Display.ContentsPage
                 item.Status = Status.Doing;
 
                 //演员名
-                var actorName = item.name;
+                var actorName = item.Name;
 
                 progress_TextBlock.Text = $"{actorName} - 获取演员参演的视频";
                 //获取演员参演的视频
@@ -639,7 +639,7 @@ namespace Display.ContentsPage
                 var imagePath = Path.Combine(savePath, $"{imageName}.jpg");
                 if (File.Exists(imagePath))
                 {
-                    item.prifile_path = imagePath;
+                    item.ProfilePath = imagePath;
                     progress_TextBlock.Text = $"{actorName} - 头像已存在，跳过";
 
                 }
@@ -651,12 +651,12 @@ namespace Display.ContentsPage
 
                     if (!IsNullOrEmpty(progressInfo.imagePath))
                     {
-                        item.prifile_path = progressInfo.imagePath;
+                        item.ProfilePath = progressInfo.imagePath;
 
                         //最后一次report的就是目标信息
                         var face = progressInfo.faceList[progressInfo.faceList.Count - 1];
-                        item.genderInfo = $"{face.gender.result}（{face.gender.confidence:0.00}）";
-                        item.ageInfo = $"{face.age.result}（{face.age.confidence:0.00}）";
+                        item.GenderInfo = $"{face.gender.result}（{face.gender.confidence:0.00}）";
+                        item.AgeInfo = $"{face.age.result}（{face.age.confidence:0.00}）";
                     }
                 }
 
@@ -863,9 +863,9 @@ namespace Display.ContentsPage
 
             foreach (var item in actorinfo)
             {
-                if (item.name == actorName)
+                if (item.Name == actorName)
                 {
-                    item.prifile_path = imageUrl;
+                    item.ProfilePath = imageUrl;
                     break;
                 }
             }

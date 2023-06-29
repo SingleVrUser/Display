@@ -47,7 +47,7 @@ public sealed partial class EditInfo : Page
         categories.ForEach(item => category_items.Add(item));
 
         actor_items = new();
-        var old_actors = videoInfo.actor.Split(",").Where(item => !string.IsNullOrEmpty(item)).Select(x => new ActorInfo() { name = x }).ToList();
+        var old_actors = videoInfo.actor.Split(",").Where(item => !string.IsNullOrEmpty(item)).Select(x => new ActorInfo() { Name = x }).ToList();
         old_actors.ForEach(item => actor_items.Add(item));
 
         category_suggestion = new(categories, false);
@@ -125,12 +125,12 @@ public sealed partial class EditInfo : Page
     private void Actor_TokenItemAdding(TokenizingTextBox sender, TokenItemAddingEventArgs args)
     {
         // Take the user's text and convert it to our data type (if we have a matching one).
-        args.Item = actors_suggestion.FirstOrDefault((item) => item.name.Contains(args.TokenText, System.StringComparison.CurrentCultureIgnoreCase));
+        args.Item = actors_suggestion.FirstOrDefault((item) => item.Name.Contains(args.TokenText, System.StringComparison.CurrentCultureIgnoreCase));
 
         // Otherwise, create a new version of our data type
         if (args.Item == null)
         {
-            args.Item = new ActorInfo() { name = args.TokenText };
+            args.Item = new ActorInfo() { Name = args.TokenText };
         }
     }
 
@@ -175,7 +175,7 @@ public sealed partial class EditInfo : Page
                         info.category = string.Join(",", category_items.Select(item => item.Name));
                         break;
                     case "演员":
-                        info.actor = string.Join(",", actor_items.Select(item => item.name));
+                        info.actor = string.Join(",", actor_items.Select(item => item.Name));
                         break;
                 }
             }

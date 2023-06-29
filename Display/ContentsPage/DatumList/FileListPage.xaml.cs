@@ -5,8 +5,10 @@ using ByteSizeLib;
 using Display.Data;
 using Display.Helper;
 using Display.Models;
+using Display.ViewModels;
 using Display.Views;
 using Microsoft.UI;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -18,16 +20,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
-using Microsoft.UI.Dispatching;
 using Windows.Storage;
-using Display.ViewModels;
-using Display.Services.Upload;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -40,7 +38,13 @@ namespace Display.ContentsPage.DatumList;
 public sealed partial class FileListPage : INotifyPropertyChanged
 {
     private ObservableCollection<ExplorerItem> _units;
+    private static readonly ExplorerItem _rootExplorerItem = new()
+    {
+        Name = "根目录",
+        Id = 0
+    };  
     private ExplorerItem CurrentExplorerItem => _units.LastOrDefault();
+    private ExplorerItem LastExplorerItem => _units.Count<=1 ? _rootExplorerItem : _units[^2];
 
     private IncrementalLoadDatumCollection _filesInfos;
     private IncrementalLoadDatumCollection FilesInfos
@@ -58,7 +62,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     private WebApi _webApi;
 
     private WebApi WebApi => _webApi ??= WebApi.GlobalWebApi;
-
+    
     /// <summary>
     /// 中转站文件
     /// </summary>
@@ -71,7 +75,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         List<ExplorerItem> unit;
         if (cid == 0)
         {
-            unit = new List<ExplorerItem> { new() { Name = "根目录", Id = 0 } };
+            unit = new List<ExplorerItem> { _rootExplorerItem };
 
         }
         else
@@ -497,7 +501,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         // 从115中删除
         await WebApi.DeleteFiles((long)cid,
-            sourceFilesInfos.Where(item=>item.Id!=null).Select(item => (long)item.Id).ToArray());
+            sourceFilesInfos.Where(item => item.Id != null).Select(item => (long)item.Id).ToArray());
 
     }
 
@@ -577,16 +581,18 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
         else
         {
-            var item = FilesInfos[index];
+            var folderInfo = FilesInfos[index];
 
             //目标与移动文件有重合，退出
-            if (sourceFilesInfos.Contains(item))
+            if (sourceFilesInfos.Contains(folderInfo))
             {
                 Debug.WriteLine("目标与移动文件有重合，退出");
                 return;
             }
 
-            await Move115Files(item.Cid, sourceFilesInfos);
+            if (folderInfo.Id == null) return;
+
+            await Move115Files((long)folderInfo.Id, sourceFilesInfos);
         }
     }
 
@@ -622,7 +628,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     private async Task Move115Files(long cid, List<FilesInfo> files)
     {
         await WebApi.MoveFiles(cid, files.Select(item => item.Id).ToArray());
-            
+
         // 从中转站列表中删除已经移动的文件
         TryRemoveTransferFiles(files);
     }
@@ -966,7 +972,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
                 info
             };
 
-
         }
         else
         {
@@ -1019,7 +1024,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         // 更新UI
         // 新建文件夹
-        FilesInfos.Insert(0, new FilesInfo(new Datum() { Cid = makeDirResult.cid, Name = makeDirResult.cname }));
+        FilesInfos.Insert(0, new FilesInfo(new Datum { Cid = makeDirResult.cid, Name = makeDirResult.cname , Pid = LastExplorerItem.Id, TimeEdit = (int)DateTimeOffset.Now.ToUnixTimeSeconds()}));
 
         // 删除文件
         TryRemoveFilesInExplorer(fileInfos);

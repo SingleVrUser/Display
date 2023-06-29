@@ -41,10 +41,10 @@
                Stretch="UniformToFill"
                HorizontalAlignment="Center"
                VerticalAlignment="Center"
-               Source="{x:Bind ActorInfo.prifile_path,Mode=OneWay}"/>
+               Source="{x:Bind ActorInfo.ProfilePath,Mode=OneWay}"/>
 
-        <FontIcon 
-            x:Name="LikeFontIcon"
+        <FontIcon
+            Grid.Row="0" x:Name="LikeFontIcon"
             Visibility="Collapsed"
             FontFamily="Segoe Fluent Icons"
                   Glyph="&#xE00B;"
@@ -58,9 +58,9 @@
                    HorizontalAlignment="Center"
                    Margin="5"
                    Grid.Row="1"
-                   Text="{x:Bind ActorInfo.name}" TextTrimming="CharacterEllipsis" IsTextSelectionEnabled="True"/>
+                   Text="{x:Bind ActorInfo.Name}" TextTrimming="CharacterEllipsis" IsTextSelectionEnabled="True"/>
 
-        <Border Background="{StaticResource AngleMarkBackground}" VerticalAlignment="Top" HorizontalAlignment="Right" CornerRadius="8"
+        <Border Grid.Row="0" Background="{StaticResource AngleMarkBackground}" VerticalAlignment="Top" HorizontalAlignment="Right" CornerRadius="8"
                 Padding="2,0"
                 Margin="5"
                 Visibility="{x:Bind WorkYearDiff_TextBlock.Visibility}">
@@ -76,6 +76,6 @@
                 ToolTipService.ToolTip="出演时的年龄"/>
         </Border>
 
-        <ProgressRing x:Name="GetActorInfoProgressRing" Visibility="Collapsed"/>
+        <ProgressRing Grid.Row="0" x:Name="GetActorInfoProgressRing" Visibility="Collapsed"/>
     </Grid>
 </UserControl>

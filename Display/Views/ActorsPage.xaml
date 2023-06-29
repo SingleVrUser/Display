@@ -105,12 +105,12 @@
                             <DataTemplate x:DataType="data:ActorInfo">
                                 <Image Width="300"
                                        Height="240"
-                                       Source="{x:Bind prifile_path}"
+                                       Source="{x:Bind ProfilePath}"
                                        Stretch="Uniform"
                                        Tapped="Image_Tapped"
                                        PointerEntered="Img_PointerEntered"
                                        PointerExited="Img_PointerExited"
-                                       ToolTipService.ToolTip="{x:Bind name}" />
+                                       ToolTipService.ToolTip="{x:Bind Name}" />
                             </DataTemplate>
                         </controls:Carousel.ItemTemplate>
                     </controls:Carousel>
@@ -132,7 +132,7 @@
                         </Grid.RowDefinitions>
 
                         <controls:ImageEx x:Name="ActorImage"
-                                          Source="{x:Bind prifile_path}"
+                                          Source="{x:Bind ProfilePath}"
                                           PlaceholderStretch="Uniform"
                                           CornerRadius="5"
                                           DecodePixelWidth="140"
@@ -145,15 +145,15 @@
                                   FontSize="30"
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Top"
-                                  Visibility="{x:Bind data:FileMatch.isShowLikeIcon(is_like),Mode=OneWay}" />
+                                  Visibility="{x:Bind data:FileMatch.isShowLikeIcon(IsLike),Mode=OneWay}" />
 
                         <RelativePanel Grid.Row="1">
-                            <TextBlock Text="{x:Bind name}"
+                            <TextBlock Text="{x:Bind Name}"
                                        RelativePanel.AlignVerticalCenterWithPanel="True"
                                        IsTextSelectionEnabled="True"
                                        TextWrapping="Wrap"
                                        FontFamily="霞鹜文楷" />
-                            <TextBlock Text="{x:Bind video_count}"
+                            <TextBlock Text="{x:Bind VideoCount}"
                                        RelativePanel.AlignRightWithPanel="True"
                                        RelativePanel.AlignBottomWithPanel="True"
                                        FontFamily="JetBrains Mono"

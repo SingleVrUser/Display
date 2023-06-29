@@ -132,7 +132,7 @@ namespace Display.Data
     public class StoreDatum
     {
         public long Cid { get; set; }
-        public List<Datum> DatumList { get; set; }
+        public Datum[] DatumList { get; set; }
     }
 
     public class Datum
@@ -508,76 +508,73 @@ namespace Display.Data
     public class ActorInfo : INotifyPropertyChanged
     {
         [JsonProperty(propertyName: "id")]
-        public int id { get; set; }
+        public int Id { get; set; }
 
         [JsonProperty(propertyName: "name")]
-        public string name { set; get; }
+        public string Name { set; get; }
 
-        public List<string> otherNames { get; set; }
+        public List<string> OtherNames { get; set; }
 
         [JsonProperty(propertyName: "is_woman")]
-        public int is_woman { set; get; } = 1;
+        public int IsWoman { set; get; } = 1;
 
         [JsonProperty(propertyName: "birthday")]
-        public string birthday { set; get; } = string.Empty;
+        public string Birthday { set; get; } = string.Empty;
         
         [JsonProperty(propertyName: "bwh")]
-        public string bwh { set; get; } = string.Empty;
+        public string Bwh { set; get; } = string.Empty;
 
         [JsonProperty(propertyName: "bust")]
-        public int bust { set; get; }
+        public int Bust { set; get; }
 
         [JsonProperty(propertyName: "waist")]
-        public int waist { set; get; }
+        public int Waist { set; get; }
 
         [JsonProperty(propertyName: "hips")]
-        public int hips { set; get; }
+        public int Hips { set; get; }
 
         [JsonProperty(propertyName: "height")]
-        public int height { set; get; }
+        public int Height { set; get; }
 
         [JsonProperty(propertyName: "works_count")]
-        public int works_count { set; get; }
+        public int WorksCount { set; get; }
 
         [JsonProperty(propertyName: "work_time")]
-        public string work_time { set; get; } = string.Empty;
+        public string WorkTime { set; get; } = string.Empty;
 
-        private string _prifile_path { set; get; } = string.Empty;
+        private string _profilePath { set; get; } = string.Empty;
 
         [JsonProperty(propertyName: "prifile_path")]
-        public string prifile_path
+        public string ProfilePath
         {
-            get => _prifile_path;
+            get => _profilePath;
             set
             {
-                string path = value;
+                var path = !string.IsNullOrEmpty(value) ? value : Const.Common.NoPicturePath;
+                if (_profilePath == path) return;
 
-                path = !string.IsNullOrEmpty(path) ? path : Const.Common.NoPicturePath;
-
-                if (_prifile_path == path) return;
-
-                _prifile_path = path;
+                _profilePath = path;
 
                 OnPropertyChanged();
             }
         }
 
         [JsonProperty(propertyName: "blog_url")]
-        public string blog_url { set; get; } = string.Empty;
+        public string BlogUrl { set; get; } = string.Empty;
 
         [JsonProperty(propertyName: "info_url")]
-        public string info_url { get; set; } = string.Empty;
+        public string InfoUrl { get; set; } = string.Empty;
 
         [JsonProperty(propertyName: "is_like")]
-        public int is_like { set; get; } = 0;
+        public int IsLike { set; get; } = 0;
 
         [JsonProperty(propertyName: "addtime")]
-        public long addtime { set; get; } = DateTimeOffset.Now.ToUnixTimeSeconds();
+        public long AddTime { set; get; } = DateTimeOffset.Now.ToUnixTimeSeconds();
 
         [JsonProperty(propertyName: "video_count")]
-        public int video_count { get; set; }
+        public int VideoCount { get; set; }
 
-        public string image_url { get; set; }
+        public string ImageUrl { get; set; }
 
         private Status _status = Status.BeforeStart;
 
@@ -593,7 +590,7 @@ namespace Display.Data
 
         private string _genderInfo;
         
-        public string genderInfo
+        public string GenderInfo
         {
             get
             {
@@ -609,7 +606,7 @@ namespace Display.Data
         
         private string _ageInfo;
 
-        public string ageInfo
+        public string AgeInfo
         {
             get
             {
@@ -622,7 +619,7 @@ namespace Display.Data
             }
         }
 
-        public string initials => string.Empty + name.FirstOrDefault();
+        public string Initials => string.Empty + Name.FirstOrDefault();
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string propertyName = "")
@@ -656,8 +653,9 @@ namespace Display.Data
             this.category = failDatum.Ico;
         }
 
-
         private string _truename;
+
+        [JsonProperty(propertyName: "truename")]
         public string truename
         {
             get => _truename;
@@ -668,9 +666,12 @@ namespace Display.Data
             }
         }
 
+        [JsonProperty(propertyName: "title")]
         public string title { get; set; }
 
         private string _releasetime;
+
+        [JsonProperty(propertyName: "releasetime")]
         public string releasetime
         {
             get => _releasetime;
@@ -682,6 +683,8 @@ namespace Display.Data
         }
 
         private string _lengthtime;
+
+        [JsonProperty(propertyName: "lengthtime")]
         public string lengthtime
         {
             get => _lengthtime;
@@ -693,6 +696,8 @@ namespace Display.Data
         }
 
         private string _director;
+
+        [JsonProperty(propertyName: "director")]
         public string director
         {
             get => _director;
@@ -704,6 +709,8 @@ namespace Display.Data
         }
 
         private string _producer;
+
+        [JsonProperty(propertyName: "producer")]
         public string producer
         {
             get => _producer;
@@ -715,6 +722,8 @@ namespace Display.Data
         }
 
         private string _publisher;
+
+        [JsonProperty(propertyName: "publisher")]
         public string publisher
         {
             get => _publisher;
@@ -726,6 +735,8 @@ namespace Display.Data
         }
 
         private string _series;
+
+        [JsonProperty(propertyName: "series")]
         public string series
         {
             get => _series;
@@ -737,6 +748,8 @@ namespace Display.Data
         }
 
         private string _category;
+
+        [JsonProperty(propertyName: "category")]
         public string category
         {
             get => _category;
@@ -748,6 +761,8 @@ namespace Display.Data
         }
 
         private string _actor { get; set; } = string.Empty;
+
+        [JsonProperty(propertyName: "actor")]
         public string actor
         {
             get => _actor;
@@ -760,6 +775,8 @@ namespace Display.Data
         }
 
         private string _imageurl;
+
+        [JsonProperty(propertyName: "imageurl")]
         public string imageurl
         {
             get => _imageurl;
@@ -771,9 +788,13 @@ namespace Display.Data
             }
         }
 
+
+        [JsonProperty(propertyName: "sampleImageList")]
         public string sampleImageList { get; set; }
 
         private string _imagepath;
+
+        [JsonProperty(propertyName: "imagepath")]
         public string imagepath
         {
             get => _imagepath;
@@ -787,9 +808,13 @@ namespace Display.Data
             }
         }
 
+
+        [JsonProperty(propertyName: "busurl")]
         public string busurl { get; set; }
 
         private long _look_later = 0;
+
+        [JsonProperty(propertyName: "look_later")]
         public long look_later
         {
             get => _look_later;
@@ -801,6 +826,8 @@ namespace Display.Data
         }
 
         private double _score = -1;
+
+        [JsonProperty(propertyName: "score")]
         public double score
         {
             get => _score;
@@ -811,10 +838,10 @@ namespace Display.Data
             }
         }
 
-        public int is_wm { get; set; } = -1;
 
-        //public int is_like { get; set; } = 0;
         private int _is_like = 0;
+
+        [JsonProperty(propertyName: "is_like")]
         public int is_like
         {
             get => _is_like;
@@ -825,7 +852,10 @@ namespace Display.Data
             }
         }
 
+        [JsonProperty(propertyName: "addtime")]
         public long addtime { get; set; } = DateTimeOffset.Now.ToUnixTimeSeconds();
+        public int is_wm { get; set; } = -1;
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string propertyName = "")
@@ -1050,6 +1080,7 @@ namespace Display.Data
         public readonly string PickCode;
         public readonly FileType Type;
         public readonly string IconPath;
+        public readonly int Time;
         public readonly bool IsVideo;
         public readonly bool NoId;
 
@@ -1061,7 +1092,8 @@ namespace Display.Data
             PickCode = result.PickCode;
             Type = result.Type;
             IsVideo = result.IsVideo;
-            NoId = Id !=null;
+            NoId = Id ==null;
+            Time = (int)DateTimeOffset.Now.ToUnixTimeSeconds();
 
             IconPath = GetPathFromFileType(Name.Split(".")[^1]);
 
@@ -1090,6 +1122,8 @@ namespace Display.Data
             Datum = data;
 
             Name = data.Name;
+
+            Time = data.TimeEdit;
 
             IconPath = "ms-appx:///Assets/115/file_type/other/unknown.svg";
             //文件夹
@@ -1129,7 +1163,7 @@ namespace Display.Data
                 }
             }
 
-            NoId = Id < 0;
+            NoId = Id == null;
         }
 
         public static string GetVideoQualityFromVdi(int vdi)

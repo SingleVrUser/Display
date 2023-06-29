@@ -21,32 +21,32 @@
                 CornerRadius="5"
                 PointerEntered="connectedElement_PointerEntered"
                 PointerExited="connectedElement_PointerExited">
-                <Grid Visibility="{x:Bind data:FileMatch.ShowIfImageNull(prifile_path),Mode=OneWay}">
-                    <controls:ImageEx Source="{x:Bind prifile_path,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
+                <Grid Visibility="{x:Bind data:FileMatch.ShowIfImageNull(ProfilePath),Mode=OneWay}">
+                    <controls:ImageEx Source="{x:Bind ProfilePath,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
 
-                    <TextBlock Text="{x:Bind name}" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" TextWrapping="Wrap" Margin="5"/>
+                    <TextBlock Text="{x:Bind Name}" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" TextWrapping="Wrap" Margin="5"/>
 
                     <customcontrols:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
                 </Grid>
 
-                <Grid Visibility="{x:Bind data:FileMatch.ShowIfImageENotNull(prifile_path),Mode=OneWay}">
-                    <controls:ImageEx Margin="0,0,0,20" x:Name="ActorImage" Source="{x:Bind prifile_path,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
+                <Grid Visibility="{x:Bind data:FileMatch.ShowIfImageENotNull(ProfilePath),Mode=OneWay}">
+                    <controls:ImageEx Margin="0,0,0,20" x:Name="ActorImage" Source="{x:Bind ProfilePath,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
 
                     <StackPanel VerticalAlignment="Bottom">
                         <RelativePanel Margin="5,0">
-                            <TextBlock Text="{x:Bind name}"
+                            <TextBlock Text="{x:Bind Name}"
                                        RelativePanel.AlignVerticalCenterWithPanel="True"
                                        IsTextSelectionEnabled="True"
                                        TextWrapping="Wrap" />
-                            <TextBlock Text="{x:Bind video_count}"
+                            <TextBlock Text="{x:Bind VideoCount}"
                                        RelativePanel.AlignRightWithPanel="True"
                                        RelativePanel.AlignBottomWithPanel="True"
                                        FontFamily="JetBrains Mono"
                                        Opacity="0.4" />
                         </RelativePanel>
                         
-                        <TextBlock Text="{x:Bind genderInfo,Mode=OneWay}" Visibility="Collapsed"/>
-                        <TextBlock Text="{x:Bind ageInfo,Mode=OneWay}" Visibility="Collapsed"/>
+                        <TextBlock Text="{x:Bind GenderInfo,Mode=OneWay}" Visibility="Collapsed"/>
+                        <TextBlock Text="{x:Bind AgeInfo,Mode=OneWay}" Visibility="Collapsed"/>
                     </StackPanel>
 
                     <customcontrols:StatusShow status="{x:Bind Status,Mode=OneWay}"/>

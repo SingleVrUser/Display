@@ -407,14 +407,14 @@ namespace Display.Data
             var _ = await Client.SendAsync<string>(HttpMethod.Post, url, content);
         }
 
-        public async Task<bool> CreateTorrentOfflineDown(long cid, string torrentPath)
+        public async Task<Tuple<bool, string>> CreateTorrentOfflineDown(long cid, string torrentPath)
         {
             var torrentFile = new FileInfo(torrentPath);
             if (torrentFile.Length > 2097152)
             {
                 // TODO: 转换为ed2k后添加
                 Debug.WriteLine("不支持添加超2M的种子任务");
-                return false;
+                return new Tuple<bool, string>(false, "不支持添加超2M的torrent任务");
             }
 
             // 计算torrent文件的sha1
@@ -444,7 +444,7 @@ namespace Display.Data
             }
 
             // 上传后仍然为空
-            if (info is not { state: true } || uploadInfo == null) return false;
+            if (info is not { state: true } || uploadInfo == null) return  new Tuple<bool, string>(false, "上传torrent失败");
 
             var offlineSpaceInfo = await GetOfflineSpaceInfo(uploadInfo.userkey, uploadInfo.user_id);
 
@@ -452,7 +452,7 @@ namespace Display.Data
             var torrentInfo = await GetTorrentInfo(info.data.pick_code, info.sha1, info.user_id.ToString(), offlineSpaceInfo.sign,
                 offlineSpaceInfo.time.ToString());
 
-            if (torrentInfo == null) return false;
+            if (torrentInfo == null) return new Tuple<bool, string>(false, "获取torrent信息失败");
 
             // 最小大小,10 MB
             const long minSize = 10485760;
@@ -470,11 +470,10 @@ namespace Display.Data
             // 添加任务
             var taskInfo = await AddTaskBt(torrentInfo.info_hash, string.Join(",", selectedIndexList), cid, uploadInfo.user_id.ToString(), offlineSpaceInfo.sign, offlineSpaceInfo.time.ToString());
 
-            if (taskInfo == null) return false;
+            if (taskInfo is not { state: true }) return new Tuple<bool, string>(false, "添加torrent任务失败");
 
             Debug.WriteLine("添加任务成功");
-
-            return true;
+            return new Tuple<bool, string>(true, "torrent任务添加成功");
         }
 
         private async Task<AddTaskBtResult> AddTaskBt(string infoHash, string wanted, long cid, string uid, string sign, string time, string savePath = "")

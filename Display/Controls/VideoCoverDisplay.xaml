@@ -869,7 +869,7 @@
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center" />
 
-                    <Grid Visibility="{x:Bind isShowHeaderCover,Mode=OneWay}">
+                    <Grid Visibility="{x:Bind IsShowHeaderCover,Mode=OneWay}">
                         <StackPanel VerticalAlignment="Top"
                                     HorizontalAlignment="Right"
                                     CornerRadius="5"
@@ -878,30 +878,30 @@
                                     BorderBrush="{StaticResource ControlElevationBorderBrush}"
                                     Spacing="1"
                                     BorderThickness="1"
-                                    Visibility="{x:Bind actorInfo.info_url,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
+                                    Visibility="{x:Bind ActorInfo.InfoUrl,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
 
-                            <TextBlock Visibility="{x:Bind actorInfo.birthday,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
+                            <TextBlock Visibility="{x:Bind ActorInfo.Birthday,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
                                 <Run Foreground="Gray">出生日期：</Run>
-                                <Run Text="{x:Bind actorInfo.birthday,Mode=OneWay}" />
+                                <Run Text="{x:Bind ActorInfo.Birthday,Mode=OneWay}" />
                             </TextBlock>
 
-                            <TextBlock Visibility="{x:Bind actorInfo.bwh,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
+                            <TextBlock Visibility="{x:Bind ActorInfo.Bwh,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
                                 <Run Foreground="Gray">三围：</Run>
-                                <Run Text="{x:Bind actorInfo.bust,Mode=OneWay}" />
+                                <Run Text="{x:Bind ActorInfo.Bust,Mode=OneWay}" />
                                 <Run Text="/" />
-                                <Run Text="{x:Bind actorInfo.waist,Mode=OneWay}" />
+                                <Run Text="{x:Bind ActorInfo.Waist,Mode=OneWay}" />
                                 <Run Text="/" />
-                                <Run Text="{x:Bind actorInfo.hips,Mode=OneWay}" />
+                                <Run Text="{x:Bind ActorInfo.Hips,Mode=OneWay}" />
                             </TextBlock>
 
-                            <TextBlock Visibility="{x:Bind actorInfo.height,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
+                            <TextBlock Visibility="{x:Bind ActorInfo.Height,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
                                 <Run Foreground="Gray">身高：</Run>
-                                <Run Text="{x:Bind actorInfo.height,Mode=OneWay}" />
+                                <Run Text="{x:Bind ActorInfo.Height,Mode=OneWay}" />
                             </TextBlock>
 
-                            <TextBlock Visibility="{x:Bind actorInfo.work_time,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
+                            <TextBlock Visibility="{x:Bind ActorInfo.WorkTime,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
                             <Run Foreground="Gray">出演期间：</Run>
-                            <Run Text="{x:Bind actorInfo.work_time,Mode=OneWay}" />
+                            <Run Text="{x:Bind ActorInfo.WorkTime,Mode=OneWay}" />
                             </TextBlock>
 
 
@@ -914,24 +914,24 @@
                                 VerticalAlignment="Bottom"
                                 Spacing="20"
                                 Margin="5,0"
-                                Visibility="{x:Bind isShowHeaderCover,Mode=OneWay}">
+                                Visibility="{x:Bind IsShowHeaderCover,Mode=OneWay}">
 
 
                         <HyperlinkButton x:Name="blog_HyperLink"
                                          Content="博客"
-                                         Visibility="{x:Bind actorInfo.blog_url,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}" />
+                                         Visibility="{x:Bind ActorInfo.BlogUrl,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}" />
                         <HyperlinkButton x:Name="info_HyperLink"
                                          Content="更多信息"
-                                         Visibility="{x:Bind actorInfo.info_url,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}" />
+                                         Visibility="{x:Bind ActorInfo.InfoUrl,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}" />
 
                         <ToggleButton Content="喜欢"
                                       HorizontalAlignment="Right"
                                       VerticalAlignment="Top"
                                       Margin="0,5"
-                                      IsChecked="{x:Bind data:FileMatch.isLike(actorInfo.is_like),Mode=OneWay}"
+                                      IsChecked="{x:Bind data:FileMatch.isLike(ActorInfo.IsLike),Mode=OneWay}"
                                       Click="LikeButton_Click"
-                                      Tag="{x:Bind actorInfo.id,Mode=OneWay}"
-                                      Visibility="{x:Bind isShowHeaderCover,Mode=OneWay}" />
+                                      Tag="{x:Bind ActorInfo.Id,Mode=OneWay}"
+                                      Visibility="{x:Bind IsShowHeaderCover,Mode=OneWay}" />
 
                         <!--<TextBlock Visibility="{x:Bind actorInfo.blog_url,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
                             <Hyperlink x:Name="blog_HyperLink"
@@ -954,10 +954,10 @@
                           Height="130"
                           CornerRadius="5"
                           Margin="3,5,10,0"
-                          Visibility="{x:Bind isShowHeaderCover,Mode=OneWay}">
+                          Visibility="{x:Bind IsShowHeaderCover,Mode=OneWay}">
                         <Image x:FieldModifier="public"
                                x:Name="HeaderCover"
-                               Source="{x:Bind actorInfo.prifile_path,Converter={StaticResource NotExistsImagePathConverter},Mode=OneWay}" />
+                               Source="{x:Bind ActorInfo.ProfilePath,Converter={StaticResource NotExistsImagePathConverter},Mode=OneWay}" />
                     </Grid>
                 </Grid>
 
@@ -1097,8 +1097,8 @@
                     </Grid.ColumnDefinitions>
                     <Slider x:Name="ImageSizeChangeSlider"
                             Grid.Row="0"
-                            Minimum="{x:Bind SliderMinValue}"
-                            Maximum="{x:Bind SliderMaxValue}"
+                            Minimum="{x:Bind local:VideoCoverDisplay.SliderMinValue}"
+                            Maximum="{x:Bind local:VideoCoverDisplay.SliderMaxValue}"
                             Width="200" />
 
                     <ToggleButton x:Name="IsAutoAdjustImageSize_ToggleButton"
@@ -1130,8 +1130,8 @@
                                                 HorizontalAlignment="Right" />
 
                         <local:ShowCountControl x:Name="LikeOrLookLaterFailShowCountControl"
-                                                CurrentCount="{x:Bind LikeOrLookLater_failInfocollection.Count,Mode=OneWay}"
-                                                AllCount="{x:Bind LikeOrLookLater_failInfocollection.AllCount,Mode=OneWay}"
+                                                CurrentCount="{x:Bind LikeOrLookLaterFailInfoCollection.Count,Mode=OneWay}"
+                                                AllCount="{x:Bind LikeOrLookLaterFailInfoCollection.AllCount,Mode=OneWay}"
                                                 Clicked="ToTopButton_Click"
                                                 HorizontalAlignment="Right" />
 

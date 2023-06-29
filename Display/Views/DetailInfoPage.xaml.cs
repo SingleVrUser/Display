@@ -111,7 +111,7 @@ namespace Display.Views
             }
             else if (clickButton.DataContext is ActorInfo actorInfo)
             {
-                actorName = actorInfo.name;
+                actorName = actorInfo.Name;
             }
 
             if (string.IsNullOrEmpty(actorName)) return;

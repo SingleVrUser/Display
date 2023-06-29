@@ -63,7 +63,7 @@ namespace Display.ContentsPage.SearchLink
         public async Task StartCountdownIfNecessary()
         {
             // 第一次
-            if(_lastRequestTime == 0) return;
+            if (_lastRequestTime == 0) return;
 
             // 与上次等待间隙不足15s，则等待（1s余量）
             var leftSecond = SpacingSecond - NowDate + _lastRequestTime + 1;
@@ -101,14 +101,15 @@ namespace Display.ContentsPage.SearchLink
             var result = await dialog.ShowAsync();
             if (result != ContentDialogResult.Primary) return null;
 
-            return await page.OfflineDownSelectedLink(cid) ? "已下载到网盘中" : "下载失败";
+            var downResult = await page.OfflineDownSelectedLink(cid);
+            return string.IsNullOrEmpty(downResult) ? "下载失败" : downResult;
         }
 
         private async void InitLoad()
         {
             _lastRequestTime = NowDate;
 
-            var links =  await X1080X.GetMatchInfosFromCid(_searchContent);
+            var links = await X1080X.GetMatchInfosFromCid(_searchContent);
 
             if (links is { Count: > 0 })
             {
@@ -119,13 +120,13 @@ namespace Display.ContentsPage.SearchLink
             {
                 WithoutResultTextBlock.Visibility = Visibility.Visible;
             }
-            
+
             MyProgressBar.Visibility = Visibility.Collapsed;
         }
 
-        public async Task<bool> OfflineDownSelectedLink(long cid)
+        public async Task<string> OfflineDownSelectedLink(long cid)
         {
-            if (LinksListView.SelectedItem is not Forum1080SearchResult info) return false;
+            if (LinksListView.SelectedItem is not Forum1080SearchResult info) return null;
 
             var url = info.Url;
             var attachmentInfos = await X1080X.GetDownLinkFromUrl(url);
@@ -134,52 +135,57 @@ namespace Display.ContentsPage.SearchLink
             //选择第一个不需要点数的
             var attmnInfo = attachmentInfos.FirstOrDefault(x => x.Expense == 0);
 
-            if (attmnInfo == null) return false;
+            if (attmnInfo == null) return "获取到附件下载链接时出错";
 
             // 磁力
             if (attmnInfo.Type == AttmnType.Magnet)
             {
-                return await RequestOfflineDown(cid,new List<string> { attmnInfo.Url });
+                return await RequestOfflineDown(cid, new List<string> { attmnInfo.Url });
             }
             else if (attmnInfo.Type == AttmnType.Rar)
             {
-                var rarPath = await X1080X.TryDownAttmn(attmnInfo.Url,attmnInfo.Name);
+                var rarPath = await X1080X.TryDownAttmn(attmnInfo.Url, attmnInfo.Name);
 
-                if(rarPath == null) return false;
+                if (rarPath == null) return "下载附件(.rar)时出错";
 
                 Debug.WriteLine($"附件已保存到：{rarPath}");
 
                 // 解析Rar
                 var rarInfo = await X1080X.GetRarInfoFromRarPath(rarPath);
-                if (rarInfo == null) return false;
+                if (rarInfo == null) return "解析附件时出错";
 
                 var down115LinkList = Get115DownUrlsFromAttmnInfo(rarInfo);
-                if(down115LinkList.Count==0) return false;
+                if (down115LinkList.Count == 0) return "附件中未找到115下载链接";
 
                 return await RequestOfflineDown(cid, down115LinkList, rarInfo.SrtPath);
-            }else if (attmnInfo.Type == AttmnType.Txt)
+            }
+            else if (attmnInfo.Type == AttmnType.Txt)
             {
                 var txtPath = await X1080X.TryDownAttmn(attmnInfo.Url, attmnInfo.Name);
-                if (txtPath == null) return false;
+                if (txtPath == null) return "下载附件(.txt)时出错";
 
                 Debug.WriteLine($"附件已保存到：{txtPath}");
 
                 var txtInfo = await X1080X.GetRarInfoFromTxtPath(txtPath);
 
                 var down115LinkList = Get115DownUrlsFromAttmnInfo(txtInfo);
-                if (down115LinkList.Count == 0) return false;
+                if (down115LinkList.Count == 0) return "附件中未找到115下载链接";
 
                 return await RequestOfflineDown(cid, down115LinkList);
-            }else if (attmnInfo.Type == AttmnType.Torrent)
+            }
+            else if (attmnInfo.Type == AttmnType.Torrent)
             {
                 var torrentPath = await X1080X.TryDownAttmn(attmnInfo.Url, attmnInfo.Name);
-                if (torrentPath == null) return false;
+                if (torrentPath == null) return "下载附件(.torrent)时出错";
+
                 Debug.WriteLine($"附件已保存到：{torrentPath}");
 
-                return await WebApi.GlobalWebApi.CreateTorrentOfflineDown(cid, torrentPath);
+                var(_,msg)= await WebApi.GlobalWebApi.CreateTorrentOfflineDown(cid, torrentPath);
+
+                return msg;
             }
 
-            return true;
+            return "当前附件格式不受支持";
         }
 
         private List<string> Get115DownUrlsFromAttmnInfo(AttmnFileInfo attmnInfo)
@@ -206,36 +212,35 @@ namespace Display.ContentsPage.SearchLink
                 }
             }
 
-            var noRarList = down115LinkList.Where(x=>!x.Contains(".rar")).ToList();
+            var noRarList = down115LinkList.Where(x => !x.Contains(".rar")).ToList();
             return noRarList.Count > 0 ? noRarList : down115LinkList;
         }
 
-        private async Task<bool> RequestOfflineDown(long cid, List<string> links,string srtPath=null)
+        private async Task<string> RequestOfflineDown(long cid, List<string> links, string srtPath = null)
         {
             var webApi = WebApi.GlobalWebApi;
 
             var uploadInfo = await webApi.GetUploadInfo();
-            if (uploadInfo == null) return false;
+            if (uploadInfo == null) return "获取115上传信息时出错";
 
             var offlineSpaceInfo = await webApi.GetOfflineSpaceInfo(uploadInfo.userkey, uploadInfo.user_id);
-            
+
             var addTaskUrlInfo = await webApi.AddTaskUrl(links, cid, uploadInfo.user_id, offlineSpaceInfo.sign, offlineSpaceInfo.time);
 
             // 需要验证账号
             if (addTaskUrlInfo is { errcode: Const.Common.AccountAnomalyCode })
             {
                 var window = WebApi.CreateWindowToVerifyAccount();
-                
-                var result = false;
 
-                if (window.Content is not VerifyAccountPage page) return false;
+                if (window.Content is not VerifyAccountPage page) return null;
 
+                string result = null;
                 var isClosed = false;
                 page.VerifyAccountCompleted += async (_, iSucceeded) =>
                 {
                     if (!iSucceeded)
                     {
-                        result = false;
+                        result = "验证账号未成功";
                         isClosed = true;
                         return;
                     }
@@ -261,8 +266,7 @@ namespace Display.ContentsPage.SearchLink
                 await FileUpload.SimpleUpload(srtPath, cid, uploadInfo.user_id, uploadInfo.userkey);
             }
 
-            return addTaskUrlInfo is { state: true };
-
+            return addTaskUrlInfo is { state: true } ? "任务添加成功" : (!string.IsNullOrEmpty(addTaskUrlInfo.error_msg) ? addTaskUrlInfo.error_msg : "任务添加失败");
         }
 
         private void OpenInBrowserClick(object sender, RoutedEventArgs e)

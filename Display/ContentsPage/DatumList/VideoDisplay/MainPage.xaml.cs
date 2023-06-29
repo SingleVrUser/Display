@@ -507,7 +507,7 @@ public sealed partial class MainPage : Page
             var result = DataAccess.SelectTrueName(cid);
 
             //数据库中有
-            if (result.Count != 0)
+            if (result.Length != 0)
             {
                 Debug.WriteLine("数据库中存在该信息");
 

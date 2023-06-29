@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Display.Data;
 using Display.Helper;
+using Microsoft.Data.Sqlite;
 using Microsoft.UI.Xaml.Input;
 
 namespace Display.Controls
@@ -50,7 +51,7 @@ namespace Display.Controls
             FileInSelectFolder = new ObservableCollection<FilesInfo>();
             SelectFolderName = new ObservableCollection<ExplorerItem>();
 
-            tryUpdataFolderInfo(0);
+            TryUpdateFolderInfo(0);
         }
 
 
@@ -60,9 +61,9 @@ namespace Display.Controls
         /// <param name="folderCid"></param>
         /// <param name="outType"></param>
         /// <returns></returns>
-        public List<Datum> GetFilesFromItems(long folderCid, FilesInfo.FileType outType)
+        public Datum[] GetFilesFromItems(long folderCid, FilesInfo.FileType outType)
         {
-            List<Datum> items;
+            Datum[] items;
 
             //先从存储的List中获取
             var item = StoreDataList.FirstOrDefault(x => x.Cid == folderCid);
@@ -71,7 +72,7 @@ namespace Display.Controls
                 items = DataAccess.GetListByCid(folderCid);
 
                 //排序
-                items = items.OrderByDescending(x => x.TimeEdit).ToList();
+                items = items.OrderByDescending(x => x.TimeEdit).ToArray();
 
                 StoreDataList.Add(new StoreDatum()
                 {
@@ -86,7 +87,7 @@ namespace Display.Controls
 
             if (outType == FilesInfo.FileType.Folder)
             {
-                items = items.Where(x => x.Fid == null).ToList();
+                items = items.Where(x => x.Fid == null).ToArray();
             }
 
             return items;
@@ -102,9 +103,9 @@ namespace Display.Controls
 
             foreach (var item in data)
             {
-                bool hasUnrealizedChildren = DataAccess.GetFolderListByPid(item.Cid, 1).Count != 0;
+                var hasUnrealizedChildren = DataAccess.GetFolderListByPid(item.Cid, 1).Length != 0;
 
-                ExplorerItem folders = new ExplorerItem()
+                var folders = new ExplorerItem()
                 {
                     Name = item.Name,
                     Type = FilesInfo.FileType.Folder,
@@ -112,7 +113,7 @@ namespace Display.Controls
                     HasUnrealizedChildren = hasUnrealizedChildren,
                     datum = item
                 };
-
+                
                 list.Add(folders);
             }
 
@@ -134,7 +135,7 @@ namespace Display.Controls
             if (cid == _lastInvokedCid) return;
 
             _lastInvokedCid = cid;
-            tryUpdataFolderInfo(cid);
+            TryUpdateFolderInfo(cid);
 
             ItemInvoked?.Invoke(sender, args);
 
@@ -143,25 +144,25 @@ namespace Display.Controls
         /// <summary>
         /// 根据cid更新右侧的信息（显示目录 和 文件详情）
         /// </summary>
-        /// <param Name="folderCid"></param>
-        private void tryUpdataFolderInfo(long folderCid)
+        /// <param name="folderCid"></param>
+        private void TryUpdateFolderInfo(long folderCid)
         {
             var items = GetFilesFromItems(folderCid, FilesInfo.FileType.File);
 
             //更新右侧文件夹目录
             SelectFolderName.Clear();
-            tryUpdateFolder(folderCid);
+            TryUpdateFolder(folderCid);
 
             //更新右侧文件列表
-            tryUpdateFileInSelectFolder(items);
+            TryUpdateFileInSelectFolder(items);
 
         }
 
         /// <summary>
         /// 更新详细信息的目录
         /// </summary>
-        /// <param Name="folderCid"></param>
-        private void tryUpdateFolder(long folderCid)
+        /// <param name="folderCid"></param>
+        private void TryUpdateFolder(long folderCid)
         {
             if (folderCid == 0)
             {
@@ -230,20 +231,18 @@ namespace Display.Controls
         /// <summary>
         /// 更新所选文件夹的文件列表
         /// </summary>
-        /// <param Name="items"></param>
-        private void tryUpdateFileInSelectFolder(List<Datum> items)
+        /// <param name="items"></param>
+        private void TryUpdateFileInSelectFolder(Datum[] items)
         {
             FileInSelectFolder.Clear();
 
             //排序
-            items = items.OrderByDescending(x => x.Pid).ToList();
+            items = items.OrderByDescending(x => x.Pid).ToArray();
 
             foreach (var file in items)
             {
                 FileInSelectFolder.Add(new FilesInfo(file));
             }
-
-            var item = FileInSelectFolder;
         }
 
         /// <summary>
@@ -294,21 +293,7 @@ namespace Display.Controls
         /// <param Name="MaxNum"></param>
         private void FillTreeNode(TreeViewNode node, int MaxNum = 30, bool isInsertLeft = false)
         {
-            // Get the contents of the folder represented by the current tree node.
-            // Add each item as a new child node of the node that's being expanded.
-
-            // Only process the node if it's a folder and has unrealized children.
-            ExplorerItem folder;
-
-            if (node.Content is ExplorerItem)
-            {
-                folder = node.Content as ExplorerItem;
-            }
-            else
-            {
-                // The node isn't a folder, or it's already been filled.
-                return;
-            }
+            if (node.Content is not ExplorerItem folder) return;
 
             List<Datum> itemsList;
 
@@ -321,7 +306,7 @@ namespace Display.Controls
             }
             else
             {
-                itemsList = GetFilesFromItems(folder.Id, FilesInfo.FileType.Folder);
+                itemsList = GetFilesFromItems(folder.Id, FilesInfo.FileType.Folder).ToList();
                 //itemsList = DataAccess.GetFolderListByPid(folder.Cid);
             }
 
@@ -432,7 +417,7 @@ namespace Display.Controls
                 i++;
                 progress.Report(i);
                 //检查下级是否还有文件夹
-                bool hasUnrealizedChildren = DataAccess.GetFolderListByPid(folderInfo.Cid, 1).Count != 0;
+                bool hasUnrealizedChildren = DataAccess.GetFolderListByPid(folderInfo.Cid, 1).Length != 0;
 
                 Node_HasUnrealizedChildren_Dict.Add(folderInfo, hasUnrealizedChildren);
 
@@ -489,7 +474,7 @@ namespace Display.Controls
                 // Home is special case.
                 if (args.Index == 0)
                 {
-                    tryUpdataFolderInfo(0);
+                    TryUpdateFolderInfo(0);
                 }
                 // Go back to the clicked item.
                 else
@@ -508,7 +493,7 @@ namespace Display.Controls
                     while (SelectFolderName.Count > args.Index + 1)
                     {
                         SelectFolderName.RemoveAt(SelectFolderName.Count - 1);
-                        tryUpdataFolderInfo(item.Id);
+                        TryUpdateFolderInfo(item.Id);
                     }
                 }
             }
@@ -535,7 +520,7 @@ namespace Display.Controls
             {
                 if (itemInfo.Id == null) return;
 
-                tryUpdataFolderInfo((long)itemInfo.Id);
+                TryUpdateFolderInfo((long)itemInfo.Id);
             }
 
             ItemClick?.Invoke(sender, e);
@@ -560,27 +545,39 @@ namespace Display.Controls
             var result = await dialog.ShowAsync();
             if (result == ContentDialogResult.Primary)
             {
-                deletedNodeAndDataAccessByCid(FolderTreeView.RootNodes, item.Id);
+                DeletedNodeAndDataAccessByCid(FolderTreeView.RootNodes, item.Id);
 
             }
         }
 
-        private void deletedNodeAndDataAccessByCid(IList<TreeViewNode> Nodechildrens, long cid)
+        private static void DeletedNodeAndDataAccessByCid(IList<TreeViewNode> nodeChildren, long cid, SqliteConnection connection = null)
         {
-            foreach (TreeViewNode node in Nodechildrens)
+            var isNeedCloseConnection = connection == null;
+            if (connection == null)
+            {
+                connection = new SqliteConnection(DataAccess.ConnectionString);
+                connection.Open();
+            }   
+
+            foreach (var node in nodeChildren)
             {
                 if (((ExplorerItem)node.Content).Id == cid)
                 {
-                    Nodechildrens.Remove(node);
-                    DataAccess.DeleteAllDirectoryAndFiles_InFilesInfoTable(cid);
+                    nodeChildren.Remove(node);
+                    DataAccess.DeleteAllDirectoryAndFiles_InFilesInfoTable(cid, connection);
                     return;
                 }
-                var nodeChildrens = node.Children;
-                if (nodeChildrens.Count != 0)
+                var treeViewNodes = node.Children;
+                if (treeViewNodes.Count != 0)
                 {
-                    deletedNodeAndDataAccessByCid(nodeChildrens, cid);
+                    DeletedNodeAndDataAccessByCid(treeViewNodes, cid ,connection);
                 }
             }
+
+            if (!isNeedCloseConnection) return;
+
+            connection.Close();
+            connection.Dispose();
         }
 
         public event RoutedEventHandler PlayVideoClick;
