@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Display.Data;
+using SharpCompress;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -73,7 +74,7 @@ namespace Display.Views
         
         private async void LoadActorPartInfo(int count = 30)
         {
-            var infos = await DataAccess.LoadActorInfo(count, 0, orderByList: new() { { "RANDOM()", false } },
+            var infos = await DataAccess.Get.GetActorInfo(count, 0, orderByList: new() { { "RANDOM()", false } },
                                                                 filterList: new() { "prifile_path != ''" });
 
             infos.ForEach(info => actorPartInfo.Add(info));
@@ -221,9 +222,9 @@ namespace Display.Views
                 return;
             }
 
-            var infos = await DataAccess.LoadActorInfo(-1);
+            var infos = await DataAccess.Get.GetActorInfo(-1);
 
-            int allCount = infos.Count;
+            int allCount = infos.Length;
             if (allCount == 0) return;
 
             if (!Notifications.ToastGetActorInfoWithProgressBar.SendToast(allCount)) return;
@@ -245,11 +246,11 @@ namespace Display.Views
             button.IsEnabled = false;
 
             //反序列化
-            string filePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "ActorInfo", "getting.json");
+            var filePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "ActorInfo", "getting.json");
             if (File.Exists(filePath))
             {
                 string jsonString = await File.ReadAllTextAsync(filePath);
-                List<ActorInfo> infos = JsonSerializer.Deserialize<List<ActorInfo>>(jsonString);
+                var infos = JsonSerializer.Deserialize<ActorInfo[]>(jsonString);
 
                 await GetActorsInfo(infos, AppSettings.GetActorInfoLastIndex);
 
@@ -269,9 +270,9 @@ namespace Display.Views
 
         }
 
-        private static async Task GetActorsInfo(List<ActorInfo> infos, int startIndex = 0)
+        private static async Task GetActorsInfo(ActorInfo[] infos, int startIndex = 0)
         {
-            int allCount = infos.Count;
+            int allCount = infos.Length;
             if (allCount == 0) return;
 
             if (!Notifications.ToastGetActorInfoWithProgressBar.SendToast(startIndex, allCount)) return;
@@ -324,25 +325,25 @@ namespace Display.Views
             var actorinfo = await GetActorInfoFromNetwork.SearchInfoFromMinnanoAv(actorName);
             if (actorinfo == null) return null;
 
-            var actorId = DataAccess.CheckIdInActor_Names(actorName);
+            var actorId = DataAccess.Get.GetIdInActor_Names(actorName);
             if (actorId == -1) return null;
 
-            DataAccess.UpdateActorInfo(actorId, actorinfo);
+            DataAccess.Update.UpdateActorInfo(actorId, actorinfo);
 
             //获取到的信息有头像
             if (!string.IsNullOrEmpty(actorinfo.ImageUrl))
             {
                 //查询本地数据库中的数据
-                var actorInfos = await DataAccess.LoadActorInfo(1, filterList: new List<string> { $"id == '{actorId}'" });
+                var actorInfos = await DataAccess.Get.GetActorInfo(1, filterList: new List<string> { $"id == '{actorId}'" });
 
-                if (actorInfos != null && actorInfos.Count != 0)
+                if (actorInfos != null && actorInfos.Length != 0)
                 {
-                    var oldActorInfo = actorInfos.FirstOrDefault();
+                    var firstOrDefault = actorInfos.FirstOrDefault();
 
                     //数据库中无头像
-                    if (oldActorInfo.ProfilePath == Const.Common.NoPicturePath)
+                    if (firstOrDefault is { ProfilePath: Const.Common.NoPicturePath })
                     {
-                        string filePath = Path.Combine(AppSettings.ActorInfoSavePath, actorName);
+                        var filePath = Path.Combine(AppSettings.ActorInfoSavePath, actorName);
 
                         Uri infoUri = new(actorinfo.InfoUrl);
 
@@ -353,14 +354,14 @@ namespace Display.Views
                         });
 
                         //更新头像
-                        DataAccess.UpdateActorInfoProfilePath(actorId, prifilePath);
+                        DataAccess.Update.UpdateActorInfoProfilePath(actorId, prifilePath);
 
                         actorinfo.ProfilePath = prifilePath;
                     }
                     //数据库中有头像
-                    else
+                    else if (firstOrDefault != null)
                     {
-                        actorinfo.ProfilePath = oldActorInfo.ProfilePath;
+                         actorinfo.ProfilePath = firstOrDefault.ProfilePath;
                     }
 
                 }
@@ -373,14 +374,14 @@ namespace Display.Views
             {
                 foreach (var otherName in actorinfo.OtherNames)
                 {
-                    DataAccess.AddOrIgnoreActor_Names(actorId, otherName);
+                    DataAccess.Add.AddOrIgnoreActor_Names(actorId, otherName);
                 }
             }
 
             //更新bwh
             if (!string.IsNullOrEmpty(actorinfo.Bwh))
             {
-                DataAccess.AddOrIgnoreBwh(actorinfo.Bwh, actorinfo.Bust, actorinfo.Waist, actorinfo.Hips);
+                DataAccess.Add.AddOrIgnoreBwh(actorinfo.Bwh, actorinfo.Bust, actorinfo.Waist, actorinfo.Hips);
             }
 
             return actorinfo;

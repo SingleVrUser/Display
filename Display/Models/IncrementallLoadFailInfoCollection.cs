@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Display.Data;
+using SharpCompress;
 
 namespace Display.Models;
 
@@ -34,14 +35,14 @@ public class IncrementallLoadFailInfoCollection : ObservableCollection<FailInfo>
 
     public async Task<int> LoadData(int limit = 20, int offset = 0)
     {
-        var Infos = await DataAccess.LoadFailFileInfoWithFailInfo(offset, limit, ShowType);
+        var infos = await DataAccess.Get.GetFailFileInfoWithFailInfo(offset, limit, ShowType);
 
         if (Count == 0)
-            AllCount = DataAccess.CheckFailInfosCount(ShowType);
+            AllCount = DataAccess.Get.GetCountOfFailInfos(ShowType);
 
-        Infos.ForEach(item => Add(item));
+        infos.ForEach(Add);
 
-        var getCount = Infos.Count;
+        var getCount = infos.Length;
 
         if (AllCount <= Count || getCount == 0)
         {

@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Display.Data;
+using SharpCompress;
 
 namespace Display.Models;
 
@@ -17,18 +18,18 @@ public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum
 
     public async Task LoadData(int startShowCount = 20)
     {
-        var newItems = await DataAccess.LoadFailFileInfoWithDatum(0, startShowCount, filterName, OrderBy, IsDesc, ShowType);
+        var newItems = await DataAccess.Get.GetFailFileInfoWithDatum(0, startShowCount, filterName, OrderBy, IsDesc, ShowType);
 
         if (Count == 0)
         {
             HasMoreItems = true;
-            this.AllCount = DataAccess.CheckFailDatumFilesCount(filterName, ShowType);
+            this.AllCount = DataAccess.Get.GetCountOfFailDatumFiles(filterName, ShowType);
         }
         else
             Clear();
 
 
-        newItems.ForEach(item => Add(item));
+        newItems.ForEach(Add);
     }
 
     public void SetShowType(FailType ShowType)
@@ -63,9 +64,9 @@ public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum
 
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        var failLists = await DataAccess.LoadFailFileInfoWithDatum(Items.Count, (int)count, filterName, OrderBy, IsDesc, ShowType);
+        var failLists = await DataAccess.Get.GetFailFileInfoWithDatum(Items.Count, (int)count, filterName, OrderBy, IsDesc, ShowType);
 
-        if (failLists.Count < count)
+        if (failLists.Length < count)
         {
             HasMoreItems = false;
         }
@@ -74,7 +75,7 @@ public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum
 
         return new LoadMoreItemsResult
         {
-            Count = (uint)failLists.Count
+            Count = (uint)failLists.Length
         };
     }
 }

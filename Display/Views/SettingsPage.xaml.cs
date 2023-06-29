@@ -180,7 +180,7 @@ namespace Display.Views
             AppSettings.ImageSavePath = folderPath;
 
             //检查数据库的是否需要修改
-            string imagePath = DataAccess.GetOneImagePath();
+            string imagePath = DataAccess.Get.GetOneImagePath();
             if (IsNullOrEmpty(imagePath))
             {
                 ShowTeachingTip("图片保存地址修改完成");
@@ -210,7 +210,7 @@ namespace Display.Views
             if (result == ContentDialogResult.Primary)
             {
                 //修改数据库图片地址
-                DataAccess.UpdateAllImagePath(updateImagePathPage.srcPath, updateImagePathPage.dstPath);
+                DataAccess.Update.UpdateAllImagePath(updateImagePathPage.srcPath, updateImagePathPage.dstPath);
                 ShowTeachingTip("修改完成，部分修改内容重启后生效");
             }
             else
@@ -232,7 +232,7 @@ namespace Display.Views
             AppSettings.ActorInfoSavePath = folderPath;
 
             //检查数据库的是否需要修改
-            string imagePath = DataAccess.GetOneActorProfilePath();
+            string imagePath = DataAccess.Get.GetOneActorProfilePath();
             if (IsNullOrEmpty(imagePath))
             {
                 ShowTeachingTip("保存地址修改完成");
@@ -262,7 +262,7 @@ namespace Display.Views
             if (result == ContentDialogResult.Primary)
             {
                 //修改数据库图片地址
-                DataAccess.UpdateActorProfilePath(updateImagePathPage.srcPath, updateImagePathPage.dstPath);
+                DataAccess.Update.UpdateActorProfilePath(updateImagePathPage.srcPath, updateImagePathPage.dstPath);
                 ShowTeachingTip("修改完成，部分修改内容重启后生效");
             }
             else
@@ -986,7 +986,7 @@ namespace Display.Views
 
         private void ClearDownRecordButton_Click(object sender, RoutedEventArgs e)
         {
-            DataAccess.DeleteTable(DataAccess.TableName.DownHistory);
+            DataAccess.Delete.DeleteTable(DataAccess.TableName.DownHistory);
 
             ShowTeachingTip("已清空");
         }

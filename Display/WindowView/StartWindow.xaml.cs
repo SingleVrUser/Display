@@ -33,7 +33,7 @@ namespace Display.WindowView
         private async void Grid_Loaded(object sender, RoutedEventArgs e)
         {
             //升级数据库，v0.15开始
-            await Task.Run(DataAccess.UpdateDatabaseFrom14);
+            await Task.Run(DataAccess.Update.UpdateDatabaseFrom14);
 
             //关闭窗口
             this.Close();

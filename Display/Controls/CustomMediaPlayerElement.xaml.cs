@@ -457,7 +457,7 @@ public sealed partial class CustomMediaPlayerElement
 
         if (videoInfo != null)
         {
-            DataAccess.UpdateSingleDataFromVideoInfo(trueName, "is_like", IsLike.ToString());
+            DataAccess.Update.UpdateSingleDataFromVideoInfo(trueName, "is_like", IsLike.ToString());
 
             if (IsLike == 1) ShowTeachingTip("已添加进喜欢");
         }
@@ -470,7 +470,7 @@ public sealed partial class CustomMediaPlayerElement
             if (failInfo == null)
             {
                 var capPath = await ScreenShotAsync(pickCode);
-                DataAccess.AddOrReplaceFailList_IsLike_LookLater(new()
+                DataAccess.Add.AddOrReplaceFailList_IsLike_LookLater(new()
                 {
                     PickCode = pickCode,
                     IsLike = IsLike,
@@ -481,13 +481,13 @@ public sealed partial class CustomMediaPlayerElement
             }
             else
             {
-                DataAccess.UpdateSingleFailInfo(pickCode, "is_like", IsLike.ToString());
+                DataAccess.Update.UpdateSingleFailInfo(pickCode, "is_like", IsLike.ToString());
 
                 //需要截图
                 if (failInfo.ImagePath == Const.Common.NoPicturePath || !File.Exists(failInfo.ImagePath))
                 {
                     var capPath = await ScreenShotAsync(pickCode);
-                    DataAccess.UpdateSingleFailInfo(pickCode, "image_path", capPath);
+                    DataAccess.Update.UpdateSingleFailInfo(pickCode, "image_path", capPath);
 
                     if (IsLike == 1) ShowTeachingTip("已添加进喜欢，并截取当前画面作为封面");
                 }
@@ -516,7 +516,7 @@ public sealed partial class CustomMediaPlayerElement
 
         if (videoInfo != null)
         {
-            DataAccess.UpdateSingleDataFromVideoInfo(trueName, "look_later", LookLater.ToString());
+            DataAccess.Update.UpdateSingleDataFromVideoInfo(trueName, "look_later", LookLater.ToString());
 
             if (LookLater != 0) ShowTeachingTip("已添加进稍后观看");
         }else
@@ -526,7 +526,7 @@ public sealed partial class CustomMediaPlayerElement
             if (failInfo == null)
             {
                 var capPath = await ScreenShotAsync(pickCode);
-                DataAccess.AddOrReplaceFailList_IsLike_LookLater(new()
+                DataAccess.Add.AddOrReplaceFailList_IsLike_LookLater(new()
                 {
                     PickCode = pickCode,
                     LookLater = LookLater,
@@ -537,13 +537,13 @@ public sealed partial class CustomMediaPlayerElement
             }
             else
             {
-                DataAccess.UpdateSingleFailInfo(pickCode, "look_later", LookLater.ToString());
+                DataAccess.Update.UpdateSingleFailInfo(pickCode, "look_later", LookLater.ToString());
 
                 //需要添加截图
                 if (failInfo.ImagePath == Const.Common.NoPicturePath || !File.Exists(failInfo.ImagePath))
                 {
                     var capPath = await ScreenShotAsync(pickCode);
-                    DataAccess.UpdateSingleFailInfo(pickCode, "image_path", capPath);
+                    DataAccess.Update.UpdateSingleFailInfo(pickCode, "image_path", capPath);
 
                     if (LookLater != 0) ShowTeachingTip("已添加进稍后观看，并截取当前画面作为封面");
                 }
@@ -561,13 +561,13 @@ public sealed partial class CustomMediaPlayerElement
         var playItem = _allMediaPlayItems[(int)_playIndex];
         var pickCode = playItem.PickCode;
 
-        var failInfo = DataAccess.LoadSingleFailInfo(pickCode);
+        var failInfo = DataAccess.Get.GetSingleFailInfoByPickCode(pickCode);
 
         var capPath = await ScreenShotAsync(pickCode);
 
         if (failInfo == null)
         {
-            DataAccess.AddOrReplaceFailList_IsLike_LookLater(new FailInfo
+            DataAccess.Add.AddOrReplaceFailList_IsLike_LookLater(new FailInfo
             {
                 PickCode = pickCode,
                 ImagePath = capPath
@@ -575,7 +575,7 @@ public sealed partial class CustomMediaPlayerElement
         }
         else
         {
-            DataAccess.UpdateSingleFailInfo(pickCode, "image_path", capPath);
+            DataAccess.Update.UpdateSingleFailInfo(pickCode, "image_path", capPath);
         }
 
         ShowTeachingTip("已截取当前画面作为封面");

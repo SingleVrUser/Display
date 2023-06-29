@@ -69,7 +69,7 @@ namespace Display.Controls
             var item = StoreDataList.FirstOrDefault(x => x.Cid == folderCid);
             if (item == null)
             {
-                items = DataAccess.GetListByCid(folderCid);
+                items = DataAccess.Get.GetListByCid(folderCid);
 
                 //排序
                 items = items.OrderByDescending(x => x.TimeEdit).ToArray();
@@ -103,7 +103,7 @@ namespace Display.Controls
 
             foreach (var item in data)
             {
-                var hasUnrealizedChildren = DataAccess.GetFolderListByPid(item.Cid, 1).Length != 0;
+                var hasUnrealizedChildren = DataAccess.Get.GetFolderListByPid(item.Cid, 1).Length != 0;
 
                 var folders = new ExplorerItem()
                 {
@@ -176,7 +176,7 @@ namespace Display.Controls
             else
             {
                 //从数据库中获取根目录信息
-                List<Datum> folderToRootList = DataAccess.GetRootByCid(folderCid);
+                List<Datum> folderToRootList = DataAccess.Get.GetRootByCid(folderCid);
                 foreach (var info in folderToRootList)
                 {
                     SelectFolderName.Add(new ExplorerItem()
@@ -417,7 +417,7 @@ namespace Display.Controls
                 i++;
                 progress.Report(i);
                 //检查下级是否还有文件夹
-                bool hasUnrealizedChildren = DataAccess.GetFolderListByPid(folderInfo.Cid, 1).Length != 0;
+                bool hasUnrealizedChildren = DataAccess.Get.GetFolderListByPid(folderInfo.Cid, 1).Length != 0;
 
                 Node_HasUnrealizedChildren_Dict.Add(folderInfo, hasUnrealizedChildren);
 
@@ -564,7 +564,7 @@ namespace Display.Controls
                 if (((ExplorerItem)node.Content).Id == cid)
                 {
                     nodeChildren.Remove(node);
-                    DataAccess.DeleteAllDirectoryAndFiles_InFilesInfoTable(cid, connection);
+                    DataAccess.Delete.DeleteAllDirectoryAndFiles_InFilesInfoTable(cid, connection);
                     return;
                 }
                 var treeViewNodes = node.Children;

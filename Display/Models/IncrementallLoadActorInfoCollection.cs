@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Display.Data;
+using SharpCompress;
 
 namespace Display.Models;
 
@@ -32,17 +33,17 @@ public class IncrementallLoadActorInfoCollection : ObservableCollection<ActorInf
     {
         System.Diagnostics.Debug.WriteLine($"加载{offset}-{offset + limit} 中……");
 
-        var ActorInfos = await DataAccess.LoadActorInfo(limit, offset, orderByList, filterList);
+        var ActorInfos = await DataAccess.Get.GetActorInfo(limit, offset, orderByList, filterList);
 
         if (Count == 0)
         {
-            this.AllCount = DataAccess.CheckActorInfoCount(filterList);
+            this.AllCount = DataAccess.Get.GetCountOfActorInfo(filterList);
             System.Diagnostics.Debug.WriteLine($"总数量:{this.AllCount}");
 
             System.Diagnostics.Debug.WriteLine($"HasMoreItems:{HasMoreItems}");
         }
 
-        ActorInfos.ForEach(item => Add(item));
+        ActorInfos.ForEach(Add);
 
         if (AllCount <= Count)
         {
@@ -50,7 +51,7 @@ public class IncrementallLoadActorInfoCollection : ObservableCollection<ActorInf
             System.Diagnostics.Debug.WriteLine("记载完毕");
         }
 
-        return ActorInfos.Count;
+        return ActorInfos.Length;
     }
 
     public void SetFilter(List<string> filterList)

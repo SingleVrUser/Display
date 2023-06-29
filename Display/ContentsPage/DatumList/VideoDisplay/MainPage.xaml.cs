@@ -495,8 +495,8 @@ public sealed partial class MainPage : Page
 
             VideoInfo cidInfo;
             var name = video.Name;
-            var cid = FileMatch.MatchName(name);
-            if (cid == null)
+            var trueName = FileMatch.MatchName(name);
+            if (trueName == null)
             {
                 cidInfo = new VideoInfo { truename = name, imagepath = noPicturePath };
                 CidInfos.Add(cidInfo);
@@ -504,15 +504,15 @@ public sealed partial class MainPage : Page
             }
 
             Debug.WriteLine("尝试从数据库中搜索");
-            var result = DataAccess.SelectTrueName(cid);
+            var result = DataAccess.Get.GetOneTrueNameByName(trueName);
 
             //数据库中有
-            if (result.Length != 0)
+            if (!string.IsNullOrEmpty(result))
             {
                 Debug.WriteLine("数据库中存在该信息");
 
                 //使用第一个符合条件的Name
-                cidInfo = DataAccess.LoadOneVideoInfoByCID(result[0]);
+                cidInfo = DataAccess.Get.GetSingleVideoInfoByTrueName(result);
 
 
                 Debug.WriteLine($"\t>>{cidInfo.truename}");
@@ -523,12 +523,12 @@ public sealed partial class MainPage : Page
                 Debug.WriteLine("数据库不存在该信息，尝试从网络中查找");
                 var spiderManager = Spider.Manager.Current;
 
-                cidInfo = await spiderManager.DispatchSpiderInfoByCIDInOrder(cid);
+                cidInfo = await spiderManager.DispatchSpiderInfoByCIDInOrder(trueName);
 
                 Debug.WriteLine($"\t网络搜索到的结果{cidInfo?.truename}");
             }
 
-            cidInfo ??= new VideoInfo { truename = cid, imagepath = noPicturePath };
+            cidInfo ??= new VideoInfo { truename = trueName, imagepath = noPicturePath };
             CidInfos.Add(cidInfo);
 
         }

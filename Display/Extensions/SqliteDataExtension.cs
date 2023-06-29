@@ -4,11 +4,10 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace Display.Extensions
 {
-    internal static class SQLiteDataExtension
+    internal static class SqLiteDataExtension
     {
         public static T GetNullableAndStructValue<T>(this object obj)
         {

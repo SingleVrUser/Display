@@ -80,7 +80,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
         else
         {
-            var folderToRootList = DataAccess.GetRootByCid(cid);
+            var folderToRootList = DataAccess.Get.GetRootByCid(cid);
             unit = folderToRootList.Select(x => new ExplorerItem { Name = x.Name, Id = x.Cid }).ToList();
         }
 
@@ -820,7 +820,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (result == ContentDialogResult.Primary)
         {
-            DataAccess.DeleteTable(DataAccess.TableName.FilesInfo); ;
+            DataAccess.Delete.DeleteTable(DataAccess.TableName.FilesInfo); ;
         }
     }
 

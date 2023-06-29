@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Display.Data;
+using SharpCompress;
 
 namespace Display.Models;
 
@@ -12,12 +13,12 @@ public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<Fail
 {
     public async Task LoadData(int startShowCount = 20)
     {
-        var newItems = await DataAccess.LoadFailFileInfoWithDatum(0, startShowCount, showType: ShowType);
+        var newItems = await DataAccess.Get.GetFailFileInfoWithDatum(0, startShowCount, showType: ShowType);
 
         if (Count == 0)
         {
             HasMoreItems = true;
-            this.AllCount = DataAccess.CheckFailDatumFilesCount(showType: ShowType);
+            this.AllCount = DataAccess.Get.GetCountOfFailDatumFiles(showType: ShowType);
         }
         else
             Clear();
@@ -46,9 +47,9 @@ public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<Fail
 
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        var failLists = await DataAccess.LoadFailFileInfoWithDatum(Items.Count, (int)count, showType: ShowType);
+        var failLists = await DataAccess.Get.GetFailFileInfoWithDatum(Items.Count, (int)count, showType: ShowType);
 
-        if (failLists.Count < count)
+        if (failLists.Length < count)
         {
             HasMoreItems = false;
         }
@@ -57,7 +58,7 @@ public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<Fail
 
         return new LoadMoreItemsResult
         {
-            Count = (uint)failLists.Count
+            Count = (uint)failLists.Length
         };
     }
 }

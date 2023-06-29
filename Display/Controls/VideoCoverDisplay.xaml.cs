@@ -14,6 +14,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Display.Data;
+using SharpCompress;
 
 namespace Display.Controls;
 
@@ -253,9 +254,9 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
                     // 准确查询演员，一般来源于详情页和演员页
                     if (!isFuzzyQueryActor)
                     {
-                        var actorInfos = await DataAccess.LoadActorInfo(filterList: new() { $"Name == '{ShowName}'" });
+                        var actorInfos = await DataAccess.Get.GetActorInfo(filterList: new() { $"Name == '{ShowName}'" });
 
-                        if (actorInfos.Count != 0)
+                        if (actorInfos.Length != 0)
                         {
                             ActorInfo = actorInfos.FirstOrDefault();
 
@@ -479,7 +480,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         videoInfo.is_like = (bool)Button.IsChecked ? 1 : 0;
 
-        DataAccess.UpdateSingleDataFromVideoInfo(videoInfo.truename, "is_like", videoInfo.is_like.ToString());
+        DataAccess.Update.UpdateSingleDataFromVideoInfo(videoInfo.truename, "is_like", videoInfo.is_like.ToString());
     }
 
     private void FailLikeToggleButton_Click(object sender, RoutedEventArgs e)
@@ -490,7 +491,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         info.IsLike = (bool)Button.IsChecked ? 1 : 0;
 
-        DataAccess.UpdateSingleFailInfo(info.PickCode, "is_like", info.IsLike.ToString());
+        DataAccess.Update.UpdateSingleFailInfo(info.PickCode, "is_like", info.IsLike.ToString());
     }
 
     /// <summary>
@@ -506,7 +507,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         videoInfo.look_later = (bool)Button.IsChecked ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
 
-        DataAccess.UpdateSingleDataFromVideoInfo(videoInfo.truename, "look_later", videoInfo.look_later.ToString());
+        DataAccess.Update.UpdateSingleDataFromVideoInfo(videoInfo.truename, "look_later", videoInfo.look_later.ToString());
     }
 
     private void FailLookLaterToggleButton_Click(object sender, RoutedEventArgs e)
@@ -517,7 +518,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         info.LookLater = (bool)Button.IsChecked ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
 
-        DataAccess.UpdateSingleFailInfo(info.PickCode, "look_later", info.LookLater.ToString());
+        DataAccess.Update.UpdateSingleFailInfo(info.PickCode, "look_later", info.LookLater.ToString());
     }
 
     /// <summary>
@@ -531,7 +532,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         string score_str = videoInfo.score == 0 ? "-1" : sender.Value.ToString();
 
-        DataAccess.UpdateSingleDataFromVideoInfo(videoInfo.truename, "score", score_str);
+        DataAccess.Update.UpdateSingleDataFromVideoInfo(videoInfo.truename, "score", score_str);
 
     }
 
@@ -541,7 +542,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         string score_str = Info.Score == 0 ? "-1" : sender.Value.ToString();
 
-        DataAccess.UpdateSingleFailInfo(Info.PickCode, "score", score_str);
+        DataAccess.Update.UpdateSingleFailInfo(Info.PickCode, "score", score_str);
     }
 
     public event RoutedEventHandler SingleVideoPlayClick;
@@ -713,8 +714,9 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         AllFailInfoCollection.OrderBy = FailListOrderBy;
         AllFailInfoCollection.IsDesc = FailListIsDesc;
-        List<Datum> lists = await DataAccess.LoadFailFileInfoWithDatum(0, 30, localCheckText, orderBy: FailListOrderBy, isDesc: FailListIsDesc);
-        lists.ForEach(datum => AllFailInfoCollection.Add(datum));
+        var lists = await DataAccess.Get.GetFailFileInfoWithDatum(0, 30, localCheckText, orderBy: FailListOrderBy, isDesc: FailListIsDesc);
+        lists.ForEach(AllFailInfoCollection.Add);
+
 
     }
 
@@ -744,7 +746,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             {
                 var item = appBarButton.DataContext as VideoCoverDisplayClass;
                 //从数据库中删除
-                DataAccess.DeleteDataInVideoInfoTable(item.truename);
+                DataAccess.Delete.DeleteDataInVideoInfoTable(item.truename);
 
                 //删除存储的文件夹
                 string savePath = Path.Combine(AppSettings.ImageSavePath, item.truename);
@@ -1130,7 +1132,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         var isLike = (bool)isLikeButton.IsChecked ? 1 : 0;
 
-        DataAccess.UpdateSingleDataFromActorInfo(actorId.ToString(), "is_like", isLike.ToString());
+        DataAccess.Update.UpdateSingleDataFromActorInfo(actorId.ToString(), "is_like", isLike.ToString());
     }
 
     private void ChangedHyperlink()
@@ -1246,11 +1248,11 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         var pickCode = datum.PickCode;
 
-        var failInfo = DataAccess.LoadSingleFailInfo(pickCode);
+        var failInfo = DataAccess.Get.GetSingleFailInfoByPickCode(pickCode);
 
         if (failInfo == null)
         {
-            DataAccess.AddOrReplaceFailList_IsLike_LookLater(new FailInfo
+            DataAccess.Add.AddOrReplaceFailList_IsLike_LookLater(new FailInfo
             {
                 PickCode = pickCode,
                 IsLike = 1
@@ -1264,7 +1266,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             switch (failInfo.IsLike)
             {
                 case 0:
-                    DataAccess.UpdateSingleFailInfo(pickCode, "is_like", "1");
+                    DataAccess.Update.UpdateSingleFailInfo(pickCode, "is_like", "1");
                     ShowTeachingTip("已添加进喜欢");
                     break;
                 default:
@@ -1282,11 +1284,11 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         var pickCode = datum.PickCode;
 
-        var failInfo = DataAccess.LoadSingleFailInfo(pickCode);
+        var failInfo = DataAccess.Get.GetSingleFailInfoByPickCode(pickCode);
 
         if (failInfo == null)
         {
-            DataAccess.AddOrReplaceFailList_IsLike_LookLater(new()
+            DataAccess.Add.AddOrReplaceFailList_IsLike_LookLater(new()
             {
                 PickCode = pickCode,
                 LookLater = 1
@@ -1301,7 +1303,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             switch (failInfo.LookLater)
             {
                 case 0:
-                    DataAccess.UpdateSingleFailInfo(pickCode, "look_later", "1");
+                    DataAccess.Update.UpdateSingleFailInfo(pickCode, "look_later", "1");
                     ShowTeachingTip("已添加进稍后观看");
                     break;
                 default:
