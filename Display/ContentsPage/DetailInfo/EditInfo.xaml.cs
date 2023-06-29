@@ -3,7 +3,6 @@
 
 using CommunityToolkit.WinUI.UI;
 using CommunityToolkit.WinUI.UI.Controls;
-using Display.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
@@ -12,6 +11,7 @@ using System.Data;
 using System.Linq;
 using Windows.Foundation;
 using Display.Data;
+using Display.Models.IncrementalCollection;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -30,7 +30,7 @@ public sealed partial class EditInfo : Page
     private List<TokenData> categories;
 
     //private AdvancedCollectionView actor_acv;
-    private IncrementallLoadActorInfoCollection actors_suggestion;
+    private IncrementalLoadActorInfoCollection actors_suggestion;
     private ObservableCollection<ActorInfo> actor_items;
 
     VideoCoverDisplayClass videoInfo;

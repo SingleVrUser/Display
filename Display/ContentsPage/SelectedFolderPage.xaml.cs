@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 using Display.Data;
-using Display.Models;
+using Display.Models.IncrementalCollection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;

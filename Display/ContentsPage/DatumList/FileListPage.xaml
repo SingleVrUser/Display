@@ -394,7 +394,7 @@
                     <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource TitleText}"
                                Tapped="OrderBy_Tapped">
                                 <Run>名称</Run>
-                                <Run x:Name="Name_Run"
+                                <Run x:Name="NameRun"
                                      FontFamily="Segoe Fluent Icons"></Run>
                     </TextBlock>
 
@@ -402,7 +402,7 @@
                                Grid.Column="1"
                                Tapped="OrderBy_Tapped">
                             <Run>修改时间</Run>
-                            <Run x:Name="Time_Run"
+                            <Run x:Name="TimeRun"
                                  FontFamily="Segoe Fluent Icons"
                                  Text="&#xE015;"></Run>
                     </TextBlock>
@@ -411,7 +411,7 @@
                                Grid.Column="2"
                                Tapped="OrderBy_Tapped">
                             <Run>大小</Run>
-                            <Run x:Name="Size_Run"
+                            <Run x:Name="SizeRun"
                                  FontFamily="Segoe Fluent Icons"></Run>
                     </TextBlock>
                 </Grid>

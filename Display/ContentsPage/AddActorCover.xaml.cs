@@ -1,6 +1,4 @@
-﻿
-using Display.Models;
-using Microsoft.UI.Input;
+﻿using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -20,6 +18,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Display.Data;
 using static System.String;
+using Display.Models.IncrementalCollection;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -31,7 +30,7 @@ namespace Display.ContentsPage
     /// </summary>
     public sealed partial class AddActorCover : Page
     {
-        IncrementallLoadActorInfoCollection actorinfo;
+        IncrementalLoadActorInfoCollection actorinfo;
 
         ObservableCollection<string> ShowImageList = new();
 

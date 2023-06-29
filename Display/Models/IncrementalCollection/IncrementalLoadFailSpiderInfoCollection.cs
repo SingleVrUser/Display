@@ -7,29 +7,23 @@ using Windows.Foundation;
 using Display.Data;
 using SharpCompress;
 
-namespace Display.Models;
+namespace Display.Models.IncrementalCollection;
 
-public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum>, ISupportIncrementalLoading
+public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<FailDatum>, ISupportIncrementalLoading
 {
-    public IncrementalLoadFailDatumInfoCollection()
-    {
-
-    }
-
     public async Task LoadData(int startShowCount = 20)
     {
-        var newItems = await DataAccess.Get.GetFailFileInfoWithDatum(0, startShowCount, filterName, OrderBy, IsDesc, ShowType);
+        var newItems = await DataAccess.Get.GetFailFileInfoWithDatum(0, startShowCount, showType: ShowType);
 
         if (Count == 0)
         {
             HasMoreItems = true;
-            this.AllCount = DataAccess.Get.GetCountOfFailDatumFiles(filterName, ShowType);
+            AllCount = DataAccess.Get.GetCountOfFailDatumFiles(showType: ShowType);
         }
         else
             Clear();
 
-
-        newItems.ForEach(Add);
+        newItems.ForEach(item => Add(new(item)));
     }
 
     public void SetShowType(FailType ShowType)
@@ -39,8 +33,6 @@ public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum
 
     public FailType ShowType { get; set; } = FailType.All;
 
-    public string filterName { get; set; } = string.Empty;
-
     public int AllCount { get; private set; }
 
     public bool HasMoreItems { get; set; } = true;
@@ -49,29 +41,20 @@ public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum
     {
         return InnerLoadMoreItemsAsync(count).AsAsyncOperation();
     }
-    public void SetFilter(string filterKeywords)
-    {
-        this.filterName = filterKeywords;
-    }
-    public void SetOrder(string orderBy, bool isDesc)
-    {
-        this.OrderBy = orderBy;
-        this.IsDesc = isDesc;
-    }
 
     public string OrderBy { get; set; }
     public bool IsDesc { get; set; }
 
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        var failLists = await DataAccess.Get.GetFailFileInfoWithDatum(Items.Count, (int)count, filterName, OrderBy, IsDesc, ShowType);
+        var failLists = await DataAccess.Get.GetFailFileInfoWithDatum(Items.Count, (int)count, showType: ShowType);
 
         if (failLists.Length < count)
         {
             HasMoreItems = false;
         }
 
-        failLists.ForEach(item => Add(item));
+        failLists.ForEach(item => Add(new(item)));
 
         return new LoadMoreItemsResult
         {

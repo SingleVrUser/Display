@@ -5,6 +5,7 @@ using ByteSizeLib;
 using Display.Data;
 using Display.Helper;
 using Display.Models;
+using Display.Models.IncrementalCollection;
 using Display.ViewModels;
 using Display.Views;
 using Microsoft.UI;
@@ -37,6 +38,9 @@ namespace Display.ContentsPage.DatumList;
 /// </summary>
 public sealed partial class FileListPage : INotifyPropertyChanged
 {
+    private const string UpSortIconRun = "\uE014";
+    private const string DownSortIconRun = "\uE015";
+    private WebApi _webApi;
     private ObservableCollection<ExplorerItem> _units;
     private static readonly ExplorerItem RootExplorerItem = new()
     {
@@ -59,21 +63,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
     }
 
-    //private Visibility _withoutFilesTipVisibility = Visibility.Collapsed;
-    //private Visibility WithoutFilesTipVisibility
-    //{   
-    //    get => _withoutFilesTipVisibility;
-    //    set
-    //    {
-    //        if (_withoutFilesTipVisibility == value) return;
-
-    //        _withoutFilesTipVisibility = value;
-
-    //        OnPropertyChanged();
-    //    }
-    //}
-
-    private WebApi _webApi;
 
     private WebApi WebApi => _webApi ??= WebApi.GlobalWebApi;
     
@@ -222,56 +211,52 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (textBlock.Inlines.FirstOrDefault() is not Run run) return;
 
-        //string DownSortIconRun = "\uE015";
-
         switch (run.Text)
         {
             case "名称":
-                ChangedOrder(WebApi.OrderBy.FileName, Name_Run);
+                ChangedOrder(WebApi.OrderBy.FileName, NameRun);
                 break;
             case "修改时间":
-                ChangedOrder(WebApi.OrderBy.UserPtime, Time_Run);
+                ChangedOrder(WebApi.OrderBy.UserProduceTime, TimeRun);
                 break;
             case "大小":
-                ChangedOrder(WebApi.OrderBy.FileSize, Size_Run);
+                ChangedOrder(WebApi.OrderBy.FileSize, SizeRun);
                 break;
         }
     }
 
+
     private async void ChangedOrder(WebApi.OrderBy orderBy, Run run)
     {
-        string UpSortIconRun = "\uE014";
-        int asc = run.Text == UpSortIconRun ? 0 : 1;
+        var asc = run.Text == UpSortIconRun ? 0 : 1;
 
         await FilesInfos.SetOrder(orderBy, asc);
     }
 
     private void ChangedOrderIcon(WebApi.OrderBy orderBy, int asc)
     {
-        string UpSortIconRun = "\uE014";
-        string DownSortIconRun = "\uE015";
 
-        Run[] OrderIconRunList = new[] { Time_Run, Name_Run, Size_Run };
+        Run[] orderIconRunList = { TimeRun, NameRun, SizeRun };
 
         Run run;
 
         switch (orderBy)
         {
             case WebApi.OrderBy.FileName:
-                run = Name_Run;
+                run = NameRun;
                 break;
-            case WebApi.OrderBy.UserPtime:
-                run = Time_Run;
+            case WebApi.OrderBy.UserProduceTime:
+                run = TimeRun;
                 break;
             case WebApi.OrderBy.FileSize:
-                run = Size_Run;
+                run = SizeRun;
                 break;
             default:
-                run = Time_Run;
+                run = TimeRun;
                 break;
         }
 
-        foreach (var itemRun in OrderIconRunList)
+        foreach (var itemRun in orderIconRunList)
         {
             if (itemRun == run)
             {

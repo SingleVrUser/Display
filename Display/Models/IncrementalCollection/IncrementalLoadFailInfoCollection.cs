@@ -7,9 +7,9 @@ using Windows.Foundation;
 using Display.Data;
 using SharpCompress;
 
-namespace Display.Models;
+namespace Display.Models.IncrementalCollection;
 
-public class IncrementallLoadFailInfoCollection : ObservableCollection<FailInfo>, ISupportIncrementalLoading
+public class IncrementalLoadFailInfoCollection : ObservableCollection<FailInfo>, ISupportIncrementalLoading
 {
     public bool HasMoreItems { get; set; } = true;
 
@@ -17,7 +17,7 @@ public class IncrementallLoadFailInfoCollection : ObservableCollection<FailInfo>
 
     public FailInfoShowType ShowType { get; private set; }
 
-    public IncrementallLoadFailInfoCollection(FailInfoShowType showType)
+    public IncrementalLoadFailInfoCollection(FailInfoShowType showType)
     {
         ShowType = showType;
     }

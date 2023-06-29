@@ -1,5 +1,4 @@
-﻿using Display.Models;
-using Microsoft.UI.Input;
+﻿using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -16,6 +15,7 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using Display.Data;
 using SharpCompress;
+using Display.Models.IncrementalCollection;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -27,7 +27,7 @@ namespace Display.Views
     /// </summary>
     public sealed partial class ActorsPage : Page
     {
-        IncrementallLoadActorInfoCollection actorinfo;
+        IncrementalLoadActorInfoCollection actorinfo;
         ObservableCollection<ActorInfo> actorPartInfo = new();
 
         public static ActorsPage Current;
@@ -51,7 +51,7 @@ namespace Display.Views
         {
             ProgressRing.IsActive = true;
 
-            actorinfo = new IncrementallLoadActorInfoCollection(new Dictionary<string, bool> { { "is_like", true }, { "prifile_path", true } });
+            actorinfo = new IncrementalLoadActorInfoCollection(new Dictionary<string, bool> { { "is_like", true }, { "prifile_path", true } });
             BasicGridView.ItemsSource = actorinfo;
             await actorinfo.LoadData();
 
