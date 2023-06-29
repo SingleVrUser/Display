@@ -12,7 +12,8 @@ public class DoubleToInt32Converter : IValueConverter
         {
             return (int)doubleValue;
         }
-        else if(value is int intValue)
+
+        if(value is int intValue)
         {
             return intValue;
         }

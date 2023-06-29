@@ -89,9 +89,8 @@ namespace Display.Services.Upload
             _fileInfo = new FileInfo(path);
             if (!_fileInfo.Exists) return;
 
-            FileUploadResult = new FileUploadResult
+            FileUploadResult = new FileUploadResult(_fileInfo.Name)
             {
-                Name = _fileInfo.Name,
                 FileSize = _fileInfo.Length,
                 Cid = cid
             };
@@ -379,18 +378,38 @@ namespace Display.Services.Upload
 
     public class FileUploadResult
     {
-        public long Id;
-        public string Name;
+        public readonly string Name;
+        public long? Id;
         public long FileSize;
         public long Cid;
         public string PickCode;
         public string Sha1;
-        public bool Success;
         public string ThumbUrl;
         public int Aid;
-        public bool IsVideo;
+
         public FilesInfo.FileType Type = FilesInfo.FileType.File;
         public int Time = (int)DateTimeOffset.Now.ToUnixTimeSeconds();
+
+        public bool Success;
+
+        private bool? _isVideo;
+
+        public bool IsVideo
+        {
+            get
+            {
+                if(_isVideo!=null) return (bool)_isVideo;
+
+                _isVideo = FilesInfo.GetTypeFromIcon(Name.Split('.')[^1]) == "video";
+                return (bool)_isVideo;
+            }
+            set=>_isVideo = value;
+        }
+
+        public FileUploadResult(string name)
+        {
+            Name = name;
+        }
 
         public void SetFromOssUploadResult(OssUploadResult uploadResult)
         {
@@ -403,7 +422,6 @@ namespace Display.Services.Upload
             ThumbUrl = data.thumb_url;
             Sha1 = data.sha1;
             Aid = data.aid;
-            Name = data.file_name;
             Cid = data.cid;
             IsVideo = data.is_video == 1;
         }

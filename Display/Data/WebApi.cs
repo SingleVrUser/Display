@@ -434,8 +434,6 @@ namespace Display.Data
 
                 if (torrentCidInfo != null && uploadInfo != null)
                 {
-                    //await Upload115.SingleUpload115.UploadTo115(torrentPath, torrentCidInfo.cid, uploadInfo.user_id, uploadInfo.userkey);
-
                     await FileUpload.SimpleUpload(torrentPath, torrentCidInfo.cid, uploadInfo.user_id, uploadInfo.userkey);
                 }
 
@@ -444,7 +442,7 @@ namespace Display.Data
             }
 
             // 上传后仍然为空
-            if (info is not { state: true } || uploadInfo == null) return  new Tuple<bool, string>(false, "上传torrent失败");
+            if (info is not { state: true } || uploadInfo == null) return new Tuple<bool, string>(false, "上传torrent失败");
 
             var offlineSpaceInfo = await GetOfflineSpaceInfo(uploadInfo.userkey, uploadInfo.user_id);
 

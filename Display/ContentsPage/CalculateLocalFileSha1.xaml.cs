@@ -219,7 +219,7 @@ namespace Display.ContentsPage
                 string iconpath;
                 if (FileType == FilesInfo.FileType.File)
                 {
-                    iconpath = FilesInfo.GetPathFromFileType(Icon);
+                    iconpath = FilesInfo.GetPathFromIcon(Icon);
                 }
                 else
                 {

@@ -38,13 +38,13 @@ namespace Display.ContentsPage.DatumList;
 public sealed partial class FileListPage : INotifyPropertyChanged
 {
     private ObservableCollection<ExplorerItem> _units;
-    private static readonly ExplorerItem _rootExplorerItem = new()
+    private static readonly ExplorerItem RootExplorerItem = new()
     {
         Name = "根目录",
         Id = 0
     };  
     private ExplorerItem CurrentExplorerItem => _units.LastOrDefault();
-    private ExplorerItem LastExplorerItem => _units.Count<=1 ? _rootExplorerItem : _units[^2];
+    private ExplorerItem LastExplorerItem => _units.Count<=1 ? RootExplorerItem : _units[^2];
 
     private IncrementalLoadDatumCollection _filesInfos;
     private IncrementalLoadDatumCollection FilesInfos
@@ -58,6 +58,20 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
+
+    //private Visibility _withoutFilesTipVisibility = Visibility.Collapsed;
+    //private Visibility WithoutFilesTipVisibility
+    //{   
+    //    get => _withoutFilesTipVisibility;
+    //    set
+    //    {
+    //        if (_withoutFilesTipVisibility == value) return;
+
+    //        _withoutFilesTipVisibility = value;
+
+    //        OnPropertyChanged();
+    //    }
+    //}
 
     private WebApi _webApi;
 
@@ -75,7 +89,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         List<ExplorerItem> unit;
         if (cid == 0)
         {
-            unit = new List<ExplorerItem> { _rootExplorerItem };
+            unit = new List<ExplorerItem> { RootExplorerItem };
 
         }
         else
@@ -86,7 +100,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         InitData(unit);
     }
-
 
     private void InitData(List<ExplorerItem> units)
     {
@@ -103,43 +116,12 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         FilesInfos.GetFileInfoCompleted += FilesInfos_GetFileInfoCompleted;
     }
 
-
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    public void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        // Raise the PropertyChanged event, passing the Name of the property whose value has changed.
-        this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
     private void FilesInfos_GetFileInfoCompleted(object sender, GetFileInfoCompletedEventArgs e)
     {
-        ChangedOrderIcon(e.orderby, e.asc);
+        ChangedOrderIcon(e.Orderby, e.Asc);
         MyProgressBar.Visibility = Visibility.Collapsed;
     }
 
-    private async Task OpenFolder(ExplorerItem currentItem)
-    {
-        //不存在，返回
-        if (currentItem?.Id == null) return;
-
-        //删除选中路径后面的路径
-        var index = _units.IndexOf(currentItem);
-
-        //不存在，返回
-        if (index < 0) return;
-
-        for (int i = _units.Count - 1; i > index; i--)
-        {
-            _units.RemoveAt(i);
-        }
-
-        await FilesInfos.SetCid(currentItem.Id);
-
-        // 切换目录时，全选checkBox不是选中状态
-        MultipleSelectedCheckBox.IsChecked = false;
-    }
 
     private void OpenFile_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
@@ -163,7 +145,30 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     }
 
-    private async void ChangedFolder(FilesInfo filesInfo)
+    private async Task OpenFolder(ExplorerItem currentItem)
+    {
+        //不存在，返回
+        if (currentItem?.Id == null) return;
+
+
+        //删除选中路径后面的路径
+        var index = _units.IndexOf(currentItem);
+
+        //不存在，返回
+        if (index < 0) return;
+            
+        for (var i = _units.Count - 1; i > index; i--)
+        {
+            _units.RemoveAt(i);
+        }
+
+        await FilesInfos.SetCid(currentItem.Id);
+
+        // 切换目录时，全选checkBox不是选中状态
+        MultipleSelectedCheckBox.IsChecked = false;
+    }
+
+    private async void GoToFolder(FilesInfo filesInfo)
     {
         //跳过文件
         if (filesInfo.Type == FilesInfo.FileType.File) return;
@@ -184,11 +189,11 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         MultipleSelectedCheckBox.IsChecked = false;
     }
 
-    private void TextBlock_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
+    private void TextBlock_Tapped(object sender, TappedRoutedEventArgs e)
     {
         if (sender is not TextBlock { DataContext: FilesInfo filesInfo }) return;
 
-        ChangedFolder(filesInfo);
+        GoToFolder(filesInfo);
     }
 
     private void ToTopButton_Click(object sender, RoutedEventArgs e)
@@ -204,9 +209,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             ShowTeachingTip("当前未选中文件");
             return;
         }
-
-        ////检查选中的文件或文件夹
-        //if (BaseExample.SelectedItems.FirstOrDefault() is not FilesInfo) return;
 
         var filesInfo = BaseExample.SelectedItems.Cast<FilesInfo>().ToList();
 
@@ -637,26 +639,23 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     private int GetInsertIndexInListView(ListView target, DragEventArgs e)
     {
         // Find the insertion index:
-        Windows.Foundation.Point pos = e.GetPosition(target.ItemsPanelRoot);
+        var pos = e.GetPosition(target.ItemsPanelRoot);
 
-        // If the target ListView has items in it, use the height of the first item
-        //      to find the insertion index.
-        int index = -1;
-        if (target.Items.Count != 0)
+        var index = -1;
+        if (target.Items.Count == 0) return index;
+
+        // Get a reference to the first item in the ListView
+        var sampleItem = (ListViewItem)target.ContainerFromIndex(0);
+
+        // Adjust itemHeight for margins
+        var itemHeight = sampleItem.ActualHeight + sampleItem.Margin.Top + sampleItem.Margin.Bottom;
+
+        // Find index based on dividing number of items by height of each item
+        var tmp = (int)(pos.Y / itemHeight);
+
+        if (tmp <= target.Items.Count - 1)
         {
-            // Get a reference to the first item in the ListView
-            ListViewItem sampleItem = (ListViewItem)target.ContainerFromIndex(0);
-
-            // Adjust itemHeight for margins
-            double itemHeight = sampleItem.ActualHeight + sampleItem.Margin.Top + sampleItem.Margin.Bottom;
-
-            // Find index based on dividing number of items by height of each item
-            int tmp = (int)(pos.Y / itemHeight);
-
-            if (tmp <= target.Items.Count - 1)
-            {
-                index = tmp;
-            }
+            index = tmp;
         }
 
         return index;
@@ -676,7 +675,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     private List<FilesInfo> TransferStationFilesToFilesInfo(List<TransferStationFiles> srcList)
     {
         List<FilesInfo> infos = new();
-        foreach (TransferStationFiles item in srcList)
+        foreach (var item in srcList)
         {
             infos.AddRange(item.TransferFiles);
         }
@@ -743,19 +742,18 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     /// <summary>
     /// 显示确认提示框
     /// </summary>
-    /// <param Name="selectedItemList"></param>
+    /// <param name="nameList"></param>
     /// <returns></returns>
-    private async Task<ContentDialogResult> ShowContentDialog(List<string> NameList)
+    private async Task<ContentDialogResult> ShowContentDialog(List<string> nameList)
     {
-        StackPanel readyStackPanel = new StackPanel();
+        var readyStackPanel = new StackPanel();
 
         readyStackPanel.Children.Add(new TextBlock() { Text = "选中文件夹：" });
-        int index = 0;
-
-        foreach (var name in NameList)
+        var index = 0;
+        foreach (var name in nameList)
         {
             index++;
-            TextBlock textBlock = new TextBlock()
+            var textBlock = new TextBlock()
             {
                 Text = $"  {index}.{name}",
                 IsTextSelectionEnabled = true,
@@ -775,8 +773,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
                 Margin = new Thickness(0, 8, 0, 0)
             });
 
-        ContentDialog dialog = new ContentDialog
-        {
+        var dialog = new ContentDialog
+        {   
             XamlRoot = XamlRoot,
             Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
             Title = "确认后继续",
@@ -791,7 +789,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         return result;
     }
 
-    private async void deleData_Click(object sender, RoutedEventArgs e)
+    private async void deleteData_Click(object sender, RoutedEventArgs e)
     {
         var dialog = new ContentDialog
         {
@@ -806,11 +804,11 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         RichTextBlock textHighlightingRichTextBlock = new();
 
         Paragraph paragraph = new();
-        paragraph.Inlines.Add(new Run() { Text = "该操作将" });
-        paragraph.Inlines.Add(new Run() { Text = "删除", Foreground = new SolidColorBrush(Colors.OrangeRed), FontWeight = FontWeights.Bold, FontSize = 15 });
-        paragraph.Inlines.Add(new Run() { Text = "之前导入的" });
-        paragraph.Inlines.Add(new Run() { Text = "所有", Foreground = new SolidColorBrush(Colors.OrangeRed) });
-        paragraph.Inlines.Add(new Run() { Text = "115数据" });
+        paragraph.Inlines.Add(new Run { Text = "该操作将" });
+        paragraph.Inlines.Add(new Run { Text = "删除", Foreground = new SolidColorBrush(Colors.OrangeRed), FontWeight = FontWeights.Bold, FontSize = 15 });
+        paragraph.Inlines.Add(new Run { Text = "之前导入的" });
+        paragraph.Inlines.Add(new Run { Text = "所有", Foreground = new SolidColorBrush(Colors.OrangeRed) });
+        paragraph.Inlines.Add(new Run { Text = "115数据" });
 
         textHighlightingRichTextBlock.Blocks.Add(paragraph);
 
@@ -818,10 +816,9 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         var result = await dialog.ShowAsync();
 
-        if (result == ContentDialogResult.Primary)
-        {
-            DataAccess.Delete.DeleteTable(DataAccess.TableName.FilesInfo); ;
-        }
+        if (result != ContentDialogResult.Primary) return;
+
+        DataAccess.Delete.DeleteTable(DataAccess.TableName.FilesInfo); ;
     }
 
     private async void DownButton_Click(object sender, RoutedEventArgs e)
@@ -1230,6 +1227,28 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     private async void Refresh_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
         await OpenFolder(CurrentExplorerItem);
+    }
+
+    private bool _isSelectedListView = false;
+    private void BaseExample_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (sender is not ListView listView) return;
+
+        var isSelectedState = listView.SelectedItems.Count > 0;
+
+        if (_isSelectedListView == isSelectedState) return;
+        _isSelectedListView = isSelectedState;
+
+        VisualStateManager.GoToState(this, isSelectedState ?"Show": "Hidden", true);
+    }
+
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    public void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        // Raise the PropertyChanged event, passing the Name of the property whose value has changed.
+        this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
 

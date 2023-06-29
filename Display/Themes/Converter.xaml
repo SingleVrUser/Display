@@ -16,4 +16,5 @@
     <converter:NameToColorConverter x:Key="NameToColorConverter" />
     <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter" />
     <converter:BoolToVisibleConverter x:Key="BoolToVisibleConverter" />
+    <converter:ZeroToVisibleConverter x:Key="ZeroToVisibleConverter" />
 </ResourceDictionary>

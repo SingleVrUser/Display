@@ -91,7 +91,7 @@
             <!--无内容显示时显示该控件-->
             <StackPanel HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Visibility="{x:Bind isContentNull(CoverList.Count),Mode=OneWay}"
+                        Visibility="{x:Bind CoverList.Count,Converter={StaticResource ZeroToVisibleConverter},Mode=OneWay}"
                         Opacity="0.2">
                 <TextBlock Text="暂无内容显示"
                            FontSize="40"

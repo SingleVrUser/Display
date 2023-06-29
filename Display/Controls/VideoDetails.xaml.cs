@@ -16,10 +16,14 @@ using System.Threading.Tasks;
 using Windows.Foundation.Metadata;
 using Windows.Storage;
 using Windows.Storage.Streams;
+using Display.ContentsPage.DatumList;
 using Display.Data;
 using Display.Helper;
 using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
 using Display.ContentsPage.SearchLink;
+using Display.WindowView;
+using Display.Views;
+using Windows.Foundation;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -28,40 +32,40 @@ namespace Display.Controls
 {
     public sealed partial class VideoDetails : UserControl
     {
-        public VideoCoverDisplayClass resultinfo
+        public VideoCoverDisplayClass ResultInfo
         {
-            get { return (VideoCoverDisplayClass)GetValue(resultinfoProperty); }
-            set { SetValue(resultinfoProperty, value); }
+            get => (VideoCoverDisplayClass)GetValue(ResultInfoProperty);
+            set => SetValue(ResultInfoProperty, value);
         }
 
-        public static readonly DependencyProperty resultinfoProperty =
-            DependencyProperty.Register("resultinfo", typeof(string), typeof(VideoDetails), null);
+        public static readonly DependencyProperty ResultInfoProperty =
+            DependencyProperty.Register(nameof(ResultInfo), typeof(string), typeof(VideoDetails), null);
 
         public VideoDetails()
         {
             this.InitializeComponent();
         }
 
-        ObservableCollection<string> ShowImageList = new();
+        private readonly ObservableCollection<string> _showImageList = new();
 
-        private async void loadData()
+        private async void LoadData()
         {
-            if (resultinfo == null) return;
+            if (ResultInfo == null) return;
 
             //标题
-            Title_TextBlock.Text = resultinfo.title;
+            Title_TextBlock.Text = ResultInfo.title;
 
             //演员
             //之前有数据，清空
             if (ActorStackPanel.Children.Count != 0) ActorStackPanel.Children.Clear();
 
             ////查询该视频对应的演员列表
-            var actorList = await DataAccess.Get.GetActorInfoByVideoName(resultinfo.truename);
+            var actorList = await DataAccess.Get.GetActorInfoByVideoName(ResultInfo.truename);
 
             for (var i = 0; i < actorList.Length; i++)
             {
                 var actor = actorList[i];
-                var actorImageControl = new Controls.ActorImage(actor, resultinfo.releasetime);
+                var actorImageControl = new Controls.ActorImage(actor, ResultInfo.releasetime);
 
                 if (!string.IsNullOrEmpty(actor.Name))
                     actorImageControl.Click += ActorButtonOnClick;
@@ -72,7 +76,7 @@ namespace Display.Controls
             //标签
             //之前有数据，清空
             if (CategoryWrapPanel.Children.Count != 0) CategoryWrapPanel.Children.Clear();
-            var categoryList = resultinfo.category?.Split(",");
+            var categoryList = ResultInfo.category?.Split(",");
             for (var i = 0; i < categoryList?.Length; i++)
             {
                 var content = categoryList[i];
@@ -104,7 +108,7 @@ namespace Display.Controls
             //来源为本地
             if (AppSettings.ThumbnailOrigin == (int)Const.Origin.Local)
             {
-                var folderFullName = Path.Combine(AppSettings.ImageSavePath, resultinfo.truename);
+                var folderFullName = Path.Combine(AppSettings.ImageSavePath, ResultInfo.truename);
                 var theFolder = new DirectoryInfo(folderFullName);
 
                 if (theFolder.Exists)
@@ -123,7 +127,7 @@ namespace Display.Controls
             //来源为网络
             else if (AppSettings.ThumbnailOrigin == (int)Const.Origin.Web)
             {
-                var videoInfo = DataAccess.Get.GetSingleVideoInfoByTrueName(resultinfo.truename);
+                var videoInfo = DataAccess.Get.GetSingleVideoInfoByTrueName(ResultInfo.truename);
 
                 var sampleImageListStr = videoInfo?.sampleImageList;
                 if (!string.IsNullOrEmpty(sampleImageListStr))
@@ -143,7 +147,7 @@ namespace Display.Controls
 
         private void GridLoaded(object sender, RoutedEventArgs e)
         {
-            loadData();
+            LoadData();
 
             StartListCover_GridTapped();
         }
@@ -174,7 +178,7 @@ namespace Display.Controls
 
         private async void DownButton_Click(object sender, RoutedEventArgs e)
         {
-            string name = resultinfo.truename;
+            string name = ResultInfo.truename;
             var videoinfoList = DataAccess.Get.GetSingleFileInfoByTrueName(name);
 
             videoinfoList = videoinfoList.OrderBy(item => item.Name).ToList();
@@ -272,20 +276,20 @@ namespace Display.Controls
             }
         }
 
-        private void updateLookLater(bool? val)
+        private void UpdateLookLater(bool? val)
         {
             var lookLaterT = val == true ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
 
-            resultinfo.look_later = lookLaterT;
-            DataAccess.Update.UpdateSingleDataFromVideoInfo(resultinfo.truename, "look_later", lookLaterT.ToString());
+            ResultInfo.look_later = lookLaterT;
+            DataAccess.Update.UpdateSingleDataFromVideoInfo(ResultInfo.truename, "look_later", lookLaterT.ToString());
         }
 
-        private void updateLike(bool? val)
+        private void UpdateLike(bool? val)
         {
             var isLike = val == true ? 1 : 0;
 
-            resultinfo.is_like = isLike;
-            DataAccess.Update.UpdateSingleDataFromVideoInfo(resultinfo.truename, "is_like", isLike.ToString());
+            ResultInfo.is_like = isLike;
+            DataAccess.Update.UpdateSingleDataFromVideoInfo(ResultInfo.truename, "is_like", isLike.ToString());
         }
 
         private void Animation_Completed(ConnectedAnimation sender, object args)
@@ -302,22 +306,22 @@ namespace Display.Controls
             SmokeGridCancel();
         }
 
-        ContentsPage.DetailInfo.FindInfoAgainSmoke FindInfoAgainSmoke;
+        private FindInfoAgainSmoke _findInfoAgainSmoke;
 
         private void FindAppBarButton_Click(object sender, RoutedEventArgs e)
         {
             //第一次启动FindInfoAgainSmoke
-            if (FindInfoAgainSmoke == null)
+            if (_findInfoAgainSmoke == null)
             {
 
-                FindInfoAgainSmoke = new FindInfoAgainSmoke(resultinfo.truename);
+                _findInfoAgainSmoke = new FindInfoAgainSmoke(ResultInfo.truename);
 
-                FindInfoAgainSmoke.ConfirmClick += FindInfoAgainSmoke_ConfirmClick;
+                _findInfoAgainSmoke.ConfirmClick += FindInfoAgainSmoke_ConfirmClick;
             }
 
-            if (!SmokeGrid.Children.Contains(FindInfoAgainSmoke))
+            if (!SmokeGrid.Children.Contains(_findInfoAgainSmoke))
             {
-                SmokeGrid.Children.Add(FindInfoAgainSmoke);
+                SmokeGrid.Children.Add(_findInfoAgainSmoke);
                 SmokeCancelGrid.Tapped += FindInfoAgainSmokeCancelGrid_Tapped;
             }
 
@@ -327,14 +331,14 @@ namespace Display.Controls
         /// <summary>
         /// 重新搜刮后选择了选项，并按下了确认键
         /// </summary>
-        /// <param Name="sender"></param>
-        /// <param Name="e"></param>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void FindInfoAgainSmoke_ConfirmClick(object sender, RoutedEventArgs e)
         {
             if (!(sender is Button button)) return;
 
             //获取最新的信息
-            if (!(button.DataContext is VideoInfo videoInfo)) return;
+            if (button.DataContext is not VideoInfo videoInfo) return;
 
             await UpdateInfo(videoInfo);
 
@@ -364,13 +368,13 @@ namespace Display.Controls
 
                 var value = item.GetValue(videoInfo);
 
-                var newItem = resultinfo.GetType().GetProperty(name);
-                newItem?.SetValue(resultinfo, value);
+                var newItem = ResultInfo.GetType().GetProperty(name);
+                newItem?.SetValue(ResultInfo, value);
             }
 
             //图片地址不变，但内容变了
             //为了图片显示能够变化
-            var oldPath = resultinfo.imagepath;
+            var oldPath = ResultInfo.imagepath;
             var newPath = videoInfo.imagepath;
             //string NoPictruePath = "ms-appx:///Assets/NoPicture.jpg";
             if (!oldPath.Contains("ms-appx:") && File.Exists(newPath))
@@ -388,7 +392,7 @@ namespace Display.Controls
 
 
             //重新加载数据
-            loadData();
+            LoadData();
         }
 
         private void FindInfoAgainSmokeCancelGrid_Tapped(object sender, TappedRoutedEventArgs e)
@@ -402,9 +406,9 @@ namespace Display.Controls
         {
             SmokeGrid.Visibility = Visibility.Collapsed;
 
-            if (SmokeGrid.Children.Contains(FindInfoAgainSmoke))
+            if (SmokeGrid.Children.Contains(_findInfoAgainSmoke))
             {
-                SmokeGrid.Children.Remove(FindInfoAgainSmoke);
+                SmokeGrid.Children.Remove(_findInfoAgainSmoke);
             }
         }
 
@@ -447,18 +451,19 @@ namespace Display.Controls
                 animation = ThumbnailGridView.PrepareConnectedAnimation("forwardAnimation", _storedItem,
                     "Thumbnail_Image");
             }
-
-            string imagePath = e.ClickedItem as string;
+                
+            var imagePath = e.ClickedItem as string;
 
             //之前未赋值
-            if (ShowImageList.Count == 0)
+            if (_showImageList.Count == 0)
             {
-                var ThumbnailList = ThumbnailGridView.ItemsSource as List<string>;
-                for (int i = 0; i < ThumbnailList.Count; i++)
-                {
-                    var image = ThumbnailList[i];
+                if (ThumbnailGridView.ItemsSource is not List<string> thumbnailList) return;
 
-                    ShowImageList.Add(image);
+                for (var i = 0; i < thumbnailList.Count; i++)
+                {
+                    var image = thumbnailList[i];
+
+                    _showImageList.Add(image);
                     if (image == imagePath)
                     {
                         ShowImageFlipView.SelectedIndex = i;
@@ -469,7 +474,7 @@ namespace Display.Controls
             //之前已赋值
             else
             {
-                var index = ShowImageList.IndexOf(imagePath);
+                var index = _showImageList.IndexOf(imagePath);
                 ShowImageFlipView.SelectedIndex = index;
             }
 
@@ -478,10 +483,12 @@ namespace Display.Controls
             SmokeGrid.Visibility = Visibility.Visible;
             destinationImageElement.Visibility = Visibility.Visible;
 
-            animation.Completed += Animation_Completed1;
+            if (animation != null)
+            {
+                animation.Completed += Animation_Completed1;
 
-            animation.TryStart(destinationImageElement);
-
+                animation.TryStart(destinationImageElement);
+            }
         }
 
         private void Animation_Completed1(ConnectedAnimation sender, object args)
@@ -506,7 +513,7 @@ namespace Display.Controls
 
         private string GetFileIndex()
         {
-            return $"{ShowImageFlipView.SelectedIndex + 1}/{ShowImageList.Count}";
+            return $"{ShowImageFlipView.SelectedIndex + 1}/{_showImageList.Count}";
         }
 
         public event RoutedEventHandler DeleteClick;
@@ -518,7 +525,7 @@ namespace Display.Controls
 
         private async void EditAppBarButton_Click(object sender, RoutedEventArgs e)
         {
-            var EditPage = new EditInfo(resultinfo);
+            var EditPage = new EditInfo(ResultInfo);
             ContentDialog dialog = new()
             {
                 XamlRoot = this.XamlRoot,
@@ -560,13 +567,13 @@ namespace Display.Controls
                     }
 
                     //原先的旧值
-                    var oldItem = resultinfo.GetType().GetProperty(name);
-                    var oldValue = oldItem.GetValue(resultinfo);
+                    var oldItem = ResultInfo.GetType().GetProperty(name);
+                    var oldValue = oldItem.GetValue(ResultInfo);
 
                     //与新值比较，判断是否需要更新正在显示的ResultInfo数据
                     if (newValue != oldValue)
                     {
-                        oldItem.SetValue(resultinfo, newValue);
+                        oldItem.SetValue(ResultInfo, newValue);
                     }
                 }
 
@@ -576,7 +583,7 @@ namespace Display.Controls
 
         private void OpenDirectory_Click(object sender, RoutedEventArgs e)
         {
-            string ImagePath = Path.GetDirectoryName(resultinfo.imagepath);
+            string ImagePath = Path.GetDirectoryName(ResultInfo.imagepath);
             FileMatch.LaunchFolder(ImagePath);
         }
 
@@ -589,16 +596,18 @@ namespace Display.Controls
         {
             string score_str = sender.Value == 0 ? "-1" : sender.Value.ToString();
 
-            DataAccess.Update.UpdateSingleDataFromVideoInfo(resultinfo.truename, "score", score_str);
+            DataAccess.Update.UpdateSingleDataFromVideoInfo(ResultInfo.truename, "score", score_str);
         }
 
         private void ShowTeachingTip(string subtitle, string content = null)
         {
-            LightDismissTeachingTip.Subtitle = subtitle;
-            if (content != null)
-                LightDismissTeachingTip.Content = content;
+            BasePage.ShowTeachingTip(LightDismissTeachingTip, subtitle, content);
+        }
 
-            LightDismissTeachingTip.IsOpen = true;
+        private void ShowTeachingTip(string subtitle,
+            string actionContent, TypedEventHandler<TeachingTip, object> actionButtonClick)
+        {
+            BasePage.ShowTeachingTip(LightDismissTeachingTip, subtitle, actionContent, actionButtonClick);
         }
 
         FileInfoInCidSmoke FileInfoInCidSmokePage;
@@ -607,7 +616,7 @@ namespace Display.Controls
         {
             SmokeGrid.Visibility = Visibility.Visible;
 
-            FileInfoInCidSmokePage = new FileInfoInCidSmoke(resultinfo.truename);
+            FileInfoInCidSmokePage = new FileInfoInCidSmoke(ResultInfo.truename);
             SmokeGrid.Children.Add(FileInfoInCidSmokePage);
 
             SmokeCancelGrid.Tapped += FileInfoInCidSmokeCancelGrid_Tapped;
@@ -702,11 +711,19 @@ namespace Display.Controls
 
         private async void FindVideoAppBarButton_Click(object sender, RoutedEventArgs e)
         {
-            var contentResult = await SearchLinkPage.ShowInContentDialog(resultinfo.truename, XamlRoot);
+            var (isSucceed, msg) = await SearchLinkPage.ShowInContentDialog(ResultInfo.truename, XamlRoot);
 
-            if (!string.IsNullOrEmpty(contentResult))
+            if (isSucceed)
             {
-                ShowTeachingTip(contentResult);
+                ShowTeachingTip(msg, "打开所在目录", (_, _) =>
+                {
+                    // 打开所在目录
+                    CommonWindow.CreateAndShowWindow(new FileListPage(AppSettings.SavePath115Cid));
+                });
+            }
+            else
+            {
+                ShowTeachingTip(msg);
             }
         }
     }

@@ -60,13 +60,7 @@ namespace Display.Controls
         {
             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
-
-        private Visibility isContentNull(int coverCount)
-        {
-            return coverCount == 0 ? Visibility.Visible : Visibility.Collapsed;
-        }
-
-
+        
         public event RoutedEventHandler MoreClick;
         private void MoreButton_Click(object sender, RoutedEventArgs e)
         {

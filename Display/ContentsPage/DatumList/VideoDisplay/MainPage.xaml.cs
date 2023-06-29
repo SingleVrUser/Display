@@ -483,7 +483,7 @@ public sealed partial class MainPage : Page
         Debug.WriteLine("正在搜索cid相应的信息");
         FindCidInfo_ProgressRing.Visibility = Visibility.Visible;
 
-        const string noPicturePath = Const.Common.NoPicturePath;
+        const string noPicturePath = Const.FileType.NoPicturePath;
 
         //搜刮
         foreach (var video in filesInfos)

@@ -1,20 +1,18 @@
 ﻿
+using Display.Data;
 using Microsoft.UI.Xaml.Data;
 using System;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Display.Data;
-using OpenCvSharp.Flann;
 
 namespace Display.Models;
 
 public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, ISupportIncrementalLoading
 {
-    private WebApi webApi { get; set; }
-
+    private WebApi WebApi { get; set; }
+        
     public bool HasMoreItems { get; private set; } = true;
 
     private int _allCount;
@@ -28,6 +26,21 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
             _allCount = value;
 
             OnPropertyChanged(new PropertyChangedEventArgs(nameof(AllCount)));
+        }
+    }
+
+    private bool _isNull;
+
+    public bool IsNull
+    {
+        get => _isNull;
+        set
+        {
+            if(_isNull == value) return;
+
+            _isNull = value;
+
+            OnPropertyChanged(new PropertyChangedEventArgs(nameof(IsNull)));
         }
     }
 
@@ -45,10 +58,9 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         AllCount--;
     }
 
+    public WebApi.OrderBy OrderBy { get; private set; } = WebApi.OrderBy.UserPtime;
 
-    public WebApi.OrderBy orderby { get; private set; } = WebApi.OrderBy.UserPtime;
-
-    public int asc { get; private set; }
+    public int Asc { get; private set; }
 
     public long Cid { get; set; }
 
@@ -57,7 +69,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
     public IncrementalLoadDatumCollection(long cid,bool isOnlyFolder = false)
     {
         Cid = cid;
-        webApi = WebApi.GlobalWebApi;
+        WebApi = WebApi.GlobalWebApi;
         IsOnlyFolder = isOnlyFolder;
     }
 
@@ -66,19 +78,20 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
     public async Task<WebFileInfo> GetFilesInfoAsync(int limit, int offset)
     {
         //查询该目录的排列方式
-        var filesShowMethod = await webApi.GetFilesShowInfo(Cid);
+        var filesShowMethod = await WebApi.GetFilesShowInfo(Cid);
 
         WebApi.OrderBy order;
         Enum.TryParse(filesShowMethod.order, out order);
-        if (this.orderby != order) this.orderby = order;
+        if (this.OrderBy != order) this.OrderBy = order;
 
-        this.asc = filesShowMethod.is_asc;
+        Asc = filesShowMethod.is_asc;
 
-        var filesInfo = await webApi.GetFileAsync(Cid, limit, offset, orderBy: orderby, asc: asc,isOnlyFolder:IsOnlyFolder);
+        var filesInfo = await WebApi.GetFileAsync(Cid, limit, offset, orderBy: OrderBy, asc: Asc,isOnlyFolder:IsOnlyFolder);
         WebPaths = filesInfo.path;
+        AllCount = filesInfo.count;
 
         //汇报事件
-        GetFileInfoCompletedEventArgs args = new() { orderby = this.orderby, asc = this.asc, TimeReached = DateTime.Now };
+        GetFileInfoCompletedEventArgs args = new() { Orderby = OrderBy, Asc = Asc, TimeReached = DateTime.Now };
         GetFileInfoCompleted?.Invoke(this, args);
 
         return filesInfo;
@@ -86,12 +99,20 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
 
     public async Task<int> LoadData(int limit = 40, int offset = 0)
     {
+        IsNull = false;
         var filesInfo = await GetFilesInfoAsync(limit, offset);
 
-        AllCount = filesInfo.count;
-
+        // 访问失败，发生未知错误
         if (filesInfo.data == null)
         {
+            throw new ArgumentException(nameof(filesInfo.data));
+            //HasMoreItems = false;
+            //return 0;
+        }
+
+        if (AllCount == 0)
+        {
+            IsNull = true;
             HasMoreItems = false;
             return 0;
         }
@@ -103,9 +124,10 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
 
         HasMoreItems = AllCount > Count;
 
+
+
         return filesInfo.data.Length;
     }
-
 
     public async Task SetCid(long cid)
     {
@@ -113,7 +135,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         Clear();
 
         //当目录为空时，HasMoreItems==True无法激活查询服务，需要手动LoadData
-        bool isNeedLoad = Count == 0;
+        var isNeedLoad = Count == 0;
         HasMoreItems = !isNeedLoad;
 
         if (isNeedLoad) await LoadData();
@@ -121,9 +143,9 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
 
     public async Task SetOrder(WebApi.OrderBy orderBy, int asc)
     {
-        this.orderby = orderBy;
-        this.asc = asc;
-        await webApi.ChangedShowType(Cid, orderBy, asc);
+        this.OrderBy = orderBy;
+        this.Asc = asc;
+        await WebApi.ChangedShowType(Cid, orderBy, asc);
         await SetCid(Cid);
     }
 
@@ -135,7 +157,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
     private readonly int _defaultCount = 30;
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        int getCount = HasMoreItems ? await LoadData(_defaultCount, Count) : 0;
+        var getCount = HasMoreItems ? await LoadData(_defaultCount, Count) : 0;
 
         return new LoadMoreItemsResult
         {
@@ -148,9 +170,9 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
 
 public class GetFileInfoCompletedEventArgs : EventArgs
 {
-    public WebApi.OrderBy orderby { get; set; }
+    public WebApi.OrderBy Orderby { get; set; }
 
-    public int asc { get; set; }
+    public int Asc { get; set; }
 
     public DateTime TimeReached { get; set; }
 }
