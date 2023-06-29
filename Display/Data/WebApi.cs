@@ -174,7 +174,7 @@ namespace Display.Data
                     return;
                 }
 
-                await DataAccess.AddFilesInfoAsync(info.Datum);
+                await DataAccess.Add.AddFilesInfoAsync(info.Datum);
 
                 getFilesProgressInfo!.FilesCount++;
 
@@ -206,7 +206,7 @@ namespace Display.Data
             }
 
             // 获取上一次已添加文件夹的pid（如果存在，且修改时间不变；不存在的默认值为string.empty）
-            var pid = DataAccess.GetLatestFolderPid(cidCategory.pick_code, cidCategory.utime);
+            var pid = DataAccess.Get.GetLatestFolderPid(cidCategory.pick_code, cidCategory.utime);
 
             // 该文件已存在数据库里，且修改时间不变
             if (pid>=0 && StaticData.isJumpExistsFolder)
@@ -214,7 +214,7 @@ namespace Display.Data
                 //如果修改时间未变，但移动了位置
                 if (pid == cidCategory.paths.Last().file_id)
                 {
-                    await DataAccess.AddFilesInfoAsync(FileCategory.ConvertFolderToDatum(cidCategory, cid));
+                    await DataAccess.Add.AddFilesInfoAsync(FileCategory.ConvertFolderToDatum(cidCategory, cid));
                 }
 
                 //统计上下级文件夹所含文件的数量
@@ -239,21 +239,21 @@ namespace Display.Data
                 var addToDataAccessList = getFilesProgressInfo.AddToDataAccessList;
 
                 //删除后重新添加
-                DataAccess.DeleteAllDirectoryAndFiles_InFilesInfoTable(cid);
+                DataAccess.Delete.DeleteAllDirectoryAndFiles_InFilesInfoTable(cid);
 
                 if (addToDataAccessList.Count > 0)
                 {
                     //需要添加进数据库的Datum
                     foreach (var item in addToDataAccessList)
                     {
-                        await DataAccess.AddFilesInfoAsync(item);
+                        await DataAccess.Add.AddFilesInfoAsync(item);
                     }
                 }
 
                 //不添加有错误的目录进数据库（添加数据库时会跳过已经添加过的目录，对于出现错误的目录不添加方便后续重新添加）
                 if (getFilesProgressInfo.FailCid.Count == 0)
                 {
-                    await DataAccess.AddFilesInfoAsync(FileCategory.ConvertFolderToDatum(cidCategory, cid));
+                    await DataAccess.Add.AddFilesInfoAsync(FileCategory.ConvertFolderToDatum(cidCategory, cid));
                 }
             }
 
@@ -297,11 +297,11 @@ namespace Display.Data
                         getFilesProgressInfo.AddToDataAccessList.Add(item);
 
                         //查询数据库是否存在
-                        if (DataAccess.GetLatestFolderPid(item.PickCode, item.TimeEdit)>=0 && Data.StaticData.isJumpExistsFolder)
+                        if (DataAccess.Get.GetLatestFolderPid(item.PickCode, item.TimeEdit)>=0 && Data.StaticData.isJumpExistsFolder)
                         {
                             //统计下级文件夹所含文件的数量
                             //通过数据库获取
-                            var datumList = DataAccess.GetAllFilesTraverse(item.Cid);
+                            var datumList = DataAccess.Get.GetAllFilesTraverse(item.Cid);
 
                             getFilesProgressInfo.AddToDataAccessList.AddRange(datumList);
 
@@ -1412,7 +1412,7 @@ namespace Display.Data
 
             if (AppSettings.IsRecordDownRequest)
             {
-                var downUrlInfo = DataAccess.GetDownHistoryByPcAndUa(pickCode, ua);
+                var downUrlInfo = DataAccess.Get.GetDownHistoryByPcAndUa(pickCode, ua);
 
                 //检查链接是否失效
                 if (downUrlInfo != null && (tm - downUrlInfo.AddTime) < AppSettings.DownUrlOverdueTime)
@@ -1466,7 +1466,7 @@ namespace Display.Data
             //添加下载记录
             if (AppSettings.IsRecordDownRequest && downUrlList.Count != 0)
             {
-                DataAccess.AddDownHistory(new DownInfo
+                DataAccess.Add.AddDownHistory(new DownInfo
                 {
                     FileName = downUrlList.First().Key,
                     TrueUrl = downUrlList.First().Value,

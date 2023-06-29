@@ -132,7 +132,7 @@ namespace Display.Views
                 return;
             }
 
-            var videoInfoList = DataAccess.loadFileInfoByTruename(videoInfo.truename);
+            var videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(videoInfo.truename);
 
             _storeditem = videoInfo;
 

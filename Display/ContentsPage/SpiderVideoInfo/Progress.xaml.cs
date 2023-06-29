@@ -75,7 +75,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 _matchVideoResults.Add(new MatchVideoResult() { status = true, OriginalName = item.Datum.Name, message = "匹配成功", statusCode = 1, MatchName = item.MatchName });
 
                 //替换数据库的数据
-                DataAccess.AddFileToInfo(item.Datum.PickCode, item.MatchName, isReplace: true);
+                DataAccess.Add.AddFileToInfo(item.Datum.PickCode, item.MatchName, isReplace: true);
             }
 
             //显示进度环
@@ -124,7 +124,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             //目前datumList仅有一级目录文件
             //遍历获取文件列表中所有的文件
-            _fileList = await DataAccess.GetAllFilesInFolderListAsync(_fileList);
+            _fileList = await DataAccess.Get.GetAllFilesInFolderListAsync(_fileList);
 
             //除去文件夹
             _fileList = _fileList.Where(item => item.Fid!=null).ToList();
@@ -359,15 +359,15 @@ namespace Display.ContentsPage.SpiderVideoInfo
             ProgressMore_TextBlock.Text = $"失败数：0";
 
             //记录到SpiderLog
-            long task_id = DataAccess.InsertSpiderLog();
-
+            var taskId = DataAccess.Add.AddSpiderLog();
+                
             //记录到SpiderTask
             foreach (var item in matchVideoResults)
             {
                 if (item.MatchName == null)
                     continue;
                 
-                DataAccess.AddSpiderTask(item.MatchName, task_id);
+                DataAccess.Add.AddSpiderTask(item.MatchName, taskId);
             }
 
             //视频数量
@@ -451,7 +451,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             TotalProgress_TextBlock.Text = "正在使用搜刮源搜刮";
 
-            await SearchAllInfoMultiTask(task_id, SpiderSourceProgress);
+            await SearchAllInfoMultiTask(taskId, SpiderSourceProgress);
 
             //完成
             ProgressRing_StackPanel.SetValue(Grid.ColumnSpanProperty, 1);
@@ -501,8 +501,8 @@ namespace Display.ContentsPage.SpiderVideoInfo
             //DataAccess.UpdateSpiderLogDone(task_id);
 
             //删除SpiderTask和SpiderLog表中的所有数据
-            DataAccess.DeleteTable(DataAccess.TableName.SpiderTask);
-            DataAccess.DeleteTable(DataAccess.TableName.SpiderLog);
+            DataAccess.Delete.DeleteTable(DataAccess.TableName.SpiderTask);
+            DataAccess.Delete.DeleteTable(DataAccess.TableName.SpiderLog);
 
         }
 
@@ -530,14 +530,14 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 lock (myLock)
                 {
                     //查询待搜刮的name
-                    name = DataAccess.GetOneSpiderTask(spiderSource,null);
+                    name = DataAccess.Get.GetOneSpiderTask(spiderSource,null);
 
                     if (!string.IsNullOrEmpty(name))
                     {
                         //System.Diagnostics.Debug.WriteLine($"{spiderSourceName}查询到的{Name}");
 
                         //记录为正在进行
-                        DataAccess.UpdateSpiderTask(name, spiderSource, SpiderStates.doing);
+                        DataAccess.Update.UpdateSpiderTask(name, spiderSource, SpiderStates.doing);
                     }
                 }
 
@@ -556,7 +556,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     for (int i = 0; i < 100; i++)
                     {
                         //确认正在进行搜刮的番号已经被搜刮源搜刮过，避免发生只有该搜刮源能搜刮到的情况
-                        var leftWaitCount = DataAccess.GetWaitSpiderTaskCount(spiderSource);
+                        var leftWaitCount = DataAccess.Get.GetWaitSpiderTaskCount(spiderSource);
 
                         if (leftWaitCount == 0)
                         {
@@ -570,7 +570,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                             lock (myLock)
                             {
                                 //再次查询待搜刮的name
-                                name = DataAccess.GetOneSpiderTask(spiderSource, null);
+                                name = DataAccess.Get.GetOneSpiderTask(spiderSource, null);
                             }
 
                             //查询到了，退出循环，开始任务
@@ -590,22 +590,24 @@ namespace Display.ContentsPage.SpiderVideoInfo
                         break;
                 }
 
-                var result = DataAccess.SelectTrueName(name);
+                var result = DataAccess.Get.GetOneTrueNameByName(name);
 
                 //如果数据库已存在该数据，直接从数据库中读取
-                if (result.Length != 0)
+                if (!string.IsNullOrEmpty(result))
                 {
-                    currentSpiderInfo = new(Models.SpiderInfo.SpiderSourceName.Local, name);
-                    currentSpiderInfo.State = SpiderStates.doing;
-                    currentSpiderInfo.Message = name;
+                    currentSpiderInfo = new SpiderInfo(Models.SpiderInfo.SpiderSourceName.Local, name)
+                    {
+                        State = SpiderStates.doing,
+                        Message = name
+                    };
 
                     //不汇报,两次汇报间隔时间太短,会将第二次的数据重复提交两次
                     //progress.Report(currentSpiderInfo);
 
                     //使用第一个符合条件的Name
-                    resultInfo = DataAccess.LoadOneVideoInfoByCID(result[0]);
+                    resultInfo = DataAccess.Get.GetSingleVideoInfoByTrueName(result);
 
-                    DataAccess.UpdateFileToInfo(name, true);
+                    DataAccess.Update.UpdateFileToInfo(name, true);
                 }
                 //数据库没有，则开始搜刮
                 else
@@ -629,7 +631,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     await GetInfoFromNetwork.RandomTimeDelay(spiderSource.DelayRanges.Item1, spiderSource.DelayRanges.Item2);
 
                     // 添加搜刮信息到数据库（只有从搜刮源查找到的才添加）
-                    if (resultInfo != null) await DataAccess.AddVideoInfo_ActorInfo_IsWmAsync(resultInfo);
+                    if (resultInfo != null) await DataAccess.Add.AddVideoInfo_ActorInfo_IsWmAsync(resultInfo);
 
                 }
 
@@ -646,11 +648,11 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     lock (myLock)
                     {
                         //记录为已完成且已全部完成
-                        DataAccess.UpdateSpiderTask(name, spiderSource, SpiderStates.done, true);
+                        DataAccess.Update.UpdateSpiderTask(name, spiderSource, SpiderStates.done, true);
                     }
 
                     //更新FileToInfo表
-                    DataAccess.UpdateFileToInfo(name, true);
+                    DataAccess.Update.UpdateFileToInfo(name, true);
                 }
                 else
                 {
@@ -659,8 +661,8 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     lock (myLock)
                     {
                         //仅记录该搜刮源为已完成
-                        DataAccess.UpdateSpiderTask(name, spiderSource, SpiderStates.done);
-                        IsAllSpiderSourceAttempt = DataAccess.IsAllSpiderSourceAttempt(name);
+                        DataAccess.Update.UpdateSpiderTask(name, spiderSource, SpiderStates.done);
+                        IsAllSpiderSourceAttempt = DataAccess.Get.GetIsAllSpiderSourceAttempt(name);
                     }
 
                     if (IsAllSpiderSourceAttempt)
@@ -668,7 +670,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                         lock (myLock)
                         {
                             //标记为AllDone
-                            DataAccess.UpdateSpiderTask(name, spiderSource, SpiderStates.done, true);
+                            DataAccess.Update.UpdateSpiderTask(name, spiderSource, SpiderStates.done, true);
                         }
 
                         //宣告失败(搜刮源)

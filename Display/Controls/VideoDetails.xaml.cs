@@ -56,9 +56,9 @@ namespace Display.Controls
             if (ActorStackPanel.Children.Count != 0) ActorStackPanel.Children.Clear();
 
             ////查询该视频对应的演员列表
-            var actorList = await DataAccess.LoadActorInfoByVideoName(resultinfo.truename);
+            var actorList = await DataAccess.Get.GetActorInfoByVideoName(resultinfo.truename);
 
-            for (var i = 0; i < actorList.Count; i++)
+            for (var i = 0; i < actorList.Length; i++)
             {
                 var actor = actorList[i];
                 var actorImageControl = new Controls.ActorImage(actor, resultinfo.releasetime);
@@ -123,7 +123,7 @@ namespace Display.Controls
             //来源为网络
             else if (AppSettings.ThumbnailOrigin == (int)Const.Origin.Web)
             {
-                var videoInfo = DataAccess.LoadOneVideoInfoByCID(resultinfo.truename);
+                var videoInfo = DataAccess.Get.GetSingleVideoInfoByTrueName(resultinfo.truename);
 
                 var sampleImageListStr = videoInfo?.sampleImageList;
                 if (!string.IsNullOrEmpty(sampleImageListStr))
@@ -175,7 +175,7 @@ namespace Display.Controls
         private async void DownButton_Click(object sender, RoutedEventArgs e)
         {
             string name = resultinfo.truename;
-            var videoinfoList = DataAccess.loadFileInfoByTruename(name);
+            var videoinfoList = DataAccess.Get.GetSingleFileInfoByTrueName(name);
 
             videoinfoList = videoinfoList.OrderBy(item => item.Name).ToList();
 
@@ -277,7 +277,7 @@ namespace Display.Controls
             var lookLaterT = val == true ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
 
             resultinfo.look_later = lookLaterT;
-            DataAccess.UpdateSingleDataFromVideoInfo(resultinfo.truename, "look_later", lookLaterT.ToString());
+            DataAccess.Update.UpdateSingleDataFromVideoInfo(resultinfo.truename, "look_later", lookLaterT.ToString());
         }
 
         private void updateLike(bool? val)
@@ -285,7 +285,7 @@ namespace Display.Controls
             var isLike = val == true ? 1 : 0;
 
             resultinfo.is_like = isLike;
-            DataAccess.UpdateSingleDataFromVideoInfo(resultinfo.truename, "is_like", isLike.ToString());
+            DataAccess.Update.UpdateSingleDataFromVideoInfo(resultinfo.truename, "is_like", isLike.ToString());
         }
 
         private void Animation_Completed(ConnectedAnimation sender, object args)
@@ -352,39 +352,38 @@ namespace Display.Controls
             }
 
             //更新数据库
-            DataAccess.UpdateDataFromVideoInfo(videoInfo);
+            DataAccess.Update.UpdateDataFromVideoInfo(videoInfo);
 
             //更新ResultInfo数据
             foreach (var item in videoInfo.GetType().GetProperties())
             {
                 var name = item.Name;
                 //忽略自定义数据
-                if (name == "look_later" || name == "score" || name == "is_like")
+                if (name is "look_later" or "score" or "is_like")
                     continue;
 
                 var value = item.GetValue(videoInfo);
 
                 var newItem = resultinfo.GetType().GetProperty(name);
-                newItem.SetValue(resultinfo, value);
+                newItem?.SetValue(resultinfo, value);
             }
 
             //图片地址不变，但内容变了
             //为了图片显示能够变化
-            string oldPath = resultinfo.imagepath;
-            string newPath = videoInfo.imagepath;
+            var oldPath = resultinfo.imagepath;
+            var newPath = videoInfo.imagepath;
             //string NoPictruePath = "ms-appx:///Assets/NoPicture.jpg";
             if (!oldPath.Contains("ms-appx:") && File.Exists(newPath))
             {
-                StorageFile file = await StorageFile.GetFileFromPathAsync(newPath);
+                var file = await StorageFile.GetFileFromPathAsync(newPath);
 
-                using (IRandomAccessStream fileStream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read))
-                {
-                    // Set the image source to the selected bitmap
-                    BitmapImage bitmapImage = new BitmapImage();
+                using IRandomAccessStream fileStream = await file.OpenReadAsync();
 
-                    await bitmapImage.SetSourceAsync(fileStream);
-                    Cover_Image.Source = bitmapImage;
-                }
+                // Set the image source to the selected bitmap
+                var bitmapImage = new BitmapImage();
+                    
+                await bitmapImage.SetSourceAsync(fileStream);
+                Cover_Image.Source = bitmapImage;
             }
 
 
@@ -590,7 +589,7 @@ namespace Display.Controls
         {
             string score_str = sender.Value == 0 ? "-1" : sender.Value.ToString();
 
-            DataAccess.UpdateSingleDataFromVideoInfo(resultinfo.truename, "score", score_str);
+            DataAccess.Update.UpdateSingleDataFromVideoInfo(resultinfo.truename, "score", score_str);
         }
 
         private void ShowTeachingTip(string subtitle, string content = null)

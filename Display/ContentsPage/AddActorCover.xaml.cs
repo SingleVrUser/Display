@@ -265,11 +265,11 @@ namespace Display.ContentsPage
                 progressInfo.Status = Status.BeforeStart;
                 progress.Report(progressInfo);
 
-                var actorId = DataAccess.CheckIdInActor_Names(actorName);
+                var actorId = DataAccess.Get.GetIdInActor_Names(actorName);
                 if (actorId != -1)
                 {
                     //更新数据库
-                    DataAccess.UpdateActorInfoProfilePath(actorId, imageSavePath);
+                    DataAccess.Update.UpdateActorInfoProfilePath(actorId, imageSavePath);
                 }
             }
 
@@ -560,7 +560,7 @@ namespace Display.ContentsPage
 
                 progress_TextBlock.Text = $"{actorName} - 获取演员参演的视频";
                 //获取演员参演的视频
-                var videoList = DataAccess.loadVideoInfoByActor(actorName);
+                var videoList = DataAccess.Get.GetSingleVideoInfoByActor(actorName);
 
                 //progress_TextBlock.Text = $"{actorName} - 获取演员参演的视频 - 成功";
 
@@ -588,7 +588,7 @@ namespace Display.ContentsPage
                     progress_TextBlock.Text = $"{actorName} - {videoName} - 挑选单体作品 - {videoName}";
 
                     //获取视频列表
-                    var videoFileList = DataAccess.loadFileInfoByTruename(videoName);
+                    var videoFileList = DataAccess.Get.GetSingleFileInfoByTrueName(videoName);
 
                     progress_TextBlock.Text = $"{actorName} - {videoName} - 挑选单体作品中能在线看的";
 

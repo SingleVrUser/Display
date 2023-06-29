@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.System;
+using SharpCompress;
 
 namespace Display.Data
 {
@@ -177,7 +178,7 @@ namespace Display.Data
             //如果最后仍然匹配不了番号，则尝试使用文件所在文件夹的名字去匹配
             if (file_cid!=null)
             {
-                var folderDatum = DataAccess.GetUpperLevelFolderCid((long)file_cid);
+                var folderDatum = DataAccess.Get.GetUpperLevelFolderCid((long)file_cid);
 
                 if (!string.IsNullOrEmpty(folderDatum.Name))
                 {
@@ -262,8 +263,8 @@ namespace Display.Data
                     //失败比较特殊
                     //从另外的表中查找
                     case "失败" or "fail":
-                        var failItems = await DataAccess.LoadFailFileInfoWithDatum(n: keywords, limit: limit);
-                        failItems.ForEach(item => dicts.TryAdd(item.Name, new(item)));
+                        var failItems = await DataAccess.Get.GetFailFileInfoWithDatum(n: keywords, limit: limit);
+                        failItems.ForEach(item => dicts.TryAdd(item.Name, new VideoInfo(item)));
                         continue;
                     default:
                         trueType = "truename";
@@ -275,7 +276,7 @@ namespace Display.Data
                 // 当数量超过Limit数量时，跳过（不包括失败列表）
                 if (leftCount <= 0) continue;
 
-                var newItems = DataAccess.loadVideoInfoBySomeType(trueType, keywords, leftCount);
+                var newItems = DataAccess.Get.GetSingleVideoInfoBySomeType(trueType, keywords, leftCount);
 
                 newItems.ForEach(item => dicts.TryAdd(item.truename, item));
             }
@@ -415,7 +416,7 @@ namespace Display.Data
                     var videoName = FileMatch.MatchName(fileName, fileInfo.Cid);
 
                     //无论匹配与否，都存入数据库
-                    DataAccess.AddFileToInfo(fileInfo.PickCode, videoName, isReplace:true);
+                    DataAccess.Add.AddFileToInfo(fileInfo.PickCode, videoName, isReplace:true);
 
                     //未匹配
                     if (videoName == null)

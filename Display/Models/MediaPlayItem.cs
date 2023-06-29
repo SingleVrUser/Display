@@ -24,14 +24,14 @@ namespace Display.Models
 
         public FailInfo GetFailInfo()
         {
-            return _failInfo ??= DataAccess.LoadSingleFailInfo(PickCode);
+            return _failInfo ??= DataAccess.Get.GetSingleFailInfoByPickCode(PickCode);
         }
 
         private VideoInfo _videoInfo;
 
         public VideoInfo GetVideoInfo()
         {
-            return _videoInfo ??= DataAccess.LoadOneVideoInfoByCID(TrueName);
+            return _videoInfo ??= DataAccess.Get.GetSingleVideoInfoByTrueName(TrueName);
         }
 
         public List<Quality> QualityInfos;
@@ -61,7 +61,7 @@ namespace Display.Models
             if (!AppSettings.IsFindSub || string.IsNullOrEmpty(pickCode) || type==FilesInfo.FileType.Folder) return;
 
             SubInfos = new List<SubInfo>();
-            var subDict = DataAccess.FindSubFile(pickCode);
+            var subDict = DataAccess.Get.GetSubFile(pickCode);
             subDict.ToList().ForEach(item => SubInfos.Add(new SubInfo(item.Key, item.Value, pickCode, TrueName)));
             SubInfos = SubInfos.OrderBy(item => item.Name).ToList();
         }

@@ -86,7 +86,7 @@ namespace Display.Views
 
             if (VideoPlayButton.DataContext is not VideoCoverDisplayClass videoInfo) return;
 
-            List<Datum> videoInfoList = DataAccess.loadFileInfoByTruename(videoInfo.truename);
+            List<Datum> videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(videoInfo.truename);
 
 
             //没有

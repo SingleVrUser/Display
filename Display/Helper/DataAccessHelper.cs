@@ -131,23 +131,6 @@ namespace Display.Helper
 
         #region ExecuteReader
 
-        public static T[] ExecuteReaderGetSingleFieldArray<T>(string commandText, SqliteConnection connection)
-        {
-            var (isNeedCloseConnection, command) = OpenConnection(commandText, ref connection);
-
-            var reader = command.ExecuteReader();
-
-            List<T> data = null;
-
-            while (reader.Read())
-            {
-                data ??= new List<T>();
-                data.Add(reader.GetNullableFieldValue<T>());
-            }
-
-            return CloseConnectionIfNeedAndReturn(connection, isNeedCloseConnection, data);
-        }
-            
         public static T[] ExecuteReaderGetArray<T>(string commandText, SqliteConnection connection) where T : new()
         {
             var (isNeedCloseConnection, command) = OpenConnection(commandText, ref connection);
@@ -176,14 +159,14 @@ namespace Display.Helper
             return CloseConnectionIfNeedAndReturn(connection, isNeedCloseConnection, data);
         }
 
-        public static async Task<T[]> ExecuteReaderAsync<T>(string commandText, SqliteConnection connection) where T : new()
+        public static async Task<T[]> ExecuteReaderGetArrayAsync<T>(string commandText, SqliteConnection connection) where T : new()
         {
             var (isNeedCloseConnection, command) = OpenConnection(commandText,ref connection);
 
             var reader = await command.ExecuteReaderAsync();
 
             List<T> data = null;
-
+                
             while (reader.Read())
             {
                 data ??= new List<T>();

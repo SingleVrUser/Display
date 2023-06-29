@@ -37,11 +37,11 @@ namespace Display.ContentsPage
 
         private async void LoadedData()
         {
-            List<VideoInfo> VideoInfoList = await Task.Run(() => DataAccess.LoadVideoInfo(-1));
+            var videoInfoList = await Task.Run(() => DataAccess.Get.GetVideoInfo(-1));
 
-            foreach (var item in VideoInfoList)
+            foreach (var item in videoInfoList)
             {
-                thumbnailInfo.Add(new(item));
+                thumbnailInfo.Add(new ThumbnailInfo(item));
             }
         }
 
@@ -260,7 +260,7 @@ namespace Display.ContentsPage
                 }
 
                 //考虑多集视频
-                var videoInfoList = DataAccess.loadFileInfoByTruename(name);
+                var videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(name);
 
                 //检查视频是否已转码
                 var videofileListAfterDecode = videoInfoList.Where(x => x.Vdi != 0).ToList();

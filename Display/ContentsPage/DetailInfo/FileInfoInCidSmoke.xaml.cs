@@ -30,7 +30,7 @@ namespace Display.ContentsPage.DetailInfo
 
         private async void PageLoad(object sender, RoutedEventArgs e)
         {
-            var videoInfos = await DataAccess.FindFileInfoByTrueName(trueName, null);
+            var videoInfos = await DataAccess.Get.GetDatumByTrueName(trueName, null);
 
             InfosListView.ItemsSource = videoInfos;
         }
@@ -38,7 +38,7 @@ namespace Display.ContentsPage.DetailInfo
         public static string GetFolderString(long folderCid)
         {
             //从数据库中获取根目录信息
-            var folderToRootList = DataAccess.GetRootByCid(folderCid);
+            var folderToRootList = DataAccess.Get.GetRootByCid(folderCid);
 
             return string.Join(" > ", folderToRootList.Select(x=>x.Name));
         }
@@ -79,7 +79,7 @@ namespace Display.ContentsPage.DetailInfo
                 new[] { fileId });
 
             // 从数据库中删除
-            DataAccess.DeleteDataInFilesInfoAndFileToInfo(info.PickCode);
+            DataAccess.Delete.DeleteDataInFilesInfoAndFileToInfo(info.PickCode);
         }
     }
 }

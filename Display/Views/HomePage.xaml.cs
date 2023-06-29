@@ -56,7 +56,7 @@ namespace Display.Views
         private async void LoadCover()
         {
             //随机获取20个视频，每次启动自动获取一遍
-            var imageList = await DataAccess.GetNameAndImageRandom();
+            var imageList = await DataAccess.Get.GetNameAndImageRandom();
             foreach (var info in imageList.Select(item => new VideoCoverDisplayClass(item, 500, 300)))
             {
                 Items.Add(info);
@@ -135,7 +135,7 @@ namespace Display.Views
             Items.Clear();
 
             //随机获取20个视频
-            foreach (var item in await DataAccess.GetNameAndImageRandom())
+            foreach (var item in await DataAccess.Get.GetNameAndImageRandom())
             {
                 Items.Add(new VideoCoverDisplayClass(item, 500, 300));
             }
@@ -181,7 +181,7 @@ namespace Display.Views
             TryUpdateCoverShow();
         }
 
-        private void TryUpdateVideoCoverDisplayClass(List<VideoInfo> videoInfos, ObservableCollection<VideoCoverDisplayClass> videoList)
+        private void TryUpdateVideoCoverDisplayClass(VideoInfo[] videoInfos, ObservableCollection<VideoCoverDisplayClass> videoList)
         {
             //添加
             var addList = new List<VideoInfo>();
@@ -250,7 +250,7 @@ namespace Display.Views
         {
             recentCoverList.Clear();
 
-            foreach (var videoInfo in await DataAccess.GetNameAndImageRecent())
+            foreach (var videoInfo in await DataAccess.Get.GetNameAndImageRecent())
             {
                 recentCoverList.Add(new VideoCoverDisplayClass(videoInfo, 500, 300));
             }
@@ -261,7 +261,7 @@ namespace Display.Views
         {
             lookLaterList.Clear();
 
-            foreach (var videoInfo in await DataAccess.GetNameAndImageFromLookLater())
+            foreach (var videoInfo in await DataAccess.Get.GetNameAndImageFromLookLater())
             {
                 lookLaterList.Add(new VideoCoverDisplayClass(videoInfo, 500, 300));
             }
@@ -271,7 +271,7 @@ namespace Display.Views
         {
             LoveCoverList.Clear();
 
-            foreach (var videoInfo in await DataAccess.GetNameAndImageFromLike())
+            foreach (var videoInfo in await DataAccess.Get.GetNameAndImageFromLike())
             {
                 LoveCoverList.Add(new VideoCoverDisplayClass(videoInfo, 500, 300));
             }
@@ -280,11 +280,11 @@ namespace Display.Views
         private async void TryUpdateCoverShow()
         {
             //最近视频
-            TryUpdateVideoCoverDisplayClass(await DataAccess.GetNameAndImageRecent(), recentCoverList);
+            TryUpdateVideoCoverDisplayClass(await DataAccess.Get.GetNameAndImageRecent(), recentCoverList);
             //稍后观看
-            TryUpdateVideoCoverDisplayClass(await DataAccess.GetNameAndImageFromLookLater(), lookLaterList);
+            TryUpdateVideoCoverDisplayClass(await DataAccess.Get.GetNameAndImageFromLookLater(), lookLaterList);
             //喜欢视频
-            TryUpdateVideoCoverDisplayClass(await DataAccess.GetNameAndImageFromLike(), LoveCoverList);
+            TryUpdateVideoCoverDisplayClass(await DataAccess.Get.GetNameAndImageFromLike(), LoveCoverList);
         }
     }
 

@@ -1,11 +1,12 @@
 ﻿
+using Display.Data;
 using Microsoft.UI.Xaml.Data;
+using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Display.Data;
 
 namespace Display.Models;
 
@@ -36,24 +37,25 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
 
     public async Task LoadData(int startShowCount = 20)
     {
-        var newItems = await DataAccess.LoadVideoInfo(startShowCount, 0, orderBy, isDesc, filterConditionList, filterKeywords, ranges, isFuzzyQueryActor);
+        var newItems = await DataAccess.Get.GetVideoInfo(startShowCount, 0, orderBy, isDesc, filterConditionList, filterKeywords, ranges, isFuzzyQueryActor);
 
         if (Count == 0)
         {
-            int successCount = DataAccess.CheckVideoInfoCount(orderBy, isDesc, filterConditionList, filterKeywords, ranges);
-            int failCount = 0;
+            var successCount = DataAccess.Get.GetCountOfVideoInfo(filterConditionList, filterKeywords, ranges);
+            var failCount = 0;
             if (IsContainFail)
             {
-                failCount = DataAccess.GetCount_FailFileInfoWithDatum(0, -1, filterKeywords);
+                failCount = DataAccess.Get.GetCountOfFailFileInfoWithDatum(0, -1, filterKeywords);
             }
 
-            this.AllCount = successCount + failCount;
+            AllCount = successCount + failCount;
         }
 
         else
             Clear();
 
-        newItems.ForEach(item => Add(new(item, imageWidth, imageHeight)));
+        newItems.ForEach(item => Add(new VideoCoverDisplayClass(item, imageWidth, imageHeight)));
+
     }
 
     public void SetImageSize(double imgwidth, double imgheight)
@@ -89,11 +91,11 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
 
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        var lists = await DataAccess.LoadVideoInfo(defaultCount, Count, orderBy, isDesc, filterConditionList, filterKeywords, ranges, isFuzzyQueryActor);
+        var lists = await DataAccess.Get.GetVideoInfo(defaultCount, Count, orderBy, isDesc, filterConditionList, filterKeywords, ranges, isFuzzyQueryActor);
 
         //在最后的时候加载匹配失败的
         //用于展示搜索结果
-        if (lists.Count < defaultCount)
+        if (lists.Length < defaultCount)
         {
             HasMoreItems = false;
 
@@ -101,7 +103,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
             //无筛选功能
             if (IsContainFail)
             {
-                var failList = await DataAccess.LoadFailFileInfoWithDatum(0, -1, filterKeywords);
+                var failList = await DataAccess.Get.GetFailFileInfoWithDatum(0, -1, filterKeywords);
                 failList.ForEach(item => Add(new(new(item), imageWidth, imageHeight)));
             }
         }
@@ -110,7 +112,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
 
         return new LoadMoreItemsResult
         {
-            Count = (uint)lists.Count
+            Count = (uint)lists.Length
         };
     }
 

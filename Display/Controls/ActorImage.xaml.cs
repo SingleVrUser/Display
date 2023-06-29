@@ -92,7 +92,7 @@ namespace Display.Controls
                     break;
             }
 
-            DataAccess.UpdateSingleDataFromActorInfo(ActorInfo.Id.ToString(), "is_like", is_like.ToString());
+            DataAccess.Update.UpdateSingleDataFromActorInfo(ActorInfo.Id.ToString(), "is_like", is_like.ToString());
         }
 
         private async void GetInfoMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
