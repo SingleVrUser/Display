@@ -104,11 +104,11 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
             if (IsContainFail)
             {
                 var failList = await DataAccess.Get.GetFailFileInfoWithDatum(0, -1, filterKeywords);
-                failList.ForEach(item => Add(new(new(item), imageWidth, imageHeight)));
+                failList.ForEach(item => Add(new VideoCoverDisplayClass(new VideoInfo(item), imageWidth, imageHeight)));
             }
         }
 
-        lists.ForEach(item => Add(new(item, imageWidth, imageHeight)));
+        lists.ForEach(item => Add(new VideoCoverDisplayClass(item, imageWidth, imageHeight)));
 
         return new LoadMoreItemsResult
         {
@@ -116,5 +116,5 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
         };
     }
 
-    private bool IsContainFail { get => filterConditionList != null && filterConditionList.Contains("fail"); }
+    private bool IsContainFail => filterConditionList != null && filterConditionList.Contains("fail");
 }
