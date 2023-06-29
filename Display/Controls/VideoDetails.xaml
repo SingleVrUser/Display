@@ -77,7 +77,7 @@
                     <AppBarSeparator />
 
                     <!--喜欢-->
-                    <AppBarToggleButton IsChecked="{x:Bind data:FileMatch.isLike(resultinfo.is_like), BindBack = updateLike, Mode=TwoWay}"
+                    <AppBarToggleButton IsChecked="{x:Bind data:FileMatch.isLike(ResultInfo.is_like), BindBack = UpdateLike, Mode=TwoWay}"
                                         Label="喜欢">
                         <AppBarToggleButton.Icon>
                             <FontIcon Glyph="&#xE006;" />
@@ -85,7 +85,7 @@
                     </AppBarToggleButton>
 
                     <!--稍后再看-->
-                    <AppBarToggleButton IsChecked="{x:Bind data:FileMatch.isLookLater(resultinfo.look_later), BindBack = updateLookLater, Mode=TwoWay}"
+                    <AppBarToggleButton IsChecked="{x:Bind data:FileMatch.isLookLater(ResultInfo.look_later), BindBack = UpdateLookLater, Mode=TwoWay}"
                                         Label="稍后再看">
                         <AppBarToggleButton.Icon>
                             <FontIcon Glyph="&#xE13B;" />
@@ -205,7 +205,7 @@
 
                         <Image x:FieldModifier="public"
                                x:Name="Cover_Image"
-                               Source="{x:Bind resultinfo.imagepath}"
+                               Source="{x:Bind ResultInfo.imagepath}"
                                HorizontalAlignment="Left"
                                VerticalAlignment="Center"
                                MaxHeight="500"/>
@@ -252,17 +252,17 @@
                         <StackPanel Grid.Row="1"
                                     Orientation="Horizontal"
                                     Spacing="10">
-                            <TextBlock Text="{x:Bind resultinfo.truename,Mode=OneWay}"
+                            <TextBlock Text="{x:Bind ResultInfo.truename,Mode=OneWay}"
                                        IsTextSelectionEnabled="True"
                                        FontFamily="JetBrains Mono"
                                        FontSize="26"
                                        FontWeight="Bold" />
 
-                            <HyperlinkButton NavigateUri="{x:Bind resultinfo.busurl,Mode=OneWay}"
+                            <HyperlinkButton NavigateUri="{x:Bind ResultInfo.busurl,Mode=OneWay}"
                                              Opacity="1"
                                              CornerRadius="10"
                                              Padding="5"
-                                             ToolTipService.ToolTip="{x:Bind resultinfo.busurl,Mode=OneWay}">
+                                             ToolTipService.ToolTip="{x:Bind ResultInfo.busurl,Mode=OneWay}">
                                 <FontIcon FontFamily="Segoe Fluent Icons"
                                           Glyph="&#xF6FA;"
                                           Foreground="LightGray"
@@ -273,17 +273,17 @@
                         <!--发行时间，视频时长-->
                         <StackPanel Grid.Row="2"
                                     Orientation="Horizontal">
-                            <TextBlock Text="{x:Bind resultinfo.releasetime,Mode=OneWay}"
+                            <TextBlock Text="{x:Bind ResultInfo.releasetime,Mode=OneWay}"
                                        IsTextSelectionEnabled="True"
                                        FontFamily="霞鹜文楷"
                                        FontWeight="Bold" />
-                            <TextBlock Text="{x:Bind resultinfo.lengthtime,Mode=OneWay}"
+                            <TextBlock Text="{x:Bind ResultInfo.lengthtime,Mode=OneWay}"
                                        IsTextSelectionEnabled="True" />
                         </StackPanel>
 
                         <!--评分-->
                         <RatingControl Grid.Row="3"
-                                       Value="{x:Bind resultinfo.score,Mode=TwoWay}"
+                                       Value="{x:Bind ResultInfo.score,Mode=TwoWay}"
                                        ValueChanged="RatingControl_ValueChanged"
                                        HorizontalAlignment="Left"
                                        Margin="10,0,0,0" />
@@ -307,7 +307,7 @@
                                     <TextBlock Text="导演"
                                                Style="{StaticResource LeftTitle}" />
 
-                                    <TextBlock Text="{x:Bind resultinfo.director,Mode=OneWay}"
+                                    <TextBlock Text="{x:Bind ResultInfo.director,Mode=OneWay}"
                                                Padding="50,0,0,0"
                                                IsTextSelectionEnabled="True" />
                                 </Grid>
@@ -316,7 +316,7 @@
                                     <TextBlock Text="系列"
                                                Style="{StaticResource LeftTitle}" />
 
-                                    <TextBlock Text="{x:Bind resultinfo.series,Mode=OneWay}"
+                                    <TextBlock Text="{x:Bind ResultInfo.series,Mode=OneWay}"
                                                Padding="50,0,0,0" />
                                 </Grid>
 
@@ -328,7 +328,7 @@
                                     <TextBlock Text="制作商"
                                                Style="{StaticResource LeftTitle}" />
 
-                                    <TextBlock Text="{x:Bind resultinfo.producer,Mode=OneWay}"
+                                    <TextBlock Text="{x:Bind ResultInfo.producer,Mode=OneWay}"
                                                Padding="60,0,0,0"
                                                TextTrimming="CharacterEllipsis"
                                                IsTextSelectionEnabled="True" />
@@ -338,7 +338,7 @@
                                     <TextBlock Text="发行商"
                                                Style="{StaticResource LeftTitle}" />
 
-                                    <TextBlock Text="{x:Bind resultinfo.publisher,Mode=OneWay}"
+                                    <TextBlock Text="{x:Bind ResultInfo.publisher,Mode=OneWay}"
                                                Padding="60,0,0,0"
                                                IsTextSelectionEnabled="True" />
                                 </Grid>
@@ -490,7 +490,7 @@
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <FlipView x:Name="ShowImageFlipView"
-                                      ItemsSource="{x:Bind ShowImageList}"
+                                      ItemsSource="{x:Bind _showImageList}"
                                       SelectionChanged="ShowImageFlipView_SelectionChanged"
                                       Background="{ThemeResource AccentAAFillColorDisabledBrush}">
                                 <FlipView.ItemTemplate>
@@ -502,7 +502,7 @@
 
                             <PipsPager Grid.Row="1"
                                        HorizontalAlignment="Center"
-                                       NumberOfPages="{x:Bind ShowImageList.Count,Mode=OneWay}"
+                                       NumberOfPages="{x:Bind _showImageList.Count,Mode=OneWay}"
                                        SelectedPageIndex="{x:Bind ShowImageFlipView.SelectedIndex,Mode=TwoWay}" />
                         </Grid>
 

@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -550,7 +551,7 @@ namespace Display.Data
             get => _profilePath;
             set
             {
-                var path = !string.IsNullOrEmpty(value) ? value : Const.Common.NoPicturePath;
+                var path = !string.IsNullOrEmpty(value) ? value : Const.FileType.NoPicturePath;
                 if (_profilePath == path) return;
 
                 _profilePath = path;
@@ -803,7 +804,7 @@ namespace Display.Data
                 if (_imagepath == value) return;
 
                 string path = value;
-                _imagepath = !string.IsNullOrEmpty(path) ? path : Const.Common.NoPicturePath;
+                _imagepath = !string.IsNullOrEmpty(path) ? path : Const.FileType.NoPicturePath;
                 OnPropertyChanged();
             }
         }
@@ -1084,6 +1085,8 @@ namespace Display.Data
         public readonly bool IsVideo;
         public readonly bool NoId;
 
+        
+
         public FilesInfo(FileUploadResult result)
         {
             Name = result.Name;
@@ -1091,11 +1094,15 @@ namespace Display.Data
             Cid = result.Cid;
             PickCode = result.PickCode;
             Type = result.Type;
-            IsVideo = result.IsVideo;
             NoId = Id ==null;
             Time = (int)DateTimeOffset.Now.ToUnixTimeSeconds();
 
-            IconPath = GetPathFromFileType(Name.Split(".")[^1]);
+            var icon = Name.Split('.')[^1];
+            IconPath = GetPathFromIcon(icon);
+
+            IsVideo = result.IsVideo;
+
+            //IsVideo = GetTypeFromIcon(icon) == "video";
 
             // TODO 应该逐渐抛弃Datum
             //var isFile = Type == FileType.File;
@@ -1120,12 +1127,9 @@ namespace Display.Data
         public FilesInfo(Datum data)
         {
             Datum = data;
-
             Name = data.Name;
-
             Time = data.TimeEdit;
-
-            IconPath = "ms-appx:///Assets/115/file_type/other/unknown.svg";
+            
             //文件夹
             if (data.Fid == null && data.Pid!=null)
             {
@@ -1133,8 +1137,7 @@ namespace Display.Data
                 Id = data.Cid;
                 Cid = (long)data.Pid;
                 PickCode = data.PickCode;
-
-                IconPath = "ms-appx:///Assets/115/file_type/folder/folder.svg";
+                IconPath = Const.FileType.FolderSvgPath;
             }
             else if(data.Fid != null)
             {
@@ -1149,13 +1152,13 @@ namespace Display.Data
                     IsVideo = true;
                     var videoQuality = GetVideoQualityFromVdi(data.Vdi);
 
-                    IconPath = videoQuality != null ? $"ms-appx:///Assets/115/file_type/video_quality/{videoQuality}.svg"
-                                                    : "ms-appx:///Assets/115/file_type/video/video.svg";
+                    IconPath = videoQuality != null ? "ms-appx:///Assets/115/file_type/video_quality/"+videoQuality+".svg"
+                                                    : Const.FileType.VideoSvgPath;
 
                 }
                 else if (!string.IsNullOrEmpty(data.Ico))
                 {
-                    var tmpIcoPath = GetPathFromFileType(data.Ico);
+                    var tmpIcoPath = GetPathFromIcon(data.Ico);
                     if (tmpIcoPath != null)
                     {
                         IconPath = tmpIcoPath;
@@ -1168,35 +1171,29 @@ namespace Display.Data
 
         public static string GetVideoQualityFromVdi(int vdi)
         {
-            string video_quality = null;
+            string videoQuality = null;
             switch (vdi)
             {
                 case 1:
-                    video_quality = "sd";
-                    //IconPath = "ms-appx:///Assets/115/file_type/video_quality/sd.svg";
+                    videoQuality = "sd";
                     break;
                 case 2:
-                    video_quality = "hd";
-                    //IconPath = "ms-appx:///Assets/115/file_type/video_quality/hd.svg";
+                    videoQuality = "hd";
                     break;
                 case 3:
-                    video_quality = "fhd";
-                    //IconPath = "ms-appx:///Assets/115/file_type/video_quality/fhd.svg";
+                    videoQuality = "fhd";
                     break;
                 case 4:
-                    video_quality = "1080p";
-                    //IconPath = "ms-appx:///Assets/115/file_type/video_quality/1080p.svg";
+                    videoQuality = "1080p";
                     break;
                 case 5:
-                    video_quality = "4k";
-                    //IconPath = "ms-appx:///Assets/115/file_type/video_quality/4k.svg";
+                    videoQuality = "4k";
                     break;
                 case 100:
-                    video_quality = "origin";
-                    //IconPath = "ms-appx:///Assets/115/file_type/video_quality/origin.svg";
+                    videoQuality = "origin";
                     break;
             }
-            return video_quality;
+            return videoQuality;
         }
 
         private string _name;
@@ -1229,138 +1226,74 @@ namespace Display.Data
                 return _nameWithoutExtension;
             }
         }
-        public static string GetPathFromFileType(string ico)
+        public static string GetPathFromIcon(string ico)
         {
-            var iconPath = "ms-appx:///Assets/115/file_type/other/unknown.svg";
-            var fileType = new Dictionary<string, Dictionary<string, List<string>>>()
-            {
-                { "application", new Dictionary<string, List<string>>(){
-                    { "apk",new List<string>(){"apk"}  },
-                    { "bat",new List<string>(){ "bat" }  },
-                    { "exe",new List<string>(){ "exe" }  },
-                    { "ipa",new List<string>(){ "ipa" }  },
-                    { "msi",new List<string>(){"msi"}  },
-                } },
-                { "archive", new Dictionary<string, List<string>>(){
-                    {"7z",new List<string>(){"7z"} },
-                    {"cab",new List<string>(){"cab"} },
-                    {"dmg",new List<string>(){"dmg"} },
-                    {"iso",new List<string>(){"iso"} },
-                    {"rar",new List<string>(){"rar", "tar"} },
-                    {"zip",new List<string>(){"zip"} },
-                } },
-                { "audio", new Dictionary<string, List<string>>(){
-                    {"ape",new List<string>(){"ape"} },
-                    {"audio",new List<string>(){"wav","midi","mid","flac","aac","m4a","ogg","amr"}},
-                    {"mp3",new List<string>(){"mp3"} },
-                    {"wma",new List<string>(){"wma"} },
-                } },
-                { "code", new Dictionary<string, List<string>>(){
-                    {"code",new List<string>(){ "c", "cpp", "asp", "js", "php", "tpl", "xml", "h", "cs", "plist", "py", "rb" } },
-                    {"css",new List<string>(){ "css", "sass", "scss", "less" } },
-                    {"html",new List<string>(){ "htm", "html" } },
-                } },
-                { "document", new Dictionary<string, List<string>>(){
-                    {"ass",new List<string>(){"ass"} },
-                    {"chm",new List<string>(){"chm"} },
-                    {"doc",new List<string>(){ "doc", "docx", "docm", "dot", "dotx", "dotm" } },
-                    {"key",new List<string>(){"key"} },
-                    {"log",new List<string>(){"log"} },
-                    {"numbers",new List<string>(){"numbers"} },
-                    {"pages",new List<string>(){"pages"} },
-                    {"pdf",new List<string>(){"pdf"} },
-                    {"ppt",new List<string>(){ "ppt", "pptx", "pptm", "pps", "pot" } },
-                    {"srt",new List<string>(){"srt"} },
-                    {"ssa",new List<string>(){"ssa"} },
-                    {"torrent",new List<string>(){"torrent"} },
-                    {"txt",new List<string>(){"txt"} },
-                    {"xls",new List<string>(){ "xls", "xlsx", "xlsm", "xltx", "xltm", "xlam", "xlsb" } },
-                } },
-                { "image", new Dictionary<string, List<string>>(){
-                    {"gif",new List<string>(){"gif"} },
-                    {"img",new List<string>(){ "bmp", "tiff", "exif" } },
-                    {"jpg",new List<string>(){"jpg"} },
-                    {"png",new List<string>(){"png"} },
-                    {"raw",new List<string>(){"raw"} },
-                    {"svg",new List<string>(){ "svg" } }
-                } },
-                { "source", new Dictionary<string, List<string>>(){
-                    {"ai",new List<string>(){ "ai" } },
-                    {"fla",new List<string>(){"fla"} },
-                    {"psd",new List<string>(){"psd"} },
-                } },
-                { "video", new Dictionary<string, List<string>>(){
-                    {"3gp",new List<string>(){ "3g2", "3gp", "3gp2", "3gpp" } },
-                    {"flv",new List<string>(){"flv"} },
-                    {"mkv",new List<string>(){"mkv"} },
-                    {"mov",new List<string>(){"mov"} },
-                    {"mp4",new List<string>(){ "mp4", "mpeg4" } },
-                    {"rm",new List<string>(){"rm"} },
-                    {"rmvb",new List<string>(){"rmvb"} },
-                    {"swf",new List<string>(){"swf"} },
-                    {"video",new List<string>(){ "mpe", "mpeg", "mpg", "asf", "ram", "m4v", "vob", "divx", "webm" } },
-                    {"wmv",new List<string>(){"wmv"} },
-                    {"mts",new List<string>(){"mts"} },
-                    {"mpg",new List<string>(){"mpg"} },
-                    {"dat",new List<string>(){"dat"} },
-                } },
-                { "folder", new Dictionary<string, List<string>>(){
-                    {"folder",new List<string>(){ "folder" } }
-                } },
-            };
+            string iconPath = null;
 
-            bool isMatch = false;
-            foreach (var kvp in fileType)
+            var isMatch = false;
+            foreach (var (key, values) in Const.FileType.FileTypeDictionary)
             {
                 if (isMatch)
                     break;
 
-                string key = kvp.Key;
-                var values = kvp.Value;
-
-                foreach (var kvp2 in values)
+                foreach (var (key2, values2) in values)
                 {
                     if (isMatch)
                         break;
 
-                    string key2 = kvp2.Key;
-                    List<string> values2 = kvp2.Value;
-
-                    foreach (string key3 in values2)
+                    foreach (var key3 in values2)
                     {
-                        if (key3 == ico)
+                        if (key3 != ico) continue;
+
+                        var tmpStringBuilder = new StringBuilder(Const.FileType.FileTypeBasePath).Append(key).Append('/').Append(key2).Append(".svg");
+                        if (File.Exists(Path.Combine(Package.Current.InstalledLocation.Path, tmpStringBuilder.ToString())))
                         {
-                            var tmpPath = $"Assets/115/file_type/{key}/{key2}.svg";
-
-                            if (!File.Exists(Path.Combine(Package.Current.InstalledLocation.Path, tmpPath)))
-                                iconPath = $"ms-appx:///Assets/115/file_type/{key}/{key}.svg";
-                            else
-                                iconPath = $"ms-appx:///{tmpPath}";
-
-
-                            isMatch = true;
-                            break;
+                            iconPath = tmpStringBuilder.Insert(0,Const.FileType.MsUri).ToString();
                         }
+                        else
+                        {
+                            var newStringBuilder = new StringBuilder(Const.FileType.FileTypeFullBasePath).Append(key).Append('/').Append(key).Append(".svg");
+                            iconPath = newStringBuilder.ToString();
+                        }
+                        isMatch = true;
+                        break;
                     }
                 }
             }
 
-            return iconPath;
+            return string.IsNullOrEmpty(iconPath) ? Const.FileType.UnknownSvgPath: iconPath;
+        }
+
+        public static string GetTypeFromIcon(string ico)
+        {
+            foreach (var (key, values) in Const.FileType.FileTypeDictionary)
+            {
+                foreach (var (_, values2) in values)
+                {
+                    foreach (var value3 in values2)
+                    {
+                        if (value3 != ico) continue;
+
+                        return key;
+                    }
+                }
+            }
+
+            return "unknown";
         }
 
         public static string GetFileIconFromType(FileType fileType)
         {
-            var iconUrl = "ms-appx:///Assets/115/file_type/other/unknown.svg";
+            var iconUrl  = Const.FileType.UnknownSvgPath;
 
             switch (fileType)
             {
                 case FileType.Folder:
-                    iconUrl = "ms-appx:///Assets/115/file_type/folder/folder.svg";
+                    iconUrl = Const.FileType.FolderSvgPath;
                     break;
                 case FileType.File:
-                    iconUrl = "ms-appx:///Assets/115/file_type/other/unknown.svg";
+                    iconUrl = Const.FileType.UnknownSvgPath;
                     break;
-
             }
 
             return iconUrl;
@@ -1371,7 +1304,6 @@ namespace Display.Data
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
 
         public enum FileType { Folder, File };
     }
@@ -1571,7 +1503,7 @@ namespace Display.Data
                 if (string.IsNullOrEmpty(_prifilePhotoPath))
                 {
                     //初始化
-                    _prifilePhotoPath = Const.Common.NoPicturePath;
+                    _prifilePhotoPath = Const.FileType.NoPicturePath;
 
                     //检查演员图片是否存在
                     string imagePath = Path.Combine(AppSettings.ActorInfoSavePath, name, "face.jpg");
@@ -2174,7 +2106,7 @@ namespace Display.Data
         public long LookLater { get; set; } = 0;
 
         [JsonProperty(propertyName: "image_path")]
-        public string ImagePath { get; set; } = Const.Common.NoPicturePath;
+        public string ImagePath { get; set; } = Const.FileType.NoPicturePath;
 
         [JsonProperty(propertyName: nameof(Datum))]
         public Datum Datum { get; set; }

@@ -175,19 +175,36 @@
         </Grid.RowDefinitions>
 
         <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup x:Name="RecyStates">
+            <VisualStateGroup x:Name="RecycleStates">
 
                 <VisualState x:Name="NoDelete" />
 
                 <VisualState x:Name="ReadyDelete">
                     <VisualState.Setters>
-                        <Setter Target="RecyTextBlock.Foreground"
+                        <Setter Target="RecycleTextBlock.Foreground"
                                 Value="Red" />
-                        <Setter Target="RecyFontIcon.Foreground"
+                        <Setter Target="RecycleFontIcon.Foreground"
                                 Value="Red" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
+
+            <VisualStateGroup x:Name="ButtonState">
+                <VisualState x:Name="Hidden"/>
+                <VisualState x:Name="Show">
+                    <VisualState.Setters>
+                        <Setter Target="PlayButton.Visibility"
+                                Value="Visible" />
+                        <Setter Target="ImportButton.Visibility"
+                                Value="Visible" />
+                        <Setter Target="DownloadButton.Visibility"
+                                Value="Visible" />
+                        <Setter Target="SortButton.Visibility"
+                                Value="Visible" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+
         </VisualStateManager.VisualStateGroups>
 
         <!--进度条-->
@@ -212,14 +229,14 @@
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
 
-
             <CommandBar Grid.Column="1">
                 <CommandBar.Transitions>
                     <EdgeUIThemeTransition Edge="Right" />
                 </CommandBar.Transitions>
 
-                <AppBarButton Icon="Play"
+                <AppBarButton x:Name="PlayButton" Icon="Play"
                               Label="播放"
+                              Visibility="Collapsed"
                               Click="PlayButton_Click">
                     <AppBarButton.ContextFlyout>
                         <MenuFlyout>
@@ -259,11 +276,13 @@
                         </MenuFlyout>
                     </AppBarButton.ContextFlyout>
                 </AppBarButton>
-                <AppBarButton Icon="Import"
+                <AppBarButton x:Name="ImportButton" Icon="Import"
                               Label="导入"
+                              Visibility="Collapsed"
                               Click="ImportDataButton_Click" />
-                <AppBarButton Icon="Download"
+                <AppBarButton x:Name="DownloadButton" Icon="Download"
                               Label="下载"
+                              Visibility="Collapsed"
                               Click="DownButton_Click"
                               ToolTipService.ToolTip="点击使用比特彗星下载，右键选择更多下载方式">
                     <AppBarButton.ContextFlyout>
@@ -277,7 +296,7 @@
                 </AppBarButton>
 
                 <CommandBar.SecondaryCommands>
-                    <AppBarButton Icon="Sort"
+                    <AppBarButton x:Name="SortButton" Visibility="Collapsed" Icon="Sort"
                                   Label="整理"
                                   Click="Sort115Button_Click"/>
                     <AppBarButton Icon="Setting"
@@ -290,7 +309,7 @@
                                                   OnContent="跳过"
                                                   OffContent="不跳过" />
                                     <HyperlinkButton Content="清空已存数据"
-                                                     Click="deleData_Click"
+                                                     Click="deleteData_Click"
                                                      HorizontalAlignment="Right"
                                                      Opacity="0.5" />
                                 </StackPanel>
@@ -347,6 +366,7 @@
         <ListView x:Name="BaseExample"
                   Grid.Row="1"
                   ItemTemplate="{StaticResource FileListTemplate}"
+                  SelectionChanged="BaseExample_OnSelectionChanged"
                   SelectionMode="Multiple"
                   CanDragItems="True"
                   DragItemsStarting="Source_DragItemsStarting"
@@ -398,9 +418,11 @@
             </ListView.Header>
         </ListView>
 
+
         <Grid Grid.Row="1"
               BorderThickness="0,1,0,0"
               BorderBrush="{StaticResource CircleElevationBorderBrush}">
+
             <!--数量指示-->
             <customizeControls:ShowCountControl Margin="2"
                                                 CurrentCount="{x:Bind FilesInfos.Count,Mode=OneWay}"
@@ -434,11 +456,11 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock x:Name="RecyTextBlock"
+                    <TextBlock x:Name="RecycleTextBlock"
                                Text="回收站"
                                HorizontalAlignment="Center"
                                Foreground="Gray" />
-                    <FontIcon x:Name="RecyFontIcon"
+                    <FontIcon x:Name="RecycleFontIcon"
                               FontFamily="Segoe Fluent Icons"
                               Glyph="&#xE107;"
                               Grid.Row="1" />
@@ -491,9 +513,17 @@
             </Grid>
         </Grid>
 
-        <TeachingTip Grid.Row="0"
-                     Grid.RowSpan="2"
+        <TeachingTip Grid.Row="1"
                      x:Name="LightDismissTeachingTip"
                      IsLightDismissEnabled="True"/>
+
+        <TextBlock Grid.Row="1"
+                   Margin="0,30,0,0"
+                   Text="暂无文件"
+                   Visibility="{x:Bind FilesInfos.IsNull,Mode=OneWay}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontSize="30"
+                   Opacity="0.5" />
     </Grid>
 </Page>

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -491,7 +492,7 @@ namespace Display.Data
                 }
 
                 var commandText =
-                    $"UPDATE VideoInfo SET {string.Join(",", dict.Values.ToList().Select(item => item.Item1))} WHERE truename == @truename";
+                    $"UPDATE VideoInfo SET {string.Join(",", dict.Values.Select(item => item.Item1))} WHERE truename == @truename";
 
                 var parameters = dict.Select(item => new SqliteParameter(item.Key, item.Value.Item2)).ToArray();
 
@@ -1235,8 +1236,6 @@ namespace Display.Data
 
             public static int GetCountOfFailFileInfoWithDatum(int offset = 0, int limit = -1, string n = null, string orderBy = null, bool isDesc = false, FailType showType = FailType.All, SqliteConnection connection = null)
             {
-                var orderStr = GetOrderStr(orderBy, isDesc);
-
                 var queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n.Replace("'", "%")}%'";
 
                 string showTypeStr;
@@ -1254,7 +1253,7 @@ namespace Display.Data
                 }
 
                 var commandText =
-                    $"SELECT COUNT(pc) FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{showTypeStr}{queryStr}{orderStr} LIMIT {limit} offset {offset} ";
+                    $"SELECT COUNT(pc) FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{showTypeStr}{queryStr} LIMIT {limit} offset {offset} ";
 
                 return DataAccessHelper.ExecuteScalar<int>(commandText,connection);
             }
@@ -1280,39 +1279,36 @@ namespace Display.Data
 
             public static int GetCountOfFailInfos(FailInfoShowType showType, SqliteConnection connection = null)
             {
-                var showTypeStr = showType == FailInfoShowType.like ? " WHERE is_like = 1" : " WHERE look_later != 0";
+                var commandStringBuilder = new StringBuilder("SELECT COUNT(pc) FROM FailList_islike_looklater ");
 
-                var commandText = $"SELECT COUNT(pc) FROM FailList_islike_looklater {showTypeStr}";
+                commandStringBuilder.Append(showType == FailInfoShowType.like
+                    ? "WHERE is_like = 1"
+                    : "WHERE look_later != 0");
 
-                return DataAccessHelper.ExecuteScalar<int>(commandText,connection);
+                return DataAccessHelper.ExecuteScalar<int>(commandStringBuilder.ToString(), connection);
             }
 
             public static int GetCountOfFailDatumFiles(string n = "", FailType showType = FailType.All, SqliteConnection connection = null)
             {
-                if (!string.IsNullOrEmpty(n) && n.Contains("'"))
-                {
-                    n = n.Replace("'", "%");
-                }
+                var commandStringBuilder = new StringBuilder("SELECT COUNT(n) FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode");
 
-                var queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n.Replace("'", "%")}%'";
-
-                string showTypeStr;
                 switch (showType)
                 {
                     case FailType.MatchFail:
-                        showTypeStr = " AND FileToInfo.truename == ''";
+                        commandStringBuilder.Append(" AND FileToInfo.truename == ''");
                         break;
                     case FailType.SpiderFail:
-                        showTypeStr = " AND FileToInfo.truename != ''";
-                        break;
-                    default:
-                        showTypeStr = string.Empty;
+                        commandStringBuilder.Append(" AND FileToInfo.truename != ''");
                         break;
                 }
 
-                var commandText = $"SELECT COUNT(n) FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{showTypeStr}{queryStr}";
+                if (!string.IsNullOrEmpty(n))
+                {
+                    n = n.Replace('\'', '%');
+                    commandStringBuilder.Append(" And FilesInfo.n LIKE '%").Append(n).Append("%'");
+                }
 
-                return DataAccessHelper.ExecuteScalar<int>(commandText, connection);
+                return DataAccessHelper.ExecuteScalar<int>(commandStringBuilder.ToString(), connection);
             }
 
             /// <summary>
@@ -1509,9 +1505,7 @@ namespace Display.Data
             /// <returns></returns>
             public static async Task<VideoInfo[]> GetVideoInfo(int limit = 1, int offset = 0, string orderBy = null, bool isDesc = false, List<string> filterConditionList = null, string filterKeywords = null, Dictionary<string, string> rangesDicts = null, bool isFuzzyQueryActor = true, SqliteConnection connection= null)
             {
-                //排序
                 var orderStr = GetOrderStr(orderBy, isDesc);
-
                 //筛选
                 var filterStr = GetVideoInfoFilterStr(filterConditionList, filterKeywords, rangesDicts);
                 string commandText;
@@ -1669,7 +1663,7 @@ namespace Display.Data
             /// <param name="limit"></param>
             /// <param name="connection"></param>
             /// <returns></returns>
-            public static VideoInfo[] GetSingleVideoInfoBySomeType(string type, string label, int limit,SqliteConnection connection = null)
+            public static VideoInfo[] GetVideoInfoBySomeType(string type, string label, int limit,SqliteConnection connection = null)
             {
                 var commandText = string.IsNullOrEmpty(label) ? $"SELECT * from VideoInfo WHERE {type} == '' LIMIT {limit}"
                                                             : $"SELECT * from VideoInfo WHERE {type} LIKE '%{label}%' LIMIT {limit}";

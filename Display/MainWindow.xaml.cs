@@ -21,6 +21,8 @@ using System.Linq;
 using Windows.System;
 using Display.ContentsPage;
 using Windows.Foundation;
+using Display.WindowView;
+using Display.ContentsPage.DatumList;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -388,11 +390,19 @@ namespace Display
                 var searchContent = sender.Text;
                 if (string.IsNullOrEmpty(searchContent)) return;
 
-                var contentResult = await SearchLinkPage.ShowInContentDialog(searchContent, RootGrid.XamlRoot);
+                var (isSucceed, msg) = await SearchLinkPage.ShowInContentDialog(searchContent, RootGrid.XamlRoot);
 
-                if (!string.IsNullOrEmpty(contentResult))
+                if (isSucceed)
                 {
-                    ShowTeachingTip(contentResult);
+                    ShowTeachingTip(msg, "打开所在目录", (_, _) =>
+                    {
+                        // 打开所在目录
+                        CommonWindow.CreateAndShowWindow(new FileListPage(AppSettings.SavePath115Cid));
+                    });
+                }
+                else
+                {
+                    ShowTeachingTip(msg);
                 }
 
                 return;

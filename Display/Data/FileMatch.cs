@@ -264,7 +264,7 @@ namespace Display.Data
                     //从另外的表中查找
                     case "失败" or "fail":
                         var failItems = await DataAccess.Get.GetFailFileInfoWithDatum(n: keywords, limit: limit);
-                        failItems.ForEach(item => dicts.TryAdd(item.Name, new VideoInfo(item)));
+                        failItems?.ForEach(item => dicts.TryAdd(item.Name, new VideoInfo(item)));
                         continue;
                     default:
                         trueType = "truename";
@@ -276,9 +276,9 @@ namespace Display.Data
                 // 当数量超过Limit数量时，跳过（不包括失败列表）
                 if (leftCount <= 0) continue;
 
-                var newItems = DataAccess.Get.GetSingleVideoInfoBySomeType(trueType, keywords, leftCount);
+                var newItems = DataAccess.Get.GetVideoInfoBySomeType(trueType, keywords, leftCount);
 
-                newItems.ForEach(item => dicts.TryAdd(item.truename, item));
+                newItems?.ForEach(item => dicts.TryAdd(item.truename, item));
             }
 
             return dicts.Values.ToList();
@@ -517,14 +517,14 @@ namespace Display.Data
         //临时方法
         public static Visibility ShowIfImageENotNull(string imagePath)
         {
-            return imagePath == Const.Common.NoPicturePath ? Visibility.Collapsed : Visibility.Visible;
+            return imagePath == Const.FileType.NoPicturePath ? Visibility.Collapsed : Visibility.Visible;
 
         }
 
         //临时方法
         public static Visibility ShowIfImageNull(string imagePath)
         {
-            return imagePath == Const.Common.NoPicturePath ? Visibility.Visible : Visibility.Collapsed;
+            return imagePath == Const.FileType.NoPicturePath ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public static IEnumerable<T> OrderByNatural<T>(this IEnumerable<T> items, Func<T, string> selector, StringComparer stringComparer = null)
