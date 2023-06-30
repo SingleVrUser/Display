@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Net.Http;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Display.Data;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Display.Models;
 using Display.Services.Upload;
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Display.ViewModels
 {
-    internal partial class UploadViewModel : ObservableObject
+    internal class UploadViewModel : ObservableObject
     {
         private const int MaxUploadCount = 3;
 
@@ -41,7 +36,6 @@ namespace Display.ViewModels
                     SequentialStart();
                 }
             };
-            //uploadUi.Start();
 
             SequentialStart();
         }
