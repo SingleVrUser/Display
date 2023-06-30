@@ -141,7 +141,7 @@ public class AvMoo
         var info = await Common.AnalysisHtmlDocInfoFromAvSoxOrAvMoo(CID, detail_url, htmlDoc);
         if (info == null) return null;
 
-        info.is_wm = 0;
+        info.IsWm = 0;
 
         return info;
     }

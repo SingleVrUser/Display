@@ -211,7 +211,7 @@ public class JavDB
 
         VideoInfo videoInfo = new VideoInfo();
 
-        videoInfo.busurl = detail_url;
+        videoInfo.busUrl = detail_url;
 
         Uri Uri = new(detail_url);
         string JavDBUrl = $"{Uri.Scheme}://{Uri.Host}";
@@ -225,7 +225,7 @@ public class JavDB
 
         var AttributeNodes = video_meta_panelNode.SelectNodes(".//div[contains(@class,'panel-block')]");
 
-        videoInfo.truename = CID;
+        videoInfo.trueName = CID;
         //信息
         for (var i = 0; i < AttributeNodes.Count; i++)
         {
@@ -243,23 +243,23 @@ public class JavDB
             //}
             if (key.Contains("日期"))
             {
-                videoInfo.releasetime = valueNode.InnerText;
+                videoInfo.ReleaseTime = valueNode.InnerText;
             }
             else if (key.Contains("時長"))
             {
-                videoInfo.lengthtime = valueNode.InnerText.Trim().Replace(" 分鍾", "分钟");
+                videoInfo.Lengthtime = valueNode.InnerText.Trim().Replace(" 分鍾", "分钟");
             }
             else if (key.Contains("片商") || key.Contains("賣家"))
             {
-                videoInfo.producer = valueNode.InnerText;
+                videoInfo.Producer = valueNode.InnerText;
             }
             else if (key.Contains("發行"))
             {
-                videoInfo.publisher = valueNode.InnerText;
+                videoInfo.Publisher = valueNode.InnerText;
             }
             else if (key.Contains("系列"))
             {
-                videoInfo.series = valueNode.InnerText;
+                videoInfo.Series = valueNode.InnerText;
             }
             else if (key.Contains("類別"))
             {
@@ -269,7 +269,7 @@ public class JavDB
                 {
                     categoryList.Add(node.InnerText);
                 }
-                videoInfo.category = string.Join(",", categoryList);
+                videoInfo.Category = string.Join(",", categoryList);
             }
             else if (key.Contains("演員"))
             {
@@ -290,20 +290,20 @@ public class JavDB
 
                     actorList.Add($"{actorNode.InnerText.Trim()}{genderNode.InnerText}");
                 }
-                videoInfo.actor = string.Join(",", actorList);
+                videoInfo.Actor = string.Join(",", actorList);
             }
         }
 
         //标题
         var TitleNode = htmlDoc.DocumentNode.SelectSingleNode(".//strong[@class='current-title']");
         var title = TitleNode.InnerText;
-        videoInfo.title = title.Replace(videoInfo.truename, "").Trim();
+        videoInfo.Title = title.Replace(videoInfo.trueName, "").Trim();
 
         //下载封面
         string SavePath = AppSettings.ImageSavePath;
         string filePath = Path.Combine(SavePath, CID);
-        videoInfo.imageurl = ImageUrl;
-        videoInfo.imagepath = await GetInfoFromNetwork.DownloadFile(ImageUrl, filePath, CID);
+        videoInfo.ImageUrl = ImageUrl;
+        videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(ImageUrl, filePath, CID);
 
         //样品图片
         var preview_imagesSingesNode = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class,'preview-images')]");
@@ -322,7 +322,7 @@ public class JavDB
                     }
                     sampleUrlList.Add(sampleImageUrl);
                 }
-                videoInfo.sampleImageList = string.Join(",", sampleUrlList);
+                videoInfo.SampleImageList = string.Join(",", sampleUrlList);
             }
         }
 

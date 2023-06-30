@@ -53,19 +53,19 @@ namespace Display.Controls
             if (ResultInfo == null) return;
 
             //标题
-            Title_TextBlock.Text = ResultInfo.title;
+            Title_TextBlock.Text = ResultInfo.Title;
 
             //演员
             //之前有数据，清空
             if (ActorStackPanel.Children.Count != 0) ActorStackPanel.Children.Clear();
 
             ////查询该视频对应的演员列表
-            var actorList = await DataAccess.Get.GetActorInfoByVideoName(ResultInfo.truename);
+            var actorList = await DataAccess.Get.GetActorInfoByVideoName(ResultInfo.trueName);
 
             for (var i = 0; i < actorList.Length; i++)
             {
                 var actor = actorList[i];
-                var actorImageControl = new Controls.ActorImage(actor, ResultInfo.releasetime);
+                var actorImageControl = new Controls.ActorImage(actor, ResultInfo.ReleaseTime);
 
                 if (!string.IsNullOrEmpty(actor.Name))
                     actorImageControl.Click += ActorButtonOnClick;
@@ -76,7 +76,7 @@ namespace Display.Controls
             //标签
             //之前有数据，清空
             if (CategoryWrapPanel.Children.Count != 0) CategoryWrapPanel.Children.Clear();
-            var categoryList = ResultInfo.category?.Split(",");
+            var categoryList = ResultInfo.Category?.Split(",");
             for (var i = 0; i < categoryList?.Length; i++)
             {
                 var content = categoryList[i];
@@ -108,7 +108,7 @@ namespace Display.Controls
             //来源为本地
             if (AppSettings.ThumbnailOrigin == (int)Const.Origin.Local)
             {
-                var folderFullName = Path.Combine(AppSettings.ImageSavePath, ResultInfo.truename);
+                var folderFullName = Path.Combine(AppSettings.ImageSavePath, ResultInfo.trueName);
                 var theFolder = new DirectoryInfo(folderFullName);
 
                 if (theFolder.Exists)
@@ -127,9 +127,9 @@ namespace Display.Controls
             //来源为网络
             else if (AppSettings.ThumbnailOrigin == (int)Const.Origin.Web)
             {
-                var videoInfo = DataAccess.Get.GetSingleVideoInfoByTrueName(ResultInfo.truename);
+                var videoInfo = DataAccess.Get.GetSingleVideoInfoByTrueName(ResultInfo.trueName);
 
-                var sampleImageListStr = videoInfo?.sampleImageList;
+                var sampleImageListStr = videoInfo?.SampleImageList;
                 if (!string.IsNullOrEmpty(sampleImageListStr))
                 {
                     thumbnailList = sampleImageListStr.Split(",").ToList();
@@ -178,7 +178,7 @@ namespace Display.Controls
 
         private async void DownButton_Click(object sender, RoutedEventArgs e)
         {
-            string name = ResultInfo.truename;
+            string name = ResultInfo.trueName;
             var videoinfoList = DataAccess.Get.GetSingleFileInfoByTrueName(name);
 
             videoinfoList = videoinfoList.OrderBy(item => item.Name).ToList();
@@ -280,16 +280,16 @@ namespace Display.Controls
         {
             var lookLaterT = val == true ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
 
-            ResultInfo.look_later = lookLaterT;
-            DataAccess.Update.UpdateSingleDataFromVideoInfo(ResultInfo.truename, "look_later", lookLaterT.ToString());
+            ResultInfo.LookLater = lookLaterT;
+            DataAccess.Update.UpdateSingleDataFromVideoInfo(ResultInfo.trueName, "look_later", lookLaterT.ToString());
         }
 
         private void UpdateLike(bool? val)
         {
             var isLike = val == true ? 1 : 0;
 
-            ResultInfo.is_like = isLike;
-            DataAccess.Update.UpdateSingleDataFromVideoInfo(ResultInfo.truename, "is_like", isLike.ToString());
+            ResultInfo.IsLike = isLike;
+            DataAccess.Update.UpdateSingleDataFromVideoInfo(ResultInfo.trueName, "is_like", isLike.ToString());
         }
 
         private void Animation_Completed(ConnectedAnimation sender, object args)
@@ -314,7 +314,7 @@ namespace Display.Controls
             if (_findInfoAgainSmoke == null)
             {
 
-                _findInfoAgainSmoke = new FindInfoAgainSmoke(ResultInfo.truename);
+                _findInfoAgainSmoke = new FindInfoAgainSmoke(ResultInfo.trueName);
 
                 _findInfoAgainSmoke.ConfirmClick += FindInfoAgainSmoke_ConfirmClick;
             }
@@ -349,10 +349,10 @@ namespace Display.Controls
         private async Task UpdateInfo(VideoInfo videoInfo)
         {
             //重新下载图片
-            if (!string.IsNullOrEmpty(videoInfo.imageurl))
+            if (!string.IsNullOrEmpty(videoInfo.ImageUrl))
             {
-                await GetInfoFromNetwork.DownloadFile(videoInfo.imageurl,
-                    Path.Combine(AppSettings.ImageSavePath, videoInfo.truename), videoInfo.truename, true);
+                await GetInfoFromNetwork.DownloadFile(videoInfo.ImageUrl,
+                    Path.Combine(AppSettings.ImageSavePath, videoInfo.trueName), videoInfo.trueName, true);
             }
 
             //更新数据库
@@ -374,8 +374,8 @@ namespace Display.Controls
 
             //图片地址不变，但内容变了
             //为了图片显示能够变化
-            var oldPath = ResultInfo.imagepath;
-            var newPath = videoInfo.imagepath;
+            var oldPath = ResultInfo.ImagePath;
+            var newPath = videoInfo.ImagePath;
             //string NoPictruePath = "ms-appx:///Assets/NoPicture.jpg";
             if (!oldPath.Contains("ms-appx:") && File.Exists(newPath))
             {
@@ -583,7 +583,7 @@ namespace Display.Controls
 
         private void OpenDirectory_Click(object sender, RoutedEventArgs e)
         {
-            string ImagePath = Path.GetDirectoryName(ResultInfo.imagepath);
+            string ImagePath = Path.GetDirectoryName(ResultInfo.ImagePath);
             FileMatch.LaunchFolder(ImagePath);
         }
 
@@ -596,7 +596,7 @@ namespace Display.Controls
         {
             string score_str = sender.Value == 0 ? "-1" : sender.Value.ToString();
 
-            DataAccess.Update.UpdateSingleDataFromVideoInfo(ResultInfo.truename, "score", score_str);
+            DataAccess.Update.UpdateSingleDataFromVideoInfo(ResultInfo.trueName, "score", score_str);
         }
 
         private void ShowTeachingTip(string subtitle, string content = null)
@@ -616,7 +616,7 @@ namespace Display.Controls
         {
             SmokeGrid.Visibility = Visibility.Visible;
 
-            FileInfoInCidSmokePage = new FileInfoInCidSmoke(ResultInfo.truename);
+            FileInfoInCidSmokePage = new FileInfoInCidSmoke(ResultInfo.trueName);
             SmokeGrid.Children.Add(FileInfoInCidSmokePage);
 
             SmokeCancelGrid.Tapped += FileInfoInCidSmokeCancelGrid_Tapped;
@@ -711,7 +711,7 @@ namespace Display.Controls
 
         private async void FindVideoAppBarButton_Click(object sender, RoutedEventArgs e)
         {
-            var (isSucceed, msg) = await SearchLinkPage.ShowInContentDialog(ResultInfo.truename, XamlRoot);
+            var (isSucceed, msg) = await SearchLinkPage.ShowInContentDialog(ResultInfo.trueName, XamlRoot);
 
             if (isSucceed)
             {

@@ -172,7 +172,7 @@
                                                     <Grid CornerRadius="5"
                                                           HorizontalAlignment="Center"
                                                           VerticalAlignment="Center">
-                                                        <Image Source="{x:Bind imagepath}"
+                                                        <Image Source="{x:Bind ImagePath}"
                                                                Height="230" />
 
                                                         <Button x:Name="EnlargeButton"
@@ -189,10 +189,10 @@
 
                                                     <StackPanel Grid.Row="1"
                                                                 HorizontalAlignment="Center">
-                                                        <TextBlock Text="{x:Bind truename}"
+                                                        <TextBlock Text="{x:Bind trueName}"
                                                                    IsTextSelectionEnabled="True" />
-                                                        <TextBlock Text="{x:Bind releasetime}" />
-                                                        <customcontrols:TextBlockWithLongText StringValue="{x:Bind actor}" />
+                                                        <TextBlock Text="{x:Bind ReleaseTime}" />
+                                                        <customcontrols:TextBlockWithLongText StringValue="{x:Bind Actor}" />
                                                     </StackPanel>
 
                                                     <StackPanel Orientation="Horizontal"

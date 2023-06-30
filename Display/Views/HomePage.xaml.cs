@@ -190,7 +190,7 @@ namespace Display.Views
                 bool isAdd = true;
                 foreach (var showItem in videoList)
                 {
-                    if (showItem.truename == item.truename)
+                    if (showItem.trueName == item.trueName)
                     {
                         isAdd = false;
                     }
@@ -209,7 +209,7 @@ namespace Display.Views
                 bool isDel = true;
                 foreach (var item in videoInfos)
                 {
-                    if (showItem.truename == item.truename)
+                    if (showItem.trueName == item.trueName)
                     {
                         isDel = false;
                     }
@@ -217,13 +217,13 @@ namespace Display.Views
 
                 if (isDel)
                 {
-                    delList.Add(showItem.truename);
+                    delList.Add(showItem.trueName);
                 }
             }
 
             foreach (var trueName in delList)
             {
-                var delItem = videoList.FirstOrDefault(x => x.truename == trueName);
+                var delItem = videoList.FirstOrDefault(x => x.trueName == trueName);
                 videoList.Remove(delItem);
             }
             foreach (var item in addList)

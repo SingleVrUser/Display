@@ -441,7 +441,7 @@ namespace Display.Data
                 var videoInfoList = await Get.GetVideoInfo(-1);
                 foreach (var videoInfo in videoInfoList)
                 {   
-                    var actorStr = videoInfo.actor;
+                    var actorStr = videoInfo.Actor;
 
                     var actorList = actorStr.Split(",");
                     foreach (var actor in actorList)
@@ -451,7 +451,7 @@ namespace Display.Data
                         {
                             actorsInfoDict.Add(actor, new List<string>());
                         }
-                        actorsInfoDict[actor].Add(videoInfo.truename);
+                        actorsInfoDict[actor].Add(videoInfo.trueName);
                     }
                 }
 
@@ -672,13 +672,13 @@ namespace Display.Data
                 Update.UpdateVideoInfo(videoInfo, connection);
 
                 //更新是否步兵
-                Add.AddOrReplaceIs_Wm(videoInfo.truename, videoInfo.producer, videoInfo.is_wm, connection);
+                Add.AddOrReplaceIs_Wm(videoInfo.trueName, videoInfo.Producer, videoInfo.IsWm, connection);
 
                 //更新演员信息
                 //先删除Actor_Videos中所有Video_name的数据
-                Delete.DeleteVideoInfoByName(videoInfo.truename, connection);
+                Delete.DeleteVideoInfoByName(videoInfo.trueName, connection);
 
-                Add.AddActorInfoByActorInfo(videoInfo, new List<string> { videoInfo.truename }, connection);
+                Add.AddActorInfoByActorInfo(videoInfo, new List<string> { videoInfo.trueName }, connection);
 
                 connection.Close();
             }
@@ -995,10 +995,10 @@ namespace Display.Data
                 AddVideoInfo(data, connection);
 
                 //添加演员信息
-                AddActorInfoByActorInfo(data, new List<string> { data.truename }, connection);
+                AddActorInfoByActorInfo(data, new List<string> { data.trueName }, connection);
 
                 //添加是否步兵
-                AddOrReplaceIs_Wm(data.truename, data.producer, data.is_wm, connection);
+                AddOrReplaceIs_Wm(data.trueName, data.Producer, data.IsWm, connection);
 
                 connection.Close();
             }
@@ -1011,7 +1011,7 @@ namespace Display.Data
             /// <param name="connection"></param>
             public static void AddActorInfoByActorInfo(VideoInfo videoInfo, List<string> videoNameList, SqliteConnection connection)
             {
-                var actorStr = videoInfo.actor;
+                var actorStr = videoInfo.Actor;
                 var actorList = actorStr.Split(",");
                 foreach (var actorName in actorList)
                 {
@@ -1023,7 +1023,7 @@ namespace Display.Data
                         //添加信息，如果已经存在则忽略
                         command.CommandText = $"INSERT OR IGNORE INTO Actor_Video VALUES (@actor_id,@video_name)";
                         command.Parameters.AddWithValue("@actor_id", actorId);
-                        command.Parameters.AddWithValue("@video_name", videoInfo.truename);
+                        command.Parameters.AddWithValue("@video_name", videoInfo.trueName);
                         command.ExecuteNonQuery();
                     }
                     // 没有该演员信息的话

@@ -43,11 +43,11 @@ public sealed partial class EditInfo : Page
         this.videoInfo = videoInfo;
 
         category_items = new();
-        categories = videoInfo.category.Split(",").Where(item => !string.IsNullOrEmpty(item)).Select(x => new TokenData(x)).ToList();
+        categories = videoInfo.Category.Split(",").Where(item => !string.IsNullOrEmpty(item)).Select(x => new TokenData(x)).ToList();
         categories.ForEach(item => category_items.Add(item));
 
         actor_items = new();
-        var old_actors = videoInfo.actor.Split(",").Where(item => !string.IsNullOrEmpty(item)).Select(x => new ActorInfo() { Name = x }).ToList();
+        var old_actors = videoInfo.Actor.Split(",").Where(item => !string.IsNullOrEmpty(item)).Select(x => new ActorInfo() { Name = x }).ToList();
         old_actors.ForEach(item => actor_items.Add(item));
 
         category_suggestion = new(categories, false);
@@ -68,13 +68,13 @@ public sealed partial class EditInfo : Page
                                         SuggestedItemsSource = actors_suggestion, ItemTemplate= this.Resources["ActorTemplate"] as DataTemplate,ItemsSource=actor_items,
                                         SymbolIconSource=new(){Symbol=Symbol.AddFriend} },
 
-            new CommonEditOption(){Header= "标题",MinWidth=480,Text=videoInfo.title},
-            new CommonEditOption (){Header= "发布时间",Text=videoInfo.releasetime},
-            new CommonEditOption (){Header= "视频长度",Text=videoInfo.lengthtime},
-            new CommonEditOption() { Header = "导演",Text=videoInfo.director },
-            new CommonEditOption() { Header = "制作商" ,Text=videoInfo.producer},
-            new CommonEditOption() { Header = "发行商" ,Text=videoInfo.publisher},
-            new CommonEditOption() { Header = "系列" ,Text=videoInfo.series},
+            new CommonEditOption(){Header= "标题",MinWidth=480,Text=videoInfo.Title},
+            new CommonEditOption (){Header= "发布时间",Text=videoInfo.ReleaseTime},
+            new CommonEditOption (){Header= "视频长度",Text=videoInfo.Lengthtime},
+            new CommonEditOption() { Header = "导演",Text=videoInfo.Director },
+            new CommonEditOption() { Header = "制作商" ,Text=videoInfo.Producer},
+            new CommonEditOption() { Header = "发行商" ,Text=videoInfo.Publisher},
+            new CommonEditOption() { Header = "系列" ,Text=videoInfo.Series},
         };
     }
 
@@ -145,25 +145,25 @@ public sealed partial class EditInfo : Page
                 switch (commonEditOption.Header)
                 {
                     case "标题":
-                        info.title = commonEditOption.Text;
+                        info.Title = commonEditOption.Text;
                         break;
                     case "发布时间":
-                        info.releasetime = commonEditOption.Text;
+                        info.ReleaseTime = commonEditOption.Text;
                         break;
                     case "视频长度":
-                        info.lengthtime = commonEditOption.Text;
+                        info.Lengthtime = commonEditOption.Text;
                         break;
                     case "导演":
-                        info.director = commonEditOption.Text;
+                        info.Director = commonEditOption.Text;
                         break;
                     case "制作商":
-                        info.producer = commonEditOption.Text;
+                        info.Producer = commonEditOption.Text;
                         break;
                     case "发行商":
-                        info.publisher = commonEditOption.Text;
+                        info.Publisher = commonEditOption.Text;
                         break;
                     case "系列":
-                        info.series = commonEditOption.Text;
+                        info.Series = commonEditOption.Text;
                         break;
                 }
             }
@@ -172,10 +172,10 @@ public sealed partial class EditInfo : Page
                 switch (tokenizingEditOption.Header)
                 {
                     case "类别":
-                        info.category = string.Join(",", category_items.Select(item => item.Name));
+                        info.Category = string.Join(",", category_items.Select(item => item.Name));
                         break;
                     case "演员":
-                        info.actor = string.Join(",", actor_items.Select(item => item.Name));
+                        info.Actor = string.Join(",", actor_items.Select(item => item.Name));
                         break;
                 }
             }

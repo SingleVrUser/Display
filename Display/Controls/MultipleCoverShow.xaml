@@ -78,7 +78,7 @@
                                    VerticalAlignment="Center"
                                    Stretch="Uniform">
                                 <Image.Source>
-                                    <BitmapImage UriSource="{x:Bind imagepath}"
+                                    <BitmapImage UriSource="{x:Bind ImagePath}"
                                                  DecodePixelWidth="300" />
                                 </Image.Source>
                             </Image>

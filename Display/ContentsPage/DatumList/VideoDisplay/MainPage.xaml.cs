@@ -499,7 +499,7 @@ public sealed partial class MainPage : Page
             var trueName = FileMatch.MatchName(name);
             if (trueName == null)
             {
-                cidInfo = new VideoInfo { truename = name, imagepath = noPicturePath };
+                cidInfo = new VideoInfo { trueName = name, ImagePath = noPicturePath };
                 CidInfos.Add(cidInfo);
                 continue;
             }
@@ -516,7 +516,7 @@ public sealed partial class MainPage : Page
                 cidInfo = DataAccess.Get.GetSingleVideoInfoByTrueName(result);
 
 
-                Debug.WriteLine($"\t>>{cidInfo.truename}");
+                Debug.WriteLine($"\t>>{cidInfo.trueName}");
             }
             //网络中查询
             else
@@ -526,10 +526,10 @@ public sealed partial class MainPage : Page
 
                 cidInfo = await spiderManager.DispatchSpiderInfoByCIDInOrder(trueName);
 
-                Debug.WriteLine($"\t网络搜索到的结果{cidInfo?.truename}");
+                Debug.WriteLine($"\t网络搜索到的结果{cidInfo?.trueName}");
             }
 
-            cidInfo ??= new VideoInfo { truename = trueName, imagepath = noPicturePath };
+            cidInfo ??= new VideoInfo { trueName = trueName, ImagePath = noPicturePath };
             CidInfos.Add(cidInfo);
 
         }
@@ -661,7 +661,7 @@ public sealed partial class MainPage : Page
     {
         //移除cid信息（预览图/信息）
         var removeCid = CidInfos.FirstOrDefault(item =>
-            item.truename == fileInfo.Name || item.truename.ToUpper() == FileMatch.MatchName(fileInfo.Name)?.ToUpper());
+            item.trueName == fileInfo.Name || item.trueName.ToUpper() == FileMatch.MatchName(fileInfo.Name)?.ToUpper());
 
         if (removeCid != null)
         {
@@ -794,7 +794,7 @@ public sealed partial class MainPage : Page
 
         SmokeGrid.Visibility = Visibility.Visible;
 
-        EnlargeImage.Source = new BitmapImage(new Uri(videoInfo.imagepath));
+        EnlargeImage.Source = new BitmapImage(new Uri(videoInfo.ImagePath));
 
     }
 

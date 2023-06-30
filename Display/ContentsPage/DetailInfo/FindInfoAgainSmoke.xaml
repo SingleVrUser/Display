@@ -86,7 +86,7 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <controls:ImageEx Source="{x:Bind VideoInfo.imageurl,Converter={StaticResource NotExistsImagePathConverter},Mode=OneWay}" CornerRadius="5"/>
+                        <controls:ImageEx Source="{x:Bind VideoInfo.ImageUrl,Converter={StaticResource NotExistsImagePathConverter},Mode=OneWay}" CornerRadius="5"/>
 
                         <StackPanel Grid.Column="1"
                                     VerticalAlignment="Center"
@@ -101,23 +101,23 @@
                             <TextBlock>
                                     <Run>番号</Run>
                                     <Run FontWeight="Bold"
-                                         Text="{x:Bind VideoInfo.truename,Mode=OneWay}" />
+                                         Text="{x:Bind VideoInfo.trueName,Mode=OneWay}" />
                             </TextBlock>
 
                             <TextBlock>
                                     <Run>演员</Run>
-                                    <Run Text="{x:Bind VideoInfo.actor,Mode=OneWay}" />
+                                    <Run Text="{x:Bind VideoInfo.Actor,Mode=OneWay}" />
                             </TextBlock>
 
                             <TextBlock>
                                     
                                 <Run>类别</Run>
-                                    <Run Text="{x:Bind VideoInfo.category,Mode=OneWay}" />
+                                    <Run Text="{x:Bind VideoInfo.Category,Mode=OneWay}" />
                             </TextBlock>
 
                             <TextBlock>
                                     <Run>时间</Run>
-                                    <Run Text="{x:Bind VideoInfo.releasetime,Mode=OneWay}" />
+                                    <Run Text="{x:Bind VideoInfo.ReleaseTime,Mode=OneWay}" />
                             </TextBlock>
                         </StackPanel>
 
@@ -208,7 +208,7 @@
                                     </Grid.Resources>
 
                                     <Grid CornerRadius="3">
-                                        <Image Source="{x:Bind imageurl}" />
+                                        <Image Source="{x:Bind ImageUrl}" />
                                     </Grid>
 
                                     <Grid Grid.Column="1"
@@ -242,22 +242,22 @@
 
                                         <TextBlock Grid.Column="1"
                                                    Grid.Row="0"
-                                                   Text="{x:Bind truename}"
+                                                   Text="{x:Bind trueName}"
                                                    FontWeight="Bold" />
 
                                         <TextBlock Grid.Column="1"
                                                    Grid.Row="1"
-                                                   Text="{x:Bind actor}"
+                                                   Text="{x:Bind Actor}"
                                                    TextTrimming="CharacterEllipsis" />
 
                                         <TextBlock Grid.Column="1"
                                                    Grid.Row="2"
-                                                   Text="{x:Bind category}"
+                                                   Text="{x:Bind Category}"
                                                    TextTrimming="CharacterEllipsis" />
 
                                         <TextBlock Grid.Column="1"
                                                    Grid.Row="3"
-                                                   Text="{x:Bind releasetime}" />
+                                                   Text="{x:Bind ReleaseTime}" />
                                     </Grid>
 
                                 </Grid>

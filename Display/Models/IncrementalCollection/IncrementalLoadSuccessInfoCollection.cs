@@ -11,40 +11,43 @@ namespace Display.Models.IncrementalCollection;
 
 public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCoverDisplayClass>, ISupportIncrementalLoading
 {
+    private const int DefaultCount = 30;
+    private double ImageWidth { get; set; }
+    private double ImageHeight { get; set; }
+    private bool IsFuzzyQueryActor { get; set; }
+
+    private bool IsContainFail => FilterConditionList != null && FilterConditionList.Contains("fail");
+
+    private string OrderBy { get; set; }
+    private bool IsDesc { get; set; }
+
+    private Dictionary<string, string> Ranges { get; set; }
+
+    private List<string> FilterConditionList { get; set; }
+
+    private string FilterKeywords { get; set; }
+
+
     public int AllCount { get; private set; }
 
     public bool HasMoreItems { get; set; } = true;
 
-    private double imageWidth { get; set; }
-    private double imageHeight { get; set; }
-
-    private bool isFuzzyQueryActor { get; set; }
-
-    private string orderBy { get; set; }
-    private bool isDesc { get; set; }
-
-    private Dictionary<string, string> ranges { get; set; }
-
-    private List<string> filterConditionList { get; set; }
-
-    private string filterKeywords { get; set; }
-
-    public IncrementalLoadSuccessInfoCollection(double imgwidth, double imgheight)
+    public IncrementalLoadSuccessInfoCollection(double imgWidth, double imgHeight)
     {
-        SetImageSize(imgwidth, imgheight);
+        SetImageSize(imgWidth, imgHeight);
     }
 
     public async Task LoadData(int startShowCount = 20)
     {
-        var newItems = await DataAccess.Get.GetVideoInfo(startShowCount, 0, orderBy, isDesc, filterConditionList, filterKeywords, ranges, isFuzzyQueryActor);
+        var newItems = await DataAccess.Get.GetVideoInfo(startShowCount, 0, OrderBy, IsDesc, FilterConditionList, FilterKeywords, Ranges, IsFuzzyQueryActor);
 
         if (Count == 0)
         {
-            var successCount = DataAccess.Get.GetCountOfVideoInfo(filterConditionList, filterKeywords, ranges);
+            var successCount = DataAccess.Get.GetCountOfVideoInfo(FilterConditionList, FilterKeywords, Ranges);
             var failCount = 0;
             if (IsContainFail)
             {
-                failCount = DataAccess.Get.GetCountOfFailFileInfoWithDatum(0, -1, filterKeywords);
+                failCount = DataAccess.Get.GetCountOfFailFileInfoWithDatum(0, -1, FilterKeywords);
             }
 
             AllCount = successCount + failCount;
@@ -53,32 +56,32 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
         else
             Clear();
 
-        newItems.ForEach(item => Add(new VideoCoverDisplayClass(item, imageWidth, imageHeight)));
+        newItems.ForEach(item => Add(new VideoCoverDisplayClass(item, ImageWidth, ImageHeight)));
 
     }
 
-    public void SetImageSize(double imgwidth, double imgheight)
+    public void SetImageSize(double imgWidth, double imgHeight)
     {
-        imageWidth = imgwidth;
-        imageHeight = imgheight;
+        ImageWidth = imgWidth;
+        ImageHeight = imgHeight;
     }
 
     public void SetFilter(List<string> filterConditionList, string filterKeywords, bool isFuzzyQueryActor)
     {
-        this.filterConditionList = filterConditionList;
-        this.filterKeywords = filterKeywords;
-        this.isFuzzyQueryActor = isFuzzyQueryActor;
+        this.FilterConditionList = filterConditionList;
+        this.FilterKeywords = filterKeywords;
+        this.IsFuzzyQueryActor = isFuzzyQueryActor;
     }
 
     public void SetRange(Dictionary<string, string> ranges)
     {
-        this.ranges = ranges;
+        this.Ranges = ranges;
     }
 
     public void SetOrder(string orderBy, bool isDesc)
     {
-        this.orderBy = orderBy;
-        this.isDesc = isDesc;
+        this.OrderBy = orderBy;
+        this.IsDesc = isDesc;
     }
 
     public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
@@ -86,15 +89,14 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
         return InnerLoadMoreItemsAsync(count).AsAsyncOperation();
     }
 
-    public int defaultCount = 30;
 
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        var lists = await DataAccess.Get.GetVideoInfo(defaultCount, Count, orderBy, isDesc, filterConditionList, filterKeywords, ranges, isFuzzyQueryActor);
+        var lists = await DataAccess.Get.GetVideoInfo(DefaultCount, Count, OrderBy, IsDesc, FilterConditionList, FilterKeywords, Ranges, IsFuzzyQueryActor);
 
         //在最后的时候加载匹配失败的
         //用于展示搜索结果
-        if (lists.Length < defaultCount)
+        if (lists==null || lists.Length < DefaultCount)
         {
             HasMoreItems = false;
 
@@ -102,18 +104,16 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
             //无筛选功能
             if (IsContainFail)
             {
-                var failList = await DataAccess.Get.GetFailFileInfoWithDatum(0, -1, filterKeywords);
-                failList.ForEach(item => Add(new VideoCoverDisplayClass(new VideoInfo(item), imageWidth, imageHeight)));
+                var failList = await DataAccess.Get.GetFailFileInfoWithDatum(0, -1, FilterKeywords);
+                failList.ForEach(item => Add(new VideoCoverDisplayClass(new VideoInfo(item), ImageWidth, ImageHeight)));
             }
         }
 
-        lists.ForEach(item => Add(new VideoCoverDisplayClass(item, imageWidth, imageHeight)));
+        lists?.ForEach(item => Add(new VideoCoverDisplayClass(item, ImageWidth, ImageHeight)));
 
         return new LoadMoreItemsResult
         {
-            Count = (uint)lists.Length
+            Count = (uint)(lists?.Length ?? 0)
         };
     }
-
-    private bool IsContainFail => filterConditionList != null && filterConditionList.Contains("fail");
 }

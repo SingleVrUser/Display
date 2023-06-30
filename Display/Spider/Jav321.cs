@@ -56,8 +56,8 @@ public class Jav321
 
         var videoInfo = new VideoInfo
         {
-            busurl = detailUrl,
-            title = titleNode.FirstChild.InnerText
+            busUrl = detailUrl,
+            Title = titleNode.FirstChild.InnerText
         };
 
         //图片地址
@@ -99,7 +99,7 @@ public class Jav321
         }
 
         //CID
-        videoInfo.truename = cid;
+        videoInfo.trueName = cid;
 
         //其他信息
         var InfoNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='col-md-9']");
@@ -157,29 +157,29 @@ public class Jav321
             switch (info.Key)
             {
                 case "出演者":
-                    videoInfo.actor = info.Value.Trim();
+                    videoInfo.Actor = info.Value.Trim();
                     break;
                 case "メーカー":
-                    videoInfo.producer = info.Value.Trim();
+                    videoInfo.Producer = info.Value.Trim();
                     break;
                 case "シリーズ":
-                    videoInfo.series = info.Value.Trim();
+                    videoInfo.Series = info.Value.Trim();
                     break;
                 case "ジャンル":
-                    videoInfo.category = info.Value.Trim();
+                    videoInfo.Category = info.Value.Trim();
                     break;
                 case "配信開始日":
-                    videoInfo.releasetime = info.Value.Trim();
+                    videoInfo.ReleaseTime = info.Value.Trim();
                     break;
                 case "収録時間":
-                    videoInfo.lengthtime = info.Value.Trim().Replace(" minutes", "分钟");
+                    videoInfo.Lengthtime = info.Value.Trim().Replace(" minutes", "分钟");
                     break;
             }
         }
 
         if (sampleUrlList != null)
         {
-            videoInfo.sampleImageList = string.Join(",", sampleUrlList);
+            videoInfo.SampleImageList = string.Join(",", sampleUrlList);
         }
 
         ////下载封面
@@ -187,8 +187,8 @@ public class Jav321
         {
             string SavePath = AppSettings.ImageSavePath;
             string filePath = Path.Combine(SavePath, cid);
-            videoInfo.imageurl = ImageUrl;
-            videoInfo.imagepath = await GetInfoFromNetwork.DownloadFile(ImageUrl, filePath, cid);
+            videoInfo.ImageUrl = ImageUrl;
+            videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(ImageUrl, filePath, cid);
         }
         //（接受无封面）
 

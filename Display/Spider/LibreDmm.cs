@@ -53,15 +53,15 @@ public class LibreDmm
         }
 
         VideoInfo videoInfo = new VideoInfo();
-        videoInfo.busurl = detail_url;
-        videoInfo.truename = CID;
+        videoInfo.busUrl = detail_url;
+        videoInfo.trueName = CID;
 
         //dmm肯定没有步兵
-        videoInfo.is_wm = 0;
+        videoInfo.IsWm = 0;
 
         var titleNode = htmlDoc.DocumentNode.SelectSingleNode("//h1");
         if (titleNode != null)
-            videoInfo.title = titleNode.InnerText.Trim();
+            videoInfo.Title = titleNode.InnerText.Trim();
 
         var keyNodes = htmlDoc.DocumentNode.SelectNodes("//div[@class='col-md-4']/dl/dt");
         if (keyNodes == null) return null;
@@ -73,23 +73,23 @@ public class LibreDmm
             switch (key)
             {
                 case "Release Date":
-                    videoInfo.releasetime = valueNodes[i].InnerText.Trim();
+                    videoInfo.ReleaseTime = valueNodes[i].InnerText.Trim();
                     break;
                 case "Directors":
-                    videoInfo.director = valueNodes[i].InnerText.Trim();
+                    videoInfo.Director = valueNodes[i].InnerText.Trim();
                     break;
                 case "Genres":
                     var generesNodes = valueNodes[i].SelectNodes("ul/li");
-                    videoInfo.category = string.Join(",", generesNodes.Select(x => x.InnerText.Trim()));
+                    videoInfo.Category = string.Join(",", generesNodes.Select(x => x.InnerText.Trim()));
                     break;
                 case "Labels":
-                    videoInfo.series = valueNodes[i].InnerText.Trim();
+                    videoInfo.Series = valueNodes[i].InnerText.Trim();
                     break;
                 case "Makers":
-                    videoInfo.producer = valueNodes[i].InnerText.Trim();
+                    videoInfo.Producer = valueNodes[i].InnerText.Trim();
                     break;
                 case "Volume":
-                    videoInfo.lengthtime = valueNodes[i].InnerText.Trim().Replace(" minutes", "分钟");
+                    videoInfo.Lengthtime = valueNodes[i].InnerText.Trim().Replace(" minutes", "分钟");
                     break;
             }
         }
@@ -99,7 +99,7 @@ public class LibreDmm
 
         if (actressesNodes != null)
         {
-            videoInfo.actor = string.Join(",", actressesNodes.Select(x => x.InnerText.Trim()));
+            videoInfo.Actor = string.Join(",", actressesNodes.Select(x => x.InnerText.Trim()));
         }
 
         //下载封面
@@ -107,8 +107,8 @@ public class LibreDmm
         {
             string SavePath = AppSettings.ImageSavePath;
             string filePath = Path.Combine(SavePath, CID);
-            videoInfo.imageurl = ImageUrl;
-            videoInfo.imagepath = await GetInfoFromNetwork.DownloadFile(ImageUrl, filePath, CID);
+            videoInfo.ImageUrl = ImageUrl;
+            videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(ImageUrl, filePath, CID);
         }
 
         return videoInfo;
