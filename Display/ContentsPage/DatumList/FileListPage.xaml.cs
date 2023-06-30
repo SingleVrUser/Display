@@ -294,7 +294,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     /// <param name="e"></param>
     private void TransferStationGrid_Drop(object sender, DragEventArgs e)
     {
-        Debug.WriteLine("拖拽文件，在中转站上松开");
+        //Debug.WriteLine("拖拽文件，在中转站上松开");
         if (sender is not Grid) return;
 
         if (e.DataView.Properties.Values.FirstOrDefault() is not List<FilesInfo> sourceFilesInfos) return;
@@ -481,8 +481,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         // 删除文件列表中的文件
         TryRemoveFilesInExplorer(sourceFilesInfos);
 
-        // 删除中转站中的文件
-        TryRemoveTransferFiles(sourceFilesInfos);
+        //// 删除中转站中的文件
+        //TryRemoveTransferFiles(sourceFilesInfos);
 
         var cid = sourceFilesInfos.First().Cid;
 
@@ -596,7 +596,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     }
 
 
-    private void TryRemoveTransferFiles(ICollection<FilesInfo> files)
+    private void TryRemoveFilesInTransfer(IEnumerable<FilesInfo> files)
     {
         if (_transferStationFiles is not { Count: > 0 }) return;
 
@@ -616,8 +616,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         await WebApi.MoveFiles(cid, files.Select(item => item.Id).ToArray());
 
-        // 从中转站列表中删除已经移动的文件
-        TryRemoveTransferFiles(files);
+        //// 从中转站列表中删除已经移动的文件
+        //TryRemoveTransferFiles(files);
     }
 
 
@@ -653,11 +653,11 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         RecycleStationGrid.Visibility = Visibility.Visible;
 
         // 添加数据
-        var infos = e.Items.Cast<TransferStationFiles>().ToList();
+        var infos = e.Items.Cast<TransferStationFiles>().ToArray();
         e.Data.Properties.Add("items", TransferStationFilesToFilesInfo(infos));
     }
 
-    private List<FilesInfo> TransferStationFilesToFilesInfo(List<TransferStationFiles> srcList)
+    private List<FilesInfo> TransferStationFilesToFilesInfo(TransferStationFiles[] srcList)
     {
         List<FilesInfo> infos = new();
         foreach (var item in srcList)
@@ -1122,12 +1122,19 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (args.DropResult is not DataPackageOperation.Move) return;
 
-        // 移动成功，删除列表文件（如果存在）
-        var infos = args.Items.Cast<TransferStationFiles>().ToList();
-        TryRemoveFilesInExplorer(TransferStationFilesToFilesInfo(infos));
+        // 移动成功，移除对应已经移动的文件（如果存在）
+        var infos = args.Items.Cast<TransferStationFiles>().ToArray();
+        var infosFormat = TransferStationFilesToFilesInfo(infos);
 
-        // 如果中转站为空，就隐藏（目前数量为一个，移动后将为0）
-        if (_transferStationFiles.Count == 1)
+        //// 从列表文件中删除
+        //TryRemoveFilesInExplorer(infosFormat);
+
+        // 从中转站列表中删除
+        TryRemoveFilesInTransfer(infosFormat);
+
+        //// 如果中转站为空，就隐藏（目前数量为移动的数量，移动后将为0）
+        // 如果中转站为空，就隐藏
+        if (_transferStationFiles.Count == 0)
         {
             TransferStationGrid.Visibility = Visibility.Collapsed;
         }
@@ -1207,8 +1214,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         await OpenFolder(info);
     }
-
-
+    
     private async void Refresh_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
         await OpenFolder(CurrentExplorerItem);
@@ -1235,6 +1241,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         // Raise the PropertyChanged event, passing the Name of the property whose value has changed.
         this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
+    
 }
 
 class TransferStationFiles

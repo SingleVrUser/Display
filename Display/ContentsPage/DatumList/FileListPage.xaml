@@ -371,9 +371,9 @@
                   CanDragItems="True"
                   DragItemsStarting="Source_DragItemsStarting"
                   DragItemsCompleted="Source_DragItemsCompleted"
+                  Drop="BaseExample_Drop"
                   DragOver="FileMove_DragOver"
-                  AllowDrop="True"
-                  Drop="BaseExample_Drop">
+                  AllowDrop="True">
 
             <interactivity:Interaction.Behaviors>
                 <behaviors:QuickReturnHeaderBehavior />
