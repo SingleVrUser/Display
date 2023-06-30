@@ -37,18 +37,18 @@ namespace Display.Helper.Crypto
             return Convert.ToHexString(hashBytes);
         }
 
-        public static async Task<string> ComputeSha1ByStream(FileStream stream, CancellationToken cancellationToken)
+        public static async Task<string> ComputeSha1ByStream(Stream stream, CancellationToken cancellationToken)
         {
             using var sha = SHA1.Create();
             var hash = await sha.ComputeHashAsync(stream, cancellationToken);
             return Convert.ToHexString(hash);
         }
 
-        public static async Task<string> ComputeSha1ByStream(FileStream stream, CancellationToken cancellationToken, IProgress<long> progress, int bufferSize = 1024 * 1024)
+        public static async Task<string> ComputeSha1ByStream(Stream stream, CancellationToken cancellationToken, IProgress<long> progress, int bufferSize = 1024 * 1024)
         {
             using var sha = SHA1.Create();
 
-            var hash = await sha.ComputeHashAsync(stream, cancellationToken, progress, bufferSize);
+            var hash = await sha.ComputeHashAsync(stream, progress, cancellationToken, bufferSize);
 
             return hash == null ? null : Convert.ToHexString(hash);
         }

@@ -58,6 +58,7 @@ namespace Display.Services.Upload
         private CancellationToken Token => _source.Token;
 
         public FileUploadResult FileUploadResult;
+        private bool IsGetUploadInfo => _userId != 0 && !IsNullOrEmpty(_userKey);
 
         public override void Dispose()
         {
@@ -89,14 +90,17 @@ namespace Display.Services.Upload
             _fileInfo = new FileInfo(path);
             if (!_fileInfo.Exists) return;
 
+            Position = 0;
+            Length = _fileInfo.Length;
+
             FileUploadResult = new FileUploadResult(_fileInfo.Name)
             {
-                FileSize = _fileInfo.Length,
+                FileSize = Length,
                 Cid = cid
             };
 
-            Position = 0;
-            _fileSizeString = _fileInfo.Length.ToByteSizeString();
+            _fileSizeString = Length.ToByteSizeString();
+            Content = _fileSizeString;
 
             _stream = _fileInfo.OpenRead();
         }
@@ -116,8 +120,6 @@ namespace Display.Services.Upload
 
             await fileUpload.Start();
         }
-
-        private bool IsGetUploadInfo => _userId != 0 && !IsNullOrEmpty(_userKey);
 
 
         private async Task<bool> UploadFile()
@@ -234,11 +236,9 @@ namespace Display.Services.Upload
                         State = UploadState.Succeed;
                         return fastUploadResult;
                     }
-                    else
-                    {
-                        Debug.WriteLine($"上传时发生错误：{fastUploadResult.statusmsg}");
-                        State = UploadState.Faulted;
-                    }
+
+                    Debug.WriteLine($"上传时发生错误：{fastUploadResult.statusmsg}");
+                    State = UploadState.Faulted;
 
                     return null;
                 }
@@ -326,11 +326,13 @@ namespace Display.Services.Upload
             }
 
             // 计算本地Sha1
-            _totalSha1 = await HashHelper.ComputeSha1ByStream(_stream, Token, progress: new Progress<long>(i =>
+            var progress = new Progress<long>(i =>
                 {
                     Content = $"{i.ToByteSizeString()}/{_fileSizeString}";
+                    //Debug.WriteLine(i);
                 }
-            ));
+            );
+            _totalSha1 = await HashHelper.ComputeSha1ByStream(_stream, Token,progress);
 
             if (IsNullOrEmpty(_totalSha1))
             {
@@ -338,7 +340,6 @@ namespace Display.Services.Upload
             }
             else
             {
-                Length = _fileInfo.Length;
                 State = UploadState.Initialized;
                 _isInitSucceed = true;
             }

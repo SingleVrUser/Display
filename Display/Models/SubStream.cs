@@ -40,11 +40,11 @@ namespace Display.Models
         public override int Read(byte[] buffer, int offset, int count)
         {
             CheckDisposed();
-            long remaining = _length - _position;
+            var remaining = _length - _position;
             if (remaining <= 0) return 0;
             if (remaining < count) count = (int)remaining;
-
-            int read = _baseStream.Read(buffer, offset, count);
+                
+            var read = _baseStream.Read(buffer, offset, count);
             _position += read;
 
             _progress.Report(_position);

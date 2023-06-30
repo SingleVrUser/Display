@@ -8,44 +8,33 @@ namespace Display.Extensions
 {
     internal static class HashAlgorithmExtension
     {
-        public static async Task<byte[]> ComputeHashAsync(this HashAlgorithm hashAlgorithm, Stream stream, CancellationToken cancellationToken = default,
-            IProgress<long> progress = null,
+        public static async Task<byte[]> ComputeHashAsync(this HashAlgorithm hashAlgorithm, Stream stream,
+            IProgress<long> progress, CancellationToken cancellationToken = default,
             int bufferSize = 1024 * 1024)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            long totalBytesRead = 0;
-
-            var readAheadBuffer = new byte[bufferSize];
-            var readAheadBytesRead = await stream.ReadAsync(readAheadBuffer, 0,
-                readAheadBuffer.Length, cancellationToken);
-            totalBytesRead += readAheadBytesRead;
-
-            while (readAheadBytesRead != 0)
+            var buffer = new byte[bufferSize];
+            var streamLength = stream.Length;
+            while (true)
             {
-                // 上一个 byteRead
-                var bytesRead = readAheadBytesRead;
-                // 上一个 buffer
-                var buffer = readAheadBuffer;
-                readAheadBuffer = new byte[bufferSize];
+                // 必须加.ConfigureAwait(false)，不然异步运行一个以上，UI会卡
+                var read = await stream.ReadAsync(buffer, 0, bufferSize, cancellationToken).ConfigureAwait(false);
+                if (stream.Position == streamLength)
+                {
+                    hashAlgorithm.TransformFinalBlock(buffer, 0, read);
+                    break;
+                }
 
-                readAheadBytesRead = await stream.ReadAsync(readAheadBuffer, 0,
-                    readAheadBuffer.Length, cancellationToken);
-                totalBytesRead += readAheadBytesRead;
+                hashAlgorithm.TransformBlock(buffer, 0, read, default, default);
 
-                if (readAheadBytesRead == 0)
-                    hashAlgorithm.TransformFinalBlock(buffer, 0, bytesRead);
-                else
-                    hashAlgorithm.TransformBlock(buffer, 0, bytesRead, buffer, 0);
-
-                progress?.Report(totalBytesRead);
+                progress?.Report(stream.Position);
 
                 if (cancellationToken.IsCancellationRequested)
                 {
                     return null;
                 }
             }
-
             return hashAlgorithm.Hash;
         }
     }

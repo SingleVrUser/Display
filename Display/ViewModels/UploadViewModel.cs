@@ -41,8 +41,9 @@ namespace Display.ViewModels
                     SequentialStart();
                 }
             };
+            //uploadUi.Start();
 
-             SequentialStart();
+            SequentialStart();
         }
 
         /// <summary>

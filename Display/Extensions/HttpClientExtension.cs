@@ -29,12 +29,19 @@ namespace Display.Extensions
                 Toast.TryToast("网络异常", e.Message);
                 return defaultValue;
             }
+            catch (Exception e)
+            {
+                Toast.TryToast("网络异常", e.Message);
+                return defaultValue;
+            }
 
             if (!response.IsSuccessStatusCode) return defaultValue;
 
             try
             {
                 var contentAsString = await response.Content.ReadAsStringAsync(token);
+
+                Debug.WriteLine($"服务器返回的结果为:{contentAsString}");
 
                 if (contentAsString is T value) return value;
 
