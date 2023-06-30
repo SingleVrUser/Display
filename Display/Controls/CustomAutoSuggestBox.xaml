@@ -19,17 +19,17 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid CornerRadius="2">
-                        <Image Source="{x:Bind imagepath}"
+                        <Image Source="{x:Bind ImagePath}"
                                Width="150"
                                x:Name="Cover_image" />
                     </Grid>
                     <StackPanel Grid.Column="1">
-                        <TextBlock Text="{x:Bind truename}"
+                        <TextBlock Text="{x:Bind trueName}"
                                    TextTrimming="CharacterEllipsis"/>
-                        <TextBlock Text="{x:Bind actor}"
+                        <TextBlock Text="{x:Bind Actor}"
                                    TextTrimming="WordEllipsis"
                                    FontWeight="Normal" />
-                        <TextBlock Text="{x:Bind category}"
+                        <TextBlock Text="{x:Bind Category}"
                                    TextTrimming="WordEllipsis"
                                    MaxWidth="300"
                                    FontWeight="Normal" />

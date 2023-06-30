@@ -82,12 +82,12 @@ public class JavBus
         }
 
         VideoInfo videoInfo = new VideoInfo();
-        videoInfo.busurl = detail_url;
-        videoInfo.truename = CID;
+        videoInfo.busUrl = detail_url;
+        videoInfo.trueName = CID;
 
         //标题
         var title = ImageUrlNode.Attributes["title"].Value;
-        videoInfo.title = title;
+        videoInfo.Title = title;
 
         //是否步兵
         var activeNavbarNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@id='navbar']/ul[@class='nav navbar-nav']/li[@class='active']/a");
@@ -96,10 +96,10 @@ public class JavBus
             switch (activeNavbarNode.InnerText)
             {
                 case "有碼":
-                    videoInfo.is_wm = 0;
+                    videoInfo.IsWm = 0;
                     break;
                 case "無碼":
-                    videoInfo.is_wm = 1;
+                    videoInfo.IsWm = 1;
                     break;
             }
         }
@@ -113,27 +113,27 @@ public class JavBus
 
             if (header == "發行日期:")
             {
-                videoInfo.releasetime = AttributeNode.LastChild.InnerText.Trim();
+                videoInfo.ReleaseTime = AttributeNode.LastChild.InnerText.Trim();
             }
             else if (header == "長度:")
             {
-                videoInfo.lengthtime = AttributeNode.LastChild.InnerText.Trim().Replace("分鐘", "分钟");
+                videoInfo.Lengthtime = AttributeNode.LastChild.InnerText.Trim().Replace("分鐘", "分钟");
             }
             else if (header == "導演:")
             {
-                videoInfo.director = AttributeNode.LastChild.InnerText.Trim();
+                videoInfo.Director = AttributeNode.LastChild.InnerText.Trim();
             }
             else if (header == "製作商:")
             {
-                videoInfo.producer = AttributeNode.SelectSingleNode(".//a").InnerText.Trim();
+                videoInfo.Producer = AttributeNode.SelectSingleNode(".//a").InnerText.Trim();
             }
             else if (header == "發行商:")
             {
-                videoInfo.publisher = AttributeNode.SelectSingleNode(".//a").InnerText.Trim();
+                videoInfo.Publisher = AttributeNode.SelectSingleNode(".//a").InnerText.Trim();
             }
             else if (header == "系列:")
             {
-                videoInfo.series = AttributeNode.SelectSingleNode(".//a").InnerText.Trim();
+                videoInfo.Series = AttributeNode.SelectSingleNode(".//a").InnerText.Trim();
             }
             else if (header == "類別:")
             {
@@ -143,7 +143,7 @@ public class JavBus
                 {
                     categoryList.Add(node.InnerText);
                 }
-                videoInfo.category = string.Join(",", categoryList);
+                videoInfo.Category = string.Join(",", categoryList);
             }
             else if (header == "演員")
             {
@@ -154,7 +154,7 @@ public class JavBus
                 {
                     actorList.Add(node.InnerText);
                 }
-                videoInfo.actor = string.Join(",", actorList);
+                videoInfo.Actor = string.Join(",", actorList);
             }
         }
 
@@ -164,8 +164,8 @@ public class JavBus
             string SavePath = AppSettings.ImageSavePath;
 
             string filePath = Path.Combine(SavePath, CID);
-            videoInfo.imageurl = ImageUrl;
-            videoInfo.imagepath = await GetInfoFromNetwork.DownloadFile(ImageUrl, filePath, CID);
+            videoInfo.ImageUrl = ImageUrl;
+            videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(ImageUrl, filePath, CID);
         }
 
         var sampleBox_Nodes = htmlDoc.DocumentNode.SelectNodes("//a[@class='sample-box']");
@@ -181,7 +181,7 @@ public class JavBus
                 }
                 sampleUrlList.Add(sampleImageUrl);
             }
-            videoInfo.sampleImageList = string.Join(",", sampleUrlList);
+            videoInfo.SampleImageList = string.Join(",", sampleUrlList);
         }
 
         return videoInfo;

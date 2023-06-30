@@ -565,7 +565,7 @@ namespace Display.ContentsPage
 
 
                 progress_TextBlock.Text = $"{actorName} - 挑选单体作品（非VR）";
-                var videoInfoList = videoList.Where(x => x.actor == actorName && !x.category.Contains("VR") && !x.series.Contains("VR")).ToList();
+                var videoInfoList = videoList.Where(x => x.Actor == actorName && !x.Category.Contains("VR") && !x.Series.Contains("VR")).ToList();
 
                 //无单体作品，跳过
                 if (videoInfoList.Count == 0)
@@ -582,7 +582,7 @@ namespace Display.ContentsPage
                     var firstVideoInfo = videoInfoList[i];
 
                     //视频名称
-                    var videoName = firstVideoInfo.truename;
+                    var videoName = firstVideoInfo.trueName;
 
                     progress_TextBlock.Text = $"{actorName} - {videoName} - 挑选单体作品 - {videoName}";
 

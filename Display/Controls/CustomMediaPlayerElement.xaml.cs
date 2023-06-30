@@ -298,8 +298,8 @@ public sealed partial class CustomMediaPlayerElement
         }
         else
         {
-            IsLike = videoInfo.is_like;
-            LookLater = Convert.ToInt32(videoInfo.look_later);
+            IsLike = videoInfo.IsLike;
+            LookLater = Convert.ToInt32(videoInfo.LookLater);
 
             isLike = IsLike == 1;
             isLookLater = this.LookLater != 0;

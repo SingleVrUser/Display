@@ -644,54 +644,54 @@ namespace Display.Data
         //魔改
         public VideoInfo(Datum failDatum)
         {
-            this.truename = failDatum.Name;
-            this.imagepath = "ms-appx:///Assets/Fail.jpg";
-            this.series = "fail";
-            this.releasetime = failDatum.Time;
-            this.imageurl = failDatum.PickCode;
-            this.look_later = failDatum.Size;
-            this.busurl = failDatum.PickCode;
-            this.category = failDatum.Ico;
+            this.trueName = failDatum.Name;
+            this.ImagePath = "ms-appx:///Assets/Fail.jpg";
+            this.Series = "fail";
+            this.ReleaseTime = failDatum.Time;
+            this.ImageUrl = failDatum.PickCode;
+            this.LookLater = failDatum.Size;
+            this.busUrl = failDatum.PickCode;
+            this.Category = failDatum.Ico;
         }
 
-        private string _truename;
+        private string _trueName;
 
         [JsonProperty(propertyName: "truename")]
-        public string truename
+        public string trueName
         {
-            get => _truename;
+            get => _trueName;
             set
             {
-                _truename = value;
+                _trueName = value;
                 OnPropertyChanged();
             }
         }
 
         [JsonProperty(propertyName: "title")]
-        public string title { get; set; }
+        public string Title { get; set; }
 
-        private string _releasetime;
+        private string _releaseTime;
 
         [JsonProperty(propertyName: "releasetime")]
-        public string releasetime
+        public string ReleaseTime
         {
-            get => _releasetime;
+            get => _releaseTime;
             set
             {
-                _releasetime = value;
+                _releaseTime = value;
                 OnPropertyChanged();
             }
         }
 
-        private string _lengthtime;
+        private string _lengthTime;
 
         [JsonProperty(propertyName: "lengthtime")]
-        public string lengthtime
+        public string Lengthtime
         {
-            get => _lengthtime;
+            get => _lengthTime;
             set
             {
-                _lengthtime = value;
+                _lengthTime = value;
                 OnPropertyChanged();
             }
         }
@@ -699,7 +699,7 @@ namespace Display.Data
         private string _director;
 
         [JsonProperty(propertyName: "director")]
-        public string director
+        public string Director
         {
             get => _director;
             set
@@ -712,7 +712,7 @@ namespace Display.Data
         private string _producer;
 
         [JsonProperty(propertyName: "producer")]
-        public string producer
+        public string Producer
         {
             get => _producer;
             set
@@ -725,7 +725,7 @@ namespace Display.Data
         private string _publisher;
 
         [JsonProperty(propertyName: "publisher")]
-        public string publisher
+        public string Publisher
         {
             get => _publisher;
             set
@@ -738,7 +738,7 @@ namespace Display.Data
         private string _series;
 
         [JsonProperty(propertyName: "series")]
-        public string series
+        public string Series
         {
             get => _series;
             set
@@ -751,7 +751,7 @@ namespace Display.Data
         private string _category;
 
         [JsonProperty(propertyName: "category")]
-        public string category
+        public string Category
         {
             get => _category;
             set
@@ -764,7 +764,7 @@ namespace Display.Data
         private string _actor { get; set; } = string.Empty;
 
         [JsonProperty(propertyName: "actor")]
-        public string actor
+        public string Actor
         {
             get => _actor;
             set
@@ -775,53 +775,53 @@ namespace Display.Data
 
         }
 
-        private string _imageurl;
+        private string _imageUrl;
 
         [JsonProperty(propertyName: "imageurl")]
-        public string imageurl
+        public string ImageUrl
         {
-            get => _imageurl;
+            get => _imageUrl;
             set
             {
-                if (_imageurl == value) return;
-                _imageurl = value;
+                if (_imageUrl == value) return;
+                _imageUrl = value;
                 OnPropertyChanged();
             }
         }
 
 
         [JsonProperty(propertyName: "sampleImageList")]
-        public string sampleImageList { get; set; }
+        public string SampleImageList { get; set; }
 
-        private string _imagepath;
+        private string _imagePath;
 
         [JsonProperty(propertyName: "imagepath")]
-        public string imagepath
+        public string ImagePath
         {
-            get => _imagepath;
+            get => _imagePath;
             set
             {
-                if (_imagepath == value) return;
+                if (_imagePath == value) return;
 
                 string path = value;
-                _imagepath = !string.IsNullOrEmpty(path) ? path : Const.FileType.NoPicturePath;
+                _imagePath = !string.IsNullOrEmpty(path) ? path : Const.FileType.NoPicturePath;
                 OnPropertyChanged();
             }
         }
 
 
         [JsonProperty(propertyName: "busurl")]
-        public string busurl { get; set; }
+        public string busUrl { get; set; }
 
-        private long _look_later = 0;
+        private long _lookLater = 0;
 
         [JsonProperty(propertyName: "look_later")]
-        public long look_later
+        public long LookLater
         {
-            get => _look_later;
+            get => _lookLater;
             set
             {
-                _look_later = value;
+                _lookLater = value;
                 OnPropertyChanged();
             }
         }
@@ -829,7 +829,7 @@ namespace Display.Data
         private double _score = -1;
 
         [JsonProperty(propertyName: "score")]
-        public double score
+        public double Score
         {
             get => _score;
             set
@@ -840,22 +840,22 @@ namespace Display.Data
         }
 
 
-        private int _is_like = 0;
+        private int _isLike = 0;
 
         [JsonProperty(propertyName: "is_like")]
-        public int is_like
+        public int IsLike
         {
-            get => _is_like;
+            get => _isLike;
             set
             {
-                _is_like = value;
+                _isLike = value;
                 OnPropertyChanged();
             }
         }
 
         [JsonProperty(propertyName: "addtime")]
-        public long addtime { get; set; } = DateTimeOffset.Now.ToUnixTimeSeconds();
-        public int is_wm { get; set; } = -1;
+        public long AddTime { get; set; } = DateTimeOffset.Now.ToUnixTimeSeconds();
+        public int IsWm { get; set; } = -1;
 
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -888,16 +888,16 @@ namespace Display.Data
             }
 
             //标题
-            title = videoinfo.title;
+            Title = videoinfo.Title;
 
             //是否显示右上角的标签
-            string category = videoinfo.category;
+            string category = videoinfo.Category;
             Visibility isShowLabel = Visibility.Collapsed;
 
             string ShowLabel = string.Empty;
             if (!string.IsNullOrEmpty(category))
             {
-                if (category.Contains("VR") || (!string.IsNullOrEmpty(videoinfo.series) && videoinfo.series.Contains("VR")))
+                if (category.Contains("VR") || (!string.IsNullOrEmpty(videoinfo.Series) && videoinfo.Series.Contains("VR")))
                 {
                     isShowLabel = Visibility.Visible;
                     ShowLabel = "VR";
@@ -909,24 +909,24 @@ namespace Display.Data
                 }
             }
 
-            if (!string.IsNullOrEmpty(releasetime))
+            if (!string.IsNullOrEmpty(ReleaseTime))
             {
-                if (videoinfo.releasetime.Contains("/"))
+                if (videoinfo.ReleaseTime.Contains("/"))
                 {
-                    this.realeaseYear = videoinfo.releasetime.Split('/')[0];
+                    this.realeaseYear = videoinfo.ReleaseTime.Split('/')[0];
                 }
                 else
                 {
-                    this.realeaseYear = videoinfo.releasetime.Split('-')[0];
+                    this.realeaseYear = videoinfo.ReleaseTime.Split('-')[0];
                 }
             }
 
             this.isShowLabel = isShowLabel;
             this.ShowLabel = ShowLabel;
-            this.score = videoinfo.score;
+            this.Score = videoinfo.Score;
 
             //图片大小
-            this.imageheight = imgheight;
+            this.imageHeight = imgheight;
             this.ImageWidth = imgwidth;
         }
 
@@ -956,16 +956,16 @@ namespace Display.Data
             }
         }
 
-        private double _imageheight;
-        public double imageheight
+        private double _imageHeight;
+        public double imageHeight
         {
             get
             {
-                return _imageheight;
+                return _imageHeight;
             }
             set
             {
-                _imageheight = value;
+                _imageHeight = value;
                 OnPropertyChanged();
             }
         }
@@ -1589,15 +1589,15 @@ namespace Display.Data
     {
         public ThumbnailInfo(VideoInfo videoinfo)
         {
-            name = videoinfo.truename;
+            name = videoinfo.trueName;
 
-            var tmpList = videoinfo.sampleImageList.Split(',').ToList();
+            var tmpList = videoinfo.SampleImageList.Split(',').ToList();
             if (tmpList.Count > 1)
             {
                 thumbnailDownUrlList = tmpList;
             }
 
-            if (videoinfo.category.Contains("VR") || videoinfo.series.Contains("VR"))
+            if (videoinfo.Category.Contains("VR") || videoinfo.Series.Contains("VR"))
             {
                 isVr = true;
             }
@@ -2086,12 +2086,12 @@ namespace Display.Data
         /// 是否是搜刮失败
         /// </summary>
         public bool IsSpiderFail { get; set; }
+        
     }
-
 
     public enum FailType { All, MatchFail, SpiderFail }
 
-    public class FailInfo
+    public class FailInfo : INotifyPropertyChanged
     {
         [JsonProperty(propertyName: "pc")]
         public string PickCode { get; set; }
@@ -2099,8 +2099,18 @@ namespace Display.Data
         [JsonProperty(propertyName: "is_like")]
         public int IsLike { get; set; } = 0;
 
+        private double _score = 0;
+
         [JsonProperty(propertyName: "score")]
-        public double Score { get; set; } = -1;
+        public double Score
+        {
+            get => _score;
+            set
+            {
+                _score = value;
+                OnPropertyChanged();
+            }
+        }
 
         [JsonProperty(propertyName: "look_later")]
         public long LookLater { get; set; } = 0;
@@ -2110,6 +2120,13 @@ namespace Display.Data
 
         [JsonProperty(propertyName: nameof(Datum))]
         public Datum Datum { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
     public enum FailInfoShowType { like, look_later }

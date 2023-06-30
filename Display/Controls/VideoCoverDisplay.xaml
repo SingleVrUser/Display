@@ -218,7 +218,7 @@
                     <!--右键操作-->
                     <MenuFlyout>
                         <MenuFlyoutItem Text="删除"
-                                        Click="deleteAppBarButton_Click">
+                                        Click="DeleteAppBarButton_Click">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="&#xE107;" />
                             </MenuFlyoutItem.Icon>
@@ -234,11 +234,11 @@
                     <!--图片-->
                     <Grid x:Name="showImage">
                         <controls:ImageEx x:Name="CoverImage" Stretch="UniformToFill"
-                                          Source="{x:Bind imagepath,Mode=OneWay}"
+                                          Source="{x:Bind ImagePath,Mode=OneWay}"
                                           Width="{x:Bind ImageWidth,Mode=OneWay}"
-                                          Height="{x:Bind imageheight,Mode=OneWay}"
+                                          Height="{x:Bind imageHeight,Mode=OneWay}"
                                           DecodePixelWidth="{x:Bind ImageWidth,Converter={StaticResource DoubleToInt32Converter},Mode=OneWay}"
-                                          DecodePixelHeight="{x:Bind imageheight,Converter={StaticResource DoubleToInt32Converter},Mode=OneWay}"/>
+                                          DecodePixelHeight="{x:Bind imageHeight,Converter={StaticResource DoubleToInt32Converter},Mode=OneWay}"/>
 
                         <RelativePanel>
                             <!--喜欢就显示爱心-->
@@ -248,7 +248,7 @@
                                       Opacity="1"
                                       Margin="8"
                                       FontSize="30"
-                                      Visibility="{x:Bind data:FileMatch.isShowLikeIcon(is_like),Mode=OneWay}" />
+                                      Visibility="{x:Bind data:FileMatch.isShowLikeIcon(IsLike),Mode=OneWay}" />
 
                             <!--标签（4K/VR）-->
                             <StackPanel Margin="5"
@@ -271,7 +271,7 @@
                     <Grid Visibility="Collapsed"
                           Background="{StaticResource OperableGridBackground}"
                           Width="{x:Bind ImageWidth,Mode=OneWay}"
-                          Height="{x:Bind imageheight,Mode=OneWay}">
+                          Height="{x:Bind imageHeight,Mode=OneWay}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="*" />
@@ -282,7 +282,7 @@
                             <AppBarToggleButton IsCompact="True"
                                                 ToolTipService.ToolTip="稍后观看"
                                                 RelativePanel.AlignRightWithPanel="True"
-                                                IsChecked="{x:Bind data:FileMatch.isLookLater(look_later), Mode=OneWay}"
+                                                IsChecked="{x:Bind data:FileMatch.isLookLater(LookLater), Mode=OneWay}"
                                                 Click="LookLaterToggleButton_Click">
 
                                 <AppBarToggleButton.Icon>
@@ -351,7 +351,7 @@
                                                 </Style>
                                             </Flyout.FlyoutPresenterStyle>
                                             <RatingControl Caption="评分"
-                                                           Value="{x:Bind score, Mode=TwoWay}"
+                                                           Value="{x:Bind Score, Mode=TwoWay}"
                                                            ValueChanged="RatingControl_ValueChanged">
                                                 <RatingControl.Resources>
                                                     <SolidColorBrush x:Key="RatingControlSelectedForeground"
@@ -368,7 +368,7 @@
                                 <!--标记为喜欢-->
                                 <AppBarToggleButton ToolTipService.ToolTip="喜欢"
                                                     IsCompact="True"
-                                                    IsChecked="{x:Bind data:FileMatch.isLike(is_like),Mode=OneWay}"
+                                                    IsChecked="{x:Bind data:FileMatch.isLike(IsLike),Mode=OneWay}"
                                                     Click="LikeToggleButton_Click">
                                     <FontIcon Glyph="&#xE006;" />
                                 </AppBarToggleButton>
@@ -434,7 +434,7 @@
                         </Grid.ColumnDefinitions>
 
 
-                        <TextBlock Text="{x:Bind truename}"
+                        <TextBlock Text="{x:Bind trueName}"
                                    IsTextSelectionEnabled="True" />
                         <AppBarSeparator Grid.Column="1" />
                         <TextBlock Grid.Column="2"
@@ -452,7 +452,7 @@
                                    Opacity="0.5" />
                         <AppBarSeparator Grid.Column="7" />
                         <local:TextBlockWithLongText Grid.Column="8"
-                                                     StringValue="{x:Bind actor}" />
+                                                     StringValue="{x:Bind Actor}" />
 
                     </Grid>
 
@@ -461,7 +461,7 @@
                     <RatingControl IsClearEnabled="False"
                                    Grid.Row="1"
                                    IsReadOnly="True"
-                                   Value="{x:Bind score,Mode=OneWay}">
+                                   Value="{x:Bind Score,Mode=OneWay}">
                         <RatingControl.Resources>
                             <SolidColorBrush x:Key="RatingControlSelectedForeground"
                                              Color="#f7ba36" />
@@ -493,10 +493,10 @@
                           BorderThickness="2"
                           Padding="5">
                         <Image MinWidth="{x:Bind ImageWidth,Mode=OneWay}"
-                               MinHeight="{x:Bind imageheight,Mode=OneWay}">
+                               MinHeight="{x:Bind imageHeight,Mode=OneWay}">
 
                         </Image>
-                        <TextBlock Text="{x:Bind truename}"
+                        <TextBlock Text="{x:Bind trueName}"
                                    TextWrapping="Wrap"
                                    MaxWidth="{x:Bind ImageWidth,Mode=OneWay}" />
                     </Grid>
@@ -555,7 +555,7 @@
                                Opacity="0.5" />
 
                     <TextBlock Grid.Column="2"
-                               Text="{x:Bind look_later,Converter={StaticResource BytesToSizeStrConverter}}" />
+                               Text="{x:Bind LookLater,Converter={StaticResource BytesToSizeStrConverter}}" />
 
                     <!--评分-->
                     <RatingControl Grid.ColumnSpan="3"
@@ -568,7 +568,7 @@
 
 
         <!--匹配失败中的喜欢或稍后观看的展示样式-->
-        <DataTemplate x:Key="LikeOrLookLaterInFail_CoverTemplate"
+        <DataTemplate x:Key="LikeOrLookLaterInFailCoverTemplate"
                       x:DataType="data:FailInfo">
 
             <Grid Padding="3,0"
@@ -655,7 +655,7 @@
                                     <AppBarButton.Flyout>
                                         <Flyout>
                                             <RatingControl Caption="评分"
-                                                           Value="{x:Bind Score}"
+                                                           Value="{x:Bind Score,Mode=TwoWay}"
                                                            ValueChanged="FailRatingControl_ValueChanged">
                                                 <RatingControl.Resources>
                                                     <SolidColorBrush x:Key="RatingControlSelectedForeground"
@@ -683,7 +683,6 @@
 
                         </CommandBar>
                     </Grid>
-
                 </Grid>
 
                 <!--文字信息-->
@@ -703,8 +702,9 @@
                     <!--评分-->
                     <RatingControl Grid.ColumnSpan="3"
                                    IsClearEnabled="True"
+                                   IsReadOnly="True"
+                                   Value="{x:Bind Score,Mode=OneWay}"
                                    Grid.Row="1" />
-
                 </Grid>
             </Grid>
         </DataTemplate>
@@ -770,7 +770,7 @@
 
         <local:CoverItemTemplateSelector x:Key="FailItemTemplateSelector"
                                          WithoutImageTemplate="{StaticResource FailListTemplate}"
-                                         LikeOrLookLaterInFailCoverTemplate="{StaticResource LikeOrLookLaterInFail_CoverTemplate}" />
+                                         LikeOrLookLaterInFailCoverTemplate="{StaticResource LikeOrLookLaterInFailCoverTemplate}" />
 
         <local:CoverItemTemplateSelector x:Key="SuccessOrSearchResult_ItemTemplateSelector"
                                          ImageTemplate="{StaticResource ImageTemplate}"
@@ -1101,7 +1101,7 @@
                             Maximum="{x:Bind local:VideoCoverDisplay.SliderMaxValue}"
                             Width="200" />
 
-                    <ToggleButton x:Name="IsAutoAdjustImageSize_ToggleButton"
+                    <ToggleButton x:Name="IsAutoAdjustImageSizeToggleButton"
                                   Grid.Column="1"
                                   Content="&#xE167;"
                                   FontFamily="Segoe Fluent Icons"

@@ -37,12 +37,12 @@ public class IncrementalLoadFailInfoCollection : ObservableCollection<FailInfo>,
     {
         var infos = await DataAccess.Get.GetFailFileInfoWithFailInfo(offset, limit, ShowType);
 
+        infos?.ForEach(Add);
+
+        var getCount = infos?.Length ?? 0;
+
         if (Count == 0)
             AllCount = DataAccess.Get.GetCountOfFailInfos(ShowType);
-
-        infos.ForEach(Add);
-
-        var getCount = infos.Length;
 
         if (AllCount <= Count || getCount == 0)
         {

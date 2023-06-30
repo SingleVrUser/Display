@@ -105,7 +105,7 @@
                                                 HorizontalAlignment="Center"
                                                 VerticalAlignment="Center"
                                                 CornerRadius="3">
-                                            <Image Source="{x:Bind imagepath}"
+                                            <Image Source="{x:Bind ImagePath}"
                                                    Tapped="Image_Tapped" />
                                         </Border>
 
@@ -133,7 +133,7 @@
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
 
-                                        <controls:ImageEx Source="{x:Bind imagepath}"
+                                        <controls:ImageEx Source="{x:Bind ImagePath}"
                                                           Width="120"
                                                           DecodePixelWidth="120"
                                                           CornerRadius="2">
@@ -142,11 +142,11 @@
                                         <StackPanel Grid.Column="1"
                                                     VerticalAlignment="Center"
                                                     Margin="5">
-                                            <TextBlock Text="{x:Bind truename}"
+                                            <TextBlock Text="{x:Bind trueName}"
                                                        FontFamily="JetBrains Mono" />
-                                            <customecontrol:TextBlockWithLongText StringValue="{x:Bind actor}"
+                                            <customecontrol:TextBlockWithLongText StringValue="{x:Bind Actor}"
                                                                                   IsFirstTextSelectionEnabled="False" />
-                                            <customecontrol:TextBlockWithLongText StringValue="{x:Bind category}"
+                                            <customecontrol:TextBlockWithLongText StringValue="{x:Bind Category}"
                                                                                   IsFirstTextSelectionEnabled="False" />
                                         </StackPanel>
                                     </Grid>

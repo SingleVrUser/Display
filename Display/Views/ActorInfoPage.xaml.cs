@@ -125,14 +125,14 @@ namespace Display.Views
             if (videoPlayButton.DataContext is not VideoCoverDisplayClass videoInfo) return;
 
             //播放失败列表（imgUrl就是pc）
-            if (videoInfo.series == "fail")
+            if (videoInfo.Series == "fail")
             {
-                var mediaPlayItem = new MediaPlayItem(videoInfo.imageurl, videoInfo.truename, FilesInfo.FileType.File);
+                var mediaPlayItem = new MediaPlayItem(videoInfo.ImageUrl, videoInfo.trueName, FilesInfo.FileType.File);
                 await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, playType: PlayType.Fail);
                 return;
             }
 
-            var videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(videoInfo.truename);
+            var videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(videoInfo.trueName);
 
             _storeditem = videoInfo;
 
@@ -146,7 +146,7 @@ namespace Display.Views
             }
             else if (videoInfoList.Count == 1)
             {
-                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].PickCode, videoInfo.truename, FilesInfo.FileType.File);
+                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].PickCode, videoInfo.trueName, FilesInfo.FileType.File);
                 await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
             }
 

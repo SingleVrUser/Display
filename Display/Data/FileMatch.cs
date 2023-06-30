@@ -278,7 +278,7 @@ namespace Display.Data
 
                 var newItems = DataAccess.Get.GetVideoInfoBySomeType(trueType, keywords, leftCount);
 
-                newItems?.ForEach(item => dicts.TryAdd(item.truename, item));
+                newItems?.ForEach(item => dicts.TryAdd(item.trueName, item));
             }
 
             return dicts.Values.ToList();

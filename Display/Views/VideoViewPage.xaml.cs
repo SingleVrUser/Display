@@ -86,7 +86,7 @@ namespace Display.Views
 
             if (VideoPlayButton.DataContext is not VideoCoverDisplayClass videoInfo) return;
 
-            List<Datum> videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(videoInfo.truename);
+            List<Datum> videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(videoInfo.trueName);
 
 
             //没有
@@ -101,7 +101,7 @@ namespace Display.Views
             {
                 _storeditem = videoInfo;
 
-                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].PickCode, videoInfo.truename, FilesInfo.FileType.File);
+                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].PickCode, videoInfo.trueName, FilesInfo.FileType.File);
                 await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
                 ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             }

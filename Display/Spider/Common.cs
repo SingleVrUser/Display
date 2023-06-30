@@ -61,21 +61,21 @@ public class Common
     public static async Task<VideoInfo> AnalysisHtmlDocInfoFromAvSoxOrAvMoo(string CID, string detail_url, HtmlDocument htmlDoc)
     {
         VideoInfo videoInfo = new();
-        videoInfo.truename = CID;
-        videoInfo.busurl = detail_url;
+        videoInfo.trueName = CID;
+        videoInfo.busUrl = detail_url;
 
         //封面图
         string CoverUrl = null;
         var ImageNode = htmlDoc.DocumentNode.SelectSingleNode("//a[@class='bigImage']");
         if (ImageNode == null) return null;
         CoverUrl = ImageNode.Attributes["href"].Value;
-        videoInfo.imageurl = CoverUrl;
+        videoInfo.ImageUrl = CoverUrl;
 
         //标题（AvMoox在a标签上，AvSox在img标签上）
         var result = ImageNode.GetAttributeValue("title", string.Empty);
         if (!string.IsNullOrEmpty(result))
         {
-            videoInfo.title = result;
+            videoInfo.Title = result;
         }
         else
         {
@@ -88,7 +88,7 @@ public class Common
             if (string.IsNullOrEmpty(result))
                 return null;
 
-            videoInfo.title = result;
+            videoInfo.Title = result;
         }
 
         //其他信息
@@ -165,25 +165,25 @@ public class Common
             switch (info.Key)
             {
                 case "发行时间":
-                    videoInfo.releasetime = info.Value;
+                    videoInfo.ReleaseTime = info.Value;
                     break;
                 case "长度":
-                    videoInfo.lengthtime = info.Value;
+                    videoInfo.Lengthtime = info.Value;
                     break;
                 case "导演":
-                    videoInfo.director = info.Value;
+                    videoInfo.Director = info.Value;
                     break;
                 case "制作商":
-                    videoInfo.producer = info.Value;
+                    videoInfo.Producer = info.Value;
                     break;
                 case "发行商":
-                    videoInfo.publisher = info.Value;
+                    videoInfo.Publisher = info.Value;
                     break;
                 case "系列":
-                    videoInfo.series = info.Value;
+                    videoInfo.Series = info.Value;
                     break;
                 case "类别":
-                    videoInfo.category = info.Value;
+                    videoInfo.Category = info.Value;
                     break;
             }
         }
@@ -191,7 +191,7 @@ public class Common
         //演员
         var ActorNodes = htmlDoc.DocumentNode.SelectNodes("//div[@id='avatar-waterfall']/a[@class='avatar-box']/span");
         if (ActorNodes != null)
-            videoInfo.actor = string.Join(",", ActorNodes.Select(item => item.InnerText.Trim()).ToList());
+            videoInfo.Actor = string.Join(",", ActorNodes.Select(item => item.InnerText.Trim()).ToList());
 
         //样品图片
         List<string> sampleUrlList = new List<string>();
@@ -204,13 +204,13 @@ public class Common
                 sampleUrlList.Add(sampleNode.GetAttributeValue("href", string.Empty));
             }
 
-            videoInfo.sampleImageList = string.Join(",", sampleUrlList);
+            videoInfo.SampleImageList = string.Join(",", sampleUrlList);
         }
 
         //下载图片
         string filePath = Path.Combine(AppSettings.ImageSavePath, CID);
-        videoInfo.imageurl = CoverUrl;
-        videoInfo.imagepath = await GetInfoFromNetwork.DownloadFile(CoverUrl, filePath, CID);
+        videoInfo.ImageUrl = CoverUrl;
+        videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(CoverUrl, filePath, CID);
 
         return videoInfo;
     }

@@ -150,7 +150,7 @@ namespace Display.Views
             if (sender is not Button videoPlayButton)
                 return;
 
-            string trueName = DetailInfo.truename;
+            string trueName = DetailInfo.trueName;
             var videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(trueName);
 
             //没有该数据
@@ -213,10 +213,10 @@ namespace Display.Views
                 if (sender is AppBarButton)
                 {
                     //从数据库中删除
-                    DataAccess.Delete.DeleteDataInVideoInfoTable(DetailInfo.truename);
+                    DataAccess.Delete.DeleteDataInVideoInfoTable(DetailInfo.trueName);
 
                     //删除存储的文件夹
-                    string savePath = Path.Combine(AppSettings.ImageSavePath, DetailInfo.truename);
+                    string savePath = Path.Combine(AppSettings.ImageSavePath, DetailInfo.trueName);
                     if (Directory.Exists(savePath))
                     {
                         Directory.Delete(savePath, true);
@@ -239,7 +239,7 @@ namespace Display.Views
             if (!(sender is Grid grid))
                 return;
 
-            string name = DetailInfo.truename;
+            string name = DetailInfo.trueName;
             var videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(name);
 
             //没有该数据

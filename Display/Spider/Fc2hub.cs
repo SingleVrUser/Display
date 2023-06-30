@@ -47,9 +47,9 @@ public class Fc2hub
     public static async Task<VideoInfo> GetVideoInfoFromHtmlDoc(string CID, string detail_url, HtmlDocument htmlDoc)
     {
         VideoInfo videoInfo = new VideoInfo();
-        videoInfo.busurl = detail_url;
+        videoInfo.busUrl = detail_url;
         //默认是步兵
-        videoInfo.is_wm = 1;
+        videoInfo.IsWm = 1;
 
         var jsons = htmlDoc.DocumentNode.SelectNodes("//script[@type='application/ld+json']");
 
@@ -61,19 +61,19 @@ public class Fc2hub
 
         if (json.name == null || json.image == null) return null;
 
-        videoInfo.title = json.name;
-        videoInfo.truename = CID;
-        videoInfo.releasetime = json.datePublished.Replace("/", "-");
+        videoInfo.Title = json.name;
+        videoInfo.trueName = CID;
+        videoInfo.ReleaseTime = json.datePublished.Replace("/", "-");
         //PTxHxMxS转x分钟
-        videoInfo.lengthtime = Data.FileMatch.ConvertPtTimeToTotalMinute(json.duration);
-        videoInfo.director = json.director;
-        videoInfo.producer = "fc2";
+        videoInfo.Lengthtime = Data.FileMatch.ConvertPtTimeToTotalMinute(json.duration);
+        videoInfo.Director = json.director;
+        videoInfo.Producer = "fc2";
 
         if (json.genre != null)
-            videoInfo.category = string.Join(",", json.genre);
+            videoInfo.Category = string.Join(",", json.genre);
 
         if (json.actor != null)
-            videoInfo.actor = string.Join(",", json.actor);
+            videoInfo.Actor = string.Join(",", json.actor);
 
 
         string ImageUrl = string.Empty;
@@ -96,8 +96,8 @@ public class Fc2hub
         {
             string SavePath = AppSettings.ImageSavePath;
             string filePath = Path.Combine(SavePath, CID);
-            videoInfo.imageurl = ImageUrl;
-            videoInfo.imagepath = await GetInfoFromNetwork.DownloadFile(ImageUrl, filePath, CID);
+            videoInfo.ImageUrl = ImageUrl;
+            videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(ImageUrl, filePath, CID);
         }
 
         return videoInfo;
