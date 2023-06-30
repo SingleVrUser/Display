@@ -46,11 +46,10 @@ namespace Display.Models
         [ObservableProperty]
         private bool _progressShowPaused;
 
-        [ObservableProperty]
-        private double _maximum;
+        public const int Maximum = 100;
 
         [ObservableProperty]
-        private double _position;
+        private int _position;
 
         public UploadSubItem(string path, long cid)
         {
@@ -106,8 +105,8 @@ namespace Display.Models
                     Debug.WriteLine("上传失败");
                     Content = "上传失败";
                     UploadButtonVisibility = Visibility.Collapsed;
+                    PauseButtonVisibility = Visibility.Collapsed;
                     ProgressShowError = true;
-
                     // Running在后，Running改变后有Action
                     IsFinish = true;
                     Running = false;
@@ -140,15 +139,14 @@ namespace Display.Models
 
             _fileUpload = new FileUpload(UploadFilePath, _saveFolderCid);
 
-            _fileUpload.LengthCallback += l =>
-            {
-                Maximum = l;
-            };
-            _fileUpload.StateChanged += FileUpload_StateChanged;
+            // new FileUpload(……)中的设置Content
+            ProgressContent = _fileUpload.Content;
+            var length = _fileUpload.Length;
             _fileUpload.ContentChanged += c => ProgressContent = c;
+            _fileUpload.StateChanged += FileUpload_StateChanged;
             _fileUpload.PositionCallback += p =>
             {
-                Position = p;
+                Position = p==0 ? 0 : length == p ? Maximum : (int)(Maximum * (p/(double)length));
             };
 
             await _fileUpload.Init();

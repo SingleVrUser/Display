@@ -174,7 +174,7 @@
                                          ShowPaused="{x:Bind ProgressShowPaused,Mode=OneWay}"
                                          Visibility="{x:Bind ProgressVisibility, Mode=OneWay}"
                                          Value="{x:Bind Position, Mode=OneWay}"
-                                         Maximum="{x:Bind Maximum,Mode=OneWay}" />
+                                         Maximum="{x:Bind models:UploadSubItem.Maximum}" />
 
                             <StackPanel Grid.Column="2"
                                         Grid.RowSpan="3">

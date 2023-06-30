@@ -46,16 +46,18 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
 
     public new void Insert(int index, FilesInfo item)
     {
-        //base.InsertItem(index, item);
         base.Insert(index, item);
         AllCount++;
+
+        if (IsNull) IsNull = false;
     }
 
     public new void Remove(FilesInfo item)
     {
-        //base.RemoveItem(item);
         base.Remove(item);
         AllCount--;
+
+        if (AllCount == 0) IsNull = true;
     }
 
     public WebApi.OrderBy OrderBy { get; private set; } = WebApi.OrderBy.UserProduceTime;
