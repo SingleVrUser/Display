@@ -365,7 +365,7 @@
                                                            StringValue="{x:Bind SelectedDatum.Iv,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="27"
-                                                           StringValue="{x:Bind data:FileMatch.ConvertInt32ToDateStr(SelectedDatum.CurrentTime),Mode=OneWay}" />
+                                                                  StringValue="{x:Bind SelectedDatum.CurrentTime,Converter={StaticResource NumberToLengthStrConverter},Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="28"
                                                            StringValue="{x:Bind SelectedDatum.PlayedEnd,Mode=OneWay}" />
