@@ -275,7 +275,7 @@
 
                         <ListView.HeaderTemplate>
                             <DataTemplate>
-                                <Grid Padding="12" Background="{ThemeResource SystemBaseLowColor}" ColumnDefinitions="*,150,180,20" ColumnSpacing="5">
+                                <Grid Padding="12" Background="{ThemeResource SystemBaseLowColor}" ColumnDefinitions="*,150,180,25" ColumnSpacing="5">
 
                                     <TextBlock Text="原名称" Style="{ThemeResource CaptionTextBlockStyle}"/>
                                     <TextBlock Grid.Column="1"
@@ -290,7 +290,7 @@
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="models:Sort115HomeModel">
                                 <Grid Height="48"
-                                      ColumnDefinitions="*,150,180,20"
+                                      ColumnDefinitions="*,150,180,25"
                                       ColumnSpacing="5">
 
                                     <customcontrols:FileControl FolderName="{x:Bind Info.Name}"

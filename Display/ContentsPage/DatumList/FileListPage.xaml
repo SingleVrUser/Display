@@ -30,6 +30,8 @@
                     Value="Center" />
             <Setter Property="HorizontalAlignment"
                     Value="Center" />
+            <Setter Property="TextTrimming"
+                    Value="CharacterEllipsis" />
         </Style>
 
         <DataTemplate x:Key="TransferStationTemplate"
@@ -44,8 +46,8 @@
         <DataTemplate x:Key="FileListTemplate"
                       x:DataType="data:FilesInfo">
             <Grid DoubleTapped="OpenFile_DoubleTapped"
-                  Background="Transparent">
-
+                  Background="Transparent"
+                  ColumnDefinitions="*,140,70">
                 <Grid.ContextFlyout>
                     <MenuFlyout ShouldConstrainToRootBounds="False">
                         <MenuFlyoutSubItem Text="在其他应用播放"
@@ -101,11 +103,6 @@
 
                     </MenuFlyout>
                 </Grid.ContextFlyout>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="200" />
-                    <ColumnDefinition Width="75" />
-                </Grid.ColumnDefinitions>
 
                 <Grid ColumnSpacing="8">
                     <Grid.ColumnDefinitions>
@@ -381,17 +378,15 @@
 
             <ListView.Header>
                 <Grid MinHeight="30"
-                      Background="{ThemeResource LayerFillColorDefaultBrush}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition MinWidth="50"
-                                          Width="*" />
-                        <ColumnDefinition Width="200" />
-                        <ColumnDefinition Width="100" />
-                    </Grid.ColumnDefinitions>
+                      Background="{ThemeResource LayerFillColorDefaultBrush}"
+                      ColumnDefinitions="44,*,140,70,12">
 
-                    <CheckBox x:Name="MultipleSelectedCheckBox" Margin="14,0" Click="SelectedMultipleFilesCheckBox_OnClick"/>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource TitleText}"
+                    <CheckBox x:Name="MultipleSelectedCheckBox"
+                              Margin="14,0,0,0"
+                              Click="SelectedMultipleFilesCheckBox_OnClick"/>
+
+                    <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource TitleText}"
                                Tapped="OrderBy_Tapped">
                                 <Run>名称</Run>
                                 <Run x:Name="NameRun"
@@ -399,7 +394,7 @@
                     </TextBlock>
 
                     <TextBlock Style="{StaticResource TitleText}"
-                               Grid.Column="1"
+                               Grid.Column="2"
                                Tapped="OrderBy_Tapped">
                             <Run>修改时间</Run>
                             <Run x:Name="TimeRun"
@@ -408,7 +403,7 @@
                     </TextBlock>
 
                     <TextBlock Style="{StaticResource TitleText}"
-                               Grid.Column="2"
+                               Grid.Column="3"
                                Tapped="OrderBy_Tapped">
                             <Run>大小</Run>
                             <Run x:Name="SizeRun"
