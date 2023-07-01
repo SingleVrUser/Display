@@ -8,7 +8,8 @@
 
     <converter:BytesToSizeStrConverter x:Key="BytesToSizeStrConverter" />
     <converter:IsVideoToVisibilityConverter x:Key="IsVideoToVisibilityConverter" />
-    <converter:Int32ToDateTimeStrConverter x:Key="Int32ToDateTimeStrConverter" />
+    <converter:NumberToDateTimeStrConverter x:Key="NumberToDateTimeStrConverter" />
+    <converter:NumberToLengthStrConverter x:Key="NumberToLengthStrConverter" />
     <converter:IsVideoToBoolConverter x:Key="IsVideoToBoolConverter" />
     <converter:AppUpdateContentConverter x:Key="AppUpdateContentConverter" />
     <converter:CollapsedWhenNullConverter x:Key="CollapsedWhenNullConverter" />

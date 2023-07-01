@@ -901,7 +901,7 @@ namespace Display.Data
                 const string commandText = "INSERT OR REPLACE INTO SpiderTask VALUES (@Name,@bus,@Jav321,@Avmoo,@Avsox,@libre,@fc,@db,@done,@task_id);";
 
                 //fc只有javdb，fc2club能刮
-                var isFc = FileMatch.IsFC2(name);
+                var isFc = FileMatch.IsFc2(name);
 
                 var parameters = new List<SqliteParameter>
                 {

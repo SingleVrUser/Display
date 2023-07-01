@@ -14,6 +14,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using Windows.ApplicationModel;
+using Display.Helper;
 using static Display.Data.FilesInfo;
 
 namespace Display.Data
@@ -1353,7 +1354,7 @@ namespace Display.Data
                 Name = fileCategory.file_name,
                 Pid = fileCategory.paths[^1].file_id,
                 PickCode = fileCategory.pick_code,
-                Time = FileMatch.ConvertInt32ToDateTime(fileCategory.utime),
+                Time = DateHelper.ConvertInt32ToDateTime(fileCategory.utime),
                 TimeProduce = fileCategory.ptime,
                 TimeEdit = fileCategory.utime,
             };

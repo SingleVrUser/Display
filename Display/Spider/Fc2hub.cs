@@ -65,7 +65,7 @@ public class Fc2hub
         videoInfo.trueName = CID;
         videoInfo.ReleaseTime = json.datePublished.Replace("/", "-");
         //PTxHxMxS转x分钟
-        videoInfo.Lengthtime = Data.FileMatch.ConvertPtTimeToTotalMinute(json.duration);
+        videoInfo.Lengthtime = DateHelper.ConvertPtTimeToTotalMinute(json.duration);
         videoInfo.Director = json.director;
         videoInfo.Producer = "fc2";
 

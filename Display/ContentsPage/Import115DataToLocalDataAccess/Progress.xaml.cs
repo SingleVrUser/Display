@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.System;
 using Display.Data;
+using Display.Helper;
 using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -159,7 +160,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                     successCount = progressPercent.getFilesProgressInfo.AllCount;
                     UpdateProgress();
                     cps_TextBlock.Text = $"{progressPercent.sendCountPerMinutes} 次/分钟";
-                    leftTime_Run.Text = FileMatch.ConvertDoubleToDateStr(1.5 * (folderCount - progressPercent.getFilesProgressInfo.FolderCount));
+                    leftTime_Run.Text = DateHelper.ConvertDoubleToLengthStr(1.5 * (folderCount - progressPercent.getFilesProgressInfo.FolderCount));
                     //updateSendSpeed(progressPercent.sendCountPerSecond);
 
                 }
@@ -189,7 +190,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
 
                     //剩余时间改总耗时
                     leftTimeTitle_Run.Text = "总耗时：";
-                    leftTime_Run.Text = FileMatch.ConvertDoubleToDateStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime);
+                    leftTime_Run.Text = DateHelper.ConvertDoubleToLengthStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime);
 
                     cps_TextBlock.Visibility = Visibility.Collapsed;
                     GetFolderCategory_Expander.IsExpanded = true;

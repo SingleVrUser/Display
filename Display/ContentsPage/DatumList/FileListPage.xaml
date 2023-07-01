@@ -130,7 +130,7 @@
                 </Grid>
 
                 <TextBlock  Grid.Column="1"
-                            Text="{x:Bind Time,Converter={StaticResource Int32ToDateTimeStrConverter}}"
+                            Text="{x:Bind Time,Converter={StaticResource NumberToDateTimeStrConverter}}"
                             Style="{StaticResource ValueText}" />
 
                 <TextBlock  Grid.Column="2"

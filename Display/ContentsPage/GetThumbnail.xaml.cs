@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Display.Data;
+using Display.Helper;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -144,7 +145,7 @@ namespace Display.ContentsPage
                 //完成
                 if (item.Status != Status.Doing && thumbnailInfo.Count == info.index + 1)
                 {
-                    progress_TextBlock.Text = $"任务已完成，耗时{FileMatch.ConvertDoubleToDateStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
+                    progress_TextBlock.Text = $"任务已完成，耗时{DateHelper.ConvertDoubleToLengthStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
                 }
             });
 
@@ -188,7 +189,7 @@ namespace Display.ContentsPage
                 //完成
                 if (item.Status != Status.Doing && thumbnailInfo.Count == info.index + 1)
                 {
-                    progress_TextBlock.Text = $"任务已完成，耗时{FileMatch.ConvertDoubleToDateStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
+                    progress_TextBlock.Text = $"任务已完成，耗时{DateHelper.ConvertDoubleToLengthStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
                 }
 
             });

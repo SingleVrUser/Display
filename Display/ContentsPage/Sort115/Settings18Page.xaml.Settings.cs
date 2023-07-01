@@ -56,7 +56,6 @@ namespace Display.ContentsPage.Sort115
 
         private static void Settings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            //Debug.WriteLine("Settings改变了");
             SaveSettings();
         }
 

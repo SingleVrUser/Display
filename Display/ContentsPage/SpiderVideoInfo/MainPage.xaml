@@ -5,6 +5,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:data="using:Display.Data"
       xmlns:customControls="using:Display.Controls"
+      xmlns:helper="using:Display.Helper"
       mc:Ignorable="d">
 
     <Page.Resources>
@@ -323,10 +324,10 @@
                                                            StringValue="{x:Bind SelectedDatum.Time,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="13"
-                                                           StringValue="{x:Bind SelectedDatum.TimeEdit,Converter={StaticResource Int32ToDateTimeStrConverter},Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.TimeEdit,Converter={StaticResource NumberToDateTimeStrConverter},Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="14"
-                                                           StringValue="{x:Bind SelectedDatum.TimeProduce,Converter={StaticResource Int32ToDateTimeStrConverter},Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.TimeProduce,Converter={StaticResource NumberToDateTimeStrConverter},Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="15"
                                                            StringValue="{x:Bind SelectedDatum.D,Mode=OneWay}" />
@@ -365,19 +366,19 @@
                                                            StringValue="{x:Bind SelectedDatum.Iv,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="27"
-                                                                  StringValue="{x:Bind SelectedDatum.CurrentTime,Converter={StaticResource NumberToLengthStrConverter},Mode=OneWay}" />
+                                                                  StringValue="{x:Bind SelectedDatum.CurrentTime,Converter={StaticResource NumberToDateTimeStrConverter},Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="28"
                                                            StringValue="{x:Bind SelectedDatum.PlayedEnd,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="29"
-                                                           StringValue="{x:Bind SelectedDatum.LastTime,Converter={StaticResource Int32ToDateTimeStrConverter},Mode=OneWay}" />
+                                                            StringValue="{x:Bind SelectedDatum.LastTime,Converter={StaticResource NumberToDateTimeStrConverter},Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="30"
                                                            StringValue="{x:Bind SelectedDatum.Vdi,Mode=OneWay}" />
                             <customControls:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="31"
-                                                           StringValue="{x:Bind data:FileMatch.ConvertDoubleToDateStr(SelectedDatum.PlayLong),Mode=OneWay}" />
+                                                                  StringValue="{x:Bind SelectedDatum.PlayLong,Converter={StaticResource NumberToLengthStrConverter},Mode=OneWay}" />
                         </Grid>
                     </ScrollViewer>
 

@@ -32,9 +32,9 @@ namespace Display.ContentsPage
     /// </summary>
     public sealed partial class SelectedFolderPage : Page
     {
-        private IncrementalLoadDatumCollection folderInfos;
+        private readonly IncrementalLoadDatumCollection folderInfos;
 
-        private ObservableCollection<ExplorerItem> explorerItems;
+        private readonly ObservableCollection<ExplorerItem> explorerItems;
 
         private readonly ItemsPanelTemplate _myListViewPanelTemplate;
         private readonly ItemsPanelTemplate _myGridViewPanelTemplate;
@@ -51,7 +51,6 @@ namespace Display.ContentsPage
 
             folderInfos = new IncrementalLoadDatumCollection(0,isOnlyFolder:true);
             folderInfos.GetFileInfoCompleted += FolderInfos_GetFileInfoCompleted;
-
 
             _myListViewPanelTemplate = Resources["ListViewPanelTemplate"] as ItemsPanelTemplate;
             _myGridViewPanelTemplate = Resources["GridViewPanelTemplate"] as ItemsPanelTemplate;
@@ -99,16 +98,18 @@ namespace Display.ContentsPage
             OpenFolder(cid);
         }
 
-        private async void OpenFolder(long cid)
+        private async void OpenFolder(long? cid)
         {
-            await folderInfos.SetCid(cid);
+            if(cid==null) return;
+
+            await folderInfos.SetCid((long)cid);
         }
 
         private void ListViewBase_OnItemClick(object sender, ItemClickEventArgs e)
         {
             if (e.ClickedItem is not FilesInfo info) return;
 
-            OpenFolder(info.Cid);
+            OpenFolder(info.Id);
         }
 
         private void ChangedViewButton_OnClick(object sender, RoutedEventArgs e)

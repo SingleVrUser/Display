@@ -59,7 +59,7 @@ public class PlayVideoHelper
         {
             //浏览器播放
             case 0:
-                VideoPlayWindow.CreateNewWindow(FileMatch.getVideoPlayUrl(firstPlayItem.PickCode));
+                VideoPlayWindow.CreateNewWindow(FileMatch.GetVideoPlayUrl(firstPlayItem.PickCode));
                 break;
             //PotPlayer播放
             case 1:

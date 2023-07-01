@@ -7,6 +7,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
+             xmlns:helper="using:Display.Helper"
              mc:Ignorable="d">
 
     <Grid BorderThickness="0,1,0,0"
@@ -77,7 +78,7 @@
                     <AppBarSeparator />
 
                     <!--喜欢-->
-                    <AppBarToggleButton IsChecked="{x:Bind data:FileMatch.isLike(ResultInfo.IsLike), BindBack = UpdateLike, Mode=TwoWay}"
+                    <AppBarToggleButton IsChecked="{x:Bind helper:FileMatch.IsLike(ResultInfo.IsLike), BindBack = UpdateLike, Mode=TwoWay}"
                                         Label="喜欢">
                         <AppBarToggleButton.Icon>
                             <FontIcon Glyph="&#xE006;" />
@@ -85,7 +86,7 @@
                     </AppBarToggleButton>
 
                     <!--稍后再看-->
-                    <AppBarToggleButton IsChecked="{x:Bind data:FileMatch.isLookLater(ResultInfo.LookLater), BindBack = UpdateLookLater, Mode=TwoWay}"
+                    <AppBarToggleButton IsChecked="{x:Bind helper:FileMatch.IsLookLater(ResultInfo.LookLater), BindBack = UpdateLookLater, Mode=TwoWay}"
                                         Label="稍后再看">
                         <AppBarToggleButton.Icon>
                             <FontIcon Glyph="&#xE13B;" />

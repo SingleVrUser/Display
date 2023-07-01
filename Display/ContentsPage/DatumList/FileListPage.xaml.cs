@@ -364,18 +364,15 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         else
         {
             var item = FilesInfos[index];
-            //目标与移动文件有重合，退出
+            // 目标与移动文件有重合，退出
             if (sourceFilesInfos.Contains(item))
             {
-                Debug.WriteLine("目标与移动文件有重合，禁止操作");
-
                 e.AcceptedOperation = DataPackageOperation.None;
                 e.DragUIOverride.Caption = null;
             }
+            // 目标为文件，没法移动到文件，退出
             else if (item.Type == FilesInfo.FileType.File)
             {
-                Debug.WriteLine("目标为文件，禁止操作");
-
                 e.AcceptedOperation = DataPackageOperation.None;
                 e.DragUIOverride.Caption = null;
             }

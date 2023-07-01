@@ -7,6 +7,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:customcontrols="using:Display.Controls"
       xmlns:data="using:Display.Data"
+      xmlns:helper="using:Display.Helper"
       mc:Ignorable="d">
 
     <Page.Resources>
@@ -203,7 +204,7 @@
                                                RelativePanel.AlignVerticalCenterWithPanel="True" />
 
                                     <TextBlock x:Name="OverdueTimeTextBlock"
-                                               Text="{x:Bind data:FileMatch.ConvertDoubleToDateStr(OverdueTimeNumberBox.Value) ,Mode=OneWay}"
+                                               Text="{x:Bind OverdueTimeNumberBox.Value,Converter={StaticResource NumberToLengthStrConverter} ,Mode=OneWay}"
                                                RelativePanel.LeftOf="OverdueTimeNumberBox"
                                                RelativePanel.AlignVerticalCenterWithPanel="True"
                                                Margin="10,0"

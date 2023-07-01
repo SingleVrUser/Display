@@ -300,7 +300,7 @@
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="models:Sort115HomeModel">
                                 <Grid Height="48"
-                                      ColumnDefinitions="*,200,200">
+                                      ColumnDefinitions="*,200,200,20">
 
                                     <customcontrols:FileControl FolderName="{x:Bind Info.Name}"
                                                                 Type="{x:Bind Info.Type}"
@@ -316,7 +316,7 @@
                                                Style="{ThemeResource BaseTextBlockStyle}"
                                                Text="{x:Bind DestinationPathName,Mode=OneWay}"/>
 
-                                    <customcontrols:StatusShow Grid.Column="2" status="{x:Bind Status,Mode=OneWay}"/>
+                                    <customcontrols:StatusShow Grid.Column="3" status="{x:Bind Status,Mode=OneWay}"/>
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>

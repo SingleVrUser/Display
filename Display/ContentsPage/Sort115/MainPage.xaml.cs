@@ -1,7 +1,8 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
-using Display.ViewModels;
+using Display.Data;
+using Display.Models;
 using Display.WindowView;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -10,8 +11,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
-using Display.Data;
-using Display.Models;
 using SpiderInfo = Display.Models.SpiderInfo;
 
 // To learn more about WinUI, the WinUI project structure,

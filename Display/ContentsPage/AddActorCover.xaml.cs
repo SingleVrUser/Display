@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Display.Data;
+using Display.Helper;
 using static System.String;
 using Display.Models.IncrementalCollection;
 
@@ -182,7 +183,7 @@ namespace Display.ContentsPage
                 //完成
                 if (item.Status != Status.Doing && actorinfo.Count == info.Index + 1)
                 {
-                    progress_TextBlock.Text = $"任务已完成，耗时{FileMatch.ConvertDoubleToDateStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
+                    progress_TextBlock.Text = $"任务已完成，耗时{DateHelper.ConvertDoubleToLengthStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
                 }
             });
 
@@ -663,7 +664,7 @@ namespace Display.ContentsPage
             }
 
             //结束
-            progress_TextBlock.Text = $"总耗时：{FileMatch.ConvertDoubleToDateStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
+            progress_TextBlock.Text = $"总耗时：{DateHelper.ConvertDoubleToLengthStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
         }
 
         private static async Task<progressInfo> GetActorFaceByVideoPlayUrl(string actorName, string url, int Task_Count, string SavePath, string imageName, bool isShowWindow = true)
