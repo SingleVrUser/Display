@@ -71,6 +71,8 @@ namespace Display.Controls
             {
                 items = DataAccess.Get.GetListByCid(folderCid);
 
+                if (items == null) return null;
+
                 //排序
                 items = items.OrderByDescending(x => x.TimeEdit).ToArray();
 
@@ -153,6 +155,7 @@ namespace Display.Controls
             SelectFolderName.Clear();
             TryUpdateFolder(folderCid);
 
+
             //更新右侧文件列表
             TryUpdateFileInSelectFolder(items);
 
@@ -207,7 +210,7 @@ namespace Display.Controls
             while (targertNode == null && childrenNode.Count != 0)
             {
                 List<TreeViewNode> tmpChildrenNode = new();
-                foreach (TreeViewNode node in childrenNode)
+                foreach (var node in childrenNode)
                 {
                     //Content
                     if (((ExplorerItem)node.Content).Id == folderCid)
@@ -235,6 +238,8 @@ namespace Display.Controls
         private void TryUpdateFileInSelectFolder(Datum[] items)
         {
             FileInSelectFolder.Clear();
+
+            if (items == null) return;
 
             //排序
             items = items.OrderByDescending(x => x.Pid).ToArray();
@@ -417,7 +422,7 @@ namespace Display.Controls
                 i++;
                 progress.Report(i);
                 //检查下级是否还有文件夹
-                bool hasUnrealizedChildren = DataAccess.Get.GetFolderListByPid(folderInfo.Cid, 1).Length != 0;
+                bool hasUnrealizedChildren = DataAccess.Get.GetFolderListByPid(folderInfo.Cid, 1)?.Length != 0;
 
                 Node_HasUnrealizedChildren_Dict.Add(folderInfo, hasUnrealizedChildren);
 

@@ -116,8 +116,6 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
 
         HasMoreItems = AllCount > Count;
 
-
-
         return filesInfo.data.Length;
     }
 

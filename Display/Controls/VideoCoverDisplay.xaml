@@ -10,6 +10,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:data="using:Display.Data"
+             xmlns:helper="using:Display.Helper"
              mc:Ignorable="d"
              CacheMode="BitmapCache">
 
@@ -248,7 +249,7 @@
                                       Opacity="1"
                                       Margin="8"
                                       FontSize="30"
-                                      Visibility="{x:Bind data:FileMatch.isShowLikeIcon(IsLike),Mode=OneWay}" />
+                                      Visibility="{x:Bind helper:FileMatch.IsShowLikeIcon(IsLike),Mode=OneWay}" />
 
                             <!--标签（4K/VR）-->
                             <StackPanel Margin="5"
@@ -282,7 +283,7 @@
                             <AppBarToggleButton IsCompact="True"
                                                 ToolTipService.ToolTip="稍后观看"
                                                 RelativePanel.AlignRightWithPanel="True"
-                                                IsChecked="{x:Bind data:FileMatch.isLookLater(LookLater), Mode=OneWay}"
+                                                IsChecked="{x:Bind helper:FileMatch.IsLookLater(LookLater), Mode=OneWay}"
                                                 Click="LookLaterToggleButton_Click">
 
                                 <AppBarToggleButton.Icon>
@@ -368,7 +369,7 @@
                                 <!--标记为喜欢-->
                                 <AppBarToggleButton ToolTipService.ToolTip="喜欢"
                                                     IsCompact="True"
-                                                    IsChecked="{x:Bind data:FileMatch.isLike(IsLike),Mode=OneWay}"
+                                                    IsChecked="{x:Bind helper:FileMatch.IsLike(IsLike),Mode=OneWay}"
                                                     Click="LikeToggleButton_Click">
                                     <FontIcon Glyph="&#xE006;" />
                                 </AppBarToggleButton>
@@ -608,7 +609,7 @@
                             <AppBarToggleButton IsCompact="True"
                                                 ToolTipService.ToolTip="稍后观看"
                                                 RelativePanel.AlignRightWithPanel="True"
-                                                IsChecked="{x:Bind data:FileMatch.isLookLater(LookLater)}"
+                                                IsChecked="{x:Bind helper:FileMatch.IsLookLater(LookLater)}"
                                                 Click="FailLookLaterToggleButton_Click">
                                 <AppBarToggleButton.Resources>
 
@@ -672,7 +673,7 @@
                                 <!--标记为喜欢-->
                                 <AppBarToggleButton ToolTipService.ToolTip="喜欢"
                                                     IsCompact="True"
-                                                    IsChecked="{x:Bind data:FileMatch.isLike(IsLike)}"
+                                                    IsChecked="{x:Bind helper:FileMatch.IsLike(IsLike)}"
                                                     Click="FailLikeToggleButton_Click">
                                     <FontIcon Glyph="&#xE006;" />
                                 </AppBarToggleButton>
@@ -928,7 +929,7 @@
                                       HorizontalAlignment="Right"
                                       VerticalAlignment="Top"
                                       Margin="0,5"
-                                      IsChecked="{x:Bind data:FileMatch.isLike(ActorInfo.IsLike),Mode=OneWay}"
+                                      IsChecked="{x:Bind helper:FileMatch.IsLike(ActorInfo.IsLike),Mode=OneWay}"
                                       Click="LikeButton_Click"
                                       Tag="{x:Bind ActorInfo.Id,Mode=OneWay}"
                                       Visibility="{x:Bind IsShowHeaderCover,Mode=OneWay}" />

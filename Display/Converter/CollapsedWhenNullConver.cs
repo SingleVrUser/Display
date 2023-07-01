@@ -12,7 +12,8 @@ public class CollapsedWhenNullConverter : IValueConverter
         {
             return Visibility.Collapsed;
         }
-        else if (value is string contentStr)
+
+        if (value is string contentStr)
         {
             if (string.IsNullOrEmpty(contentStr))
             {

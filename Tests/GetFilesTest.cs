@@ -37,6 +37,10 @@ namespace Tests
             }
         }
 
+        /// <summary>
+        /// 有加密，格式与Web有所不同
+        /// </summary>
+        /// <returns></returns>
         [TestMethod]
         public async Task GetFilesByDesktopTest()
         {   
@@ -77,6 +81,11 @@ namespace Tests
             Assert.AreEqual(result.offset, 0);
         }
 
+        /// <summary>
+        /// 无加密，格式与Web有所不同
+        /// </summary>
+        /// <param name="cid"></param>
+        /// <returns></returns>
         [TestMethod]
         [DataRow(2665320937582231158)]
         public async Task GetFilesByTvTest(long cid)

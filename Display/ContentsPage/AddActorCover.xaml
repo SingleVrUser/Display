@@ -9,6 +9,7 @@
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:data="using:Display.Data"
     xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
+    xmlns:helper="using:Display.Helper"
     mc:Ignorable="d">
     <Page.Resources>
 
@@ -21,7 +22,7 @@
                 CornerRadius="5"
                 PointerEntered="connectedElement_PointerEntered"
                 PointerExited="connectedElement_PointerExited">
-                <Grid Visibility="{x:Bind data:FileMatch.ShowIfImageNull(ProfilePath),Mode=OneWay}">
+                <Grid Visibility="{x:Bind helper:FileMatch.ShowIfImageNull(ProfilePath),Mode=OneWay}">
                     <controls:ImageEx Source="{x:Bind ProfilePath,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
 
                     <TextBlock Text="{x:Bind Name}" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" TextWrapping="Wrap" Margin="5"/>
@@ -29,7 +30,7 @@
                     <customcontrols:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
                 </Grid>
 
-                <Grid Visibility="{x:Bind data:FileMatch.ShowIfImageENotNull(ProfilePath),Mode=OneWay}">
+                <Grid Visibility="{x:Bind helper:FileMatch.ShowIfImageENotNull(ProfilePath),Mode=OneWay}">
                     <controls:ImageEx Margin="0,0,0,20" x:Name="ActorImage" Source="{x:Bind ProfilePath,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
 
                     <StackPanel VerticalAlignment="Bottom">

@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using System;
 using Display.Data;
+using Display.Helper;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -49,7 +50,7 @@ namespace Display.Controls
 
         private void tryShowActorAge(string birthday)
         {
-            if (FileMatch.CalculateTimeStrDiff(birthday, releaseTime) is TimeSpan dtDif)
+            if (DateHelper.CalculateTimeStrDiff(birthday, releaseTime) is TimeSpan dtDif)
             {
                 if (dtDif != TimeSpan.Zero)
                 {

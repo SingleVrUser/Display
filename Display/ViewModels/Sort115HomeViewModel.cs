@@ -69,13 +69,8 @@ namespace Display.ViewModels
         [RelayCommand]
         private async void Start()
         {
-            Debug.WriteLine("开始");
-
             var infos = SelectedFiles.ToList();
-
-            const string matchRegex = "(\\d?[a-z]+-?\\d+)([_-]([2468]ks?([36]0fps)?)|hhb|.part)?(\\d?)(_8k)?$";
-
-
+            
             var settings = Settings18Page.Settings;
 
             // 单集保存路径
@@ -86,6 +81,8 @@ namespace Display.ViewModels
 
             var multipleDict = new Dictionary<string, List<Sort115HomeModel>>();
             var singleList = new List<Sort115HomeModel>();
+
+            const string matchRegex = "(\\d?[a-z]+-?\\d+)([_-]([2468]ks?([36]0fps)?)|hhb|.part)?(\\d?)(_8k)?$";
 
             // 整理预览
             foreach (var info in infos)
@@ -137,7 +134,6 @@ namespace Display.ViewModels
                     Debug.WriteLine("  匹配失败");
 
                     info.Status = Status.Error;
-
                 }
             }
 

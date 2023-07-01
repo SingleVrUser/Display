@@ -6,6 +6,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:data="using:Display.Data"
+      xmlns:helper="using:Display.Helper"
       mc:Ignorable="d"
       NavigationCacheMode="Enabled">
 
@@ -145,7 +146,7 @@
                                   FontSize="30"
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Top"
-                                  Visibility="{x:Bind data:FileMatch.isShowLikeIcon(IsLike),Mode=OneWay}" />
+                                  Visibility="{x:Bind helper:FileMatch.IsShowLikeIcon(IsLike),Mode=OneWay}" />
 
                         <RelativePanel Grid.Row="1">
                             <TextBlock Text="{x:Bind Name}"

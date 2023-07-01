@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using Display.Helper;
 using static System.String;
 
 // To learn more about WinUI, the WinUI project structure,

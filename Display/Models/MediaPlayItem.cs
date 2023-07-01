@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media.Playback;
+using Display.Helper;
 
 namespace Display.Models
 {

@@ -1,8 +1,8 @@
-﻿
+﻿using Display.Data;
 using Microsoft.UI.Xaml;
+using SharpCompress;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -10,72 +10,57 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.System;
-using SharpCompress;
 
-namespace Display.Data
+namespace Display.Helper
 {
     public static class FileMatch
     {
         /// <summary>
-        /// //正则删除某些关键词
+        /// 正则删除某些关键词
         /// </summary>
-        /// <param Name="name"></param>
+        /// <param name="name"></param>
         /// <returns></returns>
         public static string DeleteSomeKeywords(string name)
         {
-            List<string> reg_replace_list =
+            var regReplaceList =
                 new List<string> { "uur76", @"({\d}K)?\d{2,3}fps\d{0,}", @"part\d", "@18P2P", @"[^\d]\d{3,6}P", @"\[?[0-9a-z]+?\.(com|cn|xyz|la|me|net|app|cc)\]?@?",
                                 @"SE\d{2}",@"EP\d{2}", @"S\d{1,2}E\d{1,2}", @"\D[hx]26[54]", "[-_][468]k", @"h_[0-9]{3,4}",@"[a-z0-9]{15,}",
                                 @"\d+bit",@"\d{3,6}x\d{3,6}", @"whole[-_\w]+$"};
-            for (int i = 0; i < reg_replace_list.Count; i++)
+                
+            foreach (var t in regReplaceList)
             {
-                Regex rgx = new Regex(reg_replace_list[i], RegexOptions.IgnoreCase);
+                Regex rgx = new Regex(t, RegexOptions.IgnoreCase);
                 name = rgx.Replace(name, "");
             }
 
             return name;
         }
 
-        public static bool IsFC2(string cid)
+        public static bool IsFc2(string cid)
         {
             return cid.Contains("FC2");
         }
 
-        ///// <summary>
-        ///// 是否是特殊番号(用于区分AvMoo和AvSox)
-        ///// </summary>
-        ///// <param Name="cid"></param>
-        ///// <returns></returns>
-        //public static bool IsSpecialCid(string cid)
-        //{
-        //    string CID = cid.ToUpper();
-
-        //    //FC2 / 无分隔符 / HEY / HEYZO / 无字母 / 字母+数字+字母 / 有分隔符但是是特殊字母
-        //    return IsFC2(CID) || !CID.Contains('-') || CID.Contains("HEY") || !Regex.Match(CID, "[A-Z]").Success
-        //        || Regex.Match(CID, @"[A-Z]\d[A-z]").Success
-        //        || (CID.Contains('-') && Regex.Match(CID, "^SKYHUD-").Success || Regex.Match(CID, "^RED-").Success || Regex.Match(CID, "^SKY-").Success)
-        //        || Regex.Match(CID, "^SE-").Success || Regex.Match(CID, "^DSAMBD-").Success;
-        //}
-
         /// <summary>
         /// 从文件名中匹配CID名字
         /// </summary>
-        /// <param name="src_text"></param>
+        /// <param name="srcText"></param>
+        /// <param name="fileCid"></param>
         /// <returns></returns>
-        public static string MatchName(string src_text, long? file_cid = null)
+        public static string MatchName(string srcText, long? fileCid = null)
         {
             //提取文件名
-            var name = Regex.Replace(src_text, @"(\.\w{3,5}?)$", "", RegexOptions.IgnoreCase);
+            var name = Regex.Replace(srcText, @"(\.\w{3,5}?)$", "", RegexOptions.IgnoreCase);
 
             //删除空格
             name = name.Replace(" ", "_");
 
             //转小写
-            string name_lc = name.ToLower();
+            var nameLc = name.ToLower();
 
             Match match;
-            string no_domain = name;
-            if (name_lc.Contains("fc"))
+            var noDomain = name;
+            if (nameLc.Contains("fc"))
             {
                 //根据FC2 Club的影片数据，FC2编号为5-7个数字
                 match = Regex.Match(name, @"fc2?[^a-z\d]{0,5}(ppv[^a-z\d]{0,5})?(\d{5,7})", RegexOptions.IgnoreCase);
@@ -85,7 +70,7 @@ namespace Display.Data
                     return $"FC2-{match.Groups[2].Value}";
                 }
             }
-            else if (name_lc.Contains("heydouga"))
+            else if (nameLc.Contains("heydouga"))
             {
                 match = Regex.Match(name, @"(heydouga)[-_]*(\d{4})[-_]+0?(\d{3,5})", RegexOptions.IgnoreCase);
 
@@ -97,22 +82,22 @@ namespace Display.Data
             else
             {
                 //先尝试移除可疑关键词进行匹配，如果匹配不到再使用去掉关键词的名称进行匹配
-                no_domain = DeleteSomeKeywords(name);
+                noDomain = DeleteSomeKeywords(name);
 
-                if (!string.IsNullOrEmpty(no_domain) && no_domain != name)
+                if (!string.IsNullOrEmpty(noDomain) && noDomain != name)
                 {
-                    return MatchName(no_domain);
+                    return MatchName(noDomain);
                 }
             }
 
             //匹配缩写成hey的heydouga影片。由于番号分三部分，要先于后面分两部分的进行匹配
-            match = Regex.Match(no_domain, @"(?:hey)[-_]*(\d{4})[-_]+0?(\d{3,5})", RegexOptions.IgnoreCase);
+            match = Regex.Match(noDomain, @"(?:hey)[-_]*(\d{4})[-_]+0?(\d{3,5})", RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 return $"heydouga-" + string.Join("-", match.Groups.Values.Skip(1));
             }
             //普通番号，优先尝试匹配带分隔符的（如ABC - 123）
-            match = Regex.Match(no_domain, @"([a-z]{2,10})[-_]+0*(\d{2,5})", RegexOptions.IgnoreCase);
+            match = Regex.Match(noDomain, @"([a-z]{2,10})[-_]+0*(\d{2,5})", RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 string number = match.Groups[2].Value;
@@ -123,7 +108,7 @@ namespace Display.Data
             }
 
             //然后再将影片视作缺失了 - 分隔符来匹配
-            match = Regex.Match(no_domain, @"([a-z]{2,})0*(\d{2,5})", RegexOptions.IgnoreCase);
+            match = Regex.Match(noDomain, @"([a-z]{2,})0*(\d{2,5})", RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 string number = match.Groups[2].Value;
@@ -136,10 +121,10 @@ namespace Display.Data
             //普通番号，运行到这里时表明无法匹配到带分隔符的番号
             //先尝试匹配东热的red, sky, ex三个不带 - 分隔符的系列
             //（这三个系列已停止更新，因此根据其作品编号将数字范围限制得小一些以降低误匹配概率）
-            match = Regex.Match(no_domain, @"(red[01]\d\d|sky[0-3]\d\d|ex00[01]\d)", RegexOptions.IgnoreCase);
+            match = Regex.Match(noDomain, @"(red[01]\d\d|sky[0-3]\d\d|ex00[01]\d)", RegexOptions.IgnoreCase);
             if (match.Success)
             {
-                string matchName = match.Groups[1].Value;
+                var matchName = match.Groups[1].Value;
                 match = Regex.Match(matchName, @"([a-z]+)(\d+)", RegexOptions.IgnoreCase);
                 if (match.Success)
                 {
@@ -150,35 +135,35 @@ namespace Display.Data
             }
 
             //尝试匹配TMA制作的影片（如'T28-557'，他家的番号很乱）
-            match = Regex.Match(no_domain, @"(T28[-_]+\d{3})", RegexOptions.IgnoreCase);
+            match = Regex.Match(noDomain, @"(T28[-_]+\d{3})", RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 return match.Groups[1].Value;
             }
             //尝试匹配东热n, k系列
-            match = Regex.Match(no_domain, @"(n\d{4}|k\d{4})", RegexOptions.IgnoreCase);
+            match = Regex.Match(noDomain, @"(n\d{4}|k\d{4})", RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 return match.Groups[1].Value;
             }
             //尝试匹配纯数字番号（无码影片）
-            match = Regex.Match(no_domain, @"(\d{6}[-_]+\d{2,3})", RegexOptions.IgnoreCase);
+            match = Regex.Match(noDomain, @"(\d{6}[-_]+\d{2,3})", RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 return match.Groups[1].Value;
             }
             //如果还是匹配不了，尝试将')('替换为'-'后再试，少部分影片的番号是由')('分隔的
-            if (no_domain.Contains(")("))
+            if (noDomain.Contains(")("))
             {
-                string avid = MatchName(no_domain.Replace(")(", "-"));
+                string avid = MatchName(noDomain.Replace(")(", "-"));
                 if (!string.IsNullOrEmpty(avid))
                     return avid;
             }
 
             //如果最后仍然匹配不了番号，则尝试使用文件所在文件夹的名字去匹配
-            if (file_cid!=null)
+            if (fileCid!=null)
             {
-                var folderDatum = DataAccess.Get.GetUpperLevelFolderCid((long)file_cid);
+                var folderDatum = DataAccess.Get.GetUpperLevelFolderCid((long)fileCid);
 
                 if (!string.IsNullOrEmpty(folderDatum.Name))
                 {
@@ -191,55 +176,54 @@ namespace Display.Data
         }
 
         /// <summary>
-        /// List<class>转换,VideoInfo ==> VideoCoverDisplayClass
+        /// List(class)转换,VideoInfo ==> VideoCoverDisplayClass
         /// </summary>
-        /// <param Name="VideoInfoList"></param>
+        /// <param name="videoInfoList"></param>
+        /// <param name="imgWidth"></param>
+        /// <param name="imgHeight"></param>
         /// <returns></returns>
-        public static List<VideoCoverDisplayClass> getFileGrid(List<VideoInfo> VideoInfoList, double imgwidth, double imgheight)
+        public static List<VideoCoverDisplayClass> GetFileGrid(List<VideoInfo> videoInfoList, double imgWidth, double imgHeight)
         {
-            List<VideoCoverDisplayClass> FileGrid = new();
+            List<VideoCoverDisplayClass> fileGrid = new();
 
             // VR 和 4K 类别在右上角显示标签
             // 初始化为图片大小
-            for (var i = 0; i < VideoInfoList.Count; i++)
+            foreach (var t in videoInfoList)
             {
-                VideoCoverDisplayClass info = new(VideoInfoList[i], imgwidth, imgheight);
-                FileGrid.Add(info);
+                VideoCoverDisplayClass info = new(t, imgWidth, imgHeight);
+                fileGrid.Add(info);
             }
 
-            return FileGrid;
+            return fileGrid;
         }
 
-        public static bool isLike(int is_like)
+        public static bool IsLike(int isLike)
         {
-            bool result = is_like == 0 ? false : true;
-            return result;
+            return isLike != 0;
         }
 
-        public static bool? isLookLater(long look_later)
+        public static bool? IsLookLater(long lookLater)
         {
-            bool result = look_later == 0 ? false : true;
-            return result;
+            return lookLater != 0;
         }
-
-
+        
         //是否显示喜欢图标
-        public static Visibility isShowLikeIcon(int is_like)
+        public static Visibility IsShowLikeIcon(int isLike)
         {
-            return is_like == 0 ? Visibility.Collapsed : Visibility.Visible;
+            return isLike == 0 ? Visibility.Collapsed : Visibility.Visible;
         }
 
         //根据类别搜索结果
-        public static async Task<List<VideoInfo>> getVideoInfoFromType(List<string> types, string keywords, int limit)
+        public static async Task<List<VideoInfo>> GetVideoInfoFromType(List<string> types, string keywords, int limit)
         {
             if (types == null) return null;
 
-            string trueType;
             //避免重复
-            Dictionary<string, VideoInfo> dicts = new();
+            Dictionary<string, VideoInfo> dictionary = new();
 
             foreach (var type in types)
             {
+                string trueType;
                 switch (type)
                 {
                     case "番号" or "truename":
@@ -264,141 +248,35 @@ namespace Display.Data
                     //从另外的表中查找
                     case "失败" or "fail":
                         var failItems = await DataAccess.Get.GetFailFileInfoWithDatum(n: keywords, limit: limit);
-                        failItems?.ForEach(item => dicts.TryAdd(item.Name, new VideoInfo(item)));
+                        failItems?.ForEach(item => dictionary.TryAdd(item.Name, new VideoInfo(item)));
                         continue;
                     default:
                         trueType = "truename";
                         break;
                 }
 
-                int leftCount = limit - dicts.Count;
+                int leftCount = limit - dictionary.Count;
 
                 // 当数量超过Limit数量时，跳过（不包括失败列表）
                 if (leftCount <= 0) continue;
 
                 var newItems = DataAccess.Get.GetVideoInfoBySomeType(trueType, keywords, leftCount);
 
-                newItems?.ForEach(item => dicts.TryAdd(item.trueName, item));
+                newItems?.ForEach(item => dictionary.TryAdd(item.trueName, item));
             }
 
-            return dicts.Values.ToList();
+            return dictionary.Values.ToList();
         }
 
-        public static string getVideoPlayUrl(string pickCode)
+        public static string GetVideoPlayUrl(string pickCode)
         {
             return $"https://v.anxia.com/?pickcode={pickCode}&share_id=0";
-        }
-
-        public static string ConvertInt32ToDateTime(int dateInt)
-        {
-            DateTime startTime = new DateTime(1970, 1, 1, 0, 0, 0);
-            startTime = startTime.AddSeconds(dateInt).ToLocalTime();
-
-            var result = string.Format("{0:yyyy/MM/dd H:mm}", startTime);
-
-            return result;
-        }
-
-        public static TimeSpan CalculateTimeStrDiff(string dt1Str, string dt2Str)
-        {
-            if (string.IsNullOrEmpty(dt1Str) || string.IsNullOrEmpty(dt2Str)) return TimeSpan.Zero;
-
-            var dt1 = Convert.ToDateTime(dt1Str);
-
-            var dt2 = Convert.ToDateTime(dt2Str);
-
-            if (dt2 > dt1)
-            {
-                return dt2 - dt1;
-            }
-
-            return dt1 - dt2;
-        }
-
-        public static int ConvertDateTimeToInt32(string dateStr)
-        {
-            var dt1 = new DateTime(1970, 1, 1, 8, 0, 0);
-            var dt2 = Convert.ToDateTime(dateStr);
-            return Convert.ToInt32((dt2 - dt1).TotalSeconds);
-        }
-            
-        /// <summary>
-        /// 字符串内容是否为数字
-        /// </summary>
-        /// <param name="_string"></param>
-        /// <returns></returns>
-        public static bool IsNumberic1(this string _string)
-        {
-            if (string.IsNullOrEmpty(_string))
-                return false;
-
-            foreach (char c in _string)
-            {
-                if (!char.IsDigit(c))
-                    return false;
-            }
-            return true;
-        }
-
-        public static string ConvertInt32ToDateStr(int second)
-        {
-            return ConvertDoubleToDateStr(Convert.ToDouble(second));
-        }
-
-        public static string ConvertDoubleToDateStr(double second)
-        {
-            if (second is double.NaN)
-                return second.ToString(CultureInfo.InvariantCulture);
-
-            string formatStr;
-
-            if (second < 60)
-            {
-                formatStr = "ss'秒'";
-            }
-            else if (second < 3600)
-            {
-                formatStr = "mm'分'ss'秒'";
-            }
-            else if (second < 86400)
-            {
-                formatStr = "hh'小时'mm'分'ss'秒'";
-            }
-            else
-            {
-                formatStr = "dd'天'hh'小时'mm'分'ss'秒'";
-            }
-
-            TimeSpan ts = TimeSpan.FromSeconds(second);
-
-            return ts.ToString(formatStr);
-        }
-
-        public static string ConvertPtTimeToTotalMinute(string ptTimeStr)
-        {
-            int totalMinute = 0;
-
-            var match = Regex.Match(ptTimeStr, @"PT((\d+)H)?(\d+)M(\d+)S", RegexOptions.IgnoreCase);
-            if (!match.Success) return ptTimeStr;
-
-            if (int.TryParse(match.Groups[2].Value, out var result))
-            {
-                totalMinute += result * 60;
-            }
-
-            if (int.TryParse(match.Groups[3].Value, out result))
-            {
-                totalMinute += result;
-            }
-
-            return $"{totalMinute}分钟";
-
         }
 
         /// <summary>
         /// 从文件中挑选出视频文件
         /// </summary>
-        /// <param Name="data"></param>
+        /// <param name="data"></param>
         /// <returns></returns>
         public static List<MatchVideoResult> GetVideoAndMatchFile(List<Datum> data)
         {
@@ -413,7 +291,7 @@ namespace Display.Data
                 if (fileInfo.Iv == 1)
                 {
                     //根据视频名称匹配番号
-                    var videoName = FileMatch.MatchName(fileName, fileInfo.Cid);
+                    var videoName = MatchName(fileName, fileInfo.Cid);
 
                     //无论匹配与否，都存入数据库
                     DataAccess.Add.AddFileToInfo(fileInfo.PickCode, videoName, isReplace:true);
@@ -448,11 +326,11 @@ namespace Display.Data
             return resultList;
         }
 
-        public static List<CookieFormat> ExportCookies(string Cookies)
+        public static List<CookieFormat> ExportCookies(string cookie)
         {
             List<CookieFormat> cookieList = new();
 
-            var cookiesList = Cookies.Split(';');
+            var cookiesList = cookie.Split(';');
             foreach (var cookies in cookiesList)
             {
                 var item = cookies.Split('=');
@@ -487,7 +365,6 @@ namespace Display.Data
             var folder = await StorageFolder.GetFolderFromPathAsync(path);
             await Launcher.LaunchFolderAsync(folder);
         }
-
 
         public static async void PlayByPotPlayer(string playUrl)
         {
@@ -541,7 +418,7 @@ namespace Display.Data
 
         public static Tuple<string, string> SplitLeftAndRightFromCid(string cid)
         {
-            string[] splitList = cid.Split(new[] { '-', '_' });
+            var splitList = cid.Split('-', '_');
             var leftName = splitList[0];
 
             var rightNumber = string.Empty;

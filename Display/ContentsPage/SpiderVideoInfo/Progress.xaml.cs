@@ -20,6 +20,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Display.Data;
+using Display.Helper;
 using Display.Spider;
 using WinUIEx;
 
@@ -72,7 +73,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             foreach (var item in _failDatumList)
             {
-                _matchVideoResults.Add(new MatchVideoResult() { status = true, OriginalName = item.Datum.Name, message = "匹配成功", statusCode = 1, MatchName = item.MatchName });
+                _matchVideoResults.Add(new MatchVideoResult { status = true, OriginalName = item.Datum.Name, message = "匹配成功", statusCode = 1, MatchName = item.MatchName });
 
                 //替换数据库的数据
                 DataAccess.Add.AddFileToInfo(item.Datum.PickCode, item.MatchName, isReplace: true);
@@ -80,7 +81,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             //显示进度环
             ShowProgress(_matchVideoResults.Count);
-
+            
             if (s_cts.IsCancellationRequested) return;
             await SpiderVideoInfo(_matchVideoResults);
             if (s_cts.IsCancellationRequested) return;
@@ -468,7 +469,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
             }
 
             //显示总耗时
-            SearchMessage_TextBlock.Text = $"⏱总耗时：{FileMatch.ConvertDoubleToDateStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime)}";
+            SearchMessage_TextBlock.Text = $"⏱总耗时：{DateHelper.ConvertDoubleToLengthStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime)}";
 
             TopProgressRing.IsActive = false;
         }

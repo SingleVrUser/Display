@@ -49,4 +49,5 @@ public class MatchHelper
         sameContent = matchList.MaxBy(x => x.Length);
         return sameContent ?? string.Empty;
     }
+
 }

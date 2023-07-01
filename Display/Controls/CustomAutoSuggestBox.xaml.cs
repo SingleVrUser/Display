@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Windows.Foundation;
 using Display.Data;
+using Display.Helper;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -37,7 +38,7 @@ namespace Display.Controls
 
             var Selectedtypes = GetSelectedTypes();
 
-            List<VideoInfo> item = await FileMatch.getVideoInfoFromType(Selectedtypes, searchText, 50);
+            List<VideoInfo> item = await FileMatch.GetVideoInfoFromType(Selectedtypes, searchText, 50);
 
             if (item.Count == 0)
             {

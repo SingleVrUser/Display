@@ -642,11 +642,11 @@ namespace Display.Data
                     //item.t 可能是 "1658999027" 也可能是 "2022-07-28 17:03"
 
                     //"1658999027"
-                    if (item.Time.IsNumberic1())
+                    if (item.Time.IsNumber())
                     {
                         var dateInt = Parse(item.Time);
                         item.TimeEdit = item.TimeProduce = dateInt;
-                        item.Time = FileMatch.ConvertInt32ToDateTime(dateInt);
+                        item.Time = DateHelper.ConvertInt32ToDateTime(dateInt);
                     }
                     //"2022-07-28 17:03"
                     else
@@ -664,16 +664,16 @@ namespace Display.Data
                     //item.t 可能是 "1658999027" 也可能是 "2022-07-28 17:03"
 
                     //"1658999027"
-                    if (item.Time.IsNumberic1())
+                    if (item.Time.IsNumber())
                     {
                         dateInt = Parse(item.Time);
-                        item.Time = FileMatch.ConvertInt32ToDateTime(dateInt);
+                        item.Time = DateHelper.ConvertInt32ToDateTime(dateInt);
 
                     }
                     //"2022-07-28 17:03"
                     else
                     {
-                        dateInt = FileMatch.ConvertDateTimeToInt32(item.Time);
+                        dateInt = DateHelper.ConvertDateTimeToInt32(item.Time);
                     }
 
                     if (useApi2)
