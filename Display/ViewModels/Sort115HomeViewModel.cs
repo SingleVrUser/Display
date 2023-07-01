@@ -81,6 +81,7 @@ namespace Display.ViewModels
             }
             else if (ButtonName == ResumeName)
             {
+                // 不应该使用这个_tmpTaskList，在正式开始时可删除SelectedFiles项。但_tmpTaskList已经确定了
                 if (_tmpTaskList == null) return;
 
                 var singleInfoList = new List<Sort115HomeModel>();
@@ -95,8 +96,13 @@ namespace Display.ViewModels
 
                         info.Status = Status.Doing;
 
+                        // 原文件名与目标名称一致，不修改
+                        if (info.DestinationName == info.Info.NameWithoutExtension)
+                        {
+                            singleInfoList.Add(info);
+                        }
                         // 重命名
-                        if (info.DestinationName != info.Info.NameWithoutExtension)
+                        else
                         {
                             var renameRequest = await _webApi.RenameFile(info.Info.Id, info.DestinationName);
                             if (renameRequest == null)
