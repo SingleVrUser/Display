@@ -10,9 +10,9 @@ namespace Tests
     public class GetFilesTest
     {
         private const long RootCid = 0;
-        private const int UserId = Constant.UserId;
-        private const string UserKey = Constant.UserKey;
-        private const string Cookie = Constant.Cookie;
+        private const int UserId = UserInfo.UserId;
+        private const string UserKey = UserInfo.UserKey;
+        private const string Cookie = UserInfo.Cookie;
         private const string AppVer = Const.DefaultSettings.Network._115.UploadAppVersion;
 
         private readonly CancellationTokenSource _cts = new();
