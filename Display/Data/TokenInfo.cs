@@ -1149,6 +1149,9 @@ namespace Display.Data
                         IconPath = tmpIcoPath;
                     }
                 }
+
+                IconPath ??= Const.FileType.UnknownSvgPath;
+
             }
 
             NoId = Id == null;
