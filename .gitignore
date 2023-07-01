@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /Tests/Tests.csproj
 /Tests/GetFilesTest.cs
 /Tests/Constant.cs
+/Tests/UserInfo.cs
