@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Web;
 using static Display.Data.WebApi;
+using Windows.System;
 
 namespace Display.Helper;
 
@@ -228,6 +229,23 @@ public class PlayVideoHelper
             Toast.TryToast("播放错误", "调用播放器时出现异常", e.Message);
         }
     }
+
+
+    public static async void PlayByPotPlayer(string playUrl)
+    {
+        var url = $"PotPlayer://{playUrl}";
+        var uriDown = new Uri(url);
+
+        // Set the option to show a warning
+        var options = new LauncherOptions
+        {
+            DesiredRemainingView = Windows.UI.ViewManagement.ViewSizePreference.UseLess
+        };
+
+        // Launch the URI
+        await Launcher.LaunchUriAsync(uriDown, options);
+    }
+
 
     public static async void ShowSelectedVideoToPlayPage(List<Datum> multisetList, XamlRoot xamlRoot)
     {

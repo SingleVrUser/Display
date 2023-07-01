@@ -45,7 +45,7 @@ namespace Display.Helper
         /// 从文件名中匹配CID名字
         /// </summary>
         /// <param name="srcText"></param>
-        /// <param name="fileCid"></param>
+        /// <param name="fileCid">父级目录的id，通过数据库获取id对应的目录名</param>
         /// <returns></returns>
         public static string MatchName(string srcText, long? fileCid = null)
         {
@@ -338,8 +338,8 @@ namespace Display.Helper
                 if (item.Length != 2)
                     continue;
 
-                string key = item[0].Trim();
-                string value = item[1].Trim();
+                var key = item[0].Trim();
+                var value = item[1].Trim();
                 switch (key)
                 {
                     case "acw_tc":
@@ -366,21 +366,6 @@ namespace Display.Helper
             await Launcher.LaunchFolderAsync(folder);
         }
 
-        public static async void PlayByPotPlayer(string playUrl)
-        {
-            var url = $"PotPlayer://{playUrl}";
-            var uriDown = new Uri(url);
-
-            // Set the option to show a warning
-            var options = new LauncherOptions
-            {
-                DesiredRemainingView = Windows.UI.ViewManagement.ViewSizePreference.UseLess
-            };
-
-            // Launch the URI
-            await Launcher.LaunchUriAsync(uriDown, options);
-        }
-
         public static void CreateDirectoryIfNotExists(string savePath)
         {
             if (string.IsNullOrEmpty(savePath)) return;
@@ -392,7 +377,7 @@ namespace Display.Helper
         }
 
         //临时方法
-        public static Visibility ShowIfImageENotNull(string imagePath)
+        public static Visibility ShowIfImageNotNull(string imagePath)
         {
             return imagePath == Const.FileType.NoPicturePath ? Visibility.Collapsed : Visibility.Visible;
 

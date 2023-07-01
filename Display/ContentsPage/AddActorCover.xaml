@@ -30,7 +30,7 @@
                     <customcontrols:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
                 </Grid>
 
-                <Grid Visibility="{x:Bind helper:FileMatch.ShowIfImageENotNull(ProfilePath),Mode=OneWay}">
+                <Grid Visibility="{x:Bind helper:FileMatch.ShowIfImageNotNull(ProfilePath),Mode=OneWay}">
                     <controls:ImageEx Margin="0,0,0,20" x:Name="ActorImage" Source="{x:Bind ProfilePath,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
 
                     <StackPanel VerticalAlignment="Bottom">

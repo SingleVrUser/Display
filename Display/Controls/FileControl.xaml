@@ -31,8 +31,6 @@
                     <VisualState.Setters>
                         <Setter Target="HoverButtons.Visibility"
                                 Value="Visible" />
-                        <!--<Setter Target="Folder115Info.BorderBrush"
-                                Value="{StaticResource ColorSecondary}" />-->
                     </VisualState.Setters>
 
                 </VisualState>

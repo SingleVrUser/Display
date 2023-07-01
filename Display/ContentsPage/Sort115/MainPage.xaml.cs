@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
+using static Display.Data.Const;
 using SpiderInfo = Display.Models.SpiderInfo;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -55,54 +56,29 @@ public sealed partial class MainPage : Page
 
     private void FolderVideoDragOver(object sender, DragEventArgs e)
     {
-        if (!e.Data.Properties.TryGetValue("items", out var value))
-        {
-            if (!e.Data.Properties.TryGetValue("folder", out value) || value is not FilesInfo) return;
+        if (!e.Data.Properties.TryGetValue("items", out var value) || value is not List<FilesInfo> files) return;
 
-            e.AcceptedOperation = DataPackageOperation.Link;
-        }
-        else if (value is List<FilesInfo> files)
+        if (files.Any(x => x.Type == FilesInfo.FileType.Folder))
         {
-            if (files.All(x => x.Type == FilesInfo.FileType.File))
-            {
-                e.AcceptedOperation = DataPackageOperation.Link;
-            }
-
+            e.DragUIOverride.Caption = "暂不支持文件夹";
+            return;
         }
+
+        e.AcceptedOperation = DataPackageOperation.Link;
+        e.DragUIOverride.Caption = "松开后添加";
     }
 
     private void FolderVideoListView_OnDrop(object sender, DragEventArgs e)
     {
-        if (!e.Data.Properties.TryGetValue("items", out var value))
+        if (!e.Data.Properties.TryGetValue("items", out var value) || value is not List<FilesInfo> files) return;
+
+        foreach (var info in files)
         {
-            if (!e.Data.Properties.TryGetValue("folder", out value) || value is not FilesInfo folder) return;
+            var existsInfo = ViewModel.SelectedFiles.FirstOrDefault(i => i.Info.Id == info.Id);
+            if(existsInfo!=null) continue;
 
-            if (ViewModel.SelectedFiles.All(model => model.Info != folder))
-                ViewModel.SelectedFiles.Add(new Sort115HomeModel(folder));
+            ViewModel.SelectedFiles.Add(new Sort115HomeModel(info));
         }
-        else if (value is List<FilesInfo> files)
-        {
-            foreach (var info in files)
-            {
-                ViewModel.SelectedFiles.Add(new Sort115HomeModel(info));
-            }
-        }
-    }
-
-    private void SingleFolderSaveVideoDragOver(object sender, DragEventArgs e)
-    {
-        if (!e.Data.Properties.TryGetValue("items", out var value)) return;
-
-        if (value is List<FilesInfo> {Count:0})
-            e.AcceptedOperation = DataPackageOperation.Link;
-    }
-
-    private void FolderVideoDragItemStarting(object sender, DragItemsStartingEventArgs e)
-    {
-        //var folder = e.Items.Cast<FilesInfo>().FirstOrDefault();
-
-        //e.Data.Properties.Add("folder", folder);
-        //e.Data.Properties.Add("source", nameof(FolderVideoListView));
     }
 
     private async void Video18SettingsButtonClick(object sender, RoutedEventArgs e)
@@ -128,6 +104,7 @@ public sealed partial class MainPage : Page
             Debug.WriteLine("点击了确定");
         }
     }
+
 }
 
 public class FetchingSourceOptions
