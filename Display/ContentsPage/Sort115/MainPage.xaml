@@ -21,7 +21,7 @@
         <StandardUICommand x:Name="DeleteCommand"
                            Kind="Delete"
                            Command="{x:Bind ViewModel.DeleteCommand}"
-                           Description="Remove this character" />
+                           Description="移除该项" />
 
         <StandardUICommand x:Name="DeleteFolderSaveVideoCommand"
                            Kind="Delete"
@@ -220,7 +220,7 @@
                     </Style>
                 </StackPanel.Resources>-->
 
-                <AppBarButton Label="开始"
+                <AppBarButton Label="{x:Bind ViewModel.ButtonName,Mode=OneWay}"
                               Command="{x:Bind ViewModel.StartCommand}">
                     <AppBarButton.Icon>
                         <FontIcon FontFamily="Segoe Fluent Icons"
@@ -256,15 +256,6 @@
                                   Foreground="Gray"
                                   RelativePanel.AlignRightWithPanel="True"
                                   RelativePanel.AlignVerticalCenterWithPanel="True" />
-                        <!--<Button x:Name="VideoSettingsButton"
-                                RelativePanel.AlignRightWithPanel="True"
-                                Margin="10,0,0,0"
-                                Padding="5"
-                                Click="Video18SettingsButtonClick">
-                            <FontIcon FontFamily="Segoe Fluent Icons"
-                                      Glyph="&#xE713;"
-                                      FontSize="14" />
-                        </Button>-->
 
                     </RelativePanel>
                 </controls:HeaderedContentControl.Header>
@@ -275,23 +266,22 @@
                         拖拽需要整理的文件到这里
                     </TextBlock>
 
-                    <!--DragItemsStarting="FolderVideoDragItemStarting"-->
-                    <!--DragOver="FolderVideoDragOver"-->
-                    <ListView x:Name="FolderVideoListView"
-                              ItemsSource="{x:Bind ViewModel.SelectedFiles, Mode=OneWay}"
+                    <ListView ItemsSource="{x:Bind ViewModel.SelectedFiles, Mode=OneWay}"
                               SelectionMode="None"
                               CanDragItems="False"
+                              DragOver="FolderVideoDragOver"
                               AllowDrop="True"
                               Drop="FolderVideoListView_OnDrop">
 
                         <ListView.HeaderTemplate>
                             <DataTemplate>
-                                <Grid Padding="12" Background="{ThemeResource SystemBaseLowColor}" ColumnDefinitions="*,200,200">
+                                <Grid Padding="12" Background="{ThemeResource SystemBaseLowColor}" ColumnDefinitions="*,150,180,20" ColumnSpacing="5">
+
                                     <TextBlock Text="原名称" Style="{ThemeResource CaptionTextBlockStyle}"/>
                                     <TextBlock Grid.Column="1"
                                                Text="目标名称"
                                                Style="{ThemeResource CaptionTextBlockStyle}"/>
-                                    <TextBlock Grid.Column="3"
+                                    <TextBlock Grid.Column="2"
                                                Text="目标目录" Style="{ThemeResource CaptionTextBlockStyle}"/>
                                 </Grid>
                             </DataTemplate>
@@ -300,7 +290,8 @@
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="models:Sort115HomeModel">
                                 <Grid Height="48"
-                                      ColumnDefinitions="*,200,200,20">
+                                      ColumnDefinitions="*,150,180,20"
+                                      ColumnSpacing="5">
 
                                     <customcontrols:FileControl FolderName="{x:Bind Info.Name}"
                                                                 Type="{x:Bind Info.Type}"
@@ -327,62 +318,5 @@
 
             </controls:HeaderedContentControl>
         </Grid>
-
-
-        <!--<Grid Grid.Row="1"
-              Grid.Column="0"
-              Style="{StaticResource ContentGrid}">
-            <controls:HeaderedContentControl>
-                <controls:HeaderedContentControl.Header>
-                    <RelativePanel>
-                        <TextBlock Text="🎞️影视"
-                                   Style="{StaticResource TitleTextBlock}"
-                                   RelativePanel.RightOf="TitleIcon"
-                                   RelativePanel.AlignVerticalCenterWithPanel="True"
-                                   Margin="2" />
-
-                        <FontIcon x:Name="MovieInfoIcon"
-                                  FontFamily="Segoe Fluent Icons"
-                                  Glyph="&#xE946;"
-                                  FontSize="15"
-                                  Foreground="Gray"
-                                  RelativePanel.LeftOf="MovieSettingsButton"
-                                  RelativePanel.AlignVerticalCenterWithPanel="True" />
-                        <Button x:Name="MovieSettingsButton"
-                                Content="设置"
-                                RelativePanel.AlignRightWithPanel="True"
-                                Margin="10,0,0,0" />
-                    </RelativePanel>
-                </controls:HeaderedContentControl.Header>
-            </controls:HeaderedContentControl>
-        </Grid>
-
-        <Grid Grid.Row="1"
-              Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-
-            <Grid Style="{StaticResource ContentGrid}">
-                <controls:HeaderedContentControl>
-                    <controls:HeaderedContentControl.Header>
-
-                        <TextBlock HorizontalAlignment="Right">总文件数量</TextBlock>
-                    </controls:HeaderedContentControl.Header>
-                </controls:HeaderedContentControl>
-            </Grid>
-
-            <Grid Grid.Row="1"
-                  Style="{StaticResource ContentGrid}">
-                <controls:HeaderedContentControl>
-                    <controls:HeaderedContentControl.Header>
-
-                        <TextBlock HorizontalAlignment="Right">总文件数量</TextBlock>
-                    </controls:HeaderedContentControl.Header>
-                </controls:HeaderedContentControl>
-            </Grid>
-        </Grid>-->
-
     </Grid>
 </Page>
