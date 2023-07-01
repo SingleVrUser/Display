@@ -138,6 +138,7 @@
                             </StackPanel>
 
 
+
                         </Expander>
                         <!--115-->
                         <Expander Header="115"
@@ -147,14 +148,17 @@
                                         Spacing="10">
                                 <RelativePanel>
                                     <PasswordBox x:Name="CookieBox"
-                                             MinWidth="100"
-                                             MaxWidth="600"
-                                             Password="{x:Bind data:AppSettings._115_Cookie}"/>
+                                                 MinWidth="100"
+                                                 MaxWidth="600"
+                                                 Password="{x:Bind data:AppSettings._115_Cookie}"/>
+
                                     <StackPanel Orientation="Horizontal"
                                                 RelativePanel.AlignRightWithPanel="True"
                                                 Spacing="5">
                                         <Button Content="删除"
                                                 Click="DeleteCookieButton" />
+                                        <Button Content="复制"
+                                                Click="CopyCookieButtonClick" />
                                         <Button Content="导出"
                                                 Click="ExportCookieButton">
                                             <ToolTipService.ToolTip>

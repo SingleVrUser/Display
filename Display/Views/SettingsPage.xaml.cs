@@ -476,10 +476,19 @@ namespace Display.Views
                         FileMatch.LaunchFolder(lastDBSavePath);
                     }
                 }
-
-
-
             }
+        }
+
+        private void CopyCookieButtonClick(object sender, RoutedEventArgs e)
+        {
+            //创建一个数据包
+            var dataPackage = new DataPackage();
+            dataPackage.SetText(CookieBox.Password);
+
+            //把数据包放到剪贴板里
+            Clipboard.SetContent(dataPackage);
+
+            ShowTeachingTip("已复制");
         }
 
         //导出Cookies
@@ -494,23 +503,21 @@ namespace Display.Views
 
             var exportCookieList = FileMatch.ExportCookies(cookies);
 
-            //创建一个数据包
-            var dataPackage = new DataPackage();
             //设置创建包里的文本内容
             var clipboardText = System.Text.Json.JsonSerializer.Serialize(exportCookieList);
+
+            //创建一个数据包
+            var dataPackage = new DataPackage();
             dataPackage.SetText(clipboardText);
 
             //把数据包放到剪贴板里
             Clipboard.SetContent(dataPackage);
 
-
             var dataPackageView = Clipboard.GetContent();
             var text = await dataPackageView.GetTextAsync();
             if (text != clipboardText) return;
 
-            LightDismissTeachingTip.Subtitle = "已添加到剪贴板";
-            LightDismissTeachingTip.IsOpen = true;
-
+            ShowTeachingTip("已添加到剪贴板");
         }
 
         /// <summary>
@@ -1065,5 +1072,6 @@ namespace Display.Views
 
             CookieBox.PasswordRevealMode = button.IsChecked == true ? PasswordRevealMode.Visible : PasswordRevealMode.Hidden;
         }
+
     }
 }

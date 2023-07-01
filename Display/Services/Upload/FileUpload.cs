@@ -271,7 +271,7 @@ namespace Display.Services.Upload
 
             var contentBytes = await response.Content.ReadAsByteArrayAsync(token);
 
-            return UploadEncryptHelper.DecryptReceiveData(contentBytes, aesKey: aesKey, aesIv: aesIv);
+            return UploadEncryptHelper.DecryptReceiveData<FastUploadResult>(contentBytes, aesKey: aesKey, aesIv: aesIv);
         }
 
         private async Task<OssUploadResult> UploadByAliyunOss(FastUploadResult fastUploadResult)

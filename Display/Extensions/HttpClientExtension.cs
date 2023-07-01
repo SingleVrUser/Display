@@ -37,11 +37,10 @@ namespace Display.Extensions
 
             if (!response.IsSuccessStatusCode) return defaultValue;
 
+            string contentAsString = null;
             try
             {
-                var contentAsString = await response.Content.ReadAsStringAsync(token);
-
-                Debug.WriteLine($"服务器返回的结果为:{contentAsString}");
+                contentAsString = await response.Content.ReadAsStringAsync(token);
 
                 if (contentAsString is T value) return value;
 
@@ -49,8 +48,8 @@ namespace Display.Extensions
             }
             catch (Exception e)
             {
-                Debug.WriteLine($"发生错误{e.Message}");
-                Toast.TryToast("格式异常", $"{nameof(T)}转换异常", e.Message);
+                Debug.WriteLine($"结果转换失败：{contentAsString}");
+                Toast.TryToast("格式异常", $"{typeof(T).Name}转换异常", e.Message);
 
                 return defaultValue;
             }

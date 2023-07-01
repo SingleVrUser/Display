@@ -610,7 +610,8 @@ namespace Display.Data
         }
 
         /// <summary>
-        /// 获取文件信息
+        /// 获取文件信息，获取data可能要访问两次（web接口1和web接口2）
+        /// 后续考虑使用 android/desktop/tv 端接口访问
         /// </summary>
         /// <param name="cid"></param>
         /// <param name="limit"></param>
@@ -621,11 +622,11 @@ namespace Display.Data
         /// <param name="asc"></param>
         /// <param name="isOnlyFolder"></param>
         /// <returns></returns>
-        public async Task<WebFileInfo> GetFileAsync(long? cid, int limit = 40, int offset = 0, bool useApi2 = false, bool loadAll = false, OrderBy orderBy = OrderBy.UserProduceTime, int asc = 0, bool isOnlyFolder = false)
+        public async Task<WebFileInfo> GetFileAsync(long? cid, int limit = 40, int offset = 0, bool useApi2 = false, bool loadAll = false, string orderBy = "user_ptime", int asc = 0, bool isOnlyFolder = false)
         {
-            var url = !useApi2 ? $"https://webapi.115.com/files?aid=1&cid={cid}&o={orderBy.GetDescription()}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json" :
+            var url = !useApi2 ? $"https://webapi.115.com/files?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json" :
                 //旧接口只有t，没有修改时间（te），创建时间（tp）
-                $"https://aps.115.com/natsort/files.php?aid=1&cid={cid}&o={orderBy.GetDescription()}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json&fc_mix=0&type=&star=&is_share=&suffix=&custom_order=";
+                $"https://aps.115.com/natsort/files.php?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json&fc_mix=0&type=&star=&is_share=&suffix=&custom_order=";
 
             if (isOnlyFolder)
                 url += "&nf=1";
@@ -686,7 +687,7 @@ namespace Display.Data
             //接口1出错，使用接口2
             if (webFileInfoResult.errNo == 20130827 && useApi2 == false)
             {
-                webFileInfoResult = await GetFileAsync(cid, limit, offset, true, loadAll, orderBy, asc, isOnlyFolder: isOnlyFolder);
+                webFileInfoResult = await GetFileAsync(cid, limit, offset, true, loadAll, webFileInfoResult.order,webFileInfoResult.is_asc, isOnlyFolder: isOnlyFolder);
             }
             //需要加载全部，但未加载全部
             else if (loadAll && webFileInfoResult.count > limit)
@@ -695,13 +696,6 @@ namespace Display.Data
             }
 
             return webFileInfoResult;
-        }
-
-        public async Task<FilesShowInfo> GetFilesShowInfo(long cid)
-        {
-            var url = $"https://webapi.115.com/files?aid=1&cid={cid}&o=user_ptime&asc=0&offset=0&show_dir=1&limit=30&code=&scid=&snap=0&natsort=1&star=1&source=&format=json";
-
-            return await Client.SendAsync<FilesShowInfo>(HttpMethod.Get, url);
         }
 
         /// <summary>
