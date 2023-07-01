@@ -145,7 +145,7 @@ namespace Display.Helper.Crypto
             return tokenMd5;
         }
 
-        public static FastUploadResult DecryptReceiveData(byte[] data, byte[] aesKey, byte[] aesIv)
+        public static T DecryptReceiveData<T>(byte[] data, byte[] aesKey, byte[] aesIv) where T:new()
         {
             var cipherText = new byte[data.Length - 12];
 
@@ -160,7 +160,7 @@ namespace Display.Helper.Crypto
             if (crc32 != trueCrc32)
             {
                 Debug.WriteLine("无效的_crc_salt");
-                return null;
+                return default;
             }
 
             var plaintext = AesDecrypt(cipherText, aesKey, aesIv);
@@ -178,7 +178,7 @@ namespace Display.Helper.Crypto
             if (srcSize > plaintext.Length)
             {
                 Debug.WriteLine("Can't unCompress data");
-                return null;
+                return default;
             }
 
             // 需要解密的信息
@@ -195,9 +195,7 @@ namespace Display.Helper.Crypto
 
             Debug.WriteLine($"最终结果: {content}");
 
-            var upload115Result = JsonConvert.DeserializeObject<FastUploadResult>(content);
-
-            return upload115Result;
+            return JsonConvert.DeserializeObject<T>(content);
         }
     }
 }

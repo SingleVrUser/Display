@@ -12,9 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using static Display.Data.FilesInfo;
 
@@ -86,21 +84,11 @@ namespace Display.Data
         public string SEID { get; set; }
     }
 
-    public class FilesShowInfo
-    {
-        public int count { get; set; }
-        public int errNo { get; set; }
-        public string error { get; set; }
-        public int fc_mix { get; set; }
-        public int is_asc { get; set; }
-        public string order { get; set; }
-        public bool state { get; set; }
-
-    }
-
     public class WebFileInfo
     {
         public Datum[] data { get; set; }
+        public WebPath[] path { get; set; }
+
         public int count { get; set; }
         public string data_source { get; set; }
         public int sys_count { get; set; }
@@ -108,8 +96,8 @@ namespace Display.Data
         public int o { get; set; }
         public int limit { get; set; }
         public int page_size { get; set; }
-        public string aid { get; set; }
-        public string cid { get; set; }
+        public int aid { get; set; }
+        public long cid { get; set; }
         public int is_asc { get; set; }
         public string order { get; set; }
         public int star { get; set; }
@@ -121,7 +109,6 @@ namespace Display.Data
         public string suffix { get; set; }
         public int min_size { get; set; }
         public int max_size { get; set; }
-        public WebPath[] path { get; set; }
         public bool state { get; set; }
         public string error { get; set; }
         public int errNo { get; set; }
@@ -151,7 +138,6 @@ namespace Display.Data
 
         [JsonProperty(propertyName: "uid")]
         public long Uid { get; set; }
-
 
         [JsonProperty(propertyName: "aid")]
         public int Aid { get; set; }
@@ -275,9 +261,9 @@ namespace Display.Data
     public class WebPath
     {
         public string name { get; set; }
-        public object aid { get; set; }
+        public int aid { get; set; }
         public long cid { get; set; }
-        public object pid { get; set; }
+        public long pid { get; set; }
         public object isp { get; set; }
         public string p_cid { get; set; }
     }
@@ -1084,8 +1070,6 @@ namespace Display.Data
         public readonly int Time;
         public readonly bool IsVideo;
         public readonly bool NoId;
-
-        
 
         public FilesInfo(FileUploadResult result)
         {

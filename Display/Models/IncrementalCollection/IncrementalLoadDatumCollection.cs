@@ -79,19 +79,14 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
 
     public async Task<WebFileInfo> GetFilesInfoAsync(int limit, int offset)
     {
-        //查询该目录的排列方式
-        var filesShowMethod = await WebApi.GetFilesShowInfo(Cid);
-
-        //Enum.TryParse(filesShowMethod.order, out WebApi.OrderBy order);
-        var order = filesShowMethod.order.ParseEnumByDescription<WebApi.OrderBy>();
-
-        if (OrderBy != order) OrderBy = order;
-
-        Asc = filesShowMethod.is_asc;
-
-        var filesInfo = await WebApi.GetFileAsync(Cid, limit, offset, orderBy: OrderBy, asc: Asc, isOnlyFolder: IsOnlyFolder);
+        var filesInfo = await WebApi.GetFileAsync(Cid, limit, offset, orderBy: OrderBy.GetDescription(), asc: Asc, isOnlyFolder: IsOnlyFolder);
         WebPaths = filesInfo.path;
         AllCount = filesInfo.count;
+
+        //查询该目录的排列方式
+        var order = filesInfo.order.ParseEnumByDescription<WebApi.OrderBy>();
+        if (OrderBy != order) OrderBy = order;
+        Asc = filesInfo.is_asc;
 
         //汇报事件
         GetFileInfoCompletedEventArgs args = new() { Orderby = OrderBy, Asc = Asc, TimeReached = DateTime.Now };
@@ -105,15 +100,9 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         IsNull = false;
         var filesInfo = await GetFilesInfoAsync(limit, offset);
 
-        // 访问失败，发生未知错误
-        if (filesInfo.data == null)
-        {
-            throw new ArgumentException(nameof(filesInfo.data));
-            //HasMoreItems = false;
-            //return 0;
-        }
-
-        if (AllCount == 0)
+        // 访问失败，没有登陆
+        // 或者没有数据
+        if (filesInfo?.data == null || AllCount == 0)
         {
             IsNull = true;
             HasMoreItems = false;
