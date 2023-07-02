@@ -2,11 +2,11 @@
 using Display.Extensions;
 using Display.Helper.Crypto;
 using Display.Models;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -14,7 +14,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using static System.String;
-using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace Display.Services.Upload
 {
@@ -23,7 +22,7 @@ namespace Display.Services.Upload
         private const string AppVer = Const.DefaultSettings.Network._115.UploadAppVersion;
 
         private static HttpClient _client;
-        private static HttpClient Client
+        public static HttpClient Client
         {
             get
             {
@@ -138,6 +137,7 @@ namespace Display.Services.Upload
             if (uploadResult)
             {
                 FileUploadResult.PickCode = upload115Result.pickcode;
+                FileUploadResult.Sha1 = _totalSha1;
                 FileUploadResult.Success = true;
                 
                 await DisposeAsync();
@@ -161,41 +161,145 @@ namespace Display.Services.Upload
             return true;
         }
 
-        private async Task<FastUploadResult> UploadByFastUpload()
+        public static Dictionary<string, string> BuildDataForm(long cid, string fileId, string name, long length,int userId, string userKey,out string userIdMd5)
         {
-            State = UploadState.FastUploading;
+            var target = "U_1_" + cid;
+            var sign = UploadEncryptHelper.GetSign(userId, fileId, target, userKey);
+
+            userIdMd5 = HashHelper.ComputeMd5ByContent(userId.ToString()).ToLower();
+
+            return new Dictionary<string, string>
+            {
+                { "appid", "0" },
+                { "appversion", AppVer },
+                { "filename", HttpUtility.UrlEncode(name, Encoding.UTF8) },
+                { "filesize", length.ToString() },
+                { "fileid", fileId },
+                { "target", target },
+                { "userid", userId.ToString() },
+                { "sig", sign },
+            };
+        }
+
+        public static async Task<FastUploadResult> UploadAgainByFastUpload(HttpClient client,string pickCode, long cid, string totalSha1, string newName, long length, int userId, string userKey, CancellationToken token = default)
+        {
+            var signKey = string.Empty; 
+            var signVal = string.Empty; 
+            var dataForm = FileUpload.BuildDataForm(cid, totalSha1, newName, length, userId, userKey, out var userIdMd5);
 
             var aesKey = UploadKey.Instance.AesKey;
             var aesIv = UploadKey.Instance.AesIv;
             var clientPublicKey = UploadKey.Instance.ClientPublicKey;
-
-            var target = "U_1_" + _saveFolderCid;
-            var fileName = _fileInfo.Name;
-            var fileSize = _fileInfo.Length;
-            var fileId = _totalSha1;
-            var signKey = Empty;
-            var signVal = Empty;
-            var sign = UploadEncryptHelper.GetSign(_userId, fileId, target, _userKey);
-            var userIdMd5 = HashHelper.ComputeMd5ByContent(_userId.ToString()).ToLower();
-
-            var dataForm = new Dictionary<string, string>
-            {
-                {"appid", "0"},
-                {"appversion", AppVer},
-                {"filename", HttpUtility.UrlEncode(fileName, Encoding.UTF8)},
-                {"filesize", fileSize.ToString()},
-                {"fileid", fileId},
-                {"target", target},
-                {"userid", _userId.ToString()},
-                {"sig", sign},
-            };
 
             for (var i = 0; i < 3; i++)
             {
                 var timeSpan = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
                 dataForm["t"] = timeSpan.ToString();
-                dataForm["token"] = UploadEncryptHelper.GetToken(fileId, fileSize, signKey, signVal, timeSpan, _userId, userIdMd5, AppVer);
+                dataForm["token"] = UploadEncryptHelper.GetToken(totalSha1, length, signKey, signVal, timeSpan, userId, userIdMd5, AppVer);
+
+                if (!string.IsNullOrEmpty(signKey) && !string.IsNullOrEmpty(signVal))
+                {
+                    dataForm["sign_key"] = signKey;
+                    dataForm["sign_val"] = signVal;
+                }
+
+                FastUploadResult fastUploadResult;
+                try
+                {
+                    fastUploadResult = await GetUpload115Result(dataForm, timeSpan, aesKey, aesIv, clientPublicKey, token);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"获取Upload115Result时发生错误：{ex.Message}");
+                    break;
+                }
+
+                if (fastUploadResult == null)
+                {
+                    Debug.WriteLine("可能是解密出错");
+                    continue;
+                }
+
+                if (string.IsNullOrEmpty(fastUploadResult.sign_key) || string.IsNullOrEmpty(fastUploadResult.sign_check))
+                {
+                    // 不能秒传，需要上传
+                    if (!string.IsNullOrEmpty(fastUploadResult.Object))
+                    {
+                        return null;
+                    }
+
+                    // 秒传成功
+                    if (fastUploadResult.status == 2)
+                    {
+                        return fastUploadResult;
+                    }
+
+                    Debug.WriteLine($"上传时发生错误：{fastUploadResult.statusmsg}");
+
+                    return null;
+                }
+
+                signKey = fastUploadResult.sign_key;
+                signVal = await GetRangSha1FromInternet(client,pickCode, fastUploadResult.sign_check, token);
+            }
+
+            return null;
+        }
+
+        private static async Task<string> GetRangSha1FromInternet(HttpClient client,string pickCode, string signCheck, CancellationToken token)
+        {
+            // 获取下载链接
+            var downUrls = await WebApi.GetDownUrl(client, pickCode, GetInfoFromNetwork.DownUserAgent, false);
+
+            if (downUrls is not { Count: > 0 })
+            {
+                return null;
+            }
+
+            var downUrl = downUrls.First().Value;
+
+            // 根据下载链接获取分段Sha1
+            return await GetRangSha1FromDownUrl(client, downUrl, signCheck, token);
+        }
+
+        private static async Task<string> GetRangSha1FromDownUrl(HttpClient client,string url, string signCheck, CancellationToken token)
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+
+            request.Headers.Add("Range", "bytes=" + signCheck);
+
+            var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);
+            if (!response.IsSuccessStatusCode) return null;
+
+            var contentLength = response.Content.Headers.ContentLength;
+            if (contentLength == null) return null;
+
+            var stream = await response.Content.ReadAsStreamAsync(token);
+
+            var sha1 = await HashHelper.ComputeSha1ByStream(stream, token);
+
+            return sha1;
+        }
+
+        private async Task<FastUploadResult> UploadByFastUpload()
+        {
+            State = UploadState.FastUploading;
+            var signKey = Empty;
+            var signVal = Empty;
+
+            var dataForm = BuildDataForm(_saveFolderCid, _totalSha1, _fileInfo.Name, _fileInfo.Length, _userId,_userKey, out var userIdMd5);
+
+            var aesKey = UploadKey.Instance.AesKey;
+            var aesIv = UploadKey.Instance.AesIv;
+            var clientPublicKey = UploadKey.Instance.ClientPublicKey;
+
+            for (var i = 0; i < 3; i++)
+            {
+                var timeSpan = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+                dataForm["t"] = timeSpan.ToString();
+                dataForm["token"] = UploadEncryptHelper.GetToken(_totalSha1, _fileInfo.Length, signKey, signVal, timeSpan, _userId, userIdMd5, AppVer);
 
                 if (!IsNullOrEmpty(signKey) && !IsNullOrEmpty(signVal))
                 {

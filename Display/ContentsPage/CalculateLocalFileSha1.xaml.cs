@@ -212,22 +212,7 @@ namespace Display.ContentsPage
         public FilesInfo.FileType FileType { get; set; } = FilesInfo.FileType.File;
         public long FilesCount { get; set; } = 1;
         public string Icon;
-        public string IconPath
-        {
-            get
-            {
-                string iconpath;
-                if (FileType == FilesInfo.FileType.File)
-                {
-                    iconpath = FilesInfo.GetPathFromIcon(Icon);
-                }
-                else
-                {
-                    iconpath = "ms-appx:///Assets/115/file_type/folder/folder.svg";
-                }
-                return iconpath;
-            }
-        }
+        public string IconPath => FileType == FilesInfo.FileType.File ? FilesInfo.GetPathFromIcon(Icon) : Const.FileType.FolderSvgPath;
 
         public string Size;
         public string FullPath;
@@ -235,16 +220,13 @@ namespace Display.ContentsPage
         private int _progressBarMaximum { get; set; } = 100;
         public int ProgressBarMaximum
         {
-            get
-            {
-                return _progressBarMaximum;
-            }
+            get => _progressBarMaximum;
             set
             {
                 _progressBarMaximum = value;
                 FilesCount = _progressBarMaximum;
                 OnPropertyChanged();
-                OnPropertyChanged("FilesCount");
+                OnPropertyChanged(nameof(FilesCount));
             }
         }
 

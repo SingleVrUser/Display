@@ -30,11 +30,6 @@ namespace Display.Helper.Crypto
 
         public static (byte[], byte[]) Encode(string src, long tm)
         {
-            //var hashDlg = MD5.Create();
-            //var btext = Encoding.ASCII.GetBytes();
-            //byte[] hashBytes = hashDlg.ComputeHash(btext);
-            //var key = Convert.ToHexString(hashBytes);
-
             var key = HashHelper.ComputeMd5ByContent($"!@###@#{tm}DFDR@#@#");
 
             var keyBytes = Encoding.ASCII.GetBytes(key);

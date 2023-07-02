@@ -75,8 +75,10 @@ namespace Display.ContentsPage.DetailInfo
             if (result != ContentDialogResult.Primary) return;
 
             // 从115中删除 
-            await WebApi.GlobalWebApi.DeleteFiles(info.Cid,
+            var deleteResult = await WebApi.GlobalWebApi.DeleteFiles(info.Cid,
                 new[] { fileId });
+
+            if (!deleteResult) return;
 
             // 从数据库中删除
             DataAccess.Delete.DeleteDataInFilesInfoAndFileToInfo(info.PickCode);

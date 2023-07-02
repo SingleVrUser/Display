@@ -336,5 +336,8 @@
                    MaxWidth="800" />
         </Grid>
 
+
+        <TeachingTip x:Name="LightDismissTeachingTip"
+                     IsLightDismissEnabled="True" />
     </Grid>
 </Page>

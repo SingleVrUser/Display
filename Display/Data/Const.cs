@@ -1,7 +1,5 @@
-﻿using CommunityToolkit.WinUI.UI.Animations;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Windows.Storage;
-using static Display.Data.FilesInfo;
 
 namespace Display.Data;
 

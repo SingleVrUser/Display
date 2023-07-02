@@ -2,6 +2,7 @@
 using Display.Extensions;
 using Display.Helper.Crypto;
 using Display.Services.Upload;
+using Tests.Helper;
 using FileInfo = Tests.Models.FileInfo;
 
 namespace Tests
@@ -12,30 +13,12 @@ namespace Tests
         private const long RootCid = 0;
         private const int UserId = UserInfo.UserId;
         private const string UserKey = UserInfo.UserKey;
-        private const string Cookie = UserInfo.Cookie;
         private const string AppVer = Const.DefaultSettings.Network._115.UploadAppVersion;
+
+        private readonly HttpClient _client = RequestHelper.UploadClient;
 
         private readonly CancellationTokenSource _cts = new();
         private CancellationToken Token => _cts.Token;
-
-        private static HttpClient? _client;
-        private static HttpClient Client
-        {
-            get
-            {
-                if (_client != null) return _client;
-
-                var headers = new Dictionary<string, string>
-                {
-                    { "user-agent", Const.DefaultSettings.Network._115.UploadUserAgent },
-                    { "Cookie", Cookie }
-                };
-
-                _client = GetInfoFromNetwork.CreateClient(headers);
-
-                return _client;
-            }
-        }
 
         /// <summary>
         /// 有加密，格式与Web有所不同
@@ -70,7 +53,7 @@ namespace Tests
             var url = $"https://proapi.115.com/pc/ufile/files?{data}";
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
 
-            var response = await Client.SendAsync(request, Token);
+            var response = await RequestHelper.UploadClient.SendAsync(request, Token);
 
             var contentBytes = await response.Content.ReadAsByteArrayAsync(Token);
 
@@ -92,9 +75,11 @@ namespace Tests
         {
             var url = $"https://proapi.115.com/box/files?ver=2&offset=0&user_id={UserId}&limit=16&show_dir=1&aid=1&cid={cid}&app_ver=16.3.5";
 
-            var result = await Client.SendAsync<FileInfo.Tv.Info>(HttpMethod.Get, url, Token);
+            var result = await _client.SendAsync<FileInfo.Tv.Info>(HttpMethod.Get, url, Token);
 
             Assert.IsNotNull(result);
         }
+
+
     }
 }

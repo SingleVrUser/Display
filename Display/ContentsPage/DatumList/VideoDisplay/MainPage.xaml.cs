@@ -24,6 +24,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Media.Playback;
+using Display.Views;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -605,7 +606,12 @@ public sealed partial class MainPage : Page
         await TryRemoveCurrentVideoAndPlayNextVideo(fileInfo);
 
         // 然后，删除115文件
-        await webApi.DeleteFiles(fileInfo.Cid, new[] { (long)fid });
+        var result = await webApi.DeleteFiles(fileInfo.Cid, new[] { (long)fid });
+        if (!result)
+        {
+            ShowTeachingTip("删除115文件失败");
+            return;
+        }
 
         // 接着，删除资源管理器的文件，如果存在（有可能已经关掉了）
         if (LastFilesListView.IsLoaded && LastFilesListView.ItemsSource is IncrementalLoadDatumCollection filesInfos &&
@@ -1094,5 +1100,10 @@ public sealed partial class MainPage : Page
         {
             LastFilesListView.ScrollIntoView(info, ScrollIntoViewAlignment.Leading);
         }
+    }
+
+    private void ShowTeachingTip(string subtitle, string content=null)
+    {
+        BasePage.ShowTeachingTip(LightDismissTeachingTip,subtitle,content);
     }
 }

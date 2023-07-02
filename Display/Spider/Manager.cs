@@ -29,7 +29,7 @@ public class Manager
         spiderByCIDHandlers = new Dictionary<int, Func<string, Task<VideoInfo>>>
         {
             { JavBus.Id, JavBus.SearchInfoFromCID },
-            { Jav321.Id, Jav321.SearchInfoFromCID },
+            { Jav321.Id, Jav321.SearchInfoFromCid },
             { AvMoo.Id, AvMoo.SearchInfoFromCID },
             { AvSox.Id, AvSox.SearchInfoFromCID },
             { LibreDmm.Id, LibreDmm.SearchInfoFromCID },
