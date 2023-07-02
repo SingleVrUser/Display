@@ -1,11 +1,15 @@
 ﻿using Display.Data;
 using Microsoft.UI.Xaml.Data;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Display.Extensions;
+using SharpCompress;
+using System.IO;
 
 namespace Display.Models.IncrementalCollection;
 
@@ -48,6 +52,14 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
     {
         base.Insert(index, item);
         AllCount++;
+
+        if (IsNull) IsNull = false;
+    }
+
+    public void AddArray(FilesInfo[] items)
+    {
+        items.ForEach(Add);
+        AllCount += items.Length;
 
         if (IsNull) IsNull = false;
     }
@@ -111,10 +123,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
             return 0;
         }
 
-        foreach (var datum in filesInfo.data)
-        {
-            Add(new FilesInfo(datum));
-        }
+        filesInfo.data.ForEach(i=>Add(new FilesInfo(i)));
 
         HasMoreItems = AllCount > Count;
 

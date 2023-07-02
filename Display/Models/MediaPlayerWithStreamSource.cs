@@ -28,7 +28,6 @@ namespace Display.Models
             Url = url;
             FilesInfo = filesInfo;
         }
-
         
         public static async Task<MediaPlayerWithStreamSource> CreateMediaPlayer(string videoUrl,SubInfo subInfo = null ,FilesInfo filesInfo=null)
         {
@@ -37,25 +36,22 @@ namespace Display.Models
             var mediaPlayer = mediaPlayerWithStreamSource.MediaPlayer;
 
             MediaSource ms = null;
-            var videoHttpClient = WebApi.CreateWindowWebHttpClient(); 
 
             if (videoUrl.Contains(".m3u8"))
             {
+                var videoHttpClient = WebApi.SingleVideoWindowWebHttpClient;
                 var result = await AdaptiveMediaSource.CreateFromUriAsync(new Uri(videoUrl), videoHttpClient);
-                mediaPlayerWithStreamSource._httpClient = videoHttpClient;
+                //mediaPlayerWithStreamSource._httpClient = videoHttpClient;
 
                 if (result.Status == AdaptiveMediaSourceCreationStatus.Success)
                 {
                     ms = MediaSource.CreateFromAdaptiveMediaSource(result.MediaSource);
-
-                    mediaPlayerWithStreamSource._httpClient = videoHttpClient;
                 }
             }
 
             if (ms == null)
             {
-                mediaPlayerWithStreamSource._stream = await HttpRandomAccessStream.CreateAsync(videoHttpClient, new Uri(videoUrl));
-                mediaPlayerWithStreamSource._httpClient = videoHttpClient;
+                mediaPlayerWithStreamSource._stream = await HttpRandomAccessStream.CreateAsync(WebApi.GlobalWebApi.Client, new Uri(videoUrl));
 
                 if (!mediaPlayerWithStreamSource._stream.CanRead)
                 {
@@ -126,8 +122,6 @@ namespace Display.Models
 
         public void Dispose()
         {
-            Debug.WriteLine("Dispose MediaPlayerStreamSource");
-
             // 从大到小销毁
             try
             {
@@ -142,8 +136,6 @@ namespace Display.Models
 
                 _httpClient?.Dispose();
                 _httpClient = null;
-
-                Debug.WriteLine("Dispose MediaPlayerStreamSource success");
             }
             catch (Exception e)
             {

@@ -23,11 +23,6 @@
                            Command="{x:Bind ViewModel.DeleteCommand}"
                            Description="移除该项" />
 
-        <StandardUICommand x:Name="DeleteFolderSaveVideoCommand"
-                           Kind="Delete"
-                           Command="{x:Bind ViewModel.DeleteFolderSaveVideoCommand}"
-                           Description="Remove this character" />
-
         <Style TargetType="Grid"
                x:Key="BaseGrid">
             <Setter Property="BorderBrush"
@@ -275,7 +270,7 @@
 
                         <ListView.HeaderTemplate>
                             <DataTemplate>
-                                <Grid Padding="12" Background="{ThemeResource SystemBaseLowColor}" ColumnDefinitions="*,150,180,25" ColumnSpacing="5">
+                                <Grid Padding="12" Background="{ThemeResource SystemBaseLowColor}" ColumnDefinitions="*,150,180,30" ColumnSpacing="5">
 
                                     <TextBlock Text="原名称" Style="{ThemeResource CaptionTextBlockStyle}"/>
                                     <TextBlock Grid.Column="1"
@@ -290,7 +285,7 @@
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="models:Sort115HomeModel">
                                 <Grid Height="48"
-                                      ColumnDefinitions="*,150,180,25"
+                                      ColumnDefinitions="*,150,180,30"
                                       ColumnSpacing="5">
 
                                     <customcontrols:FileControl FolderName="{x:Bind Info.Name}"

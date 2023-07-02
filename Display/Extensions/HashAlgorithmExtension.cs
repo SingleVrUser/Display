@@ -22,8 +22,9 @@ namespace Display.Extensions
                 var read = await stream.ReadAsync(buffer, 0, bufferSize, cancellationToken).ConfigureAwait(false);
                 if (stream.Position == streamLength)
                 {
-                    progress?.Report(stream.Position);
                     hashAlgorithm.TransformFinalBlock(buffer, 0, read);
+
+                    progress?.Report(stream.Position);
                     break;
                 }
 
