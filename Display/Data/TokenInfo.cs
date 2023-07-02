@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 using Windows.ApplicationModel;
 using Display.Helper;
 using static Display.Data.FilesInfo;
+using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace Display.Data
 {
@@ -362,6 +363,14 @@ namespace Display.Data
         public bool state { get; set; }
         public int mark { get; set; }
     }
+
+    public class DeleteFilesResult
+    {
+        public bool state { get; set; }
+        public string error { get; set; }
+        public string errno { get; set; }
+    }
+
 
     public class QRCodeInfo
     {
@@ -985,6 +994,8 @@ namespace Display.Data
         public string ImagePath;
     }
 
+
+
     /// <summary>
     /// 目录展示
     /// </summary>
@@ -1065,12 +1076,20 @@ namespace Display.Data
         public readonly Datum Datum;
         public readonly long? Id;
         public readonly long Cid;
+        public readonly long Size;
+        public readonly string Sha1;
         public readonly string PickCode;
         public readonly FileType Type;
-        public readonly string IconPath;
         public readonly int Time;
         public readonly bool IsVideo;
         public readonly bool NoId;
+        public string Ico{
+            get
+            {
+                var nameArray = Name.Split('.');
+                return nameArray.Length == 1 ? string.Empty : nameArray[^1];
+            }
+        }
 
         public FilesInfo(FileUploadResult result)
         {
@@ -1078,35 +1097,21 @@ namespace Display.Data
             Id = result.Id;
             Cid = result.Cid;
             PickCode = result.PickCode;
+            Size = result.FileSize;
+            Sha1 = result.Sha1;
             Type = result.Type;
             NoId = Id ==null;
             Time = (int)DateTimeOffset.Now.ToUnixTimeSeconds();
 
-            var icon = Name.Split('.')[^1];
-            IconPath = GetPathFromIcon(icon);
-
             IsVideo = result.IsVideo;
+        }
 
-            //IsVideo = GetTypeFromIcon(icon) == "video";
-
-            // TODO 应该逐渐抛弃Datum
-            //var isFile = Type == FileType.File;
-            //Datum = new Datum
-            //{
-            //    fid = isFile ? result.Id : string.Empty,
-            //    cid = isFile ? result.Cid.ToString() : result.Id,
-            //    pid = isFile ? string.Empty : result.Cid.ToString(),
-            //    n = result.Name,
-            //    s = result.FileSize,
-            //    pc = result.PickCode,
-            //    sha = result.Sha1,
-            //    u = result.ThumbUrl,
-            //    aid = result.Aid,
-            //    iv = result.IsVideo ? 1 : 0,
-            //    te = result.Time,
-            //    tp = result.Time,
-            //    t = FileMatch.ConvertInt32ToDateTime(result.Time)
-            //};
+        public void UpdateName(string name)
+        {
+            Name = name;
+            // 清空_nameWithoutExtension，再次获取时会重新计算
+            _nameWithoutExtension = null;
+            IconPath = GetPathFromIcon(Ico);
         }
 
         public FilesInfo(Datum data)
@@ -1130,6 +1135,8 @@ namespace Display.Data
                 Id = data.Fid;
                 Cid = data.Cid;
                 PickCode = data.PickCode;
+                Size = data.Size;
+                Sha1 = data.Sha;
 
                 //视频文件
                 if (data.Iv == 1)
@@ -1202,9 +1209,10 @@ namespace Display.Data
             {
                 if (_nameWithoutExtension != null) return _nameWithoutExtension;
 
-                if (Type == FileType.File && !string.IsNullOrEmpty(Datum.Ico))
+                var ico = Ico;
+                if (Type == FileType.File && !string.IsNullOrEmpty(ico))
                 {
-                    _nameWithoutExtension = Regex.Replace(Name, $".{Datum.Ico}$", "", RegexOptions.IgnoreCase);
+                    _nameWithoutExtension = Regex.Replace(Name, $".{ico}$", "", RegexOptions.IgnoreCase);
                 }
                 else
                 {
@@ -1214,6 +1222,18 @@ namespace Display.Data
                 return _nameWithoutExtension;
             }
         }
+        
+        private string _iconPath;
+        public string IconPath
+        {
+            get => _iconPath;
+            set
+            {
+                _iconPath = value;
+                OnPropertyChanged();
+            }
+        }
+
         public static string GetPathFromIcon(string ico)
         {
             string iconPath = null;

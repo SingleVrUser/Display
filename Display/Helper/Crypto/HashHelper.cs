@@ -55,14 +55,12 @@ namespace Display.Helper.Crypto
 
         public static string ComputeSha1RangeByStream(FileStream stream, string signCheck)
         {
-            Debug.WriteLine($"需要 {signCheck} 范围的Sha1");
-
             var ranges = signCheck.Split("-");
             if (ranges.Length != 2) return string.Empty;
 
             if (!long.TryParse(ranges[0], out var startIndex) || !long.TryParse(ranges[1], out var endIndex)) return string.Empty;
-
-            int bufferSize = (int)(endIndex - startIndex + 1);
+                
+            var bufferSize = (int)(endIndex - startIndex + 1);
             var buffer = new byte[bufferSize];
 
             stream.Seek(startIndex, SeekOrigin.Begin);

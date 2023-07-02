@@ -14,24 +14,24 @@ public class Common
 {
     public static readonly HttpClient Client = GetInfoFromNetwork.CommonClient;
 
-    public static Tuple<string, string> SplitCid(string CID)
+    public static Tuple<string, string> SplitCid(string cid)
     {
         string leftCid;
         string rightCid;
 
-        if(CID.Contains("H_"))
+        if(cid.Contains("H_"))
         {
-            var matchResult = Regex.Match(CID, @"H_\d+([A-Z]+)(\d+)");
+            var matchResult = Regex.Match(cid, @"H_\d+([A-Z]+)(\d+)");
 
             leftCid = matchResult.Groups[1].Value;
             rightCid = matchResult.Groups[2].Value;
         }
         else
         {
-            var splitResult = CID.Split('-', '_');
+            var splitResult = cid.Split('-', '_');
             if (splitResult.Length == 1)
             {
-                var matchResult = Regex.Match(CID, @"([A-Z]+)(\d+)");
+                var matchResult = Regex.Match(cid, @"([A-Z]+)(\d+)");
 
                 leftCid = matchResult.Groups[1].Value;
                 rightCid = matchResult.Groups[2].Value;
@@ -43,7 +43,7 @@ public class Common
             }
             else if (splitResult.Length == 3)
             {
-                if (CID.Contains("HEYDOUGA"))
+                if (cid.Contains("HEYDOUGA"))
                 {
                     leftCid = splitResult[1];
                     rightCid = splitResult[2];

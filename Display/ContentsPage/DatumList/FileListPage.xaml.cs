@@ -484,9 +484,10 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         var cid = sourceFilesInfos.First().Cid;
 
         // 从115中删除
-        await WebApi.DeleteFiles((long)cid,
+       var result = await WebApi.DeleteFiles(cid,
             sourceFilesInfos.Where(item => item.Id != null).Select(item => (long)item.Id).ToArray());
 
+        if(!result) ShowTeachingTip("删除文件失败");
     }
 
     private void RecycleStationGrid_DragEnter(object sender, DragEventArgs e)
@@ -1013,17 +1014,32 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
 
-        TextBox inputTextBox = new()
+        var stackPanel = new StackPanel
+        {
+            Spacing = 3
+        };
+
+        var inputTextBox = new TextBox
         {
             Text = info.NameWithoutExtension,
             PlaceholderText = info.NameWithoutExtension,
             SelectionStart = info.NameWithoutExtension.Length
         };
 
+        var checkBox = new CheckBox
+        {
+            Content = "强制重命名（包括后缀名）",
+            HorizontalAlignment = HorizontalAlignment.Right,
+        };
+
+        ToolTipService.SetToolTip(checkBox,"按新名称重新上传文件，完成后删除旧文件");
+
+        stackPanel.Children.Add(inputTextBox);
+        stackPanel.Children.Add(checkBox);
         ContentDialog contentDialog = new()
         {
             XamlRoot = this.XamlRoot,
-            Content = inputTextBox,
+            Content = stackPanel,
             Title = "重命名",
             PrimaryButtonText = "确定",
             CloseButtonText = "取消",
@@ -1036,24 +1052,34 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         // 添加后缀，模仿官方
         var inputText = inputTextBox.Text;
-        var newName = string.IsNullOrEmpty(info.Datum.Ico) ? inputText : $"{inputText}.{info.Datum.Ico}";
+
+        // 强制重命名新名称就是输入框Text
+        var newName = checkBox.IsChecked ==true ? inputText: string.IsNullOrEmpty(info.Datum.Ico) ? inputText : $"{inputText}.{info.Datum.Ico}";
 
         //没变
         if (newName == info.Name) return;
 
-        var renameRequest = await WebApi.RenameFile(info.Id, newName);
-        if (renameRequest == null)
+        bool isSucceed;
+
+        // 强制重命名
+        if (checkBox.IsChecked == true)
+        {
+            isSucceed = await WebApi.RenameForce(info, newName);
+        }
+        // 一般重命名
+        else
+        {
+            var renameRequest = await WebApi.RenameFile(info.Id, newName);
+            isSucceed = renameRequest.state;
+        }
+
+        if (!isSucceed)
         {
             ShowTeachingTip("重命名失败");
             return;
         }
 
-        var firstData = renameRequest.data.FirstOrDefault();
-
-        if (firstData.Key != null)
-        {
-            info.Name = firstData.Value;
-        }
+        info.UpdateName(newName);
     }
 
     private async void FolderBreadcrumbBar_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
@@ -1182,8 +1208,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         {
             infos.Add("id", info.Id.ToString());
             infos.Add("pickCode", info.PickCode);
-            infos.Add("大小", ByteSize.FromBytes(info.Datum.Size).ToString("#.#"));
-            infos.Add("sha1", info.Datum.Sha);
+            infos.Add("大小", ByteSize.FromBytes(info.Size).ToString("#.#"));
+            infos.Add("sha1", info.Sha1);
             infos.Add("所在目录id", info.Cid.ToString());
 
             title = "文件属性";
@@ -1224,6 +1250,13 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         var isSelectedState = listView.SelectedItems.Count > 0;
 
+        // 没有选中的情况，如果全选按钮选中，则取消
+        if (!isSelectedState && MultipleSelectedCheckBox.IsChecked == true)
+        {
+            MultipleSelectedCheckBox.IsChecked = false;
+        }
+
+        // 当前状态与之前的一致，退出
         if (_isSelectedListView == isSelectedState) return;
         _isSelectedListView = isSelectedState;
 

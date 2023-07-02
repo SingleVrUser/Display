@@ -28,6 +28,10 @@ using Exception = System.Exception;
 using HttpMethod = System.Net.Http.HttpMethod;
 using HttpRequestMessage = System.Net.Http.HttpRequestMessage;
 using Display.Extensions;
+using static Display.Data.Const.DefaultSettings.Network;
+using static Display.Models.GitHubInfo;
+using System.Security.Cryptography;
+using Windows.System;
 
 namespace Display.Data
 {
@@ -41,7 +45,7 @@ namespace Display.Data
         public HttpClient Client;
         public TokenInfo TokenInfo;
 
-        private long NowDate => DateTimeOffset.Now.ToUnixTimeSeconds();
+        private static long NowDate => DateTimeOffset.Now.ToUnixTimeSeconds();
 
         private static WebApi _webApi;
 
@@ -60,7 +64,6 @@ namespace Display.Data
         /// </summary>
         public void InitializeInternet()
         {
-
             var headers = new Dictionary<string, string> { { "user-agent", GetInfoFromNetwork.DownUserAgent } };
 
             var cookie = AppSettings._115_Cookie;
@@ -210,7 +213,7 @@ namespace Display.Data
             var pid = DataAccess.Get.GetLatestFolderPid(cidCategory.pick_code, cidCategory.utime);
 
             // 该文件已存在数据库里，且修改时间不变
-            if (pid>=0 && StaticData.isJumpExistsFolder)
+            if (pid >= 0 && StaticData.isJumpExistsFolder)
             {
                 //如果修改时间未变，但移动了位置
                 if (pid == cidCategory.paths.Last().file_id)
@@ -298,7 +301,7 @@ namespace Display.Data
                         getFilesProgressInfo.AddToDataAccessList.Add(item);
 
                         //查询数据库是否存在
-                        if (DataAccess.Get.GetLatestFolderPid(item.PickCode, item.TimeEdit)>=0 && Data.StaticData.isJumpExistsFolder)
+                        if (DataAccess.Get.GetLatestFolderPid(item.PickCode, item.TimeEdit) >= 0 && Data.StaticData.isJumpExistsFolder)
                         {
                             //统计下级文件夹所含文件的数量
                             //通过数据库获取
@@ -355,7 +358,7 @@ namespace Display.Data
                     {"fc_mix","0" },
                 };
             var content = new FormUrlEncodedContent(values);
-                
+
             var _ = await Client.SendAsync<string>(HttpMethod.Post, url, content);
 
         }
@@ -367,7 +370,12 @@ namespace Display.Data
         /// <param name="fids"></param>
         /// <param name="ignoreWarn"></param>
         /// <returns></returns>
-        public async Task DeleteFiles(long cid, long[] fids, int ignoreWarn = 1)
+        public async Task<bool> DeleteFiles(long cid, long[] fids, int ignoreWarn = 1)
+        {
+            return await DeleteFiles(Client, cid, fids, ignoreWarn);
+        }
+
+        public static async Task<bool> DeleteFiles(HttpClient client, long cid, long[] fids, int ignoreWarn = 1)
         {
             const string url = "https://webapi.115.com/rb/delete";
 
@@ -385,7 +393,10 @@ namespace Display.Data
 
             var content = new FormUrlEncodedContent(values);
 
-            var _ = await Client.SendAsync<string>(HttpMethod.Post, url, content);
+            var result = await client.SendAsync<DeleteFilesResult>(HttpMethod.Post, url, content);
+
+            return result.state;
+
         }
 
         /// <summary>
@@ -597,6 +608,21 @@ namespace Display.Data
             return await Client.SendAsync<RenameRequest>(HttpMethod.Post, url, content);
         }
 
+        public async Task<bool> RenameForce(FilesInfo data, string newName)
+        {
+            if (data is not {NoId:false}) return false;
+
+            var uploadInfo = await GetUploadInfo();
+            var userId = uploadInfo.user_id;
+            var userKey = uploadInfo.userkey;
+
+            // 通过秒传上传一份
+            var result = await FileUpload.UploadAgainByFastUpload(FileUpload.Client, data.PickCode, data.Cid, data.Sha1, newName, data.Size, userId, userKey);
+            if(result ==null || string.IsNullOrEmpty(result.pickcode)) return false;
+
+            // 删除原文件
+            return await WebApi.DeleteFiles(FileUpload.Client, data.Cid, new[] { (long)data.Id! });
+        }
         public enum OrderBy
         {
             [Description("file_name")]
@@ -687,7 +713,7 @@ namespace Display.Data
             //接口1出错，使用接口2
             if (webFileInfoResult.errNo == 20130827 && useApi2 == false)
             {
-                webFileInfoResult = await GetFileAsync(cid, limit, offset, true, loadAll, webFileInfoResult.order,webFileInfoResult.is_asc, isOnlyFolder: isOnlyFolder);
+                webFileInfoResult = await GetFileAsync(cid, limit, offset, true, loadAll, webFileInfoResult.order, webFileInfoResult.is_asc, isOnlyFolder: isOnlyFolder);
             }
             //需要加载全部，但未加载全部
             else if (loadAll && webFileInfoResult.count > limit)
@@ -1400,20 +1426,28 @@ namespace Display.Data
         //    }
         //    return null;
         //}
+        public async Task<Dictionary<string, string>> GetDownUrl(string pickCode, string ua)
+        {
+            return await GetDownUrl(Client, pickCode, ua, AppSettings.IsRecordDownRequest);
+        }
 
         /// <summary>
         /// 获取下载链接
         /// </summary>
         /// <param name="pickCode"></param>
         /// <param name="ua"></param>
+        /// <param name="client"></param>
+        /// <param name="isRecodeDownRequest"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, string>> GetDownUrl(string pickCode, string ua)
+        public static async Task<Dictionary<string, string>> GetDownUrl(HttpClient client, string pickCode, string ua, bool isRecodeDownRequest = true)
         {
+            client ??= WebApi.GlobalWebApi.Client;
+
             Dictionary<string, string> downUrlList = new();
 
             var tm = NowDate;
 
-            if (AppSettings.IsRecordDownRequest)
+            if (isRecodeDownRequest)
             {
                 var downUrlInfo = DataAccess.Get.GetDownHistoryByPcAndUa(pickCode, ua);
 
@@ -1425,12 +1459,10 @@ namespace Display.Data
                 }
             }
 
-            string src = $"{{\"pickcode\":\"{pickCode}\"}}";
-            var item = M115.Encode(src, tm);
-            byte[] data = item.Item1;
-            byte[] keyBytes = item.Item2;
+            var src = $"{{\"pickcode\":\"{pickCode}\"}}";
+            var (data, keyBytes) = M115.Encode(src, tm);
 
-            string dataString = Encoding.ASCII.GetString(data);
+            var dataString = Encoding.ASCII.GetString(data);
             var dataUrlEncode = HttpUtility.UrlEncode(dataString);
 
             var url = $"http://proapi.115.com/app/chrome/downurl?t={tm}";
@@ -1441,7 +1473,7 @@ namespace Display.Data
                 Headers = { ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded") }
             };
 
-            var downUrlBase64EncryptInfo = await Client.SendAsync<DownUrlBase64EncryptInfo>(HttpMethod.Post, url, content);
+            var downUrlBase64EncryptInfo = await client.SendAsync<DownUrlBase64EncryptInfo>(HttpMethod.Post, url, content);
 
             if (downUrlBase64EncryptInfo is { state: true })
             {
@@ -1467,7 +1499,7 @@ namespace Display.Data
             }
 
             //添加下载记录
-            if (AppSettings.IsRecordDownRequest && downUrlList.Count != 0)
+            if (isRecodeDownRequest && downUrlList.Count != 0)
             {
                 DataAccess.Add.AddDownHistory(new DownInfo
                 {

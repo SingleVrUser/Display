@@ -80,6 +80,8 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
     public async Task<WebFileInfo> GetFilesInfoAsync(int limit, int offset)
     {
         var filesInfo = await WebApi.GetFileAsync(Cid, limit, offset, orderBy: OrderBy.GetDescription(), asc: Asc, isOnlyFolder: IsOnlyFolder);
+        if(filesInfo == null) return null;
+
         WebPaths = filesInfo.path;
         AllCount = filesInfo.count;
 

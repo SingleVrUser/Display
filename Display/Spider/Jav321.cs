@@ -25,15 +25,15 @@ public class Jav321
 
     private static string baseUrl => AppSettings.Jav321BaseUrl;
 
-    public static async Task<VideoInfo> SearchInfoFromCID(string CID)
+    public static async Task<VideoInfo> SearchInfoFromCid(string cid)
     {
         var searchUrl = GetInfoFromNetwork.UrlCombine(baseUrl, "search");
 
-        CID = CID.ToUpper();
+        cid = cid.ToUpper();
 
         var postValues = new Dictionary<string, string>
         {
-            { "sn", CID}
+            { "sn", cid}
         };
 
         var result = await RequestHelper.PostHtml(Common.Client, searchUrl, postValues);
@@ -45,7 +45,7 @@ public class Jav321
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlString);
 
-        return await GetVideoInfoFromHtmlDoc(CID, detailUrl, htmlDoc);
+        return await GetVideoInfoFromHtmlDoc(cid, detailUrl, htmlDoc);
     }
 
     public static async Task<VideoInfo> GetVideoInfoFromHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
