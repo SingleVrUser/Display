@@ -9,18 +9,19 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Display.ViewModels
 {
     public partial class Sort115HomeViewModel : ObservableObject
     {
         public ObservableCollection<Sort115HomeModel> SelectedFiles = new();
-        public ObservableCollection<Sort115HomeModel> SingleFolderSaveVideo = new();
-        private Sort115Settings _settings = Settings18Page.Settings;
+        private readonly Sort115Settings _settings = Settings18Page.Settings;
         private readonly WebApi _webApi = WebApi.GlobalWebApi;
 
         private const string StartName = "开始";
         private const string ResumeName = "继续";
+        private const string ClearName = "清空";
 
         [ObservableProperty]
         private string _buttonName = StartName;
@@ -49,16 +50,6 @@ namespace Display.ViewModels
         }
 
         [RelayCommand]
-        private void DeleteFolderSaveVideo(string parameter)
-        {
-            if (parameter is null) return;
-
-            var toBeDeleted = SingleFolderSaveVideo.FirstOrDefault(c => c.Info.Name == parameter);
-
-            SingleFolderSaveVideo.Remove(toBeDeleted);
-        }
-
-        [RelayCommand]
         private void Delete(string parameter)
         {
             if (parameter is null) return;
@@ -67,8 +58,6 @@ namespace Display.ViewModels
 
             SelectedFiles.Remove(toBeDeleted);
         }
-
-        private Dictionary<string, List<Sort115HomeModel>> _tmpTaskList;
 
         [RelayCommand]
         private async void Start()
@@ -81,74 +70,108 @@ namespace Display.ViewModels
             }
             else if (ButtonName == ResumeName)
             {
-                // 不应该使用这个_tmpTaskList，在正式开始时可删除SelectedFiles项。但_tmpTaskList已经确定了
-                if (_tmpTaskList == null) return;
+                await StartRenameAndMove();
 
-                var singleInfoList = new List<Sort115HomeModel>();
+                ButtonName = ClearName;
+            }
+            else if (ButtonName == ClearName)
+            {
+                SelectedFiles.Clear();
 
-                // 正式开始整理
-                foreach (var (matchName,infoList) in _tmpTaskList)
+                ButtonName = StartName;
+            }
+        }
+
+        private async Task StartRenameAndMove()
+        {
+            var infos = SelectedFiles.ToArray();
+            var singleInfoList = new List<Sort115HomeModel>();
+            var multipleList = new Dictionary<string, List<Sort115HomeModel>>();
+
+            // 正式开始整理
+            foreach (var info in infos)
+            {
+                if(info.Status == Status.Error) continue;
+
+                var destinationPathArray = info.DestinationPathName.Split("\\");
+
+                // 单集
+                if (destinationPathArray.Length == 1)
                 {
-                    // 单集
-                    if (infoList.Count == 1)
+                    info.Status = Status.Doing;
+
+                    // 原文件名与目标名称一致，不修改
+                    if (info.DestinationName == info.Info.NameWithoutExtension)
                     {
-                        var info = infoList.First();
+                        singleInfoList.Add(info);
+                    }
+                    // 重命名
+                    else
+                    {
+                        await GetInfoFromNetwork.RandomTimeDelay(1, 2);
 
-                        info.Status = Status.Doing;
-
-                        // 原文件名与目标名称一致，不修改
-                        if (info.DestinationName == info.Info.NameWithoutExtension)
+                        var renameRequest = await _webApi.RenameFile(info.Info.Id, info.DestinationName);
+                        if (renameRequest == null)
+                        {
+                            info.Status = Status.Error;
+                        }
+                        else
                         {
                             singleInfoList.Add(info);
                         }
-                        // 重命名
-                        else
-                        {
-                            var renameRequest = await _webApi.RenameFile(info.Info.Id, info.DestinationName);
-                            if (renameRequest == null)
-                            {
-                                info.Status = Status.Error;
-                            }
-                            else
-                            {
-                                singleInfoList.Add(info);
-                            }
-                        }
-                    }
-                    // 多集
-                    else
-                    {
-                        infoList.ForEach(i =>
-                        {
-                            i.Status = Status.Doing;
-                        });
 
-                        // 新建文件夹
-                        var makeDirResult = await _webApi.RequestMakeDir(_settings.MultipleVideoSaveExplorerItem.Id, matchName);
-                        if (makeDirResult == null)
-                        {
-                            infoList.ForEach(x => x.Status = Status.Error);
-                            continue;
-                        }
-
-                        // 移动到
-                        await _webApi.MoveFiles(makeDirResult.cid, infoList.Select(x => x.Info.Id).ToArray());
-
-                        foreach (var info in infoList.Where(info => info.Status != Status.Error))
-                        {
-                            info.Status = Status.Success;
-                        }
                     }
                 }
-
-                //单集文件最后移动到一个指定目录
-                await _webApi.MoveFiles(_settings.SingleVideoSaveExplorerItem.Id, singleInfoList.Select(x => x.Info.Id).ToArray());
-
-                singleInfoList.ForEach(i =>
+                // 多集
+                else if(destinationPathArray.Length == 2)
                 {
-                    i.Status = Status.Success;
-                });
+                    var destinationPath = destinationPathArray[1];
 
+                    if (multipleList.TryGetValue(destinationPath, out var value))
+                    {
+                        value.Add(info);
+                    }
+                    else
+                    {
+                        multipleList[destinationPath] = new List<Sort115HomeModel> { info };
+                    }
+                }
+            }
+
+            // 单集文件最后移动到一个指定目录
+            var moveResult = await _webApi.MoveFiles(_settings.SingleVideoSaveExplorerItem.Id, singleInfoList.Select(x => x.Info.Id).ToArray());
+            var moveState = moveResult.state ? Status.Success : Status.Error;
+            singleInfoList.ForEach(i => { i.Status = moveState; });
+
+            // 多集移动到对应目录
+            foreach (var (matchName, infoList) in multipleList)
+            {
+                // 单集
+                if (infoList.Count == 1) continue;
+
+                infoList.ForEach(i => { i.Status = Status.Doing; });
+
+
+                await GetInfoFromNetwork.RandomTimeDelay(1, 2);
+
+                // 新建文件夹
+                var makeDirResult = await _webApi.RequestMakeDir(_settings.MultipleVideoSaveExplorerItem.Id, matchName);
+                if (makeDirResult == null)
+                {
+                    infoList.ForEach(x => x.Status = Status.Error);
+                    continue;
+                }
+
+                await GetInfoFromNetwork.RandomTimeDelay(1, 2);
+
+                // 移动到
+                moveResult = await _webApi.MoveFiles(makeDirResult.cid, infoList.Select(x => x.Info.Id).ToArray());
+
+                moveState = moveResult.state ? Status.Success : Status.Error;
+                foreach (var info in infoList.Where(info => info.Status != Status.Error))
+                {
+                    info.Status = moveState;
+                }
             }
         }
 
@@ -156,7 +179,7 @@ namespace Display.ViewModels
         {
             var infos = SelectedFiles.ToArray();
 
-            _tmpTaskList = new Dictionary<string, List<Sort115HomeModel>>();
+            var tmpTaskList = new Dictionary<string, List<Sort115HomeModel>>();
 
             // 整理预览
             foreach (var info in infos)
@@ -173,18 +196,18 @@ namespace Display.ViewModels
                     continue;
                 }
 
-                if (_tmpTaskList.TryGetValue(matchName, out var value))
+                if (tmpTaskList.TryGetValue(matchName, out var value))
                 {
                     value.Add(info);
                 }
                 else
                 {
-                    _tmpTaskList[matchName] = new List<Sort115HomeModel> { info };
+                    tmpTaskList[matchName] = new List<Sort115HomeModel> { info };
                 }
             }
 
             // 根据数量判断单集和多集
-            foreach (var (matchName, itemList) in _tmpTaskList)
+            foreach (var (matchName, itemList) in tmpTaskList)
             {
                 // 单集
                 if (itemList.Count == 1)

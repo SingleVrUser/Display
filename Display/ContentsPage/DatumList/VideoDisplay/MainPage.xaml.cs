@@ -34,27 +34,24 @@ namespace Display.ContentsPage.DatumList.VideoDisplay;
 /// <summary>
 /// An empty page that can be used on its own or navigated to within a Frame.
 /// </summary>
-public sealed partial class MainPage : Page
+public sealed partial class MainPage : Page,IDisposable
 {
 
-    ObservableCollection<FilesInfo> PlayingVideoInfos = new();
+    private readonly ObservableCollection<FilesInfo> _playingVideoInfos = new();
 
-    ObservableCollection<VideoInfo> CidInfos = new();
+    private readonly ObservableCollection<VideoInfo> _cidInfos = new();
 
-    ObservableCollection<FilesInfo> FilesInfos;
+    private readonly ObservableCollection<FilesInfo> _filesInfos;
 
-    IncrementalLoadDatumCollection FilesInfosCollection;
+    private IncrementalLoadDatumCollection _filesInfosCollection;
 
-    private List<string> _highBitRateVideos = new();
+    private readonly ObservableCollection<MetadataItem> _units;
 
-    ObservableCollection<MetadataItem> _units;
+    private readonly ListView _lastFilesListView;
 
-    ListView LastFilesListView;
-
-    WebApi webApi;
+    private readonly WebApi _webApi;
 
     private bool _isDisposing;
-
 
     /// <summary>
     /// 可播放的最大数量
@@ -63,32 +60,22 @@ public sealed partial class MainPage : Page
 
     public MainPage(List<FilesInfo> filesInfos, ListView lastFilesListView)
     {
-        this.InitializeComponent();
+        InitializeComponent();
 
-        this.LastFilesListView = lastFilesListView;
+        _lastFilesListView = lastFilesListView;
 
-        FilesInfos = new ObservableCollection<FilesInfo>();
-        filesInfos.ForEach(item => FilesInfos.Add(item));
+        _filesInfos = new ObservableCollection<FilesInfo>();
+        filesInfos.ForEach(_filesInfos.Add);
 
-        _units = new ObservableCollection<MetadataItem>()
-            { new() { Label = "播放列表", Command = OpenFolderCommand, CommandParameter = 0 } };
-        metadataControl.Items = _units;
-        webApi = WebApi.GlobalWebApi;
+        _units = new ObservableCollection<MetadataItem> { new() { Label = "播放列表", Command = OpenFolderCommand, CommandParameter = (long)0 } };
 
-        Unloaded += OnUnloaded;
+        _webApi = WebApi.GlobalWebApi;
 
-        TryPlayVideoFromSelectedFiles(FilesInfos.ToList());
+        TryPlayVideoFromSelectedFiles(_filesInfos.ToList());
     }
-
-    private void OnUnloaded(object sender, RoutedEventArgs e)
-    {
-        Video_UniformGrid.PointerExited -= Video_UniformGrid_OnPointerExited;
-        aTimer?.Stop();
-    }
-
+    
     private async void TryPlayVideoFromSelectedFiles(List<FilesInfo> filesInfos)
     {
-        //var maxPlayCount = AppSettings.IsDefaultPlaySingleVideo ? 1 : MaxCanPlayCount;
         var maxPlayCount = MaxCanPlayCount;
 
         var videoList = filesInfos.Where(item => item.Type == FilesInfo.FileType.File && item.IsVideo)
@@ -97,16 +84,11 @@ public sealed partial class MainPage : Page
 
         if (maxPlayCount == 1)
         {
-            tryPlayVideos(videoList);
+            TryPlayVideos(videoList);
         }
         else
         {
-            if (videoCount >= maxPlayCount)
-            {
-                tryPlayVideos(videoList);
-            }
-            // count > 4
-            else
+            if (videoCount <= maxPlayCount)
             {
                 var leftCount = maxPlayCount - videoCount;
 
@@ -115,10 +97,9 @@ public sealed partial class MainPage : Page
                     .ToList();
                 if (folderList.Count > 0)
                 {
-
                     foreach (var folder in folderList)
                     {
-                        var filesInfo = await webApi.GetFileAsync(folder.Cid, 40);
+                        var filesInfo = await _webApi.GetFileAsync(folder.Cid, 40);
 
                         // 挑选视频数量
                         var videoInFolder = filesInfo.data
@@ -138,10 +119,9 @@ public sealed partial class MainPage : Page
                         if (leftCount == 0) break;
                     }
                 }
-
-                tryPlayVideos(videoList);
-
             }
+
+            TryPlayVideos(videoList);
         }
     }
 
@@ -163,7 +143,7 @@ public sealed partial class MainPage : Page
         //不存在，返回
         if (index < 0) return;
 
-        for (int i = _units.Count - 1; i > index; i--)
+        for (var i = _units.Count - 1; i > index; i--)
         {
             _units.RemoveAt(i);
         }
@@ -171,14 +151,12 @@ public sealed partial class MainPage : Page
         //选中的是第一项
         if (index == 0)
         {
-            VideoShow_ListView.ItemsSource = FilesInfos;
+            VideoShow_ListView.ItemsSource = _filesInfos;
             return;
         }
-        else
-        {
-            await FilesInfosCollection.SetCid(cid);
-            VideoShow_ListView.ItemsSource = FilesInfosCollection;
-        }
+
+        await _filesInfosCollection.SetCid(cid);
+        VideoShow_ListView.ItemsSource = _filesInfosCollection;
 
     }
 
@@ -194,76 +172,55 @@ public sealed partial class MainPage : Page
     private void Window_Closed(object sender, WindowEventArgs args)
     {
         _isDisposing = true;
-        RemoveAllMediaControl();
+        Dispose();
     }
 
     private void RemoveAllMediaControl()
     {
         foreach (var child in Video_UniformGrid.Children)
         {
-            //var videoControl = child as MediaPlayerElement;
-
             if (child is not MediaPlayerElement { Tag: MediaPlayerWithStreamSource oldMediaPlayerWithStreamSource }) continue;
 
-            try
-            {
-                Debug.WriteLine("Dispose MediaPlayer");
-
-                oldMediaPlayerWithStreamSource.Dispose();
-
-                //videoControl?.MediaPlayer?.Dispose();
-
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"关闭MediaControl出错{ex.Message}");
-            }
+            oldMediaPlayerWithStreamSource.Dispose();
         }
 
         Video_UniformGrid.Children.Clear();
     }
-
-
+    
     private void OpenFolder_Tapped(object sender, DoubleTappedRoutedEventArgs e)
     {
         if (sender is not Grid { DataContext: FilesInfo filesInfo }) return;
 
-
         ChangedFolder(filesInfo);
     }
 
-    private void TextBlock_Tapped(object sender, TappedRoutedEventArgs e)
-    {
-        if (sender is not TextBlock { DataContext: FilesInfo filesInfo }) return;
-
-        ChangedFolder(filesInfo);
-    }
 
     private async void ChangedFolder(FilesInfo filesInfo)
     {
         //跳过文件
-        if (filesInfo.Type == FilesInfo.FileType.File) return;
+        if (filesInfo.Type == FilesInfo.FileType.File || filesInfo.Id==null) return;
 
-        if (FilesInfosCollection == null)
+        var folderId = (long)filesInfo.Id;
+
+        if (_filesInfosCollection == null)
         {
-            FilesInfosCollection = new IncrementalLoadDatumCollection(filesInfo.Cid);
+            _filesInfosCollection = new IncrementalLoadDatumCollection(folderId);
         }
         else
         {
-            await FilesInfosCollection.SetCid(filesInfo.Cid);
+            await _filesInfosCollection.SetCid(folderId);
         }
 
-        if (VideoShow_ListView.ItemsSource != FilesInfosCollection)
+        if (VideoShow_ListView.ItemsSource != _filesInfosCollection)
         {
-            VideoShow_ListView.ItemsSource = FilesInfosCollection;
+            VideoShow_ListView.ItemsSource = _filesInfosCollection;
         }
-
 
         _units.Add(new MetadataItem
         {
             Label = filesInfo.Name,
             Command = OpenFolderCommand,
-            CommandParameter = filesInfo.Cid,
+            CommandParameter = folderId
         });
     }
 
@@ -305,7 +262,7 @@ public sealed partial class MainPage : Page
         //转码成功，可以用m3u8
         if (file.Datum.Vdi != 0)
         {
-            var m3U8Infos = await webApi.GetM3U8InfoByPickCode(pickCode);
+            var m3U8Infos = await _webApi.GetM3U8InfoByPickCode(pickCode);
 
             if (m3U8Infos.Count > 0)
             {
@@ -316,7 +273,7 @@ public sealed partial class MainPage : Page
         // 视频未转码，尝试获取直链
         else
         {
-            var downUrlList = await webApi.GetDownUrl(pickCode, GetInfoFromNetwork.DownUserAgent);
+            var downUrlList = await _webApi.GetDownUrl(pickCode, GetInfoFromNetwork.DownUserAgent);
 
             if (downUrlList.Count > 0)
             {
@@ -348,7 +305,6 @@ public sealed partial class MainPage : Page
         menuFlyoutItemDeletedFrom115.Click += RemoveFileFrom115Button_Click;
         menuFlyoutItemDeletedFrom115.DataContext = file;
 
-
         var menuFlyoutItemLoadVideoAgain = new MenuFlyoutItem()
         {
             Text = "重新加载",
@@ -379,7 +335,7 @@ public sealed partial class MainPage : Page
             await MediaPlayerWithStreamSource.CreateMediaPlayer(videoUrl, filesInfo: file);
 
         var mediaPlayer = mediaPlayerWithStreamSource.MediaPlayer;
-        var mediaPlayerElement = new MediaPlayerElement()
+        var mediaPlayerElement = new MediaPlayerElement
         {
             ContextFlyout = menuFlyout,
             Tag = mediaPlayerWithStreamSource
@@ -399,11 +355,6 @@ public sealed partial class MainPage : Page
 
             MediaPlayer_MediaOpened(sender, args);
 
-            if (sender.PlaybackSession.NaturalVideoHeight > 2000)
-            {
-                _highBitRateVideos.Add(file.PickCode);
-            }
-
             DispatcherQueue.TryEnqueue(() =>
             {
                 var transportControlsTemplateRoot = (FrameworkElement)VisualTreeHelper.GetChild(mediaPlayerElement.TransportControls, 0);
@@ -417,9 +368,6 @@ public sealed partial class MainPage : Page
             });
 
         };
-        mediaPlayerElement.MediaPlayer.MediaEnded += MediaPlayer_MediaEnded;
-
-        mediaPlayerElement.MediaPlayer.MediaFailed += MediaPlayer_MediaFailed;
 
         if (addIndex == -1)
         {
@@ -432,12 +380,6 @@ public sealed partial class MainPage : Page
 
     }
 
-    private void MediaPlayer_MediaEnded(MediaPlayer sender, object args)
-    {
-        Debug.WriteLine("视频已经播放完了");
-    }
-
-
     private static void MediaPlayer_MediaOpened(MediaPlayer sender, object args)
     {
         // 是否需要改变起始位置
@@ -446,17 +388,12 @@ public sealed partial class MainPage : Page
         sender.Position = sender.NaturalDuration * AppSettings.AutoPlayPositionPercentage / 100;
     }
 
-    private void MediaPlayer_MediaFailed(MediaPlayer sender, MediaPlayerFailedEventArgs args)
-    {
-        Debug.WriteLine("播放失败");
-    }
 
-
-    private async void tryPlayVideos(List<FilesInfo> filesInfo)
+    private async void TryPlayVideos(List<FilesInfo> filesInfo)
     {
         ChangedVideo_UniformGrid(filesInfo.Count);
 
-        PlayingVideoInfos.Clear();
+        _playingVideoInfos.Clear();
 
         RemoveAllMediaControl();
 
@@ -466,20 +403,18 @@ public sealed partial class MainPage : Page
             await AddMediaElement(file);
 
             // 记录正在播放的视频
-            PlayingVideoInfos.Add(file);
+            _playingVideoInfos.Add(file);
         }
 
         VideoPlay_Pivot.SelectedIndex = 1;
 
         // 搜索影片信息
-        CidInfos.Clear();
+        _cidInfos.Clear();
         
-        await FindAndShowInfosFromInternet(PlayingVideoInfos.ToList());
-
-
+        await FindAndShowInfosFromInternet(_playingVideoInfos.ToArray());
     }
 
-    private async Task FindAndShowInfosFromInternet(List<FilesInfo> filesInfos)
+    private async Task FindAndShowInfosFromInternet(FilesInfo[] filesInfos)
     {
         VideoPlay_ListView.IsEnabled = false;
         Debug.WriteLine("正在搜索cid相应的信息");
@@ -501,7 +436,7 @@ public sealed partial class MainPage : Page
             if (trueName == null)
             {
                 cidInfo = new VideoInfo { trueName = name, ImagePath = noPicturePath };
-                CidInfos.Add(cidInfo);
+                _cidInfos.Add(cidInfo);
                 continue;
             }
 
@@ -531,7 +466,7 @@ public sealed partial class MainPage : Page
             }
 
             cidInfo ??= new VideoInfo { trueName = trueName, ImagePath = noPicturePath };
-            CidInfos.Add(cidInfo);
+            _cidInfos.Add(cidInfo);
 
         }
 
@@ -606,7 +541,7 @@ public sealed partial class MainPage : Page
         await TryRemoveCurrentVideoAndPlayNextVideo(fileInfo);
 
         // 然后，删除115文件
-        var result = await webApi.DeleteFiles(fileInfo.Cid, new[] { (long)fid });
+        var result = await _webApi.DeleteFiles(fileInfo.Cid, new[] { (long)fid });
         if (!result)
         {
             ShowTeachingTip("删除115文件失败");
@@ -614,7 +549,7 @@ public sealed partial class MainPage : Page
         }
 
         // 接着，删除资源管理器的文件，如果存在（有可能已经关掉了）
-        if (LastFilesListView.IsLoaded && LastFilesListView.ItemsSource is IncrementalLoadDatumCollection filesInfos &&
+        if (_lastFilesListView.IsLoaded && _lastFilesListView.ItemsSource is IncrementalLoadDatumCollection filesInfos &&
             filesInfos.Contains(fileInfo))
         {
             filesInfos.Remove(fileInfo);
@@ -636,24 +571,24 @@ public sealed partial class MainPage : Page
         var fid = fileInfo.Id;
 
         //移除播放列表
-        if (FilesInfos.Contains(fileInfo)) FilesInfos.Remove(fileInfo);
+        if (_filesInfos.Contains(fileInfo)) _filesInfos.Remove(fileInfo);
 
         // 文件
         if (isFile)
         {
             //移除正在播放的视频列表
-            if (PlayingVideoInfos.Contains(fileInfo)) PlayingVideoInfos.Remove(fileInfo);
+            if (_playingVideoInfos.Contains(fileInfo)) _playingVideoInfos.Remove(fileInfo);
 
         }
         // 文件夹
         else
         {
-            var playList = PlayingVideoInfos.Where(info => info.Id == fid).ToList();
+            var playList = _playingVideoInfos.Where(info => info.Id == fid).ToList();
 
             playList.ForEach(info =>
             {
                 //移除正在播放的视频列表
-                PlayingVideoInfos.Remove(info);
+                _playingVideoInfos.Remove(info);
             });
         }
 
@@ -666,12 +601,12 @@ public sealed partial class MainPage : Page
     private void RemoveCidInfo(FilesInfo fileInfo)
     {
         //移除cid信息（预览图/信息）
-        var removeCid = CidInfos.FirstOrDefault(item =>
+        var removeCid = _cidInfos.FirstOrDefault(item =>
             item.trueName == fileInfo.Name || item.trueName.ToUpper() == FileMatch.MatchName(fileInfo.Name)?.ToUpper());
 
         if (removeCid != null)
         {
-            CidInfos.Remove(removeCid);
+            _cidInfos.Remove(removeCid);
         }
     }
 
@@ -679,33 +614,19 @@ public sealed partial class MainPage : Page
     {
         if (mediaPlayerElement.Tag is not MediaPlayerWithStreamSource oldMediaPlayerWithStreamSource) return;
 
-        Debug.WriteLine("Dispose oldMediaPlayerWithStreamSource mediaPlayer");
         try
         {
-            oldMediaPlayerWithStreamSource.Dispose();
-            Debug.WriteLine("Dispose oldMediaPlayerWithStreamSource and mediaPlayer success");
-
             if (Video_UniformGrid.Children.Contains(mediaPlayerElement))
             {
-                Debug.WriteLine("Remove mediaPlayerElement");
                 Video_UniformGrid.Children.Remove(mediaPlayerElement);
-
-                Debug.WriteLine("Remove mediaPlayerElement succeed");
             }
 
-            if (_highBitRateVideos.Contains(oldMediaPlayerWithStreamSource.FilesInfo.PickCode))
-            {
-                _highBitRateVideos.Remove(oldMediaPlayerWithStreamSource.FilesInfo.PickCode);
-            }
-
-            Debug.WriteLine("成功移除正在播放的视频");
+            oldMediaPlayerWithStreamSource.Dispose();
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"删除正在播放的视频文件时出现问题{ex.Message}");
         }
-
-
     }
 
     private async Task<ContentDialogResult> TipDeletedFiles()
@@ -753,19 +674,19 @@ public sealed partial class MainPage : Page
     {
         if (sender is not ListView target) return;
 
-        if (target.ItemsSource != FilesInfos) return;
+        if (target.ItemsSource != _filesInfos) return;
 
         if (e.DataView.Properties.Values.FirstOrDefault() is not List<FilesInfo> filesInfos) return;
 
         foreach (var fileInfo in filesInfos)
         {
-            FilesInfos.Add(fileInfo);
+            _filesInfos.Add(fileInfo);
         }
     }
 
     private void EmptyList_Click(object sender, RoutedEventArgs e)
     {
-        FilesInfos.Clear();
+        _filesInfos.Clear();
     }
 
     private void VideoUniformGrid_Drop(object sender, DragEventArgs e)
@@ -774,15 +695,15 @@ public sealed partial class MainPage : Page
 
         if (e.DataView.Properties.Values.FirstOrDefault() is not List<Data.FilesInfo> filesInfos) return;
 
-        FilesInfos.Clear();
+        _filesInfos.Clear();
         foreach (var info in filesInfos)
         {
             //if (info.Type == FilesInfo.FileType.File && info.IsVideo)
 
-            FilesInfos.Add(info);
+            _filesInfos.Add(info);
         }
 
-        TryPlayVideoFromSelectedFiles(FilesInfos.ToList());
+        TryPlayVideoFromSelectedFiles(_filesInfos.ToList());
 
     }
 
@@ -881,7 +802,7 @@ public sealed partial class MainPage : Page
 
         // 挑选播放列表中不是正在播放的视频
         // 删除的一般只有一个，只取一个
-        var videoInfo = FilesInfos.FirstOrDefault(item => item.IsVideo && !playingPcList.Contains(item.PickCode));
+        var videoInfo = _filesInfos.FirstOrDefault(item => item.IsVideo && !playingPcList.Contains(item.PickCode));
 
         if (videoInfo != null)
         {
@@ -892,12 +813,12 @@ public sealed partial class MainPage : Page
             Debug.WriteLine("添加到正在播放的视频的信息中");
 
             // 添加到正在播放的视频的信息中
-            PlayingVideoInfos.Add(videoInfo);
+            _playingVideoInfos.Add(videoInfo);
 
             Debug.WriteLine("搜索信息");
 
             // 搜索信息
-            await FindAndShowInfosFromInternet(new List<FilesInfo>() { videoInfo });
+            await FindAndShowInfosFromInternet(new[] { videoInfo });
         }
         // 没有下一集，则修改布局
         else
@@ -913,44 +834,6 @@ public sealed partial class MainPage : Page
         }
     }
 
-    ///// <summary>
-    ///// 修改UriSource并移到最后
-    ///// </summary>
-    ///// <param name="mediaPlayerElement"></param>
-    ///// <param name="videoInfo"></param>
-    ///// <returns></returns>
-    //private async Task ChangedVideoSourceAndMoveToLast(MediaPlayerElement mediaPlayerElement, FilesInfo videoInfo)
-    //{
-    //    Debug.WriteLine("正在切换UriSource");
-
-    //    //将即将删除的视频移到最后
-    //    Video_UniformGrid.Children.Move((uint)Video_UniformGrid.Children.IndexOf(mediaPlayerElement),
-    //        (uint)Video_UniformGrid.Children.Count - 1);
-
-    //    var videoUrl = await GetVideoUrl(videoInfo);
-    //    if (videoUrl == null) return;
-
-    //    var menuFlyout = BuildMenuFlyout(videoInfo);
-
-    //    var mediaPlayerWithStreamSource =
-    //        await MediaPlayerWithStreamSource.CreateMediaPlayer(videoUrl, filesInfo: videoInfo);
-
-    //    var mediaPlayer = mediaPlayerWithStreamSource.MediaPlayer;
-    //    mediaPlayer.CurrentStateChanged += MediaPlayer_CurrentStateChanged;
-
-    //    mediaPlayerElement.Tag = mediaPlayerElement;
-    //    mediaPlayerElement.ContextFlyout = menuFlyout;
-
-    //    mediaPlayerElement.SetMediaPlayer(mediaPlayerWithStreamSource.MediaPlayer);
-
-    //    Debug.WriteLine("成功切换UriSource");
-    //}
-
-    private void MediaPlayer_CurrentStateChanged(MediaPlayer sender, object args)
-    {
-        Debug.WriteLine("当前的状态改变了");
-    }
-
     /// <summary>
     /// 删除后重新添加
     /// </summary>
@@ -960,14 +843,6 @@ public sealed partial class MainPage : Page
     private async Task RemoveVideoAndPlayNextVideo(MediaPlayerElement mediaPlayerElement, FilesInfo videoInfo)
     {
         RemovePlayingVideo(mediaPlayerElement);
-
-        Debug.WriteLine($"当前高质量视频数量为：{_highBitRateVideos.Count}");
-        // 避免同时请求过多
-        if (_highBitRateVideos.Count > 2)
-        {
-            Debug.WriteLine("等待3秒");
-            await Task.Delay(3000);
-        }
 
         await AddMediaElement(videoInfo);
     }
@@ -1008,9 +883,9 @@ public sealed partial class MainPage : Page
         var videoUrl = oldMediaPlayerWithStreamSource.Url;
 
         // 删除旧的
-        oldMediaPlayerWithStreamSource.Dispose();
         var index = Video_UniformGrid.Children.IndexOf(oldMediaElement);
         Video_UniformGrid.Children.RemoveAt(index);
+        oldMediaPlayerWithStreamSource.Dispose();
 
         // 添加新的
         await AddMediaElement(fileInfo, videoUrl, index);
@@ -1095,15 +970,30 @@ public sealed partial class MainPage : Page
         if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
 
         // 接着，删除资源管理器的文件，如果存在（有可能已经关掉了）
-        if (LastFilesListView.IsLoaded && LastFilesListView.ItemsSource is IncrementalLoadDatumCollection filesInfos &&
+        if (_lastFilesListView.IsLoaded && _lastFilesListView.ItemsSource is IncrementalLoadDatumCollection filesInfos &&
             filesInfos.Contains(info))
         {
-            LastFilesListView.ScrollIntoView(info, ScrollIntoViewAlignment.Leading);
+            _lastFilesListView.ScrollIntoView(info, ScrollIntoViewAlignment.Leading);
         }
     }
 
     private void ShowTeachingTip(string subtitle, string content=null)
     {
         BasePage.ShowTeachingTip(LightDismissTeachingTip,subtitle,content);
+    }
+
+    public void Dispose()
+    {
+        Video_UniformGrid.PointerExited -= Video_UniformGrid_OnPointerExited;
+        aTimer?.Stop();
+        aTimer?.Dispose();
+        RemoveAllMediaControl();
+
+        _playingVideoInfos.Clear();
+        _cidInfos.Clear();
+        _filesInfos?.Clear();
+        _filesInfosCollection?.Clear();
+        _units?.Clear();
+
     }
 }

@@ -556,7 +556,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
                 await Move115Files(FilesInfos.Cid, sourceFilesInfos);
 
                 // 在文件列表中添加
-                sourceFilesInfos.ForEach(FilesInfos.Add);
+                FilesInfos.AddArray(sourceFilesInfos.ToArray());
             }
             else
             {

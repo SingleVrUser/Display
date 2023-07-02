@@ -1111,7 +1111,8 @@ namespace Display.Data
             Name = name;
             // 清空_nameWithoutExtension，再次获取时会重新计算
             _nameWithoutExtension = null;
-            IconPath = GetPathFromIcon(Ico);
+
+            if(Type == FileType.File) IconPath = GetPathFromIcon(Ico);
         }
 
         public FilesInfo(Datum data)

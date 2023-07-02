@@ -562,11 +562,11 @@ namespace Display.Data
         /// <param Name="pid"></param>
         /// <param Name="fids"></param>
         /// <returns></returns>
-        public async Task MoveFiles(long cid, long?[] ids)
+        public async Task<MakeDirRequest> MoveFiles(long cid, long?[] ids)
         {
             ids = ids.Where(id => id != null).ToArray();
 
-            if (ids is not { Length: > 0 }) return;
+            if (ids is not { Length: > 0 }) return null;
 
             const string url = "https://webapi.115.com/files/move";
 
@@ -583,7 +583,7 @@ namespace Display.Data
 
             var content = new FormUrlEncodedContent(values);
 
-            await Client.SendAsync<MakeDirRequest>(HttpMethod.Post, url, content);
+            return await Client.SendAsync<MakeDirRequest>(HttpMethod.Post, url, content);
         }
 
         /// <summary>

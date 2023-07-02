@@ -23,7 +23,7 @@ namespace Display.Helper
         public static string DeleteSomeKeywords(string name)
         {
             var regReplaceList =
-                new List<string> { "uur76", @"({\d}K)?\d{2,3}fps\d{0,}", @"part\d", "@18P2P", @"[^\d]\d{3,6}P", @"\[?[0-9a-z]+?\.(com|cn|xyz|la|me|net|app|cc)\]?@?",
+                new List<string> { "uur76", @"({\d}K)?\d{2,3}fps\d{0,}", @"part\d", "@18P2P", @"[^\d]\d{3,6}P", @"\[?[0-9a-z]+?[\._](com|cn|xyz|la|me|net|app|cc)\]?@?",
                                 @"SE\d{2}",@"EP\d{2}", @"S\d{1,2}E\d{1,2}", @"\D[hx]26[54]", "[-_][468]k", @"h_[0-9]{3,4}",@"[a-z0-9]{15,}",
                                 @"\d+bit",@"\d{3,6}x\d{3,6}", @"whole[-_\w]+$"};
                 

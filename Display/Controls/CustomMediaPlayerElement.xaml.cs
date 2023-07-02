@@ -67,7 +67,6 @@ public sealed partial class CustomMediaPlayerElement
         //m3u8UrlList
         _webApi ??= WebApi.GlobalWebApi;
 
-        //_httpClient = WebApi.CreateWindowWebHttpClient();
         _httpClient = WebApi.SingleVideoWindowWebHttpClient;
 
         _adaptiveMediaSourceList = new List<AdaptiveMediaSourceCreationResult>();
@@ -264,7 +263,7 @@ public sealed partial class CustomMediaPlayerElement
         mediaTransportControls.SetQualityListSource(list,_qualityIndex);
     }
 
-    private async void SetButton(MediaPlayItem playItem)
+    private void SetButton(MediaPlayItem playItem)
     {
         //设置喜欢、稍后观看
         bool isLike;
@@ -339,7 +338,8 @@ public sealed partial class CustomMediaPlayerElement
         //SetStream
         else
         {
-            var httpClient = WebApi.CreateWindowWebHttpClient();
+            //var httpClient = WebApi.CreateWindowWebHttpClient();
+            var httpClient = WebApi.GlobalWebApi.Client;
             var stream = await HttpRandomAccessStream.CreateAsync(httpClient, new Uri(videoUrl));
 
             _httpRandomAccessStreamList.Add(stream);

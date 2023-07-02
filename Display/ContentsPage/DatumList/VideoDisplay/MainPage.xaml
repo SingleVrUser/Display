@@ -73,13 +73,14 @@
                                 </StackPanel>
 
                                 <controls:MetadataControl x:Name="metadataControl"
+                                                            Items="{x:Bind _units}"
                                                           Grid.Row="1"
                                                           Separator=" > " />
 
                                 <ListView x:Name="VideoShow_ListView"
                                           Grid.Row="2"
                                           SelectionMode="Multiple"
-                                          ItemsSource="{x:Bind FilesInfos}"
+                                          ItemsSource="{x:Bind _filesInfos}"
                                           AllowDrop="True"
                                           DragOver="Target_DragOver"
                                           Drop="Target_Drop"
@@ -122,7 +123,6 @@
                                                 <TextBlock Grid.Column="1"
                                                            Text="{x:Bind Name}"
                                                            VerticalAlignment="Center"
-                                                           Tapped="TextBlock_Tapped"
                                                            TextTrimming="CharacterEllipsis" />
                                             </Grid>
                                         </DataTemplate>
@@ -142,7 +142,7 @@
                                     <RowDefinition Height="auto" />
                                 </Grid.RowDefinitions>
 
-                                <FlipView ItemsSource="{x:Bind CidInfos}"
+                                <FlipView ItemsSource="{x:Bind _cidInfos}"
                                           Height="300"
                                           SelectedIndex="{x:Bind VideoPlay_ListView.SelectedIndex,Mode=TwoWay}">
                                     <FlipView.ItemTemplate>
@@ -215,7 +215,7 @@
                                 <ListView x:Name="VideoPlay_ListView"
                                           Grid.Row="1"
                                           SelectionMode="Single"
-                                          ItemsSource="{x:Bind PlayingVideoInfos}">
+                                          ItemsSource="{x:Bind _playingVideoInfos}">
                                     <ListView.ItemTemplate>
                                         <DataTemplate x:DataType="data:FilesInfo">
                                             <Grid ColumnSpacing="5">
