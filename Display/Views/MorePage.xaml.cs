@@ -81,7 +81,7 @@ namespace Display.Views
                     window4.Activate();
                     break;
                 case "文件列表":
-                    CommonWindow.CreateAndShowWindow(new ContentsPage.DatumList.FileListPage());
+                    CommonWindow.CreateAndShowWindow(new ContentsPage.DatumList.MainPage());
                     break;
                 case "演员头像":
                     CommonWindow.CreateAndShowWindow(new ContentsPage.AddActorCover());

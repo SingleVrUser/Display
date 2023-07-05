@@ -142,23 +142,19 @@ namespace Display.ContentsPage
             byte[] qrCodeAsPngByteArr = qrCode.GetGraphic(20);
 
             //e.g. Windows 10 Universal App (UAP)
-            using (InMemoryRandomAccessStream stream = new InMemoryRandomAccessStream())
+            using var stream = new InMemoryRandomAccessStream();
+            using (var writer = new DataWriter(stream.GetOutputStreamAt(0)))
             {
-                using (DataWriter writer = new DataWriter(stream.GetOutputStreamAt(0)))
-                {
-                    writer.WriteBytes(qrCodeAsPngByteArr);
-                    await writer.StoreAsync();
-                }
-
-                //显示二维码
-                var image = new BitmapImage();
-                await image.SetSourceAsync(stream);
-
-                //QRLoadingRing.IsActive = false;
-                QRCodeImage.Source = image;
+                writer.WriteBytes(qrCodeAsPngByteArr);
+                await writer.StoreAsync();
             }
 
+            //显示二维码
+            var image = new BitmapImage();
+            await image.SetSourceAsync(stream);
 
+            //QRLoadingRing.IsActive = false;
+            QRCodeImage.Source = image;
         }
 
         /// <summary>

@@ -35,6 +35,7 @@
         </StackPanel>
 
         <controls:AdaptiveGridView x:Name="BasicGridView"
+                                   SingleSelectionFollowsFocus="False"
                                    Grid.Row="1"
                                    ItemHeight="140"
                                    DesiredWidth="140"

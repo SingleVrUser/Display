@@ -55,7 +55,7 @@
               CornerRadius="8"
               Margin="0,5"
               MinHeight="280">
-            <controls:AdaptiveGridView StretchContentForSingleRow="True"
+            <controls:AdaptiveGridView StretchContentForSingleRow="False"
                                        OneRowModeEnabled="True"
                                        ItemHeight="250"
                                        DesiredWidth="300"

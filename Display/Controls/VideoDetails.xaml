@@ -209,7 +209,7 @@
                                Source="{x:Bind ResultInfo.ImagePath}"
                                HorizontalAlignment="Left"
                                VerticalAlignment="Center"
-                               MaxHeight="500"/>
+                               MaxHeight="500" />
 
                         <Grid x:Name="VideoPlayIconInCover"
                               Visibility="Collapsed">
@@ -400,6 +400,7 @@
                                                      Header="缩略图">
 
                         <controls:AdaptiveGridView x:Name="ThumbnailGridView"
+                                                   SingleSelectionFollowsFocus="False"
                                                    IsItemClickEnabled="True"
                                                    ItemClick="ThumbnailGridView_ItemClick"
                                                    ItemHeight="120"
@@ -464,93 +465,79 @@
                   VerticalAlignment="Stretch"
                   Visibility="Collapsed">
 
-                <Grid x:Name="SmokeCancelGrid">
-                    <Grid.Background>
-                        <SolidColorBrush Color="{ThemeResource SystemChromeAltHighColor}"
-                                         Opacity="0.8" />
-                    </Grid.Background>
-                </Grid>
+                <Border x:Name="SmokeCancelGrid">
+                    <Border.Background>
+                        <SolidColorBrush Color="{ThemeResource SystemChromeAltHighColor}"/>
+                    </Border.Background>
+                </Border>
 
-                <Grid x:Name="destinationImageElement"
+                <Grid x:Name="DestinationImageElement"
                       HorizontalAlignment="Center"
                       VerticalAlignment="Center"
-                      BorderThickness="1"
-                      Visibility="Collapsed">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <Grid HorizontalAlignment="Stretch"
-                          VerticalAlignment="Stretch"
-                          Background="{ThemeResource AccentAAFillColorDisabledBrush}">
-                        <Grid x:Name="ThumbnailGrid"
-                              MaxWidth="630"
-                              MaxHeight="420">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
-                            <FlipView x:Name="ShowImageFlipView"
-                                      ItemsSource="{x:Bind _showImageList}"
-                                      SelectionChanged="ShowImageFlipView_SelectionChanged"
-                                      Background="{ThemeResource AccentAAFillColorDisabledBrush}">
-                                <FlipView.ItemTemplate>
-                                    <DataTemplate x:DataType="x:String">
-                                        <Image Source="{x:Bind}" />
-                                    </DataTemplate>
-                                </FlipView.ItemTemplate>
-                            </FlipView>
+                      Visibility="Collapsed"
+                      CornerRadius="3"
+                      RowDefinitions="*,auto,auto"
+                      Background="{ThemeResource AccentAAFillColorDisabledBrush}">
 
-                            <PipsPager Grid.Row="1"
-                                       HorizontalAlignment="Center"
-                                       NumberOfPages="{x:Bind _showImageList.Count,Mode=OneWay}"
-                                       SelectedPageIndex="{x:Bind ShowImageFlipView.SelectedIndex,Mode=TwoWay}" />
-                        </Grid>
+                    <FlipView x:Name="ShowImageFlipView"
+                              Grid.Row="0"
+                              MaxHeight="600"
+                              MaxWidth="800"
+                              ItemsSource="{x:Bind _showImageList}"
+                              SelectionChanged="ShowImageFlipView_SelectionChanged"
+                              Background="{ThemeResource AccentAAFillColorDisabledBrush}">
+                        <FlipView.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Image Source="{x:Bind}" />
+                            </DataTemplate>
+                        </FlipView.ItemTemplate>
+                    </FlipView>
+                    <Button Grid.Row="0"
+                            Click="BackButton_Click"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            BorderThickness="0"
+                            Height="40"
+                            Width="40"
+                            Background="Transparent"
+                            Margin="8">
+                        <Button.Content>
+                            <SymbolIcon Symbol="Clear" />
+                        </Button.Content>
+                    </Button>
 
-                        <!--<Image x:Name="ShowImage"/>-->
-                        <Button Click="BackButton_Click"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Top"
-                                Height="40"
-                                Width="40"
-                                Margin="5">
-                            <Button.Content>
-                                <SymbolIcon Symbol="Clear" />
-                            </Button.Content>
-                        </Button>
-                    </Grid>
-                    <Grid HorizontalAlignment="Stretch"
-                          VerticalAlignment="Stretch"
-                          Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
-                          Grid.Row="1">
-                        <!--<TextBlock x:Name="ShoeImageName" Text="{x:Bind GetFileNameFromFullPath(ShowImageFlipView.SelectedItem),Mode=OneWay}" Style="{ThemeResource BaseTextBlockStyle}" HorizontalAlignment="Center" Margin="12" IsTextSelectionEnabled="True"/>-->
-                        <TextBlock x:Name="ShoeImageName"
-                                   Style="{ThemeResource BaseTextBlockStyle}"
-                                   HorizontalAlignment="Center"
-                                   Margin="12"
-                                   IsTextSelectionEnabled="True" />
+                    <PipsPager Grid.Row="1"
+                               HorizontalAlignment="Center"
+                               NumberOfPages="{x:Bind _showImageList.Count,Mode=OneWay}"
+                               SelectedPageIndex="{x:Bind ShowImageFlipView.SelectedIndex,Mode=TwoWay}" />
 
-                    </Grid>
+                    <TextBlock x:Name="ShoeImageName"
+                               Grid.Row="2"
+                               Style="{ThemeResource BaseTextBlockStyle}"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,2"
+                               IsTextSelectionEnabled="True"/>
                 </Grid>
 
             </Grid>
 
-            <Grid x:Name="EnLargeGrid"
+            <Border x:Name="EnLargeGrid"
                   Grid.Column="0"
                   Visibility="Collapsed"
                   Margin="65,20"
                   HorizontalAlignment="Center"
                   VerticalAlignment="Center"
-                  CornerRadius="10"
+                  CornerRadius="3"
                   IsHitTestVisible="False">
 
                 <Image x:Name="EnlargeImage"
-                       MaxWidth="800" />
-            </Grid>
+                       MaxWidth="800"/>
+            </Border>
 
         </Grid>
 
-        <TeachingTip Grid.Row="0" x:Name="LightDismissTeachingTip"
+        <TeachingTip Grid.Row="0"
+                     x:Name="LightDismissTeachingTip"
                      IsLightDismissEnabled="True" />
     </Grid>
 </UserControl>

@@ -107,6 +107,7 @@
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
+
                                 <VisualState x:Name="LabelOnRight">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentViewbox"

@@ -986,6 +986,7 @@
 
         <!--匹配失败的预览-->
         <controls:AdaptiveGridView x:Name="FailGridView"
+                                   SingleSelectionFollowsFocus="False"
                                    Grid.Row="2"
                                    ItemTemplateSelector="{StaticResource FailItemTemplateSelector}"
                                    SelectionMode="None"
