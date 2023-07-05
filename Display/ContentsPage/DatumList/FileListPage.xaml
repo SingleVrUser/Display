@@ -7,7 +7,6 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:behaviors="using:CommunityToolkit.WinUI.UI.Behaviors"
-      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:local="using:Display.ContentsPage.DatumList"
       xmlns:customizeControls="using:Display.Controls"
       xmlns:data="using:Display.Data"
@@ -205,7 +204,8 @@
         </VisualStateManager.VisualStateGroups>
 
         <!--进度条-->
-        <ProgressBar x:Name="MyProgressBar"
+        <ProgressBar Grid.Row="0"
+                     x:Name="MyProgressBar"
                      VerticalAlignment="Top"
                      Visibility="Collapsed"
                      IsIndeterminate="True" />
@@ -411,7 +411,6 @@
                 </Grid>
             </ListView.Header>
         </ListView>
-
 
         <Grid Grid.Row="1"
               BorderThickness="0,1,0,0"

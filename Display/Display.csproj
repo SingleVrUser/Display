@@ -70,6 +70,7 @@
     <None Remove="ContentsPage\CheckCookie.xaml" />
     <None Remove="ContentsPage\CloudDownPage.xaml" />
     <None Remove="ContentsPage\DatumList\FileListPage.xaml" />
+    <None Remove="ContentsPage\DatumList\MainPage.xaml" />
     <None Remove="ContentsPage\DatumList\VideoDisplay\MainPage.xaml" />
     <None Remove="ContentsPage\DetailInfo\EditInfo.xaml" />
     <None Remove="ContentsPage\FileInfoInCidSmoke.xaml" />
@@ -100,6 +101,7 @@
     <None Remove="Controls\Explorer.xaml" />
     <None Remove="Controls\FileAutoSuggestBox.xaml" />
     <None Remove="Controls\FileControl.xaml" />
+    <None Remove="Controls\ImageInfoControl.xaml" />
     <None Remove="Controls\InfoListFilter.xaml" />
     <None Remove="Controls\MultipleCoverShow.xaml" />
     <None Remove="Controls\RangeSlider.xaml" />
@@ -130,8 +132,6 @@
     <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
-    <Content Include="Views\AboutPage.xaml" />
-    <Content Include="Views\AboutPage.xaml.cs" />
     <Content Include="Views\ActorInfoPage.xaml" />
     <Content Include="Views\ActorInfoPage.xaml.cs" />
     <Content Include="Views\ActorsPage.xaml" />
@@ -157,6 +157,7 @@
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WinUI" Version="2.0.0-beta.330" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.5" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.3.230502000" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
@@ -260,9 +261,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\AboutPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Update="Views\ActorInfoPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -305,6 +303,12 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <Page Update="ContentsPage\DatumList\MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Controls\ImageInfoControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="ContentsPage\TaskPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

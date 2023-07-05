@@ -1,12 +1,11 @@
-﻿using System;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Display.Services.Upload;
 using Display.ViewModels;
 using Microsoft.UI.Xaml;
+using System;
 using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace Display.Models
 {

@@ -16,6 +16,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,6 +24,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -46,9 +48,9 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         Name = "根目录",
         Id = 0
-    };  
+    };
     private ExplorerItem CurrentExplorerItem => _units.LastOrDefault();
-    private ExplorerItem LastExplorerItem => _units.Count<=1 ? RootExplorerItem : _units[^2];
+    private ExplorerItem LastExplorerItem => _units.Count <= 1 ? RootExplorerItem : _units[^2];
 
     private IncrementalLoadDatumCollection _filesInfos;
     private IncrementalLoadDatumCollection FilesInfos
@@ -63,32 +65,47 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
     }
 
-
     private WebApi WebApi => _webApi ??= WebApi.GlobalWebApi;
-    
+
     /// <summary>
     /// 中转站文件
     /// </summary>
     private ObservableCollection<TransferStationFiles> _transferStationFiles;
 
+    public FileListPage()
+    {
+        InitializeComponent();
+
+        var units = InitUnit(0);
+
+        InitData(units);
+    }
+
     public FileListPage(long cid = 0)
     {
         this.InitializeComponent();
 
-        List<ExplorerItem> unit;
+        var units = InitUnit(cid);
+
+        InitData(units);
+    }
+
+    private static List<ExplorerItem> InitUnit(long cid)
+    {
+        List<ExplorerItem> units;
         if (cid == 0)
         {
-            unit = new List<ExplorerItem> { RootExplorerItem };
-
+            units = new List<ExplorerItem> { RootExplorerItem };
         }
         else
         {
             var folderToRootList = DataAccess.Get.GetRootByCid(cid);
-            unit = folderToRootList.Select(x => new ExplorerItem { Name = x.Name, Id = x.Cid }).ToList();
+            units = folderToRootList.Select(x => new ExplorerItem { Name = x.Name, Id = x.Cid }).ToList();
         }
 
-        InitData(unit);
+        return units;
     }
+
 
     private void InitData(List<ExplorerItem> units)
     {
@@ -111,17 +128,25 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         MyProgressBar.Visibility = Visibility.Collapsed;
     }
 
-
     private void OpenFile_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
         if (sender is not Grid { DataContext: FilesInfo info }) return;
 
-        // 不是文件夹或视频就跳过
+        // 跳过文件夹
         if (info.Type == FilesInfo.FileType.Folder) return;
+
+        if (info.IsImage)
+        {
+            if (info.Id == null) return;
+            var files = FilesInfos.Where(i=>i.IsImage).ToList();
+            var currentIndex = files.IndexOf(info);
+            NavigationToImagePage(files, currentIndex);
+            return;
+        }
 
         if (!info.IsVideo)
         {
-            ShowTeachingTip("不支持打开非视频文件");
+            ShowTeachingTip("不支持打开该格式");
 
             return;
         }
@@ -145,7 +170,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         //不存在，返回
         if (index < 0) return;
-            
+
         for (var i = _units.Count - 1; i > index; i--)
         {
             _units.RemoveAt(i);
@@ -224,7 +249,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
                 break;
         }
     }
-
 
     private async void ChangedOrder(WebApi.OrderBy orderBy, Run run)
     {
@@ -484,10 +508,10 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         var cid = sourceFilesInfos.First().Cid;
 
         // 从115中删除
-       var result = await WebApi.DeleteFiles(cid,
-            sourceFilesInfos.Where(item => item.Id != null).Select(item => (long)item.Id).ToArray());
+        var result = await WebApi.DeleteFiles(cid,
+             sourceFilesInfos.Where(item => item.Id != null).Select(item => (long)item.Id).ToArray());
 
-        if(!result) ShowTeachingTip("删除文件失败");
+        if (!result) ShowTeachingTip("删除文件失败");
     }
 
     private void RecycleStationGrid_DragEnter(object sender, DragEventArgs e)
@@ -593,7 +617,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
     }
 
-
     private void TryRemoveFilesInTransfer(IEnumerable<FilesInfo> files)
     {
         if (_transferStationFiles is not { Count: > 0 }) return;
@@ -617,7 +640,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         //// 从中转站列表中删除已经移动的文件
         //TryRemoveTransferFiles(files);
     }
-
 
     private int GetInsertIndexInListView(ListView target, DragEventArgs e)
     {
@@ -644,7 +666,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         return index;
     }
 
-
     private void FilesTransferStation_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
     {
         // 显示回收站
@@ -665,7 +686,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         return infos;
     }
-
 
     private void Source_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
     {
@@ -757,7 +777,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             });
 
         var dialog = new ContentDialog
-        {   
+        {
             XamlRoot = XamlRoot,
             Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
             Title = "确认后继续",
@@ -1004,7 +1024,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         // 更新UI
         // 新建文件夹
-        FilesInfos.Insert(0, new FilesInfo(new Datum { Cid = makeDirResult.cid, Name = makeDirResult.cname , Pid = LastExplorerItem.Id, TimeEdit = (int)DateTimeOffset.Now.ToUnixTimeSeconds()}));
+        FilesInfos.Insert(0, new FilesInfo(new Datum { Cid = makeDirResult.cid, Name = makeDirResult.cname, Pid = LastExplorerItem.Id, TimeEdit = (int)DateTimeOffset.Now.ToUnixTimeSeconds() }));
 
         // 删除文件
         TryRemoveFilesInExplorer(fileInfos);
@@ -1032,7 +1052,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             HorizontalAlignment = HorizontalAlignment.Right,
         };
 
-        ToolTipService.SetToolTip(checkBox,"按新名称重新上传文件，完成后删除旧文件");
+        ToolTipService.SetToolTip(checkBox, "按新名称重新上传文件，完成后删除旧文件");
 
         stackPanel.Children.Add(inputTextBox);
         stackPanel.Children.Add(checkBox);
@@ -1054,7 +1074,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         var inputText = inputTextBox.Text;
 
         // 强制重命名新名称就是输入框Text
-        var newName = checkBox.IsChecked ==true ? inputText: string.IsNullOrEmpty(info.Datum.Ico) ? inputText : $"{inputText}.{info.Datum.Ico}";
+        var newName = checkBox.IsChecked == true ? inputText : string.IsNullOrEmpty(info.Datum.Ico) ? inputText : $"{inputText}.{info.Datum.Ico}";
 
         //没变
         if (newName == info.Name) return;
@@ -1237,7 +1257,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         await OpenFolder(info);
     }
-    
+
     private async void Refresh_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
         await OpenFolder(CurrentExplorerItem);
@@ -1260,8 +1280,19 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         if (_isSelectedListView == isSelectedState) return;
         _isSelectedListView = isSelectedState;
 
-        VisualStateManager.GoToState(this, isSelectedState ?"Show": "Hidden", true);
+        VisualStateManager.GoToState(this, isSelectedState ? "Show" : "Hidden", true);
     }
+
+
+    #region 设置图片控件
+
+    public void NavigationToImagePage(List<FilesInfo> files, int currentIndex)
+    {
+        Frame.Navigate(typeof(ImagePage), Tuple.Create(files, currentIndex), new EntranceNavigationTransitionInfo());
+    }
+
+    #endregion
+
 
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -1271,7 +1302,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         // Raise the PropertyChanged event, passing the Name of the property whose value has changed.
         this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-    
+
 }
 
 class TransferStationFiles

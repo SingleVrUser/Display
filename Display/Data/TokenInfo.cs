@@ -1075,6 +1075,7 @@ namespace Display.Data
     {
         public readonly Datum Datum;
         public readonly long? Id;
+        public readonly bool NoId;
         public readonly long Cid;
         public readonly long Size;
         public readonly string Sha1;
@@ -1082,12 +1083,22 @@ namespace Display.Data
         public readonly FileType Type;
         public readonly int Time;
         public readonly bool IsVideo;
-        public readonly bool NoId;
+        public readonly bool IsImage;
+
+        public readonly string ThumbnailUrl;
+
+        private string _ico;
         public string Ico{
             get
             {
+                if (!string.IsNullOrEmpty(_ico))
+                {
+                    return _ico;
+                }
+
                 var nameArray = Name.Split('.');
-                return nameArray.Length == 1 ? string.Empty : nameArray[^1];
+                _ico = nameArray.Length == 1 ? string.Empty : nameArray[^1];
+                return _ico;
             }
         }
 
@@ -1104,25 +1115,24 @@ namespace Display.Data
             Time = (int)DateTimeOffset.Now.ToUnixTimeSeconds();
 
             IsVideo = result.IsVideo;
+
+            // 不是视频文件，判断是不是图片文件
+            if (!IsVideo)
+            {
+                IsImage = GetTypeFromIcon(Ico) == "image";
+
+                ThumbnailUrl = result.ThumbUrl;
+            }
+
         }
-
-        public void UpdateName(string name)
-        {
-            Name = name;
-            // 清空_nameWithoutExtension，再次获取时会重新计算
-            _nameWithoutExtension = null;
-
-            if(Type == FileType.File) IconPath = GetPathFromIcon(Ico);
-        }
-
         public FilesInfo(Datum data)
         {
             Datum = data;
             Name = data.Name;
             Time = data.TimeEdit;
-            
+
             //文件夹
-            if (data.Fid == null && data.Pid!=null)
+            if (data.Fid == null && data.Pid != null)
             {
                 Type = FileType.Folder;
                 Id = data.Cid;
@@ -1130,7 +1140,7 @@ namespace Display.Data
                 PickCode = data.PickCode;
                 IconPath = Const.FileType.FolderSvgPath;
             }
-            else if(data.Fid != null)
+            else if (data.Fid != null)
             {
                 Type = FileType.File;
                 Id = data.Fid;
@@ -1145,17 +1155,21 @@ namespace Display.Data
                     IsVideo = true;
                     var videoQuality = GetVideoQualityFromVdi(data.Vdi);
 
-                    IconPath = videoQuality != null ? "ms-appx:///Assets/115/file_type/video_quality/"+videoQuality+".svg"
-                                                    : Const.FileType.VideoSvgPath;
+                    IconPath = videoQuality != null ? "ms-appx:///Assets/115/file_type/video_quality/" + videoQuality + ".svg"
+                        : Const.FileType.VideoSvgPath;
 
                 }
                 else if (!string.IsNullOrEmpty(data.Ico))
                 {
+                    // 图片文件
                     var tmpIcoPath = GetPathFromIcon(data.Ico);
                     if (tmpIcoPath != null)
                     {
                         IconPath = tmpIcoPath;
                     }
+
+                    IsImage = GetTypeFromIcon(data.Ico) == "image";
+                    ThumbnailUrl = data.U;
                 }
 
                 IconPath ??= Const.FileType.UnknownSvgPath;
@@ -1163,6 +1177,16 @@ namespace Display.Data
             }
 
             NoId = Id == null;
+        }
+
+
+        public void UpdateName(string name)
+        {
+            Name = name;
+            // 清空_nameWithoutExtension，再次获取时会重新计算
+            _nameWithoutExtension = null;
+
+            if(Type == FileType.File) IconPath = GetPathFromIcon(Ico);
         }
 
         public static string GetVideoQualityFromVdi(int vdi)

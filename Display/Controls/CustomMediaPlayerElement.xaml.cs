@@ -27,6 +27,7 @@ using Windows.Storage.Streams;
 using Windows.System.Display;
 using Windows.Web.Http;
 using Display.ContentsPage;
+using Microsoft.UI.Xaml.Media.Imaging;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -581,13 +582,12 @@ public sealed partial class CustomMediaPlayerElement
         ShowTeachingTip("已截取当前画面作为封面");
     }
 
-    public async Task<string> ScreenShotAsync(string PickCode)
+    public async Task<string> ScreenShotAsync(string pickCode)
     {
-        string savePath = Path.Combine(AppSettings.ImageSavePath, "Screen");
+        var savePath = Path.Combine(AppSettings.ImageSavePath, "Screen");
         if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
-        StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(savePath);
-        StorageFile file = await storageFolder.CreateFileAsync($"{PickCode}.png", CreationCollisionOption.ReplaceExisting);
-        var fileStream = await file.OpenAsync(FileAccessMode.ReadWrite);
+        var storageFolder = await StorageFolder.GetFolderFromPathAsync(savePath);
+        var file = await storageFolder.CreateFileAsync($"{pickCode}.png", CreationCollisionOption.ReplaceExisting);
 
         var canvasRenderTarget = new CanvasRenderTarget(
                 CanvasDevice.GetSharedDevice(),
@@ -596,12 +596,9 @@ public sealed partial class CustomMediaPlayerElement
                 96);
         MediaControl.MediaPlayer.CopyFrameToVideoSurface(canvasRenderTarget);
 
-        var targetFileStream = fileStream.AsStreamForWrite();
-        await using (targetFileStream)
-        {
-            var stream = targetFileStream.AsRandomAccessStream();
-            await canvasRenderTarget.SaveAsync(stream, CanvasBitmapFileFormat.Png);
-        }
+        await using var targetFileStream = await file.OpenStreamForWriteAsync();
+        var stream = targetFileStream.AsRandomAccessStream();
+        await canvasRenderTarget.SaveAsync(stream, CanvasBitmapFileFormat.Png);
 
         return file.Path;
     }

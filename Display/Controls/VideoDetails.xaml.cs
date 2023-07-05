@@ -295,8 +295,8 @@ namespace Display.Controls
         private void Animation_Completed(ConnectedAnimation sender, object args)
         {
             SmokeGrid.Visibility = Visibility.Collapsed;
-            SmokeGrid.Children.Add(destinationImageElement);
-            destinationImageElement.Visibility = Visibility.Collapsed;
+            SmokeGrid.Children.Add(DestinationImageElement);
+            DestinationImageElement.Visibility = Visibility.Collapsed;
 
             SmokeCancelGrid.Tapped -= SmokeCancelGrid_Tapped;
         }
@@ -376,7 +376,6 @@ namespace Display.Controls
             //为了图片显示能够变化
             var oldPath = ResultInfo.ImagePath;
             var newPath = videoInfo.ImagePath;
-            //string NoPictruePath = "ms-appx:///Assets/NoPicture.jpg";
             if (!oldPath.Contains("ms-appx:") && File.Exists(newPath))
             {
                 var file = await StorageFile.GetFileFromPathAsync(newPath);
@@ -414,17 +413,19 @@ namespace Display.Controls
 
         private async void SmokeGridCancel()
         {
-            if (!destinationImageElement.IsLoaded) return;
+            if (!DestinationImageElement.IsLoaded) return;
 
-            ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView()
-                .PrepareToAnimate("backwardsAnimation", destinationImageElement);
-            SmokeGrid.Children.Remove(destinationImageElement);
+            var animation = ConnectedAnimationService.GetForCurrentView()
+                .PrepareToAnimate("backwardsAnimation", DestinationImageElement);
+            SmokeGrid.Children.Remove(DestinationImageElement);
 
             // Collapse the smoke when the animation completes.
             animation.Completed += Animation_Completed;
 
+            if (ShowImageFlipView.SelectedItem is not string item) return;
+
             // If the connected item appears outside the viewport, scroll it into view.
-            ThumbnailGridView.ScrollIntoView(_storedItem, ScrollIntoViewAlignment.Default);
+            ThumbnailGridView.ScrollIntoView(item, ScrollIntoViewAlignment.Default);
             ThumbnailGridView.UpdateLayout();
 
             // Use the Direct configuration to go back (if the API is available). 
@@ -434,11 +435,9 @@ namespace Display.Controls
             }
 
             // Play the second connected animation. 
-            await ThumbnailGridView.TryStartConnectedAnimationAsync(animation, _storedItem, "Thumbnail_Image");
+            await ThumbnailGridView.TryStartConnectedAnimationAsync(animation, item, "Thumbnail_Image");
 
         }
-
-        private string _storedItem;
 
         private void ThumbnailGridView_ItemClick(object sender, ItemClickEventArgs e)
         {
@@ -446,9 +445,9 @@ namespace Display.Controls
 
             if (ThumbnailGridView.ContainerFromItem(e.ClickedItem) is GridViewItem container)
             {
-                _storedItem = container.Content as string;
+                var item = container.Content as string;
 
-                animation = ThumbnailGridView.PrepareConnectedAnimation("forwardAnimation", _storedItem,
+                animation = ThumbnailGridView.PrepareConnectedAnimation("forwardAnimation", item,
                     "Thumbnail_Image");
             }
                 
@@ -481,13 +480,13 @@ namespace Display.Controls
             ShoeImageName.Text = GetFileIndex();
 
             SmokeGrid.Visibility = Visibility.Visible;
-            destinationImageElement.Visibility = Visibility.Visible;
+            DestinationImageElement.Visibility = Visibility.Visible;
 
             if (animation != null)
             {
                 animation.Completed += Animation_Completed1;
 
-                animation.TryStart(destinationImageElement);
+                animation.TryStart(DestinationImageElement);
             }
         }
 
@@ -694,8 +693,7 @@ namespace Display.Controls
                 VisualStateManager.GoToState(sender as Control, "EnlargeButtonShown", true);
             }
         }
-
-
+        
         private void EnLargeImage_OnPointerExited(object sender, PointerRoutedEventArgs e)
         {
             if (e.Pointer.PointerDeviceType is PointerDeviceType.Mouse or PointerDeviceType.Pen)

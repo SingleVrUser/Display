@@ -9,7 +9,10 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using WinRT.Interop;
+using Display.ViewModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -21,17 +24,28 @@ namespace Display
     /// </summary>
     public partial class App : Application
     {
-        /// <summary>
-        /// 主窗口.
-        /// </summary>
         public static Window AppMainWindow;
 
         private static NotificationManager _notificationManager;
 
-        /// <summary>
-        /// Initializes the singleton application object.  This is the first line of authored code
-        /// executed, and as such is the logical equivalent of main() or WinMain().
-        /// </summary>
+        //private static readonly IHost _host = Host.CreateDefaultBuilder().ConfigureServices((_, services) =>
+        //{
+        //    services.AddSingleton<ImageViewModel>();
+
+        //}).Build();
+
+        private static readonly IHost _host = Host
+            .CreateDefaultBuilder()
+            .ConfigureServices((_, services) =>
+            {
+                services
+                    // Services
+                    //.AddSingleton<IThumbnailService, ThumbnailService>()
+                    // Views and ViewModels
+                    .AddSingleton<ImageViewModel>();
+            })
+            .Build();
+
         public App()
         {
             this.InitializeComponent();
@@ -39,7 +53,13 @@ namespace Display
             _notificationManager = new NotificationManager();
 
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+        }
 
+        public static T GetService<T>() where T : class
+        {
+            return _host.Services.GetService(typeof(T)) as T ??
+                   throw new ArgumentException(
+                       $"Service {typeof(T)} not found. Did you forget to register the service?");
         }
 
         private void CurrentDomain_ProcessExit(object sender, EventArgs e)
@@ -50,11 +70,6 @@ namespace Display
             _notificationManager.Unregister();
         }
 
-        /// <summary>
-        /// Invoked when the application is launched normally by the end user.  Other entry points
-        /// will be used such as when the application is launched to open a specific file.
-        /// </summary>
-        /// <param Name="args">Details about the launch request and process.</param>
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
             //运行前检查
@@ -89,7 +104,7 @@ namespace Display
 
         private static bool CheckErrorBeforeActivateMainWindow()
         {
-            bool isNormal = true;
+            var isNormal = true;
 
             var dataAccessSavePath = AppSettings.DataAccessSavePath;
 
@@ -111,8 +126,7 @@ namespace Display
             {
                 DataAccess.TryCreateDbFile(dataAccessSavePath);
             }
-            // TODO
-            // 数据文件格式有误
+            // TODO 数据文件格式有误
 
             return isNormal;
         }
