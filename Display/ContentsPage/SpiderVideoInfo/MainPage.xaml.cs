@@ -1,6 +1,9 @@
 ﻿
+using Display.Data;
 using Display.Helper;
-using Microsoft.UI.Input;
+using Display.Models;
+using Display.Models.IncrementalCollection;
+using Display.Views;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -8,12 +11,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Display.Data;
-using HarfBuzzSharp;
 using System.Threading.Tasks;
-using Display.Models;
-using Display.Views;
-using Display.Models.IncrementalCollection;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

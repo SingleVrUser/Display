@@ -3,6 +3,7 @@
 
 using CommunityToolkit.WinUI.UI;
 using CommunityToolkit.WinUI.UI.Controls;
+using Display.Data;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
@@ -10,7 +11,6 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using Windows.Foundation;
-using Display.Data;
 using Display.Models.IncrementalCollection;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -114,7 +114,7 @@ public sealed partial class EditInfo : Page
             }
             else
             {
-                actors_suggestion.SetFilter(new() { $"name LIKE '%{sender.Text}%'" });
+                actors_suggestion.SetFilter(new () { $"name LIKE '%{sender.Text}%'" });
             }
 
             if (actors_suggestion.Count == 0) await actors_suggestion.LoadData(20);

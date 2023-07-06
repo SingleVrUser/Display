@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Display.Models
+namespace Display.Services
 {
     internal class SubStream : Stream
     {
@@ -17,9 +17,9 @@ namespace Display.Models
             if (!baseStream.CanRead) throw new ArgumentException("can't read base stream");
             if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
 
-            this._baseStream = baseStream;
-            this._length = length;
-            this._progress = progress;
+            _baseStream = baseStream;
+            _length = length;
+            _progress = progress;
 
             if (baseStream.CanSeek)
             {
@@ -43,7 +43,7 @@ namespace Display.Models
             var remaining = _length - _position;
             if (remaining <= 0) return 0;
             if (remaining < count) count = (int)remaining;
-                
+
             var read = _baseStream.Read(buffer, offset, count);
             _position += read;
 

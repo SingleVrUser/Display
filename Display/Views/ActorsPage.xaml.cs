@@ -1,9 +1,12 @@
-﻿using Microsoft.UI.Input;
+﻿using Display.Data;
+using Display.Models.IncrementalCollection;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
+using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,9 +16,6 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
-using Display.Data;
-using SharpCompress;
-using Display.Models.IncrementalCollection;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

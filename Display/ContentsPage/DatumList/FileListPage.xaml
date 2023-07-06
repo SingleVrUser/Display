@@ -10,6 +10,7 @@
       xmlns:local="using:Display.ContentsPage.DatumList"
       xmlns:customizeControls="using:Display.Controls"
       xmlns:data="using:Display.Data"
+      xmlns:models="using:Display.Models"
       xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
       mc:Ignorable="d">
     <Page.Resources>
@@ -41,6 +42,56 @@
                            TextWrapping="Wrap" />
             </Grid>
         </DataTemplate>
+
+
+        <DataTemplate x:Key="SearchListTemplate"
+                      x:DataType="data:FilesInfo">
+            <Grid Background="Transparent"
+                  ColumnDefinitions="*">
+                <Grid.ContextFlyout>
+                    <MenuFlyout ShouldConstrainToRootBounds="False">
+                        <MenuFlyoutItem Text="属性"
+                                        Click="ShowInfoClick">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe Fluent Icons"
+                                          Glyph="&#xE946;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </Grid.ContextFlyout>
+
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Image Height="30"
+                           Width="30">
+                        <Image.Source>
+                            <SvgImageSource UriSource="{x:Bind IconPath}"
+                                            RasterizePixelWidth="35"
+                                            RasterizePixelHeight="30" />
+                        </Image.Source>
+                    </Image>
+
+                    <TextBlock Grid.Column="1"
+                               Text="{x:Bind Name}"
+                               Style="{StaticResource ValueText}"
+                               Tapped="TextBlock_Tapped"
+                               HorizontalAlignment="Left" />
+                </Grid>
+
+                <!--<TextBlock  Grid.Column="1"
+                            Text="{x:Bind Time,Converter={StaticResource NumberToDateTimeStrConverter}}"
+                            Style="{StaticResource ValueText}" />
+
+                <TextBlock  Grid.Column="2"
+                            Text="{x:Bind Size,Converter={StaticResource BytesToSizeStrConverter}}"
+                            Style="{StaticResource ValueText}" />-->
+            </Grid>
+        </DataTemplate>
+
 
         <DataTemplate x:Key="FileListTemplate"
                       x:DataType="data:FilesInfo">
@@ -133,13 +184,17 @@
                             Text="{x:Bind Size,Converter={StaticResource BytesToSizeStrConverter}}"
                             Style="{StaticResource ValueText}" />
 
-                <Border Grid.Column="0" HorizontalAlignment="Right" Padding="5" CornerRadius="5" Visibility="{x:Bind NoId,Converter={StaticResource BoolToVisibleConverter}}">
+                <Border Grid.Column="0"
+                        HorizontalAlignment="Right"
+                        Padding="5"
+                        CornerRadius="5"
+                        Visibility="{x:Bind NoId,Converter={StaticResource BoolToVisibleConverter}}">
                     <Border.Background>
                         <SolidColorBrush Color="{ThemeResource SystemChromeAltHighColor}"
                                          Opacity="0.8" />
                     </Border.Background>
                     <TextBlock VerticalAlignment="Center"
-                               Text="id 缺失，刷新后补全"/>
+                               Text="id 缺失，刷新后补全" />
                 </Border>
             </Grid>
         </DataTemplate>
@@ -186,7 +241,7 @@
             </VisualStateGroup>
 
             <VisualStateGroup x:Name="ButtonState">
-                <VisualState x:Name="Hidden"/>
+                <VisualState x:Name="Hidden" />
                 <VisualState x:Name="Show">
                     <VisualState.Setters>
                         <Setter Target="PlayButton.Visibility"
@@ -231,7 +286,8 @@
                     <EdgeUIThemeTransition Edge="Right" />
                 </CommandBar.Transitions>
 
-                <AppBarButton x:Name="PlayButton" Icon="Play"
+                <AppBarButton x:Name="PlayButton"
+                              Icon="Play"
                               Label="播放"
                               Visibility="Collapsed"
                               Click="PlayButton_Click">
@@ -273,11 +329,13 @@
                         </MenuFlyout>
                     </AppBarButton.ContextFlyout>
                 </AppBarButton>
-                <AppBarButton x:Name="ImportButton" Icon="Import"
+                <AppBarButton x:Name="ImportButton"
+                              Icon="Import"
                               Label="导入"
                               Visibility="Collapsed"
                               Click="ImportDataButton_Click" />
-                <AppBarButton x:Name="DownloadButton" Icon="Download"
+                <AppBarButton x:Name="DownloadButton"
+                              Icon="Download"
                               Label="下载"
                               Visibility="Collapsed"
                               Click="DownButton_Click"
@@ -292,10 +350,17 @@
                     </AppBarButton.ContextFlyout>
                 </AppBarButton>
 
+                <AppBarButton x:Name="SearchButton"
+                              Icon="Find"
+                              Label="搜索"
+                              Click="SearchButton_Click" />
+
                 <CommandBar.SecondaryCommands>
-                    <AppBarButton x:Name="SortButton" Visibility="Collapsed" Icon="Sort"
+                    <AppBarButton x:Name="SortButton"
+                                  Visibility="Collapsed"
+                                  Icon="Sort"
                                   Label="整理"
-                                  Click="Sort115Button_Click"/>
+                                  Click="Sort115Button_Click" />
                     <AppBarButton Icon="Setting"
                                   Label="设置">
                         <AppBarButton.Flyout>
@@ -338,7 +403,7 @@
                                             <MenuFlyout>
                                                 <MenuFlyoutItem Text="刷新"
                                                                 Click="RefreshFolderClick"
-                                                                Icon="Refresh"/>
+                                                                Icon="Refresh" />
 
                                                 <MenuFlyoutItem Text="属性"
                                                                 Click="ShowFolderInfoClick">
@@ -383,9 +448,11 @@
 
                     <CheckBox x:Name="MultipleSelectedCheckBox"
                               Margin="14,0,0,0"
-                              Click="SelectedMultipleFilesCheckBox_OnClick"/>
+                              Click="SelectedMultipleFilesCheckBox_OnClick" />
 
-                    <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource TitleText}"
+                    <TextBlock Grid.Row="0"
+                               Grid.Column="1"
+                               Style="{StaticResource TitleText}"
                                Tapped="OrderBy_Tapped">
                                 <Run>名称</Run>
                                 <Run x:Name="NameRun"
@@ -508,7 +575,7 @@
 
         <TeachingTip Grid.Row="1"
                      x:Name="LightDismissTeachingTip"
-                     IsLightDismissEnabled="True"/>
+                     IsLightDismissEnabled="True" />
 
         <TextBlock Grid.Row="1"
                    Margin="0,30,0,0"
@@ -518,5 +585,28 @@
                    VerticalAlignment="Center"
                    FontSize="30"
                    Opacity="0.5" />
+
+        <!--搜索结果-->
+        <TeachingTip x:Name="SearchTeachingTip" Grid.Row="0"
+                     Grid.Column="0"
+                     IsLightDismissEnabled="True"
+                     Closed="SearchTeachingTip_OnClosed"
+                     PreferredPlacement="Center">
+            <TeachingTip.Content>
+                <Grid RowDefinitions="auto,*" MaxHeight="400" RowSpacing="10">
+                    <AutoSuggestBox PlaceholderText="搜索"
+                                    Width="620"
+                                    QueryIcon="Find"
+                                    QuerySubmitted="SearchBoxOnQuerySubmitted" />
+
+                    <ListView x:Name="SearchResultListView"
+                              Grid.Row="1"
+                              ItemTemplate="{StaticResource SearchListTemplate}"
+                              SelectionMode="None"
+                              IsItemClickEnabled="True"
+                              ItemClick="SearchResultListView_OnItemClick"/>
+                </Grid>
+            </TeachingTip.Content>
+        </TeachingTip>
     </Grid>
 </Page>

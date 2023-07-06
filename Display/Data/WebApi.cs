@@ -1,4 +1,5 @@
-﻿using Display.Helper;
+﻿using Display.Extensions;
+using Display.Helper;
 using Display.Helper.Crypto;
 using Display.Models;
 using Display.Services.Upload;
@@ -24,14 +25,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using static System.Int32;
-using Exception = System.Exception;
 using HttpMethod = System.Net.Http.HttpMethod;
-using HttpRequestMessage = System.Net.Http.HttpRequestMessage;
-using Display.Extensions;
-using static Display.Data.Const.DefaultSettings.Network;
-using static Display.Models.GitHubInfo;
-using System.Security.Cryptography;
-using Windows.System;
 
 namespace Display.Data
 {
@@ -739,49 +733,6 @@ namespace Display.Data
             return await Client.SendAsync<FileCategory>(HttpMethod.Get, $"https://webapi.115.com/category/get?cid={cid}");
         }
 
-        //private async Task<T> SendAsync<T>(HttpMethod method, string url,HttpContent content = null,T defaultValue = default)
-        //{
-        //    var uri = new Uri(url);
-        //    using var request = new HttpRequestMessage(method, url)
-        //    {
-        //        RequestUri = uri,
-        //        Content = content
-        //    };
-
-        //    HttpResponseMessage response;
-        //    try
-        //    {
-        //        response = await Client.SendAsync(request);
-        //    }
-        //    catch (AggregateException e)
-        //    {
-        //        Toast.TryToast("网络异常", $"{uri.Host}", e.Message);
-        //        return defaultValue;
-        //    }
-        //    catch (HttpRequestException e)
-        //    {
-        //        Toast.TryToast("网络异常", $"{uri.Host}", e.Message);
-        //        return defaultValue;
-        //    }
-
-        //    if (!response.IsSuccessStatusCode) return defaultValue;
-
-        //    try
-        //    {
-        //        var contentAsString = await response.Content.ReadAsStringAsync();
-        //        if (contentAsString is T result) return result;
-
-        //        return contentAsString == "[]" ? defaultValue : JsonConvert.DeserializeObject<T>(contentAsString);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Debug.WriteLine($"发生错误{e.Message}");
-        //        Toast.TryToast("格式异常", $"{nameof(T)}转换异常", e.Message);
-
-        //        return defaultValue;
-        //    }
-        //}
-
         /// <summary>
         /// 检查二维码登录验证状态，若登录成功则存储cookie;
         /// </summary>
@@ -986,6 +937,13 @@ namespace Display.Data
             const string url = "https://webapi.115.com/offine/downpath";
 
             return await Client.SendAsync<OfflineDownPathRequest>(HttpMethod.Get, url);
+        }
+
+        public async Task<SearchResult> GetSearchResult(long cid, string value)
+        {
+            var url = $"https://webapi.115.com/files/search?offset=0&limit=30&search_value={value}&date=&aid=1&cid={cid}&pick_code=&type=&count_folders=1&source=&format=json";
+
+            return await Client.SendAsync<SearchResult>(HttpMethod.Get, url);
         }
 
         public async Task<UploadInfo> GetUploadInfo(bool isUpdate = false)
@@ -1393,39 +1351,6 @@ namespace Display.Data
             AppSettings._115_Cookie = null;
         }
 
-        //public async Task<string> GetVerifyAccountInfo()
-        //{
-        //    HttpResponseMessage response;
-        //    try
-        //    {
-        //        response = await Client.GetAsync($"https://captchaapi.115.com/?ac=code&t=sign&callback=jQuery17202178075311826495_1683902571757&_={DateTimeOffset.Now.ToUnixTimeSeconds()}");
-        //    }
-        //    catch (HttpRequestException e)
-        //    {
-        //        Toast.tryToast("网络异常", "检查115登录状态时出现异常：", e.Message);
-
-        //        return null;
-        //    }
-
-        //    if (!response.IsSuccessStatusCode)
-        //    {
-        //        return null;
-        //    }
-
-        //    string strReuslt = await response.Content.ReadAsStringAsync();
-        //    strReuslt = strReuslt.Replace("jQuery17202178075311826495_1683902571757(", "");
-        //    strReuslt = strReuslt.Replace(");", "");
-
-        //    try
-        //    {
-        //        UserInfo = JsonConvert.DeserializeObject<UserInfo>(strReuslt);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine($"发生错误：{ex.Message}");
-        //    }
-        //    return null;
-        //}
         public async Task<Dictionary<string, string>> GetDownUrl(string pickCode, string ua)
         {
             return await GetDownUrl(Client, pickCode, ua, AppSettings.IsRecordDownRequest);

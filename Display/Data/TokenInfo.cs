@@ -15,6 +15,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Windows.ApplicationModel;
 using Display.Helper;
+using Display.Models;
 using static Display.Data.FilesInfo;
 using static SkiaSharp.HarfBuzz.SKShaper;
 
@@ -1100,6 +1101,57 @@ namespace Display.Data
                 _ico = nameArray.Length == 1 ? string.Empty : nameArray[^1];
                 return _ico;
             }
+        }
+
+        public FilesInfo(SearchDatum data)
+        {
+            Name = data.n;
+            Time = data.te;
+
+            // 文件
+            if(data.fid != null)
+            {
+                Type = FileType.File;
+                Id = data.fid;
+                Cid = data.cid;
+                PickCode = data.pc;
+                Size = data.s;
+                Sha1 = data.sha;
+
+                //视频文件
+                if (data.iv == 1)
+                {
+                    IsVideo = true;
+                    var videoQuality = GetVideoQualityFromVdi(data.vdi);
+
+                    IconPath = videoQuality != null ? "ms-appx:///Assets/115/file_type/video_quality/" + videoQuality + ".svg"
+                        : Const.FileType.VideoSvgPath;
+                }
+                else if (!string.IsNullOrEmpty(data.ico))
+                {
+                    // 图片文件
+                    var tmpIcoPath = GetPathFromIcon(data.ico);
+                    if (tmpIcoPath != null)
+                    {
+                        IconPath = tmpIcoPath;
+                    }
+
+                    IsImage = GetTypeFromIcon(data.ico) == "image";
+                    ThumbnailUrl = data.u;
+                }
+
+                IconPath ??= Const.FileType.UnknownSvgPath;
+            }
+            //文件夹
+            else if (data.fid == null && data.pid != null)
+            {
+                Type = FileType.Folder;
+                Id = data.cid;
+                Cid = (long)data.pid;
+                PickCode = data.pc;
+                IconPath = Const.FileType.FolderSvgPath;
+            }
+
         }
 
         public FilesInfo(FileUploadResult result)
