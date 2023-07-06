@@ -591,10 +591,10 @@
                      Grid.Column="0"
                      IsLightDismissEnabled="True"
                      Closed="SearchTeachingTip_OnClosed"
-                     PreferredPlacement="Center">
+                     PreferredPlacement="Top">
             <TeachingTip.Content>
                 <Grid RowDefinitions="auto,*" MaxHeight="400" RowSpacing="10">
-                    <AutoSuggestBox PlaceholderText="搜索"
+                    <AutoSuggestBox x:Name="SearchBox" PlaceholderText="搜索"
                                     Width="620"
                                     QueryIcon="Find"
                                     QuerySubmitted="SearchBoxOnQuerySubmitted" />
