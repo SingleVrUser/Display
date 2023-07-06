@@ -7,6 +7,7 @@ using Display.Data;
 using Display.Helper;
 using Display.Models;
 using Display.Models.IncrementalCollection;
+using Display.Views;
 using Display.WindowView;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -19,12 +20,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Media.Playback;
-using Display.Views;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

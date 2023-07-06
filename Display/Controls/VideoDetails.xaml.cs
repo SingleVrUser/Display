@@ -582,8 +582,8 @@ namespace Display.Controls
 
         private void OpenDirectory_Click(object sender, RoutedEventArgs e)
         {
-            string ImagePath = Path.GetDirectoryName(ResultInfo.ImagePath);
-            FileMatch.LaunchFolder(ImagePath);
+            string imagePath = Path.GetDirectoryName(ResultInfo.ImagePath);
+            FileMatch.LaunchFolder(imagePath);
         }
 
         private void ShowImageFlipView_SelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -14,8 +14,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Display.Data;
-using SharpCompress;
 using Display.Models.IncrementalCollection;
+using Display.Services.IncrementalCollection;
+using SharpCompress;
 
 namespace Display.Controls;
 

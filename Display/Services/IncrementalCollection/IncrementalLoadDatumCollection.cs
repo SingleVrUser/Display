@@ -15,7 +15,7 @@ namespace Display.Models.IncrementalCollection;
 
 public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, ISupportIncrementalLoading
 {
-    private WebApi WebApi { get; set; }
+    private WebApi WebApi { get; }
 
     public bool HasMoreItems { get; private set; } = true;
 

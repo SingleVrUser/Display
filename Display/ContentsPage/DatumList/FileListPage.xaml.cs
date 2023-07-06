@@ -24,11 +24,11 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
+using Microsoft.UI.Xaml.Navigation;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -43,7 +43,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     private const string UpSortIconRun = "\uE014";
     private const string DownSortIconRun = "\uE015";
     private WebApi _webApi;
-    private ObservableCollection<ExplorerItem> _units;
+    private readonly ObservableCollection<ExplorerItem> _units = new();
     private static readonly ExplorerItem RootExplorerItem = new()
     {
         Name = "根目录",
@@ -76,54 +76,37 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         InitializeComponent();
 
-        var units = InitUnit(0);
-
-        InitData(units);
+        InitData(0);
     }
 
-    public FileListPage(long cid = 0)
+    public FileListPage(long cid)
     {
-        this.InitializeComponent();
+        InitializeComponent();
 
-        var units = InitUnit(cid);
-
-        InitData(units);
+        InitData(cid);
     }
 
-    private static List<ExplorerItem> InitUnit(long cid)
+    private void InitData(long cid)
     {
-        List<ExplorerItem> units;
-        if (cid == 0)
-        {
-            units = new List<ExplorerItem> { RootExplorerItem };
-        }
-        else
-        {
-            var folderToRootList = DataAccess.Get.GetRootByCid(cid);
-            units = folderToRootList.Select(x => new ExplorerItem { Name = x.Name, Id = x.Cid }).ToList();
-        }
+        NavigationCacheMode = NavigationCacheMode.Enabled;
 
-        return units;
-    }
-
-
-    private void InitData(List<ExplorerItem> units)
-    {
         MyProgressBar.Visibility = Visibility.Visible;
 
-        _units = new ObservableCollection<ExplorerItem>();
-        units.ForEach(_units.Add);
+        FilesInfos = new IncrementalLoadDatumCollection(cid);
 
         MetadataControl.ItemsSource = _units;
-
-        FilesInfos = new IncrementalLoadDatumCollection(CurrentExplorerItem?.Id ?? 0);
         BaseExample.ItemsSource = FilesInfos;
-
         FilesInfos.GetFileInfoCompleted += FilesInfos_GetFileInfoCompleted;
     }
 
     private void FilesInfos_GetFileInfoCompleted(object sender, GetFileInfoCompletedEventArgs e)
     {
+        _units.Clear();
+        foreach (var path in FilesInfos.WebPaths)
+        {
+            _units.Add(new ExplorerItem { Name = path.name, Id = path.cid });
+        }
+
         ChangedOrderIcon(e.Orderby, e.Asc);
         MyProgressBar.Visibility = Visibility.Collapsed;
     }
@@ -159,24 +142,9 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     }
 
-    private async Task OpenFolder(ExplorerItem currentItem)
+    private async Task OpenFolder(long cid)
     {
-        //不存在，返回
-        if (currentItem?.Id == null) return;
-
-
-        //删除选中路径后面的路径
-        var index = _units.IndexOf(currentItem);
-
-        //不存在，返回
-        if (index < 0) return;
-
-        for (var i = _units.Count - 1; i > index; i--)
-        {
-            _units.RemoveAt(i);
-        }
-
-        await FilesInfos.SetCid(currentItem.Id);
+        await FilesInfos.SetCid(cid);
 
         // 切换目录时，全选checkBox不是选中状态
         MultipleSelectedCheckBox.IsChecked = false;
@@ -193,11 +161,11 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         await FilesInfos.SetCid(id);
 
-        _units.Add(new ExplorerItem
-        {
-            Name = filesInfo.Name,
-            Id = id,
-        });
+        //_units.Add(new ExplorerItem
+        //{
+        //    Name = filesInfo.Name,
+        //    Id = id,
+        //});
 
         // 切换目录时，全选checkBox不是选中状态
         MultipleSelectedCheckBox.IsChecked = false;
@@ -1106,7 +1074,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         if (args.Item is not ExplorerItem item) return;
 
-        await OpenFolder(item);
+        await OpenFolder(item.Id);
     }
 
     private void MetadataItem_OnDragOver(object sender, DragEventArgs e)
@@ -1202,7 +1170,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         if (_units.Count <= 1) return;
 
         var currentItem = _units[^2];
-        await OpenFolder(currentItem);
+        await OpenFolder(currentItem.Id);
     }
 
     private async void ShowInfoClick(object sender, RoutedEventArgs e)
@@ -1255,12 +1223,12 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         if (sender is not MenuFlyoutItem { DataContext: ExplorerItem info }) return;
 
-        await OpenFolder(info);
+        await OpenFolder(info.Id);
     }
 
     private async void Refresh_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
-        await OpenFolder(CurrentExplorerItem);
+        await OpenFolder(CurrentExplorerItem.Id);
     }
 
     private bool _isSelectedListView = false;
@@ -1292,8 +1260,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     }
 
     #endregion
-
-
+    
 
     public event PropertyChangedEventHandler PropertyChanged;
 
@@ -1303,6 +1270,76 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
+    private void SearchButton_Click(object sender, RoutedEventArgs e)
+    {
+        SearchTeachingTip.IsOpen = true;
+    }
+
+    private async void SearchBoxOnQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+    {
+        SearchResultListView.Footer = null;
+        var result = await WebApi.GetSearchResult(CurrentExplorerItem.Id, sender.Text);
+
+        if (result == null)
+        {
+            ShowTeachingTip("搜索失败");
+            return;
+        }
+
+        if (result.data.Length == 0)
+        {
+            SearchResultListView.ItemsSource = null;
+            SearchResultListView.Footer = new TextBlock { Text = "无结果" };
+            return;
+        }
+
+        SearchResultListView.ItemsSource = result.data.Select(x=>new FilesInfo(x)).ToList();
+    }
+
+    private void SearchTeachingTip_OnClosed(TeachingTip sender, TeachingTipClosedEventArgs args)
+    {
+        Debug.WriteLine("Closed");
+    }
+
+    private async void SearchResultListView_OnItemClick(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is not FilesInfo info) return;
+
+        if (info.Id == null) return;
+
+        // 打开文件夹
+        if (info.Type == FilesInfo.FileType.Folder)
+        {
+            await OpenFolder(info.Cid);
+            return;
+        }
+
+        // 打开图片
+        if (info.IsImage)
+        {
+            if (info.Id == null || SearchResultListView.ItemsSource is not List<FilesInfo> infos) return;
+
+            var images = infos.Where(x => x.IsImage).ToList();
+
+            var currentIndex = images.IndexOf(info);
+            
+            NavigationToImagePage(images, currentIndex);
+            return;
+        }
+
+        if (!info.IsVideo)
+        {
+            ShowTeachingTip("不支持打开该格式");
+
+            return;
+        }
+
+        // 视频文件
+        var mediaPlayItem = new MediaPlayItem(info.PickCode, info.Name, info.Type);
+
+        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal,
+            () => _ = PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this));
+    }
 }
 
 class TransferStationFiles

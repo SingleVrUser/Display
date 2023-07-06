@@ -208,7 +208,11 @@
             </ResourceDictionary.MergedDictionaries>
             <!-- Other app resources here -->
 
-            <x:Double x:Key="ContentDialogMaxWidth">900</x:Double>
+
+            <!--重置TeachingTip宽度-->
+            <x:Double x:Key="TeachingTipMaxWidth">700</x:Double>
+
+            <!--<x:Double x:Key="ContentDialogMaxWidth">900</x:Double>-->
 
             <!--颜色-->
             <ui:Color x:Key="ColorDefault">#FBFBFB</ui:Color>

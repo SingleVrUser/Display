@@ -467,7 +467,7 @@
 
                 <Border x:Name="SmokeCancelGrid">
                     <Border.Background>
-                        <SolidColorBrush Color="{ThemeResource SystemChromeAltHighColor}"/>
+                        <SolidColorBrush Color="{ThemeResource SystemChromeAltHighColor}" Opacity="0.8"/>
                     </Border.Background>
                 </Border>
 

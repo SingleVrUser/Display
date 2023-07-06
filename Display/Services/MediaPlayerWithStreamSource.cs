@@ -1,5 +1,6 @@
 ﻿using Display.Data;
 using Display.Helper.Encode;
+using Display.Services;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -8,7 +9,6 @@ using System.Threading.Tasks;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Media.Streaming.Adaptive;
-using HttpClient = Windows.Web.Http.HttpClient;
 
 namespace Display.Models
 {

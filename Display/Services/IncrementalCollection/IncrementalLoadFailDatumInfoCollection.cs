@@ -5,9 +5,10 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Display.Data;
+using Display.Models;
 using SharpCompress;
 
-namespace Display.Models.IncrementalCollection;
+namespace Display.Services.IncrementalCollection;
 
 public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum>, ISupportIncrementalLoading
 {
@@ -71,7 +72,7 @@ public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum
             HasMoreItems = false;
         }
 
-        failLists.ForEach(item => Add(item));
+        failLists.ForEach(Add);
 
         return new LoadMoreItemsResult
         {
