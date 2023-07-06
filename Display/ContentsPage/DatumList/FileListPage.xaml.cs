@@ -1270,9 +1270,11 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    private void SearchButton_Click(object sender, RoutedEventArgs e)
+    private async void SearchButton_Click(object sender, RoutedEventArgs e)
     {
         SearchTeachingTip.IsOpen = true;
+        await Task.Delay(TimeSpan.FromSeconds(0.05));
+        SearchBox.Focus(FocusState.Keyboard);
     }
 
     private async void SearchBoxOnQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
