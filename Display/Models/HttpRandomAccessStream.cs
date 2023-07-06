@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
-using System.Net.Http;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Storage.Streams;
+using Windows.Web.Http;
 
-namespace MediaPlayerElement_Test.Models
+namespace Display.Models
 {
     internal class HttpRandomAccessStream : IRandomAccessStreamWithContentType
     {
@@ -19,7 +18,8 @@ namespace MediaPlayerElement_Test.Models
         private string _etagHeader;
         private string _lastModifiedHeader;
         private bool _isDisposing;
-        
+
+        // No public constructor, factory methods instead to handle async tasks.
         private HttpRandomAccessStream(HttpClient client, Uri uri)
         {
             _client = client;
@@ -45,7 +45,7 @@ namespace MediaPlayerElement_Test.Models
         {
             var randomStream = new HttpRandomAccessStream(client, uri);
 
-            return AsyncInfo.Run(async (_) =>
+            return AsyncInfo.Run(async _ =>
             {
                 await randomStream.SendRequestAsync();
                 return randomStream;
@@ -86,11 +86,9 @@ namespace MediaPlayerElement_Test.Models
             _isDisposing = true;
 
             Debug.WriteLine("开始销毁_inputStream");
-            
+
             _inputStream?.Dispose();
             _inputStream = null;
-
-            GC.SuppressFinalize(this);
 
             //Debug.WriteLine("开始销毁_client");
             //_client?.Dispose();
@@ -188,16 +186,15 @@ namespace MediaPlayerElement_Test.Models
 
 
             //设置超时时间5s
-            using var cancellationSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            var cancellationToken = cancellationSource.Token;
+            var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token;
 
             try
             {
                 Debug.WriteLine("_client访问");
 
-                response = await _client.SendAsync(
+                response = await _client.SendRequestAsync(
                     request,
-                    HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    HttpCompletionOption.ResponseHeadersRead).AsTask(cancellationToken: cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -207,7 +204,9 @@ namespace MediaPlayerElement_Test.Models
                 return;
             }
 
-            if (!response.IsSuccessStatusCode)
+            _size = response.Content?.Headers?.ContentLength ?? 0;
+
+            if (response.Content?.Headers == null || !response.IsSuccessStatusCode)
             {
                 Debug.WriteLine($"访问视频出错：{response.StatusCode}");
                 CanRead = false;
@@ -220,28 +219,23 @@ namespace MediaPlayerElement_Test.Models
                 ContentType = response.Content.Headers.ContentType.MediaType;
             }
 
-            _size = (ulong)(response.Content.Headers.ContentLength ?? 0);
-            
-            if (string.IsNullOrEmpty(_etagHeader) && response.Headers.ETag!=null)
+            if (string.IsNullOrEmpty(_etagHeader) && response.Headers.TryGetValue("ETag", out var etagHeader))
             {
-                _etagHeader = response.Headers.ETag.Tag;
+                _etagHeader = etagHeader;
             }
 
-            if (string.IsNullOrEmpty(_lastModifiedHeader) && response.Content.Headers.LastModified!=null)
+            if (string.IsNullOrEmpty(_lastModifiedHeader) && response.Content.Headers.TryGetValue("Last-Modified", out var lastModifiedHeader))
             {
-                _lastModifiedHeader = response.Content.Headers.LastModified.ToString();
+                _lastModifiedHeader = lastModifiedHeader;
             }
 
-            if (response.Content.Headers.ContentType!=null)
+            if (response.Content.Headers.TryGetValue("Content-Type", out var contentType))
             {
-                ContentType = response.Content.Headers.ContentType.MediaType;
+                ContentType = contentType;
             }
 
-            //_inputStream = await response.Content.ReadAsInputStreamAsync().AsTask(cancellationToken).ConfigureAwait(false);
+            _inputStream = await response.Content.ReadAsInputStreamAsync().AsTask(cancellationToken).ConfigureAwait(false);
 
-            var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-
-            _inputStream = stream.AsInputStream();
         }
     }
 }

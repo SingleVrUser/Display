@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using Display.ContentsPage;
 using Display.Data;
 using Display.Models;
 using Display.Views;
 using Display.WindowView;
-using MediaPlayerElement_Test.Models;
 using Microsoft.Graphics.Canvas;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -23,11 +23,8 @@ using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Media.Streaming.Adaptive;
 using Windows.Storage;
-using Windows.Storage.Streams;
 using Windows.System.Display;
 using Windows.Web.Http;
-using Display.ContentsPage;
-using Microsoft.UI.Xaml.Media.Imaging;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -339,9 +336,7 @@ public sealed partial class CustomMediaPlayerElement
         //SetStream
         else
         {
-            //var httpClient = WebApi.CreateWindowWebHttpClient();
-            var httpClient = WebApi.GlobalWebApi.Client;
-            var stream = await HttpRandomAccessStream.CreateAsync(httpClient, new Uri(videoUrl));
+            var stream = await HttpRandomAccessStream.CreateAsync(_httpClient, new Uri(videoUrl));
 
             _httpRandomAccessStreamList.Add(stream);
 

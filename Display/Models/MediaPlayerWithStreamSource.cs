@@ -1,15 +1,14 @@
-﻿using MediaPlayerElement_Test.Models;
+﻿using Display.Data;
+using Display.Helper.Encode;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
-using Windows.Media.Playback;
-using Display.Data;
-using Windows.Media.Core;
-using Windows.Media.Streaming.Adaptive;
 using System.Text;
+using System.Threading.Tasks;
+using Windows.Media.Core;
+using Windows.Media.Playback;
+using Windows.Media.Streaming.Adaptive;
 using HttpClient = Windows.Web.Http.HttpClient;
-using Display.Helper.Encode;
 
 namespace Display.Models
 {
@@ -17,7 +16,6 @@ namespace Display.Models
     {
         private HttpRandomAccessStream _stream;
         private MediaSource _ms;
-        private HttpClient _httpClient;
         public MediaPlayer MediaPlayer = new();
         public FilesInfo FilesInfo;
 
@@ -37,11 +35,10 @@ namespace Display.Models
 
             MediaSource ms = null;
 
+            var videoHttpClient = WebApi.SingleVideoWindowWebHttpClient;
             if (videoUrl.Contains(".m3u8"))
             {
-                var videoHttpClient = WebApi.SingleVideoWindowWebHttpClient;
                 var result = await AdaptiveMediaSource.CreateFromUriAsync(new Uri(videoUrl), videoHttpClient);
-                //mediaPlayerWithStreamSource._httpClient = videoHttpClient;
 
                 if (result.Status == AdaptiveMediaSourceCreationStatus.Success)
                 {
@@ -51,7 +48,7 @@ namespace Display.Models
 
             if (ms == null)
             {
-                mediaPlayerWithStreamSource._stream = await HttpRandomAccessStream.CreateAsync(WebApi.GlobalWebApi.Client, new Uri(videoUrl));
+                mediaPlayerWithStreamSource._stream = await HttpRandomAccessStream.CreateAsync(videoHttpClient, new Uri(videoUrl));
 
                 if (!mediaPlayerWithStreamSource._stream.CanRead)
                 {
@@ -133,9 +130,6 @@ namespace Display.Models
 
                 _stream?.Dispose();
                 _stream = null;
-
-                _httpClient?.Dispose();
-                _httpClient = null;
             }
             catch (Exception e)
             {
