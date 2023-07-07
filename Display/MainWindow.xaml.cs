@@ -390,7 +390,12 @@ namespace Display
                 var searchContent = sender.Text;
                 if (string.IsNullOrEmpty(searchContent)) return;
 
-                var (isSucceed, msg) = await SearchLinkPage.ShowInContentDialog(searchContent, RootGrid.XamlRoot);
+                var tupleResult = await SearchLinkPage.ShowInContentDialog(searchContent, RootGrid.XamlRoot);
+
+                // 用户取消操作
+                if (tupleResult == null) return;
+
+                var (isSucceed, msg) = tupleResult;
 
                 if (isSucceed)
                 {
