@@ -87,7 +87,21 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         IsOnlyFolder = isOnlyFolder;
     }
 
-    public WebPath[] WebPaths;
+
+    private WebPath[] _webPaths;
+
+    public WebPath[] WebPaths
+    {
+        get => _webPaths;
+        set
+        {
+            if(_webPaths == value) return;
+
+            _webPaths = value;
+
+            WebPathChanged?.Invoke(_webPaths);
+        }
+    }
 
     public async Task<WebFileInfo> GetFilesInfoAsync(int limit, int offset)
     {
@@ -167,6 +181,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
     }
 
     public event EventHandler<GetFileInfoCompletedEventArgs> GetFileInfoCompleted;
+    public event Action<WebPath[]> WebPathChanged;
 }
 
 public class GetFileInfoCompletedEventArgs : EventArgs
