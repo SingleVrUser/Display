@@ -50,8 +50,8 @@
                   ColumnDefinitions="*">
                 <Grid.ContextFlyout>
                     <MenuFlyout ShouldConstrainToRootBounds="False">
-                        <MenuFlyoutItem Text="属性"
-                                        Click="ShowInfoClick">
+                        <MenuFlyoutItem Text="打开所在文件夹"
+                                        Click="OpenFolderInSearchResult_ItemClick">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon FontFamily="Segoe Fluent Icons"
                                           Glyph="&#xE946;" />
@@ -353,7 +353,15 @@
                 <AppBarButton x:Name="SearchButton"
                               Icon="Find"
                               Label="搜索"
-                              Click="SearchButton_Click" />
+                              Click="SearchButton_Click">
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control"
+                                             Key="F"
+                                             Invoked="SearchBoxInvoked" />
+                    </AppBarButton.KeyboardAccelerators>
+
+
+                </AppBarButton>
 
                 <CommandBar.SecondaryCommands>
                     <AppBarButton x:Name="SortButton"

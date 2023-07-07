@@ -124,7 +124,7 @@ namespace Display.Services
                 {
                     Debug.WriteLine(ex);
 
-                    return default;
+                    return null;
                 }
 
                 if (_inputStream == null || _isDisposing)
@@ -148,7 +148,7 @@ namespace Display.Services
                     Debug.WriteLine(ex);
                 }
 
-                return default;
+                return null;
             });
 
             return result;

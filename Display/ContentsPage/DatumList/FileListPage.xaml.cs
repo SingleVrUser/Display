@@ -97,15 +97,20 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         MetadataControl.ItemsSource = _units;
         BaseExample.ItemsSource = FilesInfos;
         FilesInfos.GetFileInfoCompleted += FilesInfos_GetFileInfoCompleted;
+        FilesInfos.WebPathChanged += FilesInfos_WebPathChanged;
     }
 
-    private void FilesInfos_GetFileInfoCompleted(object sender, GetFileInfoCompletedEventArgs e)
+    private void FilesInfos_WebPathChanged(WebPath[] obj)
     {
         _units.Clear();
         foreach (var path in FilesInfos.WebPaths)
         {
             _units.Add(new ExplorerItem { Name = path.name, Id = path.cid });
         }
+    }
+
+    private void FilesInfos_GetFileInfoCompleted(object sender, GetFileInfoCompletedEventArgs e)
+    {
 
         ChangedOrderIcon(e.Orderby, e.Asc);
         MyProgressBar.Visibility = Visibility.Collapsed;
@@ -1272,8 +1277,17 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async void SearchButton_Click(object sender, RoutedEventArgs e)
     {
-        SearchTeachingTip.IsOpen = true;
-        await Task.Delay(TimeSpan.FromSeconds(0.05));
+        await OpenSearchContent();
+    }
+
+    private async Task OpenSearchContent()
+    {
+        if (!SearchTeachingTip.IsOpen)
+        {
+            SearchTeachingTip.IsOpen = true;
+            await Task.Delay(TimeSpan.FromSeconds(0.05));
+        }
+
         SearchBox.Focus(FocusState.Keyboard);
     }
 
@@ -1312,7 +1326,9 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         // 打开文件夹
         if (info.Type == FilesInfo.FileType.Folder)
         {
-            await OpenFolder(info.Cid);
+            if(info.Id == null) return;
+
+            await OpenFolder((long)info.Id);
             return;
         }
 
@@ -1341,6 +1357,21 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal,
             () => _ = PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this));
+    }
+
+    private async void SearchBoxInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        await OpenSearchContent();
+    }
+
+    private async void OpenFolderInSearchResult_ItemClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem menuFlyoutItem) return;
+        if (menuFlyoutItem.DataContext is not FilesInfo info) return;
+
+        await OpenFolder(info.Cid);
+
+
     }
 }
 
