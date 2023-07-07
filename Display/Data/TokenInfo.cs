@@ -18,6 +18,8 @@ using Display.Helper;
 using Display.Models;
 using static Display.Data.FilesInfo;
 using static SkiaSharp.HarfBuzz.SKShaper;
+using System.Reflection;
+using Display.Extensions;
 
 namespace Display.Data
 {
@@ -131,20 +133,18 @@ namespace Display.Data
         [JsonProperty(propertyName: "fid")]
         public long? Fid { get; set; }
 
-
-        [JsonProperty(propertyName: "pid")]
-        public long? Pid { get; set; }
-
-
-        [JsonProperty(propertyName: "cid")]
-        public long Cid { get; set; }
-
         [JsonProperty(propertyName: "uid")]
         public long Uid { get; set; }
+
+
 
         [JsonProperty(propertyName: "aid")]
         public int Aid { get; set; }
 
+
+        [JsonProperty(propertyName: "cid")]
+        public long Cid { get; set; }
+        
         [JsonProperty(propertyName: "n")]
         public string Name { get; set; }
 
@@ -157,9 +157,12 @@ namespace Display.Data
 
         [JsonProperty(propertyName: "pt")]
         public string Pt { get; set; }
+        [JsonProperty(propertyName: "pid")]
+        public long? Pid { get; set; }
 
         [JsonProperty(propertyName: "pc")]
         public string PickCode { get; set; }
+        
 
 
         [JsonProperty(propertyName: "p")]
@@ -217,7 +220,6 @@ namespace Display.Data
         public int Fvs { get; set; }
 
 
-        [JsonProperty(propertyName: "fl")]
         public Fl[] Fl { get; set; }
 
 
@@ -877,11 +879,11 @@ namespace Display.Data
         {
             foreach (var videoInfoItem in videoinfo.GetType().GetProperties())
             {
-                var key = videoInfoItem.Name;
+                var name = videoInfoItem.Name;
                 var value = videoInfoItem.GetValue(videoinfo);
 
-                var newItem = this.GetType().GetProperty(key);
-                newItem.SetValue(this, value);
+                var newItem = this.GetType().GetProperty(name);
+                newItem?.SetValue(this, value);
             }
 
             //标题
@@ -891,18 +893,18 @@ namespace Display.Data
             string category = videoinfo.Category;
             Visibility isShowLabel = Visibility.Collapsed;
 
-            string ShowLabel = string.Empty;
+            string showLabel = string.Empty;
             if (!string.IsNullOrEmpty(category))
             {
                 if (category.Contains("VR") || (!string.IsNullOrEmpty(videoinfo.Series) && videoinfo.Series.Contains("VR")))
                 {
                     isShowLabel = Visibility.Visible;
-                    ShowLabel = "VR";
+                    showLabel = "VR";
                 }
                 else if (category.Contains("4K"))
                 {
                     isShowLabel = Visibility.Visible;
-                    ShowLabel = "4K";
+                    showLabel = "4K";
                 }
             }
 
@@ -919,7 +921,7 @@ namespace Display.Data
             }
 
             this.isShowLabel = isShowLabel;
-            this.ShowLabel = ShowLabel;
+            this.ShowLabel = showLabel;
             this.Score = videoinfo.Score;
 
             //图片大小

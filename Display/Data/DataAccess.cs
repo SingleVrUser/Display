@@ -1,14 +1,17 @@
 ﻿using Display.Helper;
 using Microsoft.Data.Sqlite;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Display.Extensions;
 using static Display.Spider.Manager;
 using static System.Int32;
 
@@ -403,8 +406,9 @@ namespace Display.Data
                 }
 
                 var files = Get.GetAllFilesTraverse(cid);
-                List<long> cidList = new();
+                if (files == null) return;
 
+                List<long> cidList = new();
                 foreach (var file in files)
                 {
                     if (!cidList.Contains(file.Cid))
@@ -415,7 +419,7 @@ namespace Display.Data
 
                 foreach (var cidFolder in cidList)
                 {
-                    Delete.DeleteDirectoryAndFiles_InFilesInfoTable(cidFolder, connection);
+                    DeleteDirectoryAndFiles_InFilesInfoTable(cidFolder, connection);
                 }
 
 
@@ -474,10 +478,13 @@ namespace Display.Data
                 Dictionary<string, Tuple<string, string>> dict = new();
                 foreach (var item in videoInfo.GetType().GetProperties())
                 {
-                    var name = item.Name;
+                    if (!item.TryGetJsonName(out var fieldName)) continue;
+
+                    //var fieldName = item.Name;
+
                     var value = string.Empty + item.GetValue(videoInfo);
 
-                    switch (name)
+                    switch (fieldName)
                     {
                         //忽略是否步兵
                         //忽略自定义数据
@@ -488,7 +495,7 @@ namespace Display.Data
                             break;
                     }
 
-                    dict.Add($"@{name}", new Tuple<string, string>($"{name} = @{name}", $"{value}"));
+                    dict.Add($"@{fieldName}", new Tuple<string, string>($"{fieldName} = @{fieldName}", $"{value}"));
                 }
 
                 var commandText =
@@ -699,21 +706,26 @@ namespace Display.Data
                 var keyList = new List<string>();
                 foreach (var item in data.GetType().GetProperties())
                 {
-                    //fl为数组，应添加进新表中，一对多。目前暂不考虑，故跳过
-                    if (item.Name == "fl") continue;
+                    ////fl为数组，应添加进新表中，一对多。目前暂不考虑，故跳过
+                    //if (item.Name == "Fl") continue;
 
-                    keyList.Add($"@{item.Name}");
+                    if (!item.TryGetJsonName(out var fieldName)) continue;
+
+                    keyList.Add("@"+ fieldName);
                 }
+
                 //唯一值（pc）重复 则代替 （replace）
                 var commandText = $"INSERT OR REPLACE INTO FilesInfo VALUES ({string.Join(",", keyList)});";
 
                 var parameters = new List<SqliteParameter>();
                 foreach (var item in data.GetType().GetProperties())
                 {
-                    //fl为数组，应添加进新表中，一对多。目前暂不考虑，故跳过
-                    if (item.Name == "fl") continue;
+                    ////fl为数组，应添加进新表中，一对多。目前暂不考虑，故跳过
+                    //if (item.Name == "Fl") continue;
 
-                    parameters.Add(new SqliteParameter("@" + item.Name, $"{item.GetValue(data)}"));
+                    if(!item.TryGetJsonName(out var fieldName)) continue;
+                    
+                    parameters.Add(new SqliteParameter("@" + fieldName, $"{item.GetValue(data)}"));
                 }
 
                 await DataAccessHelper.ExecuteNonQueryWithParametersAsync(commandText,parameters, connection);
@@ -749,24 +761,33 @@ namespace Display.Data
                 Dictionary<string, string> dictionary = new();
                 foreach (var item in data.GetType().GetProperties())
                 {
-                    if (item.Name == "is_wm")
+                    if (!item.TryGetJsonName(out var fieldName)) continue;
+
+                    if (fieldName == "is_wm")
                         continue;
 
                     var value = string.Empty + item.GetValue(data);
 
                     //去除演员性别标记
-                    if (item.Name == "actor")
+                    if (fieldName == "actor")
                     {
                         value = Spider.JavDB.RemoveGenderFromActorListString(value);
                     }
 
-                    dictionary.Add($"@{item.Name}", $"{value}");
+                    dictionary.Add($"@{fieldName}", $"{value}");
                 }
 
                 //添加信息，如果已经存在则跳过
                 var commandText = $"INSERT OR IGNORE INTO VideoInfo VALUES ({string.Join(",", dictionary.Keys)});";
 
-                DataAccessHelper.ExecuteNonQuery(commandText, connection);
+                var parameters = new List<SqliteParameter>();
+
+                foreach (var item in dictionary)
+                {
+                    parameters.Add(new SqliteParameter(item.Key, item.Value));
+                }
+
+                DataAccessHelper.ExecuteNonQueryWithParameters(commandText, parameters, connection);
             }
 
             /// <summary>
@@ -1108,7 +1129,7 @@ namespace Display.Data
 
                 //添加Actor_Names
                 //主名称
-                Add.AddOrIgnoreActor_Names(actorId, singleActorName, connection);
+                AddOrIgnoreActor_Names(actorId, singleActorName, connection);
                 //别名
                 if (otherNames != null)
                 {
@@ -1121,7 +1142,7 @@ namespace Display.Data
                 //添加演员和作品的信息
                 foreach (var videoName in videoNameList)
                 {
-                    Add.AddOrIgnoreActor_Video(actorId, videoName, connection);
+                    AddOrIgnoreActor_Video(actorId, videoName, connection);
                 }
 
 
@@ -1776,7 +1797,9 @@ namespace Display.Data
             {
                 allDatumList ??= new List<Datum>();
 
-                var datumList = GetListByCid(cid);  
+                var datumList = GetListByCid(cid);
+                if (datumList == null) return null;
+
                 allDatumList.AddRange(datumList);
 
                 foreach (var datum in datumList)
@@ -2057,7 +2080,9 @@ namespace Display.Data
                     if (currentFile.Fid == null)
                     {
                         // 获取当前文件夹下所有的文件夹和文件
-                        var newDataList = Get.GetListByCid(currentFile.Cid, connection:connection);
+                        var newDataList = GetListByCid(currentFile.Cid, connection:connection);
+
+                        if(newDataList == null) continue;
 
                         var fileInFolderList = GetAllFilesInFolderList(newDataList.ToList(), connection);
 

@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Display.Data;
+﻿using Display.Data;
 using Display.Extensions;
 using Microsoft.Data.Sqlite;
-using static Display.ContentsPage.SpiderVideoInfo.FileStatistics;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Threading.Tasks;
 
 namespace Display.Helper
 {

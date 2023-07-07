@@ -167,7 +167,6 @@ namespace Display.ContentsPage.SpiderVideoInfo
             SearchResult_StackPanel.Visibility = Visibility.Collapsed;
             ProgressRing_StackPanel.SetValue(Grid.ColumnSpanProperty, 2);
 
-            if (s_cts.IsCancellationRequested) return;
         }
 
         private void ShowSpiderInfoList()
@@ -247,11 +246,11 @@ namespace Display.ContentsPage.SpiderVideoInfo
             FileInfoPieChart.Visibility = Visibility.Visible;
 
             //1.视频文件，其中SD:x个，hd:x个，fhd:x个，1080p:x个，4k:x个，原画:x个
-            FileStatistics VideoInfo = new FileStatistics(FileFormat.Video);
-            FileStatistics SubInfo = new FileStatistics(FileFormat.Subtitles);
-            FileStatistics TorrentInfo = new FileStatistics(FileFormat.Torrent);
-            FileStatistics ImageInfo = new FileStatistics(FileFormat.Image);
-            FileStatistics AudioInfo = new FileStatistics(FileFormat.Audio);
+            var videoInfo = new FileStatistics(FileFormat.Video);
+            var subInfo = new FileStatistics(FileFormat.Subtitles);
+            var torrentInfo = new FileStatistics(FileFormat.Torrent);
+            var imageInfo = new FileStatistics(FileFormat.Image);
+            var audioInfo = new FileStatistics(FileFormat.Audio);
             //FileStatistics ArchiveInfo = new FileStatistics(FileFormat.Archive);
 
             foreach (var info in datumList)
@@ -264,10 +263,10 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 //视频文件
                 else if (info.Iv == 1)
                 {
-                    string video_qulity = FilesInfo.GetVideoQualityFromVdi(info.Vdi);
+                    var videoQuality = FilesInfo.GetVideoQualityFromVdi(info.Vdi);
 
-                    UpdateFileStaticstics(info, VideoInfo, video_qulity);
-                }
+                    UpdateFileStaticstics(info, videoInfo, videoQuality);
+                }   
                 //其他文件
                 else
                 {
@@ -275,19 +274,19 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     {
                         //字幕
                         case "ass" or "srt" or "ssa":
-                            UpdateFileStaticstics(info, SubInfo, info.Ico);
+                            UpdateFileStaticstics(info, subInfo, info.Ico);
                             break;
                         //种子
                         case "torrent":
-                            UpdateFileStaticstics(info, TorrentInfo, info.Ico);
+                            UpdateFileStaticstics(info, torrentInfo, info.Ico);
                             break;
                         //图片
                         case "gif" or "bmp" or "tiff" or "exif" or "jpg" or "png" or "raw" or "svg":
-                            UpdateFileStaticstics(info, ImageInfo, info.Ico);
+                            UpdateFileStaticstics(info, imageInfo, info.Ico);
                             break;
                         //音频
                         case "ape" or "wav" or "midi" or "mid" or "flac" or "aac" or "m4a" or "ogg" or "amr":
-                            UpdateFileStaticstics(info, AudioInfo, info.Ico);
+                            UpdateFileStaticstics(info, audioInfo, info.Ico);
                             break;
                             //case "7z" or "cab" or "dmg" or "iso" or "rar" or "zip":
                             //    UpdateFileStaticstics(info, ArchiveInfo, info.ico);
@@ -297,11 +296,11 @@ namespace Display.ContentsPage.SpiderVideoInfo
             }
 
             CountPercentPieChart.Series = new ISeries[] {
-                new PieSeries<double> { Values = new List<double> { VideoInfo.Count }, Pushout = 5, Name = "视频"},
-                new PieSeries<double> { Values = new List<double> { AudioInfo.Count }, Pushout = 0, Name = "音频"},
-                new PieSeries<double> { Values = new List<double> { SubInfo.Count }, Pushout = 0, Name = "字幕"},
-                new PieSeries<double> { Values = new List<double> { TorrentInfo.Count }, Pushout = 0, Name = "种子"},
-                new PieSeries<double> { Values = new List<double> { ImageInfo.Count }, Pushout = 0, Name = "图片"}
+                new PieSeries<double> { Values = new List<double> { videoInfo.Count }, Pushout = 5, Name = "视频"},
+                new PieSeries<double> { Values = new List<double> { audioInfo.Count }, Pushout = 0, Name = "音频"},
+                new PieSeries<double> { Values = new List<double> { subInfo.Count }, Pushout = 0, Name = "字幕"},
+                new PieSeries<double> { Values = new List<double> { torrentInfo.Count }, Pushout = 0, Name = "种子"},
+                new PieSeries<double> { Values = new List<double> { imageInfo.Count }, Pushout = 0, Name = "图片"}
             };
 
         }
@@ -357,7 +356,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             var startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
 
-            ProgressMore_TextBlock.Text = $"失败数：0";
+            ProgressMore_TextBlock.Text = "失败数：0";
 
             //记录到SpiderLog
             var taskId = DataAccess.Add.AddSpiderLog();
@@ -399,7 +398,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
 
             //统计成功的名称
             int successCount = 0;
-            List<string> successVIdeoNameList = new();
+            List<string> successVideoNameList = new();
 
             int failCount = 0;
 
@@ -417,7 +416,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 {
                     successCount++;
                     CidSuccessCount_Run.Text = successCount.ToString();
-                    successVIdeoNameList.Add(progressPercent.Name);
+                    successVideoNameList.Add(progressPercent.Name);
 
                     UpdateSpiderCartesianChart(Models.SpiderInfo.SpiderSourceName.Local);
                 }
@@ -443,7 +442,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 //System.Diagnostics.Debug.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>接受:{i} - {progressPercent.Name} - {progressPercent.SpiderSource} - {progressPercent.RequestStates} - {progressPercent.Message}");
 
                 //更新整体进度
-                var currentCount = successVIdeoNameList.Count + FailVideoNameList.Count;
+                var currentCount = successVideoNameList.Count + FailVideoNameList.Count;
                 overallProgress.Value = currentCount;
                 percentProgress_TextBlock.Text = $"{currentCount * 100 / totalCount}%";
                 countProgress_TextBlock.Text = $"{currentCount}/{totalCount}";
@@ -493,9 +492,11 @@ namespace Display.ContentsPage.SpiderVideoInfo
             await Task.WhenAll(tasks);
 
             //数据库源最后完成
-            SpiderInfo currentSpiderInfo = new(Models.SpiderInfo.SpiderSourceName.Local);
-            currentSpiderInfo.State = SpiderStates.done;
-            currentSpiderInfo.Message = "完成";
+            SpiderInfo currentSpiderInfo = new(Models.SpiderInfo.SpiderSourceName.Local)
+            {
+                State = SpiderStates.done,
+                Message = "完成"
+            };
             progress.Report(currentSpiderInfo);
 
             ////所有任务已结束（后面已经删除了,所以这个没用了）
@@ -613,9 +614,11 @@ namespace Display.ContentsPage.SpiderVideoInfo
                 //数据库没有，则开始搜刮
                 else
                 {
-                    currentSpiderInfo = new(spiderSourceName, name);
-                    currentSpiderInfo.State = SpiderStates.doing;
-                    currentSpiderInfo.Message = name;
+                    currentSpiderInfo = new(spiderSourceName, name)
+                    {
+                        State = SpiderStates.doing,
+                        Message = name
+                    };
                     progress.Report(currentSpiderInfo);
 
                     //FC2且cookie异常（如未登录）

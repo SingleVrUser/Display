@@ -92,11 +92,8 @@ namespace Display.Extensions
             {
                 // 获取属性对应表字段的名称
                 //var name = propertyInfo.Name;
-                var attrs = propertyInfo.GetCustomAttributes().OfType<JsonPropertyAttribute>().ToArray();
 
-                if (attrs.Length == 0 || attrs.First().PropertyName is null) continue;
-
-                var fieldName = attrs.First().PropertyName;
+                if (!propertyInfo.TryGetJsonName(out var fieldName)) continue;
 
                 // 获取属性对应的Type
                 var type = propertyInfo.PropertyType;
@@ -133,5 +130,15 @@ namespace Display.Extensions
             return data;
         }
 
+
+        public static bool TryGetJsonName(this PropertyInfo info, out string name)
+        {
+            name = null;
+            var attrs = info.GetCustomAttributes().OfType<JsonPropertyAttribute>().ToArray();
+            if (attrs.Length == 0 || attrs.First().PropertyName is null) return false;
+
+            name = attrs[0].PropertyName;
+            return true;
+        }
     }
 }

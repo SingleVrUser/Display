@@ -109,10 +109,14 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                 // 文件夹
                 else
                 {
+                    if(info.Id == null) continue;
+
+                    var cid = (long)info.Id;
+
                     //cid为0（根目录）无法使用GetFolderCategory接口获取文件信息，故将0目录变为0目录下的目录
-                    if (info.Cid == 0)
+                    if (cid == 0)
                     {
-                        var rootFileInfo = await webapi.GetFileAsync(info.Cid, loadAll: true);
+                        var rootFileInfo = await webapi.GetFileAsync(cid, loadAll: true);
 
                         var foldersInfoInRoot = rootFileInfo.data;
 
@@ -123,9 +127,9 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                         filesWithoutRootList.Add(info);
                     }
 
-                    foreach (var folderInfo in filesWithoutRootList.Where(i=>i.Type==FilesInfo.FileType.Folder))
+                    foreach (var folderInfo in filesWithoutRootList.Where(i=>i.Type==FilesInfo.FileType.Folder && i.Id!=null))
                     {
-                        var item = await webapi.GetFolderCategory(folderInfo.Cid);
+                        var item = await webapi.GetFolderCategory((long)folderInfo.Id!);
 
                         //添加文件和文件夹数量
                         overallCount += item.folder_count;
@@ -219,10 +223,6 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             //搜刮完成,是否自动搜刮
             if (AppSettings.IsSpiderAfterImportDataAccess && overallCount != 0)
             {
-                ////datum只用到其中的cid,所以只赋值cid (fid默认为空,不用理)
-                //List<Datum> folderList = new();
-                //filesWithoutRootList.ForEach(info => folderList.Add(new Datum { cid = info.Cid }));
-
                 //提示将会开始搜刮
                 WillStartSpiderTaskTip.IsOpen = true;
 
