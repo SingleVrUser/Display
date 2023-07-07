@@ -162,7 +162,7 @@ namespace Display.Data
                 {
                     return;
                 }
-                getFilesProgressInfo = await TryAddFolderToDataAccess(token, progress, info.Cid, getFilesProgressInfo);
+                getFilesProgressInfo = await TryAddFolderToDataAccess(token, progress, (long)info.Id!, getFilesProgressInfo);
             }
 
             foreach (var info in fileInfos.Where(x => x.Type == FilesInfo.FileType.File))
