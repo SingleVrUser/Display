@@ -1178,6 +1178,8 @@ namespace Display.Data
                 ThumbnailUrl = result.ThumbUrl;
             }
 
+            IconPath = GetPathFromIcon(Ico);
+
         }
         public FilesInfo(Datum data)
         {

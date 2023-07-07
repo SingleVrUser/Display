@@ -709,7 +709,12 @@ namespace Display.Controls
 
         private async void FindVideoAppBarButton_Click(object sender, RoutedEventArgs e)
         {
-            var (isSucceed, msg) = await SearchLinkPage.ShowInContentDialog(ResultInfo.trueName, XamlRoot);
+            var tupleResult = await SearchLinkPage.ShowInContentDialog(ResultInfo.trueName, XamlRoot);
+
+            // 用户取消操作
+            if (tupleResult == null) return;
+
+            var (isSucceed, msg) = tupleResult;
 
             if (isSucceed)
             {
