@@ -1018,17 +1018,20 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             PlaceholderText = info.NameWithoutExtension,
             SelectionStart = info.NameWithoutExtension.Length
         };
-
-        var checkBox = new CheckBox
-        {
-            Content = "强制重命名（包括后缀名）",
-            HorizontalAlignment = HorizontalAlignment.Right,
-        };
-
-        ToolTipService.SetToolTip(checkBox, "按新名称重新上传文件，完成后删除旧文件");
-
         stackPanel.Children.Add(inputTextBox);
-        stackPanel.Children.Add(checkBox);
+
+        CheckBox checkBox = null;
+        if (info.Type == FilesInfo.FileType.File)
+        {
+            checkBox = new CheckBox
+            {
+                Content = "强制重命名（包括后缀名）",
+                HorizontalAlignment = HorizontalAlignment.Right,
+            };
+            ToolTipService.SetToolTip(checkBox, "按新名称重新上传文件，完成后删除旧文件");
+            stackPanel.Children.Add(checkBox);
+        }
+
         ContentDialog contentDialog = new()
         {
             XamlRoot = this.XamlRoot,
@@ -1043,19 +1046,22 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (result != ContentDialogResult.Primary) return;
 
+        var isForceRename = checkBox?.IsChecked == true;
+
         // 添加后缀，模仿官方
         var inputText = inputTextBox.Text;
 
         // 强制重命名新名称就是输入框Text
-        var newName = checkBox.IsChecked == true ? inputText : string.IsNullOrEmpty(info.Datum.Ico) ? inputText : $"{inputText}.{info.Datum.Ico}";
+        var newName = isForceRename ? inputText : string.IsNullOrEmpty(info.Datum.Ico) ? inputText : $"{inputText}.{info.Datum.Ico}";
 
         //没变
         if (newName == info.Name) return;
 
         bool isSucceed;
 
+
         // 强制重命名
-        if (checkBox.IsChecked == true)
+        if (isForceRename)
         {
             isSucceed = await WebApi.RenameForce(info, newName);
         }
@@ -1072,7 +1078,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             return;
         }
 
-        info.UpdateName(newName);
+        // 强制重命名会影响图标
+        info.UpdateName(newName, isForceRename);
     }
 
     private async void FolderBreadcrumbBar_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
