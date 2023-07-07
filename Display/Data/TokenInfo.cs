@@ -1236,13 +1236,13 @@ namespace Display.Data
         }
 
 
-        public void UpdateName(string name)
+        public void UpdateName(string name, bool isUpdateIco = false)
         {
             Name = name;
             // 清空_nameWithoutExtension，再次获取时会重新计算
             _nameWithoutExtension = null;
 
-            if(Type == FileType.File) IconPath = GetPathFromIcon(Ico);
+            if(isUpdateIco && Type == FileType.File) IconPath = GetPathFromIcon(Ico);
         }
 
         public static string GetVideoQualityFromVdi(int vdi)
