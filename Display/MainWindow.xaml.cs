@@ -132,7 +132,7 @@ namespace Display
         private void SetDragRegionForCustomTitleBar(AppWindow appWindow)
         {
             // 多显示器，scaleAdjustment可能不同
-            double scaleAdjustment = WindowHelper.GetScaleAdjustment(this);
+            var scaleAdjustment = WindowHelper.GetScaleAdjustment(this);
 
             // 拖拽区域数组
             List<Windows.Graphics.RectInt32> dragRectsList = new();

@@ -1059,7 +1059,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         bool isSucceed;
 
-
         // 强制重命名
         if (isForceRename)
         {
@@ -1078,7 +1077,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             return;
         }
 
-        // 强制重命名会影响图标
+        // 强制重命名可能会影响图标
         info.UpdateName(newName, isForceRename);
     }
 

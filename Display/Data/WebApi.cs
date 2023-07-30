@@ -301,6 +301,11 @@ namespace Display.Data
                             //通过数据库获取
                             var datumList = DataAccess.Get.GetAllFilesTraverse(item.Cid);
 
+                            if (datumList == null)
+                            {
+                                continue;
+                            }
+
                             getFilesProgressInfo.AddToDataAccessList.AddRange(datumList);
 
                             //文件数量
