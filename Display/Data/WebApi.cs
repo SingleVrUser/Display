@@ -969,7 +969,6 @@ namespace Display.Data
             return await Client.SendAsync<OfflineSpaceInfo>(HttpMethod.Get, url);
         }
 
-
         public async Task<AddTaskUrlInfo> AddTaskUrl(List<string> linkList, long wpPathId, int uid, string sign, long time)
         {
             if (linkList.Count == 0) return null;
