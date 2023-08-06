@@ -204,7 +204,7 @@
             <Setter Property="CornerRadius"
                     Value="10" />
             <Setter Property="BorderThickness"
-                    Value="1" />
+                    Value="0.5" />
             <Setter Property="BorderBrush"
                     Value="{StaticResource ControlElevationBorderBrush}" />
             <Setter Property="Padding"
@@ -227,7 +227,6 @@
 
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="RecycleStates">
-
                 <VisualState x:Name="NoDelete" />
 
                 <VisualState x:Name="ReadyDelete">
@@ -236,6 +235,17 @@
                                 Value="Red" />
                         <Setter Target="RecycleFontIcon.Foreground"
                                 Value="Red" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+
+            <VisualStateGroup x:Name="TransferStates">
+                <VisualState x:Name="TransferNormal"/>
+
+                <VisualState x:Name="TransferPointerOver">
+                    <VisualState.Setters>
+                        <Setter Target="TransferStationGrid.Background"
+                                Value="WhiteSmoke"/>
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -255,6 +265,8 @@
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
+
+
 
         </VisualStateManager.VisualStateGroups>
 
@@ -518,7 +530,7 @@
                       DragOver="DeletedFileMove_DragOver"
                       DragEnter="RecycleStationGrid_DragEnter"
                       DragLeave="RecycleStationGrid_DragLeave"
-                      Background="{ThemeResource LayerFillColorDefaultBrush}">
+                      Background="WhiteSmoke">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="*" />
@@ -543,6 +555,8 @@
                   AllowDrop="True"
                   DragOver="TransferMove_DragOver"
                   Drop="TransferStationGrid_Drop"
+                  PointerEntered="TransferStationGrid_OnPointerEntered"
+                  PointerExited="TransferStationGrid_OnPointerExited"
                   VerticalAlignment="Bottom"
                   HorizontalAlignment="Stretch"
                   Margin="100,5"
@@ -569,6 +583,10 @@
                           ItemsSource="{x:Bind _transferStationFiles}"
                           SelectionMode="Multiple"
                           CanDragItems="True"
+                          ScrollViewer.HorizontalScrollMode="Enabled"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          ScrollViewer.VerticalScrollMode="Disabled"
+                          ScrollViewer.VerticalScrollBarVisibility="Hidden"
                           DragItemsStarting="FilesTransferStation_DragItemsStarting"
                           DragItemsCompleted="TransferStationListView_OnDragItemsCompleted">
                     <ListView.ItemsPanel>
