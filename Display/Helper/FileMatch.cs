@@ -165,7 +165,7 @@ namespace Display.Helper
             {
                 var folderDatum = DataAccess.Get.GetUpperLevelFolderCid((long)fileCid);
 
-                if (!string.IsNullOrEmpty(folderDatum.Name))
+                if (!string.IsNullOrEmpty(folderDatum?.Name))
                 {
                     return MatchName(folderDatum.Name);
                 }
