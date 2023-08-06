@@ -58,18 +58,8 @@ namespace Display.ContentsPage.OfflineDown
 
             DownPathComboBox.SelectedIndex = 0;
 
-            _uploadInfo = await _webApi.GetUploadInfo();
-
-            if (_uploadInfo == null)
-            {
-                // 无法获取离线下载信息
-                FailLoaded?.Invoke(this, new FailLoadedEventArgs("无法获取UploadInfo"));
-                return;
-            }
-
-            _offlineSpaceInfo = await _webApi.GetOfflineSpaceInfo(_uploadInfo.userkey, _uploadInfo.user_id);
         }
-
+        
         private void TextBox_OnSelectionChanged(object sender, RoutedEventArgs e)
         {
             if (sender is not TextBox textBox) return;
@@ -87,7 +77,30 @@ namespace Display.ContentsPage.OfflineDown
 
         public async void CreateOfflineDownRequest()
         {
+            _uploadInfo ??= await _webApi.GetUploadInfo();
+
+            if (_uploadInfo == null)
+            {
+                // 无法获取上传信息
+                FailLoaded?.Invoke(this, new FailLoadedEventArgs("无法获取UploadInfo"));
+                return;
+            }
+
+            _offlineSpaceInfo ??= await _webApi.GetOfflineSpaceInfo(_uploadInfo.userkey, _uploadInfo.user_id);
+
+            if (_offlineSpaceInfo == null)
+            {
+                // 无法获取离线空间信息
+                FailLoaded?.Invoke(this, new FailLoadedEventArgs("无法获取OfflineSpaceInfo"));
+                return;
+            }
+
+            // 没有磁力
             if (_matchLinkCollection.Count == 0) return;
+
+            // 保存路径
+            if (DownPathComboBox.SelectedItem is not OfflineDownPathData downPath) return;
+
 
             // 链接
             List<string> links = new();
@@ -96,13 +109,15 @@ namespace Display.ContentsPage.OfflineDown
                 links.Add(match.Groups[1].Value);
             }
 
-            // 保存路径
-            if (DownPathComboBox.SelectedItem is not OfflineDownPathData downPath) return;
+            Debug.WriteLine("正在添加磁力任务");
 
             var result = await _webApi.AddTaskUrl(links, downPath.file_id, downPath.user_id, _offlineSpaceInfo.sign,
                 _offlineSpaceInfo.time);
 
+            Debug.WriteLine("添加磁力任务完毕");
+
             RequestCompleted?.Invoke(this, new RequestCompletedEventArgs(result));
+            Debug.WriteLine("Invoke 添加磁力任务完毕");
         }
 
         public event EventHandler<FailLoadedEventArgs> FailLoaded;
@@ -173,6 +188,8 @@ namespace Display.ContentsPage.OfflineDown
             {
                 ShowTeachingTip(content, "打开所在目录", (_, _) =>
                 {
+                    Debug.WriteLine("请求打开所在目录");
+
                     // 打开所在目录
                     CommonWindow.CreateAndShowWindow(new DatumList.FileListPage(downPath.file_id));
                 });
