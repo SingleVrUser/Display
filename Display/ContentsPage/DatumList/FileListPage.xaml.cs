@@ -303,6 +303,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         };
 
         _transferStationFiles.Add(new TransferStationFiles(sourceFilesInfos));
+
     }
 
     /// <summary>
@@ -337,6 +338,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             e.AcceptedOperation = DataPackageOperation.Link;
             e.DragUIOverride.Caption = "松开后开始上传";
         }
+
+        VisualStateManager.GoToState(this, "TransferPointerOver", true);
     }
 
     private void HandleCaption(DragEventArgs e, ListView target, List<FilesInfo> sourceFilesInfos)
@@ -1377,8 +1380,18 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         await OpenFolder(info.Cid);
 
-
     }
+
+    private void TransferStationGrid_OnPointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        VisualStateManager.GoToState(this, "TransferPointerOver", true);
+    }
+
+    private void TransferStationGrid_OnPointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        VisualStateManager.GoToState(this, "TransferNormal", true);
+    }
+    
 }
 
 class TransferStationFiles
