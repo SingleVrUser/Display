@@ -137,7 +137,7 @@ namespace Display.Views
             _storeditem = videoInfo;
 
             //没有
-            if (videoInfoList.Count == 0)
+            if (videoInfoList == null || videoInfoList.Count == 0)
             {
                 videoPlayButton.Flyout = new Flyout()
                 {
