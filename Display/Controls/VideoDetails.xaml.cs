@@ -582,7 +582,12 @@ namespace Display.Controls
 
         private void OpenDirectory_Click(object sender, RoutedEventArgs e)
         {
-            string imagePath = Path.GetDirectoryName(ResultInfo.ImagePath);
+            var imagePath = Path.GetDirectoryName(ResultInfo.ImagePath);
+            if (imagePath == Const.FileType.NoPicturePath)
+            {
+                return;
+            }
+
             FileMatch.LaunchFolder(imagePath);
         }
 

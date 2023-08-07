@@ -2,6 +2,7 @@
 using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Display.Data;
 using SpiderInfo = Display.Models.SpiderInfo;
@@ -118,6 +119,7 @@ public class Manager
     public async Task<VideoInfo> DispatchSpiderInfoByDetailUrl(string cid, string detailUrl)
     {
         //先访问detail_url，获取到标题
+        //当访问JavDB且内容为FC2时，由于使用的是CommonClient，所以会提示需要登入
         var tuple = await RequestHelper.RequestHtml(GetInfoFromNetwork.CommonClient, detailUrl);
         if (tuple == null) return null;
 
@@ -138,6 +140,16 @@ public class Manager
             var fun = handler.Value;
 
             if (!title.Contains(keywords)) continue;
+
+            // 当遇到需要登入才能访问的内容时，使用特定的client
+            if (keywords == JavDB.Keywords && title.Contains("登入"))
+            {
+                tuple = await RequestHelper.RequestHtml(GetInfoFromNetwork.ClientWithJavDBCookie, detailUrl);
+                if (tuple == null) return null;
+
+                strResult = tuple.Item2;
+                htmlDoc.LoadHtml(strResult);
+            }
 
             info = await fun(cid.ToUpper(), detailUrl, htmlDoc);
             break;

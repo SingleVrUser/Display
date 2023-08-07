@@ -1716,6 +1716,8 @@ namespace Display.Data
 
                 var tmpList = DataAccessHelper.ExecuteReaderGetArray<Datum>(commandText, null);
 
+                if (tmpList == null) return null;
+
                 var data = new List<Datum>();
             
                 //进一步筛选，通过右侧数字
