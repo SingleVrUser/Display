@@ -67,6 +67,6 @@ namespace Display.Models
         public string u { get; set; }
         public int iv { get; set; }
         public int vdi { get; set; }
-        public int play_long { get; set; }
+        public double play_long { get; set; }
     }
 }
