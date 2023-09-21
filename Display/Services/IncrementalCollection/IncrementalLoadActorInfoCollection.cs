@@ -34,6 +34,11 @@ public class IncrementalLoadActorInfoCollection : ObservableCollection<ActorInfo
         System.Diagnostics.Debug.WriteLine($"加载{offset}-{offset + limit} 中……");
 
         var actorInfos = await DataAccess.Get.GetActorInfo(limit, offset, OrderByList, FilterList);
+        if (actorInfos == null)
+        {
+            HasMoreItems = false;
+            return 0;
+        }
 
         if (Count == 0)
         {

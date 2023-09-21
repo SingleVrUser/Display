@@ -102,6 +102,7 @@ namespace Display.Controls
 
             //位于根目录下的文件夹
             var data = GetFilesFromItems(0, FilesInfo.FileType.Folder);
+            if(data == null) return list;
 
             foreach (var item in data)
             {

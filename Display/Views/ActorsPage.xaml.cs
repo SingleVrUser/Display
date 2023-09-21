@@ -77,7 +77,7 @@ namespace Display.Views
             var infos = await DataAccess.Get.GetActorInfo(count, 0, orderByList: new() { { "RANDOM()", false } },
                                                                 filterList: new() { "prifile_path != ''" });
 
-            infos.ForEach(info => actorPartInfo.Add(info));
+            infos?.ForEach(info => actorPartInfo.Add(info));
 
         }
 

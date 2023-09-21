@@ -1375,8 +1375,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async void OpenFolderInSearchResult_ItemClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem menuFlyoutItem) return;
-        if (menuFlyoutItem.DataContext is not FilesInfo info) return;
+        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info } menuFlyoutItem) return;
 
         await OpenFolder(info.Cid);
 
