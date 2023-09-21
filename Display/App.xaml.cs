@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WinRT.Interop;
 using Display.ViewModels;
+using System.Xml.Linq;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -76,10 +77,17 @@ namespace Display
             var isNormal = CheckErrorBeforeActivateMainWindow();
             if (!isNormal) return;
 
+            // 数据文件是否存在
+            // 不存在就不需要更新
+            if (!File.Exists(DataAccess.DbPath))
+            {
+                AppSettings.IsUpdatedDataAccessFrom014 = true;
+            }
+
             //初始化数据库
             await DataAccess.InitializeDatabase();
 
-            //没有升级过数据库
+            // 存在数据库且没有升级过数据库
             if (!AppSettings.IsUpdatedDataAccessFrom014)
             {
                 var startWindow = new StartWindow();

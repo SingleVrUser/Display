@@ -26,7 +26,6 @@ namespace Display.WindowView
 
         private void StartWindow_Closed(object sender, WindowEventArgs args)
         {
-            AppSettings.IsUpdatedDataAccessFrom014 = true;
             App.CreateActivateMainWindow();
         }
 
@@ -34,6 +33,8 @@ namespace Display.WindowView
         {
             //升级数据库，v0.15开始
             await Task.Run(DataAccess.Update.UpdateDatabaseFrom14);
+
+            AppSettings.IsUpdatedDataAccessFrom014 = true;
 
             //关闭窗口
             this.Close();

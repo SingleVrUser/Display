@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Input;
+﻿using Display.Data;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
@@ -9,9 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
-using Display.Data;
-using Microsoft.UI.Dispatching;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -57,6 +55,8 @@ namespace Display.Views
         {
             //随机获取20个视频，每次启动自动获取一遍
             var imageList = await DataAccess.Get.GetNameAndImageRandom();
+            if (imageList == null) return;
+
             foreach (var info in imageList.Select(item => new VideoCoverDisplayClass(item, 500, 300)))
             {
                 Items.Add(info);
@@ -183,6 +183,8 @@ namespace Display.Views
 
         private void TryUpdateVideoCoverDisplayClass(VideoInfo[] videoInfos, ObservableCollection<VideoCoverDisplayClass> videoList)
         {
+            if (videoInfos == null) return;
+
             //添加
             var addList = new List<VideoInfo>();
             foreach (var item in videoInfos)

@@ -443,6 +443,9 @@ namespace Display.Data
 
                 //加载全部数据
                 var videoInfoList = await Get.GetVideoInfo(-1);
+
+                if (videoInfoList == null || videoInfoList.Length == 0) return;
+
                 foreach (var videoInfo in videoInfoList)
                 {   
                     var actorStr = videoInfo.Actor;
@@ -464,7 +467,6 @@ namespace Display.Data
                 {
                     Add.AddActorInfo(item.Key, item.Value, connection);
                 }
-
                 connection.Close();
             }
 

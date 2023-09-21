@@ -41,6 +41,8 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
     {
         var newItems = await DataAccess.Get.GetVideoInfo(startShowCount, 0, OrderBy, IsDesc, FilterConditionList, FilterKeywords, Ranges, IsFuzzyQueryActor);
 
+        if(newItems == null) return;
+
         if (Count == 0)
         {
             var successCount = DataAccess.Get.GetCountOfVideoInfo(FilterConditionList, FilterKeywords, Ranges);
