@@ -126,20 +126,20 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                     {
                         filesWithoutRootList.Add(info);
                     }
-
-                    foreach (var folderInfo in filesWithoutRootList.Where(i=>i.Type==FilesInfo.FileType.Folder && i.Id!=null))
-                    {
-                        var item = await webapi.GetFolderCategory((long)folderInfo.Id!);
-
-                        //添加文件和文件夹数量
-                        overallCount += item.folder_count;
-                        overallCount += item.count;
-
-                        //更新文件夹数量
-                        folderCount += item.folder_count;
-                        FileCategoryCollection.Add(item);
-                    }
                 }
+            }
+
+            foreach (var folderInfo in filesWithoutRootList.Where(i => i.Type == FilesInfo.FileType.Folder && i.Id != null))
+            {
+                var item = await webapi.GetFolderCategory((long)folderInfo.Id!);
+
+                //添加文件和文件夹数量
+                overallCount += item.folder_count;
+                overallCount += item.count;
+
+                //更新文件夹数量
+                folderCount += item.folder_count;
+                FileCategoryCollection.Add(item);
             }
 
             //1-2.显示进度
@@ -158,61 +158,60 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             //进度条
             var progress = new Progress<GetFileProgessIProgress>(progressPercent =>
             {
-                //正常
-                if (progressPercent.status == ProgressStatus.normal)
+                switch (progressPercent.status)
                 {
-                    successCount = progressPercent.getFilesProgressInfo.AllCount;
-                    UpdateProgress();
-                    cps_TextBlock.Text = $"{progressPercent.sendCountPerMinutes} 次/分钟";
-                    leftTime_Run.Text = DateHelper.ConvertDoubleToLengthStr(1.5 * (folderCount - progressPercent.getFilesProgressInfo.FolderCount));
-                    //updateSendSpeed(progressPercent.sendCountPerSecond);
-
-                }
-                else if (progressPercent.status == ProgressStatus.done)
-                {
-                    //全部完成
-                    if (successCount == overallCount)
+                    //正常
+                    case ProgressStatus.normal:
+                        successCount = progressPercent.getFilesProgressInfo.AllCount;
+                        UpdateProgress();
+                        cps_TextBlock.Text = $"{progressPercent.sendCountPerMinutes} 次/分钟";
+                        leftTime_Run.Text = DateHelper.ConvertDoubleToLengthStr(1.5 * (folderCount - progressPercent.getFilesProgressInfo.FolderCount));
+                        //updateSendSpeed(progressPercent.sendCountPerSecond);
+                        break;
+                    case ProgressStatus.done:
                     {
-                        GetInfos_Progress.status = Status.Success;
+                        //全部完成
+                        if (successCount == overallCount)
+                        {
+                            GetInfos_Progress.status = Status.Success;
 
-                        //通知
-                        tryToast("任务已完成", $"{overallCount}条数据添加进数据库 👏");
+                            //通知
+                            tryToast("任务已完成", $"{overallCount}条数据添加进数据库 👏");
+                        }
+                        else
+                        {
+                            Fail_Expander.Visibility = Visibility.Visible;
+                            GetInfos_Progress.status = Status.Pause;
+
+                            Fail_Expander.IsExpanded = true;
+
+                            Fail_ListView.ItemsSource = progressPercent.getFilesProgressInfo?.FailCid;
+                            FailCount_TextBlock.Text = progressPercent.getFilesProgressInfo?.FailCid.Count.ToString();
+
+                            //通知
+                            tryToast("任务已结束", $"完成情况：{successCount}/{overallCount}，问题不大 😋");
+                        }
+
+                        //剩余时间改总耗时
+                        leftTimeTitle_Run.Text = "总耗时：";
+                        leftTime_Run.Text = DateHelper.ConvertDoubleToLengthStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime);
+
+                        cps_TextBlock.Visibility = Visibility.Collapsed;
+                        GetFolderCategory_Expander.IsExpanded = true;
+                        GetInfos_Progress.Visibility = Visibility.Collapsed;
+                        break;
                     }
-                    else
-                    {
-                        Fail_Expander.Visibility = Visibility.Visible;
-                        GetInfos_Progress.status = Status.Pause;
-
-                        Fail_Expander.IsExpanded = true;
-
-                        Fail_ListView.ItemsSource = progressPercent.getFilesProgressInfo.FailCid;
-                        FailCount_TextBlock.Text = progressPercent.getFilesProgressInfo.FailCid.Count.ToString();
-
-                        //通知
-                        tryToast("任务已结束", $"完成情况：{successCount}/{overallCount}，问题不大 😋");
-                    }
-
-                    //剩余时间改总耗时
-                    leftTimeTitle_Run.Text = "总耗时：";
-                    leftTime_Run.Text = DateHelper.ConvertDoubleToLengthStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime);
-
-                    cps_TextBlock.Visibility = Visibility.Collapsed;
-                    GetFolderCategory_Expander.IsExpanded = true;
-                    GetInfos_Progress.Visibility = Visibility.Collapsed;
-                }
-                else if (progressPercent.status == ProgressStatus.cancel)
-                {
-                    Debug.WriteLine("退出进程");
-                }
-                //出错
-                else
-                {
-                    ErrorTeachingTip.IsOpen = true;
-                    GetInfos_Progress.status = Status.Error;
+                    case ProgressStatus.cancel:
+                        Debug.WriteLine("退出进程");
+                        break;
+                    //出错
+                    default:
+                        ErrorTeachingTip.IsOpen = true;
+                        GetInfos_Progress.status = Status.Error;
+                        break;
                 }
 
                 _status = GetInfos_Progress.status;
-
             });
 
             // 2.获取数据，获取所有文件的全部信息（大小和数量）
