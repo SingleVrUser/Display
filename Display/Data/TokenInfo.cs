@@ -1506,7 +1506,7 @@ namespace Display.Data
         public List<Datum> AddToDataAccessList = new();
     }
     //报告进度和状态
-    public class GetFileProgessIProgress
+    public class GetFileProgressIProgress
     {
         public ProgressStatus status { get; set; } = ProgressStatus.normal;
         public GetFilesProgressInfo getFilesProgressInfo { get; set; }
