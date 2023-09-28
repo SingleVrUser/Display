@@ -61,7 +61,8 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
         private async void CurrentWindow_Closed(object sender, WindowEventArgs args)
         {
             args.Handled = true;
-            var window = (sender as Window);
+
+            if (sender is not Window window) return;
 
             var dialog = new ContentDialog
             {
@@ -76,13 +77,12 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             };
 
             var result = await dialog.ShowAsync();
-            if (result == ContentDialogResult.Primary)
-            {
-                s_cts.Cancel();
+            if (result != ContentDialogResult.Primary) return;
 
-                window.Closed -= CurrentWindow_Closed;
-                window.Close();
-            }
+            s_cts.Cancel();
+
+            window.Closed -= CurrentWindow_Closed;
+            window.Close();
         }
 
         private async void LoadData()
@@ -102,7 +102,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                 if (info.Type == FilesInfo.FileType.File)
                 {
                     filesWithoutRootList.Add(info);
-                    overallCount ++;
+                    _overallCount ++;
 
                     FileCategoryCollection.Add(new FileCategory(info.Datum));
                 }
@@ -134,16 +134,20 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                 var item = await webapi.GetFolderCategory((long)folderInfo.Id!);
 
                 //添加文件和文件夹数量
-                overallCount += item.folder_count;
-                overallCount += item.count;
+                _overallCount += item.folder_count;
+                _overallCount += item.count;
 
-                //更新文件夹数量
-                folderCount += item.folder_count;
+                //当前文件夹下更新文件夹数量
+                _folderCount += item.folder_count;
+
+                //自身为文件夹，也添加进去
+                _folderCount++;
+
                 FileCategoryCollection.Add(item);
             }
 
             //1-2.显示进度
-            overallProgress.Maximum = overallCount;
+            overallProgress.Maximum = _overallCount;
             UpdateProgress();
             GetFolderCategory_Progress.status = Status.Success;
 
@@ -156,27 +160,27 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             var startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
 
             //进度条
-            var progress = new Progress<GetFileProgessIProgress>(progressPercent =>
+            var progress = new Progress<GetFileProgressIProgress>(progressPercent =>
             {
                 switch (progressPercent.status)
                 {
                     //正常
                     case ProgressStatus.normal:
-                        successCount = progressPercent.getFilesProgressInfo.AllCount;
+                        _successCount = progressPercent.getFilesProgressInfo.AllCount;
                         UpdateProgress();
                         cps_TextBlock.Text = $"{progressPercent.sendCountPerMinutes} 次/分钟";
-                        leftTime_Run.Text = DateHelper.ConvertDoubleToLengthStr(1.5 * (folderCount - progressPercent.getFilesProgressInfo.FolderCount));
+                        leftTime_Run.Text = DateHelper.ConvertDoubleToLengthStr(1.5 * (_folderCount - progressPercent.getFilesProgressInfo.FolderCount));
                         //updateSendSpeed(progressPercent.sendCountPerSecond);
                         break;
                     case ProgressStatus.done:
                     {
                         //全部完成
-                        if (successCount == overallCount)
+                        if (_successCount == _overallCount)
                         {
                             GetInfos_Progress.status = Status.Success;
 
                             //通知
-                            tryToast("任务已完成", $"{overallCount}条数据添加进数据库 👏");
+                            TryToast("任务已完成", $"{_overallCount}条数据添加进数据库 👏");
                         }
                         else
                         {
@@ -189,7 +193,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
                             FailCount_TextBlock.Text = progressPercent.getFilesProgressInfo?.FailCid.Count.ToString();
 
                             //通知
-                            tryToast("任务已结束", $"完成情况：{successCount}/{overallCount}，问题不大 😋");
+                            TryToast("任务已结束", $"完成情况：{_successCount}/{_overallCount}，问题不大 😋");
                         }
 
                         //剩余时间改总耗时
@@ -220,7 +224,7 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
             if (s_cts.Token.IsCancellationRequested) return;
 
             //搜刮完成,是否自动搜刮
-            if (AppSettings.IsSpiderAfterImportDataAccess && overallCount != 0)
+            if (AppSettings.IsSpiderAfterImportDataAccess && _overallCount != 0)
             {
                 //提示将会开始搜刮
                 WillStartSpiderTaskTip.IsOpen = true;
@@ -241,11 +245,11 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
         }
 
         //文件总数（包括文件夹）
-        int successCount = 0;
-        int overallCount = 0;
-        int folderCount = 0;
+        private int _successCount = 0;
+        private int _overallCount = 0;
+        private int _folderCount = 0;
 
-        private void tryToast(string title, string content)
+        private static void TryToast(string title, string content)
         {
             if (!AppSettings.IsToastAfterImportDataAccess) return;
 
@@ -264,16 +268,16 @@ namespace Display.ContentsPage.Import115DataToLocalDataAccess
         private void UpdateProgress()
         {
             int percentProgress;
-            if (overallCount == 0)
+            if (_overallCount == 0)
             {
                 percentProgress = 100;
             }
             else
-                percentProgress = (successCount * 100) / overallCount;
+                percentProgress = (_successCount * 100) / _overallCount;
 
             percent_TextBlock.Text = $"{percentProgress}%";
-            countProgress_TextBlock.Text = $"{successCount}/{overallCount}";
-            overallProgress.Value = successCount;
+            countProgress_TextBlock.Text = $"{_successCount}/{_overallCount}";
+            overallProgress.Value = _successCount;
         }
 
         private async void OpenSavePathButton_Click(object sender, RoutedEventArgs e)

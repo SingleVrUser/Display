@@ -152,10 +152,11 @@ namespace Display.Data
         /// <param name="token"></param>
         /// <param name="progress"></param>
         /// <returns></returns>
-        public async Task GetAllFileInfoToDataAccess(List<FilesInfo> fileInfos, CancellationToken token, IProgress<GetFileProgessIProgress> progress = null)
+        public async Task GetAllFileInfoToDataAccess(List<FilesInfo> fileInfos, CancellationToken token, IProgress<GetFileProgressIProgress> progress = null)
         {
             var getFilesProgressInfo = new GetFilesProgressInfo();
 
+            // 文件夹，获取文件夹下文件信息后添加
             foreach (var info in fileInfos.Where(x => x.Type == FilesInfo.FileType.Folder))
             {
                 if (token.IsCancellationRequested)
@@ -165,8 +166,10 @@ namespace Display.Data
                 getFilesProgressInfo = await TryAddFolderToDataAccess(token, progress, (long)info.Id!, getFilesProgressInfo);
             }
 
+            // 文件，直接添加
             foreach (var info in fileInfos.Where(x => x.Type == FilesInfo.FileType.File))
             {
+
                 if (token.IsCancellationRequested)
                 {
                     return;
@@ -176,17 +179,17 @@ namespace Display.Data
 
                 getFilesProgressInfo!.FilesCount++;
 
-                progress?.Report(new GetFileProgessIProgress
+                progress?.Report(new GetFileProgressIProgress
                 { getFilesProgressInfo = getFilesProgressInfo });
             }
 
             progress?.Report(token.IsCancellationRequested
-                ? new GetFileProgessIProgress { status = ProgressStatus.cancel }
+                ? new GetFileProgressIProgress { status = ProgressStatus.cancel }
                 // 完成
-                : new GetFileProgessIProgress { status = ProgressStatus.done });
+                : new GetFileProgressIProgress { status = ProgressStatus.done });
         }
 
-        private async Task<GetFilesProgressInfo> TryAddFolderToDataAccess(CancellationToken token, IProgress<GetFileProgessIProgress> progress, long cid, GetFilesProgressInfo getFilesProgressInfo)
+        private async Task<GetFilesProgressInfo> TryAddFolderToDataAccess(CancellationToken token, IProgress<GetFileProgressIProgress> progress, long cid, GetFilesProgressInfo getFilesProgressInfo)
         {
             var lastDate = NowDate;
 
@@ -197,7 +200,7 @@ namespace Display.Data
             //正常不为空，为空说明有异常
             if (cidCategory == null)
             {
-                progress?.Report(new GetFileProgessIProgress { getFilesProgressInfo = getFilesProgressInfo, status = ProgressStatus.error, sendCountPerMinutes = 1 });
+                progress?.Report(new GetFileProgressIProgress { getFilesProgressInfo = getFilesProgressInfo, status = ProgressStatus.error, sendCountPerMinutes = 1 });
 
                 // 退出
                 return null;
@@ -225,7 +228,7 @@ namespace Display.Data
 
                 var cpm = 60 / (NowDate - lastDate);
 
-                progress?.Report(new GetFileProgessIProgress
+                progress?.Report(new GetFileProgressIProgress
                 { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
             }
             //之前未添加或修改时间已改变
@@ -266,7 +269,7 @@ namespace Display.Data
         /// <param name="token"></param>
         /// <param name="progress"></param>
         /// <returns></returns>
-        public async Task<GetFilesProgressInfo> TraverseAllFileInfo(long? cid, GetFilesProgressInfo getFilesProgressInfo, CancellationToken token, IProgress<GetFileProgessIProgress> progress = null)
+        public async Task<GetFilesProgressInfo> TraverseAllFileInfo(long? cid, GetFilesProgressInfo getFilesProgressInfo, CancellationToken token, IProgress<GetFileProgressIProgress> progress = null)
         {
             if (token.IsCancellationRequested) return getFilesProgressInfo;
 
@@ -312,7 +315,7 @@ namespace Display.Data
                             getFilesProgressInfo.FilesCount += datumList.Count;
 
                             var cpm = 60 / (NowDate - lastDate);
-                            progress?.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
+                            progress?.Report(new GetFileProgressIProgress() { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
                         }
                         else
                         {
@@ -325,7 +328,7 @@ namespace Display.Data
                         getFilesProgressInfo.FilesCount++;
 
                         var cpm = 60 / (NowDate - lastDate);
-                        progress?.Report(new GetFileProgessIProgress() { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
+                        progress?.Report(new GetFileProgressIProgress() { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
 
                         getFilesProgressInfo.AddToDataAccessList.Add(item);
                     }
