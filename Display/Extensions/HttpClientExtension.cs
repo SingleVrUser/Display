@@ -44,7 +44,12 @@ namespace Display.Extensions
 
                 if (contentAsString is T value) return value;
 
-                return contentAsString == "[]" ? defaultValue : JsonConvert.DeserializeObject<T>(contentAsString);
+                if (contentAsString.Contains("[]"))
+                {
+                    contentAsString = contentAsString.Replace("[]", "null");
+                }
+
+                return contentAsString == "null" ? defaultValue : JsonConvert.DeserializeObject<T>(contentAsString);
             }
             catch (Exception e)
             {

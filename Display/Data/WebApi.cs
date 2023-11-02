@@ -760,13 +760,11 @@ namespace Display.Data
             if (TokenInfo.state != 1) return TokenInfo;
 
             //存储cookie至本地
-            var cookieList = new List<string>();
-            foreach (var item in TokenInfo.data.cookie.GetType().GetProperties())
-            {
-                cookieList.Add($"{item.Name}={item.GetValue(TokenInfo.data.cookie)}");
-            }
+            var cookieList = TokenInfo.data.cookie.GetType().GetProperties().Select(item => $"{item.Name}={item.GetValue(TokenInfo.data.cookie)}").ToList();
+            
             var cookie = string.Join(";", cookieList);
             AppSettings._115_Cookie = cookie;
+            Client.DefaultRequestHeaders.Remove("Cookie");
             Client.DefaultRequestHeaders.Add("Cookie", cookie);
 
             return TokenInfo;

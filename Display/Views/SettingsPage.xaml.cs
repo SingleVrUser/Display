@@ -79,7 +79,7 @@ namespace Display.Views
 
         private void updateLoginStatus()
         {
-            UserInfoControl.status = WebApi.UserInfo == null ? "NoLogin" : "Login";
+            UserInfoControl.status = WebApi.UserInfo?.state == true ? "Login" : "NoLogin";
         }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
