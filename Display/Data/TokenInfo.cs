@@ -40,7 +40,7 @@ namespace Display.Data
         public string email { get; set; }
         public string mobile { get; set; }
         public string country { get; set; }
-        public int is_vip { get; set; }
+        public long is_vip { get; set; }
         public int mark { get; set; }
         public string alert { get; set; }
         public int is_chang_passwd { get; set; }
