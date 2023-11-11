@@ -277,6 +277,8 @@ public sealed partial class MainPage : Page,IDisposable
 
         if (!string.IsNullOrEmpty(videoUrl)) return videoUrl;
 
+
+
         // 视频未转码，m3u8链接为0，尝试获取直链
         var downUrlList = await _webApi.GetDownUrl(pickCode, GetInfoFromNetwork.DownUserAgent);
 
@@ -284,6 +286,7 @@ public sealed partial class MainPage : Page,IDisposable
         {
             videoUrl = downUrlList.FirstOrDefault().Value;
         }
+        
         return videoUrl;
 
     }
@@ -323,17 +326,16 @@ public sealed partial class MainPage : Page,IDisposable
         return menuFlyout;
     }
 
-    private int currentCount = 0;
+    private int currentCount;
     private async Task AddMediaElement(FilesInfo file, string videoUrl = null, int addIndex = -1)
     {
         currentCount++;
-        Debug.WriteLine($"当前数量：{currentCount}");
 
         videoUrl ??= await GetVideoUrl(file);
         if (videoUrl == null) return;
 
         var menuFlyout = BuildMenuFlyout(file);
-        
+
         var mediaPlayerWithStreamSource =
             await MediaPlayerWithStreamSource.CreateMediaPlayer(videoUrl, filesInfo: file);
 
@@ -402,11 +404,12 @@ public sealed partial class MainPage : Page,IDisposable
 
         foreach (var file in filesInfo.Take(MaxCanPlayCount))
         {
+            // 记录正在播放的视频
+            _playingVideoInfos.Add(file);
+
             // 添加MediaElement
             await AddMediaElement(file);
 
-            // 记录正在播放的视频
-            _playingVideoInfos.Add(file);
         }
 
         VideoPlay_Pivot.SelectedIndex = 1;
@@ -420,7 +423,6 @@ public sealed partial class MainPage : Page,IDisposable
     private async Task FindAndShowInfosFromInternet(FilesInfo[] filesInfos)
     {
         VideoPlay_ListView.IsEnabled = false;
-        Debug.WriteLine("正在搜索cid相应的信息");
         FindCidInfo_ProgressRing.Visibility = Visibility.Visible;
 
         const string noPicturePath = Const.FileType.NoPicturePath;
@@ -428,9 +430,6 @@ public sealed partial class MainPage : Page,IDisposable
         //搜刮
         foreach (var video in filesInfos)
         {
-            Debug.WriteLine($"\t当前搜索：{video.Name}");
-
-            Debug.WriteLine($"\t_isDisposing：{_isDisposing}");
             if (_isDisposing) return;
 
             var name = video.Name;
@@ -441,19 +440,16 @@ public sealed partial class MainPage : Page,IDisposable
                 continue;
             }
 
-            Debug.WriteLine("尝试从数据库中搜索");
             var result = DataAccess.Get.GetOneTrueNameByName(trueName);
 
             //数据库中有
             if (!string.IsNullOrEmpty(result))
             {
-                Debug.WriteLine("数据库中存在该信息");
-
                 //使用第一个符合条件的Name
                 var videoInfo = DataAccess.Get.GetSingleVideoInfoByTrueName(result);
 
                 _cidInfos.Add(new CidInfo(videoInfo));
-                Debug.WriteLine($"\t>>{videoInfo.trueName}");
+
             }
             //网络中查询
             else
@@ -462,7 +458,6 @@ public sealed partial class MainPage : Page,IDisposable
 
                 _cidInfos.Add(info);
 
-                Debug.WriteLine("数据库不存在该信息，尝试从网络中查找");
                 var spiderManager = Spider.Manager.Current;
 
                 var videoInfo = await spiderManager.DispatchSpiderInfoByCIDInOrder(trueName, info.CancellationTokenSource.Token);
@@ -471,14 +466,10 @@ public sealed partial class MainPage : Page,IDisposable
                 _cidInfos.Remove(info);
                 _cidInfos.Add(new CidInfo(videoInfo));
 
-                Debug.WriteLine($"\t网络搜索到的结果{videoInfo.trueName}");
-
             }
         }
 
         FindCidInfo_ProgressRing.Visibility = Visibility.Collapsed;
-
-        Debug.WriteLine("完成搜索cid相应的信息");
 
         VideoPlay_ListView.IsEnabled = true;
     }
@@ -522,8 +513,6 @@ public sealed partial class MainPage : Page,IDisposable
 
     private void Slider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
-        System.Diagnostics.Debug.WriteLine($"进度条拖到 {e.NewValue}%");
-
         foreach (var item in Video_UniformGrid.Children)
         {
             var videoControl = item as MediaPlayerElement;
@@ -610,17 +599,14 @@ public sealed partial class MainPage : Page,IDisposable
         var removeCid = _cidInfos.FirstOrDefault(item =>
             item.VideoInfo.trueName == fileInfo.Name || item.VideoInfo.trueName.ToUpper() == FileMatch.MatchName(fileInfo.Name)?.ToUpper());
 
-        if (removeCid != null)
-        {
-            Debug.WriteLine("删除:" + fileInfo.NameWithoutExtension+ " 后移除cid: "+removeCid.VideoInfo.trueName);
+        if (removeCid == null) return;
 
-            removeCid.CancellationTokenSource.Cancel();
-            _cidInfos.Remove(removeCid);
-        }
-        else
+        if (removeCid.CancellationTokenSource.Token.CanBeCanceled)
         {
-            Debug.WriteLine("未找到指定cid");
+            removeCid.CancellationTokenSource.Cancel();
         }
+
+        _cidInfos.Remove(removeCid);
     }
 
     private void RemovePlayingVideo(MediaPlayerElement mediaPlayerElement)
@@ -772,21 +758,12 @@ public sealed partial class MainPage : Page,IDisposable
     {
         if (sender is not MenuFlyoutItem { DataContext: FilesInfo fileInfo }) return;
 
-        Debug.WriteLine("开始从播放列表中删除");
-
         // 从播放列表中删除
         DeletedFileFromListAsync(fileInfo);
-
-        Debug.WriteLine("完成一部分 从播放列表中删除");
-
-        Debug.WriteLine("开始 自动播放下一视频");
 
         // 移除视频后，如果播放列表中有其余的视频则插入到播放中
         await TryRemoveCurrentVideoAndPlayNextVideo(fileInfo);
 
-
-
-        Debug.WriteLine("完成从播放列表中删除");
     }
 
     private MediaPlayerElement GetFirstElementPlayPickCode(string pc)
@@ -809,26 +786,21 @@ public sealed partial class MainPage : Page,IDisposable
 
         if (mediaPlayerElement == null) return;
 
-        //正在播放的文件的pc
-        var playingPcList = Video_UniformGrid.Children.Select(element =>
-            ((element as MediaPlayerElement)?.Tag as MediaPlayerWithStreamSource)?.FilesInfo.PickCode).ToList();
+        ////正在播放的文件的pc
+        //var playingPcList = Video_UniformGrid.Children.Select(element =>
+        //    ((element as MediaPlayerElement)?.Tag as MediaPlayerWithStreamSource)?.FilesInfo.PickCode).ToList();
 
         // 挑选播放列表中不是正在播放的视频
         // 删除的一般只有一个，只取一个
-        var videoInfo = _filesInfos.FirstOrDefault(item => item.IsVideo && !playingPcList.Contains(item.PickCode));
+        //var videoInfo = _filesInfos.FirstOrDefault(item => item.IsVideo && !playingPcList.Contains(item.PickCode) && !_playingVideoInfos.Contains(item));
+        var videoInfo = _filesInfos.FirstOrDefault(item => item.IsVideo && !_playingVideoInfos.Contains(item));
 
         if (videoInfo != null)
         {
-            Debug.WriteLine("准备加载下一集");
-
-            await RemoveVideoAndPlayNextVideo(mediaPlayerElement, videoInfo);
-
-            Debug.WriteLine("添加到正在播放的视频的信息中");
-
             // 添加到正在播放的视频的信息中
             _playingVideoInfos.Add(videoInfo);
 
-            Debug.WriteLine("搜索信息");
+            await RemoveVideoAndPlayNextVideo(mediaPlayerElement, videoInfo);
 
             // 搜索信息
             await FindAndShowInfosFromInternet(new[] { videoInfo });
@@ -836,15 +808,15 @@ public sealed partial class MainPage : Page,IDisposable
         // 没有下一集，则修改布局
         else
         {
-            Debug.WriteLine("未发现下一集");
 
             //移除正在播放的视频
             RemovePlayingVideo(mediaPlayerElement);
 
-            Debug.WriteLine("播放的视频数量减小，修改布局");
             // 修改布局
             ChangedVideo_UniformGrid(Video_UniformGrid.Children.Count);
         }
+
+
     }
 
     /// <summary>
@@ -934,7 +906,6 @@ public sealed partial class MainPage : Page,IDisposable
         {
             while (_iCount >= 0)
             {
-                Debug.WriteLine($"隐藏鼠标 ({_iCount}）");
                 _iCount = CursorHelper.ShowCursor(false);
                 TryUpdateUi(false);
             }
@@ -944,7 +915,6 @@ public sealed partial class MainPage : Page,IDisposable
         {
             while (_iCount < 0)
             {
-                Debug.WriteLine($"显示鼠标 ({_iCount}）");
                 _iCount = CursorHelper.ShowCursor(true);
                 TryUpdateUi();
             }
