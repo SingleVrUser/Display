@@ -24,6 +24,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using static Display.Data.Const.DefaultSettings.Network;
 using static System.Int32;
 using HttpMethod = System.Net.Http.HttpMethod;
 
@@ -1483,6 +1484,7 @@ namespace Display.Data
 
         public async Task<List<m3u8Info>> GetM3U8InfoByPickCode(string pickCode)
         {
+            Debug.WriteLine($"获取{pickCode}中的m3u8链接");
             List<m3u8Info> m3U8Infos = new();
 
             string strResult;
@@ -1491,10 +1493,10 @@ namespace Display.Data
                 var response = await Client.GetAsync($"https://v.anxia.com/site/api/video/m3u8/{pickCode}.m3u8");
                 strResult = await response.Content.ReadAsStringAsync();
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine("获取m3u8链接时发生错误");
                 return null;
-                //Debug.WriteLine("获取m3u8链接失败");
             }
 
             var lineList = strResult.Split(new[] { '\n' });
