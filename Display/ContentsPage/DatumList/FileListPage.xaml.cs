@@ -166,12 +166,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         await FilesInfos.SetCid(id);
 
-        //_units.Add(new ExplorerItem
-        //{
-        //    Name = filesInfo.Name,
-        //    Id = id,
-        //});
-
         // 切换目录时，全选checkBox不是选中状态
         MultipleSelectedCheckBox.IsChecked = false;
     }
