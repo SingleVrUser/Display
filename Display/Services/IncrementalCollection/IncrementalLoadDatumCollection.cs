@@ -10,6 +10,7 @@ using Windows.Foundation;
 using Display.Extensions;
 using SharpCompress;
 using System.IO;
+using System.Threading;
 
 namespace Display.Models.IncrementalCollection;
 
@@ -17,7 +18,11 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
 {
     private WebApi WebApi { get; }
 
+    private bool isBusy;
+
     public bool HasMoreItems { get; private set; } = true;
+
+    private CancellationToken _token = CancellationToken.None;
 
     private int _allCount;
     public int AllCount
@@ -126,7 +131,10 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
     public async Task<int> LoadData(int limit = 40, int offset = 0)
     {
         IsNull = false;
+
+        isBusy = true;
         var filesInfo = await GetFilesInfoAsync(limit, offset);
+        isBusy = false;
 
         // 访问失败，没有登陆
         // 或者没有数据
@@ -146,6 +154,8 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
 
     public async Task SetCid(long cid)
     {
+        if (isBusy) return;
+
         Cid = cid;
         Clear();
 
