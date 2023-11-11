@@ -322,7 +322,7 @@ namespace Display.Views
             if (Regex.Match(actorName, @"\d+").Success) return null;
 
             //从网站中获取信息
-            var actorinfo = await GetActorInfoFromNetwork.SearchInfoFromMinnanoAv(actorName);
+            var actorinfo = await GetActorInfoFromNetwork.SearchInfoFromMinnanoAv(actorName, default);
             if (actorinfo == null) return null;
 
             var actorId = DataAccess.Get.GetIdInActor_Names(actorName);

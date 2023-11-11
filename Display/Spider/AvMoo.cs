@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Display.Data;
 using SpiderInfo = Display.Models.SpiderInfo;
+using System.Threading;
 
 namespace Display.Spider;
 
@@ -25,15 +26,15 @@ public class AvMoo
 
     private static string baseUrl => AppSettings.AvMooBaseUrl;
 
-    public static async Task<VideoInfo> SearchInfoFromCID(string CID)
+    public static async Task<VideoInfo> SearchInfoFromCID(string CID, CancellationToken token)
     {
         CID = CID.ToUpper();
 
-        var detail_url = await GetDetailUrlFromCID(CID);
+        var detail_url = await GetDetailUrlFromCID(CID, token);
         //搜索无果，退出
         if (detail_url == null) return null;
 
-        Tuple<string, string> result = await RequestHelper.RequestHtml(Common.Client, detail_url);
+        Tuple<string, string> result = await RequestHelper.RequestHtml(Common.Client, detail_url, token);
         if (result == null) return null;
 
         string htmlString = result.Item2;
@@ -47,12 +48,12 @@ public class AvMoo
 
     }
 
-    private static async Task<string> GetDetailUrlFromCID(string CID)
+    private static async Task<string> GetDetailUrlFromCID(string CID, CancellationToken token)
     {
         string url = GetInfoFromNetwork.UrlCombine(baseUrl, $"cn/search/{CID}");
 
         // 访问
-        Tuple<string, string> result = await RequestHelper.RequestHtml(Common.Client, url);
+        Tuple<string, string> result = await RequestHelper.RequestHtml(Common.Client, url, token);
         if (result == null) return null;
 
         string htmlString = result.Item2;

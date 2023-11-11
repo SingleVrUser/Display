@@ -61,7 +61,7 @@ namespace Display.Spider
 
         public static async Task<List<Forum1080AttachmentInfo>> GetDownLinkFromUrl(string url)
         {
-            var result = await RequestHelper.RequestHtml(Client, url);
+            var result = await RequestHelper.RequestHtml(Client, url, default);
 
             var htmlString = result.Item2;
 
@@ -253,7 +253,7 @@ namespace Display.Spider
 
             while (!string.IsNullOrEmpty(nextPageUrl))
             {
-                var result = await RequestHelper.PostHtml(Client, nextPageUrl, postValues);
+                var result = await RequestHelper.PostHtml(Client, nextPageUrl, postValues, default);
                 if (result == null) return null;
 
                 //var detailUrl = result.Item1;

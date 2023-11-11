@@ -182,6 +182,7 @@ public static class Const
 
             public const bool IsAutoAdjustImageSize = true;
 
+
             public const bool IsShowFailListInDisplay = false;
 
             //Local = 0, Web = 1
@@ -305,6 +306,9 @@ public static class Const
 
             //M3U8 = 0, Origin = 1
             public const int DefaultQuality = 0;
+
+            //是否画质优先
+            public const bool IsPlayBestQualityFirst = true;
 
         }
 

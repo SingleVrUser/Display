@@ -6,12 +6,13 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Display.Data;
 using SpiderInfo = Display.Models.SpiderInfo;
+using System.Threading;
 
 namespace Display.Spider;
 
 public class Manager
 {
-    private static Dictionary<int, Func<string, Task<VideoInfo>>> spiderByCIDHandlers;
+    private static Dictionary<int, Func<string, CancellationToken, Task<VideoInfo>>> spiderByCIDHandlers;
     private static Dictionary<string, Func<string, string, HtmlDocument, Task<VideoInfo>>> spiderByUrlHandlers;
 
     private static Manager _manager;
@@ -27,7 +28,7 @@ public class Manager
 
     public Manager()
     {
-        spiderByCIDHandlers = new Dictionary<int, Func<string, Task<VideoInfo>>>
+        spiderByCIDHandlers = new Dictionary<int, Func<string, CancellationToken, Task<VideoInfo>>>
         {
             { JavBus.Id, JavBus.SearchInfoFromCID },
             { Jav321.Id, Jav321.SearchInfoFromCid },
@@ -38,7 +39,7 @@ public class Manager
             { JavDB.Id, JavDB.SearchInfoFromCID },
         };
 
-        spiderByUrlHandlers = new()
+        spiderByUrlHandlers = new Dictionary<string, Func<string, string, HtmlDocument, Task<VideoInfo>>>
         {
             { JavBus.Keywords, JavBus.GetVideoInfoFromHtmlDoc },
             { Jav321.Keywords, Jav321.GetVideoInfoFromHtmlDoc },
@@ -50,21 +51,23 @@ public class Manager
         };
 
     }
-    public async Task<VideoInfo> DispatchSpiderInfoByCIDInOrder(string CID)
+    public async Task<VideoInfo> DispatchSpiderInfoByCIDInOrder(string cid, CancellationToken token)
     {
-        CID = CID.ToUpper();
+        cid = cid.ToUpper();
 
         VideoInfo videoInfo = null;
 
 
         foreach (int id in Enum.GetValues(typeof(SpiderInfo.SpiderSourceName)))
         {
+            if (token.IsCancellationRequested) break;
+
             SpiderSource spiderSource = new((SpiderInfo.SpiderSourceName)id);
 
             //判断搜刮源是否可以搜刮该番号
-            if (!AnalysisIfCIDCanSpider(CID, spiderSource)) continue;
+            if (!AnalysisIfCIDCanSpider(cid, spiderSource)) continue;
 
-            videoInfo = await DispatchSpecificSpiderInfoByCID(CID, id);
+            videoInfo = await DispatchSpecificSpiderInfoByCid(cid, id, token);
 
             if (videoInfo != null) break;
         }
@@ -85,7 +88,7 @@ public class Manager
             //判断搜刮源是否可以搜刮该番号
             if (!AnalysisIfCIDCanSpider(CID, spiderSource)) continue;
 
-            var videoInfo = await DispatchSpecificSpiderInfoByCID(CID, id);
+            var videoInfo = await DispatchSpecificSpiderInfoByCid(CID, id, default);
 
             if (videoInfo == null) continue;
 
@@ -108,19 +111,19 @@ public class Manager
         return (!isFc2 || !spiderSource.IgnoreFc2) && (isFc2 || !spiderSource.OnlyFc2);
     }
 
-    public async Task<VideoInfo> DispatchSpecificSpiderInfoByCID(string CID, int spiderId)
+    public async Task<VideoInfo> DispatchSpecificSpiderInfoByCid(string cid, int spiderId, CancellationToken token)
     {
-        if (!spiderByCIDHandlers.TryGetValue(spiderId, out Func<string, Task<VideoInfo>> func)) return null;
+        if (!spiderByCIDHandlers.TryGetValue(spiderId, out var func)) return null;
 
-        return await func(CID.ToUpper());
+        return await func(cid.ToUpper(), token);
     }
 
 
-    public async Task<VideoInfo> DispatchSpiderInfoByDetailUrl(string cid, string detailUrl)
+    public async Task<VideoInfo> DispatchSpiderInfoByDetailUrl(string cid, string detailUrl, CancellationToken token)
     {
         //先访问detail_url，获取到标题
         //当访问JavDB且内容为FC2时，由于使用的是CommonClient，所以会提示需要登入
-        var tuple = await RequestHelper.RequestHtml(GetInfoFromNetwork.CommonClient, detailUrl);
+        var tuple = await RequestHelper.RequestHtml(GetInfoFromNetwork.CommonClient, detailUrl, token);
         if (tuple == null) return null;
 
         string strResult = tuple.Item2;
@@ -144,7 +147,7 @@ public class Manager
             // 当遇到需要登入才能访问的内容时，使用特定的client
             if (keywords == JavDB.Keywords && title.Contains("登入"))
             {
-                tuple = await RequestHelper.RequestHtml(GetInfoFromNetwork.ClientWithJavDBCookie, detailUrl);
+                tuple = await RequestHelper.RequestHtml(GetInfoFromNetwork.ClientWithJavDBCookie, detailUrl, token);
                 if (tuple == null) return null;
 
                 strResult = tuple.Item2;

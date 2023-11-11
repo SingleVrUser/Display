@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Media.Playback;
@@ -38,7 +39,7 @@ public sealed partial class MainPage : Page,IDisposable
 
     private readonly ObservableCollection<FilesInfo> _playingVideoInfos = new();
 
-    private readonly ObservableCollection<VideoInfo> _cidInfos = new();
+    private readonly ObservableCollection<CidInfo> _cidInfos = new();
 
     private readonly ObservableCollection<FilesInfo> _filesInfos;
 
@@ -258,6 +259,7 @@ public sealed partial class MainPage : Page,IDisposable
     {
         string videoUrl = null;
         var pickCode = file.PickCode;
+
         //转码成功，可以用m3u8
         if (file.Datum.Vdi != 0)
         {
@@ -265,21 +267,23 @@ public sealed partial class MainPage : Page,IDisposable
 
             if (m3U8Infos.Count > 0)
             {
-                //选择最高分辨率的播放
-                videoUrl = m3U8Infos[0].Url;
+                //选择对应分辨率的播放
+                var selectedIndex = AppSettings.IsPlayBestQualityFirst ? 0 : m3U8Infos.Count - 1;
+
+                videoUrl = m3U8Infos[selectedIndex].Url;
+
             }
         }
-        // 视频未转码，尝试获取直链
-        else
+
+        if (!string.IsNullOrEmpty(videoUrl)) return videoUrl;
+
+        // 视频未转码，m3u8链接为0，尝试获取直链
+        var downUrlList = await _webApi.GetDownUrl(pickCode, GetInfoFromNetwork.DownUserAgent);
+
+        if (downUrlList.Count > 0)
         {
-            var downUrlList = await _webApi.GetDownUrl(pickCode, GetInfoFromNetwork.DownUserAgent);
-
-            if (downUrlList.Count > 0)
-            {
-                videoUrl = downUrlList.FirstOrDefault().Value;
-            }
+            videoUrl = downUrlList.FirstOrDefault().Value;
         }
-
         return videoUrl;
 
     }
@@ -429,13 +433,11 @@ public sealed partial class MainPage : Page,IDisposable
             Debug.WriteLine($"\t_isDisposing：{_isDisposing}");
             if (_isDisposing) return;
 
-            VideoInfo cidInfo;
             var name = video.Name;
             var trueName = FileMatch.MatchName(name);
             if (trueName == null)
             {
-                cidInfo = new VideoInfo { trueName = name, ImagePath = noPicturePath };
-                _cidInfos.Add(cidInfo);
+                _cidInfos.Add(new CidInfo(name,noPicturePath));
                 continue;
             }
 
@@ -448,25 +450,30 @@ public sealed partial class MainPage : Page,IDisposable
                 Debug.WriteLine("数据库中存在该信息");
 
                 //使用第一个符合条件的Name
-                cidInfo = DataAccess.Get.GetSingleVideoInfoByTrueName(result);
+                var videoInfo = DataAccess.Get.GetSingleVideoInfoByTrueName(result);
 
-
-                Debug.WriteLine($"\t>>{cidInfo.trueName}");
+                _cidInfos.Add(new CidInfo(videoInfo));
+                Debug.WriteLine($"\t>>{videoInfo.trueName}");
             }
             //网络中查询
             else
             {
+                var info = new CidInfo(trueName, noPicturePath);
+
+                _cidInfos.Add(info);
+
                 Debug.WriteLine("数据库不存在该信息，尝试从网络中查找");
                 var spiderManager = Spider.Manager.Current;
 
-                cidInfo = await spiderManager.DispatchSpiderInfoByCIDInOrder(trueName);
+                var videoInfo = await spiderManager.DispatchSpiderInfoByCIDInOrder(trueName, info.CancellationTokenSource.Token);
+                if (videoInfo == null || info.CancellationTokenSource.Token.IsCancellationRequested) continue;
 
-                Debug.WriteLine($"\t网络搜索到的结果{cidInfo?.trueName}");
+                _cidInfos.Remove(info);
+                _cidInfos.Add(new CidInfo(videoInfo));
+
+                Debug.WriteLine($"\t网络搜索到的结果{videoInfo.trueName}");
+
             }
-
-            cidInfo ??= new VideoInfo { trueName = trueName, ImagePath = noPicturePath };
-            _cidInfos.Add(cidInfo);
-
         }
 
         FindCidInfo_ProgressRing.Visibility = Visibility.Collapsed;
@@ -601,11 +608,18 @@ public sealed partial class MainPage : Page,IDisposable
     {
         //移除cid信息（预览图/信息）
         var removeCid = _cidInfos.FirstOrDefault(item =>
-            item.trueName == fileInfo.Name || item.trueName.ToUpper() == FileMatch.MatchName(fileInfo.Name)?.ToUpper());
+            item.VideoInfo.trueName == fileInfo.Name || item.VideoInfo.trueName.ToUpper() == FileMatch.MatchName(fileInfo.Name)?.ToUpper());
 
         if (removeCid != null)
         {
+            Debug.WriteLine("删除:" + fileInfo.NameWithoutExtension+ " 后移除cid: "+removeCid.VideoInfo.trueName);
+
+            removeCid.CancellationTokenSource.Cancel();
             _cidInfos.Remove(removeCid);
+        }
+        else
+        {
+            Debug.WriteLine("未找到指定cid");
         }
     }
 
@@ -714,13 +728,13 @@ public sealed partial class MainPage : Page,IDisposable
 
     private void EnlargeButton_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        if (sender is not Button { DataContext: VideoInfo videoInfo }) return;
+        if (sender is not Button { DataContext: CidInfo cidInfo }) return;
 
         ProtectedCursor = CursorHelper.GetZoomCursor();
 
         SmokeGrid.Visibility = Visibility.Visible;
 
-        EnlargeImage.Source = new BitmapImage(new Uri(videoInfo.ImagePath));
+        EnlargeImage.Source = new BitmapImage(new Uri(cidInfo.VideoInfo.ImagePath));
 
     }
 
@@ -995,4 +1009,22 @@ public sealed partial class MainPage : Page,IDisposable
         _units?.Clear();
 
     }
+
+}
+
+public class CidInfo
+{
+    public VideoInfo VideoInfo;
+
+    public CidInfo(string name, string imagePath)
+    {
+        VideoInfo = new VideoInfo { trueName = name , ImagePath = imagePath};
+    }
+
+    public CidInfo(VideoInfo info)
+    {
+        VideoInfo = info;
+    }
+
+    public CancellationTokenSource CancellationTokenSource { get; set; } = new();
 }

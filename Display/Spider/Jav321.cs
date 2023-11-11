@@ -6,6 +6,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Display.Data;
 using SpiderInfo = Display.Models.SpiderInfo;
+using System.Threading;
 
 namespace Display.Spider;
 
@@ -25,7 +26,7 @@ public class Jav321
 
     private static string baseUrl => AppSettings.Jav321BaseUrl;
 
-    public static async Task<VideoInfo> SearchInfoFromCid(string cid)
+    public static async Task<VideoInfo> SearchInfoFromCid(string cid, CancellationToken token)
     {
         var searchUrl = GetInfoFromNetwork.UrlCombine(baseUrl, "search");
 
@@ -36,7 +37,7 @@ public class Jav321
             { "sn", cid}
         };
 
-        var result = await RequestHelper.PostHtml(Common.Client, searchUrl, postValues);
+        var result = await RequestHelper.PostHtml(Common.Client, searchUrl, postValues, token);
         if (result == null) return null;
 
         var detailUrl = result.Item1;

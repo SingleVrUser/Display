@@ -3,6 +3,7 @@ using HtmlAgilityPack;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Display.Data;
 using SpiderInfo = Display.Models.SpiderInfo;
@@ -25,12 +26,12 @@ public class LibreDmm
 
     private static string baseUrl => AppSettings.LibreDmmBaseUrl;
 
-    public static async Task<VideoInfo> SearchInfoFromCID(string CID)
+    public static async Task<VideoInfo> SearchInfoFromCID(string CID, CancellationToken token)
     {
         CID = CID.ToUpper();
         string url = GetInfoFromNetwork.UrlCombine(baseUrl, $"movies/{CID}");
 
-        Tuple<string, string> result = await RequestHelper.RequestHtml(Common.Client, url);
+        Tuple<string, string> result = await RequestHelper.RequestHtml(Common.Client, url, token);
         if (result == null) return null;
 
         string detail_url = result.Item1;

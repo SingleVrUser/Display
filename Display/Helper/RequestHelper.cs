@@ -10,7 +10,7 @@ namespace Display.Helper;
 
 public class RequestHelper
 {
-    public static async Task<Tuple<string, string>> RequestHtml(HttpClient client, string url, int maxRequestCount = 5)
+    public static async Task<Tuple<string, string>> RequestHtml(HttpClient client, string url, CancellationToken token, int maxRequestCount = 5)
     {
         // 访问
         var strResult = string.Empty;
@@ -18,40 +18,46 @@ public class RequestHelper
         Tuple<string, string> tuple = null;
         var requestUrl = string.Empty;
 
-        for (int i = 0; i < maxRequestCount; i++)
+
+
+        for (var i = 0; i < maxRequestCount; i++)
         {
+            // 设置超时时间（5s）
+            var timeoutCancelToken = new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token;
+
+            // 添加额外的退出条件
+            var compositeCancel = CancellationTokenSource.CreateLinkedTokenSource(timeoutCancelToken, token);
+
             try
             {
-                //设置超时时间（5s）
-                var option = new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token;
-
-                var response = await client.GetAsync(new Uri(url), option);
+                var response = await client.GetAsync(new Uri(url), compositeCancel.Token);
 
                 requestUrl = response.RequestMessage?.RequestUri?.ToString();
 
                 if (response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.Found)
                 {
-                    strResult = await response.Content.ReadAsStringAsync(option);
+                    strResult = await response.Content.ReadAsStringAsync(timeoutCancelToken);
                     strResult = strResult.Replace("\r", "").Replace("\n", "").Trim();
 
                     break;
                 }
 
                 //JavDb访问Fc2需要登录，如果cookie失效，就无法访问
-                if (response.StatusCode == System.Net.HttpStatusCode.BadGateway)
-                {
-                    if (url.Contains(AppSettings.JavDbBaseUrl))
-                        GetInfoFromNetwork.IsJavDbCookieVisible = false;
+                if (response.StatusCode != System.Net.HttpStatusCode.BadGateway) continue;
 
-                    break;
-                }
+                if (url.Contains(AppSettings.JavDbBaseUrl))
+                    GetInfoFromNetwork.IsJavDbCookieVisible = false;
+
+                break;
             }
             catch (Exception ex)
             {
+                if (token.IsCancellationRequested) return null;
+
                 Debug.WriteLine($"访问网页时发生错误:{ex.Message}");
 
-                //等待一秒后继续
-                await Task.Delay(1000);
+                //等待两秒后继续
+                await Task.Delay(2000, token);
             }
         }
 
@@ -61,7 +67,7 @@ public class RequestHelper
         return tuple;
     }
 
-    public static async Task<Tuple<string, string>> PostHtml(HttpClient client, string url, Dictionary<string, string> values, int maxRequestCount = 5)
+    public static async Task<Tuple<string, string>> PostHtml(HttpClient client, string url, Dictionary<string, string> values, CancellationToken token, int maxRequestCount = 5)
     {
         // 访问
         var strResult = string.Empty;
@@ -76,13 +82,13 @@ public class RequestHelper
         {
             try
             {
-                var response = client.PostAsync(url, content).Result;
+                var response = client.PostAsync(url, content, token).Result;
 
                 requestUrl = response.RequestMessage?.RequestUri?.ToString();
 
                 if (!response.IsSuccessStatusCode) continue;
 
-                strResult = await response.Content.ReadAsStringAsync();
+                strResult = await response.Content.ReadAsStringAsync(token);
 
                 strResult = strResult.Replace("\r", "").Replace("\n", "").Trim();
 
@@ -90,10 +96,12 @@ public class RequestHelper
             }
             catch (Exception ex)
             {
+                if (token.IsCancellationRequested) return null;
+
                 Debug.WriteLine($"访问网页时发生错误:{ex.Message}");
 
-                //等待一秒后继续
-                await Task.Delay(1000);
+                //等待两秒后继续
+                await Task.Delay(2000, token);
             }
         }
 

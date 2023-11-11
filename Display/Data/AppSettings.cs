@@ -33,6 +33,12 @@ public class AppSettings
         set => SetValue(value);
     }
 
+    public static bool IsPlayBestQualityFirst
+    {
+        get => GetValue(DefaultValue.Player.IsPlayBestQualityFirst);
+        set => SetValue(value);
+    }
+
     /// <summary>
     /// 是否已经升级了数据库
     /// </summary>

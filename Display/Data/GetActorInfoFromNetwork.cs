@@ -5,12 +5,13 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Display.Helper;
+using System.Threading;
 
 namespace Display.Data;
 
 public class GetActorInfoFromNetwork
 {
-    public static async Task<ActorInfo> SearchInfoFromMinnanoAv(string name)
+    public static async Task<ActorInfo> SearchInfoFromMinnanoAv(string name, CancellationToken token)
     {
         var baseUrl = AppSettings.MinnanoAvBaseUrl;
 
@@ -20,7 +21,7 @@ public class GetActorInfoFromNetwork
 
         ActorInfo actorInfo = new() { Name = name };
 
-        Tuple<string, string> result = await RequestHelper.RequestHtml(client, url);
+        Tuple<string, string> result = await RequestHelper.RequestHtml(client, url, token);
         if (result == null) return null;
 
         actorInfo.InfoUrl = result.Item1;
