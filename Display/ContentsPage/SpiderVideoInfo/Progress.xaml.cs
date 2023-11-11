@@ -628,7 +628,7 @@ namespace Display.ContentsPage.SpiderVideoInfo
                     }
 
                     //不同搜刮源用不同的方式搜刮,并等待对应的时间
-                    resultInfo = await spiderManager.DispatchSpecificSpiderInfoByCID(name, (int)spiderSourceName);
+                    resultInfo = await spiderManager.DispatchSpecificSpiderInfoByCid(name, (int)spiderSourceName, default);
                     currentSpiderInfo.State = SpiderStates.awaiting;
                     currentSpiderInfo.Message = $"等待 {spiderSource.DelayRanges.Item1}~{spiderSource.DelayRanges.Item2} s";
                     progress.Report(currentSpiderInfo);

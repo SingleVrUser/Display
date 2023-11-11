@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Display.Data;
 using SpiderInfo = Display.Models.SpiderInfo;
@@ -28,11 +29,11 @@ public class Fc2hub
 
     private static string baseUrl => AppSettings.Fc2HubBaseUrl;
 
-    public static async Task<VideoInfo> SearchInfoFromCID(string CID)
+    public static async Task<VideoInfo> SearchInfoFromCID(string CID, CancellationToken token)
     {
         string url = GetInfoFromNetwork.UrlCombine(baseUrl, $"search?kw={CID.Replace("FC2-", "")}");
 
-        Tuple<string, string> result = await RequestHelper.RequestHtml(Common.Client, url);
+        Tuple<string, string> result = await RequestHelper.RequestHtml(Common.Client, url, token);
         if (result == null) return null;
 
         string detail_url = result.Item1;

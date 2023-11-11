@@ -3,13 +3,13 @@
 
 <Page x:Class="Display.ContentsPage.DatumList.VideoDisplay.MainPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:local="using:Display.ContentsPage.DatumList.VideoDisplay"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:customcontrols="using:Display.Controls"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:data="using:Display.Data"
+      xmlns:videoDisplay="using:Display.ContentsPage.DatumList.VideoDisplay"
       mc:Ignorable="d">
 
     <Page.Resources>
@@ -146,7 +146,7 @@
                                           Height="300"
                                           SelectedIndex="{x:Bind VideoPlay_ListView.SelectedIndex,Mode=TwoWay}">
                                     <FlipView.ItemTemplate>
-                                        <DataTemplate x:DataType="data:VideoInfo">
+                                    <DataTemplate x:DataType="videoDisplay:CidInfo">
                                             <UserControl PointerEntered="CidInfoUserControlPointerEntered"
                                                          PointerExited="CidInfoUserControlPointerExited">
                                                 <Grid RowSpacing="10">
@@ -172,7 +172,7 @@
                                                     <Grid CornerRadius="5"
                                                           HorizontalAlignment="Center"
                                                           VerticalAlignment="Center">
-                                                        <Image Source="{x:Bind ImagePath}"
+                                                    <Image Source="{x:Bind VideoInfo.ImagePath}"
                                                                Height="230" />
 
                                                         <Button x:Name="EnlargeButton"
@@ -189,10 +189,10 @@
 
                                                     <StackPanel Grid.Row="1"
                                                                 HorizontalAlignment="Center">
-                                                        <TextBlock Text="{x:Bind trueName}"
+                                                    <TextBlock Text="{x:Bind VideoInfo.trueName}"
                                                                    IsTextSelectionEnabled="True" />
-                                                        <TextBlock Text="{x:Bind ReleaseTime}" />
-                                                        <customcontrols:TextBlockWithLongText StringValue="{x:Bind Actor}" />
+                                                    <TextBlock Text="{x:Bind VideoInfo.ReleaseTime}" />
+                                                    <customcontrols:TextBlockWithLongText StringValue="{x:Bind VideoInfo.Actor}" />
                                                     </StackPanel>
 
                                                     <StackPanel Orientation="Horizontal"
@@ -285,11 +285,17 @@
                                         TickPlacement="Outside"
                                         SnapsTo="Ticks" />
 
-                                <ToggleSwitch x:Name="IsAutoPlayButton"
-                                              Header="自动播放"
-                                              IsOn="{x:Bind data:AppSettings.IsAutoPlayInVideoDisplay,Mode=TwoWay}" />
+                                <ToggleSwitch
+                                    Header="自动播放"
+                                    IsOn="{x:Bind data:AppSettings.IsAutoPlayInVideoDisplay,Mode=TwoWay}" />
 
-                                <Slider Header="起始位置"
+
+                                <ToggleSwitch Header="画质选择"
+                                              IsOn="{x:Bind data:AppSettings.IsPlayBestQualityFirst,Mode=TwoWay}"
+                                              OnContent="最高画质"
+                                              OffContent="流畅优先"/>
+
+                            <Slider Header="起始位置"
                                         Value="{x:Bind data:AppSettings.AutoPlayPositionPercentage,Mode=TwoWay}"/>
                             </StackPanel>
                         </PivotItem>

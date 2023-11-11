@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Display.Data;
 using SpiderInfo = Display.Models.SpiderInfo;
+using System.Threading;
 
 namespace Display.Spider;
 
@@ -27,11 +28,11 @@ public class JavBus
 
     private static string baseUrl => AppSettings.JavBusBaseUrl;
 
-    public static async Task<VideoInfo> SearchInfoFromCID(string CID)
+    public static async Task<VideoInfo> SearchInfoFromCID(string cid, CancellationToken token)
     {
-        CID = CID.ToUpper();
+        cid = cid.ToUpper();
 
-        var spliteCid = CID.Split("-");
+        var spliteCid = cid.Split("-");
         if (spliteCid.Count() != 2) return null;
 
         string searchCID;
@@ -39,31 +40,31 @@ public class JavBus
         switch (spliteCid[0])
         {
             case "MIUM" or "MAAN":
-                searchCID = $"300{CID}";
+                searchCID = $"300{cid}";
                 break;
             case "JAC":
-                searchCID = $"390{CID}";
+                searchCID = $"390{cid}";
                 break;
             case "DSVR":
-                searchCID = $"3{CID}";
+                searchCID = $"3{cid}";
                 break;
             default:
-                searchCID = CID;
+                searchCID = cid;
                 break;
         }
 
-        string tmp_url = GetInfoFromNetwork.UrlCombine(baseUrl, searchCID);
+        var tmp_url = GetInfoFromNetwork.UrlCombine(baseUrl, searchCID);
 
-        Tuple<string, string> result = await RequestHelper.RequestHtml(Common.Client, tmp_url);
+        var result = await RequestHelper.RequestHtml(Common.Client, tmp_url, token);
         if (result == null) return null;
-
-        string detail_url = result.Item1;
-        string htmlString = result.Item2;
+            
+        var detail_url = result.Item1;
+        var htmlString = result.Item2;
 
         HtmlDocument htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlString);
 
-        return await GetVideoInfoFromHtmlDoc(CID, detail_url, htmlDoc);
+        return await GetVideoInfoFromHtmlDoc(cid, detail_url, htmlDoc);
     }
 
     public static async Task<VideoInfo> GetVideoInfoFromHtmlDoc(string CID, string detail_url, HtmlDocument htmlDoc)
@@ -186,4 +187,5 @@ public class JavBus
 
         return videoInfo;
     }
+
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Display.Data;
 using SpiderInfo = Display.Models.SpiderInfo;
@@ -50,13 +51,13 @@ public class JavDB
         set => _clientWithJavDBCookie = value;
     }
 
-    public static async Task<VideoInfo> SearchInfoFromCID(string CID)
+    public static async Task<VideoInfo> SearchInfoFromCID(string CID, CancellationToken token)
     {
         var isUseCookie = CID.Contains("FC");
 
         if (isUseCookie && string.IsNullOrEmpty(AppSettings.JavDbCookie)) return null;
 
-        var detailUrl = await GetDetailUrlFromCid(CID);
+        var detailUrl = await GetDetailUrlFromCid(CID, token);
 
         //搜索无果，退出
         if (detailUrl == null) return null;
@@ -64,9 +65,9 @@ public class JavDB
         Tuple<string, string> tuple;
         //访问fc内容需要cookie
         if (isUseCookie)
-            tuple = await RequestHelper.RequestHtml(ClientWithCookie, detailUrl);
+            tuple = await RequestHelper.RequestHtml(ClientWithCookie, detailUrl, token);
         else
-            tuple = await RequestHelper.RequestHtml(Common.Client, detailUrl);
+            tuple = await RequestHelper.RequestHtml(Common.Client, detailUrl, token);
 
         var htmlString = tuple.Item2;
         if (string.IsNullOrEmpty(htmlString)) return null;
@@ -77,12 +78,12 @@ public class JavDB
         return await GetVideoInfoFromHtmlDoc(CID, detailUrl, htmlDoc);
     }
 
-    private static async Task<string> GetDetailUrlFromCid(string CID)
+    private static async Task<string> GetDetailUrlFromCid(string CID, CancellationToken token)
     {
         var url = GetInfoFromNetwork.UrlCombine(baseUrl, $"search?q={CID}&f=all");
 
         // 访问
-        var tuple = await RequestHelper.RequestHtml(Common.Client, url);
+        var tuple = await RequestHelper.RequestHtml(Common.Client, url, token);
         if (tuple == null) return null;
 
         var strResult = tuple.Item2;
@@ -194,7 +195,7 @@ public class JavDB
             //没有登录
             if (headingNode != null && headingNode.InnerText.Contains("登入"))
             {
-                var tuple = await RequestHelper.RequestHtml(ClientWithCookie, detail_url);
+                var tuple = await RequestHelper.RequestHtml(ClientWithCookie, detail_url, default);
                 string htmlString = tuple.Item2;
 
                 htmlDoc.LoadHtml(htmlString);

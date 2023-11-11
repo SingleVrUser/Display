@@ -643,14 +643,14 @@ namespace Display.Data
         //魔改
         public VideoInfo(Datum failDatum)
         {
-            this.trueName = failDatum.Name;
-            this.ImagePath = "ms-appx:///Assets/Fail.jpg";
-            this.Series = "fail";
-            this.ReleaseTime = failDatum.Time;
-            this.ImageUrl = failDatum.PickCode;
-            this.LookLater = failDatum.Size;
-            this.busUrl = failDatum.PickCode;
-            this.Category = failDatum.Ico;
+            trueName = failDatum.Name;
+            ImagePath = "ms-appx:///Assets/Fail.jpg";
+            Series = "fail";
+            ReleaseTime = failDatum.Time;
+            ImageUrl = failDatum.PickCode;
+            LookLater = failDatum.Size;
+            busUrl = failDatum.PickCode;
+            Category = failDatum.Ico;
         }
 
         private string _trueName;
@@ -802,7 +802,7 @@ namespace Display.Data
             {
                 if (_imagePath == value) return;
 
-                string path = value;
+                var path = value;
                 _imagePath = !string.IsNullOrEmpty(path) ? path : Const.FileType.NoPicturePath;
                 OnPropertyChanged();
             }

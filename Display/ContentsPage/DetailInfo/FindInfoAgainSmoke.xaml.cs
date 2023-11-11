@@ -30,7 +30,7 @@ namespace Display.ContentsPage.DetailInfo
         {
             ReCheckProgressRing.Visibility = Visibility.Visible;
 
-            List<VideoInfo> infos = await Manager.Current.DispatchSpiderInfosByCIDInOrder(cidName);
+            var infos = await Manager.Current.DispatchSpiderInfosByCIDInOrder(cidName);
 
             if (infos.Count > 0)
             {
@@ -54,15 +54,10 @@ namespace Display.ContentsPage.DetailInfo
         /// <param Name="e"></param>
         private void NewInfo_ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!(sender is ListView listView))
+            if (sender is not ListView listView)
                 return;
 
-            if (listView.SelectedIndex == -1)
-                Confirm_Button.IsEnabled = false;
-            else
-            {
-                Confirm_Button.IsEnabled = true;
-            }
+            Confirm_Button.IsEnabled = listView.SelectedIndex != -1;
         }
 
         public event RoutedEventHandler ConfirmClick;
@@ -98,7 +93,7 @@ namespace Display.ContentsPage.DetailInfo
             ReCheckProgressRing.Visibility = Visibility.Visible;
             ConfirmSpecificUrlButton.IsEnabled = false;
 
-            var info = await Manager.Current.DispatchSpiderInfoByDetailUrl(cidName, url);
+            var info = await Manager.Current.DispatchSpiderInfoByDetailUrl(cidName, url, default);
 
             ReCheckProgressRing.Visibility = Visibility.Collapsed;
 
