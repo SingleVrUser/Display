@@ -50,9 +50,10 @@
                                                          MediaDoubleTapped="mediaControl_MediaDoubleTapped"
                                                          RightButtonClick="MediaControl_OnRightButtonClick"
                                                          PointerEntered="MediaControl_OnPointerEntered"
-                                                         PointerExited="MediaControl_OnPointerExited"/>
-
-
+                                                         PointerExited="MediaControl_OnPointerExited"
+                                                         AllowDrop="True"
+                                                         DragOver="MediaControl_OnDragOver"
+                                                         Drop="MediaControl_OnDrop"/>
 
                 <Grid x:Name="MoreGrid"
                       Grid.Column="1"
@@ -70,6 +71,7 @@
                                     <Grid.Resources>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Foreground" Value="White"/>
+                                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
                                         </Style>
                                     </Grid.Resources>
                                     <TextBlock Text="{x:Bind FileNameWithoutExtension}"/>

@@ -895,8 +895,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async void PlayWithPlayerButtonClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem menuFlyoutItem) return;
-        if (menuFlyoutItem is not { Tag: string aTag }) return;
+        if (sender is not (MenuFlyoutItem { Tag: string aTag } menuFlyoutItem)) return;
         if (!int.TryParse(aTag, out var playerSelection)) return;
 
         // 多个播放

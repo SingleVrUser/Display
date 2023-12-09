@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media.Playback;
 using Display.Helper;
+using System.Collections.ObjectModel;
 
 namespace Display.Models
 {
@@ -59,8 +60,10 @@ namespace Display.Models
                 Cid = (long)cid;
             }
 
+            
             if (!AppSettings.IsFindSub || string.IsNullOrEmpty(pickCode) || type==FilesInfo.FileType.Folder) return;
 
+            // 加载字母
             SubInfos = new List<SubInfo>();
             var subDict = DataAccess.Get.GetSubFile(pickCode);
             subDict.ToList().ForEach(item => SubInfos.Add(new SubInfo(item.Key, item.Value, pickCode, TrueName)));
@@ -195,7 +198,7 @@ namespace Display.Models
         }
 
 
-        public static async Task<List<MediaPlayItem>> OpenFolderThenInsertVideoFileToMediaPlayItem(List<MediaPlayItem> oldMediaPlayItems ,WebApi webApi)
+        public static async Task<IList<MediaPlayItem>> OpenFolderThenInsertVideoFileToMediaPlayItem(IList<MediaPlayItem> oldMediaPlayItems ,WebApi webApi)
         {
             List<MediaPlayItem> newMediaPlayItems = new();
 

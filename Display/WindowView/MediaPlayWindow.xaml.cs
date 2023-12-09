@@ -4,7 +4,7 @@
 using Display.Data;
 using Display.Helper;
 using Display.Models;
-using Display.Views;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -12,7 +12,7 @@ using Microsoft.UI.Xaml.Input;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Microsoft.UI.Dispatching;
+using Windows.ApplicationModel.DataTransfer;
 using static Display.Controls.CustomMediaPlayerElement;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -29,7 +29,7 @@ public sealed partial class MediaPlayWindow : Window
 
     private readonly Page _lastPage;
 
-    public MediaPlayWindow(List<MediaPlayItem> playItems, Page lastPage)
+    public MediaPlayWindow(IList<MediaPlayItem> playItems, Page lastPage)
     {
         InitializeComponent();
 
@@ -45,13 +45,12 @@ public sealed partial class MediaPlayWindow : Window
         if (playItems.Count > 1)
         {
             InitMoreGrid(playItems);
-
         }
 
         Closed += MediaPlayWindow_Closed;
     }
 
-    private void InitMoreGrid(List<MediaPlayItem> playItems)
+    private void InitMoreGrid(IList<MediaPlayItem> playItems)
     {
         MoreGrid.Visibility = Visibility.Visible;
 
@@ -60,7 +59,7 @@ public sealed partial class MediaPlayWindow : Window
 
     public void ChangedVideoListViewIndex(int index)
     {
-        int maxIndex = VideoListView.Items.Count - 1;
+        var maxIndex = VideoListView.Items.Count - 1;
 
         if (index > maxIndex)
         {
@@ -87,7 +86,7 @@ public sealed partial class MediaPlayWindow : Window
     private void MediaPlayWindow_Closed(object sender, WindowEventArgs args)
     {
         Debug.WriteLine("aTimer Stop");
-        aTimer?.Stop();
+        _aTimer?.Stop();
 
         if (MediaControl.IsLoaded && VideoPlayGrid.Children.Contains(MediaControl))
         {
@@ -102,14 +101,14 @@ public sealed partial class MediaPlayWindow : Window
         VideoPlayGrid.Children.Clear();
     }
 
-    public static MediaPlayWindow CreateNewWindow(List<MediaPlayItem> playItems, PlayType playType, Page lastPage)
+    public static MediaPlayWindow CreateNewWindow(IList<MediaPlayItem> playItems, PlayType playType, Page lastPage)
     {
-        MediaPlayWindow newWindow =  new(playItems, lastPage);
+        MediaPlayWindow newWindow = new(playItems, lastPage);
         newWindow.Activate();
 
         return newWindow;
     }
-    
+
     #region 全屏设置
 
     private void mediaControls_FullWindow(object sender, RoutedEventArgs e)
@@ -123,7 +122,7 @@ public sealed partial class MediaPlayWindow : Window
     private void EnterFullScreen()
     {
         if (_appwindow.Presenter.Kind == AppWindowPresenterKind.FullScreen) return;
-        
+
         ExtendsContentIntoTitleBar = false;
         TitleBarRowDefinition.Height = new GridLength(0);
 
@@ -131,7 +130,7 @@ public sealed partial class MediaPlayWindow : Window
 
         //监听ESC退出
         RootGrid.KeyDown += RootGrid_KeyDown;
-            
+
         VisualStateManager.GoToState(MyUserControl, "FullWindow", true);
 
         VisualStateManager.GoToState(MediaControl.mediaTransportControls, "FullWindowState", true);
@@ -184,27 +183,27 @@ public sealed partial class MediaPlayWindow : Window
         ChangedFullWindow();
     }
 
-    private System.Timers.Timer aTimer;
+    private System.Timers.Timer _aTimer;
     private void MediaControl_OnPointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        aTimer?.Stop();
+        _aTimer?.Stop();
 
         // Create a timer with a one second interval.
-        aTimer = new System.Timers.Timer(500);
-        aTimer.Enabled = true;
-        aTimer.Elapsed += timer_Tick; ;
+        _aTimer = new System.Timers.Timer(500);
+        _aTimer.Enabled = true;
+        _aTimer.Elapsed += timer_Tick; ;
     }
 
     private void MediaControl_OnPointerExited(object sender, PointerRoutedEventArgs e)
     {
-        aTimer?.Stop();
+        _aTimer?.Stop();
 
         RootGrid.Cursor = null;
     }
 
 
     //鼠标状态计数器
-    private int _iCount = 0;
+    private int _iCount;
 
     private void timer_Tick(object sender, System.Timers.ElapsedEventArgs e)
     {
@@ -255,5 +254,30 @@ public sealed partial class MediaPlayWindow : Window
     private void MediaControl_OnRightButtonClick(object sender, RoutedEventArgs e)
     {
         MoreGrid.Visibility = MoreGrid.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+
+    private void MediaControl_OnDrop(object sender, DragEventArgs e)
+    {
+
+        Debug.WriteLine("拖动");
+
+        if (e.DataView.Properties.Values.FirstOrDefault() is not List<FilesInfo> addInfos) return;
+
+        var addMediaPlayItems = new List<MediaPlayItem>();
+        addInfos.ForEach(info => {addMediaPlayItems.Add(new MediaPlayItem(info.PickCode, info.Name, FilesInfo.FileType.File, info.Cid));});
+
+        var allMediaPlayItems = MediaControl.ReLoad(addMediaPlayItems);
+
+        if (allMediaPlayItems.Count > 1)
+        {
+            InitMoreGrid(allMediaPlayItems);
+        }
+    }
+
+    private void MediaControl_OnDragOver(object sender, DragEventArgs e)
+    {
+        e.AcceptedOperation = DataPackageOperation.Link;
+        e.DragUIOverride.Caption = "播放";
     }
 }

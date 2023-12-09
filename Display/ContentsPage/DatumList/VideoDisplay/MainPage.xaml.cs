@@ -326,10 +326,10 @@ public sealed partial class MainPage : Page,IDisposable
         return menuFlyout;
     }
 
-    private int currentCount;
+    private int _currentCount;
     private async Task AddMediaElement(FilesInfo file, string videoUrl = null, int addIndex = -1)
     {
-        currentCount++;
+        _currentCount++;
 
         videoUrl ??= await GetVideoUrl(file);
         if (videoUrl == null) return;
@@ -692,7 +692,7 @@ public sealed partial class MainPage : Page,IDisposable
     {
         if (sender is not Grid) return;
 
-        if (e.DataView.Properties.Values.FirstOrDefault() is not List<Data.FilesInfo> filesInfos) return;
+        if (e.DataView.Properties.Values.FirstOrDefault() is not List<FilesInfo> filesInfos) return;
 
         _filesInfos.Clear();
         foreach (var info in filesInfos)

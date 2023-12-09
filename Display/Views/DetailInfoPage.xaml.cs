@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Windows.ApplicationModel.Background;
@@ -165,7 +166,7 @@ namespace Display.Views
             else if (videoInfoList.Count == 1)
             {
                 var mediaPlayItem = new MediaPlayItem(videoInfoList[0].PickCode, trueName, FilesInfo.FileType.File);
-                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
+                await PlayVideoHelper.PlayVideo(new Collection<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, lastPage: this);
             }
             //有多集
             else
