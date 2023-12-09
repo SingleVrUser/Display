@@ -59,7 +59,7 @@ namespace Display.Views
             if (string.IsNullOrEmpty(pickCode)) return;
 
             var mediaPlayItem = new MediaPlayItem(pickCode, title, FilesInfo.FileType.File);
-            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.Fail);
+            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.Fail);
         }
 
         /// <summary>

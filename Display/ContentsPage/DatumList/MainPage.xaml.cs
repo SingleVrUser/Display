@@ -18,7 +18,7 @@ namespace Display.ContentsPage.DatumList
 
         private void RootFrame_OnLoaded(object sender, RoutedEventArgs e)
         {
-            if (sender is not Microsoft.UI.Xaml.Controls.Frame frame) return;
+            if (sender is not Frame frame) return;
 
             frame.Navigate(typeof(FileListPage));
         }

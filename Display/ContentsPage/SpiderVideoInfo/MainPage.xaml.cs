@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -289,7 +290,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
         if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
 
         var mediaPlayItem = new MediaPlayItem(info.PickCode, info.Name, FilesInfo.FileType.File);
-        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
+        await PlayVideoHelper.PlayVideo(new Collection<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
     }
 
     private async void Explorer_OnPlayWithPlayerClick(object sender, RoutedEventArgs e)

@@ -17,6 +17,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using static Display.Data.WebApi;
 using Windows.System;
+using System.Collections.ObjectModel;
 
 namespace Display.Helper;
 
@@ -31,7 +32,7 @@ public class PlayVideoHelper
     /// <param name="lastPage"></param>
     /// <param name="playerSelection"></param>
     /// <returns></returns>
-    public static async Task PlayVideo(List<MediaPlayItem> playItems, XamlRoot xamlRoot = null, CustomMediaPlayerElement.PlayType playType = CustomMediaPlayerElement.PlayType.Success, Page lastPage = null, int playerSelection = -1)
+    public static async Task PlayVideo(IList<MediaPlayItem> playItems, XamlRoot xamlRoot = null, CustomMediaPlayerElement.PlayType playType = CustomMediaPlayerElement.PlayType.Success, Page lastPage = null, int playerSelection = -1)
     {
         // 播放项不能为空
         var firstPlayItem = playItems?.FirstOrDefault();
@@ -90,7 +91,7 @@ public class PlayVideoHelper
     /// <param name="quality"></param>
     /// <param name="showWindow"></param>
     /// <param name="referrerUrl"></param>
-    public static async void Play115SourceVideoWithPotPlayer(List<MediaPlayItem> playItems, string userAgent, string fileName, Const.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
+    public static async void Play115SourceVideoWithPotPlayer(IList<MediaPlayItem> playItems, string userAgent, string fileName, Const.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
     {
         var isFirst = true;
         foreach (var mediaPlayItem in playItems)
@@ -128,7 +129,7 @@ public class PlayVideoHelper
     /// <param name="quality"></param>
     /// <param name="showWindow"></param>
     /// <param name="referrerUrl"></param>
-    public static async void Play115SourceVideoWithMpv(List<MediaPlayItem> playItems, string userAgent, string fileName, Const.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
+    public static async void Play115SourceVideoWithMpv(IList<MediaPlayItem> playItems, string userAgent, string fileName, Const.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
     {
         var arguments = string.Empty;
         foreach (var mediaPlayItem in playItems)
@@ -166,7 +167,7 @@ public class PlayVideoHelper
     /// <param name="quality"></param>
     /// <param name="showWindow"></param>
     /// <param name="referrerUrl"></param>
-    public static async void Play115SourceVideoWithVlc(List<MediaPlayItem> playItems, string userAgent, string fileName, Const.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
+    public static async void Play115SourceVideoWithVlc(IList<MediaPlayItem> playItems, string userAgent, string fileName, Const.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
     {
         var arguments = string.Empty;
         foreach (var mediaPlayItem in playItems)

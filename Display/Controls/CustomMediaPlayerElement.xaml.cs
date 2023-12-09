@@ -14,6 +14,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -26,6 +27,7 @@ using Windows.Storage;
 using Windows.System.Display;
 using Windows.Web.Http;
 using Display.Services;
+using SharpCompress;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -41,10 +43,11 @@ public sealed partial class CustomMediaPlayerElement
     public event EventHandler<RoutedEventArgs> FullWindow;
 
     private WebApi _webApi;
-    private List<MediaPlayItem> _allMediaPlayItems;
+    private ObservableCollection<MediaPlayItem> _allMediaPlayItems;
+    private MediaPlaybackList _mediaPlaybackList;
     private MediaPlayWindow _window;
 
-    private DisplayRequest _appDisplayRequest = null;
+    private DisplayRequest _appDisplayRequest;
     private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     private HttpClient _httpClient;
     private int _qualityIndex = 1;
@@ -58,22 +61,29 @@ public sealed partial class CustomMediaPlayerElement
         this.InitializeComponent();
     }
 
-    public void InitLoad(List<MediaPlayItem> playItems, MediaPlayWindow window)
+    public void InitLoad(IList<MediaPlayItem> playItems, MediaPlayWindow window)
     {
-        _allMediaPlayItems = playItems;
+        _allMediaPlayItems = new ObservableCollection<MediaPlayItem>(playItems);
         _window = window;
 
         //m3u8UrlList
         _webApi ??= WebApi.GlobalWebApi;
-
         _httpClient = WebApi.SingleVideoWindowWebHttpClient;
 
         _adaptiveMediaSourceList = new List<AdaptiveMediaSourceCreationResult>();
         _httpRandomAccessStreamList = new List<HttpRandomAccessStream>();
-
+        _mediaPlaybackList = new MediaPlaybackList();
         SetMediaPlayer();
     }
 
+    public IList<MediaPlayItem> ReLoad(IList<MediaPlayItem> playItems)
+    {
+        playItems.ForEach(item => _allMediaPlayItems.Add(item));
+
+        SetMediaPlayItems(playItems);
+
+        return _allMediaPlayItems;
+    }
 
 
     public void DisposeMediaPlayer()
@@ -127,12 +137,36 @@ public sealed partial class CustomMediaPlayerElement
         MediaControl.MediaPlayer.Source = null;
     }
 
-    private bool _isHandlerCurrentItemChanged = false;
+    private bool _isHandlerCurrentItemChanged;
     private void SetMediaPlayer()
     {
-        var mediaPlaybackList = new MediaPlaybackList();
+        SetMediaPlayItems(_allMediaPlayItems);
 
-        foreach (var playItem in _allMediaPlayItems)
+        _mediaPlaybackList.StartingItem = _mediaPlaybackList.Items[(int)_playIndex];
+
+        if (!_isHandlerCurrentItemChanged)
+        {
+            _mediaPlaybackList.CurrentItemChanged += MediaPlaybackList_CurrentItemChanged;
+            _isHandlerCurrentItemChanged = true;
+        }
+
+        var mediaPlayer = new MediaPlayer
+        {
+            Source = _mediaPlaybackList,
+        };
+
+        MediaControl.SetMediaPlayer(mediaPlayer);
+
+        // 播放时修改Slider精度
+        MediaControl.MediaPlayer.MediaOpened += MediaPlayer_MediaOpened;
+
+        // 播放时保持屏幕常量，暂停播放则恢复
+        MediaControl.MediaPlayer.PlaybackSession.PlaybackStateChanged += MediaPlayerElement_CurrentStateChanged;
+    }
+
+    private void SetMediaPlayItems(IEnumerable<MediaPlayItem> items)
+    {
+        foreach (var playItem in items)
         {
             var binder = new MediaBinder
             {
@@ -151,40 +185,16 @@ public sealed partial class CustomMediaPlayerElement
 
             mediaPlaybackItem.ApplyDisplayProperties(props);
 
-            mediaPlaybackList.Items.Add(mediaPlaybackItem);
+            _mediaPlaybackList.Items.Add(mediaPlaybackItem);
         }
 
-        if (_allMediaPlayItems.Count > 1)
-        {
-            mediaTransportControls.IsNextTrackButtonVisible = true;
-            mediaTransportControls.IsPreviousTrackButtonVisible = true;
-            mediaPlaybackList.AutoRepeatEnabled = true;
-            //mediaPlaybackList.MaxPlayedItemsToKeepOpen = 2;
-        }
+        if (_allMediaPlayItems.Count <= 1) return;
 
-        mediaPlaybackList.StartingItem = mediaPlaybackList.Items[(int)_playIndex];
-
-        if (!_isHandlerCurrentItemChanged)
-        {
-            mediaPlaybackList.CurrentItemChanged += MediaPlaybackList_CurrentItemChanged;
-            _isHandlerCurrentItemChanged = true;
-        }
-
-        var mediaPlayer = new MediaPlayer
-        {
-            Source = mediaPlaybackList,
-        };
-
-        MediaControl.SetMediaPlayer(mediaPlayer);
-
-        // 播放时修改Slider精度
-        MediaControl.MediaPlayer.MediaOpened += MediaPlayer_MediaOpened;
-
-        // 播放时保持屏幕常量，暂停播放则恢复
-        MediaControl.MediaPlayer.PlaybackSession.PlaybackStateChanged += MediaPlayerElement_CurrentStateChanged;
-
+        mediaTransportControls.IsNextTrackButtonVisible = true;
+        mediaTransportControls.IsPreviousTrackButtonVisible = true;
+        _mediaPlaybackList.AutoRepeatEnabled = true;
     }
-    
+
     private bool _isChangedCurrentItem;
     private bool _isBindingCurrentItem;
 
@@ -221,7 +231,6 @@ public sealed partial class CustomMediaPlayerElement
 
 
         _isChangedCurrentItem = false;
-
     }
 
     private static async Task TryLoadSub(MediaPlayItem playItem)
