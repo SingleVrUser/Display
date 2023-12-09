@@ -60,25 +60,25 @@ namespace Display.ViewModels
         }
 
         [RelayCommand]
-        private async void Start()
+        private async Task Start()
         {
-            if (ButtonName == StartName)
+            switch (ButtonName)
             {
-                MatchName();
+                case StartName:
+                    MatchName();
 
-                ButtonName = ResumeName;
-            }
-            else if (ButtonName == ResumeName)
-            {
-                await StartRenameAndMove();
+                    ButtonName = ResumeName;
+                    break;
+                case ResumeName:
+                    await StartRenameAndMove();
 
-                ButtonName = ClearName;
-            }
-            else if (ButtonName == ClearName)
-            {
-                SelectedFiles.Clear();
+                    ButtonName = ClearName;
+                    break;
+                case ClearName:
+                    SelectedFiles.Clear();
 
-                ButtonName = StartName;
+                    ButtonName = StartName;
+                    break;
             }
         }
 
