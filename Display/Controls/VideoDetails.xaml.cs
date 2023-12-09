@@ -53,7 +53,7 @@ namespace Display.Controls
             if (ResultInfo == null) return;
 
             //标题
-            Title_TextBlock.Text = ResultInfo.Title;
+            TitleTextBlock.Text = ResultInfo.Title;
 
             //演员
             //之前有数据，清空
@@ -386,7 +386,7 @@ namespace Display.Controls
                 var bitmapImage = new BitmapImage();
                     
                 await bitmapImage.SetSourceAsync(fileStream);
-                Cover_Image.Source = bitmapImage;
+                CoverImage.Source = bitmapImage;
             }
 
 
@@ -668,9 +668,9 @@ namespace Display.Controls
 
         public void StartListCover_GridTapped()
         {
-            Cover_Grid.PointerEntered += Cover_Image_PointerEntered;
-            Cover_Grid.PointerExited += Cover_Image_PointerExited;
-            Cover_Grid.Tapped += Cover_Tapped;
+            CoverGrid.PointerEntered += Cover_Image_PointerEntered;
+            CoverGrid.PointerExited += Cover_Image_PointerExited;
+            CoverGrid.Tapped += Cover_Tapped;
         }
 
         private void EnlargeButton_PointerEntered(object sender, PointerRoutedEventArgs e)
@@ -709,7 +709,7 @@ namespace Display.Controls
 
         public void CoverImageAddEnterAnimation()
         {
-            Cover_Image.Transitions.Add(new EntranceThemeTransition());
+            CoverImage.Transitions.Add(new EntranceThemeTransition());
         }
 
         private async void FindVideoAppBarButton_Click(object sender, RoutedEventArgs e)

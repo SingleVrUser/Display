@@ -18,22 +18,20 @@ namespace Display.Views
     /// </summary>
     public sealed partial class VerifyAccountPage : Page
     {
+        private static string RequestUrl => $"https://captchaapi.115.com/?ac=security_code&type=web&cb=Close911_{DateTimeOffset.Now.ToUnixTimeMilliseconds()}";
 
+        public bool IsSucceeded;
 
-        private string RequestUrl => $"https://captchaapi.115.com/?ac=security_code&type=web&cb=Close911_{DateTimeOffset.Now.ToUnixTimeMilliseconds()}";
+        private readonly Window _currentWindow;
 
-        public bool IsSucceeded = false;
-
-        private Window currentWindow;
-
-        private string sign;
+        //private string sign;
 
 
         public VerifyAccountPage(Window window)
         {
             this.InitializeComponent();
 
-            currentWindow = window;
+            _currentWindow = window;
 
             Browser.webview.Source = new Uri(RequestUrl);
 
@@ -47,14 +45,14 @@ namespace Display.Views
             VerifyAccountCompleted?.Invoke(this, IsSucceeded);
         }
 
-        private string GetSign()
-        {
-            if(sign!=null) return sign;
+        //private string GetSign()
+        //{
+        //    if(sign!=null) return sign;
 
-            //var result = WebApi.GlobalWebApi.GetVerifyAccountInfo();
+        //    //var result = WebApi.GlobalWebApi.GetVerifyAccountInfo();
 
-            return string.Empty;
-        }
+        //    return string.Empty;
+        //}
 
         public event EventHandler<bool> VerifyAccountCompleted;
         private async void Browser_WebMessageReceived(Microsoft.Web.WebView2.Core.CoreWebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2WebResourceResponseReceivedEventArgs args)
@@ -79,7 +77,7 @@ namespace Display.Views
 
             IsSucceeded = true;
 
-            currentWindow.Close();
+            _currentWindow.Close();
         }
 
 

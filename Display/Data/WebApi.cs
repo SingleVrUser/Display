@@ -1494,7 +1494,7 @@ namespace Display.Data
                 var response = await Client.GetAsync($"https://v.anxia.com/site/api/video/m3u8/{pickCode}.m3u8");
                 strResult = await response.Content.ReadAsStringAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Debug.WriteLine("获取m3u8链接时发生错误");
                 return null;

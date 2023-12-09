@@ -49,7 +49,7 @@ namespace Display.Views
             var anim = ConnectedAnimationService.GetForCurrentView().GetAnimation("ForwardConnectedAnimation");
             if (anim != null)
             {
-                anim.TryStart(VideoDetailsControl.Cover_Image);
+                anim.TryStart(VideoDetailsControl.CoverImage);
 
                 ////有动画，动画完成后监听Cover_Grid（封面显示播放按钮）
                 //anim.Completed += (_, _) => VideoDetailsControl.StartListCover_GridTapped();
@@ -87,9 +87,9 @@ namespace Display.Views
                 {
                     //无Cover_Image，退出
                     //例：不存在Image中Source指向的图片文件
-                    if (VideoDetailsControl.Cover_Image.DesiredSize == new Size(0, 0)) return;
+                    if (VideoDetailsControl.CoverImage.DesiredSize == new Size(0, 0)) return;
 
-                    ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("BackConnectedAnimation", VideoDetailsControl.Cover_Image);
+                    ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("BackConnectedAnimation", VideoDetailsControl.CoverImage);
                     //返回动画应迅速
                     animation.Configuration = new DirectConnectedAnimationConfiguration();
                 }

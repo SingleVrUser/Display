@@ -1,15 +1,12 @@
 ﻿using Display.Data;
+using Display.Models;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
-using Display.Models;
 
 namespace Display.Helper
 {
@@ -76,7 +73,7 @@ namespace Display.Helper
             return !response.IsSuccessStatusCode ? null : Tuple.Create(await response.Content.ReadAsStreamAsync(token), size);
         }
 
-        public static async Task<IRandomAccessStream> GetIRandomAccessStreamFromUrl(string url, IProgress<int>? progress, CancellationToken token = default)
+        public static async Task<IRandomAccessStream> GetIRandomAccessStreamFromUrl(string url, IProgress<int> progress, CancellationToken token = default)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, token);

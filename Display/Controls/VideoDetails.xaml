@@ -1,12 +1,10 @@
 ﻿<UserControl x:Class="Display.Controls.VideoDetails"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:converter="using:Display.Converter"
-             xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-             xmlns:data="using:Display.Data"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
+             xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
              xmlns:helper="using:Display.Helper"
              mc:Ignorable="d">
 
@@ -42,7 +40,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
-            <TextBlock x:Name="Title_TextBlock"
+            <TextBlock x:Name="TitleTextBlock"
                        TextTrimming="CharacterEllipsis"
                        VerticalAlignment="Bottom"
                        Style="{ThemeResource FlyoutPickerTitleTextBlockStyle}"
@@ -200,12 +198,12 @@
 
                     <!--封面图-->
                     <Grid CornerRadius="4"
-                          x:Name="Cover_Grid"
+                          x:Name="CoverGrid"
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center">
 
                         <Image x:FieldModifier="public"
-                               x:Name="Cover_Image"
+                               x:Name="CoverImage"
                                Source="{x:Bind ResultInfo.ImagePath}"
                                HorizontalAlignment="Left"
                                VerticalAlignment="Center"
@@ -427,7 +425,7 @@
                                             </VisualStateManager.VisualStateGroups>
 
                                             <controls:ImageEx x:Name="Thumbnail_Image"
-                                                              Source="{x:Bind  Mode=OneWay}"
+                                                              Source="{x:Bind}"
                                                               Stretch="UniformToFill"
                                                               PlaceholderSource="/Assets/NoPicture.jpg"
                                                               PlaceholderStretch="Uniform"
