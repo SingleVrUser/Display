@@ -75,5 +75,10 @@ namespace Display.Services.Upload
         public event Action<UploadState> StateChanged;
         public event Action<long> LengthCallback;
         public event Action<string> ContentChanged;
+
+        protected virtual void OnProgressChanged(int obj)
+        {
+            ProgressChanged?.Invoke(obj);
+        }
     }
 }
