@@ -6,7 +6,7 @@
     <RootNamespace>Display</RootNamespace>
     <Platforms>x86;x64;arm64</Platforms>
     <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
-    <PublishProfile>win10-$(Platform).pubxml</PublishProfile>
+    <!--<PublishProfile>win10-$(Platform).pubxml</PublishProfile>-->
     <UseWinUI>true</UseWinUI>
     <EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
     <UserSecretsId>51af45ee-58f9-4ba6-b825-944994853423</UserSecretsId>

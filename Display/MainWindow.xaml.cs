@@ -231,7 +231,7 @@ namespace Display
                 SecondaryButtonText = "忽略该版本",
                 CloseButtonText = "取消",
                 DefaultButton = ContentDialogButton.Primary,
-                Content = new ContentsPage.UpdateAppPage(releaseCheck),
+                Content = new UpdateAppPage(releaseCheck),
                 XamlRoot = ((Page)ContentFrame.Content).XamlRoot
             };
 

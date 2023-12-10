@@ -22,18 +22,8 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-
-        <TextBlock VerticalAlignment="Center">
-                <Run FontFamily="Times New Roman"
-                     Foreground="DarkGray">最新版本：</Run>
-                <Run Text="{x:Bind ReleaseInfo.LatestVersion}" />
-        </TextBlock>
-
-        <HyperlinkButton Grid.Row="1" Grid.Column="0"
-                         Content="更多信息"
-                         NavigateUri="{x:Bind ReleaseInfo.MoreInfoUrl}"/>
-
-        <TextBlock Grid.Row="0" Grid.Column="1"
+        <TextBlock Grid.Row="0"
+                   Grid.Column="0"
                    VerticalAlignment="Center">
             <Run FontFamily="Times New Roman"
                  Foreground="DarkGray">当前版本：</Run>
@@ -41,12 +31,23 @@
         </TextBlock>
 
         <TextBlock Grid.Row="1"
-                   Grid.Column="1"
+                   Grid.Column="0"
                    VerticalAlignment="Center">
             <Run FontFamily="Times New Roman"
                  Foreground="DarkGray">当前框架：</Run>
             <Run Text="{x:Bind ReleaseInfo.CurrentArchitecture}" />
         </TextBlock>
+
+        <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
+                <Run FontFamily="Times New Roman"
+                     Foreground="DarkGray">最新版本：</Run>
+                <Run Text="{x:Bind ReleaseInfo.LatestVersion}" />
+        </TextBlock>
+
+        <HyperlinkButton Grid.Row="1" Grid.Column="1"
+                         Content="更多信息"
+                         NavigateUri="{x:Bind ReleaseInfo.MoreInfoUrl}"/>
+
 
         <TextBlock Grid.Row="2" Grid.Column="0"
                    Text="更新内容"
