@@ -31,12 +31,12 @@ public sealed partial class MediaPlayWindow : Window
 
     public MediaPlayWindow(IList<MediaPlayItem> playItems, Page lastPage)
     {
+        _lastPage = lastPage;
         InitializeComponent();
 
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
 
-        _lastPage = lastPage;
 
         _appwindow = App.GetAppWindow(this);
 

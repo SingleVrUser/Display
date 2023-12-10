@@ -41,7 +41,7 @@ public class PlayVideoHelper
         //115Cookie不能为空
         if (string.IsNullOrEmpty(AppSettings._115_Cookie) && xamlRoot != null)
         {
-            var dialog = new ContentDialog()
+            var dialog = new ContentDialog
             {
                 XamlRoot = xamlRoot,
                 Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
