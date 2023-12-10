@@ -26,6 +26,7 @@ using Windows.Media.Streaming.Adaptive;
 using Windows.Storage;
 using Windows.System.Display;
 using Windows.Web.Http;
+using ByteSizeLib;
 using Display.Services;
 using SharpCompress;
 
@@ -835,6 +836,11 @@ public sealed partial class CustomMediaPlayerElement
             {"时长",
                 MediaControl.MediaPlayer.NaturalDuration.ToString(TimeFormat)},
         };
+
+        if (playItem.Size != null)
+        {
+            infos.Add("大小", ByteSize.FromBytes((long)playItem.Size).ToString("#.#"));
+        }
 
         if (playItem.IsRequestM3U8)
         {

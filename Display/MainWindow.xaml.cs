@@ -418,9 +418,8 @@ namespace Display
             //选中的是失败项
             if (nowItem.Series == "fail")
             {
-
                 var mediaPlayItem = new MediaPlayItem(nowItem.busUrl, nowItem.trueName,FilesInfo.FileType.File);
-                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, ((Page)ContentFrame.Content).XamlRoot);
+                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, ((Page)ContentFrame.Content).XamlRoot);
             }
             //正常点击
             else

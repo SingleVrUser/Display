@@ -128,7 +128,7 @@ namespace Display.Views
             if (videoInfo.Series == "fail")
             {
                 var mediaPlayItem = new MediaPlayItem(videoInfo.ImageUrl, videoInfo.trueName, FilesInfo.FileType.File);
-                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, playType: PlayType.Fail);
+                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, playType: PlayType.Fail);
                 return;
             }
 
@@ -141,12 +141,12 @@ namespace Display.Views
             {
                 videoPlayButton.Flyout = new Flyout()
                 {
-                    Content = new TextBlock() { Text = "经查询，本地数据库无该文件，请导入后继续" }
+                    Content = new TextBlock { Text = "经查询，本地数据库无该文件，请导入后继续" }
                 };
             }
             else if (videoInfoList.Count == 1)
             {
-                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].PickCode, videoInfo.trueName, FilesInfo.FileType.File);
+                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].PickCode, videoInfo.trueName, FilesInfo.FileType.File, videoInfoList[0].Size, videoInfoList[0].Cid);
                 await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
             }
 
@@ -179,7 +179,7 @@ namespace Display.Views
 
             if (sender is not ListView { DataContext: string trueName }) return;
             
-            var mediaPlayItem = new MediaPlayItem(singleVideoInfo.PickCode, trueName, FilesInfo.FileType.File);
+            var mediaPlayItem = new MediaPlayItem(singleVideoInfo.PickCode, trueName, FilesInfo.FileType.File, singleVideoInfo.Size, singleVideoInfo.Cid);
             await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, XamlRoot, lastPage: this);
         }
 
@@ -189,8 +189,8 @@ namespace Display.Views
 
             if (videoPlayButton.DataContext is not Datum datum) return;
 
-            var mediaPlayItem = new MediaPlayItem(datum.PickCode, datum.Name, FilesInfo.FileType.File);
-            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.Fail);
+            var mediaPlayItem = new MediaPlayItem(datum.PickCode, datum.Name, FilesInfo.FileType.File, datum.Size, datum.Cid);
+            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, playType: PlayType.Fail);
         }
     }
 
