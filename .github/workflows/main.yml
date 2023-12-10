@@ -1,4 +1,4 @@
-name: Build WinUI3 App
+name: Build Application
 
 on:
 #  push:
