@@ -366,3 +366,6 @@ FodyWeavers.xsd
 /Tests/GetFilesTest.cs
 /Tests/Constant.cs
 /Tests/UserInfo.cs
+/Tests/UserInfo.cs
+/Display/Package.appxmanifest
+/Display/Display_TemporaryKey.pfx
