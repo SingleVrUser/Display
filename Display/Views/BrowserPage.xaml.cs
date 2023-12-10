@@ -85,7 +85,7 @@ namespace Display.Views
                 }
 
                 //BitComet只需要cid,n,pc三个值
-                bool isSuccess = await webApi.RequestDown(videoinfos, downtype);
+                var isSuccess = await webApi.RequestDown(videoinfos, downtype);
 
                 if (!isSuccess)
                     ShowTeachingTip("请求下载失败");
