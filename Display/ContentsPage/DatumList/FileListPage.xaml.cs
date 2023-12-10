@@ -67,6 +67,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private WebApi WebApi => _webApi ??= WebApi.GlobalWebApi;
 
+    private bool _isLoading = true;
+
     /// <summary>
     /// 中转站文件
     /// </summary>
@@ -111,40 +113,9 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private void FilesInfos_GetFileInfoCompleted(object sender, GetFileInfoCompletedEventArgs e)
     {
-
         ChangedOrderIcon(e.Orderby, e.Asc);
         MyProgressBar.Visibility = Visibility.Collapsed;
-    }
-
-    private void OpenFile_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
-    {
-        if (sender is not Grid { DataContext: FilesInfo info }) return;
-
-        // 跳过文件夹
-        if (info.Type == FilesInfo.FileType.Folder) return;
-
-        if (info.IsImage)
-        {
-            if (info.Id == null) return;
-            var files = FilesInfos.Where(i=>i.IsImage).ToList();
-            var currentIndex = files.IndexOf(info);
-            NavigationToImagePage(files, currentIndex);
-            return;
-        }
-
-        if (!info.IsVideo)
-        {
-            ShowTeachingTip("不支持打开该格式");
-
-            return;
-        }
-
-        // 只有文件能双击，文件夹Click后就跳转到新页面了
-        var mediaPlayItem = new MediaPlayItem(info.PickCode, info.Name, info.Type);
-
-        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal,
-           () => _ = PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this));
-
+        _isLoading = false;
     }
 
     private async Task OpenFolder(long cid)
@@ -159,7 +130,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         //跳过文件
         if (filesInfo.Type == FilesInfo.FileType.File) return;
-
         if (filesInfo.Id == null) return;
 
         var id = (long)filesInfo.Id;
@@ -168,13 +138,18 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         // 切换目录时，全选checkBox不是选中状态
         MultipleSelectedCheckBox.IsChecked = false;
+
+        ChangedMenuState();
     }
 
     private void TextBlock_Tapped(object sender, TappedRoutedEventArgs e)
     {
+        _isLoading = true;
+
         if (sender is not TextBlock { DataContext: FilesInfo filesInfo }) return;
 
         GoToFolder(filesInfo);
+
     }
 
     private void ToTopButton_Click(object sender, RoutedEventArgs e)
@@ -1238,12 +1213,68 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         await OpenFolder(CurrentExplorerItem.Id);
     }
 
-    private bool _isSelectedListView = false;
-    private void BaseExample_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (sender is not ListView listView) return;
+    private bool _isSelectedListView;
 
-        var isSelectedState = listView.SelectedItems.Count > 0;
+    private DateTime _lastTapTime = DateTime.MinValue;
+    private async void BaseExample_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var nowTime = DateTime.Now;
+        
+        // 双击事件
+        if ((nowTime - _lastTapTime).TotalMilliseconds < 300)  // 300毫秒内连续两次点击视为双击
+        {
+            _lastTapTime = nowTime;
+
+            FilesInfo info = null;
+            if (e.AddedItems.FirstOrDefault() is FilesInfo)
+            {
+                info = e.AddedItems.FirstOrDefault() as FilesInfo;
+            }
+            else if (e.RemovedItems.FirstOrDefault() is FilesInfo)
+            {
+                info = e.RemovedItems.FirstOrDefault() as FilesInfo;
+            }
+
+            // 跳过文件夹
+            if (info == null || info.Type == FilesInfo.FileType.Folder) return;
+
+            if (info.IsVideo)
+            {
+                // 只有文件能双击，文件夹Click后就跳转到新页面了
+                var mediaPlayItem = new MediaPlayItem(info.PickCode, info.Name, info.Type);
+
+                _ = PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this);
+            }
+            else if (info.IsImage)
+            {
+                if (info.Id == null) return;
+
+                var files = FilesInfos.Where(i => i.IsImage).ToList();
+                var currentIndex = files.IndexOf(info);
+                NavigationToImagePage(files, currentIndex);
+            }
+            else
+            {
+                ShowTeachingTip("不支持打开该格式");
+
+                return;
+            }
+
+            return;
+        }
+        _lastTapTime = nowTime;
+
+        // 单击事件
+        await Task.Delay(200);
+
+        if (_isLoading) return;
+
+        ChangedMenuState();
+    }
+
+    private void ChangedMenuState()
+    {
+        var isSelectedState = BaseExample.SelectedItems.Count > 0;
 
         // 没有选中的情况，如果全选按钮选中，则取消
         if (!isSelectedState && MultipleSelectedCheckBox.IsChecked == true)
@@ -1257,7 +1288,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         VisualStateManager.GoToState(this, isSelectedState ? "Show" : "Hidden", true);
     }
-
 
     #region 设置图片控件
 
@@ -1383,7 +1413,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         VisualStateManager.GoToState(this, "TransferNormal", true);
     }
-    
+
 }
 
 class TransferStationFiles

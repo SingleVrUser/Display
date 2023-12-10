@@ -10,7 +10,6 @@
       xmlns:local="using:Display.ContentsPage.DatumList"
       xmlns:customizeControls="using:Display.Controls"
       xmlns:data="using:Display.Data"
-      xmlns:models="using:Display.Models"
       xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
       mc:Ignorable="d">
     <Page.Resources>
@@ -95,8 +94,7 @@
 
         <DataTemplate x:Key="FileListTemplate"
                       x:DataType="data:FilesInfo">
-            <Grid DoubleTapped="OpenFile_DoubleTapped"
-                  Background="Transparent"
+            <Grid Background="Transparent"
                   ColumnDefinitions="*,140,70">
                 <Grid.ContextFlyout>
                     <MenuFlyout ShouldConstrainToRootBounds="False">
@@ -240,12 +238,12 @@
             </VisualStateGroup>
 
             <VisualStateGroup x:Name="TransferStates">
-                <VisualState x:Name="TransferNormal"/>
+                <VisualState x:Name="TransferNormal" />
 
                 <VisualState x:Name="TransferPointerOver">
                     <VisualState.Setters>
                         <Setter Target="TransferStationGrid.Background"
-                                Value="WhiteSmoke"/>
+                                Value="WhiteSmoke" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -260,8 +258,8 @@
                                 Value="Visible" />
                         <Setter Target="DownloadButton.Visibility"
                                 Value="Visible" />
-                        <Setter Target="SortButton.Visibility"
-                                Value="Visible" />
+                        <!--<Setter Target="SortButton.Visibility"
+                                Value="Visible" />-->
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -362,8 +360,7 @@
                     </AppBarButton.ContextFlyout>
                 </AppBarButton>
 
-                <AppBarButton x:Name="SearchButton"
-                              Icon="Find"
+                <AppBarButton Icon="Find"
                               Label="搜索"
                               Click="SearchButton_Click">
                     <AppBarButton.KeyboardAccelerators>
@@ -376,8 +373,7 @@
                 </AppBarButton>
 
                 <CommandBar.SecondaryCommands>
-                    <AppBarButton x:Name="SortButton"
-                                  Visibility="Collapsed"
+                    <AppBarButton Visibility="Collapsed"
                                   Icon="Sort"
                                   Label="整理"
                                   Click="Sort115Button_Click" />
@@ -613,14 +609,18 @@
                    Opacity="0.5" />
 
         <!--搜索结果-->
-        <TeachingTip x:Name="SearchTeachingTip" Grid.Row="0"
+        <TeachingTip x:Name="SearchTeachingTip"
+                     Grid.Row="0"
                      Grid.Column="0"
                      IsLightDismissEnabled="True"
                      Closed="SearchTeachingTip_OnClosed"
                      PreferredPlacement="Top">
             <TeachingTip.Content>
-                <Grid RowDefinitions="auto,*" MaxHeight="400" RowSpacing="10">
-                    <AutoSuggestBox x:Name="SearchBox" PlaceholderText="搜索"
+                <Grid RowDefinitions="auto,*"
+                      MaxHeight="400"
+                      RowSpacing="10">
+                    <AutoSuggestBox x:Name="SearchBox"
+                                    PlaceholderText="搜索"
                                     Width="620"
                                     QueryIcon="Find"
                                     QuerySubmitted="SearchBoxOnQuerySubmitted" />
@@ -630,7 +630,7 @@
                               ItemTemplate="{StaticResource SearchListTemplate}"
                               SelectionMode="None"
                               IsItemClickEnabled="True"
-                              ItemClick="SearchResultListView_OnItemClick"/>
+                              ItemClick="SearchResultListView_OnItemClick" />
                 </Grid>
             </TeachingTip.Content>
         </TeachingTip>
