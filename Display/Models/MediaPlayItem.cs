@@ -1,23 +1,23 @@
 ﻿using Display.Data;
+using Display.Helper;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media.Playback;
-using Display.Helper;
-using System.Collections.ObjectModel;
 
 namespace Display.Models
 {
     public class MediaPlayItem
     {
-        public string FileName;
-        public string FileNameWithoutExtension;
-        public string TrueName;
-        public string PickCode;
-        public string Title;
+        public readonly string FileName;
+        public readonly string FileNameWithoutExtension;
+        public readonly string TrueName;
+        public readonly string PickCode;
+        public readonly string Title;
+        public readonly long? Size;
+        public readonly long? Cid;
         public string Description;
-        public long Cid;
         public List<m3u8Info> M3U8Infos;
 
         public FilesInfo.FileType Type;
@@ -41,10 +41,10 @@ namespace Display.Models
         public string OriginalUrl;
         public List<SubInfo> SubInfos;
 
-        public bool IsRequestM3U8 = false;
-        public bool IsRequestOriginal = false;
+        public bool IsRequestM3U8;
+        public bool IsRequestOriginal;
 
-        public MediaPlayItem(string pickCode, string fileName, FilesInfo.FileType type, long? cid = null)
+        public MediaPlayItem(string pickCode, string fileName, FilesInfo.FileType type,long? size = null, long? cid = null)
         {
             PickCode = pickCode;
             FileName = fileName;
@@ -55,12 +55,10 @@ namespace Display.Models
             Title = FileNameWithoutExtension;
             Type = type;
 
-            if (cid != null)
-            {
-                Cid = (long)cid;
-            }
+            Size = size;
+            Cid = cid;
 
-            
+
             if (!AppSettings.IsFindSub || string.IsNullOrEmpty(pickCode) || type==FilesInfo.FileType.Folder) return;
 
             // 加载字母
@@ -211,7 +209,7 @@ namespace Display.Models
                     newMediaPlayItems.AddRange(
                         fileInfos.data
                             .Where(x => x.Fid!=null && x.Iv == 1)
-                            .Select(x => new MediaPlayItem(x.PickCode, x.Name, FilesInfo.FileType.File)));
+                            .Select(x => new MediaPlayItem(x.PickCode, x.Name, FilesInfo.FileType.File, x.Size, x.Cid)));
                 }
                 else
                 {

@@ -40,7 +40,7 @@ namespace Display.ContentsPage.DetailInfo
 
         private async void PlayVideos(List<Datum> infos)
         {
-            var playItems = infos.Select(x=>new MediaPlayItem(x.PickCode,x.Name,FilesInfo.FileType.File)).ToList();
+            var playItems = infos.Select(x=>new MediaPlayItem(x.PickCode,x.Name,FilesInfo.FileType.File, x.Size, x.Cid)).ToList();
 
             await PlayVideoHelper.PlayVideo(playItems, this.XamlRoot, lastPage: this);
         }

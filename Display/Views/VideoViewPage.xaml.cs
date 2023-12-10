@@ -8,8 +8,6 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -41,15 +39,21 @@ namespace Display.Views
 
             string pickCode;
             string title;
+            long Size;
+            long Cid;
             if (videoPlayGrid.DataContext is Datum datum)
             {
                 pickCode = datum.PickCode;
                 title = datum.Name;
+                Size = datum.Size;
+                Cid = datum.Cid;
             }
             else if (videoPlayGrid.DataContext is FailInfo failInfo)
             {
                 pickCode = failInfo.PickCode;
                 title = failInfo.Datum.Name;
+                Size = failInfo.Datum.Size;
+                Cid = failInfo.Datum.Cid;
             }
             else
             {
@@ -58,7 +62,7 @@ namespace Display.Views
 
             if (string.IsNullOrEmpty(pickCode)) return;
 
-            var mediaPlayItem = new MediaPlayItem(pickCode, title, FilesInfo.FileType.File);
+            var mediaPlayItem = new MediaPlayItem(pickCode, title, FilesInfo.FileType.File, Size, Cid);
             await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.Fail);
         }
 
@@ -67,7 +71,7 @@ namespace Display.Views
         /// </summary>
         private void OnClicked(object sender, RoutedEventArgs e)
         {
-            VideoCoverDisplayClass item = (sender as Button).DataContext as VideoCoverDisplayClass;
+            if (sender is not Button { DataContext: VideoCoverDisplayClass item }) return;
 
             //准备动画
             //videoControl.PrepareAnimation(item);
@@ -92,16 +96,16 @@ namespace Display.Views
             //没有
             if (videoInfoList.Count == 0)
             {
-                VideoPlayButton.Flyout = new Flyout()
+                VideoPlayButton.Flyout = new Flyout
                 {
-                    Content = new TextBlock() { Text = "经查询，本地数据库无该文件，请导入后继续" }
+                    Content = new TextBlock { Text = "经查询，本地数据库无该文件，请导入后继续" }
                 };
             }
             else if (videoInfoList.Count == 1)
             {
                 _storeditem = videoInfo;
 
-                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].PickCode, videoInfo.trueName, FilesInfo.FileType.File);
+                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].PickCode, videoInfo.trueName, FilesInfo.FileType.File, videoInfoList[0].Size, videoInfoList[0].Cid);
                 await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
                 ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             }
@@ -113,17 +117,6 @@ namespace Display.Views
                 PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, this.XamlRoot);
 
             }
-        }
-
-        private async void ContentListView_ItemClick(object sender, ItemClickEventArgs e)
-        {
-            if (e.ClickedItem is not Datum singleVideoInfo) return;
-
-            if (sender is not ListView { DataContext: string trueName }) return;
-
-
-            var mediaPlayItem = new MediaPlayItem(singleVideoInfo.PickCode, trueName, FilesInfo.FileType.File);
-            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
