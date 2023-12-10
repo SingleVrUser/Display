@@ -382,6 +382,11 @@ namespace Display.Spider
                 localFilename = name.Contains(".") ? name : $"{name}{Path.GetExtension(url)}";
             }
 
+            if (!Directory.Exists(AppSettings.X1080XAttmnSavePath))
+            {
+                Directory.CreateDirectory(AppSettings.X1080XAttmnSavePath);
+            }
+
             var localPath = Path.Combine(AppSettings.X1080XAttmnSavePath, localFilename);
 
             if (File.Exists(localPath)) return localPath;
