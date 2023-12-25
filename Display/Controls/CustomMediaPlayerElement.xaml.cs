@@ -398,7 +398,7 @@ public sealed partial class CustomMediaPlayerElement
         {
 
             var transportControlsTemplateRoot = (FrameworkElement)VisualTreeHelper.GetChild(MediaControl.TransportControls, 0);
-            var sliderControl = (Slider)transportControlsTemplateRoot.FindName("ProgressSlider");
+            var sliderControl = (Slider)transportControlsTemplateRoot?.FindName("ProgressSlider");
             if (sliderControl != null && sender.PlaybackSession.NaturalDuration.TotalSeconds > 1000)
             {
                 // 十秒一步

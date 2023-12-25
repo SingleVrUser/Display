@@ -77,7 +77,7 @@
                     <TextBlock Grid.Column="1"
                                Text="{x:Bind Name}"
                                Style="{StaticResource ValueText}"
-                               Tapped="TextBlock_Tapped"
+                               Tapped="OpenFolder_Tapped"
                                HorizontalAlignment="Left" />
                 </Grid>
 
@@ -170,7 +170,6 @@
                     <TextBlock Grid.Column="1"
                                Text="{x:Bind Name,Mode=OneWay}"
                                Style="{StaticResource ValueText}"
-                               Tapped="TextBlock_Tapped"
                                HorizontalAlignment="Left" />
                 </Grid>
 
