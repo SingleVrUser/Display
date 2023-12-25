@@ -119,37 +119,34 @@ namespace Display.Services
                         Debug.WriteLine("_inputStream为空,尝试从Url中获取");
                         await SendRequestAsync();
                     }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex);
 
-                    return null;
-                }
+                    if (_inputStream == null || _isDisposing)
+                    {
+                        Debug.WriteLine("尝试获取_inputStream后依旧未为空，返回默认值");
 
-                if (_inputStream == null || _isDisposing)
-                {
-                    Debug.WriteLine("尝试获取_inputStream后依旧未为空，返回默认值");
+                        return null;
+                    }
 
-                    return null;
-                }
 
-                try
-                {
                     var result = await _inputStream.ReadAsync(buffer, count, options).AsTask(cancellationToken, progress).ConfigureAwait(false);
 
                     // Move position forward.
                     Position += result.Length;
                     //Debug.WriteLine("requestedPosition = {0:N0}", Position);
                     return result;
+
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine(ex);
+
+                    return null;
                 }
 
                 return null;
             });
+
+
 
             return result;
         }

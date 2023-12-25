@@ -128,6 +128,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async void GoToFolder(FilesInfo filesInfo)
     {
+        _isLoading = true;
+
         //跳过文件
         if (filesInfo.Type == FilesInfo.FileType.File) return;
         if (filesInfo.Id == null) return;
@@ -142,14 +144,12 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         ChangedMenuState();
     }
 
-    private void TextBlock_Tapped(object sender, TappedRoutedEventArgs e)
+    private void OpenFolder_Tapped(object sender, TappedRoutedEventArgs e)
     {
-        _isLoading = true;
 
         if (sender is not TextBlock { DataContext: FilesInfo filesInfo }) return;
 
         GoToFolder(filesInfo);
-
     }
 
     private void ToTopButton_Click(object sender, RoutedEventArgs e)
@@ -1216,27 +1216,35 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     private bool _isSelectedListView;
 
     private DateTime _lastTapTime = DateTime.MinValue;
+    private FilesInfo _lastInfo;
     private async void BaseExample_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         var nowTime = DateTime.Now;
+
+        FilesInfo info = null;
+        if (e.AddedItems.FirstOrDefault() is FilesInfo)
+        {
+            info = e.AddedItems.FirstOrDefault() as FilesInfo;
+        }
+        else if (e.RemovedItems.FirstOrDefault() is FilesInfo)
+        {
+            info = e.RemovedItems.FirstOrDefault() as FilesInfo;
+        }
+
+        if (info == null) return;
         
         // 双击事件
-        if ((nowTime - _lastTapTime).TotalMilliseconds < 300)  // 300毫秒内连续两次点击视为双击
+        if (_lastInfo == info &&(nowTime - _lastTapTime).TotalMilliseconds < 300)  // 300毫秒内连续两次点击视为双击
         {
             _lastTapTime = nowTime;
 
-            FilesInfo info = null;
-            if (e.AddedItems.FirstOrDefault() is FilesInfo)
+
+            if (info.Type == FilesInfo.FileType.Folder)
             {
-                info = e.AddedItems.FirstOrDefault() as FilesInfo;
-            }
-            else if (e.RemovedItems.FirstOrDefault() is FilesInfo)
-            {
-                info = e.RemovedItems.FirstOrDefault() as FilesInfo;
+                GoToFolder(info);
+                return;
             }
 
-            // 跳过文件夹
-            if (info == null || info.Type == FilesInfo.FileType.Folder) return;
 
             if (info.IsVideo)
             {
@@ -1263,10 +1271,10 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             return;
         }
         _lastTapTime = nowTime;
+        _lastInfo = info;
 
         // 单击事件
-        await Task.Delay(200);
-
+        await Task.Delay(310);
         if (_isLoading) return;
 
         ChangedMenuState();
@@ -1398,7 +1406,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async void OpenFolderInSearchResult_ItemClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info } menuFlyoutItem) return;
+        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
 
         await OpenFolder(info.Cid);
 
