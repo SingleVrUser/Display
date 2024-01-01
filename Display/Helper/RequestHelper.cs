@@ -5,12 +5,13 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Org.BouncyCastle.Math;
 
 namespace Display.Helper;
 
 public class RequestHelper
 {
-    public static async Task<Tuple<string, string>> RequestHtml(HttpClient client, string url, CancellationToken token, int maxRequestCount = 5)
+    public static async Task<Tuple<string, string>> RequestHtml(HttpClient client, string url, CancellationToken token, int maxRequestCount = 3)
     {
         // 访问
         var strResult = string.Empty;
@@ -20,17 +21,21 @@ public class RequestHelper
 
 
 
+        var uri = new Uri(url);
+
+        Debug.WriteLine("正在访问：" + uri.AbsoluteUri);
+
         for (var i = 0; i < maxRequestCount; i++)
         {
-            // 设置超时时间（5s）
-            var timeoutCancelToken = new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token;
-
-            // 添加额外的退出条件
-            var compositeCancel = CancellationTokenSource.CreateLinkedTokenSource(timeoutCancelToken, token);
-
             try
             {
-                var response = await client.GetAsync(new Uri(url), compositeCancel.Token);
+                // 设置超时时间（5s）
+                var timeoutCancelToken = new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token;
+
+                // 添加额外的退出条件
+                var compositeCancel = CancellationTokenSource.CreateLinkedTokenSource(timeoutCancelToken, token);
+
+                var response = await client.GetAsync(uri, compositeCancel.Token);
 
                 requestUrl = response.RequestMessage?.RequestUri?.ToString();
 
@@ -50,10 +55,13 @@ public class RequestHelper
 
                 break;
             }
+            catch (TaskCanceledException)
+            {
+                Debug.WriteLine("任务退出");
+                break;
+            }
             catch (Exception ex)
             {
-                if (token.IsCancellationRequested) return null;
-
                 Debug.WriteLine($"访问网页时发生错误:{ex.Message}");
 
                 //等待两秒后继续

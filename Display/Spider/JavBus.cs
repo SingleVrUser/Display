@@ -28,66 +28,66 @@ public class JavBus
 
     private static string baseUrl => AppSettings.JavBusBaseUrl;
 
-    public static async Task<VideoInfo> SearchInfoFromCID(string cid, CancellationToken token)
+    public static async Task<VideoInfo> SearchInfoFromCid(string cid, CancellationToken token)
     {
         cid = cid.ToUpper();
 
-        var spliteCid = cid.Split("-");
-        if (spliteCid.Count() != 2) return null;
+        var splitCid = cid.Split("-");
+        if (splitCid.Count() != 2) return null;
 
-        string searchCID;
+        string searchCid;
 
-        switch (spliteCid[0])
+        switch (splitCid[0])
         {
             case "MIUM" or "MAAN":
-                searchCID = $"300{cid}";
+                searchCid = $"300{cid}";
                 break;
             case "JAC":
-                searchCID = $"390{cid}";
+                searchCid = $"390{cid}";
                 break;
             case "DSVR":
-                searchCID = $"3{cid}";
+                searchCid = $"3{cid}";
                 break;
             default:
-                searchCID = cid;
+                searchCid = cid;
                 break;
         }
 
-        var tmp_url = GetInfoFromNetwork.UrlCombine(baseUrl, searchCID);
+        var tmpUrl = GetInfoFromNetwork.UrlCombine(baseUrl, searchCid);
 
-        var result = await RequestHelper.RequestHtml(Common.Client, tmp_url, token);
+        var result = await RequestHelper.RequestHtml(Common.Client, tmpUrl, token);
         if (result == null) return null;
             
-        var detail_url = result.Item1;
+        var detailUrl = result.Item1;
         var htmlString = result.Item2;
 
         HtmlDocument htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlString);
 
-        return await GetVideoInfoFromHtmlDoc(cid, detail_url, htmlDoc);
+        return await GetVideoInfoFromHtmlDoc(cid, detailUrl, htmlDoc);
     }
 
-    public static async Task<VideoInfo> GetVideoInfoFromHtmlDoc(string CID, string detail_url, HtmlDocument htmlDoc)
+    public static async Task<VideoInfo> GetVideoInfoFromHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
     {
         //搜索封面
-        var ImageUrlNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='col-md-9 screencap']//a//img");
-        if (ImageUrlNode == null) return null;
+        var imageUrlNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='col-md-9 screencap']//a//img");
+        if (imageUrlNode == null) return null;
 
-        Uri Uri = new(detail_url);
-        string JavBusUrl = $"{Uri.Scheme}://{Uri.Host}";
+        Uri uri = new(detailUrl);
+        var javBusUrl = $"{uri.Scheme}://{uri.Host}";
 
-        var ImageUrl = ImageUrlNode.Attributes["src"].Value;
-        if (!ImageUrl.Contains("http"))
+        var imageUrl = imageUrlNode.Attributes["src"].Value;
+        if (!imageUrl.Contains("http"))
         {
-            ImageUrl = GetInfoFromNetwork.UrlCombine(JavBusUrl, ImageUrl);
+            imageUrl = GetInfoFromNetwork.UrlCombine(javBusUrl, imageUrl);
         }
 
         VideoInfo videoInfo = new VideoInfo();
-        videoInfo.busUrl = detail_url;
-        videoInfo.trueName = CID;
+        videoInfo.busUrl = detailUrl;
+        videoInfo.trueName = cid;
 
         //标题
-        var title = ImageUrlNode.Attributes["title"].Value;
+        var title = imageUrlNode.Attributes["title"].Value;
         videoInfo.Title = title;
 
         //是否步兵
@@ -104,41 +104,41 @@ public class JavBus
                     break;
             }
         }
-        var AttributeNodes = htmlDoc.DocumentNode.SelectNodes("//div[@class='col-md-3 info']//p");
+        var attributeNodes = htmlDoc.DocumentNode.SelectNodes("//div[@class='col-md-3 info']//p");
         //信息
-        for (var i = 0; i < AttributeNodes.Count; i++)
+        for (var i = 0; i < attributeNodes.Count; i++)
         {
-            var AttributeNode = AttributeNodes[i];
+            var attributeNode = attributeNodes[i];
 
-            var header = AttributeNode.FirstChild.InnerText.Trim();
+            var header = attributeNode.FirstChild.InnerText.Trim();
 
             if (header == "發行日期:")
             {
-                videoInfo.ReleaseTime = AttributeNode.LastChild.InnerText.Trim();
+                videoInfo.ReleaseTime = attributeNode.LastChild.InnerText.Trim();
             }
             else if (header == "長度:")
             {
-                videoInfo.Lengthtime = AttributeNode.LastChild.InnerText.Trim().Replace("分鐘", "分钟");
+                videoInfo.Lengthtime = attributeNode.LastChild.InnerText.Trim().Replace("分鐘", "分钟");
             }
             else if (header == "導演:")
             {
-                videoInfo.Director = AttributeNode.LastChild.InnerText.Trim();
+                videoInfo.Director = attributeNode.LastChild.InnerText.Trim();
             }
             else if (header == "製作商:")
             {
-                videoInfo.Producer = AttributeNode.SelectSingleNode(".//a").InnerText.Trim();
+                videoInfo.Producer = attributeNode.SelectSingleNode(".//a").InnerText.Trim();
             }
             else if (header == "發行商:")
             {
-                videoInfo.Publisher = AttributeNode.SelectSingleNode(".//a").InnerText.Trim();
+                videoInfo.Publisher = attributeNode.SelectSingleNode(".//a").InnerText.Trim();
             }
             else if (header == "系列:")
             {
-                videoInfo.Series = AttributeNode.SelectSingleNode(".//a").InnerText.Trim();
+                videoInfo.Series = attributeNode.SelectSingleNode(".//a").InnerText.Trim();
             }
             else if (header == "類別:")
             {
-                var categoryNodes = AttributeNodes[i + 1].SelectNodes(".//span/label");
+                var categoryNodes = attributeNodes[i + 1].SelectNodes(".//span/label");
                 List<string> categoryList = new List<string>();
                 foreach (var node in categoryNodes)
                 {
@@ -148,8 +148,8 @@ public class JavBus
             }
             else if (header == "演員")
             {
-                if (i >= AttributeNodes.Count - 1) continue;
-                var actorNodes = AttributeNodes[i + 1].SelectNodes(".//span/a");
+                if (i >= attributeNodes.Count - 1) continue;
+                var actorNodes = attributeNodes[i + 1].SelectNodes(".//span/a");
                 List<string> actorList = new();
                 foreach (var node in actorNodes)
                 {
@@ -160,13 +160,13 @@ public class JavBus
         }
 
         //下载封面
-        if (!string.IsNullOrEmpty(ImageUrl))
+        if (!string.IsNullOrEmpty(imageUrl))
         {
             string SavePath = AppSettings.ImageSavePath;
 
-            string filePath = Path.Combine(SavePath, CID);
-            videoInfo.ImageUrl = ImageUrl;
-            videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(ImageUrl, filePath, CID);
+            string filePath = Path.Combine(SavePath, cid);
+            videoInfo.ImageUrl = imageUrl;
+            videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(imageUrl, filePath, cid);
         }
 
         var sampleBox_Nodes = htmlDoc.DocumentNode.SelectNodes("//a[@class='sample-box']");
@@ -178,7 +178,7 @@ public class JavBus
                 string sampleImageUrl = node.Attributes["href"].Value;
                 if (!sampleImageUrl.Contains("http"))
                 {
-                    sampleImageUrl = GetInfoFromNetwork.UrlCombine(JavBusUrl, sampleImageUrl);
+                    sampleImageUrl = GetInfoFromNetwork.UrlCombine(javBusUrl, sampleImageUrl);
                 }
                 sampleUrlList.Add(sampleImageUrl);
             }

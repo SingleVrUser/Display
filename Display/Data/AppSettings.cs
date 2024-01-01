@@ -48,6 +48,12 @@ public class AppSettings
         set => SetValue(value);
     }
 
+    public static bool IsAutoSpiderInVideoDisplay
+    {
+        get => GetValue(DefaultValue.Player.VideoDisplay.IsSpiderVideoInfo);
+        set => SetValue(value);
+    }
+
     /// <summary>
     /// 是否自动播放视频
     /// </summary>

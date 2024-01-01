@@ -293,6 +293,7 @@ public static class Const
             public static class VideoDisplay
             {
                 public const bool IsAutoPlay = false;
+                public const bool IsSpiderVideoInfo = false;
                 public const double AutoPlayPositionPercentage = 33.0;
                 public const double MaxVideoPlayCount = 3.0;
             }
