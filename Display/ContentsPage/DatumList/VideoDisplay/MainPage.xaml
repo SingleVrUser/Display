@@ -163,8 +163,6 @@
                                                                     <Setter Target="EnlargeButton.Visibility"
                                                                             Value="Visible" />
                                                                 </VisualState.Setters>
-
-
                                                             </VisualState>
                                                         </VisualStateGroup>
                                                     </VisualStateManager.VisualStateGroups>
@@ -172,7 +170,7 @@
                                                     <Grid CornerRadius="5"
                                                           HorizontalAlignment="Center"
                                                           VerticalAlignment="Center">
-                                                    <Image Source="{x:Bind VideoInfo.ImagePath}"
+                                                    <Image Source="{x:Bind VideoInfo.ImagePath, Mode=OneWay}"
                                                                Height="230" />
 
                                                         <Button x:Name="EnlargeButton"
@@ -189,10 +187,10 @@
 
                                                     <StackPanel Grid.Row="1"
                                                                 HorizontalAlignment="Center">
-                                                    <TextBlock Text="{x:Bind VideoInfo.trueName}"
+                                                    <TextBlock Text="{x:Bind VideoInfo.trueName, Mode=OneWay}"
                                                                    IsTextSelectionEnabled="True" />
-                                                    <TextBlock Text="{x:Bind VideoInfo.ReleaseTime}" />
-                                                    <customcontrols:TextBlockWithLongText StringValue="{x:Bind VideoInfo.Actor}" />
+                                                    <TextBlock Text="{x:Bind VideoInfo.ReleaseTime, Mode=OneWay}" />
+                                                    <customcontrols:TextBlockWithLongText StringValue="{x:Bind VideoInfo.Actor, Mode=OneWay}" />
                                                     </StackPanel>
 
                                                     <StackPanel Orientation="Horizontal"
@@ -284,19 +282,25 @@
                                         TickFrequency="1"
                                         TickPlacement="Outside"
                                         SnapsTo="Ticks" />
+                                <Slider Header="起始位置"
+                                        Value="{x:Bind data:AppSettings.AutoPlayPositionPercentage,Mode=TwoWay}" />
 
-                                <ToggleSwitch
+
+                            <ToggleSwitch Header="从网络中搜刮信息"
+                                          IsOn="{x:Bind data:AppSettings.IsAutoSpiderInVideoDisplay,Mode=TwoWay}" />
+
+
+                            <ToggleSwitch
                                     Header="自动播放"
                                     IsOn="{x:Bind data:AppSettings.IsAutoPlayInVideoDisplay,Mode=TwoWay}" />
 
 
-                                <ToggleSwitch Header="画质选择"
-                                              IsOn="{x:Bind data:AppSettings.IsPlayBestQualityFirst,Mode=TwoWay}"
-                                              OnContent="最高画质"
-                                              OffContent="流畅优先"/>
+                            <ToggleSwitch Header="画质选择"
+                                          IsOn="{x:Bind data:AppSettings.IsPlayBestQualityFirst,Mode=TwoWay}"
+                                          OnContent="最高画质"
+                                          OffContent="流畅优先"/>
 
-                            <Slider Header="起始位置"
-                                        Value="{x:Bind data:AppSettings.AutoPlayPositionPercentage,Mode=TwoWay}"/>
+                            
                             </StackPanel>
                         </PivotItem>
                     </Pivot>

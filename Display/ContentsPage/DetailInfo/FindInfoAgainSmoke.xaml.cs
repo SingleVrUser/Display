@@ -30,7 +30,7 @@ namespace Display.ContentsPage.DetailInfo
         {
             ReCheckProgressRing.Visibility = Visibility.Visible;
 
-            var infos = await Manager.Current.DispatchSpiderInfosByCIDInOrder(cidName);
+            var infos = await Manager.Current.DispatchSpiderInfosByCidInOrder(cidName);
 
             if (infos.Count > 0)
             {

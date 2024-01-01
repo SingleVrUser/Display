@@ -69,6 +69,8 @@ public class JavDB
         else
             tuple = await RequestHelper.RequestHtml(Common.Client, detailUrl, token);
 
+        if(tuple == null) return null;
+
         var htmlString = tuple.Item2;
         if (string.IsNullOrEmpty(htmlString)) return null;
 

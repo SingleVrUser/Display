@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -276,9 +277,7 @@ public sealed partial class MainPage : Page,IDisposable
         }
 
         if (!string.IsNullOrEmpty(videoUrl)) return videoUrl;
-
-
-
+        
         // 视频未转码，m3u8链接为0，尝试获取直链
         var downUrlList = await _webApi.GetDownUrl(pickCode, GetInfoFromNetwork.DownUserAgent);
 
@@ -325,12 +324,9 @@ public sealed partial class MainPage : Page,IDisposable
 
         return menuFlyout;
     }
-
-    private int _currentCount;
+    
     private async Task AddMediaElement(FilesInfo file, string videoUrl = null, int addIndex = -1)
     {
-        _currentCount++;
-
         videoUrl ??= await GetVideoUrl(file);
         if (videoUrl == null) return;
 
@@ -363,13 +359,12 @@ public sealed partial class MainPage : Page,IDisposable
             DispatcherQueue.TryEnqueue(() =>
             {
                 var transportControlsTemplateRoot = (FrameworkElement)VisualTreeHelper.GetChild(mediaPlayerElement.TransportControls, 0);
-                var sliderControl = (Slider)transportControlsTemplateRoot.FindName("ProgressSlider");
-                if (sliderControl != null && sender.PlaybackSession.NaturalDuration.TotalSeconds > 1000)
-                {
-                    // 十秒一步
-                    sliderControl.StepFrequency = 1000 / sender.PlaybackSession.NaturalDuration.TotalSeconds;
-                    sliderControl.SmallChange = 1000 / sender.PlaybackSession.NaturalDuration.TotalSeconds;
-                }
+                var sliderControl = (Slider)transportControlsTemplateRoot?.FindName("ProgressSlider");
+                if (sliderControl == null || !(sender.PlaybackSession.NaturalDuration.TotalSeconds > 1000)) return;
+
+                // 十秒一步
+                sliderControl.StepFrequency = 1000 / sender.PlaybackSession.NaturalDuration.TotalSeconds;
+                sliderControl.SmallChange = 1000 / sender.PlaybackSession.NaturalDuration.TotalSeconds;
             });
 
         };
@@ -394,7 +389,7 @@ public sealed partial class MainPage : Page,IDisposable
     }
 
 
-    private async void TryPlayVideos(List<FilesInfo> filesInfo)
+    private async void TryPlayVideos(IReadOnlyCollection<FilesInfo> filesInfo)
     {
         ChangedVideo_UniformGrid(filesInfo.Count);
 
@@ -420,10 +415,9 @@ public sealed partial class MainPage : Page,IDisposable
         await FindAndShowInfosFromInternet(_playingVideoInfos.ToArray());
     }
 
-    private async Task FindAndShowInfosFromInternet(FilesInfo[] filesInfos)
+    private async Task FindAndShowInfosFromInternet(IEnumerable<FilesInfo> filesInfos)
     {
         VideoPlay_ListView.IsEnabled = false;
-        FindCidInfo_ProgressRing.Visibility = Visibility.Visible;
 
         const string noPicturePath = Const.FileType.NoPicturePath;
 
@@ -440,8 +434,17 @@ public sealed partial class MainPage : Page,IDisposable
                 continue;
             }
 
-            var result = DataAccess.Get.GetOneTrueNameByName(trueName);
+            Debug.WriteLine("正在添加信息："+trueName);
 
+            // cidInfo已经存在
+            var cidInfo = _cidInfos.FirstOrDefault(item => item.VideoInfo.trueName.ToUpper().Equals(trueName.ToUpper()));
+            if (cidInfo is not null)
+            {
+                _cidInfos.Add(cidInfo);
+                continue;
+            }
+
+            var result = DataAccess.Get.GetOneTrueNameByName(trueName);
             //数据库中有
             if (!string.IsNullOrEmpty(result))
             {
@@ -449,27 +452,38 @@ public sealed partial class MainPage : Page,IDisposable
                 var videoInfo = DataAccess.Get.GetSingleVideoInfoByTrueName(result);
 
                 _cidInfos.Add(new CidInfo(videoInfo));
-
             }
             //网络中查询
-            else
+            else if(AppSettings.IsAutoSpiderInVideoDisplay)
             {
+                Debug.WriteLine("从网络中搜索" + trueName);
                 var info = new CidInfo(trueName, noPicturePath);
 
                 _cidInfos.Add(info);
 
                 var spiderManager = Spider.Manager.Current;
 
-                var videoInfo = await spiderManager.DispatchSpiderInfoByCIDInOrder(trueName, info.CancellationTokenSource.Token);
+
+                FindCidInfo_ProgressRing.Visibility = Visibility.Visible;
+
+                // 直接使用await spiderManager.DispatchSpiderInfoByCidInOrder会阻塞UI线程
+                var videoInfo = await Task.Run(async () =>
+                    await spiderManager.DispatchSpiderInfoByCidInOrder(trueName, info.CancellationTokenSource.Token));
+
+                FindCidInfo_ProgressRing.Visibility = Visibility.Collapsed;
+
                 if (videoInfo == null || info.CancellationTokenSource.Token.IsCancellationRequested) continue;
 
-                _cidInfos.Remove(info);
-                _cidInfos.Add(new CidInfo(videoInfo));
+                //var cidInfos = _cidInfos.Where(item=>item.VideoInfo.trueName.Equals(trueName));
+                //foreach (var curInfo in cidInfos)
+                //{
+                //}
+
+                info.UpdateInfo(videoInfo);
 
             }
         }
 
-        FindCidInfo_ProgressRing.Visibility = Visibility.Collapsed;
 
         VideoPlay_ListView.IsEnabled = true;
     }
@@ -478,7 +492,7 @@ public sealed partial class MainPage : Page,IDisposable
     {
         foreach (var item in Video_UniformGrid.Children)
         {
-            var videoControl = item as MediaPlayerElement;
+            if (item is not MediaPlayerElement videoControl) continue;
             videoControl.MediaPlayer.Play();
         }
     }
@@ -487,7 +501,7 @@ public sealed partial class MainPage : Page,IDisposable
     {
         foreach (var item in Video_UniformGrid.Children)
         {
-            var videoControl = item as MediaPlayerElement;
+            if (item is not MediaPlayerElement videoControl) continue;
             videoControl.MediaPlayer.Pause();
         }
     }
@@ -496,7 +510,7 @@ public sealed partial class MainPage : Page,IDisposable
     {
         foreach (var item in Video_UniformGrid.Children)
         {
-            var videoControl = item as MediaPlayerElement;
+            if (item is not MediaPlayerElement videoControl) continue;
             videoControl.MediaPlayer.IsMuted = true;
 
         }
@@ -506,7 +520,8 @@ public sealed partial class MainPage : Page,IDisposable
     {
         foreach (var item in Video_UniformGrid.Children)
         {
-            var videoControl = item as MediaPlayerElement;
+            if (item is not MediaPlayerElement videoControl) continue;
+
             videoControl.MediaPlayer.IsMuted = false;
         }
     }
@@ -515,7 +530,7 @@ public sealed partial class MainPage : Page,IDisposable
     {
         foreach (var item in Video_UniformGrid.Children)
         {
-            var videoControl = item as MediaPlayerElement;
+            if (item is not MediaPlayerElement videoControl) continue;
 
             videoControl.MediaPlayer.Position = videoControl.MediaPlayer.NaturalDuration * e.NewValue / 100;
         }
@@ -543,7 +558,7 @@ public sealed partial class MainPage : Page,IDisposable
             return;
         }
 
-        // 接着，删除资源管理器的文件，如果存在（有可能已经关掉了）
+        // 删除资源管理器的文件，如果存在（有可能已经关掉了）
         if (_lastFilesListView.IsLoaded && _lastFilesListView.ItemsSource is IncrementalLoadDatumCollection filesInfos &&
             filesInfos.Contains(fileInfo))
         {
@@ -785,14 +800,9 @@ public sealed partial class MainPage : Page,IDisposable
         var mediaPlayerElement = GetFirstElementPlayPickCode(removeFileInfo.PickCode);
 
         if (mediaPlayerElement == null) return;
-
-        ////正在播放的文件的pc
-        //var playingPcList = Video_UniformGrid.Children.Select(element =>
-        //    ((element as MediaPlayerElement)?.Tag as MediaPlayerWithStreamSource)?.FilesInfo.PickCode).ToList();
-
+        
         // 挑选播放列表中不是正在播放的视频
         // 删除的一般只有一个，只取一个
-        //var videoInfo = _filesInfos.FirstOrDefault(item => item.IsVideo && !playingPcList.Contains(item.PickCode) && !_playingVideoInfos.Contains(item));
         var videoInfo = _filesInfos.FirstOrDefault(item => item.IsVideo && !_playingVideoInfos.Contains(item));
 
         if (videoInfo != null)
@@ -800,7 +810,10 @@ public sealed partial class MainPage : Page,IDisposable
             // 添加到正在播放的视频的信息中
             _playingVideoInfos.Add(videoInfo);
 
+            Debug.WriteLine("开始移除并播放下一集");
             await RemoveVideoAndPlayNextVideo(mediaPlayerElement, videoInfo);
+
+            Debug.WriteLine("开始搜刮信息");
 
             // 搜索信息
             await FindAndShowInfosFromInternet(new[] { videoInfo });
@@ -808,15 +821,13 @@ public sealed partial class MainPage : Page,IDisposable
         // 没有下一集，则修改布局
         else
         {
-
             //移除正在播放的视频
             RemovePlayingVideo(mediaPlayerElement);
 
             // 修改布局
             ChangedVideo_UniformGrid(Video_UniformGrid.Children.Count);
         }
-
-
+        
     }
 
     /// <summary>
@@ -994,6 +1005,14 @@ public class CidInfo
     public CidInfo(VideoInfo info)
     {
         VideoInfo = info;
+    }
+
+    public void UpdateInfo(VideoInfo info)
+    {
+        VideoInfo.trueName = info.trueName;
+        VideoInfo.ImagePath = info.ImagePath;
+        VideoInfo.ReleaseTime = info.ReleaseTime;
+        VideoInfo.Actor = info.Actor;
     }
 
     public CancellationTokenSource CancellationTokenSource { get; set; } = new();

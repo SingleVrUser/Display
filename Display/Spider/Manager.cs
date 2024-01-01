@@ -30,7 +30,7 @@ public class Manager
     {
         spiderByCIDHandlers = new Dictionary<int, Func<string, CancellationToken, Task<VideoInfo>>>
         {
-            { JavBus.Id, JavBus.SearchInfoFromCID },
+            { JavBus.Id, JavBus.SearchInfoFromCid },
             { Jav321.Id, Jav321.SearchInfoFromCid },
             { AvMoo.Id, AvMoo.SearchInfoFromCID },
             { AvSox.Id, AvSox.SearchInfoFromCID },
@@ -51,7 +51,7 @@ public class Manager
         };
 
     }
-    public async Task<VideoInfo> DispatchSpiderInfoByCIDInOrder(string cid, CancellationToken token)
+    public async Task<VideoInfo> DispatchSpiderInfoByCidInOrder(string cid, CancellationToken token)
     {
         cid = cid.ToUpper();
 
@@ -65,7 +65,7 @@ public class Manager
             SpiderSource spiderSource = new((SpiderInfo.SpiderSourceName)id);
 
             //判断搜刮源是否可以搜刮该番号
-            if (!AnalysisIfCIDCanSpider(cid, spiderSource)) continue;
+            if (!AnalysisIfCidCanSpider(cid, spiderSource)) continue;
 
             videoInfo = await DispatchSpecificSpiderInfoByCid(cid, id, token);
 
@@ -75,9 +75,9 @@ public class Manager
         return videoInfo;
     }
 
-    public async Task<List<VideoInfo>> DispatchSpiderInfosByCIDInOrder(string CID)
+    public async Task<List<VideoInfo>> DispatchSpiderInfosByCidInOrder(string cid)
     {
-        CID = CID.ToUpper();
+        cid = cid.ToUpper();
 
         List<VideoInfo> videoInfos = new();
 
@@ -86,9 +86,9 @@ public class Manager
             SpiderSource spiderSource = new((SpiderInfo.SpiderSourceName)id);
 
             //判断搜刮源是否可以搜刮该番号
-            if (!AnalysisIfCIDCanSpider(CID, spiderSource)) continue;
+            if (!AnalysisIfCidCanSpider(cid, spiderSource)) continue;
 
-            var videoInfo = await DispatchSpecificSpiderInfoByCid(CID, id, default);
+            var videoInfo = await DispatchSpecificSpiderInfoByCid(cid, id, default);
 
             if (videoInfo == null) continue;
 
@@ -100,11 +100,11 @@ public class Manager
         return videoInfos;
     }
 
-    private bool AnalysisIfCIDCanSpider(string CID, SpiderSource spiderSource)
+    private static bool AnalysisIfCidCanSpider(string cid, SpiderSource spiderSource)
     {
         if (!spiderSource.IsTrue) return false;
 
-        var isFc2 = CID.Contains("FC2");
+        var isFc2 = cid.Contains("FC2");
 
         //“是Fc2且忽略FC2” 或者 “是Fc2且只有Fc2”
         // 满足以上条件，跳过该搜刮源
