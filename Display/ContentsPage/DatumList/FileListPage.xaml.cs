@@ -1346,7 +1346,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             return;
         }
 
-        if (result.data.Length == 0)
+        if (result.data == null || result.data.Length == 0)
         {
             SearchResultListView.ItemsSource = null;
             SearchResultListView.Footer = new TextBlock { Text = "无结果" };
