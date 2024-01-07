@@ -248,14 +248,14 @@ namespace Display.Helper
                     //从另外的表中查找
                     case "失败" or "fail":
                         var failItems = await DataAccess.Get.GetFailFileInfoWithDatum(n: keywords, limit: limit);
-                        failItems?.ForEach(item => dictionary.TryAdd(item.Name, new VideoInfo(item)));
+                        failItems?.ForEach(item => dictionary.TryAdd(item.Name, new FailVideoInfo(item)));
                         continue;
                     default:
                         trueType = "truename";
                         break;
                 }
-
-                int leftCount = limit - dictionary.Count;
+                
+                var leftCount = limit - dictionary.Count;
 
                 // 当数量超过Limit数量时，跳过（不包括失败列表）
                 if (leftCount <= 0) continue;

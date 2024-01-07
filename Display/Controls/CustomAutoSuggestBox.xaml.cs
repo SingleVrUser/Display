@@ -28,7 +28,7 @@ namespace Display.Controls
         //输入的Text改变
         private async void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
-            string searchText = sender.Text;
+            var searchText = sender.Text;
 
             if (args.Reason != AutoSuggestionBoxTextChangeReason.UserInput || string.IsNullOrWhiteSpace(searchText))
                 return;
@@ -36,13 +36,13 @@ namespace Display.Controls
             //过滤非法元素
             searchText = searchText.Replace("'", "");
 
-            var Selectedtypes = GetSelectedTypes();
+            var selectedTypes = GetSelectedTypes();
 
-            List<VideoInfo> item = await FileMatch.GetVideoInfoFromType(Selectedtypes, searchText, 50);
+            var item = await FileMatch.GetVideoInfoFromType(selectedTypes, searchText, 50);
 
             if (item.Count == 0)
             {
-                string content = "未找到";
+                var content = "未找到";
                 if (AppSettings.IsUseX1080X)
                 {
                     content += "，点击搜索资源";
@@ -53,8 +53,7 @@ namespace Display.Controls
             }
             else
             {
-                object context;
-                Resources.TryGetValue("FoundedSuggestionBox", out context);
+                Resources.TryGetValue("FoundedSuggestionBox", out var context);
                 NavViewSearchBox.ItemTemplate = context as DataTemplate;
 
                 sender.ItemsSource = item;
@@ -91,9 +90,9 @@ namespace Display.Controls
         //选中AutoSuggest的选项值
         public event TypedEventHandler<AutoSuggestBox, AutoSuggestBoxSuggestionChosenEventArgs> SuggestionChosen;
         private void AutoSuggestBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
-        {
+        {   
             //准备动画
-            var animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", sender);
+            ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", sender);
 
             SuggestionChosen?.Invoke(sender, args);
         }
@@ -111,15 +110,14 @@ namespace Display.Controls
         {
             if (!(sender is AutoSuggestBox autoSuggestBox)) return;
 
-            if (selectFoundMethodButton.FocusState != FocusState.Pointer)
-            {
-                CloseAutoSuggestionBoxStoryboard.Begin();
+            if (selectFoundMethodButton.FocusState == FocusState.Pointer) return;
+
+            CloseAutoSuggestionBoxStoryboard.Begin();
 
 
-                //清空输入
-                NavViewSearchBox.Text = "";
-                autoSuggestBox.ItemsSource = null;
-            }
+            //清空输入
+            NavViewSearchBox.Text = "";
+            autoSuggestBox.ItemsSource = null;
 
         }
 
@@ -129,7 +127,7 @@ namespace Display.Controls
         /// <returns></returns>
         private List<ToggleMenuFlyoutItem> GetAllSelectedMethodButton()
         {
-            return new() { SelectedCid_Toggle, SelectedActor_Toggle, SelectedCategory_Toggle, SelectedTitle_Toggle, SelectedProducter_Toggle, SelectedDirector_Toggle, SelectedFail_Toggle };
+            return new List<ToggleMenuFlyoutItem> { SelectedCid_Toggle, SelectedActor_Toggle, SelectedCategory_Toggle, SelectedTitle_Toggle, SelectedProducter_Toggle, SelectedDirector_Toggle, SelectedFail_Toggle };
         }
 
         /// <summary>
@@ -140,7 +138,7 @@ namespace Display.Controls
         /// <param Name="e"></param>
         private void ChangedFindMethod_Click(object sender, RoutedEventArgs e)
         {
-            if (!(sender is ToggleMenuFlyoutItem item)) return;
+            if (sender is not ToggleMenuFlyoutItem item) return;
 
             var items = GetAllSelectedMethodButton();
 
@@ -151,10 +149,9 @@ namespace Display.Controls
             SelectedAll_Toggle.IsChecked = false;
 
             //单选，只保留一个为选中状态
-            foreach (var button in items)
+            foreach (var button in items.Where(button => button.IsChecked && button.Text != item.Text))
             {
-                if (button.IsChecked && button.Text != item.Text)
-                    button.IsChecked = false;
+                button.IsChecked = false;
             }
 
             selectFoundMethodButton.Content = item.Text;
@@ -167,20 +164,20 @@ namespace Display.Controls
         /// <param Name="e"></param>
         private void SelectedAllFindMethod_Clicked(object sender, RoutedEventArgs e)
         {
-            if (!(sender is ToggleMenuFlyoutItem item)) return;
+            if (sender is not ToggleMenuFlyoutItem item) return;
 
             var items = GetAllSelectedMethodButton();
 
             //全选
             if (item.IsChecked)
             {
-                items.ForEach(item => item.IsChecked = true);
+                items.ForEach(flyoutItem => flyoutItem.IsChecked = true);
                 selectFoundMethodButton.Content = "全部";
             }
             //全不选（除了第一个）
             else
             {
-                items.Skip(1).ToList().ForEach(item => item.IsChecked = false);
+                items.Skip(1).ToList().ForEach(flyoutItem => flyoutItem.IsChecked = false);
                 selectFoundMethodButton.Content = "番号";
             }
 
@@ -196,12 +193,12 @@ namespace Display.Controls
         {
             if (!(sender is ToggleMenuFlyoutItem item)) return;
 
-            List<ToggleMenuFlyoutItem> items = GetAllSelectedMethodButton();
+            var items = GetAllSelectedMethodButton();
 
-            var selectedList = items.Where(item => item.IsChecked).ToList();
+            var selectedList = items.Where(flyoutItem => flyoutItem.IsChecked).ToList();
 
             //加上或减去当前选中或取消项
-            int selectedCount = item.IsChecked ? selectedList.Count - 1 : selectedList.Count + 1;
+            var selectedCount = item.IsChecked ? selectedList.Count - 1 : selectedList.Count + 1;
 
             //System.Diagnostics.Debug.WriteLine($"当前选中的数量：{selectedCount}");
 

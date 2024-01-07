@@ -49,11 +49,13 @@ class ToastGetActorInfoWithProgressBar
         appNotification.Tag = c_tag;
         appNotification.Group = c_group;
 
-        AppNotificationProgressData data = new(1);
-        data.Title = c_tag;
-        data.Value = (double)currentValue / allCount;
-        data.ValueStringOverride = $"{currentValue}/{allCount} 演员";
-        data.Status = "正在获取演员信息...";
+        AppNotificationProgressData data = new(1)
+        {
+            Title = c_tag,
+            Value = (double)currentValue / allCount,
+            ValueStringOverride = $"{currentValue}/{allCount} 演员",
+            Status = "正在获取演员信息..."
+        };
 
         appNotification.Progress = data;
         AppNotificationManager.Default.Show(appNotification);
@@ -65,10 +67,12 @@ class ToastGetActorInfoWithProgressBar
     {
         ToastGetActorInfoWithProgressBar.allCount = allCount;
 
-        AppNotificationProgressData data = new(2);
-        data.Title = c_tag;
-        data.Value = (double)i / allCount;
-        data.ValueStringOverride = $"{i}/{allCount} 演员";
+        AppNotificationProgressData data = new(2)
+        {
+            Title = c_tag,
+            Value = (double)i / allCount,
+            ValueStringOverride = $"{i}/{allCount} 演员"
+        };
 
         if (i == allCount)
         {
@@ -88,7 +92,7 @@ class ToastGetActorInfoWithProgressBar
         return result == AppNotificationProgressResult.Succeeded;
     }
 
-    public static void NotificationReceived(AppNotificationActivatedEventArgs notificationActivatedEventArgs)
+    public static void NotificationReceived(AppNotificationActivatedEventArgs _)
     {
         App.ToForeground();
 

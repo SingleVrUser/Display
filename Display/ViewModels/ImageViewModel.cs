@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -52,10 +51,6 @@ namespace Display.ViewModels
         }
 
         private int _currentIndex = -1;
-
-        public ImageViewModel()
-        {
-        }   
 
         [RelayCommand]
         private void ClearAllPhotos()

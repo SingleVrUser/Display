@@ -3,12 +3,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Display.ContentsPage;
 using Display.Models;
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 using System.Diagnostics;
 using Display.ContentsPage.Sort115;
 using Display.Controls;
-using System.Net.Http;
 
 namespace Display.ViewModels
 {

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media.Playback;
+using Display.Extensions;
 
 namespace Display.Models
 {
@@ -15,8 +16,9 @@ namespace Display.Models
         public readonly string TrueName;
         public readonly string PickCode;
         public readonly string Title;
+        public readonly long? Fid;
         public readonly long? Size;
-        public readonly long? Cid;
+        public readonly long Cid;
         public string Description;
         public List<m3u8Info> M3U8Infos;
 
@@ -44,8 +46,25 @@ namespace Display.Models
         public bool IsRequestM3U8;
         public bool IsRequestOriginal;
 
-        public MediaPlayItem(string pickCode, string fileName, FilesInfo.FileType type,long? size = null, long? cid = null)
+        public MediaPlayItem(FilesInfo filesInfo)
+            :this(filesInfo.PickCode, filesInfo.Name, filesInfo.Cid, filesInfo.Id, filesInfo.Size, filesInfo.Type)
         {
+        }
+        
+        public MediaPlayItem(Datum datum)
+            :this(datum.PickCode, datum.Name, datum.Cid, datum.Fid, datum.Size, datum.Fid is null ? FilesInfo.FileType.Folder : FilesInfo.FileType.File)
+        {
+        }
+
+        public MediaPlayItem(FailVideoInfo failInfo)
+            :this(failInfo.PickCode, failInfo.FileName, failInfo.Cid, failInfo.Fid, failInfo.Size, FilesInfo.FileType.File)
+        {
+
+        }
+
+        public MediaPlayItem(string pickCode, string fileName, long cid, long? fid, long? size, FilesInfo.FileType type)
+        {
+            Fid = fid;
             PickCode = pickCode;
             FileName = fileName;
             _webApi = WebApi.GlobalWebApi;
@@ -58,10 +77,9 @@ namespace Display.Models
             Size = size;
             Cid = cid;
 
-
             if (!AppSettings.IsFindSub || string.IsNullOrEmpty(pickCode) || type==FilesInfo.FileType.Folder) return;
 
-            // 加载字母
+            // 加载字幕
             SubInfos = new List<SubInfo>();
             var subDict = DataAccess.Get.GetSubFile(pickCode);
             subDict.ToList().ForEach(item => SubInfos.Add(new SubInfo(item.Key, item.Value, pickCode, TrueName)));
@@ -69,21 +87,7 @@ namespace Display.Models
         }
 
         private static WebApi _webApi;
-
-        //public async Task<string> GetVideoUrl()
-        //{
-        //    //首先是m3u8
-        //    var videoUrl = await GetM3U8Url();
-
-        //    //无m3u8就换为原画
-        //    if (string.IsNullOrEmpty(videoUrl))
-        //    {
-        //        videoUrl = OriginalUrl;
-        //    }
-
-        //    return videoUrl;
-        //}
-
+        
         public async Task<List<m3u8Info>> GetM3U8Infos()
         {
             if (IsRequestM3U8) return M3U8Infos;
@@ -209,7 +213,7 @@ namespace Display.Models
                     newMediaPlayItems.AddRange(
                         fileInfos.data
                             .Where(x => x.Fid!=null && x.Iv == 1)
-                            .Select(x => new MediaPlayItem(x.PickCode, x.Name, FilesInfo.FileType.File, x.Size, x.Cid)));
+                            .Select(x => new MediaPlayItem(x)));
                 }
                 else
                 {

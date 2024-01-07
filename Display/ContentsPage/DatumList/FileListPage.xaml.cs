@@ -834,13 +834,10 @@ public sealed partial class FileListPage : INotifyPropertyChanged
                 return;
             }
 
-            //获取需要播放的文件
-            var files = BaseExample.SelectedItems.Cast<FilesInfo>().ToList();
-
             // 挑选视频文件，并转换为mediaPlayItem
-            var mediaPlayItems = files
+            var mediaPlayItems = BaseExample.SelectedItems.Cast<FilesInfo>()
                 .Where(x => x.Type == FilesInfo.FileType.Folder || x.IsVideo)
-                .Select(x => new MediaPlayItem(x.PickCode, x.Name, x.Type, x.Size, x.Cid)).ToList();
+                .Select(x => new MediaPlayItem(x)).ToList();
 
             await PlayVideoHelper.PlayVideo(mediaPlayItems, this.XamlRoot, lastPage: this);
 
@@ -852,7 +849,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (info.Type == FilesInfo.FileType.Folder || !info.IsVideo) return;
 
-        var mediaPlayItem = new MediaPlayItem(info.PickCode, info.Name, info.Type,info.Size, info.Cid);
+        var mediaPlayItem = new MediaPlayItem(info);
         await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, lastPage: this);
     }
 
@@ -883,11 +880,9 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             }
 
             //获取需要播放的文件
-            var files = BaseExample.SelectedItems.Cast<FilesInfo>().ToList();
-
-            var mediaPlayItems = files
+            var mediaPlayItems = BaseExample.SelectedItems.Cast<FilesInfo>()
                 .Where(x => x.Type == FilesInfo.FileType.Folder || x.IsVideo)
-                .Select(x => new MediaPlayItem(x.PickCode, x.Name, x.Type, x.Size, x.Cid)).ToList();
+                .Select(x => new MediaPlayItem(x)).ToList();
             await PlayVideoHelper.PlayVideo(mediaPlayItems, this.XamlRoot, lastPage: this, playerSelection: playerSelection);
 
             return;
@@ -898,7 +893,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (info.Type == FilesInfo.FileType.Folder || !info.IsVideo) return;
 
-        var mediaPlayItem = new MediaPlayItem(info.PickCode, info.Name, info.Type, info.Size, info.Cid);
+        var mediaPlayItem = new MediaPlayItem(info);
 
         await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this, playerSelection: playerSelection);
     }
@@ -1249,7 +1244,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             if (info.IsVideo)
             {
                 // 只有文件能双击，文件夹Click后就跳转到新页面了
-                var mediaPlayItem = new MediaPlayItem(info.PickCode, info.Name, info.Type, info.Size, info.Cid);
+                var mediaPlayItem = new MediaPlayItem(info);
 
                 _ = PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this);
             }
@@ -1393,7 +1388,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
 
         // 视频文件
-        var mediaPlayItem = new MediaPlayItem(info.PickCode, info.Name, info.Type, info.Size, info.Cid);
+        var mediaPlayItem = new MediaPlayItem(info);
 
         DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal,
             () => _ = PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this));

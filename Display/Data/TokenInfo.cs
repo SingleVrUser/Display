@@ -19,6 +19,7 @@ using Display.Models;
 using static Display.Data.FilesInfo;
 using static SkiaSharp.HarfBuzz.SKShaper;
 using System.Reflection;
+using System.Reflection.Metadata;
 using Display.Extensions;
 
 namespace Display.Data
@@ -628,31 +629,46 @@ namespace Display.Data
         }
     }
 
+    public class FailVideoInfo : VideoCoverDisplayClass
+    {
+        public long Cid { get; set; }
+
+        public long? Fid { get; set; }
+
+        public string PickCode { get; set; }
+
+        public string FileName { get;  set; }
+
+        public long Size { get; set; }
+
+
+        public FailVideoInfo(VideoInfo info, double imgWidth, double imgHeight)
+            : base(info, imgWidth, imgHeight)
+        {
+            
+        }
+
+        public FailVideoInfo(Datum failDatum)
+        {
+            trueName = failDatum.Name;
+            ImagePath = "ms-appx:///Assets/Fail.jpg";
+            busUrl = ImagePath;
+            Series = "fail";
+            ReleaseTime = failDatum.Time;
+
+            Cid = failDatum.Cid;
+            Fid = failDatum.Fid;
+            PickCode = failDatum.PickCode;
+            FileName = failDatum.Name;
+            Size = failDatum.Size;
+        }
+    }
 
     /// <summary>
     /// 视频详细信息
     /// </summary>
     public class VideoInfo : INotifyPropertyChanged
     {
-        public VideoInfo()
-        {
-
-        }
-
-        //失败的文件信息（Datum）到VideoInfo
-        //魔改
-        public VideoInfo(Datum failDatum)
-        {
-            trueName = failDatum.Name;
-            ImagePath = "ms-appx:///Assets/Fail.jpg";
-            Series = "fail";
-            ReleaseTime = failDatum.Time;
-            ImageUrl = failDatum.PickCode;
-            LookLater = failDatum.Size;
-            busUrl = failDatum.PickCode;
-            Category = failDatum.Ico;
-        }
-
         private string _trueName;
 
         [JsonProperty(propertyName: "truename")]
@@ -868,35 +884,35 @@ namespace Display.Data
     /// <summary>
     /// 视频封面缩略信息
     /// </summary>
-    public class VideoCoverDisplayClass : VideoInfo, INotifyPropertyChanged
+    public class VideoCoverDisplayClass : VideoInfo
     {
         public VideoCoverDisplayClass()
         {
             OnPropertyChanged();
         }
 
-        public VideoCoverDisplayClass(VideoInfo videoinfo, double imgwidth, double imgheight)
+        public VideoCoverDisplayClass(VideoInfo videoInfo, double imgWidth, double imgHeight)
         {
-            foreach (var videoInfoItem in videoinfo.GetType().GetProperties())
+            foreach (var videoInfoItem in videoInfo.GetType().GetProperties())
             {
                 var name = videoInfoItem.Name;
-                var value = videoInfoItem.GetValue(videoinfo);
+                var value = videoInfoItem.GetValue(videoInfo);
 
                 var newItem = this.GetType().GetProperty(name);
                 newItem?.SetValue(this, value);
             }
 
             //标题
-            Title = videoinfo.Title;
+            Title = videoInfo.Title;
 
             //是否显示右上角的标签
-            string category = videoinfo.Category;
-            Visibility isShowLabel = Visibility.Collapsed;
+            var category = videoInfo.Category;
+            var isShowLabel = Visibility.Collapsed;
 
             string showLabel = string.Empty;
             if (!string.IsNullOrEmpty(category))
             {
-                if (category.Contains("VR") || (!string.IsNullOrEmpty(videoinfo.Series) && videoinfo.Series.Contains("VR")))
+                if (category.Contains("VR") || (!string.IsNullOrEmpty(videoInfo.Series) && videoInfo.Series.Contains("VR")))
                 {
                     isShowLabel = Visibility.Visible;
                     showLabel = "VR";
@@ -910,26 +926,26 @@ namespace Display.Data
 
             if (!string.IsNullOrEmpty(ReleaseTime))
             {
-                if (videoinfo.ReleaseTime.Contains("/"))
+                if (videoInfo.ReleaseTime.Contains("/"))
                 {
-                    this.realeaseYear = videoinfo.ReleaseTime.Split('/')[0];
+                    this.ReleaseYear = videoInfo.ReleaseTime.Split('/')[0];
                 }
                 else
                 {
-                    this.realeaseYear = videoinfo.ReleaseTime.Split('-')[0];
+                    this.ReleaseYear = videoInfo.ReleaseTime.Split('-')[0];
                 }
             }
 
             this.isShowLabel = isShowLabel;
             this.ShowLabel = showLabel;
-            this.Score = videoinfo.Score;
+            this.Score = videoInfo.Score;
 
             //图片大小
-            this.imageHeight = imgheight;
-            this.ImageWidth = imgwidth;
+            this.imageHeight = imgHeight;
+            this.ImageWidth = imgWidth;
         }
 
-        public string realeaseYear { get; set; }
+        public string ReleaseYear { get; set; }
         public Visibility isShowLabel { get; set; } = Visibility.Collapsed;
         public string ShowLabel { get; set; }
 

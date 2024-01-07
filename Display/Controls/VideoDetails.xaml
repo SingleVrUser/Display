@@ -217,7 +217,7 @@
                             </Grid.Background>
                             <FontIcon FontFamily="Segoe Fluent Icons"
                                       Glyph="&#xF5B0;"
-                                      Foreground="CornflowerBlue"
+                                      Foreground="{ThemeResource SystemAccentColor}"
                                       FontSize="50" />
                             <Grid.ContextFlyout>
                                 <!--右键操作-->

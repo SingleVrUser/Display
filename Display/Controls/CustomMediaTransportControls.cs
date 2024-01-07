@@ -276,7 +276,7 @@ public class CustomMediaTransportControls : MediaTransportControls
         QualityChanged?.Invoke(sender, e);
     }
 
-    private void FullWindowButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private void FullWindowButton_Click(object sender, RoutedEventArgs e)
     {
         FullWindow?.Invoke(sender, e);
     }

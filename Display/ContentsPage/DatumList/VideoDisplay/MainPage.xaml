@@ -62,12 +62,12 @@
                                            VerticalAlignment="Center"
                                            FontSize="12" />
 
-                                <StackPanel Orientation="Horizontal"
+                                <StackPanel Grid.Row="0" Orientation="Horizontal"
                                             HorizontalAlignment="Right"
                                             Spacing="5">
                                     <Button Content="播放"
                                             Click="PlayVideoButton_Click" />
-                                    <!--<Button Content="删除" Click="DeleteFiles_Click"/>-->
+                                    <Button Content="移除" Click="DeleteFiles_Click"/>
                                     <Button Content="清空"
                                             Click="EmptyList_Click" />
                                 </StackPanel>

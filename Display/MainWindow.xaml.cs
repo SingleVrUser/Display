@@ -416,9 +416,9 @@ namespace Display
             if (args.SelectedItem is not VideoInfo nowItem) return;
 
             //选中的是失败项
-            if (nowItem.Series == "fail")
+            if (nowItem is FailVideoInfo failVideoInfo)
             {
-                var mediaPlayItem = new MediaPlayItem(nowItem.busUrl, nowItem.trueName,FilesInfo.FileType.File);
+                var mediaPlayItem = new MediaPlayItem(failVideoInfo);
                 await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, ((Page)ContentFrame.Content).XamlRoot);
             }
             //正常点击

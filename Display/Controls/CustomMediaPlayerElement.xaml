@@ -33,6 +33,13 @@
                                   Glyph="&#xE946;" />
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
+
+                <MenuFlyoutItem Text="从115中删除"
+                                Click="DeleteFileFrom115Button_Click">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE107;" />
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
             </MenuFlyout>
         </Grid.ContextFlyout>
 

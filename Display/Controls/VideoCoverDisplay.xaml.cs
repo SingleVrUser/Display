@@ -224,9 +224,9 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <summary>
     /// 加载搜索结果
     /// </summary>
-    public async void ReLoadSearchResult(List<string> types, string ShowName, bool isFuzzyQueryActor)
+    public async void ReLoadSearchResult(List<string> types, string showName, bool isFuzzyQueryActor)
     {
-        bool isShowHeaderCover = false;
+        var isShowHeaderCover = false;
 
         _isFuzzyQueryActor = isFuzzyQueryActor;
 
@@ -241,19 +241,19 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
                     Title = "稍后观看";
                     break;
                 case "fail":
-                    Title = ShowName;
-                    _localCheckText = ShowName;
+                    Title = showName;
+                    _localCheckText = showName;
                     IsShowFailListView = true;
                     FailInfoSuggestBox.Visibility = Visibility.Collapsed;
                     TrySwitchToFailView();
                     return;
                 case "actor":
-                    Title = ShowName;
+                    Title = showName;
 
                     // 准确查询演员，一般来源于详情页和演员页
                     if (!isFuzzyQueryActor)
                     {
-                        var actorInfos = await DataAccess.Get.GetActorInfo(filterList: new() { $"Name == '{ShowName}'" });
+                        var actorInfos = await DataAccess.Get.GetActorInfo(filterList: new() { $"Name == '{showName}'" });
 
                         if (actorInfos.Length != 0)
                         {
@@ -265,7 +265,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
                     break;
                 default:
-                    Title = ShowName;
+                    Title = showName;
                     break;
             }
 
@@ -273,13 +273,13 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         }
         else
         {
-            Title = ShowName;
+            Title = showName;
         }
 
         this.IsShowHeaderCover = isShowHeaderCover;
 
         _filterConditionList = types;
-        _filterKeywords = ShowName;
+        _filterKeywords = showName;
         IsShowFailListView = false;
         TrySwitchToSuccessView();
     }
@@ -414,7 +414,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <param Name="e"></param>
     private void Grid_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        if (!(sender is Grid grid)) return;
+        if (sender is not Grid grid) return;
         grid.Children[1].Visibility = Visibility.Visible;
     }
 
@@ -425,7 +425,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <param name="e"></param>
     private void Grid_PointerExited(object sender, PointerRoutedEventArgs e)
     {
-        if (!(sender is Grid grid)) return;
+        if (sender is not Grid grid) return;
 
         if (grid.Children[1] is not Grid collapsedGrid) return;
 
@@ -449,8 +449,8 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
 
-        if (grid.Children[1] is not Grid CollapsedGrid) return;
-        CollapsedGrid.Visibility = Visibility.Collapsed;
+        if (grid.Children[1] is not Grid collapsedGrid) return;
+        collapsedGrid.Visibility = Visibility.Collapsed;
 
         grid.Tapped -= FailGrid_Tapped;
     }
@@ -472,22 +472,18 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <param Name="e"></param>
     private void LikeToggleButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not AppBarToggleButton Button) return;
+        if (sender is not AppBarToggleButton { DataContext: VideoCoverDisplayClass videoInfo } button) return;
 
-        if (Button.DataContext is not VideoCoverDisplayClass videoInfo) return;
-
-        videoInfo.IsLike = (bool)Button.IsChecked ? 1 : 0;
+        videoInfo.IsLike = button.IsChecked == true ? 1 : 0;
 
         DataAccess.Update.UpdateSingleDataFromVideoInfo(videoInfo.trueName, "is_like", videoInfo.IsLike.ToString());
     }
 
     private void FailLikeToggleButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not AppBarToggleButton Button) return;
+        if (sender is not AppBarToggleButton { DataContext: FailInfo info } button) return;
 
-        if (Button.DataContext is not FailInfo info) return;
-
-        info.IsLike = (bool)Button.IsChecked ? 1 : 0;
+        info.IsLike = button.IsChecked == true ? 1 : 0;
 
         DataAccess.Update.UpdateSingleFailInfo(info.PickCode, "is_like", info.IsLike.ToString());
     }
@@ -499,22 +495,18 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <param Name="e"></param>
     private void LookLaterToggleButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not AppBarToggleButton Button) return;
+        if (sender is not AppBarToggleButton { DataContext: VideoCoverDisplayClass videoInfo } button) return;
 
-        if (Button.DataContext is not VideoCoverDisplayClass videoInfo) return;
-
-        videoInfo.LookLater = (bool)Button.IsChecked ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
+        videoInfo.LookLater = button.IsChecked == true ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
 
         DataAccess.Update.UpdateSingleDataFromVideoInfo(videoInfo.trueName, "look_later", videoInfo.LookLater.ToString());
     }
 
     private void FailLookLaterToggleButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not AppBarToggleButton Button) return;
+        if (sender is not AppBarToggleButton { DataContext: FailInfo info } button) return;
 
-        if (Button.DataContext is not FailInfo info) return;
-
-        info.LookLater = (bool)Button.IsChecked ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
+        info.LookLater = button.IsChecked == true ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
 
         DataAccess.Update.UpdateSingleFailInfo(info.PickCode, "look_later", info.LookLater.ToString());
     }
@@ -575,17 +567,17 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     {
         ListView selectListView = (ListView)sender;
         var clickStackPanel = (e.ClickedItem as StackPanel);
-        var selectTextBlock = clickStackPanel.Children.Where(x => x is TextBlock).First() as TextBlock;
+        var selectTextBlock = clickStackPanel.Children.First(x => x is TextBlock) as TextBlock;
         string selectOrderText = selectTextBlock.Text;
 
-        FontIcon lastFontIcon = clickStackPanel.Children.Where(x => x is FontIcon).Last() as FontIcon;
+        var lastFontIcon = clickStackPanel.Children.Last(x => x is FontIcon) as FontIcon;
 
         string upGlyph = "\xE014";
         string downGlyph = "\xE015";
         string newGlyph;
 
         //原图标
-        bool isUpSort = lastFontIcon.Glyph == upGlyph;
+        var isUpSort = lastFontIcon.Glyph == upGlyph;
 
         //更新降序或升序图标
         //注意：随机 无需升/降序
@@ -715,7 +707,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         //考虑当前是不是搜索过的
         if (!string.IsNullOrEmpty(_localCheckText))
-            AllFailInfoCollection.filterName = _localCheckText;
+            AllFailInfoCollection.FilterName = _localCheckText;
 
         AllFailInfoCollection.OrderBy = FailListOrderBy;
         AllFailInfoCollection.IsDesc = FailListIsDesc;
@@ -826,17 +818,18 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         if (e.AddedItems[0] is not RadioButton button) return;
 
 
-        //匹配成功
-        if (button.Name == nameof(SuccessData_RadioButton))
+        switch (button.Name)
         {
-            IsShowFailListView = false;
-            TrySwitchToSuccessView();
-        }
-        //匹配失败
-        else if (button.Name == nameof(FailData_RadioButton))
-        {
-            IsShowFailListView = true;
-            TrySwitchToFailView();
+            //匹配成功
+            case nameof(SuccessData_RadioButton):
+                IsShowFailListView = false;
+                TrySwitchToSuccessView();
+                break;
+            //匹配失败
+            case nameof(FailData_RadioButton):
+                IsShowFailListView = true;
+                TrySwitchToFailView();
+                break;
         }
     }
 
@@ -867,11 +860,14 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         //更新GridView的来源
         var imgSize = ImageSize;
 
-        SuccessInfoCollection = new(imgSize.Item1, imgSize.Item2);
-        SuccessInfoCollection.SetFilter(_filterConditionList, _filterKeywords, _isFuzzyQueryActor);
-        await SuccessInfoCollection.LoadData();
+        if (SuccessInfoCollection == null)
+        {
+            SuccessInfoCollection = new IncrementalLoadSuccessInfoCollection(imgSize.Item1, imgSize.Item2);
+            SuccessInfoCollection.SetFilter(_filterConditionList, _filterKeywords, _isFuzzyQueryActor);
+            await SuccessInfoCollection.LoadData();
 
-        BasicGridView.ItemsSource = SuccessInfoCollection;
+            BasicGridView.ItemsSource = SuccessInfoCollection;
+        }
 
         if (FailGridView.Visibility == Visibility.Visible) FailGridView.Visibility = Visibility.Collapsed;
         if (BasicGridView.Visibility == Visibility.Collapsed) BasicGridView.Visibility = Visibility.Visible;
@@ -926,9 +922,11 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         _localCheckText = sender.Text;
 
         System.Diagnostics.Debug.WriteLine($"失败项的搜索框输入：{_localCheckText}");
-        AllFailInfoCollection = new IncrementalLoadFailDatumInfoCollection { filterName = _localCheckText, OrderBy = FailListOrderBy, IsDesc = FailListIsDesc };
 
-        FailGridView.ItemsSource = AllFailInfoCollection;
+        
+        AllFailInfoCollection.SetFilter(_localCheckText);
+        //AllFailInfoCollection = new IncrementalLoadFailDatumInfoCollection { filterName = _localCheckText, OrderBy = FailListOrderBy, IsDesc = FailListIsDesc };
+        //FailGridView.ItemsSource = AllFailInfoCollection;
         await AllFailInfoCollection.LoadData();
     }
 
@@ -1202,7 +1200,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             default:
                 if (AllFailInfoCollection == null || !string.IsNullOrEmpty(_localCheckText))
                 {
-                    AllFailInfoCollection = new();
+                    AllFailInfoCollection = new IncrementalLoadFailDatumInfoCollection();
                     AllFailInfoCollection.SetOrder(FailListOrderBy, FailListIsDesc);
                     AllFailInfoCollection.SetFilter(_localCheckText);
                     await AllFailInfoCollection.LoadData();
@@ -1352,7 +1350,7 @@ public class CoverItemTemplateSelector : DataTemplateSelector
     {
         return item switch
         {
-            VideoCoverDisplayClass { Series: "fail" } => FailCoverTemplate,
+            FailVideoInfo => FailCoverTemplate,
             VideoCoverDisplayClass => ImageTemplate,
             FailInfo => LikeOrLookLaterInFailCoverTemplate,
             _ => WithoutImageTemplate
