@@ -52,7 +52,8 @@
                                                          PointerExited="MediaControl_OnPointerExited"
                                                          AllowDrop="True"
                                                          DragOver="MediaControl_OnDragOver"
-                                                         Drop="MediaControl_OnDrop"/>
+                                                         Drop="MediaControl_OnDrop"
+                                                         DeleteFileClick="MediaControl_OnDeleteFileClick"/>
 
                 <Grid x:Name="MoreGrid"
                       Grid.Column="1"

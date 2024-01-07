@@ -29,6 +29,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Microsoft.UI.Xaml.Navigation;
+using SharpCompress;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -554,12 +555,20 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     /// 删除文件列表中的文件
     /// </summary>
     /// <param name="files"></param>
-    private void TryRemoveFilesInExplorer(List<FilesInfo> files)
+    private void TryRemoveFilesInExplorer(IEnumerable<FilesInfo> files)
     {
         foreach (var item in files.Where(FilesInfos.Contains))
         {
             FilesInfos.Remove(item);
         }
+    }
+
+    public void RemoveFileById(long id)
+    {
+        var info = FilesInfos.FirstOrDefault(info=>info.Id == id);
+        if (info == null) return;
+
+        FilesInfos.Remove(info);
     }
 
     private void TryRemoveFilesInTransfer(IEnumerable<FilesInfo> files)

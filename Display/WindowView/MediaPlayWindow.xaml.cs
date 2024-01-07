@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using System;
 using Display.Data;
 using Display.Helper;
 using Display.Models;
@@ -13,6 +14,7 @@ using System.Diagnostics;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
 using static Display.Controls.CustomMediaPlayerElement;
+using Display.ContentsPage.DatumList;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -102,6 +104,7 @@ public sealed partial class MediaPlayWindow : Window
     public static MediaPlayWindow CreateNewWindow(IList<MediaPlayItem> playItems, PlayType playType, Page lastPage)
     {
         MediaPlayWindow newWindow = new(playItems, lastPage);
+        
         newWindow.Activate();
 
         return newWindow;
@@ -277,5 +280,13 @@ public sealed partial class MediaPlayWindow : Window
     {
         e.AcceptedOperation = DataPackageOperation.Link;
         e.DragUIOverride.Caption = "播放";
+    }
+    
+    private void MediaControl_OnDeleteFileClick(MediaPlayItem item)
+    {
+        if (_lastPage is FileListPage fileListPage && _lastPage.IsLoaded && item.Fid != null)
+        {
+            fileListPage.RemoveFileById((long)item.Fid);
+        }
     }
 }
