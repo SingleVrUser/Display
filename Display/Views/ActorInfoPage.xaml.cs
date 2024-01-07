@@ -39,59 +39,64 @@ namespace Display.Views
 
             //准备动画
             //限定为 返回操作
-            if (e.NavigationMode == NavigationMode.Back)
-            {
-                //指定页面
-                if (e.SourcePageType == typeof(ActorsPage))
-                {
-                    var animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("BackConnectedAnimation", videoControl.HeaderCover);
+            if (e.NavigationMode != NavigationMode.Back) return;
 
-                    //返回动画应迅速
-                    animation.Configuration = new DirectConnectedAnimationConfiguration();
-                }
-            }
+            //指定页面
+            if (e.SourcePageType != typeof(ActorsPage)) return;
+
+            var animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("BackConnectedAnimation", videoControl.HeaderCover);
+
+            //返回动画应迅速
+            animation.Configuration = new DirectConnectedAnimationConfiguration();
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
-            //过渡动画
-            if (e.NavigationMode == NavigationMode.Back)
+            switch (e.NavigationMode)
             {
-                ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("BackConnectedAnimation");
-                if (animation != null)
+                //过渡动画
+                case NavigationMode.Back:
                 {
-                    videoControl.StartAnimation(animation, _storeditem);
-                }
-            }
-            else if (e.NavigationMode == NavigationMode.New)
-            {
-                var item = e.Parameter;
-                if (item == null) return;
-                //需要显示的是搜索结果
-                if (item is Tuple<List<string>, string, bool> tuple)
-                {
-                    Tuple<List<string>, string> typesAndName = new(tuple.Item1, tuple.Item2);
-
-                    LoadShowInfo(typesAndName, tuple.Item3);
-                }
-                else
-                {
-                    return;
-                }
-
-                ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("ForwardConnectedAnimation");
-                if (animation != null)
-                {
-                    if (tuple.Item1.Count == 1 && tuple.Item1.FirstOrDefault() == "actor")
+                    ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("BackConnectedAnimation");
+                    if (animation != null)
                     {
-                        animation.TryStart(videoControl.HeaderCover);
+                        videoControl.StartAnimation(animation, _storeditem);
+                    }
+
+                    break;
+                }
+                case NavigationMode.New:
+                {
+                    var item = e.Parameter;
+                    if (item == null) return;
+                    //需要显示的是搜索结果
+                    if (item is Tuple<List<string>, string, bool> tuple)
+                    {
+                        Tuple<List<string>, string> typesAndName = new(tuple.Item1, tuple.Item2);
+
+                        LoadShowInfo(typesAndName, tuple.Item3);
                     }
                     else
                     {
-                        animation.TryStart(videoControl.showNameTextBlock);
+                        return;
                     }
+
+                    var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("ForwardConnectedAnimation");
+                    if (animation != null)
+                    {
+                        if (tuple.Item1.Count == 1 && tuple.Item1.FirstOrDefault() == "actor")
+                        {
+                            animation.TryStart(videoControl.HeaderCover);
+                        }
+                        else
+                        {
+                            animation.TryStart(videoControl.showNameTextBlock);
+                        }
+                    }
+
+                    break;
                 }
             }
         }
@@ -124,10 +129,10 @@ namespace Display.Views
             var videoPlayButton = (Button)sender;
             if (videoPlayButton.DataContext is not VideoCoverDisplayClass videoInfo) return;
 
-            //播放失败列表（imgUrl就是pc）
-            if (videoInfo.Series == "fail")
+            //播放失败列表
+            if (videoInfo is FailVideoInfo failVideoInfo)
             {
-                var mediaPlayItem = new MediaPlayItem(videoInfo.ImageUrl, videoInfo.trueName, FilesInfo.FileType.File);
+                var mediaPlayItem = new MediaPlayItem(failVideoInfo);
                 await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, playType: PlayType.Fail);
                 return;
             }
@@ -146,7 +151,7 @@ namespace Display.Views
             }
             else if (videoInfoList.Count == 1)
             {
-                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].PickCode, videoInfo.trueName, FilesInfo.FileType.File, videoInfoList[0].Size, videoInfoList[0].Cid);
+                var mediaPlayItem = new MediaPlayItem(videoInfoList[0]);
                 await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
             }
 
@@ -179,18 +184,16 @@ namespace Display.Views
 
             if (sender is not ListView { DataContext: string trueName }) return;
             
-            var mediaPlayItem = new MediaPlayItem(singleVideoInfo.PickCode, trueName, FilesInfo.FileType.File, singleVideoInfo.Size, singleVideoInfo.Cid);
+            var mediaPlayItem = new MediaPlayItem(singleVideoInfo);
             await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, XamlRoot, lastPage: this);
         }
 
         private async void SingleVideoPlayClick(object sender, RoutedEventArgs e)
         {
-            if (sender is not Grid videoPlayButton) return;
+            if (sender is not Grid { DataContext: Datum datum }) return;
 
-            if (videoPlayButton.DataContext is not Datum datum) return;
-
-            var mediaPlayItem = new MediaPlayItem(datum.PickCode, datum.Name, FilesInfo.FileType.File, datum.Size, datum.Cid);
-            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, playType: PlayType.Fail);
+            var mediaPlayItem = new MediaPlayItem(datum);
+            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, playType: PlayType.Fail);
         }
     }
 

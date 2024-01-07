@@ -25,6 +25,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using SharpCompress;
 using static Display.Data.Const.DefaultSettings.Network;
 using static System.Int32;
 using HttpMethod = System.Net.Http.HttpMethod;
@@ -652,67 +653,48 @@ namespace Display.Data
         /// <param name="asc"></param>
         /// <param name="isOnlyFolder"></param>
         /// <returns></returns>
-        public async Task<WebFileInfo> GetFileAsync(long? cid, int limit = 40, int offset = 0, bool useApi2 = false, bool loadAll = false, string orderBy = "user_ptime", int asc = 0, bool isOnlyFolder = false)
+        public async Task<WebFileInfo> GetFileAsync(long? cid, int limit = 40, int offset = 0, bool useApi2 = false,
+            bool loadAll = false, string orderBy = "user_ptime", int asc = 0, bool isOnlyFolder = false)
         {
-            var url = !useApi2 ? $"https://webapi.115.com/files?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json" :
+            var url = !useApi2
+                ? $"https://webapi.115.com/files?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json"
+                :
                 //旧接口只有t，没有修改时间（te），创建时间（tp）
                 $"https://aps.115.com/natsort/files.php?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json&fc_mix=0&type=&star=&is_share=&suffix=&custom_order=";
 
-            if (isOnlyFolder)
-                url += "&nf=1";
+            if (isOnlyFolder) url += "&nf=1";
 
             var webFileInfoResult = await Client.SendAsync<WebFileInfo>(HttpMethod.Get, url);
+
             if (webFileInfoResult == null) return null;
 
             //te，tp简单用t替换，接口2没有te,tp
-            if (useApi2)
-            {
-                foreach (var item in webFileInfoResult.data)
-                {
-                    //item.t 可能是 "1658999027" 也可能是 "2022-07-28 17:03"
 
-                    //"1658999027"
-                    if (item.Time.IsNumber())
-                    {
-                        var dateInt = Parse(item.Time);
-                        item.TimeEdit = item.TimeProduce = dateInt;
-                        item.Time = DateHelper.ConvertInt32ToDateTime(dateInt);
-                    }
-                    //"2022-07-28 17:03"
-                    else
-                    {
-                        // ignore
-                    }
+            webFileInfoResult.data?.ForEach(item =>
+            {
+                int dateInt;
+                //item.t 可能是 "1658999027" 也可能是 "2022-07-28 17:03"
+
+                //"1658999027"
+                if (item.Time.IsNumber())
+                {
+                    dateInt = Parse(item.Time);
+                    item.Time = DateHelper.ConvertInt32ToDateTime(dateInt);
+
                 }
-            }
-
-            if (webFileInfoResult.data != null)
-            {
-                foreach (var item in webFileInfoResult.data)
+                //"2022-07-28 17:03"
+                else
                 {
-                    int dateInt;
-                    //item.t 可能是 "1658999027" 也可能是 "2022-07-28 17:03"
-
-                    //"1658999027"
-                    if (item.Time.IsNumber())
-                    {
-                        dateInt = Parse(item.Time);
-                        item.Time = DateHelper.ConvertInt32ToDateTime(dateInt);
-
-                    }
-                    //"2022-07-28 17:03"
-                    else
-                    {
-                        dateInt = DateHelper.ConvertDateTimeToInt32(item.Time);
-                    }
-
-                    if (useApi2)
-                    {
-                        item.TimeEdit = item.TimeProduce = dateInt;
-                    }
+                    dateInt = DateHelper.ConvertDateTimeToInt32(item.Time);
                 }
 
-            }
+                if (useApi2)
+                {
+                    item.TimeEdit = item.TimeProduce = dateInt;
+                }
+            });
+
+
 
             //接口1出错，使用接口2
             if (webFileInfoResult.errNo == 20130827 && useApi2 == false)

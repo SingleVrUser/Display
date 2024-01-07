@@ -289,7 +289,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
         if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
 
-        var mediaPlayItem = new MediaPlayItem(info.PickCode, info.Name, FilesInfo.FileType.File, info.Size, info.Cid);
+        var mediaPlayItem = new MediaPlayItem(info);
         await PlayVideoHelper.PlayVideo(new Collection<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
     }
 
@@ -302,7 +302,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
         await Task.Delay(1);
 
 
-        var mediaPlayItem = new MediaPlayItem(info.PickCode, info.Name, FilesInfo.FileType.File, info.Size, info.Cid);
+        var mediaPlayItem = new MediaPlayItem(info);
         await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this, playerSelection: playerSelection);
     }
 }

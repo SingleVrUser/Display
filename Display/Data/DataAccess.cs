@@ -1237,19 +1237,12 @@ namespace Display.Data
 
                 var queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n.Replace("'", "%")}%'";
 
-                string showTypeStr;
-                switch (showType)
+                var showTypeStr = showType switch
                 {
-                    case FailType.MatchFail:
-                        showTypeStr = " AND FileToInfo.truename == ''";
-                        break;
-                    case FailType.SpiderFail:
-                        showTypeStr = " AND FileToInfo.truename != ''";
-                        break;
-                    default:
-                        showTypeStr = string.Empty;
-                        break;
-                }
+                    FailType.MatchFail => " AND FileToInfo.truename == ''",
+                    FailType.SpiderFail => " AND FileToInfo.truename != ''",
+                    _ => string.Empty
+                };
 
                 var commandText =
                     $"SELECT * FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{showTypeStr}{queryStr}{orderStr} LIMIT {limit} offset {offset} ";

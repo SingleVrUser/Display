@@ -37,33 +37,22 @@ namespace Display.Views
         {
             if (sender is not Grid videoPlayGrid) return;
 
-            string pickCode;
-            string title;
-            long Size;
-            long Cid;
-            if (videoPlayGrid.DataContext is Datum datum)
+            MediaPlayItem mediaPlayItem;
+            switch (videoPlayGrid.DataContext)
             {
-                pickCode = datum.PickCode;
-                title = datum.Name;
-                Size = datum.Size;
-                Cid = datum.Cid;
-            }
-            else if (videoPlayGrid.DataContext is FailInfo failInfo)
-            {
-                pickCode = failInfo.PickCode;
-                title = failInfo.Datum.Name;
-                Size = failInfo.Datum.Size;
-                Cid = failInfo.Datum.Cid;
-            }
-            else
-            {
-                return;
+                case Datum datum:
+                    mediaPlayItem = new MediaPlayItem(datum);
+                    break;
+                case FailInfo failInfo:
+                    mediaPlayItem = new MediaPlayItem(failInfo.Datum);
+                    break;
+                default:
+                    return;
             }
 
-            if (string.IsNullOrEmpty(pickCode)) return;
-
-            var mediaPlayItem = new MediaPlayItem(pickCode, title, FilesInfo.FileType.File, Size, Cid);
-            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.Fail);
+            if (string.IsNullOrEmpty(mediaPlayItem.PickCode)) return;
+            
+            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, playType: CustomMediaPlayerElement.PlayType.Fail);
         }
 
         /// <summary>
@@ -105,8 +94,8 @@ namespace Display.Views
             {
                 _storeditem = videoInfo;
 
-                var mediaPlayItem = new MediaPlayItem(videoInfoList[0].PickCode, videoInfo.trueName, FilesInfo.FileType.File, videoInfoList[0].Size, videoInfoList[0].Cid);
-                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
+                var mediaPlayItem = new MediaPlayItem(videoInfoList[0]);
+                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, XamlRoot, lastPage: this);
                 ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             }
             //有多集

@@ -133,7 +133,7 @@ public class Common
                 {
                     var className = child.GetAttributeValue("class", string.Empty);
 
-                    string childInnerText = child.InnerText.Replace(":", string.Empty).Trim();
+                    var childInnerText = child.InnerText.Replace(":", string.Empty).Trim();
 
                     if (className == "header")
                     {

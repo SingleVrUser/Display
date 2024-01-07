@@ -107,7 +107,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
             if (IsContainFail)
             {
                 var failList = await DataAccess.Get.GetFailFileInfoWithDatum(0, -1, FilterKeywords);
-                failList?.ForEach(item => Add(new VideoCoverDisplayClass(new VideoInfo(item), ImageWidth, ImageHeight)));
+                failList?.ForEach(item => Add(new FailVideoInfo(new FailVideoInfo(item), ImageWidth, ImageHeight)));
             }
         }
 

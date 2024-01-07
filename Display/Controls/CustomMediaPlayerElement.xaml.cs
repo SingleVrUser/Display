@@ -1,9 +1,11 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using ByteSizeLib;
 using Display.ContentsPage;
 using Display.Data;
 using Display.Models;
+using Display.Services;
 using Display.Views;
 using Display.WindowView;
 using Microsoft.Graphics.Canvas;
@@ -12,12 +14,14 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Windows.Media;
 using Windows.Media.Core;
@@ -26,9 +30,6 @@ using Windows.Media.Streaming.Adaptive;
 using Windows.Storage;
 using Windows.System.Display;
 using Windows.Web.Http;
-using ByteSizeLib;
-using Display.Services;
-using SharpCompress;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -105,16 +106,6 @@ public sealed partial class CustomMediaPlayerElement
         {
             MediaControl.MediaPlayer.Dispose();
         }
-
-        //// 取消保持屏幕常亮
-        //if (_appDisplayRequest != null)
-        //{
-        //    // Deactivate the display request and set the var to null.
-        //    _appDisplayRequest.RequestRelease();
-        //    _appDisplayRequest = null;
-        //}
-
-        //_httpClient.Dispose();
     }
 
     private void DisposeMediaPlayer(MediaPlaybackList mediaPlaybackList)
@@ -862,6 +853,36 @@ public sealed partial class CustomMediaPlayerElement
         infos.Add("userAgent", GetInfoFromNetwork.DownUserAgent);
 
         await InfoPage.ShowInContentDialog(XamlRoot, infos, "媒体信息");
-
     }
+    
+    private async void DeleteFileFrom115Button_Click(object sender, RoutedEventArgs e)
+    {
+        var playItem = _allMediaPlayItems[(int)_playIndex];
+
+        if (playItem.Fid == null) return;
+
+        var result = await new ContentDialog
+        {
+            XamlRoot = XamlRoot,
+            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+            Title = "确认",
+            PrimaryButtonText = "删除",
+            CloseButtonText = "返回",
+            DefaultButton = ContentDialogButton.Close,
+            Content = "该操作将删除115网盘中的文件，确认删除？"
+        }.ShowAsync();
+
+        if (result != ContentDialogResult.Primary) return;
+
+        var isSuccess = await _webApi.DeleteFiles(playItem.Cid, new[] { (long)playItem.Fid });
+        if (!isSuccess)
+        {
+            ShowTeachingTip("删除115文件失败");
+            return;
+        }
+
+        DeleteFileClick?.Invoke(playItem);
+    }
+
+    public event Action<MediaPlayItem> DeleteFileClick;
 }

@@ -26,6 +26,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Media.Playback;
+using SharpCompress;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -473,12 +474,7 @@ public sealed partial class MainPage : Page,IDisposable
                 FindCidInfo_ProgressRing.Visibility = Visibility.Collapsed;
 
                 if (videoInfo == null || info.CancellationTokenSource.Token.IsCancellationRequested) continue;
-
-                //var cidInfos = _cidInfos.Where(item=>item.VideoInfo.trueName.Equals(trueName));
-                //foreach (var curInfo in cidInfos)
-                //{
-                //}
-
+                
                 info.UpdateInfo(videoInfo);
 
             }
@@ -645,7 +641,7 @@ public sealed partial class MainPage : Page,IDisposable
 
     private async Task<ContentDialogResult> TipDeletedFiles()
     {
-        var dialog = new ContentDialog()
+        var dialog = new ContentDialog
         {
             XamlRoot = XamlRoot,
             Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
@@ -991,6 +987,17 @@ public sealed partial class MainPage : Page,IDisposable
 
     }
 
+    private void DeleteFiles_Click(object sender, RoutedEventArgs e)
+    {
+        // 移除选中的文件
+        if (VideoShow_ListView.SelectedItems.FirstOrDefault() is not FilesInfo) return;
+        
+        VideoShow_ListView.SelectedItems.Cast<FilesInfo>().ForEach(info =>
+        {
+            _filesInfos.Remove(info);
+        });
+
+    }
 }
 
 public class CidInfo

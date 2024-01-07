@@ -38,9 +38,9 @@ namespace Display.ContentsPage.DetailInfo
             PlayVideos(ContentListView.SelectedItems.Cast<Datum>().ToList());
         }
 
-        private async void PlayVideos(List<Datum> infos)
+        private async void PlayVideos(IEnumerable<Datum> infos)
         {
-            var playItems = infos.Select(x=>new MediaPlayItem(x.PickCode,x.Name,FilesInfo.FileType.File, x.Size, x.Cid)).ToList();
+            var playItems = infos.Select(x=>new MediaPlayItem(x)).ToList();
 
             await PlayVideoHelper.PlayVideo(playItems, this.XamlRoot, lastPage: this);
         }

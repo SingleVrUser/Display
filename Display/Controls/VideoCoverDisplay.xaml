@@ -17,30 +17,27 @@
     <Control.Resources>
         <!--AppBarToggleButton选中后的效果-->
         <SolidColorBrush x:Key="AppBarToggleButtonBackgroundPointerOver"
-                         Color="#70a1ff"
-                         Opacity="0.8" />
+                         Color="{ThemeResource SystemAccentColor}"/>
         <SolidColorBrush x:Key="AppBarToggleButtonBackgroundChecked"
-                         Color="#70a1ff"
-                         Opacity="0.8" />
+                         Color="{ThemeResource SystemAccentColor}"/>
         <SolidColorBrush x:Key="AppBarToggleButtonBackgroundCheckedPointerOver"
-                         Color="#70a1ff"
-                         Opacity="0.8" />
+                         Color="{ThemeResource SystemAccentColor}"/>
+
         <!--AppBarButton按钮悬停效果-->
         <SolidColorBrush x:Key="AppBarButtonBackgroundPointerOver"
-                         Color="#70a1ff"
-                         Opacity="0.8" />
+                         Color="{ThemeResource SystemAccentColor}"/>
 
         <LinearGradientBrush x:Key="OperableGridBackground"
                              StartPoint="0.5,0"
                              EndPoint="0.5,1"
                              Opacity="0.7">
-            <GradientStop Color="#70a1ff"
+            <GradientStop Color="{ThemeResource SystemAccentColor}"
                           Offset="0" />
             <GradientStop Color="#00000050"
                           Offset="0.3" />
             <GradientStop Color="#00000050"
                           Offset="0.7" />
-            <GradientStop Color="#70a1ff"
+            <GradientStop Color="{ThemeResource SystemAccentColor}"
                           Offset="1" />
         </LinearGradientBrush>
 
@@ -444,7 +441,7 @@
                                    Opacity="0.5" />
                         <AppBarSeparator Grid.Column="3" />
                         <TextBlock Grid.Column="4"
-                                   Text="{x:Bind realeaseYear}"
+                                   Text="{x:Bind ReleaseYear}"
                                    IsTextSelectionEnabled="True" />
                         <AppBarSeparator Grid.Column="5" />
                         <TextBlock Grid.Column="6"
@@ -474,11 +471,10 @@
             </Grid>
         </DataTemplate>
 
-
         <!--匹配失败的仿图片展示样式-->
         <DataTemplate x:Key="FailCoverTemplate"
-                      x:DataType="data:VideoCoverDisplayClass">
-            <Grid Padding="3,0">
+                      x:DataType="data:FailVideoInfo">
+            <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="auto" />
@@ -492,14 +488,16 @@
                     <!--图片-->
                     <Grid x:Name="showImage"
                           BorderThickness="2"
-                          Padding="5">
-                        <Image MinWidth="{x:Bind ImageWidth,Mode=OneWay}"
-                               MinHeight="{x:Bind imageHeight,Mode=OneWay}">
+                          Padding="0">
+
+                        <Image Width="{x:Bind ImageWidth,Mode=OneWay}"
+                               Height="{x:Bind imageHeight,Mode=OneWay}">
 
                         </Image>
                         <TextBlock Text="{x:Bind trueName}"
                                    TextWrapping="Wrap"
-                                   MaxWidth="{x:Bind ImageWidth,Mode=OneWay}" />
+                                   MaxWidth="{x:Bind ImageWidth,Mode=OneWay}"
+                                   HorizontalAlignment="Center"/>
                     </Grid>
 
                     <!--可操作按钮-->
@@ -510,7 +508,7 @@
                         </Grid.Background>
 
                         <!--点击跳转查看更多信息-->
-                        <Button Grid.Row="1"
+                        <Button Grid.Row="0"
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="Stretch"
                                 BorderThickness="0"
@@ -521,7 +519,7 @@
 
                             <FontIcon FontFamily="Segoe Fluent Icons"
                                       Glyph="&#xF5B0;"
-                                      Foreground="CornflowerBlue"
+                                      Foreground="{ThemeResource SystemAccentColor}"
                                       FontSize="50" />
                         </Button>
                     </Grid>
@@ -545,24 +543,24 @@
                         <ColumnDefinition Width="auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="{x:Bind realeaseYear}"
+                    <TextBlock Text="{x:Bind ReleaseYear}"
                                IsTextSelectionEnabled="True"
                                HorizontalAlignment="Right" />
 
-                    <TextBlock Grid.Column="1"
+                    <TextBlock Grid.Row="0" Grid.Column="1"
                                Text="|"
                                Foreground="Gray"
                                HorizontalAlignment="Center"
                                Opacity="0.5" />
 
-                    <TextBlock Grid.Column="2"
-                               Text="{x:Bind LookLater,Converter={StaticResource BytesToSizeStrConverter}}" />
+                    <TextBlock Grid.Row="0" Grid.Column="2"
+                               Text="{x:Bind Size,Converter={StaticResource BytesToSizeStrConverter}}" />
 
                     <!--评分-->
-                    <RatingControl Grid.ColumnSpan="3"
+                    <RatingControl Grid.ColumnSpan="3" Grid.Column="0"
                                    IsClearEnabled="False"
                                    Grid.Row="1"
-                                   IsEnabled="False" />
+                                   IsEnabled="False"/>
                 </Grid>
             </Grid>
         </DataTemplate>
@@ -773,7 +771,7 @@
                                          WithoutImageTemplate="{StaticResource FailListTemplate}"
                                          LikeOrLookLaterInFailCoverTemplate="{StaticResource LikeOrLookLaterInFailCoverTemplate}" />
 
-        <local:CoverItemTemplateSelector x:Key="SuccessOrSearchResult_ItemTemplateSelector"
+        <local:CoverItemTemplateSelector x:Key="SuccessOrSearchResultItemTemplateSelector"
                                          ImageTemplate="{StaticResource ImageTemplate}"
                                          FailCoverTemplate="{StaticResource FailCoverTemplate}" />
     </Control.Resources>
@@ -795,7 +793,7 @@
                  x:Name="InfoBar"
                  Message="Essential app message for your users to be informed of, acknowledge, or take action on." />
 
-        <RelativePanel Margin="10,2">
+        <RelativePanel Grid.Row="0" Margin="10,2">
             <!--搜索框（匹配失败列表显示时显示）-->
             <local:FileAutoSuggestBox Grid.Row="1"
                                       x:Name="FailInfoSuggestBox"
@@ -811,11 +809,10 @@
                           RelativePanel.AlignRightWithPanel="True"
                           Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource BoolToVisibleConverter}}"
                           SelectionChanged="ShowData_RadioButtons_SelectionChanged">
-                <RadioButton x:Name="AllFail_RadioButton"
+                <RadioButton x:Name="AllFailRadioButton"
                              Content="&#xE0A2;"
                              FontSize="20"
                              HorizontalContentAlignment="Center"
-                             FontFamily="Segoe Fluent Icons"
                              Style="{StaticResource RadioButtonCustomizeStyle}"
                              ToolTipService.ToolTip="全部" />
                 <RadioButton x:Name="FailLike_RadioButton"
@@ -839,7 +836,7 @@
         <GridView Grid.Row="2"
                   Margin="4,0,0,0"
                   x:Name="BasicGridView"
-                  ItemTemplateSelector="{StaticResource SuccessOrSearchResult_ItemTemplateSelector}"
+                  ItemTemplateSelector="{StaticResource SuccessOrSearchResultItemTemplateSelector}"
                   Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay}"
                   animations:ItemsReorderAnimation.Duration="00:00:00.0960000">
             <interactivity:Interaction.Behaviors>
@@ -870,7 +867,7 @@
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center" />
 
-                    <Grid Visibility="{x:Bind IsShowHeaderCover,Mode=OneWay}">
+                    <Grid Grid.Column="0" Visibility="{x:Bind IsShowHeaderCover,Mode=OneWay}">
                         <StackPanel VerticalAlignment="Top"
                                     HorizontalAlignment="Right"
                                     CornerRadius="5"
@@ -910,7 +907,7 @@
                         </StackPanel>
                     </Grid>
 
-                    <StackPanel Orientation="Horizontal"
+                    <StackPanel Grid.Column="0" Orientation="Horizontal"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Bottom"
                                 Spacing="20"
@@ -1073,7 +1070,7 @@
                               Unchecked="Filter_ToggleButton_Unchecked">
                     <ToggleButton.Resources>
                         <SolidColorBrush x:Key="ToggleButtonBackgroundPointerOver"
-                                         Color="{StaticResource ColorChecked}" />
+                                         Color="{ThemeResource SystemAccentColor}" />
                     </ToggleButton.Resources>
                 </ToggleButton>
 

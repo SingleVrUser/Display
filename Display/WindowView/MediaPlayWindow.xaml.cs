@@ -4,7 +4,6 @@
 using Display.Data;
 using Display.Helper;
 using Display.Models;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -36,7 +35,6 @@ public sealed partial class MediaPlayWindow : Window
 
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
-
 
         _appwindow = App.GetAppWindow(this);
 
@@ -265,7 +263,7 @@ public sealed partial class MediaPlayWindow : Window
         if (e.DataView.Properties.Values.FirstOrDefault() is not List<FilesInfo> addInfos) return;
 
         var addMediaPlayItems = new List<MediaPlayItem>();
-        addInfos.ForEach(info => {addMediaPlayItems.Add(new MediaPlayItem(info.PickCode, info.Name, FilesInfo.FileType.File,info.Size,info.Cid));});
+        addInfos.ForEach(info => {addMediaPlayItems.Add(new MediaPlayItem(info));});
 
         var allMediaPlayItems = MediaControl.ReLoad(addMediaPlayItems);
 

@@ -12,35 +12,15 @@ namespace Display.Services.IncrementalCollection;
 
 public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum>, ISupportIncrementalLoading
 {
-    public IncrementalLoadFailDatumInfoCollection()
+
+    public void SetShowType(FailType showType)
     {
-
-    }
-
-    public async Task LoadData(int startShowCount = 20)
-    {
-        var newItems = await DataAccess.Get.GetFailFileInfoWithDatum(0, startShowCount, filterName, OrderBy, IsDesc, ShowType);
-
-        if (Count == 0)
-        {
-            HasMoreItems = true;
-            AllCount = DataAccess.Get.GetCountOfFailDatumFiles(filterName, ShowType);
-        }
-        else
-            Clear();
-
-
-        newItems.ForEach(Add);
-    }
-
-    public void SetShowType(FailType ShowType)
-    {
-        this.ShowType = ShowType;
+        this.ShowType = showType;
     }
 
     public FailType ShowType { get; set; } = FailType.All;
 
-    public string filterName { get; set; } = string.Empty;
+    public string FilterName { get; set; } = string.Empty;
 
     public int AllCount { get; private set; }
 
@@ -52,7 +32,7 @@ public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum
     }
     public void SetFilter(string filterKeywords)
     {
-        filterName = filterKeywords;
+        FilterName = filterKeywords;
     }
     public void SetOrder(string orderBy, bool isDesc)
     {
@@ -63,9 +43,34 @@ public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum
     public string OrderBy { get; set; }
     public bool IsDesc { get; set; }
 
+    public async Task LoadData(int startShowCount = 20)
+    {
+        var newItems = await DataAccess.Get.GetFailFileInfoWithDatum(0, startShowCount, FilterName, OrderBy, IsDesc, ShowType);
+
+        if (Count == 0)
+        {
+            HasMoreItems = true;
+            AllCount = DataAccess.Get.GetCountOfFailDatumFiles(FilterName, ShowType);
+        }
+        else
+            Clear();
+
+
+        newItems?.ForEach(Add);
+    }
+
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        var failLists = await DataAccess.Get.GetFailFileInfoWithDatum(Items.Count, (int)count, filterName, OrderBy, IsDesc, ShowType);
+        var failLists = await DataAccess.Get.GetFailFileInfoWithDatum(Items.Count, (int)count, FilterName, OrderBy, IsDesc, ShowType);
+
+        if (failLists == null)
+        {
+            HasMoreItems = false;
+            return new LoadMoreItemsResult
+            {
+                Count = 0
+            };
+        }
 
         if (failLists.Length < count)
         {

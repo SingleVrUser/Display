@@ -68,13 +68,13 @@ public sealed partial class EditInfo : Page
                                         SuggestedItemsSource = actors_suggestion, ItemTemplate= this.Resources["ActorTemplate"] as DataTemplate,ItemsSource=actor_items,
                                         SymbolIconSource=new(){Symbol=Symbol.AddFriend} },
 
-            new CommonEditOption(){Header= "标题",MinWidth=480,Text=videoInfo.Title},
-            new CommonEditOption (){Header= "发布时间",Text=videoInfo.ReleaseTime},
-            new CommonEditOption (){Header= "视频长度",Text=videoInfo.Lengthtime},
-            new CommonEditOption() { Header = "导演",Text=videoInfo.Director },
-            new CommonEditOption() { Header = "制作商" ,Text=videoInfo.Producer},
-            new CommonEditOption() { Header = "发行商" ,Text=videoInfo.Publisher},
-            new CommonEditOption() { Header = "系列" ,Text=videoInfo.Series},
+            new CommonEditOption {Header= "标题",MinWidth=480,Text=videoInfo.Title},
+            new CommonEditOption {Header= "发布时间",Text=videoInfo.ReleaseTime},
+            new CommonEditOption {Header= "视频长度",Text=videoInfo.Lengthtime},
+            new CommonEditOption { Header = "导演",Text=videoInfo.Director },
+            new CommonEditOption { Header = "制作商" ,Text=videoInfo.Producer},
+            new CommonEditOption { Header = "发行商" ,Text=videoInfo.Publisher},
+            new CommonEditOption { Header = "系列" ,Text=videoInfo.Series},
         };
     }
 
