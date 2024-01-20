@@ -90,9 +90,8 @@ namespace Display.Services
             _inputStream?.Dispose();
             _inputStream = null;
 
-            //Debug.WriteLine("开始销毁_client");
+            Debug.WriteLine("成功销毁_inputStream");
             //_client?.Dispose();
-            //_client = null;
         }
 
         public IAsyncOperationWithProgress<IBuffer, uint> ReadAsync(IBuffer buffer, uint count, InputStreamOptions options)
@@ -102,49 +101,49 @@ namespace Display.Services
                 return default;
             }
 
-            var result = AsyncInfo.Run<IBuffer, uint>(async (cancellationToken, progress) =>
-            {
-                if (_isDisposing)
+            var result = AsyncInfo.Run<IBuffer, uint>(
+                async (cancellationToken, progress) =>
                 {
-                    return null;
-                }
-
-                progress.Report(0);
-
-                try
-                {
-                    // _inputStream为空，重新获取_inputStream
-                    if (_inputStream == null && !_isDisposing)
+                    if (_isDisposing)
                     {
-                        Debug.WriteLine("_inputStream为空,尝试从Url中获取");
-                        await SendRequestAsync();
+                        return default;
                     }
 
-                    if (_inputStream == null || _isDisposing)
+                    progress.Report(0);
+
+                    try
                     {
-                        Debug.WriteLine("尝试获取_inputStream后依旧未为空，返回默认值");
+                        // _inputStream为空，重新获取_inputStream
+                        if (_inputStream == null && !_isDisposing)
+                        {
+                            Debug.WriteLine("_inputStream为空,尝试从Url中获取");
+                            await SendRequestAsync();
+                        }
 
-                        return null;
+                        if (_inputStream == null || _isDisposing)
+                        {
+                            Debug.WriteLine("尝试获取_inputStream后依旧未为空，返回默认值");
+
+                            return default;
+                        }
+                        
+                        var result = await _inputStream.ReadAsync(buffer, count, options).AsTask(cancellationToken, progress).ConfigureAwait(false);
+
+                        // Move position forward.
+                        Position += result.Length;
+                        //Debug.WriteLine("requestedPosition = {0:N0}", Position);
+                        return result;
+
                     }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex);
 
-
-                    var result = await _inputStream.ReadAsync(buffer, count, options).AsTask(cancellationToken, progress).ConfigureAwait(false);
-
-                    // Move position forward.
-                    Position += result.Length;
-                    //Debug.WriteLine("requestedPosition = {0:N0}", Position);
-                    return result;
-
+                        return default;
+                    }
+                    
                 }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex);
-
-                    return null;
-                }
-
-                return null;
-            });
+            );
 
 
 
@@ -190,8 +189,18 @@ namespace Display.Services
                 Debug.WriteLine("_client访问");
 
                 response = await _client.SendRequestAsync(
-                    request,
-                    HttpCompletionOption.ResponseHeadersRead).AsTask(cancellationToken: cancellationToken).ConfigureAwait(false);
+                        request,
+                        HttpCompletionOption.ResponseHeadersRead).AsTask(cancellationToken: cancellationToken)
+                    .ConfigureAwait(false);
+
+                Debug.WriteLine("_client访问成功");
+            }
+            catch (TaskCanceledException ex)
+            {
+                Debug.WriteLine($"退出任务：{ex.Message}");
+                CanRead = false;
+                Dispose();
+                return;
             }
             catch (Exception ex)
             {

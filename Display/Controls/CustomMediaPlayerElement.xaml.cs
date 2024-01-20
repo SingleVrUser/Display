@@ -111,6 +111,8 @@ public sealed partial class CustomMediaPlayerElement
     private void DisposeMediaPlayer(MediaPlaybackList mediaPlaybackList)
     {
         MediaControl.MediaPlayer.Pause();
+        MediaControl.MediaPlayer.Source = null;
+
         foreach (var mediaPlayItem in mediaPlaybackList.Items)
         {
             mediaPlayItem.Source.Dispose();
@@ -126,7 +128,6 @@ public sealed partial class CustomMediaPlayerElement
             stream.Dispose();
         }
 
-        MediaControl.MediaPlayer.Source = null;
     }
 
     private bool _isHandlerCurrentItemChanged;
@@ -405,8 +406,7 @@ public sealed partial class CustomMediaPlayerElement
         //设置currentItem以及Binder_Binding时不计入改变
         if (_isChangedCurrentItem || _isBindingCurrentItem) return;
         
-        if (sender is not ListView listView) return;
-        if (listView.ItemsSource is not List<Quality> list) return;
+        if (sender is not ListView { ItemsSource: List<Quality> list }) return;
         if (e.AddedItems.FirstOrDefault() is not Quality quality) return;
 
         _qualityIndex = list.IndexOf(quality);
