@@ -135,6 +135,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         if (filesInfo.Type == FilesInfo.FileType.File) return;
         if (filesInfo.Id == null) return;
 
+        Debug.WriteLine("切换目录");
+
         var id = (long)filesInfo.Id;
 
         await FilesInfos.SetCid(id);
@@ -1225,6 +1227,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         var nowTime = DateTime.Now;
 
+        Debug.WriteLine("单击");
+
         FilesInfo info = null;
         if (e.AddedItems.FirstOrDefault() is FilesInfo)
         {
@@ -1240,15 +1244,15 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         // 双击事件
         if (_lastInfo == info &&(nowTime - _lastTapTime).TotalMilliseconds < 300)  // 300毫秒内连续两次点击视为双击
         {
-            _lastTapTime = nowTime;
+            Debug.WriteLine("触发双击事件");
 
+            _lastTapTime = nowTime;
 
             if (info.Type == FilesInfo.FileType.Folder)
             {
                 GoToFolder(info);
                 return;
             }
-
 
             if (info.IsVideo)
             {

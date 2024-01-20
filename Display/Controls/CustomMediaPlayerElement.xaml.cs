@@ -123,10 +123,10 @@ public sealed partial class CustomMediaPlayerElement
             source.MediaSource.Dispose();
         }
 
-        foreach (var stream in _httpRandomAccessStreamList)
-        {
-            stream.Dispose();
-        }
+        //foreach (var stream in _httpRandomAccessStreamList)
+        //{
+        //    stream.Dispose();
+        //}
 
     }
 
