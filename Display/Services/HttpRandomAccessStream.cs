@@ -17,7 +17,7 @@ namespace Display.Services
         private ulong _size;
         private string _etagHeader;
         private string _lastModifiedHeader;
-        private bool _isDisposing;
+        //private bool _isDisposing;
 
         // No public constructor, factory methods instead to handle async tasks.
         private HttpRandomAccessStream(HttpClient client, Uri uri)
@@ -52,6 +52,11 @@ namespace Display.Services
             }).AsTask();
         }
 
+        //public static HttpRandomAccessStream Create(HttpClient client, Uri uri)
+        //{
+        //    return new HttpRandomAccessStream(client, uri);
+        //}
+
         public IRandomAccessStream CloneStream() => this;
 
         public IInputStream GetInputStreamAt(ulong position)
@@ -64,90 +69,47 @@ namespace Display.Services
         {
             if (Position == position) return;
 
-            // 重置_inputStream
-            Debug.WriteLine("重置_inputStream");
-            if (_inputStream != null)
-            {
-                _inputStream.Dispose();
-                _inputStream = null;
-            }
-
-            //Debug.WriteLine("Seek: {0:N0} -> {1:N0}", Position, position);
-            Position = position;
-        }
-
-        public void Dispose()
-        {
-            if (_isDisposing)
-            {
-                return;
-            }
-
-            _isDisposing = true;
-
-            Debug.WriteLine("开始销毁_inputStream");
-
-            _inputStream?.Dispose();
+            Debug.WriteLine("Seek: {0:N0} -> {1:N0}", Position, position);
             _inputStream = null;
 
-            Debug.WriteLine("成功销毁_inputStream");
-            //_client?.Dispose();
+            Position = position;
+        }
+        
+        void IDisposable.Dispose()
+        {
+            Debug.WriteLine("销毁_inputStream");
+            _inputStream?.Dispose();
         }
 
         public IAsyncOperationWithProgress<IBuffer, uint> ReadAsync(IBuffer buffer, uint count, InputStreamOptions options)
         {
-            if (_isDisposing || !CanRead)
+            return AsyncInfo.Run<IBuffer, uint>(async (cancellationToken, progress) =>
             {
-                return default;
-            }
+                progress.Report(0);
 
-            var result = AsyncInfo.Run<IBuffer, uint>(
-                async (cancellationToken, progress) =>
+                if (_inputStream is null)
                 {
-                    if (_isDisposing)
-                    {
-                        return default;
-                    }
-
-                    progress.Report(0);
-
-                    try
-                    {
-                        // _inputStream为空，重新获取_inputStream
-                        if (_inputStream == null && !_isDisposing)
-                        {
-                            Debug.WriteLine("_inputStream为空,尝试从Url中获取");
-                            await SendRequestAsync();
-                        }
-
-                        if (_inputStream == null || _isDisposing)
-                        {
-                            Debug.WriteLine("尝试获取_inputStream后依旧未为空，返回默认值");
-
-                            return default;
-                        }
-                        
-                        var result = await _inputStream.ReadAsync(buffer, count, options).AsTask(cancellationToken, progress).ConfigureAwait(false);
-
-                        // Move position forward.
-                        Position += result.Length;
-                        //Debug.WriteLine("requestedPosition = {0:N0}", Position);
-                        return result;
-
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex);
-
-                        return default;
-                    }
-                    
+                    Debug.WriteLine("_inputStream为空,尝试从Url中获取");
+                    await SendRequestAsync();
                 }
-            );
 
 
 
-            return result;
+                if (_inputStream is null)
+                {
+                    Debug.WriteLine("_inputStream为空");
+                    return await Task.FromCanceled<IBuffer>(cancellationToken);
+                }
+
+                var result = await _inputStream.ReadAsync(buffer, count, options).AsTask(cancellationToken, progress);
+
+                // Move position forward.
+                Position += result.Length;
+                Debug.WriteLine("requestedPosition = {0:N0}", Position);
+                return result;
+
+            });
+            
         }
 
         public IAsyncOperation<bool> FlushAsync()
@@ -158,7 +120,7 @@ namespace Display.Services
 
         private async Task SendRequestAsync()
         {
-            if (_isDisposing || !CanRead || _client == null)
+            if (!CanRead || _client == null)
             {
                 return;
             }
@@ -190,23 +152,22 @@ namespace Display.Services
 
                 response = await _client.SendRequestAsync(
                         request,
-                        HttpCompletionOption.ResponseHeadersRead).AsTask(cancellationToken: cancellationToken)
-                    .ConfigureAwait(false);
+                        HttpCompletionOption.ResponseHeadersRead).AsTask(cancellationToken: cancellationToken);
 
                 Debug.WriteLine("_client访问成功");
             }
             catch (TaskCanceledException ex)
             {
-                Debug.WriteLine($"退出任务：{ex.Message}");
+                Debug.WriteLine($"任务超时：{ex.Message}");
                 CanRead = false;
-                Dispose();
+                //Dispose();
                 return;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"发生错误:{ex.Message}");
                 CanRead = false;
-                Dispose();
+                //Dispose();
                 return;
             }
 
@@ -216,7 +177,7 @@ namespace Display.Services
             {
                 Debug.WriteLine($"访问视频出错：{response.StatusCode}");
                 CanRead = false;
-                Dispose();
+                //Dispose();
                 return;
             }
 
@@ -240,7 +201,7 @@ namespace Display.Services
                 ContentType = contentType;
             }
 
-            _inputStream = await response.Content.ReadAsInputStreamAsync().AsTask(cancellationToken).ConfigureAwait(false);
+            _inputStream = await response.Content.ReadAsInputStreamAsync();
 
         }
     }

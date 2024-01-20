@@ -128,11 +128,11 @@ namespace Display.Models
                 MediaPlayer?.Dispose();
                 MediaPlayer = null;
 
-                _stream?.Dispose();
-                _stream = null;
-
                 _ms?.Dispose();
                 _ms = null;
+
+                //_stream?.Dispose();
+                //_stream = null;
             }
             catch (Exception e)
             {
