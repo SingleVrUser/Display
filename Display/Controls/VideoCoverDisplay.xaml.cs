@@ -868,10 +868,15 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     {
         if (IsShowFailListView)
         {
-            if (FailGridView.ItemsSource is IncrementalLoadFailDatumInfoCollection allFailCollection)
-                FailGridView.ScrollIntoView(allFailCollection.First());
-            else if (FailGridView.ItemsSource is IncrementalLoadFailInfoCollection failCollection)
-                FailGridView.ScrollIntoView(failCollection.First());
+            switch (FailGridView.ItemsSource)
+            {
+                case IncrementalLoadFailDatumInfoCollection allFailCollection:
+                    FailGridView.ScrollIntoView(allFailCollection.First());
+                    break;
+                case IncrementalLoadFailInfoCollection failCollection:
+                    FailGridView.ScrollIntoView(failCollection.First());
+                    break;
+            }
         }
         else
         {
