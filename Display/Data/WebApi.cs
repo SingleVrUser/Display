@@ -1473,8 +1473,8 @@ namespace Display.Data
             string strResult;
             try
             {
-                var response = await Client.GetAsync($"https://v.anxia.com/site/api/video/m3u8/{pickCode}.m3u8");
-                strResult = await response.Content.ReadAsStringAsync();
+                Debug.WriteLine("开始获取");
+                strResult = await Client.GetStringAsync($"https://v.anxia.com/site/api/video/m3u8/{pickCode}.m3u8");
             }
             catch (Exception ex)
             {
@@ -1528,6 +1528,9 @@ namespace Display.Data
 
             //排序
             m3U8Infos = m3U8Infos.OrderByDescending(x => x.Bandwidth).ToList();
+
+
+            Debug.WriteLine("成功获取M3U8链接");
 
             return m3U8Infos;
         }

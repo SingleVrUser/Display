@@ -119,17 +119,20 @@ namespace Display.Models
 
         public void Dispose()
         {
+            Debug.WriteLine("准备移除MediaPlayer");
             // 从大到小销毁
             try
             {
+                if(MediaPlayer.CanPause) MediaPlayer.Pause();
+
                 MediaPlayer?.Dispose();
                 MediaPlayer = null;
 
-                _ms?.Dispose();
-                _ms = null;
-
                 _stream?.Dispose();
                 _stream = null;
+
+                _ms?.Dispose();
+                _ms = null;
             }
             catch (Exception e)
             {
