@@ -276,7 +276,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             Title = showName;
         }
 
-        this.IsShowHeaderCover = isShowHeaderCover;
+        IsShowHeaderCover = isShowHeaderCover;
 
         _filterConditionList = types;
         _filterKeywords = showName;
@@ -431,28 +431,6 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         collapsedGrid.Visibility = Visibility.Collapsed;
 
-    }
-
-    private void FailImageGrid_PointerEntered(object sender, PointerRoutedEventArgs e)
-    {
-        if (sender is not Grid grid) return;
-        grid.Children[1].Visibility = Visibility.Visible;
-
-        ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
-
-        grid.Tapped += FailGrid_Tapped;
-    }
-
-    private void FailImageGrid_PointerExited(object sender, PointerRoutedEventArgs e)
-    {
-        if (!(sender is Grid grid)) return;
-
-        ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
-
-        if (grid.Children[1] is not Grid collapsedGrid) return;
-        collapsedGrid.Visibility = Visibility.Collapsed;
-
-        grid.Tapped -= FailGrid_Tapped;
     }
 
     private void Button_OnPointerEntered(object sender, PointerRoutedEventArgs e)
@@ -623,7 +601,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         }
 
         //更新首图标
-        FontIcon orderFontIcon = OrderButton.Content as FontIcon;
+        var orderFontIcon = OrderButton.Content as FontIcon;
         if (orderFontIcon.Glyph != newGlyph)
         {
             OrderButton.Content = new FontIcon() { FontFamily = new FontFamily("Segoe Fluent Icons"), Glyph = newGlyph };
@@ -648,7 +626,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         const string upGlyph = "\xE014";
         const string downGlyph = "\xE015";
 
-        ListView selectListView = (ListView)sender;
+        var selectListView = (ListView)sender;
 
         var selectTextBlock = clickStackPanel.Children.First(x => x is TextBlock) as TextBlock;
         var lastFontIcon = clickStackPanel.Children.Last(x => x is FontIcon) as FontIcon;
@@ -659,7 +637,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         string newGlyph;
 
         //原图标是否是升序
-        bool isUpSort = lastFontIcon.Glyph == upGlyph;
+        var isUpSort = lastFontIcon.Glyph == upGlyph;
 
         //更新降序或升序图标
         //注意：随机 无需升/降序
@@ -696,7 +674,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
                 break;
         }
         //更新首图标
-        FontIcon orderFontIcon = OrderButton.Content as FontIcon;
+        var orderFontIcon = OrderButton.Content as FontIcon;
         if (orderFontIcon.Glyph != newGlyph)
         {
             OrderButton.Content = new FontIcon() { FontFamily = new FontFamily("Segoe Fluent Icons"), Glyph = newGlyph };
@@ -745,7 +723,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         DataAccess.Delete.DeleteDataInVideoInfoTable(item.trueName);
 
         //删除存储的文件夹
-        string savePath = Path.Combine(AppSettings.ImageSavePath, item.trueName);
+        var savePath = Path.Combine(AppSettings.ImageSavePath, item.trueName);
         if (Directory.Exists(savePath))
         {
             Directory.Delete(savePath, true);
@@ -764,52 +742,6 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             await BasicGridView.TryStartConnectedAnimationAsync(animation, item, "showImage");
         }
 
-    }
-
-    public void PrepareAnimation(VideoCoverDisplayClass item)
-    {
-        BasicGridView.PrepareConnectedAnimation("ForwardConnectedAnimation", item, "showImage");
-    }
-
-    private void ShowType_ToggleSwitch_PointerEntered(object sender, PointerRoutedEventArgs e)
-    {
-        if (!(sender is ToggleSwitch toggleSwitch))
-        {
-            return;
-        }
-
-        toggleSwitch.Opacity = 1;
-    }
-
-    private void ShowType_ToggleSwitch_PointerExited(object sender, PointerRoutedEventArgs e)
-    {
-        if (!(sender is ToggleSwitch toggleSwitch))
-        {
-            return;
-        }
-
-        toggleSwitch.Opacity = 0.3;
-    }
-
-    /// <summary>
-    /// Toggle按钮改变时，切换匹配成功或失败列表
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void ShowType_ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
-    {
-        if (sender is not ToggleSwitch toggleSwitch) return;
-
-        //匹配失败
-        if (toggleSwitch.IsOn)
-        {
-            TrySwitchToFailView();
-        }
-        //匹配成功
-        else
-        {
-            TrySwitchToSuccessView();
-        }
     }
 
 
@@ -860,14 +792,11 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         //更新GridView的来源
         var imgSize = ImageSize;
 
-        if (SuccessInfoCollection == null)
-        {
-            SuccessInfoCollection = new IncrementalLoadSuccessInfoCollection(imgSize.Item1, imgSize.Item2);
-            SuccessInfoCollection.SetFilter(_filterConditionList, _filterKeywords, _isFuzzyQueryActor);
-            await SuccessInfoCollection.LoadData();
+        SuccessInfoCollection ??= new IncrementalLoadSuccessInfoCollection(imgSize.Item1, imgSize.Item2);
+        SuccessInfoCollection.SetFilter(_filterConditionList, _filterKeywords, _isFuzzyQueryActor);
+        await SuccessInfoCollection.LoadData();
 
-            BasicGridView.ItemsSource = SuccessInfoCollection;
-        }
+        BasicGridView.ItemsSource = SuccessInfoCollection;
 
         if (FailGridView.Visibility == Visibility.Visible) FailGridView.Visibility = Visibility.Collapsed;
         if (BasicGridView.Visibility == Visibility.Collapsed) BasicGridView.Visibility = Visibility.Visible;
