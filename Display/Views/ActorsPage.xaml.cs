@@ -88,22 +88,20 @@ namespace Display.Views
         /// <param Name="e"></param>
         private void BasicGridView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            if (BasicGridView.ContainerFromItem(e.ClickedItem) is GridViewItem container)
-            {
-                var actorinfo = container.Content as ActorInfo;
+            if (BasicGridView.ContainerFromItem(e.ClickedItem) is not GridViewItem container) return;
 
-                _navigationType = navigationAnimationType.gridView;
-                _storeditem = actorinfo;
-                //BasicGridView.PrepareConnectedAnimation("ForwardConnectedAnimation", _storeditem, "ActorImage");
+            var actorinfo = container.Content as ActorInfo;
 
-                GoToActorInfo(actorinfo);
-            }
+            _navigationType = navigationAnimationType.gridView;
+            _storeditem = actorinfo;
+
+            GoToActorInfo(actorinfo);
         }
 
         private void GoToActorInfo(ActorInfo actorinfo)
         {
-            Tuple<List<string>, string, bool> TypeAndName = new(new() { "actor" }, actorinfo.Name, false);
-            Frame.Navigate(typeof(ActorInfoPage), TypeAndName);
+            Tuple<List<string>, string, bool> typeAndName = new(new() { "actor" }, actorinfo.Name, false);
+            Frame.Navigate(typeof(ActorInfoPage), typeAndName);
         }
 
         private void Grid_PointerEntered(object sender, PointerRoutedEventArgs e)

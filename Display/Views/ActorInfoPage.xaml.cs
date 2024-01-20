@@ -30,7 +30,7 @@ namespace Display.Views
             //启动缓存（为了返回无需过长等待，也为了返回动画）
             NavigationCacheMode = NavigationCacheMode.Enabled;
 
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -98,6 +98,12 @@ namespace Display.Views
 
                     break;
                 }
+                case NavigationMode.Forward:
+                    break;
+                case NavigationMode.Refresh:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
