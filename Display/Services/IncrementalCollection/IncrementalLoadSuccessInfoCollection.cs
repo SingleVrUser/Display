@@ -39,26 +39,19 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
 
     public async Task LoadData(int startShowCount = 20)
     {
+        Clear();
         var newItems = await DataAccess.Get.GetVideoInfo(startShowCount, 0, OrderBy, IsDesc, FilterConditionList, FilterKeywords, Ranges, IsFuzzyQueryActor);
 
-        if(newItems == null) return;
-
-        if (Count == 0)
+        var successCount = DataAccess.Get.GetCountOfVideoInfo(FilterConditionList, FilterKeywords, Ranges);
+        var failCount = 0;
+        if (IsContainFail)
         {
-            var successCount = DataAccess.Get.GetCountOfVideoInfo(FilterConditionList, FilterKeywords, Ranges);
-            var failCount = 0;
-            if (IsContainFail)
-            {
-                failCount = DataAccess.Get.GetCountOfFailFileInfoWithDatum(0, -1, FilterKeywords);
-            }
-
-            AllCount = successCount + failCount;
+            failCount = DataAccess.Get.GetCountOfFailFileInfoWithDatum(0, -1, FilterKeywords);
         }
 
-        else
-            Clear();
+        AllCount = successCount + failCount;
 
-        newItems.ForEach(item => Add(new VideoCoverDisplayClass(item, ImageWidth, ImageHeight)));
+        newItems?.ForEach(item => Add(new VideoCoverDisplayClass(item, ImageWidth, ImageHeight)));
 
     }
 
@@ -73,6 +66,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
         this.FilterConditionList = filterConditionList;
         this.FilterKeywords = filterKeywords;
         this.IsFuzzyQueryActor = isFuzzyQueryActor;
+        HasMoreItems = true;
     }
 
     public void SetRange(Dictionary<string, string> ranges)
