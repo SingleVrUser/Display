@@ -59,7 +59,7 @@ namespace Display.Views
                 //过渡动画
                 case NavigationMode.Back:
                 {
-                    ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("BackConnectedAnimation");
+                    var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("BackConnectedAnimation");
                     if (animation != null)
                     {
                         videoControl.StartAnimation(animation, _storeditem);
