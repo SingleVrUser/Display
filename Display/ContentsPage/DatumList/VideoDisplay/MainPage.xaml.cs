@@ -351,11 +351,11 @@ public sealed partial class MainPage : Page,IDisposable
             mediaPlayerElement.AutoPlay = true;
         }
 
-        mediaPlayerElement.MediaPlayer.MediaOpened += (sender, args) =>
+        mediaPlayerElement.MediaPlayer.MediaOpened += (sender, _) =>
         {
             if(_isDisposing) return;
 
-            MediaPlayer_MediaOpened(sender, args);
+            ChangMediaPlayerPositionWhenMediaOpened(sender);
 
             DispatcherQueue.TryEnqueue(() =>
             {
@@ -367,6 +367,7 @@ public sealed partial class MainPage : Page,IDisposable
                 sliderControl.StepFrequency = 1000 / sender.PlaybackSession.NaturalDuration.TotalSeconds;
                 sliderControl.SmallChange = 1000 / sender.PlaybackSession.NaturalDuration.TotalSeconds;
             });
+
 
         };
 
@@ -381,7 +382,7 @@ public sealed partial class MainPage : Page,IDisposable
 
     }
 
-    private static void MediaPlayer_MediaOpened(MediaPlayer sender, object args)
+    private static void ChangMediaPlayerPositionWhenMediaOpened(MediaPlayer sender)
     {
         // 是否需要改变起始位置
         if (AppSettings.AutoPlayPositionPercentage == 0.0) return;
