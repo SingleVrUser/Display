@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Storage.Streams;
 using Windows.Web.Http;
+using Org.BouncyCastle.Math;
 
 namespace Display.Services
 {
@@ -24,7 +25,6 @@ namespace Display.Services
         {
             _client = client;
             _requestedUri = uri;
-            Position = 0;
         }
 
         public ulong Position { get; private set; }
@@ -41,13 +41,34 @@ namespace Display.Services
             set => throw new NotImplementedException();
         }
 
+        public IAsyncOperation<bool> FlushAsync()
+            => throw new NotImplementedException();
+
+        public IAsyncOperationWithProgress<uint, uint> WriteAsync(IBuffer buffer)
+            => throw new NotImplementedException();
+
+        public IOutputStream GetOutputStreamAt(ulong position)
+            => throw new NotImplementedException();
+
+        public IRandomAccessStream CloneStream() => this;
+
+        public IInputStream GetInputStreamAt(ulong position)
+            => _inputStream;
+
+
+        /// <summary>
+        /// 创建的同时获取到视频Size(position为0时的length)
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="uri"></param>
+        /// <returns></returns>
         public static Task<HttpRandomAccessStream> CreateAsync(HttpClient client, Uri uri)
         {
             var randomStream = new HttpRandomAccessStream(client, uri);
 
             return AsyncInfo.Run(async _ =>
             {
-                await randomStream.SendRequestAsync();
+                await randomStream.SendRequestAsync(0);
                 return randomStream;
             }).AsTask();
         }
@@ -57,19 +78,14 @@ namespace Display.Services
         //    return new HttpRandomAccessStream(client, uri);
         //}
 
-        public IRandomAccessStream CloneStream() => this;
-
-        public IInputStream GetInputStreamAt(ulong position)
-            => _inputStream;
-
-        public IOutputStream GetOutputStreamAt(ulong position)
-            => throw new NotImplementedException();
-
         public void Seek(ulong position)
         {
             if (Position == position) return;
 
             Debug.WriteLine("Seek: {0:N0} -> {1:N0}", Position, position);
+
+            // Dispose inputStream，销毁前一个_inputStream，访问量过大会触发403 Forbidden
+            _inputStream?.Dispose();
             _inputStream = null;
 
             Position = position;
@@ -77,23 +93,21 @@ namespace Display.Services
         
         void IDisposable.Dispose()
         {
-            Debug.WriteLine("销毁_inputStream");
             _inputStream?.Dispose();
+            _inputStream = null;
         }
 
         public IAsyncOperationWithProgress<IBuffer, uint> ReadAsync(IBuffer buffer, uint count, InputStreamOptions options)
         {
             return AsyncInfo.Run<IBuffer, uint>(async (cancellationToken, progress) =>
             {
-                progress.Report(0);
+                //progress.Report(0);
 
                 if (_inputStream is null)
                 {
                     Debug.WriteLine("_inputStream为空,尝试从Url中获取");
                     await SendRequestAsync();
                 }
-
-
 
                 if (_inputStream is null)
                 {
@@ -105,24 +119,22 @@ namespace Display.Services
 
                 // Move position forward.
                 Position += result.Length;
-                Debug.WriteLine("requestedPosition = {0:N0}", Position);
+                //Debug.WriteLine("requestedPosition = {0:N0}", Position);
                 return result;
 
             });
-            
         }
 
-        public IAsyncOperation<bool> FlushAsync()
-            => throw new NotImplementedException();
-
-        public IAsyncOperationWithProgress<uint, uint> WriteAsync(IBuffer buffer)
-            => throw new NotImplementedException();
-
-        private async Task SendRequestAsync()
+        private async Task SendRequestAsync(int waitSecondWhenRequestZeroPosition = 2)
         {
             if (!CanRead || _client == null)
             {
                 return;
+            }
+
+            if (Position == 0 && waitSecondWhenRequestZeroPosition != 0)
+            {
+                await Task.Delay(waitSecondWhenRequestZeroPosition * 1000);
             }
 
             var request = new HttpRequestMessage(HttpMethod.Get, _requestedUri);
@@ -142,46 +154,52 @@ namespace Display.Services
 
             HttpResponseMessage response;
 
-
             //设置超时时间5s
             var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token;
 
             try
             {
-                Debug.WriteLine("_client访问");
 
                 response = await _client.SendRequestAsync(
                         request,
                         HttpCompletionOption.ResponseHeadersRead).AsTask(cancellationToken: cancellationToken);
-
-                Debug.WriteLine("_client访问成功");
+                
             }
             catch (TaskCanceledException ex)
             {
                 Debug.WriteLine($"任务超时：{ex.Message}");
                 CanRead = false;
-                //Dispose();
                 return;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"发生错误:{ex.Message}");
+                Debug.WriteLine($"访问视频错误:{ex.Message}");
                 CanRead = false;
-                //Dispose();
                 return;
             }
 
-            _size = response.Content?.Headers?.ContentLength ?? 0;
+            var contentLength = response.Content?.Headers?.ContentLength ?? 0;
 
             if (response.Content?.Headers == null || !response.IsSuccessStatusCode)
             {
-                Debug.WriteLine($"访问视频出错：{response.StatusCode}");
+                Debug.WriteLine($"视频格式错误：{response.StatusCode}");
+
+                if (contentLength < 1024)
+                {
+                    var result = await response.Content?.ReadAsStringAsync();
+                    Debug.WriteLine($"服务器响应结果：${result}");
+                }
                 CanRead = false;
-                //Dispose();
                 return;
             }
 
-            if (response.Content.Headers.ContentType != null)
+            if (Position == 0)
+            {
+                _size = contentLength;
+                Debug.WriteLine("视频总大小:{0:N0}", _size);
+            }
+
+            if (response.Content.Headers.ContentType is not null)
             {
                 ContentType = response.Content.Headers.ContentType.MediaType;
             }
@@ -201,7 +219,7 @@ namespace Display.Services
                 ContentType = contentType;
             }
 
-            _inputStream = await response.Content.ReadAsInputStreamAsync();
+            _inputStream = await response.Content.ReadAsInputStreamAsync().AsTask(cancellationToken);
 
         }
     }
