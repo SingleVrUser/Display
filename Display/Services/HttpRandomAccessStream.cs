@@ -159,7 +159,6 @@ namespace Display.Services
 
             try
             {
-
                 response = await _client.SendRequestAsync(
                         request,
                         HttpCompletionOption.ResponseHeadersRead).AsTask(cancellationToken: cancellationToken);
