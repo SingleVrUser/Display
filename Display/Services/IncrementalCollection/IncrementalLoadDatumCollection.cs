@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation;
@@ -148,6 +149,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         filesInfo.data.ForEach(i=>Add(new FilesInfo(i)));
 
         HasMoreItems = AllCount > Count;
+        //Debug.WriteLine($"[{Count}/{AllCount}] HasMoreItems = {HasMoreItems}");
 
         return filesInfo.data.Length;
     }
@@ -157,13 +159,18 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         if (isBusy) return;
 
         Cid = cid;
+
+        // 避免使用LoadMoreItemsAsync重复加载数据，LoadData后会重新设置为正确的值
+        HasMoreItems = false;
         Clear();
 
         //当目录为空时，HasMoreItems==True无法激活查询服务，需要手动LoadData
-        var isNeedLoad = Count == 0;
-        HasMoreItems = !isNeedLoad;
-
-        if (isNeedLoad) await LoadData();
+        //var isNeedLoad = Count == 0;
+        //HasMoreItems = true;
+        //HasMoreItems = !isNeedLoad;
+        
+        await LoadData();
+        
     }
 
     public async Task SetOrder(WebApi.OrderBy orderBy, int asc)
@@ -174,13 +181,13 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         await SetCid(Cid);
     }
 
-    public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
+    public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint _)
     {
-        return InnerLoadMoreItemsAsync(count).AsAsyncOperation();
+        return InnerLoadMoreItemsAsync().AsAsyncOperation();
     }
 
     private readonly int _defaultCount = 30;
-    private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
+    private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync()
     {
         var getCount = HasMoreItems ? await LoadData(_defaultCount, Count) : 0;
 

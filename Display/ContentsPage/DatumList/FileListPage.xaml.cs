@@ -144,6 +144,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         // 切换目录时，全选checkBox不是选中状态
         MultipleSelectedCheckBox.IsChecked = false;
 
+        Debug.WriteLine("切换菜单状态");
         ChangedMenuState();
     }
 
