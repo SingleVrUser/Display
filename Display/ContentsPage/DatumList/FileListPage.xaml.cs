@@ -241,6 +241,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private void Source_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
     {
+        Debug.WriteLine("开始拖拽 start");
+
         // 排除缺失Id的文件，比如秒传后临时添加的文件
         var infos = e.Items.Cast<FilesInfo>().Where(x => !x.NoId).ToList();
         if (infos.Count == 0) return;
@@ -254,7 +256,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         // 显示中转站
         TransferStationGrid.Visibility = Visibility.Visible;
 
-
+        Debug.WriteLine("开始拖拽 finish");
     }
 
     /// <summary>
@@ -300,6 +302,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         if (sender is not ListView target) return;
 
+        Debug.WriteLine("拖拽文件不松开 start");
+
         // 应用内的文件拖动
         if (e.DataView.Properties.Values.FirstOrDefault() is List<FilesInfo> sourceFilesInfos)
         {
@@ -313,6 +317,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
 
         VisualStateManager.GoToState(this, "TransferPointerOver", true);
+
+        Debug.WriteLine("拖拽文件不松开 finish");
     }
 
     private void HandleCaption(DragEventArgs e, ListView target, List<FilesInfo> sourceFilesInfos)
@@ -646,6 +652,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private void Source_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
     {
+        Debug.WriteLine("拖拽完毕 start");
+
         // 隐藏回收站
         RecycleStationGrid.Visibility = Visibility.Collapsed;
 
@@ -660,6 +668,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         // 删除文件列表
         TryRemoveFilesInExplorer(args.Items.Cast<FilesInfo>().ToList());
+
+        Debug.WriteLine("拖拽完毕 finish");
     }
 
     private async void ImportDataButton_Click(object sender, RoutedEventArgs e)
@@ -1228,8 +1238,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         var nowTime = DateTime.Now;
 
-        Debug.WriteLine("单击");
-
         FilesInfo info = null;
         if (e.AddedItems.FirstOrDefault() is FilesInfo)
         {
@@ -1245,8 +1253,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         // 双击事件
         if (_lastInfo == info &&(nowTime - _lastTapTime).TotalMilliseconds < 300)  // 300毫秒内连续两次点击视为双击
         {
-            Debug.WriteLine("触发双击事件");
-
             _lastTapTime = nowTime;
 
             if (info.Type == FilesInfo.FileType.Folder)

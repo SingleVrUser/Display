@@ -1,16 +1,13 @@
 ﻿using Display.Data;
 using Microsoft.UI.Xaml.Data;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Display.Extensions;
 using SharpCompress;
-using System.IO;
 using System.Threading;
 
 namespace Display.Models.IncrementalCollection;
@@ -19,7 +16,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
 {
     private WebApi WebApi { get; }
 
-    private bool isBusy;
+    private bool _isBusy;
 
     public bool HasMoreItems { get; private set; } = true;
 
@@ -111,6 +108,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
 
     public async Task<WebFileInfo> GetFilesInfoAsync(int limit, int offset)
     {
+        Debug.WriteLine($"从网络中获取文件列表:{offset}-{limit + offset}");
         var filesInfo = await WebApi.GetFileAsync(Cid, limit, offset, orderBy: OrderBy.GetDescription(), asc: Asc, isOnlyFolder: IsOnlyFolder);
         if(filesInfo == null) return null;
 
@@ -133,9 +131,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
     {
         IsNull = false;
 
-        isBusy = true;
         var filesInfo = await GetFilesInfoAsync(limit, offset);
-        isBusy = false;
 
         // 访问失败，没有登陆
         // 或者没有数据
@@ -147,30 +143,35 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         }
 
         filesInfo.data.ForEach(i=>Add(new FilesInfo(i)));
-
+        
         HasMoreItems = AllCount > Count;
-        //Debug.WriteLine($"[{Count}/{AllCount}] HasMoreItems = {HasMoreItems}");
+        Debug.WriteLine($"[{Count}/{AllCount}] HasMoreItems = {HasMoreItems}");
 
         return filesInfo.data.Length;
     }
 
     public async Task SetCid(long cid)
     {
-        if (isBusy) return;
+        if (_isBusy) return;
+
+        // 两个进程同时执行Clear操作会闪退
+        _isBusy = true;
 
         Cid = cid;
 
         // 避免使用LoadMoreItemsAsync重复加载数据，LoadData后会重新设置为正确的值
         HasMoreItems = false;
+
         Clear();
 
         //当目录为空时，HasMoreItems==True无法激活查询服务，需要手动LoadData
         //var isNeedLoad = Count == 0;
         //HasMoreItems = true;
         //HasMoreItems = !isNeedLoad;
-        
+
         await LoadData();
-        
+
+        _isBusy = false;
     }
 
     public async Task SetOrder(WebApi.OrderBy orderBy, int asc)
