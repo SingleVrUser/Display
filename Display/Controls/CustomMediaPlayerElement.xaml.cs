@@ -111,22 +111,20 @@ public sealed partial class CustomMediaPlayerElement
     private void DisposeMediaPlayer(MediaPlaybackList mediaPlaybackList)
     {
         MediaControl.MediaPlayer.Pause();
-        MediaControl.MediaPlayer.Source = null;
 
         foreach (var mediaPlayItem in mediaPlaybackList.Items)
         {
             mediaPlayItem.Source.Dispose();
         }
+        mediaPlaybackList.Items.Clear();
 
         foreach (var source in _adaptiveMediaSourceList)
         {
             source.MediaSource.Dispose();
         }
+        _adaptiveMediaSourceList.Clear();
 
-        //foreach (var stream in _httpRandomAccessStreamList)
-        //{
-        //    stream.Dispose();
-        //}
+        MediaControl.MediaPlayer.Source = null;
 
     }
 
@@ -153,7 +151,7 @@ public sealed partial class CustomMediaPlayerElement
         // 播放时修改Slider精度
         MediaControl.MediaPlayer.MediaOpened += MediaPlayer_MediaOpened;
 
-        // 播放时保持屏幕常量，暂停播放则恢复
+        // 播放时保持屏幕常亮，暂停播放则恢复
         MediaControl.MediaPlayer.PlaybackSession.PlaybackStateChanged += MediaPlayerElement_CurrentStateChanged;
     }
 
@@ -217,6 +215,8 @@ public sealed partial class CustomMediaPlayerElement
 
             // 设置喜欢/稍后观看按钮
             SetButton(playItem);
+
+            Debug.WriteLine("设置画质列表");
 
             // 设置画质列表
             SetQualityList(playItem);
@@ -358,45 +358,51 @@ public sealed partial class CustomMediaPlayerElement
 
     private void MediaPlayerElement_CurrentStateChanged(MediaPlaybackSession sender, object args)
     {
-        var playbackSession = sender;
-        if (playbackSession != null && playbackSession.NaturalVideoHeight != 0)
+        /*
+         * 会出现以下异常
+         * Exception thrown: 'System.Runtime.InteropServices.COMException' in System.Private.CoreLib.dll
+         * Exception thrown: 'System.Runtime.InteropServices.COMException' in WinRT.Runtime.dll
+         */
+
+        if (sender == null || sender.NaturalVideoHeight == 0) return;
+
+        if (sender.PlaybackState == MediaPlaybackState.Playing)
         {
-            if (playbackSession.PlaybackState == MediaPlaybackState.Playing)
+            if (_appDisplayRequest is null)
             {
-                if (_appDisplayRequest is null)
+                _dispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
                 {
-                    _dispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
-                    {
-                        _appDisplayRequest = new DisplayRequest();
-                        _appDisplayRequest.RequestActive();
-                    });
-                }
-            }
-            else // PlaybackState is Buffering, None, Opening, or Paused.
-            {
-                if (_appDisplayRequest != null)
-                {
-                    // Deactivate the display request and set the var to null.
-                    _appDisplayRequest.RequestRelease();
-                    _appDisplayRequest = null;
-                }
+                    _appDisplayRequest = new DisplayRequest();
+                    _appDisplayRequest.RequestActive();
+                });
             }
         }
+        else // PlaybackState is Buffering, None, Opening, or Paused.
+        {
+            if (_appDisplayRequest == null) return;
+
+            // Deactivate the display request and set the var to null.
+            _appDisplayRequest.RequestRelease();
+            _appDisplayRequest = null;
+        }
+
     }
 
     private void MediaPlayer_MediaOpened(MediaPlayer sender, object args)
     {
         DispatcherQueue.TryEnqueue(() =>
         {
-
+            Debug.WriteLine("正在设置进度条");
             var transportControlsTemplateRoot = (FrameworkElement)VisualTreeHelper.GetChild(MediaControl.TransportControls, 0);
             var sliderControl = (Slider)transportControlsTemplateRoot?.FindName("ProgressSlider");
-            if (sliderControl != null && sender.PlaybackSession.NaturalDuration.TotalSeconds > 1000)
-            {
-                // 十秒一步
-                sliderControl.StepFrequency = 1000 / sender.PlaybackSession.NaturalDuration.TotalSeconds;
-                sliderControl.SmallChange = 1000 / sender.PlaybackSession.NaturalDuration.TotalSeconds;
-            }
+            if (sliderControl == null || !(sender.PlaybackSession.NaturalDuration.TotalSeconds > 1000)) return;
+
+            // 十秒一步
+            sliderControl.StepFrequency = 1000 / sender.PlaybackSession.NaturalDuration.TotalSeconds;
+            sliderControl.SmallChange = 1000 / sender.PlaybackSession.NaturalDuration.TotalSeconds;
+
+
+            Debug.WriteLine("成功设置进度条");
         });
     }
     
@@ -414,15 +420,18 @@ public sealed partial class CustomMediaPlayerElement
         //记录当前的时间
         var time = MediaControl.MediaPlayer.Position;
 
+        Debug.WriteLine("销毁先前的设置");
         // 先销毁
         if (MediaControl.MediaPlayer.Source is MediaPlaybackList mediaPlaybackList)
         {
             DisposeMediaPlayer(mediaPlaybackList);
         }
 
+        Debug.WriteLine("重新设置播放源");
         // 后重新设置
         SetMediaPlayer();
 
+        Debug.WriteLine("恢复之前的时间");
         //恢复之前的时间
         MediaControl.MediaPlayer.Position = time;
     }
@@ -614,14 +623,13 @@ public sealed partial class CustomMediaPlayerElement
 
     private void OnOnApplyTemplateCompleted(object sender, EventArgs e)
     {
-        mediaTransportControls.InitQuality(Resources["QualityDataTemplate"] as DataTemplate);
+        if(!Resources.TryGetValue("QualityDataTemplate", out var qualityDataTemplateValue) || qualityDataTemplateValue is not DataTemplate qualityDataTemplate) return;
+        if(!Resources.TryGetValue("PlayerDataTemplate", out var playerDataTemplateValue) || playerDataTemplateValue is not DataTemplate playerDataTemplate) return;
 
-        mediaTransportControls.InitPlayer(Resources["PlayerDataTemplate"] as DataTemplate);
+        mediaTransportControls.InitQuality(qualityDataTemplate);
+        mediaTransportControls.InitPlayer(playerDataTemplate);
 
-        if (_allMediaPlayItems.Count > 1)
-        {
-            mediaTransportControls.SetRightButton();
-        }
+        if (_allMediaPlayItems.Count > 1) mediaTransportControls.SetRightButton();
     }
 
     public event EventHandler<RoutedEventArgs> RightButtonClick;
@@ -651,7 +659,6 @@ public sealed partial class CustomMediaPlayerElement
 
         VisualStateManager.GoToState(this, "AdditionalContentShowState", true);
     }
-
 
     private void InitPositionContent()
     {

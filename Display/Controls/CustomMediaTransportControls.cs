@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.UI.Dispatching;
 
 namespace Display.Controls;
@@ -130,8 +131,8 @@ public class CustomMediaTransportControls : MediaTransportControls
         }
     }
 
-    private bool _isHandlerLikeAndLookLaterButton = false;
-    private bool _isHandlerScreenShowButton = false;
+    private bool _isHandlerLikeAndLookLaterButton;
+    private bool _isHandlerScreenShowButton;
 
     public void SetRightButton()
     {
@@ -186,7 +187,6 @@ public class CustomMediaTransportControls : MediaTransportControls
             ScreenShotButton.Click += ScreenShotButton_Click;
             _isHandlerScreenShowButton = true;
         }
-        ;
         ScreenShotButton.Visibility = Visibility.Visible;
     }
 
@@ -200,37 +200,31 @@ public class CustomMediaTransportControls : MediaTransportControls
 
     public void InitQuality(DataTemplate qualityDataTemplate)
     {
-        //画质选择按钮
-        Button qualityButton = GetTemplateChild("QualityButton") as Button;
-        if (qualityButton == null) return;
-        qualityButton.Visibility = Visibility.Visible;
-        
         if (QualityListView == null) return;
-        QualityListView.ItemTemplate = qualityDataTemplate;
 
+        QualityListView.ItemTemplate = qualityDataTemplate;
         QualityListView.SelectionChanged += QualityListView_SelectionChanged;
     }
 
-    private bool isFirstQualityChanged;
-    private bool isSettingQuslitySource;
+    //private bool _isFirstQualityChanged;
+    private bool _isSettingQualitySource;
     public void SetQualityListSource(List<Quality> qualityItemsSource,int qualityIndex)
     {
         if (QualityListView == null) return;
 
-        isFirstQualityChanged = true;
-        isSettingQuslitySource = true;
+        //_isFirstQualityChanged = true;
 
+        _isSettingQualitySource = true;
+
+        var maxIndex = qualityItemsSource.Count - 1;
+        var newIndex = qualityIndex > maxIndex ? maxIndex : qualityIndex;
         QualityListView.ItemsSource = qualityItemsSource;
 
-        int maxIndex = qualityItemsSource.Count - 1;
-        if (qualityIndex > maxIndex)
-        {
-            qualityIndex = maxIndex;
-        }
-        QualityListView.SelectedIndex = qualityIndex;
+        Debug.WriteLine($"正在设置了画质Index:{QualityListView.SelectedIndex}->{newIndex}");
+        QualityListView.SelectedIndex = newIndex;
+        Debug.WriteLine("完成修改QualityListView.SelectedIndex");
 
-        isSettingQuslitySource = false;
-
+        _isSettingQualitySource = false;
     }
 
     public void InitPlayer(DataTemplate qualityDataTemplate)
@@ -252,7 +246,7 @@ public class CustomMediaTransportControls : MediaTransportControls
             new Player(WebApi.PlayMethod.Mpv),
             new Player(WebApi.PlayMethod.Pot)};
 
-        //画质选择列表
+        //播放器选择列表
         playerListView.ItemsSource = playerItemsSource;
         playerListView.SelectionChanged += PlayerListView_SelectionChanged;
     }
@@ -265,13 +259,16 @@ public class CustomMediaTransportControls : MediaTransportControls
 
     private void QualityListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (isFirstQualityChanged)
-        {
-            isFirstQualityChanged = false;
-            return;
-        }
+        //if (_isFirstQualityChanged)
+        //{
+        //    _isFirstQualityChanged = false;
+        //    return;
+        //}
 
-        if (isSettingQuslitySource) return;
+        Debug.WriteLine("画质选项发生改变");
+        if (_isSettingQualitySource) return;
+
+        Debug.WriteLine("点击了切换画质按钮");
 
         QualityChanged?.Invoke(sender, e);
     }

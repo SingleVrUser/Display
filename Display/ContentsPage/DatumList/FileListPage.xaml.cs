@@ -135,7 +135,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         if (filesInfo.Type == FilesInfo.FileType.File) return;
         if (filesInfo.Id == null) return;
 
-        Debug.WriteLine("切换目录");
 
         var id = (long)filesInfo.Id;
 
@@ -144,7 +143,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         // 切换目录时，全选checkBox不是选中状态
         MultipleSelectedCheckBox.IsChecked = false;
 
-        Debug.WriteLine("切换菜单状态");
         ChangedMenuState();
     }
 
@@ -241,7 +239,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private void Source_DragItemsStarting(object sender, DragItemsStartingEventArgs e)
     {
-        Debug.WriteLine("开始拖拽 start");
 
         // 排除缺失Id的文件，比如秒传后临时添加的文件
         var infos = e.Items.Cast<FilesInfo>().Where(x => !x.NoId).ToList();
@@ -256,7 +253,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         // 显示中转站
         TransferStationGrid.Visibility = Visibility.Visible;
 
-        Debug.WriteLine("开始拖拽 finish");
     }
 
     /// <summary>
@@ -266,7 +262,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     /// <param name="e"></param>
     private void TransferStationGrid_Drop(object sender, DragEventArgs e)
     {
-        //Debug.WriteLine("拖拽文件，在中转站上松开");
         if (sender is not Grid) return;
 
         if (e.DataView.Properties.Values.FirstOrDefault() is not List<FilesInfo> sourceFilesInfos) return;
@@ -302,7 +297,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         if (sender is not ListView target) return;
 
-        Debug.WriteLine("拖拽文件不松开 start");
 
         // 应用内的文件拖动
         if (e.DataView.Properties.Values.FirstOrDefault() is List<FilesInfo> sourceFilesInfos)
@@ -318,7 +312,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         VisualStateManager.GoToState(this, "TransferPointerOver", true);
 
-        Debug.WriteLine("拖拽文件不松开 finish");
     }
 
     private void HandleCaption(DragEventArgs e, ListView target, List<FilesInfo> sourceFilesInfos)
@@ -488,7 +481,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         if (sender is not ListView target) return;
 
-        Debug.WriteLine("拖拽文件，在文件列表上松开");
         if (e.DataView.Properties.Values.FirstOrDefault() is List<FilesInfo> sourceFilesInfos)
         {
             await HandleFileDrop(e, target, sourceFilesInfos);
@@ -652,7 +644,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private void Source_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
     {
-        Debug.WriteLine("拖拽完毕 start");
 
         // 隐藏回收站
         RecycleStationGrid.Visibility = Visibility.Collapsed;
@@ -669,7 +660,6 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         // 删除文件列表
         TryRemoveFilesInExplorer(args.Items.Cast<FilesInfo>().ToList());
 
-        Debug.WriteLine("拖拽完毕 finish");
     }
 
     private async void ImportDataButton_Click(object sender, RoutedEventArgs e)
@@ -892,15 +882,16 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         if (sender is not (MenuFlyoutItem { Tag: string aTag } menuFlyoutItem)) return;
         if (!int.TryParse(aTag, out var playerSelection)) return;
 
-        // 多个播放
-        if (menuFlyoutItem.DataContext is null)
-        {
-            if (BaseExample.SelectedItems is null || BaseExample.SelectedItems.Count == 0)
-            {
-                ShowTeachingTip("当前未选中文件");
-                return;
-            }
 
+        if (BaseExample.SelectedItems is null || BaseExample.SelectedItems.Count == 0)
+        {
+            ShowTeachingTip("当前未选中文件");
+            return;
+        }
+
+        // 多个播放
+        if (BaseExample.SelectedItems.Count > 1)
+        {
             //获取需要播放的文件
             var mediaPlayItems = BaseExample.SelectedItems.Cast<FilesInfo>()
                 .Where(x => x.Type == FilesInfo.FileType.Folder || x.IsVideo)

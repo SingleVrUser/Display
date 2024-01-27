@@ -1473,7 +1473,6 @@ namespace Display.Data
             string strResult;
             try
             {
-                Debug.WriteLine("开始获取");
                 strResult = await Client.GetStringAsync($"https://v.anxia.com/site/api/video/m3u8/{pickCode}.m3u8");
             }
             catch (Exception ex)
