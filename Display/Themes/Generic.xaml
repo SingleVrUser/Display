@@ -3073,7 +3073,7 @@
                                                       x:Uid='QualityButton'
                                                       Style='{StaticResource AppBarButtonStyle}'
                                                       MediaTransportControlsHelper.DropoutOrder='11'
-                                                      Visibility="Collapsed">
+                                                      Visibility="Visible">
                                             <AppBarButton.Flyout>
                                                 <Flyout x:Name="QualityFlyout"
                                                         FlyoutPresenterStyle="{StaticResource FlyoutStyle}"
