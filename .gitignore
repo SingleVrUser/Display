@@ -367,4 +367,4 @@ FodyWeavers.xsd
 /Tests/UserInfo.cs
 /Display/Display_TemporaryKey.pfx
 
-!/Display/FFmpeg/bin/x64/*
+!**/avcodec-60.dll
