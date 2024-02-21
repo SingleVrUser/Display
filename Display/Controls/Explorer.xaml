@@ -3,10 +3,11 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Display.Controls"
-    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:uicontrols="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:data="using:Display.Data"
+    xmlns:data="using:Display.Models.Data"
     mc:Ignorable="d">
     <Control.Resources>
         <!--ListView 的 文件 DataTemplate-->
@@ -254,14 +255,10 @@
             </ScrollViewer>
         </Grid>
 
-        <controls:GridSplitter GripperCursor="Default"
-                               HorizontalAlignment="Left"
+        <controls:GridSplitter HorizontalAlignment="Left"
                                Grid.Column="1"
                                ResizeDirection="Columns"
-                               ResizeBehavior="BasedOnAlignment"
-                               CursorBehavior="ChangeOnGripperHover"
-                               Width="5"
-                               Opacity="0.2">
+                               ResizeBehavior="BasedOnAlignment">
             <controls:GridSplitter.RenderTransform>
                 <TranslateTransform X="-15" />
             </controls:GridSplitter.RenderTransform>

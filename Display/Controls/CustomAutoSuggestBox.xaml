@@ -4,15 +4,26 @@
              xmlns:local="using:Display.Controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:data="using:Display.Data"
+             xmlns:data="using:Display.Models.Data"
              mc:Ignorable="d">
 
     <UserControl.Resources>
         <ResourceDictionary>
+            <local:SuggestionBoxItemTemplateSelector
+                x:Key="SuggestionBoxItemTemplateSelector"
+                FoundListDataTemplate="{StaticResource FoundedSuggestionBox}"
+                NotFoundDataTemplate="{StaticResource NotFoundedSuggestionBox}"
+                HistoryDataTemplate="{StaticResource HistorySearchBox}"/>
+
+            <local:ItemsContainerStyleSelector x:Key="AutoSuggestionBoxItemsContainerStyleSelector"
+                                               NoPointerOverStyle="{StaticResource NoPointerOverListViewItemStyle}"/>
             <DataTemplate x:Key="FoundedSuggestionBox"
                           x:DataType="data:VideoInfo">
                 <Grid Margin="5"
-                      ColumnSpacing="5">
+                      ColumnSpacing="5"
+                      Tapped="ItemTapped"
+                      Background="Transparent">
+
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition Width="*" />
@@ -25,7 +36,7 @@
                     </Grid>
                     <StackPanel Grid.Column="1">
                         <TextBlock Text="{x:Bind trueName}"
-                                   TextTrimming="CharacterEllipsis"/>
+                                   TextTrimming="CharacterEllipsis" />
                         <TextBlock Text="{x:Bind Actor}"
                                    TextTrimming="WordEllipsis"
                                    FontWeight="Normal" />
@@ -37,9 +48,27 @@
                 </Grid>
             </DataTemplate>
 
-            <DataTemplate x:Key="notFoundedSuggestionBox"
+            <DataTemplate x:Key="HistorySearchBox"
+                          x:DataType="data:HistorySearchItem">
+                <GridView ItemsSource="{x:Bind KeywordList}"
+                          IsItemClickEnabled="True"
+                          ItemClick="ListViewBase_OnItemClick"
+                          Padding="0"
+                          Margin="0">
+                    <GridView.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <TextBlock Text="{x:Bind}"/>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+            </DataTemplate>
+
+            <DataTemplate x:Key="NotFoundedSuggestionBox"
                           x:DataType="x:String">
-                <TextBlock Text="{x:Bind}" />
+                <Grid Tapped="ItemTapped"
+                      Background="Transparent">
+                    <TextBlock Text="{x:Bind}" />
+                </Grid>
             </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -218,9 +247,13 @@
                             TextChanged="AutoSuggestBox_TextChanged"
                             VerticalAlignment="Center"
                             QuerySubmitted="AutoSuggestBox_QuerySubmitted"
-                            SuggestionChosen="AutoSuggestBox_SuggestionChosen"
                             GotFocus="NavViewSearchBox_GotFocus"
-                            LostFocus="NavViewSearchBox_LostFocus"/>
+                            LostFocus="NavViewSearchBox_LostFocus"
+                            ItemTemplateSelector="{StaticResource SuggestionBoxItemTemplateSelector}"
+                            ItemContainerStyleSelector="{StaticResource AutoSuggestionBoxItemsContainerStyleSelector}"
+                            Style="{StaticResource NoClickAutoSuggestBoxStyle}">
+
+            </AutoSuggestBox>
 
         </StackPanel>
 

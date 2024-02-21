@@ -5,8 +5,8 @@
       xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:data="using:Display.Data"
-      xmlns:helper="using:Display.Helper"
+      xmlns:data="using:Display.Models.Data"
+      xmlns:helper="using:Display.Helper.FileProperties.Name"
       mc:Ignorable="d"
       NavigationCacheMode="Enabled">
 

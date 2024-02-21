@@ -1,19 +1,20 @@
-﻿
-using Display.Data;
-using Display.Helper;
-using Display.Notifications;
-using Display.WindowView;
-using Microsoft.UI;
+﻿using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.IO;
+using Display.CustomWindows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WinRT.Interop;
+using Display.Helper.UI;
+using Display.Models.Data;
+using Display.Helper.Notifications;
 using Display.ViewModels;
-using System.Xml.Linq;
+using ImageViewModel = Display.ViewModels.ImageViewModel;
+using Display.Interfaces;
+using Display.Services;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -28,14 +29,8 @@ namespace Display
         public static Window AppMainWindow;
 
         private static NotificationManager _notificationManager;
-
-        //private static readonly IHost _host = Host.CreateDefaultBuilder().ConfigureServices((_, services) =>
-        //{
-        //    services.AddSingleton<ImageViewModel>();
-
-        //}).Build();
-
-        private static readonly IHost _host = Host
+        
+        private static readonly IHost Host = Microsoft.Extensions.Hosting.Host
             .CreateDefaultBuilder()
             .ConfigureServices((_, services) =>
             {
@@ -43,7 +38,9 @@ namespace Display
                     // Services
                     //.AddSingleton<IThumbnailService, ThumbnailService>()
                     // Views and ViewModels
-                    .AddSingleton<ImageViewModel>();
+                    .AddSingleton<IThumbnailGeneratorService, ThumbnailGeneratorService>()
+                    .AddTransient<ImageViewModel>()
+                    .AddTransient<ThumbnailViewModel>();
             })
             .Build();
 
@@ -58,7 +55,7 @@ namespace Display
 
         public static T GetService<T>() where T : class
         {
-            return _host.Services.GetService(typeof(T)) as T ??
+            return Host.Services.GetService(typeof(T)) as T ??
                    throw new ArgumentException(
                        $"Service {typeof(T)} not found. Did you forget to register the service?");
         }
@@ -122,9 +119,11 @@ namespace Display
             //数据存放目录不存在
             if (!Directory.Exists(dataAccessSavePath))
             {
-                CommonWindow window1 = new();
-                window1.Content = new TextBlock() { Text = $"数据文件存放目录不存在，请检查：{dataAccessSavePath}", IsTextSelectionEnabled = true, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
-                window1.Title = "出错";
+                CommonWindow window1 = new()
+                {
+                    Content = new TextBlock { Text = $"数据文件存放目录不存在，请检查：{dataAccessSavePath}", IsTextSelectionEnabled = true, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center },
+                    Title = "出错"
+                };
                 window1.Activate();
 
                 isNormal = false;

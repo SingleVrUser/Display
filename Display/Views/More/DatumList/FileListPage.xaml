@@ -1,0 +1,645 @@
+﻿<!-- Copyright (c) Microsoft Corporation and Contributors. -->
+<!-- Licensed under the MIT License. -->
+
+<Page x:Class="Display.Views.More.DatumList.FileListPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:behaviors="using:CommunityToolkit.WinUI.UI.Behaviors"
+      xmlns:local="using:Display.Views.More.DatumList"
+      xmlns:customizeControls="using:Display.Controls"
+      xmlns:data="using:Display.Models.Data"
+      xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+      mc:Ignorable="d">
+    <Page.Resources>
+        <Style TargetType="TextBlock"
+               x:Key="TitleText">
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Center" />
+            <Setter Property="FontWeight"
+                    Value="Light" />
+        </Style>
+
+        <Style TargetType="TextBlock"
+               x:Key="ValueText">
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Center" />
+            <Setter Property="TextTrimming"
+                    Value="CharacterEllipsis" />
+        </Style>
+
+        <DataTemplate x:Key="TransferStationTemplate"
+                      x:DataType="local:TransferStationFiles">
+            <Grid Padding="5">
+                <TextBlock Text="{x:Bind Name}"
+                           MaxWidth="120"
+                           TextWrapping="Wrap" />
+            </Grid>
+        </DataTemplate>
+
+
+        <DataTemplate x:Key="SearchListTemplate"
+                      x:DataType="data:FilesInfo">
+            <Grid Background="Transparent"
+                  ColumnDefinitions="*">
+                <Grid.ContextFlyout>
+                    <MenuFlyout ShouldConstrainToRootBounds="False">
+                        <MenuFlyoutItem Text="打开所在文件夹"
+                                        Click="OpenFolderInSearchResult_ItemClick">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe Fluent Icons"
+                                          Glyph="&#xE946;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </Grid.ContextFlyout>
+
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Image Height="30"
+                           Width="30">
+                        <Image.Source>
+                            <SvgImageSource UriSource="{x:Bind IconPath}"
+                                            RasterizePixelWidth="35"
+                                            RasterizePixelHeight="30" />
+                        </Image.Source>
+                    </Image>
+
+                    <TextBlock Grid.Column="1"
+                               Text="{x:Bind Name}"
+                               Style="{StaticResource ValueText}"
+                               Tapped="OpenFolder_Tapped"
+                               HorizontalAlignment="Left" />
+                </Grid>
+
+                <!--<TextBlock  Grid.Column="1"
+                            Text="{x:Bind Time,Converter={StaticResource NumberToDateTimeStrConverter}}"
+                            Style="{StaticResource ValueText}" />
+
+                <TextBlock  Grid.Column="2"
+                            Text="{x:Bind Size,Converter={StaticResource BytesToSizeStrConverter}}"
+                            Style="{StaticResource ValueText}" />-->
+            </Grid>
+        </DataTemplate>
+
+
+        <DataTemplate x:Key="FileListTemplate"
+                      x:DataType="data:FilesInfo">
+            <Grid Background="Transparent"
+                  ColumnDefinitions="*,140,70">
+                <Grid.ContextFlyout>
+                    <MenuFlyout ShouldConstrainToRootBounds="False">
+                        <MenuFlyoutSubItem Text="在其他应用播放"
+                                           IsEnabled="{x:Bind Datum.Iv, Converter={StaticResource IsVideoToBoolConverter}}">
+                            <MenuFlyoutSubItem.Icon>
+                                <FontIcon Glyph="&#xEE4A;" />
+                            </MenuFlyoutSubItem.Icon>
+
+                            <MenuFlyoutItem Text="WebView"
+                                            Tag="0"
+                                            Click="PlayWithPlayerButtonClick" />
+
+                            <MenuFlyoutItem Text="PotPlayer"
+                                            Tag="1"
+                                            Click="PlayWithPlayerButtonClick" />
+
+                            <MenuFlyoutItem Text="mpv"
+                                            Tag="2"
+                                            Click="PlayWithPlayerButtonClick" />
+
+                            <MenuFlyoutItem Text="vlc"
+                                            Tag="3"
+                                            Click="PlayWithPlayerButtonClick" />
+
+                            <MenuFlyoutItem Text="MediaElement"
+                                            Tag="4"
+                                            Click="PlayWithPlayerButtonClick" />
+
+                        </MenuFlyoutSubItem>
+
+                        <MenuFlyoutItem Text="移动到新文件夹"
+                                        Click="MoveToNewFolderItemClick">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe Fluent Icons"
+                                          Glyph="&#xE8DE;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+
+                        <MenuFlyoutItem Text="重命名"
+                                        Click="RenameItemClick">
+                            <MenuFlyoutItem.Icon>
+                                <SymbolIcon Symbol="Rename" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+
+                        <MenuFlyoutItem Text="属性"
+                                        Click="ShowInfoClick">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon FontFamily="Segoe Fluent Icons"
+                                          Glyph="&#xE946;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+
+                    </MenuFlyout>
+                </Grid.ContextFlyout>
+
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Image Height="30"
+                           Width="30">
+                        <Image.Source>
+                            <SvgImageSource UriSource="{x:Bind IconPath,Mode=OneWay}"
+                                            RasterizePixelWidth="35"
+                                            RasterizePixelHeight="30" />
+                        </Image.Source>
+                    </Image>
+
+                    <TextBlock Grid.Column="1"
+                               Text="{x:Bind Name,Mode=OneWay}"
+                               Style="{StaticResource ValueText}"
+                               HorizontalAlignment="Left" />
+                </Grid>
+
+                <TextBlock  Grid.Column="1"
+                            Text="{x:Bind Time,Converter={StaticResource NumberToDateTimeStrConverter}}"
+                            Style="{StaticResource ValueText}" />
+
+                <TextBlock  Grid.Column="2"
+                            Text="{x:Bind Size,Converter={StaticResource BytesToSizeStrConverter}}"
+                            Style="{StaticResource ValueText}" />
+
+                <Border Grid.Column="0"
+                        HorizontalAlignment="Right"
+                        Padding="5"
+                        CornerRadius="5"
+                        Visibility="{x:Bind NoId,Converter={StaticResource BoolToVisibleConverter}}">
+                    <Border.Background>
+                        <SolidColorBrush Color="{ThemeResource SystemChromeAltHighColor}"
+                                         Opacity="0.8" />
+                    </Border.Background>
+                    <TextBlock VerticalAlignment="Center"
+                               Text="id 缺失，刷新后补全" />
+                </Border>
+            </Grid>
+        </DataTemplate>
+
+        <Style TargetType="Grid"
+               x:Key="TempGridStyle">
+            <Setter Property="CornerRadius"
+                    Value="10" />
+            <Setter Property="BorderThickness"
+                    Value="0.5" />
+            <Setter Property="BorderBrush"
+                    Value="{StaticResource ControlElevationBorderBrush}" />
+            <Setter Property="Padding"
+                    Value="0,10,0,0" />
+            <Setter Property="RowSpacing"
+                    Value="5" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Right" />
+            <Setter Property="Background"
+                    Value="Transparent" />
+        </Style>
+
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="RecycleStates">
+                <VisualState x:Name="NoDelete" />
+
+                <VisualState x:Name="ReadyDelete">
+                    <VisualState.Setters>
+                        <Setter Target="RecycleTextBlock.Foreground"
+                                Value="Red" />
+                        <Setter Target="RecycleFontIcon.Foreground"
+                                Value="Red" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+
+            <VisualStateGroup x:Name="TransferStates">
+                <VisualState x:Name="TransferNormal" />
+
+                <VisualState x:Name="TransferPointerOver">
+                    <VisualState.Setters>
+                        <Setter Target="TransferStationGrid.Background"
+                                Value="WhiteSmoke" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+
+            <VisualStateGroup x:Name="ButtonState">
+                <VisualState x:Name="Hidden" />
+                <VisualState x:Name="Show">
+                    <VisualState.Setters>
+                        <Setter Target="PlayButton.Visibility"
+                                Value="Visible" />
+                        <Setter Target="ImportButton.Visibility"
+                                Value="Visible" />
+                        <Setter Target="DownloadButton.Visibility"
+                                Value="Visible" />
+                        <!--<Setter Target="GetThumbnailButton.Visibility"
+                                Value="Visible" />-->
+                        <!--<Setter Target="SortButton.Visibility"
+                                Value="Visible" />-->
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+
+
+
+        </VisualStateManager.VisualStateGroups>
+
+        <!--进度条-->
+        <ProgressBar Grid.Row="0"
+                     x:Name="MyProgressBar"
+                     VerticalAlignment="Top"
+                     Visibility="Collapsed"
+                     IsIndeterminate="True" />
+
+        <Grid Grid.Row="0"
+              KeyboardAcceleratorPlacementMode="Hidden">
+            <Grid.KeyboardAccelerators>
+                <KeyboardAccelerator Key="Left"
+                                     Modifiers="Control"
+                                     Invoked="GoBack_KeyboardAccelerator_Invoked" />
+                <KeyboardAccelerator Key="R"
+                                     Modifiers="Control"
+                                     Invoked="Refresh_KeyboardAccelerator_Invoked" />
+            </Grid.KeyboardAccelerators>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+
+            <CommandBar Grid.Column="1">
+                <CommandBar.Transitions>
+                    <EdgeUIThemeTransition Edge="Right" />
+                </CommandBar.Transitions>
+
+                <AppBarButton x:Name="PlayButton"
+                              Icon="Play"
+                              Label="播放"
+                              Visibility="Collapsed"
+                              Click="PlayButton_Click">
+                    <AppBarButton.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="在默认应用播放"
+                                            Click="PlayVideoButton_Click">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xEE4A;" />
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+
+                            <MenuFlyoutSubItem Text="在其他应用播放">
+                                <MenuFlyoutSubItem.Icon>
+                                    <FontIcon Glyph="&#xEE4A;" />
+                                </MenuFlyoutSubItem.Icon>
+
+                                <MenuFlyoutItem Text="WebView"
+                                                Tag="0"
+                                                Click="PlayWithPlayerButtonClick" />
+
+                                <MenuFlyoutItem Text="PotPlayer"
+                                                Tag="1"
+                                                Click="PlayWithPlayerButtonClick" />
+
+                                <MenuFlyoutItem Text="mpv"
+                                                Tag="2"
+                                                Click="PlayWithPlayerButtonClick" />
+
+                                <MenuFlyoutItem Text="vlc"
+                                                Tag="3"
+                                                Click="PlayWithPlayerButtonClick" />
+
+                                <MenuFlyoutItem Text="MediaElement"
+                                                Tag="4"
+                                                Click="PlayWithPlayerButtonClick" />
+
+                            </MenuFlyoutSubItem>
+                        </MenuFlyout>
+                    </AppBarButton.ContextFlyout>
+                </AppBarButton>
+                <AppBarButton x:Name="ImportButton"
+                              Icon="Import"
+                              Label="导入"
+                              Visibility="Collapsed"
+                              Click="ImportDataButton_Click" />
+                <AppBarButton x:Name="DownloadButton"
+                              Icon="Download"
+                              Label="下载"
+                              Visibility="Collapsed"
+                              Click="DownButton_Click"
+                              ToolTipService.ToolTip="点击使用比特彗星下载，右键选择更多下载方式">
+                    <AppBarButton.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="115浏览器下载"
+                                            Click="Browser115Down_Click" />
+                            <MenuFlyoutItem Text="Aria2下载"
+                                            Click="Aria2Down_Click" />
+                        </MenuFlyout>
+                    </AppBarButton.ContextFlyout>
+                </AppBarButton>
+
+                <AppBarButton Icon="Find"
+                              Label="搜索"
+                              Click="SearchButton_Click">
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control"
+                                             Key="F"
+                                             Invoked="SearchBoxInvoked" />
+                    </AppBarButton.KeyboardAccelerators>
+                </AppBarButton>
+
+                <AppBarButton x:Name="GetThumbnailButton"
+                              Label="缩略图"
+                              Visibility="Collapsed"
+                              Click="GetThumbnailButton_Click">
+                    <FontIcon FontFamily="Segoe Fluent Icons"
+                              Glyph="&#xE7C5;" />
+                </AppBarButton>
+
+                <CommandBar.SecondaryCommands>
+                    <AppBarButton Visibility="Collapsed"
+                                  Icon="Sort"
+                                  Label="整理"
+                                  Click="Sort115Button_Click" />
+                    <AppBarButton Icon="Setting"
+                                  Label="设置">
+                        <AppBarButton.Flyout>
+                            <Flyout>
+                                <StackPanel>
+                                    <ToggleSwitch IsOn="{x:Bind data:StaticData.isJumpExistsFolder,Mode=TwoWay}"
+                                                  Header="是否跳过已导入文件夹（修改时间一致）"
+                                                  OnContent="跳过"
+                                                  OffContent="不跳过" />
+                                    <HyperlinkButton Content="清空已存数据"
+                                                     Click="deleteData_Click"
+                                                     HorizontalAlignment="Right"
+                                                     Opacity="0.5" />
+                                </StackPanel>
+                            </Flyout>
+                        </AppBarButton.Flyout>
+                    </AppBarButton>
+
+                </CommandBar.SecondaryCommands>
+            </CommandBar>
+
+            <BreadcrumbBar x:Name="MetadataControl"
+                           Margin="10,5"
+                           Grid.Column="0"
+                           ItemClicked="FolderBreadcrumbBar_ItemClicked">
+                <BreadcrumbBar.Transitions>
+                    <EdgeUIThemeTransition Edge="Bottom" />
+                </BreadcrumbBar.Transitions>
+
+                <BreadcrumbBar.ItemTemplate>
+                    <DataTemplate x:DataType="data:ExplorerItem">
+                        <BreadcrumbBarItem Content="{Binding}">
+                            <BreadcrumbBarItem.ContentTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}"
+                                               AllowDrop="True"
+                                               DragOver="MetadataItem_OnDragOver"
+                                               Drop="MetadataItem_OnDrop">
+                                        <TextBlock.ContextFlyout>
+                                            <MenuFlyout>
+                                                <MenuFlyoutItem Text="刷新"
+                                                                Click="RefreshFolderClick"
+                                                                Icon="Refresh" />
+
+                                                <MenuFlyoutItem Text="属性"
+                                                                Click="ShowFolderInfoClick">
+                                                    <MenuFlyoutItem.Icon>
+                                                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                                                  Glyph="&#xE946;" />
+                                                    </MenuFlyoutItem.Icon>
+                                                </MenuFlyoutItem>
+                                            </MenuFlyout>
+                                        </TextBlock.ContextFlyout>
+
+                                    </TextBlock>
+                                </DataTemplate>
+                            </BreadcrumbBarItem.ContentTemplate>
+                        </BreadcrumbBarItem>
+                    </DataTemplate>
+                </BreadcrumbBar.ItemTemplate>
+            </BreadcrumbBar>
+
+        </Grid>
+
+        <ListView x:Name="BaseExample"
+                  Grid.Row="1"
+                  ItemTemplate="{StaticResource FileListTemplate}"
+                  SelectionChanged="BaseExample_OnSelectionChanged"
+                  SelectionMode="Multiple"
+                  CanDragItems="True"
+                  DragItemsStarting="Source_DragItemsStarting"
+                  DragItemsCompleted="Source_DragItemsCompleted"
+                  Drop="BaseExample_Drop"
+                  DragOver="FileMove_DragOver"
+                  AllowDrop="True">
+
+            <interactivity:Interaction.Behaviors>
+                <behaviors:QuickReturnHeaderBehavior />
+            </interactivity:Interaction.Behaviors>
+
+            <ListView.Header>
+                <Grid MinHeight="30"
+                      Background="{ThemeResource LayerFillColorDefaultBrush}"
+                      ColumnDefinitions="44,*,140,70,12">
+
+                    <CheckBox x:Name="MultipleSelectedCheckBox"
+                              Margin="14,0,0,0"
+                              Click="SelectedMultipleFilesCheckBox_OnClick" />
+
+                    <TextBlock Grid.Row="0"
+                               Grid.Column="1"
+                               Style="{StaticResource TitleText}"
+                               Tapped="OrderBy_Tapped">
+                                <Run>名称</Run>
+                                <Run x:Name="NameRun"
+                                     FontFamily="Segoe Fluent Icons"></Run>
+                    </TextBlock>
+
+                    <TextBlock Style="{StaticResource TitleText}"
+                               Grid.Column="2"
+                               Tapped="OrderBy_Tapped">
+                            <Run>修改时间</Run>
+                            <Run x:Name="TimeRun"
+                                 FontFamily="Segoe Fluent Icons"
+                                 Text="&#xE015;"></Run>
+                    </TextBlock>
+
+                    <TextBlock Style="{StaticResource TitleText}"
+                               Grid.Column="3"
+                               Tapped="OrderBy_Tapped">
+                            <Run>大小</Run>
+                            <Run x:Name="SizeRun"
+                                 FontFamily="Segoe Fluent Icons"></Run>
+                    </TextBlock>
+                </Grid>
+            </ListView.Header>
+        </ListView>
+
+        <Grid Grid.Row="1"
+              BorderThickness="0,1,0,0"
+              BorderBrush="{StaticResource CircleElevationBorderBrush}">
+
+            <!--数量指示-->
+            <customizeControls:ShowCountControl Margin="2"
+                                                CurrentCount="{x:Bind FilesInfos.Count,Mode=OneWay}"
+                                                AllCount="{x:Bind FilesInfos.AllCount,Mode=OneWay}"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Bottom"
+                                                Clicked="ToTopButton_Click" />
+
+            <!--回收站-->
+            <Grid Margin="10,30,10,45"
+                  RowSpacing="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="1"
+                      x:Name="RecycleStationGrid"
+                      Visibility="Collapsed"
+                      Style="{StaticResource TempGridStyle}"
+                      Width="80"
+                      Height="70"
+                      AllowDrop="True"
+                      Drop="RecycleStationGrid_Drop"
+                      DragOver="DeletedFileMove_DragOver"
+                      DragEnter="RecycleStationGrid_DragEnter"
+                      DragLeave="RecycleStationGrid_DragLeave"
+                      Background="WhiteSmoke">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock x:Name="RecycleTextBlock"
+                               Text="回收站"
+                               HorizontalAlignment="Center"
+                               Foreground="Gray" />
+                    <FontIcon x:Name="RecycleFontIcon"
+                              FontFamily="Segoe Fluent Icons"
+                              Glyph="&#xE107;"
+                              Grid.Row="1" />
+                </Grid>
+            </Grid>
+
+            <!--中转站-->
+            <Grid x:Name="TransferStationGrid"
+                  Visibility="Collapsed"
+                  Background="{ThemeResource LayerFillColorDefaultBrush}"
+                  Style="{StaticResource TempGridStyle}"
+                  AllowDrop="True"
+                  DragOver="TransferMove_DragOver"
+                  Drop="TransferStationGrid_Drop"
+                  PointerEntered="TransferStationGrid_OnPointerEntered"
+                  PointerExited="TransferStationGrid_OnPointerExited"
+                  VerticalAlignment="Bottom"
+                  HorizontalAlignment="Stretch"
+                  Margin="100,5"
+                  Padding="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="*"
+                                   MinHeight="30" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="中转站"
+                           Foreground="Gray"
+                           VerticalAlignment="Top" />
+
+                <HyperlinkButton Grid.Row="0"
+                                 Content="清空"
+                                 HorizontalAlignment="Right"
+                                 VerticalAlignment="Top"
+                                 Click="EmptyTransferStationButton_Click" />
+
+                <ListView x:Name="TransferStationListView"
+                          Grid.Row="1"
+                          ItemTemplate="{StaticResource TransferStationTemplate}"
+                          ItemsSource="{x:Bind _transferStationFiles}"
+                          SelectionMode="Multiple"
+                          CanDragItems="True"
+                          ScrollViewer.HorizontalScrollMode="Enabled"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          ScrollViewer.VerticalScrollMode="Disabled"
+                          ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                          DragItemsStarting="FilesTransferStation_DragItemsStarting"
+                          DragItemsCompleted="TransferStationListView_OnDragItemsCompleted">
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsStackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                </ListView>
+
+            </Grid>
+        </Grid>
+
+        <TeachingTip Grid.Row="1"
+                     x:Name="LightDismissTeachingTip"
+                     IsLightDismissEnabled="True" />
+
+        <TextBlock Grid.Row="1"
+                   Margin="0,30,0,0"
+                   Text="暂无文件"
+                   Visibility="{x:Bind FilesInfos.IsNull,Mode=OneWay}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontSize="30"
+                   Opacity="0.5" />
+
+        <!--搜索结果-->
+        <TeachingTip x:Name="SearchTeachingTip"
+                     Grid.Row="0"
+                     Grid.Column="0"
+                     IsLightDismissEnabled="True"
+                     Closed="SearchTeachingTip_OnClosed"
+                     PreferredPlacement="Top">
+            <TeachingTip.Content>
+                <Grid RowDefinitions="auto,*"
+                      MaxHeight="400"
+                      RowSpacing="10">
+                    <AutoSuggestBox x:Name="SearchBox"
+                                    PlaceholderText="搜索"
+                                    Width="620"
+                                    QueryIcon="Find"
+                                    QuerySubmitted="SearchBoxOnQuerySubmitted" />
+
+                    <ListView x:Name="SearchResultListView"
+                              Grid.Row="1"
+                              ItemTemplate="{StaticResource SearchListTemplate}"
+                              SelectionMode="None"
+                              IsItemClickEnabled="True"
+                              ItemClick="SearchResultListView_OnItemClick" />
+                </Grid>
+            </TeachingTip.Content>
+        </TeachingTip>
+    </Grid>
+</Page>

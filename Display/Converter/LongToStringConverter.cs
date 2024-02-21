@@ -1,6 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Data;
 using System;
-using Display.Data;
+using Display.Models.Data;
 
 namespace Display.Converter;
 

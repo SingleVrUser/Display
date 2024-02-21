@@ -1,7 +1,4 @@
-﻿using Display.Data;
-using Display.Helper.Encode;
-using Display.Services;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -9,8 +6,10 @@ using System.Threading.Tasks;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Media.Streaming.Adaptive;
+using Display.Helper.Encode;
+using Display.Models.Data;
 
-namespace Display.Models
+namespace Display.Services
 {
     public class MediaPlayerWithStreamSource
     {

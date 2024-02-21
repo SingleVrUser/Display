@@ -1,16 +1,16 @@
-﻿using Display.Data;
-using Microsoft.UI.Xaml.Data;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Display.Extensions;
+using Display.Models.Data;
+using Microsoft.UI.Xaml.Data;
 using SharpCompress;
-using System.Threading;
 
-namespace Display.Models.IncrementalCollection;
+namespace Display.Services.IncrementalCollection;
 
 public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, ISupportIncrementalLoading
 {

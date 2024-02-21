@@ -13,10 +13,9 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Display.Data;
-using Display.Models.IncrementalCollection;
 using Display.Services.IncrementalCollection;
 using SharpCompress;
+using Display.Models.Data;
 
 namespace Display.Controls;
 
@@ -544,7 +543,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     private void OrderSuccessListView_ItemClick(object sender, ItemClickEventArgs e)
     {
         ListView selectListView = (ListView)sender;
-        var clickStackPanel = (e.ClickedItem as StackPanel);
+        var clickStackPanel = e.ClickedItem as StackPanel;
         var selectTextBlock = clickStackPanel.Children.First(x => x is TextBlock) as TextBlock;
         string selectOrderText = selectTextBlock.Text;
 

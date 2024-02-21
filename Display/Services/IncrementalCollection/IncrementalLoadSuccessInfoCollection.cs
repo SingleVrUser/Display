@@ -1,13 +1,13 @@
-﻿using Display.Data;
-using Microsoft.UI.Xaml.Data;
-using SharpCompress;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Display.Models.Data;
+using Microsoft.UI.Xaml.Data;
+using SharpCompress;
 
-namespace Display.Models.IncrementalCollection;
+namespace Display.Services.IncrementalCollection;
 
 public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCoverDisplayClass>, ISupportIncrementalLoading
 {
@@ -32,6 +32,11 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
 
     public bool HasMoreItems { get; set; } = true;
 
+    public IncrementalLoadSuccessInfoCollection()
+    {
+
+    }
+
     public IncrementalLoadSuccessInfoCollection(double imgWidth, double imgHeight)
     {
         SetImageSize(imgWidth, imgHeight);
@@ -52,7 +57,6 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
         AllCount = successCount + failCount;
 
         newItems?.ForEach(item => Add(new VideoCoverDisplayClass(item, ImageWidth, ImageHeight)));
-
     }
 
     public void SetImageSize(double imgWidth, double imgHeight)

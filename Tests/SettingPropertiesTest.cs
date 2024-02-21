@@ -1,4 +1,4 @@
-﻿using Display.Data;
+﻿using Display.Models.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;

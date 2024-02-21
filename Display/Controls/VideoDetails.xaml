@@ -5,7 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
              xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-             xmlns:helper="using:Display.Helper"
+             xmlns:helper="using:Display.Helper.FileProperties.Name"
              mc:Ignorable="d">
 
     <Grid BorderThickness="0,1,0,0"

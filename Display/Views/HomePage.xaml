@@ -3,7 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:local="using:Display.Views"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:data="using:Display.Data"
+      xmlns:data="using:Display.Models.Data"
       xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:customecontrol="using:Display.Controls"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -57,12 +57,12 @@
                     </Grid.RowDefinitions>
                     <RelativePanel Margin="10,0,10,0">
                         <TextBlock Grid.Row="0"
-                                   Text="随机10部"
+                                   Text="随机视频"
                                    FontSize="20"
                                    FontWeight="Bold"
                                    RelativePanel.AlignVerticalCenterWithPanel="True" />
 
-                        <HyperlinkButton Width="45"
+                        <!--<HyperlinkButton Width="45"
                                          Height="45"
                                          x:Name="RefreshHyperlinkButton"
                                          RelativePanel.AlignRightWithPanel="True"
@@ -76,7 +76,7 @@
                             </HyperlinkButton.KeyboardAccelerators>
                             <SymbolIcon Symbol="Refresh"
                                         Opacity="0.2" />
-                        </HyperlinkButton>
+                        </HyperlinkButton>-->
                     </RelativePanel>
 
                     <Grid x:Name="mainImageShowGrid"
@@ -95,7 +95,7 @@
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <FlipView x:Name="randomImageFlipView"
-                                      ItemsSource="{x:Bind Items, Mode=OneWay}"
+                                      ItemsSource="{x:Bind _items}"
                                       Background="Transparent">
                                 <FlipView.ItemTemplate>
                                     <DataTemplate x:DataType="data:VideoInfo">
@@ -113,16 +113,16 @@
                                 </FlipView.ItemTemplate>
                             </FlipView>
 
-                            <PipsPager x:Name="ImagePipsPager"
+                            <!--<PipsPager x:Name="ImagePipsPager"
                                        Grid.Row="1"
                                        HorizontalAlignment="Center"
-                                       NumberOfPages="{x:Bind Items.Count}"
-                                       DataContext="{x:Bind randomImageFlipView}" />
+                                       NumberOfPages="{x:Bind _items.Count}"
+                                       DataContext="{x:Bind randomImageFlipView}" />-->
                         </Grid>
 
                         <ListView x:Name="videoInfoListView"
                                   Grid.Column="1"
-                                  ItemsSource="{x:Bind Items, Mode=OneWay}"
+                                  ItemsSource="{x:Bind _items}"
                                   SelectedIndex="{x:Bind randomImageFlipView.SelectedIndex, Mode=TwoWay}"
                                   SelectionChanged="videoInfoListView_SelectionChanged">
                             <ListView.ItemTemplate>
@@ -162,14 +162,14 @@
 
             <customecontrol:MultipleCoverShow Grid.Row="1"
                                               ShowName="最新视频"
-                                              CoverList="{x:Bind recentCoverList}"
+                                              CoverList="{x:Bind _recentCoverList}"
                                               ItemClick="MultipleCoverShow_ItemClick"
                                               RefreshButtonVisibility="Visible"
                                               RefreshClick="RefreshNewestVideoButtonClick"/>
 
             <customecontrol:MultipleCoverShow Grid.Row="2"
                                               ShowName="喜欢视频"
-                                              CoverList="{x:Bind LoveCoverList}"
+                                              CoverList="{x:Bind _loveCoverList}"
                                               ItemClick="MultipleCoverShow_ItemClick"
                                               MoreClick="MoreLikeVideoClick"
                                               MoreButtonVisibility="Visible"
@@ -178,7 +178,7 @@
 
             <customecontrol:MultipleCoverShow Grid.Row="3"
                                               ShowName="稍后观看"
-                                              CoverList="{x:Bind lookLaterList}"
+                                              CoverList="{x:Bind _lookLaterList}"
                                               ItemClick="MultipleCoverShow_ItemClick"
                                               MoreClick="MoreLookLaterVideoClick"
                                               MoreButtonVisibility="Visible"

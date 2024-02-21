@@ -8,7 +8,7 @@
     xmlns:local="using:Display.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:models="using:Display.Models"
+    xmlns:models="using:Display.Models.Media"
     mc:Ignorable="d">
 
     <UserControl.Resources>
@@ -136,12 +136,7 @@
                      PlacementMargin="0,5,-22,0"/>
 
         <Border x:Name="AdditionalContentBorder"
-                HorizontalAlignment="Right"
-                Background="#60000000"
-                VerticalAlignment="Top"
-                Margin="30,20"
-                CornerRadius="10"
-                Padding="10,4"
+                Style="{StaticResource AdditionalContentBorder}"
                 Visibility="Collapsed">
 
             <TextBlock x:Name="AdditionalTextBlock"

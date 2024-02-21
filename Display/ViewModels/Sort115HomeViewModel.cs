@@ -1,22 +1,21 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Display.ContentsPage.Sort115;
-using Display.Data;
-using Display.Helper;
-using Display.Models;
-using Microsoft.UI.Xaml;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Display.Helper.FileProperties.Name;
+using Display.Models.Data;
+using Microsoft.UI.Xaml;
+using Settings18Page = Display.Views.Sort115.Settings18Page;
 
 namespace Display.ViewModels
 {
     public partial class Sort115HomeViewModel : ObservableObject
     {
-        public ObservableCollection<Sort115HomeModel> SelectedFiles = new();
-        private readonly Sort115Settings _settings = Settings18Page.Settings;
+        public ObservableCollection<Models.Disk._115.Sort115HomeModel> SelectedFiles = new();
+        private readonly Models.Disk._115.Sort115Settings _settings = Settings18Page.Settings;
         private readonly WebApi _webApi = WebApi.GlobalWebApi;
 
         private const string StartName = "开始";
@@ -34,7 +33,7 @@ namespace Display.ViewModels
         {
             foreach (var info in files.Where(info => info is { Type: FilesInfo.FileType.File }).OrderBy(info=>info.Type))
             {
-                SelectedFiles.Add(new Sort115HomeModel(info));
+                SelectedFiles.Add(new Models.Disk._115.Sort115HomeModel(info));
             }
 
             SelectedFiles.CollectionChanged += SelectedFilesCollectionChanged;
@@ -85,8 +84,8 @@ namespace Display.ViewModels
         private async Task StartRenameAndMove()
         {
             var infos = SelectedFiles.ToArray();
-            var singleInfoList = new List<Sort115HomeModel>();
-            var multipleList = new Dictionary<string, List<Sort115HomeModel>>();
+            var singleInfoList = new List<Models.Disk._115.Sort115HomeModel>();
+            var multipleList = new Dictionary<string, List<Models.Disk._115.Sort115HomeModel>>();
 
             // 正式开始整理
             foreach (var info in infos)
@@ -133,7 +132,7 @@ namespace Display.ViewModels
                     }
                     else
                     {
-                        multipleList[destinationPath] = new List<Sort115HomeModel> { info };
+                        multipleList[destinationPath] = new List<Models.Disk._115.Sort115HomeModel> { info };
                     }
                 }
             }
@@ -179,7 +178,7 @@ namespace Display.ViewModels
         {
             var infos = SelectedFiles.ToArray();
 
-            var tmpTaskList = new Dictionary<string, List<Sort115HomeModel>>();
+            var tmpTaskList = new Dictionary<string, List<Models.Disk._115.Sort115HomeModel>>();
 
             // 整理预览
             foreach (var info in infos)
@@ -202,7 +201,7 @@ namespace Display.ViewModels
                 }
                 else
                 {
-                    tmpTaskList[matchName] = new List<Sort115HomeModel> { info };
+                    tmpTaskList[matchName] = new List<Models.Disk._115.Sort115HomeModel> { info };
                 }
             }
 

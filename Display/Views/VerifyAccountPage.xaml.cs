@@ -6,7 +6,8 @@ using Microsoft.UI.Xaml.Controls;
 using Newtonsoft.Json;
 using System;
 using System.IO;
-using Display.Data;
+using Display.Models.Data;
+using Display.Models.Disk._115;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -22,12 +23,12 @@ namespace Display.Views
 
         public bool IsSucceeded;
 
-        private readonly Window _currentWindow;
+        private readonly Microsoft.UI.Xaml.Window _currentWindow;
 
         //private string sign;
 
 
-        public VerifyAccountPage(Window window)
+        public VerifyAccountPage(Microsoft.UI.Xaml.Window window)
         {
             this.InitializeComponent();
 
@@ -70,7 +71,7 @@ namespace Display.Views
             using TextReader tr = new StreamReader(content);
             var re = await tr.ReadToEndAsync();
 
-            var result = JsonConvert.DeserializeObject<Models.VerifyAccountResult>(re);
+            var result = JsonConvert.DeserializeObject<VerifyAccountResult>(re);
 
             // TODO 在添加任务的异常中可用，但在播放m3u8视频的异常中无效
             if (result is not { state: true }) return;

@@ -7,18 +7,15 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Display.Data;
 using Display.Helper;
 using Microsoft.Data.Sqlite;
 using Microsoft.UI.Xaml.Input;
+using Display.Models.Data;
 
 namespace Display.Controls
 {
     public sealed partial class Explorer : UserControl
     {
-        ObservableCollection<ExplorerItem> TreeViewDataSource;
-        ObservableCollection<ExplorerItem> SelectFolderName;
-        ObservableCollection<FilesInfo> FileInSelectFolder;
 
         public static readonly DependencyProperty FileMenuFlyoutProperty =
             DependencyProperty.Register(nameof(FileMenuFlyout), typeof(MenuFlyout), typeof(Explorer), null);
@@ -28,6 +25,10 @@ namespace Display.Controls
             get => (MenuFlyout)GetValue(FileMenuFlyoutProperty);
             set => SetValue(FileMenuFlyoutProperty, value);
         }
+
+        ObservableCollection<ExplorerItem> TreeViewDataSource;
+        ObservableCollection<ExplorerItem> SelectFolderName;
+        ObservableCollection<FilesInfo> FileInSelectFolder;
 
         //存储获取过的Datum，避免重复获取
         List<StoreDatum> StoreDataList = new();
@@ -621,9 +622,7 @@ namespace Display.Controls
         protected override DataTemplate SelectTemplateCore(object item)
         {
             var explorerItem = (ExplorerItem)(item as TreeViewNode).Content;
-            if (explorerItem.Type == FilesInfo.FileType.Folder) return FolderTemplate;
-
-            return FileTemplate;
+            return explorerItem.Type == FilesInfo.FileType.Folder ? FolderTemplate : FileTemplate;
         }
     }
 

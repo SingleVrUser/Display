@@ -1,7 +1,9 @@
-﻿using Display.WindowView;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.ObjectModel;
+using Display.CustomWindows;
+using Display.Views.More;
+using Display.Views.More.DatumList;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -70,10 +72,10 @@ namespace Display.Views
             switch (clickItem?.Name)
             {
                 case "搜刮信息":
-                    CommonWindow.CreateAndShowWindow(new ContentsPage.SpiderVideoInfo.MainPage());
+                    CommonWindow.CreateAndShowWindow(new SpiderVideoInfo.MainPage());
                     break;
                 case "计算Sha1":
-                    CommonWindow.CreateAndShowWindow(new ContentsPage.CalculateLocalFileSha1());
+                    CommonWindow.CreateAndShowWindow(new CalculateLocalFileSha1());
                     break;
                 case "浏览器":
                     var window4 = new CommonWindow();
@@ -81,13 +83,13 @@ namespace Display.Views
                     window4.Activate();
                     break;
                 case "文件列表":
-                    CommonWindow.CreateAndShowWindow(new ContentsPage.DatumList.MainPage());
+                    CommonWindow.CreateAndShowWindow(new MainPage());
                     break;
                 case "演员头像":
-                    CommonWindow.CreateAndShowWindow(new ContentsPage.AddActorCover());
+                    CommonWindow.CreateAndShowWindow(new AddActorCover());
                     break;
                 case "缩略图":
-                    CommonWindow.CreateAndShowWindow(new ContentsPage.GetThumbnail());
+                    CommonWindow.CreateAndShowWindow(new GetThumbnail());
                     break;
             }
         }

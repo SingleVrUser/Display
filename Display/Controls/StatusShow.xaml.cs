@@ -1,5 +1,4 @@
-﻿
-using Display.Data;
+﻿using Display.Models.Data;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 

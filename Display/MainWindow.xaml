@@ -5,7 +5,7 @@
         xmlns:customcontrols="using:Display.Controls"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:data="using:Display.Data"
+        xmlns:data="using:Display.Models.Data"
         xmlns:winUiEx="using:WinUIEx"
         mc:Ignorable="d">
 
@@ -36,7 +36,7 @@
                     </HyperlinkButton>
                     <customcontrols:CustomAutoSuggestBox Grid.Column="2"
                                                          HorizontalAlignment="Right"
-                                                         SuggestionChosen="SuggestionChosen"
+                                                         SuggestionItemTapped="CustomAutoSuggestBox_OnSuggestionItemTapped"
                                                          QuerySubmitted="CustomAutoSuggestBox_QuerySubmitted">
 
                         <customcontrols:CustomAutoSuggestBox.KeyboardAccelerators>
@@ -84,7 +84,7 @@
 
             <customcontrols:CustomAutoSuggestBox x:Name="CustomAutoSuggestBox"
                                                  Grid.Column="2"
-                                                 SuggestionChosen="SuggestionChosen"
+                                                 SuggestionItemTapped="CustomAutoSuggestBox_OnSuggestionItemTapped"
                                                  QuerySubmitted="CustomAutoSuggestBox_QuerySubmitted">
 
                 <customcontrols:CustomAutoSuggestBox.KeyboardAccelerators>

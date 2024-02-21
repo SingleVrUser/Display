@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Display.ContentsPage;
-using Display.Models;
-using Microsoft.UI.Xaml;
-using System.Diagnostics;
-using Display.ContentsPage.Sort115;
 using Display.Controls;
+using Display.Models.Disk._115;
+using Display.Views.Settings;
+using Microsoft.UI.Xaml;
+using Settings18Page = Display.Views.Sort115.Settings18Page;
 
 namespace Display.ViewModels
 {
@@ -86,10 +86,10 @@ namespace Display.ViewModels
         {
             var result = srcName.Replace("{字母}", letter)
                 .Replace("{数字}", num);
-            return (Sort115Settings.NumNameCapFormat)numNameFormatSelectedIndex switch
+            return (Models.Disk._115.Sort115Settings.NumNameCapFormat)numNameFormatSelectedIndex switch
             {
-                Sort115Settings.NumNameCapFormat.Upper => result.ToUpper(),
-                Sort115Settings.NumNameCapFormat.Lower => result.ToLower(),
+                Models.Disk._115.Sort115Settings.NumNameCapFormat.Upper => result.ToUpper(),
+                Models.Disk._115.Sort115Settings.NumNameCapFormat.Lower => result.ToLower(),
                 _ => result
             };
         }

@@ -1,9 +1,8 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Display.Models;
-using Display.Services.Upload;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using CommunityToolkit.Mvvm.ComponentModel;
+using Display.Services.Upload;
 
 namespace Display.ViewModels
 {
@@ -14,13 +13,13 @@ namespace Display.ViewModels
         private static UploadViewModel _uploadVm;
         public static UploadViewModel Instance => _uploadVm ??= new UploadViewModel();
 
-        public ObservableCollection<UploadSubItem> UploadCollection = new();
+        public ObservableCollection<Services.UploadSubItem> UploadCollection = new();
 
         public void AddUploadTask(string filePath, long cid, Action<FileUploadResult> finishAction = null)
         {
             if (UploadCollection.Any(x => x.UploadFilePath == filePath)) return;
 
-            var uploadUi = new UploadSubItem(filePath, cid);
+            var uploadUi = new Services.UploadSubItem(filePath, cid);
             UploadCollection.Add(uploadUi);
 
             uploadUi.UploadFinish += result =>

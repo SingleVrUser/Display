@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Storage.Streams;
 using Windows.Web.Http;
-using Org.BouncyCastle.Math;
 
 namespace Display.Services
 {

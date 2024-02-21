@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Windows.Storage;
-using Display.Data;
 using Microsoft.Web.WebView2.Core;
 using Windows.Foundation;
+using Display.Models.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

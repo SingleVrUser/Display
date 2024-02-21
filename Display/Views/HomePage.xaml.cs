@@ -1,4 +1,4 @@
-﻿using Display.Data;
+﻿using Display.Models.Data;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Display.Services.IncrementalCollection;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -21,36 +22,31 @@ namespace Display.Views
     /// </summary>
     public sealed partial class HomePage : Page
     {
-        public ObservableCollection<VideoCoverDisplayClass> Items = new();
-        public ObservableCollection<VideoCoverDisplayClass> NewAddItems = new();
-        private ObservableCollection<VideoCoverDisplayClass> lookLaterList = new();
-        private ObservableCollection<VideoCoverDisplayClass> recentCoverList = new();
-        private ObservableCollection<VideoCoverDisplayClass> LoveCoverList = new();
+        private readonly IncrementalLoadSuccessInfoCollection _items;
+        private readonly ObservableCollection<VideoCoverDisplayClass> _lookLaterList = new();
+        private readonly ObservableCollection<VideoCoverDisplayClass> _recentCoverList = new();
+        private readonly ObservableCollection<VideoCoverDisplayClass> _loveCoverList = new();
 
         //过渡动画用
-        private enum navigationAnimationType { image, gridView };
-        private navigationAnimationType _navigationType;
-        private VideoCoverDisplayClass _storeditem;
-        private GridView _stroedgridview;
-        private Image _storedimage;
+        private enum NavigationAnimationType { Image, GridView };
+        private NavigationAnimationType _navigationType;
+        private VideoCoverDisplayClass _storedItem;
+        private GridView _storedGridView;
+        private Image _storedImage;
 
         public HomePage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             //启动缓存
             NavigationCacheMode = NavigationCacheMode.Required;
 
+            _items = new IncrementalLoadSuccessInfoCollection();
+            _items.SetOrder("random",true);
+
             LoadCover();
-
         }
-
-        //private void HomePage_Loaded(object sender, RoutedEventArgs e)
-        //{
-
-        //    this.Loaded -= HomePage_Loaded;
-        //}
-
+        
         private async void LoadCover()
         {
             //随机获取20个视频，每次启动自动获取一遍
@@ -59,24 +55,23 @@ namespace Display.Views
 
             foreach (var info in imageList.Select(item => new VideoCoverDisplayClass(item, 500, 300)))
             {
-                Items.Add(info);
+                _items.Add(info);
             }
 
-            //ImagePipsPager.DataContext = randomIamgeFlipView;
-            Binding binding = new Binding() { Path = new PropertyPath("SelectedIndex"), Mode = BindingMode.TwoWay };
-            ImagePipsPager.SetBinding(PipsPager.SelectedPageIndexProperty, binding);
+            //var binding = new Binding { Path = new PropertyPath("SelectedIndex"), Mode = BindingMode.TwoWay };
+            //ImagePipsPager.SetBinding(PipsPager.SelectedPageIndexProperty, binding);
         }
 
         private void MultipleCoverShow_ItemClick(object sender, ItemClickEventArgs e)
         {
-            VideoCoverDisplayClass coverInfo = (VideoCoverDisplayClass)e.ClickedItem;
+            var coverInfo = (VideoCoverDisplayClass)e.ClickedItem;
 
-            _storeditem = coverInfo;
-            _stroedgridview = (GridView)sender;
-            _navigationType = navigationAnimationType.gridView;
+            _storedItem = coverInfo;
+            _storedGridView = (GridView)sender;
+            _navigationType = NavigationAnimationType.GridView;
 
             //准备动画
-            _stroedgridview.PrepareConnectedAnimation("ForwardConnectedAnimation", _storeditem, "showImage");
+            _storedGridView.PrepareConnectedAnimation("ForwardConnectedAnimation", _storedItem, "showImage");
 
             Frame.Navigate(typeof(DetailInfoPage), coverInfo, new SuppressNavigationTransitionInfo());
         }
@@ -85,13 +80,13 @@ namespace Display.Views
         {
             if (!(sender is Image image)) return;
 
-            _storedimage = image;
+            _storedImage = image;
 
-            VideoCoverDisplayClass coverInfo = _storedimage.DataContext as VideoCoverDisplayClass;
+            VideoCoverDisplayClass coverInfo = _storedImage.DataContext as VideoCoverDisplayClass;
 
-            _navigationType = navigationAnimationType.image;
+            _navigationType = NavigationAnimationType.Image;
 
-            var animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", _storedimage);
+            var animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", _storedImage);
             animation.Configuration = new BasicConnectedAnimationConfiguration();
             Frame.Navigate(typeof(DetailInfoPage), coverInfo, new SuppressNavigationTransitionInfo());
         }
@@ -125,54 +120,51 @@ namespace Display.Views
             }
         }
 
-        private async void UpdateRandomCover_Click(object sender, RoutedEventArgs e)
-        {
-            RefreshHyperlinkButton.IsEnabled = false;
+        //private async void UpdateRandomCover_Click(object sender, RoutedEventArgs e)
+        //{
+        //    RefreshHyperlinkButton.IsEnabled = false;
 
-            ImagePipsPager.ClearValue(PipsPager.SelectedPageIndexProperty);
-            videoInfoListView.SelectionChanged -= videoInfoListView_SelectionChanged;
+        //    ImagePipsPager.ClearValue(PipsPager.SelectedPageIndexProperty);
+        //    videoInfoListView.SelectionChanged -= videoInfoListView_SelectionChanged;
 
-            Items.Clear();
+        //    Items.Clear();
 
-            //随机获取20个视频
-            foreach (var item in await DataAccess.Get.GetNameAndImageRandom())
-            {
-                Items.Add(new VideoCoverDisplayClass(item, 500, 300));
-            }
+        //    //随机获取10个视频
+        //    foreach (var item in await DataAccess.Get.GetNameAndImageRandom())
+        //    {
+        //        Items.Add(new VideoCoverDisplayClass(item, 500, 300));
+        //    }
 
-            videoInfoListView.SelectionChanged += videoInfoListView_SelectionChanged;
+        //    videoInfoListView.SelectionChanged += videoInfoListView_SelectionChanged;
 
-            Binding binding = new Binding() { Path = new PropertyPath("SelectedIndex"), Mode = BindingMode.TwoWay };
-            ImagePipsPager.SetBinding(PipsPager.SelectedPageIndexProperty, binding);
+        //    var binding = new Binding { Path = new PropertyPath("SelectedIndex"), Mode = BindingMode.TwoWay };
+        //    ImagePipsPager.SetBinding(PipsPager.SelectedPageIndexProperty, binding);
 
-
-
-            RefreshHyperlinkButton.IsEnabled = true;
-
-        }
+        //    RefreshHyperlinkButton.IsEnabled = true;
+        //}
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
             // 过渡动画
-            ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("BackConnectedAnimation");
+            var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("BackConnectedAnimation");
             if (animation != null)
             {
-                if (_navigationType == navigationAnimationType.image)
+                if (_navigationType == NavigationAnimationType.Image)
                 {
-                    if (_storedimage != null)
+                    if (_storedImage != null)
                     {
-                        animation.TryStart(_storedimage);
+                        animation.TryStart(_storedImage);
                     }
                 }
-                else if (_navigationType == navigationAnimationType.gridView)
+                else if (_navigationType == NavigationAnimationType.GridView)
                 {
                     //开始动画
-                    if (_storeditem != null)
+                    if (_storedItem != null)
                     {
                         //开始动画
-                        await _stroedgridview.TryStartConnectedAnimationAsync(animation, _storeditem, "showImage");
+                        await _storedGridView.TryStartConnectedAnimationAsync(animation, _storedItem, "showImage");
                     }
                 }
             }
@@ -250,43 +242,43 @@ namespace Display.Views
 
         private async void RefreshNewestVideoButtonClick(object sender, RoutedEventArgs e)
         {
-            recentCoverList.Clear();
+            _recentCoverList.Clear();
 
             foreach (var videoInfo in await DataAccess.Get.GetNameAndImageRecent())
             {
-                recentCoverList.Add(new VideoCoverDisplayClass(videoInfo, 500, 300));
+                _recentCoverList.Add(new VideoCoverDisplayClass(videoInfo, 500, 300));
             }
             
         }
 
         private async void RefreshLookLaterVideoButtonClick(object sender, RoutedEventArgs e)
         {
-            lookLaterList.Clear();
+            _lookLaterList.Clear();
 
             foreach (var videoInfo in await DataAccess.Get.GetNameAndImageFromLookLater())
             {
-                lookLaterList.Add(new VideoCoverDisplayClass(videoInfo, 500, 300));
+                _lookLaterList.Add(new VideoCoverDisplayClass(videoInfo, 500, 300));
             }
         }
 
         private async void RefreshLikeVideoButtonClick(object sender, RoutedEventArgs e)
         {
-            LoveCoverList.Clear();
+            _loveCoverList.Clear();
 
             foreach (var videoInfo in await DataAccess.Get.GetNameAndImageFromLike())
             {
-                LoveCoverList.Add(new VideoCoverDisplayClass(videoInfo, 500, 300));
+                _loveCoverList.Add(new VideoCoverDisplayClass(videoInfo, 500, 300));
             }
         }
 
         private async void TryUpdateCoverShow()
         {
             //最近视频
-            TryUpdateVideoCoverDisplayClass(await DataAccess.Get.GetNameAndImageRecent(), recentCoverList);
+            TryUpdateVideoCoverDisplayClass(await DataAccess.Get.GetNameAndImageRecent(), _recentCoverList);
             //稍后观看
-            TryUpdateVideoCoverDisplayClass(await DataAccess.Get.GetNameAndImageFromLookLater(), lookLaterList);
+            TryUpdateVideoCoverDisplayClass(await DataAccess.Get.GetNameAndImageFromLookLater(), _lookLaterList);
             //喜欢视频
-            TryUpdateVideoCoverDisplayClass(await DataAccess.Get.GetNameAndImageFromLike(), LoveCoverList);
+            TryUpdateVideoCoverDisplayClass(await DataAccess.Get.GetNameAndImageFromLike(), _loveCoverList);
         }
     }
 
