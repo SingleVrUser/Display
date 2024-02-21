@@ -366,3 +366,5 @@ FodyWeavers.xsd
 /Tests/Constant.cs
 /Tests/UserInfo.cs
 /Display/Display_TemporaryKey.pfx
+
+!/Display/FFmpeg/bin/

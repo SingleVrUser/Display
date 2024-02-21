@@ -27,14 +27,22 @@
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <ItemGroup>
 
-    <Compile Remove="Assets\Models\**" />
-    <Content Remove="Assets\Models\**" />
-    <EmbeddedResource Remove="Assets\Models\**" />
-    <None Remove="Assets\Models\**" />
-    <Page Remove="Assets\Models\**" />
+  <!-- Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
+       Tools extension to be activated for this project even if the Windows App SDK Nuget
+       package has not yet been restored -->
+  <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnablePreviewMsixTooling)'=='true'">
+    <ProjectCapability Include="Msix" />
   </ItemGroup>
+
+
+  <ItemGroup>
+    <None Update="Assets\SmallTile.scale-125.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
   <ItemGroup>
     <Content Remove="Assets\BadgeLogo.scale-100.png" />
     <Content Remove="Assets\BadgeLogo.scale-125.png" />
@@ -45,6 +53,7 @@
     <Content Remove="Assets\SplashScreen.png" />
     <Content Remove="Assets\Win32Resources.res" />
   </ItemGroup>
+
   <ItemGroup>
     <None Remove="app.manifest" />
     <None Remove="Assets\115favicon.ico" />
@@ -130,6 +139,7 @@
     <Content Include="Views\VideoViewPage.xaml.cs" />
   </ItemGroup>
 
+  <!--PackageReference-->
   <ItemGroup>
     <PackageReference Include="Aliyun.OSS.SDK.NetCore" Version="2.13.0" />
     <PackageReference Include="ByteSize" Version="2.1.2" />
@@ -158,86 +168,100 @@
     <!--<Manifest Include="$(ApplicationManifest)" />-->
   </ItemGroup>
 
-  <!-- Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
-       Tools extension to be activated for this project even if the Windows App SDK Nuget
-       package has not yet been restored -->
-  <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnablePreviewMsixTooling)'=='true'">
-    <ProjectCapability Include="Msix" />
+  <!--Theme-->
+  <ItemGroup>
+    <Page Update="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Themes\Converter.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
+
+  <!--Control-->
   <ItemGroup>
     <Page Update="Control\Explorer.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Themes\Generic.xaml">
+    <Page Update="Control\UserInfo.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Control\TextBlockWithLongText.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Control\CustomAutoSuggestBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Control\MultipleCoverShow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Control\VideoDetails.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Control\VideoCoverDisplay.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Controls\ImageViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Controls\ImageInfoControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Controls\CustomContentDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Controls\FileControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <None Update="Control\FolderControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <Page Update="Control\RangeSlider.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Control\CustomMediaPlayerElement.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Control\InfoListFilter.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Control\ShowCountControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Control\FileAutoSuggestBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Control\ActorImage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Control\TextBlockWithStressText.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Control\Browser.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Control\StatusShow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup>
-    <Page Update="CustomWindows\CommonWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+
+  <!--Views-->
   <ItemGroup>
     <Page Update="Views\CheckCookie.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="CustomWindows\LoginWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Control\UserInfo.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="CustomWindows\VideoPlayWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Control\TextBlockWithLongText.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Control\CustomAutoSuggestBox.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
     <Page Update="Views\VideoPlay.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Control\MultipleCoverShow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
     <Page Update="Views\DetailInfo\SelectSingleVideoToPlay.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
     <Page Update="Views\MorePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
     <Page Update="Views\BrowserPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Control\VideoDetails.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
     <Page Update="Views\ActorInfoPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -256,32 +280,41 @@
     <Page Update="Views\VideoViewPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Control\VideoCoverDisplay.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
     <Page Update="Views\DetailInfo\DownDialogContent.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Window\VideoPlay.xaml">
+    <Page Update="Views\More\DatumList\ThumbnailPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\VerifyAccountPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+
+  <!--CustomWindows-->
   <ItemGroup>
-    <Folder Include="Assets\115\file_type\" />
-    <Folder Include="FFmpeg\bin\x86\" />
-    <Folder Include="Views\Settings\" />
+    <Page Update="CustomWindows\MediaPlayWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="CustomWindows\StartWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="CustomWindows\SingleFrameWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="CustomWindows\CommonWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="CustomWindows\LoginWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="CustomWindows\VideoPlayWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
-  <ItemGroup>
-    <None Update="Assets\SmallTile.scale-125.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
+
+  <!--FFmpeg-x64-->
+  <ItemGroup Condition="'$(Platform)' == 'x64'">
     <None Update="FFmpeg\bin\x64\avcodec-60.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -300,76 +333,30 @@
     <None Update="FFmpeg\bin\x64\swscale-7.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Page Update="Views\More\DatumList\ThumbnailPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Controls\ImageViewer.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Controls\ImageInfoControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Controls\CustomContentDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\VerifyAccountPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Themes\Converter.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Controls\FileControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <None Update="Control\FolderControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
+  </ItemGroup>
+
+  <!--FFmpeg-x86-->
+  <ItemGroup Condition="'$(Platform)' == 'x86'">
+    <None Update="FFmpeg\bin\x86\avcodec-60.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Page Update="Control\RangeSlider.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Control\CustomMediaPlayerElement.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="CustomWindows\MediaPlayWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="CustomWindows\StartWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Control\InfoListFilter.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Control\ShowCountControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Control\FileAutoSuggestBox.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Control\ActorImage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Control\TextBlockWithStressText.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <None Update="FFmpeg\bin\x86\avfilter-9.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FFmpeg\bin\x86\avformat-60.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FFmpeg\bin\x86\avutil-58.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FFmpeg\bin\x86\swresample-4.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FFmpeg\bin\x86\swscale-7.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
-  <ItemGroup>
-    <Page Update="CustomWindows\SingleFrameWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Control\Browser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Control\StatusShow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <PRIResource Remove="Assets\Models\**" />
-  </ItemGroup>
+
   <ItemGroup>
     <CustomAdditionalCompileInputs Remove="Views\DetailInfo\EditInfo.xaml" />
   </ItemGroup>
