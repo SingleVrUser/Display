@@ -1,5 +1,5 @@
-﻿using Display.Data;
-using Display.Models.IncrementalCollection;
+﻿using Display.Helper.Notifications;
+using Display.Models.Data;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -16,6 +16,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Display.Services.IncrementalCollection;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -225,7 +226,7 @@ namespace Display.Views
             int allCount = infos.Length;
             if (allCount == 0) return;
 
-            if (!Notifications.ToastGetActorInfoWithProgressBar.SendToast(allCount)) return;
+            if (!ToastGetActorInfoWithProgressBar.SendToast(allCount)) return;
 
             //创建断点续传文件
             string savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "ActorInfo");
@@ -273,7 +274,7 @@ namespace Display.Views
             int allCount = infos.Length;
             if (allCount == 0) return;
 
-            if (!Notifications.ToastGetActorInfoWithProgressBar.SendToast(startIndex, allCount)) return;
+            if (!ToastGetActorInfoWithProgressBar.SendToast(startIndex, allCount)) return;
 
             bool isStart = false;
             for (int i = 0; i < allCount; i++)
@@ -293,13 +294,13 @@ namespace Display.Views
                 if (!string.IsNullOrEmpty(info.Bwh))
                 {
                     System.Diagnostics.Debug.WriteLine($"{i} 已经搜索过了");
-                    await Notifications.ToastGetActorInfoWithProgressBar.AddValue(i + 1, allCount);
+                    await ToastGetActorInfoWithProgressBar.AddValue(i + 1, allCount);
                     continue;
                 }
 
                 await GetActorInfo(info);
 
-                await Notifications.ToastGetActorInfoWithProgressBar.AddValue(i + 1, allCount);
+                await ToastGetActorInfoWithProgressBar.AddValue(i + 1, allCount);
 
                 //等待1~2秒
                 await GetInfoFromNetwork.RandomTimeDelay(1, 2);
@@ -402,7 +403,7 @@ namespace Display.Views
 
         private void ShowProgressButton_Click(object sender, RoutedEventArgs e)
         {
-            Notifications.ToastGetActorInfoWithProgressBar.SendToast();
+            ToastGetActorInfoWithProgressBar.SendToast();
 
             //点击后隐藏
             ShowProgressButton.Visibility = Visibility.Collapsed;

@@ -1,5 +1,4 @@
-﻿using Display.ContentsPage;
-using Display.Data;
+﻿
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -19,8 +18,12 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.Storage.Pickers;
-using Display.Helper;
+using Display.CustomWindows;
+using Display.Helper.FileProperties.Name;
 using static System.String;
+using Display.Models.Data;
+using Display.Helper.Network.Spider;
+using Display.Views.Settings;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -85,7 +88,7 @@ namespace Display.Views
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             //显示登录窗口
-            WindowView.LoginWindow loginWindow = new WindowView.LoginWindow();
+            LoginWindow loginWindow = new LoginWindow();
             loginWindow.Activate();
 
             //关闭登录窗口，刷新页面
@@ -204,7 +207,7 @@ namespace Display.Views
                 CloseButtonText = "不修改"
             };
 
-            var updateImagePathPage = new ContentsPage.UpdateImagePath(imagePath, srcPath, dstPath);
+            var updateImagePathPage = new UpdateImagePath(imagePath, srcPath, dstPath);
             dialog.Content = updateImagePathPage;
 
             var result = await dialog.ShowAsync();
@@ -256,7 +259,7 @@ namespace Display.Views
                 CloseButtonText = "不修改"
             };
 
-            var updateImagePathPage = new ContentsPage.UpdateImagePath(imagePath, srcPath, folderPath);
+            var updateImagePathPage = new UpdateImagePath(imagePath, srcPath, folderPath);
             dialog.Content = updateImagePathPage;
 
             var result = await dialog.ShowAsync();
@@ -1012,7 +1015,7 @@ namespace Display.Views
 
             GetInfoFromNetwork.IsX1080XCookieVisible = true;
 
-            Spider.X1080X.TryChangedClientHeader("cookie", AppSettings.X1080XCookie);
+            X1080X.TryChangedClientHeader("cookie", AppSettings.X1080XCookie);
 
             ShowTeachingTip("修改完成");
         }
@@ -1021,7 +1024,7 @@ namespace Display.Views
         {
             AppSettings.X1080XUa = X1080XuaTextBox.Text;
 
-            Spider.X1080X.TryChangedClientHeader("user-agent", AppSettings.X1080XCookie);
+            X1080X.TryChangedClientHeader("user-agent", AppSettings.X1080XCookie);
 
             ShowTeachingTip("修改完成");
         }

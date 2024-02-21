@@ -1,9 +1,4 @@
-﻿
-using Display.ContentsPage.SearchLink;
-using Display.Controls;
-using Display.Data;
-using Display.Helper;
-using Display.Models;
+﻿using Display.Controls;
 using Display.Views;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
@@ -19,10 +14,18 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Windows.System;
-using Display.ContentsPage;
 using Windows.Foundation;
-using Display.WindowView;
-using Display.ContentsPage.DatumList;
+using Display.CustomWindows;
+using Display.Helper.FileProperties.Name;
+using Display.Models.Media;
+using Display.Helper.UI;
+using Display.Helper.Network;
+using Display.Models.Data;
+using Display.Views.More.DatumList;
+using Display.Views.OfflineDown;
+using Display.Views.SearchLink;
+using Display.Views.Settings;
+using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -430,6 +433,56 @@ namespace Display
             }
         }
 
+        private async void CustomAutoSuggestBox_OnSuggestionItemTapped(object sender, string searchContent)
+        {
+            if (sender is not Grid grid) return;
+
+            if (grid.DataContext is string content && content.Contains("点击搜索资源"))
+            {
+                //输入框的内容
+                if (string.IsNullOrEmpty(searchContent)) return;
+
+                var tupleResult = await SearchLinkPage.ShowInContentDialog(searchContent, RootGrid.XamlRoot);
+
+                // 用户取消操作
+                if (tupleResult == null) return;
+
+                var (isSucceed, msg) = tupleResult;
+
+                if (isSucceed)
+                {
+                    ShowTeachingTip(msg, "打开所在目录", (_, _) =>
+                    {
+                        // 打开所在目录
+                        CommonWindow.CreateAndShowWindow(new FileListPage(AppSettings.SavePath115Cid));
+                    });
+                }
+                else
+                {
+                    ShowTeachingTip(msg);
+                }
+
+                return;
+            }
+
+            if (grid.DataContext is not VideoInfo nowItem) return;
+
+            //选中的是失败项
+            if (nowItem is FailVideoInfo failVideoInfo)
+            {
+                var mediaPlayItem = new MediaPlayItem(failVideoInfo);
+                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, ((Page)ContentFrame.Content).XamlRoot);
+            }
+            //正常点击
+            else
+            {
+                //加载应用记录的图片默认大小
+                var newItem = new VideoCoverDisplayClass(nowItem, AppSettings.ImageWidth, AppSettings.ImageHeight);
+                ContentFrame.Navigate(typeof(DetailInfoPage), newItem, new SuppressNavigationTransitionInfo());
+            }
+
+        }
+
         /// <summary>
         /// 提交搜索选项
         /// </summary>
@@ -524,7 +577,7 @@ namespace Display
 
         private async void CreateCloudDownContentDialog(string defaultLink = "")
         {
-            var downPage = new ContentsPage.OfflineDown.OfflineDownPage(defaultLink);
+            var downPage = new OfflineDownPage(defaultLink);
 
             var contentDialog = new ContentDialog
             {
@@ -554,7 +607,7 @@ namespace Display
             }
         }
 
-        private async void DownPage_RequestCompleted(object sender, ContentsPage.OfflineDown.RequestCompletedEventArgs e)
+        private async void DownPage_RequestCompleted(object sender, RequestCompletedEventArgs e)
         {
             var info = e?.Info;
 
@@ -600,7 +653,7 @@ namespace Display
                 return;
             }
 
-            var failPage = new ContentsPage.OfflineDown.FailListPage(failList);
+            var failPage = new FailListPage(failList);
             var contentDialog = new ContentDialog
             {
                 XamlRoot = RootGrid.XamlRoot,
@@ -625,7 +678,7 @@ namespace Display
             CreateCloudDownContentDialog(defaultLink);
         }
 
-        private void DownPage_FailLoaded(object sender, ContentsPage.OfflineDown.FailLoadedEventArgs e)
+        private void DownPage_FailLoaded(object sender, FailLoadedEventArgs e)
         {
             ShowTeachingTip(e.Message);
         }
@@ -660,5 +713,6 @@ namespace Display
         {
             TaskPage.ShowSingleWindow();
         }
+
     }
 }

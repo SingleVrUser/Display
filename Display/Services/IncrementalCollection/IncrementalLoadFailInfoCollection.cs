@@ -1,13 +1,12 @@
-﻿
-using Microsoft.UI.Xaml.Data;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Display.Data;
+using Display.Models.Data;
+using Microsoft.UI.Xaml.Data;
 using SharpCompress;
 
-namespace Display.Models.IncrementalCollection;
+namespace Display.Services.IncrementalCollection;
 
 public class IncrementalLoadFailInfoCollection : ObservableCollection<FailInfo>, ISupportIncrementalLoading
 {

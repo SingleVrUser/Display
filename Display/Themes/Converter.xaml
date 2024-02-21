@@ -18,4 +18,6 @@
     <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter" />
     <converter:BoolToVisibleConverter x:Key="BoolToVisibleConverter" />
     <converter:ZeroToVisibleConverter x:Key="ZeroToVisibleConverter" />
+    <converter:FloatToPercentageConverter x:Key="FloatToPercentageConverter" />
+    <converter:TimeStampToStringConverter x:Key="TimeStampToStringConverter" />
 </ResourceDictionary>

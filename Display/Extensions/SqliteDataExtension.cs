@@ -1,4 +1,4 @@
-﻿using Display.Data;
+﻿using Display.Models.Data;
 using Microsoft.Data.Sqlite;
 using Newtonsoft.Json;
 using System;

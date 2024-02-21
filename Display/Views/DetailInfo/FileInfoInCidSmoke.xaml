@@ -1,0 +1,66 @@
+﻿<!-- Copyright (c) Microsoft Corporation. All rights reserved. -->
+<!-- Licensed under the MIT License. See LICENSE in the project root for license information. -->
+
+<Page
+    x:Class="Display.Views.DetailInfo.FileInfoInCidSmoke"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Display.Views.DetailInfo"
+    xmlns:converter="using:Display.Converter"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:data="using:Display.Models.Data"
+      xmlns:detailInfo="using:Display.Views.DetailInfo"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+          Width="400"
+          VerticalAlignment="Center"
+          CornerRadius="10"
+          Padding="0,20">
+        <ListView x:Name="InfosListView"
+                  CharacterSpacing="5">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="data:Datum">
+                    <Grid Padding="5"
+                          RowDefinitions="auto,auto,*"
+                          RowSpacing="3">
+
+                        <Grid.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="打开所在文件夹" Click="OpenCurrentFolderItem_OnClick">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xE8B7;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+
+                                <MenuFlyoutItem Text="删除该文件"
+                                                Click="DeleteItem_OnClick"
+                                                Icon="Delete"/>
+                            </MenuFlyout>
+                        </Grid.ContextFlyout>
+
+                        <TextBlock Grid.Row="0" Text="{x:Bind Name}" />
+
+                        
+                        <TextBlock Grid.Row="1"
+                                   Text="{x:Bind Time}"
+                                   Opacity="0.5"/>
+                        
+                        <TextBlock Grid.Row="1"
+                                   Text="{x:Bind Size,Converter={StaticResource BytesToSizeStrConverter}}"
+                                   HorizontalAlignment="Right"
+                                   Opacity="0.5"/>
+
+                        <TextBlock Grid.Row="2" TextTrimming="CharacterEllipsis">
+                            <Run Foreground="#50000000">位置: </Run>
+                            <Run Foreground="#80000000" Text="{x:Bind local:FileInfoInCidSmoke.GetFolderString(Cid)}"/>
+                        </TextBlock>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+
+        </ListView>
+    </Grid>
+</Page>

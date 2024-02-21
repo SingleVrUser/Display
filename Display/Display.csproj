@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>Display</RootNamespace>
     <Platforms>x86;x64</Platforms>
@@ -25,6 +25,7 @@
     <Win32Resource>App.res</Win32Resource>
     <LangVersion>11</LangVersion>
     <Nullable>disable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
 
@@ -65,34 +66,17 @@
     <None Remove="Assets\Svg\face_male_man_portrait_icon.svg" />
     <None Remove="Assets\Svg\file_document_paper_page_icon.svg" />
     <None Remove="Assets\Tip\FindFolderCid.png" />
-    <None Remove="ContentsPage\AddActorCover.xaml" />
-    <None Remove="ContentsPage\CalculateLocalFileSha1.xaml" />
-    <None Remove="ContentsPage\CheckCookie.xaml" />
-    <None Remove="ContentsPage\CloudDownPage.xaml" />
-    <None Remove="ContentsPage\DatumList\FileListPage.xaml" />
-    <None Remove="ContentsPage\DatumList\MainPage.xaml" />
-    <None Remove="ContentsPage\DatumList\VideoDisplay\MainPage.xaml" />
-    <None Remove="ContentsPage\DetailInfo\EditInfo.xaml" />
-    <None Remove="ContentsPage\FileInfoInCidSmoke.xaml" />
-    <None Remove="ContentsPage\FindInfoAgainSmoke.xaml" />
-    <None Remove="ContentsPage\GetThumbnail.xaml" />
-    <None Remove="ContentsPage\InfoPage.xaml" />
-    <None Remove="ContentsPage\LoginPage.xaml" />
-    <None Remove="ContentsPage\OfflineDown\FailListPage.xaml" />
-    <None Remove="ContentsPage\SearchLink\SearchLinkPage.xaml" />
-    <None Remove="ContentsPage\SelectedFolderPage.xaml" />
-    <None Remove="ContentsPage\SelectSingleSubFileToSelected.xaml" />
-    <None Remove="ContentsPage\SelectSingleVideoToPlay.xaml" />
-    <None Remove="ContentsPage\Sort115\MainPage.xaml" />
-    <None Remove="ContentsPage\Sort115\Settings18Page.xaml" />
-    <None Remove="ContentsPage\spiderVideoInfo.xaml" />
-    <None Remove="ContentsPage\SpiderVideoInfo\Progress.xaml" />
-    <None Remove="ContentsPage\SpiderVideoInfo_ConditionalCheck.xaml" />
-    <None Remove="ContentsPage\TaskPage.xaml" />
-    <None Remove="ContentsPage\UpdateAppPage.xaml" />
-    <None Remove="ContentsPage\UpdateImagePath.xaml" />
-    <None Remove="ContentsPage\VideoPlay - 复制.xaml" />
-    <None Remove="ContentsPage\VideoPlay.xaml" />
+    <None Remove="Controls\ImageViewer.xaml" />
+    <None Remove="Views\More\DatumList\FileListPage.xaml" />
+    <None Remove="Views\More\DatumList\MainPage.xaml" />
+    <None Remove="Views\More\DatumList\ThumbnailPage.xaml" />
+    <None Remove="Views\More\DatumList\VideoDisplay\MainPage.xaml" />
+    <None Remove="Views\DetailInfo\EditInfo.xaml" />
+    <None Remove="Views\OfflineDown\FailListPage.xaml" />
+    <None Remove="Views\SearchLink\SearchLinkPage.xaml" />
+    <None Remove="Views\Sort115\MainPage.xaml" />
+    <None Remove="Views\Sort115\Settings18Page.xaml" />
+    <None Remove="Views\SpiderVideoInfo\Progress.xaml" />
     <None Remove="Controls\ActorImage.xaml" />
     <None Remove="Controls\Browser.xaml" />
     <None Remove="Controls\CustomAutoSuggestBox.xaml" />
@@ -117,11 +101,11 @@
     <None Remove="Views\BrowserPage.xaml" />
     <None Remove="Views\MorePage.xaml" />
     <None Remove="Views\VerifyAccountPage.xaml" />
-    <None Remove="WindowView\CommonWindow.xaml" />
-    <None Remove="WindowView\LoginWindow.xaml" />
-    <None Remove="WindowView\MediaPlayWindow.xaml" />
-    <None Remove="WindowView\SingleFrameWindow.xaml" />
-    <None Remove="WindowView\StartWindow.xaml" />
+    <None Remove="CustomWindows\CommonWindow.xaml" />
+    <None Remove="CustomWindows\LoginWindow.xaml" />
+    <None Remove="CustomWindows\MediaPlayWindow.xaml" />
+    <None Remove="CustomWindows\SingleFrameWindow.xaml" />
+    <None Remove="CustomWindows\StartWindow.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -148,11 +132,14 @@
 
   <ItemGroup>
     <PackageReference Include="Aliyun.OSS.SDK.NetCore" Version="2.13.0" />
-    <PackageReference Include="ByteSize" Version="2.1.1" />
+    <PackageReference Include="ByteSize" Version="2.1.2" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.Sizers" Version="8.0.240109" />
     <PackageReference Include="CommunityToolkit.WinUI.UI.Behaviors" Version="7.1.2" />
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.54" />
+    <PackageReference Include="FFmpeg.AutoGen.Abstractions" Version="6.1.0" />
+    <PackageReference Include="FFmpeg.AutoGen.Bindings.DynamicallyLoaded" Version="6.1.0" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.58" />
     <PackageReference Include="K4os.Compression.LZ4" Version="1.3.6" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WinUI" Version="2.0.0-beta.330" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.13" />
@@ -186,27 +173,17 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="WindowView\CommonWindow.xaml">
+    <Page Update="CustomWindows\CommonWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="ContentsPage\SpiderVideoInfo.xaml">
+    <Page Update="Views\CheckCookie.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="ContentsPage\LoginPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="ContensPage\CheckCookie.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="WindowView\LoginWindow.xaml">
+    <Page Update="CustomWindows\LoginWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -216,7 +193,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="WindowView\VideoPlayWindow.xaml">
+    <Page Update="CustomWindows\VideoPlayWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -231,7 +208,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="ContensPage\VideoPlay.xaml">
+    <Page Update="Views\VideoPlay.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -241,7 +218,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="ContensPage\SelectSingleVideoToPlay.xaml">
+    <Page Update="Views\DetailInfo\SelectSingleVideoToPlay.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -286,7 +263,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="ContensPage\DownDialogContent.xaml">
+    <Page Update="Views\DetailInfo\DownDialogContent.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -297,46 +274,48 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Assets\115\file_type\" />
+    <Folder Include="FFmpeg\bin\x86\" />
+    <Folder Include="Views\Settings\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Assets\SmallTile.scale-125.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <Page Update="ContentsPage\DatumList\MainPage.xaml">
+    <None Update="FFmpeg\bin\x64\avcodec-60.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FFmpeg\bin\x64\avfilter-9.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FFmpeg\bin\x64\avformat-60.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FFmpeg\bin\x64\avutil-58.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FFmpeg\bin\x64\swresample-4.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FFmpeg\bin\x64\swscale-7.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Page Update="Views\More\DatumList\ThumbnailPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Controls\ImageViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Controls\ImageInfoControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="ContentsPage\TaskPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Update="Controls\CustomContentDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="ContentsPage\InfoPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Views\VerifyAccountPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="ContentsPage\SelectedFolderPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="ContentsPage\SearchLink\SearchLinkPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="ContentsPage\OfflineDown\FailListPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="ContentsPage\CloudDownPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Update="Themes\Converter.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="ContentsPage\Sort115\Settings18Page.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Controls\FileControl.xaml">
@@ -348,76 +327,33 @@
     <Page Update="Control\RangeSlider.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="ContentsPage\Sort115\MainPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Update="Control\CustomMediaPlayerElement.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="WindowView\MediaPlayWindow.xaml">
+    <Page Update="CustomWindows\MediaPlayWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="WindowView\StartWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="ContentsPage\DatumList\VideoDisplay\MainPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="ContentsPage\DatumList\FileListPage.xaml">
+    <Page Update="CustomWindows\StartWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Control\InfoListFilter.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="ContentsPage\UpdateAppPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="ContentsPage\SpiderVideoInfo\Progress.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="ContentsPage\SelectSingleSubFileToSelected.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Update="Control\ShowCountControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="ContentsPage\FileInfoInCidSmoke.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Control\FileAutoSuggestBox.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="ContentsPage\FindInfoAgainSmoke.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="ContentsPage\GetThumbnail.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Update="Control\ActorImage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="ContentsPage\AddActorCover.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Control\TextBlockWithStressText.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="ContentsPage\UpdateImagePath.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="WindowView\SingleFrameWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="ContentsPage\Import115DataToLoaclDataAccess\Progress.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="ContentsPage\Import115DataToLoaclDataAccess\MainPage.xaml">
+    <Page Update="CustomWindows\SingleFrameWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -432,23 +368,12 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="ContentsPage\SpiderVideoInfo_ConditionalCheck.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomAdditionalCompileInputs Remove="ContentsPage\CalculateLocalFileSha1.xaml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Remove="ContentsPage\CalculateLocalFileSha1.xaml" />
-  </ItemGroup>
-  <ItemGroup>
     <PRIResource Remove="Assets\Models\**" />
   </ItemGroup>
   <ItemGroup>
-    <CustomAdditionalCompileInputs Remove="ContentsPage\DetailInfo\EditInfo.xaml" />
+    <CustomAdditionalCompileInputs Remove="Views\DetailInfo\EditInfo.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Remove="ContentsPage\DetailInfo\EditInfo.xaml" />
+    <Resource Remove="Views\DetailInfo\EditInfo.xaml" />
   </ItemGroup>
 </Project>

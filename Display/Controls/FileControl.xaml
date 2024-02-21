@@ -63,7 +63,7 @@
                           IsCompact="True"
                           HorizontalAlignment="Right"
                           Command="{x:Bind DeleteCommand}"
-                          CommandParameter="{x:Bind FolderName, Mode=OneWay}" />
+                          CommandParameter="{x:Bind FolderName, Mode=OneWay}"/>
         </StackPanel>
     </Grid>
 </UserControl>

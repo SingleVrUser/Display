@@ -1,8 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Display.Data;
-using Display.Helper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -10,13 +6,19 @@ using System.IO;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Display.Helper.Data;
+using Display.Helper.UI;
+using Display.Models.Data;
+using Microsoft.UI.Xaml;
 
 namespace Display.ViewModels
 {
     public partial class ImageViewModel:ObservableObject
     {
         [ObservableProperty]
-        private ObservableCollection<SubImageViewModel> _photos = new();
+        private List<Models.Image.SubImageModel> _photos = new();
 
         public readonly ObservableCollection<FilesInfo> Infos = new();
 
@@ -30,22 +32,23 @@ namespace Display.ViewModels
         private bool _isEnableDownButton;
 
         [ObservableProperty]
-        private SubImageViewModel _currentPhotoViewModel;
+        private Models.Image.SubImageModel _currentPhotoModel;
         
         public async Task SetDataAndCurrentIndex(List<FilesInfo> files, int currentIndex)
         {
             _currentIndex = currentIndex;
 
-            var subImageViewModels = new List<SubImageViewModel>();
+            var subImageViewModels = new List<Models.Image.SubImageModel>();
             Infos.Clear();
             foreach (var info in files)
             {
                 Infos.Add(info);
-                var photoViewModel = new SubImageViewModel(info.PickCode);
+                var photoViewModel = new Models.Image.SubImageModel(info);
                 subImageViewModels.Add(photoViewModel);
             }
 
-            Photos = new ObservableCollection<SubImageViewModel>(subImageViewModels);
+            //Photos = new ObservableCollection<Models.Image.SubImageModel>(subImageViewModels);
+            Photos = subImageViewModels;
 
             await LoadImage();
         }
@@ -79,27 +82,31 @@ namespace Display.ViewModels
             Loading = true;
             IsEnableDownButton = false;
 
-            CurrentPhotoViewModel = Photos[_currentIndex];
-            if (CurrentPhotoViewModel.IsDowning) return;
+            CurrentPhotoModel = Photos[_currentIndex];
+            if (CurrentPhotoModel.IsDowning) return;
 
             Debug.WriteLine($"正在加载{_currentIndex}");
 
             var progress = new Progress<int>(p => ProgressValue = p);
 
-            await CurrentPhotoViewModel.LoadThumbnailFromInternetAsync(progress);
+            await CurrentPhotoModel.LoadThumbnailFromInternetAsync(progress);
 
             Loading = false;
-            if (CurrentPhotoViewModel.Thumbnail is not null) IsEnableDownButton = true;
+            if (CurrentPhotoModel.Thumbnail is not null) IsEnableDownButton = true;
         }
 
         [RelayCommand]
-        private async Task ExportCurrentImageAsync()
+        private async Task ExportCurrentImageAsync(UIElement element)
         {
-            var fileName = CurrentPhotoViewModel.FileName;
+            var fileName = CurrentPhotoModel.FileInfo.Name;
 
             if (string.IsNullOrEmpty(fileName)) return;
 
-            var saveFile = await SelectSaveImageAsync(fileName);
+
+            var window = WindowHelper.GetWindowForElement(element);
+            if(window == null) return;
+
+            var saveFile = await SelectSaveImageAsync(fileName, window);
             if (saveFile is null) return;
 
             var isSuccess = await LocalCacheHelper.ExportFile(fileName, saveFile);
@@ -111,7 +118,15 @@ namespace Display.ViewModels
             }
         }
 
-        private async Task<StorageFile> SelectSaveImageAsync(string name)
+        [RelayCommand]
+        private async Task OpenWithOtherApplicationAsync()
+        {
+            var filePath = LocalCacheHelper.GetCacheFilePath(_currentPhotoModel.FileInfo.Name);
+            if (filePath == null) return;
+            await Windows.System.Launcher.LaunchUriAsync(new Uri(filePath));
+        } 
+
+        private async Task<StorageFile> SelectSaveImageAsync(string name, Window window)
         {
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(name);
             var extension = Path.GetExtension(name);
@@ -123,7 +138,8 @@ namespace Display.ViewModels
 
             savePicker.FileTypeChoices.Add("图片", new List<string> { extension });
 
-            var windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(App.AppMainWindow);
+
+            var windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(window);
             WinRT.Interop.InitializeWithWindow.Initialize(savePicker, windowHandle);
 
             var result = await savePicker.PickSaveFileAsync();

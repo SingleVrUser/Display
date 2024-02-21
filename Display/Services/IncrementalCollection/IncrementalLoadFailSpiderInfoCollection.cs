@@ -1,13 +1,12 @@
-﻿
-using Microsoft.UI.Xaml.Data;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Display.Data;
+using Display.Models.Data;
+using Microsoft.UI.Xaml.Data;
 using SharpCompress;
 
-namespace Display.Models.IncrementalCollection;
+namespace Display.Services.IncrementalCollection;
 
 public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<FailDatum>, ISupportIncrementalLoading
 {
@@ -26,9 +25,9 @@ public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<Fail
         newItems.ForEach(item => Add(new(item)));
     }
 
-    public void SetShowType(FailType ShowType)
+    public void SetShowType(FailType showType)
     {
-        this.ShowType = ShowType;
+        this.ShowType = showType;
     }
 
     public FailType ShowType { get; set; } = FailType.All;
@@ -54,7 +53,7 @@ public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<Fail
             HasMoreItems = false;
         }
 
-        failLists.ForEach(item => Add(new(item)));
+        failLists.ForEach(item => Add(new FailDatum(item)));
 
         return new LoadMoreItemsResult
         {

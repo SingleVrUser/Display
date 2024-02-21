@@ -5,8 +5,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using System;
-using Display.Data;
-using Display.Helper;
+using Display.Helper.Date;
+using Display.Models.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -74,7 +74,7 @@ namespace Display.Controls
 
         private void Grid_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
+            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
 
         private void LikeMenuFlyoutItem_Click(object sender, RoutedEventArgs e)

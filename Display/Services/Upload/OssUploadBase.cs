@@ -1,13 +1,13 @@
-﻿using Display.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Display.Helper;
-using HttpHeaders = Display.Data.Const.HttpHeaders;
+using HttpHeaders = Display.Models.Data.Const.HttpHeaders;
 using System.Threading;
 using System.IO;
+using Display.Models.Upload;
+using Display.Helper.Data;
 
 namespace Display.Services.Upload
 {

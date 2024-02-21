@@ -1,5 +1,5 @@
 ﻿using Display.Extensions;
-using Display.Models;
+using Display.Models.Upload;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,7 +7,7 @@ using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using HttpHeaders = Display.Data.Const.HttpHeaders;
+using HttpHeaders = Display.Models.Data.Const.HttpHeaders;
 
 namespace Display.Services.Upload
 {

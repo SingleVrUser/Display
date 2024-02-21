@@ -2,12 +2,10 @@
 // Licensed under the MIT License.
 
 using ByteSizeLib;
-using Display.ContentsPage;
-using Display.Data;
-using Display.Models;
+using Display.Models.Data;
+using Display.Models.Media;
 using Display.Services;
 using Display.Views;
-using Display.WindowView;
 using Microsoft.Graphics.Canvas;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -21,7 +19,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Windows.Media;
 using Windows.Media.Core;
@@ -30,6 +27,7 @@ using Windows.Media.Streaming.Adaptive;
 using Windows.Storage;
 using Windows.System.Display;
 using Windows.Web.Http;
+using Display.CustomWindows;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -112,6 +110,7 @@ public sealed partial class CustomMediaPlayerElement
     {
         MediaControl.MediaPlayer.Pause();
 
+        MediaControl.MediaPlayer.Source = null;
         foreach (var mediaPlayItem in mediaPlaybackList.Items)
         {
             mediaPlayItem.Source.Dispose();
@@ -124,7 +123,6 @@ public sealed partial class CustomMediaPlayerElement
         }
         _adaptiveMediaSourceList.Clear();
 
-        MediaControl.MediaPlayer.Source = null;
 
     }
 
@@ -333,7 +331,6 @@ public sealed partial class CustomMediaPlayerElement
             if (result.Status == AdaptiveMediaSourceCreationStatus.Success && result.MediaSource != null)
             {
                 args.SetAdaptiveMediaSource(result.MediaSource);
-
             }
         }
         //SetStream
@@ -588,7 +585,7 @@ public sealed partial class CustomMediaPlayerElement
         ShowTeachingTip("已截取当前画面作为封面");
     }
 
-    public async Task<string> ScreenShotAsync(string pickCode)
+    private async Task<string> ScreenShotAsync(string pickCode)
     {
         var savePath = Path.Combine(AppSettings.ImageSavePath, "Screen");
         if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);

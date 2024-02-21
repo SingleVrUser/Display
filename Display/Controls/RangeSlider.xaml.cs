@@ -15,35 +15,35 @@ public sealed partial class RangeSlider : UserControl
 {
     public double Minimum
     {
-        get { return (double)GetValue(MinimumProperty); }
-        set { SetValue(MinimumProperty, value); }
+        get => (double)GetValue(MinimumProperty);
+        set => SetValue(MinimumProperty, value);
     }
 
     public double Maximum
     {
-        get { return (double)GetValue(MaximumProperty); }
-        set { SetValue(MaximumProperty, value); }
+        get => (double)GetValue(MaximumProperty);
+        set => SetValue(MaximumProperty, value);
     }
 
     public double RangeMin
     {
-        get { return (double)GetValue(RangeMinProperty); }
-        set { SetValue(RangeMinProperty, value); }
+        get => (double)GetValue(RangeMinProperty);
+        set => SetValue(RangeMinProperty, value);
     }
 
     public double RangeMax
     {
-        get { return (double)GetValue(RangeMaxProperty); }
-        set { SetValue(RangeMaxProperty, value); }
+        get => (double)GetValue(RangeMaxProperty);
+        set => SetValue(RangeMaxProperty, value);
     }
 
-    public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register("Minimum", typeof(double), typeof(RangeSlider), new PropertyMetadata(0.0));
+    public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register(nameof(Minimum), typeof(double), typeof(RangeSlider), new PropertyMetadata(0.0));
 
-    public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register("Maximum", typeof(double), typeof(RangeSlider), new PropertyMetadata(1.0));
+    public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register(nameof(Maximum), typeof(double), typeof(RangeSlider), new PropertyMetadata(1.0));
 
-    public static readonly DependencyProperty RangeMinProperty = DependencyProperty.Register("RangeMin", typeof(double), typeof(RangeSlider), new PropertyMetadata(0.0, OnRangeMinPropertyChanged));
+    public static readonly DependencyProperty RangeMinProperty = DependencyProperty.Register(nameof(RangeMin), typeof(double), typeof(RangeSlider), new PropertyMetadata(0.0, OnRangeMinPropertyChanged));
 
-    public static readonly DependencyProperty RangeMaxProperty = DependencyProperty.Register("RangeMax", typeof(double), typeof(RangeSlider), new PropertyMetadata(1.0, OnRangeMaxPropertyChanged));
+    public static readonly DependencyProperty RangeMaxProperty = DependencyProperty.Register(nameof(RangeMax), typeof(double), typeof(RangeSlider), new PropertyMetadata(1.0, OnRangeMaxPropertyChanged));
 
 
 

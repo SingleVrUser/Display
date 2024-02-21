@@ -1,6 +1,4 @@
-﻿
-using Display.ContentsPage.DetailInfo;
-using Microsoft.UI.Input;
+﻿using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -16,14 +14,19 @@ using System.Threading.Tasks;
 using Windows.Foundation.Metadata;
 using Windows.Storage;
 using Windows.Storage.Streams;
-using Display.ContentsPage.DatumList;
-using Display.Data;
-using Display.Helper;
 using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
-using Display.ContentsPage.SearchLink;
-using Display.WindowView;
 using Display.Views;
 using Windows.Foundation;
+using Display.CustomWindows;
+using Display.Helper.FileProperties.Name;
+using Display.Helper.UI;
+using Display.Models.Data;
+using Display.Views.DetailInfo;
+using Display.Views.More.DatumList;
+using Display.Views.SearchLink;
+using DownDialogContent = Display.Views.DetailInfo.DownDialogContent;
+using FileInfoInCidSmoke = Display.Views.DetailInfo.FileInfoInCidSmoke;
+using FindInfoAgainSmoke = Display.Views.DetailInfo.FindInfoAgainSmoke;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

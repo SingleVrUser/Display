@@ -1,5 +1,4 @@
-﻿using Display.Helper;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -8,13 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using Windows.ApplicationModel.Background;
 using Windows.Foundation;
-using Display.Data;
-using Display.Models;
-using Display.ContentsPage.DetailInfo;
-using System.Xml.Linq;
+using Display.Models.Media;
+using Display.Helper.Network;
+using Display.Models.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -155,11 +151,11 @@ namespace Display.Views
             var videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(trueName);
 
             //没有该数据
-            if (videoInfoList.Count == 0)
+            if (videoInfoList == null || videoInfoList.Count == 0)
             {
-                videoPlayButton.Flyout = new Flyout()
+                videoPlayButton.Flyout = new Flyout
                 {
-                    Content = new TextBlock() { Text = "经查询，本地数据库无该文件，请导入后继续" }
+                    Content = new TextBlock { Text = "经查询，本地数据库无该文件，请导入后继续" }
                 };
             }
             //一集

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
-using Display.Helper;
+using Display.Helper.FileProperties.Name;
 
 namespace Tests
 {

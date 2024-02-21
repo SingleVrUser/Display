@@ -1,5 +1,4 @@
 ﻿using Display.Controls;
-using Display.Helper;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -7,9 +6,10 @@ using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Display.Data;
 using static Display.Controls.CustomMediaPlayerElement;
-using Display.Models;
+using Display.Models.Media;
+using Display.Helper.Network;
+using Display.Models.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -186,7 +186,7 @@ namespace Display.Views
 
         private async void ContentListView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            if (e.ClickedItem is not Data.Datum singleVideoInfo) return;
+            if (e.ClickedItem is not Datum singleVideoInfo) return;
 
             if (sender is not ListView { DataContext: string trueName }) return;
             
