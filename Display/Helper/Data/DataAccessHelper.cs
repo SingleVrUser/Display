@@ -212,7 +212,6 @@ namespace Display.Helper.Data
             return CloseConnectionIfNeedAndReturn(connection, isNeedCloseConnection, data);
         }
 
-
         #endregion
 
     }

@@ -129,6 +129,25 @@ namespace Display.Models.Data
         public Datum[] DatumList { get; set; }
     }
 
+    public class SearchHistory
+    {
+        [JsonProperty(propertyName: "id")]
+        public long Id { get; set; }
+
+        [JsonProperty(propertyName: "keyword")]
+        public string Keyword { get; set; }
+
+        public SearchHistory()
+        {
+
+        }
+
+        public SearchHistory(string keyword)
+        {
+            Keyword = keyword;
+        }
+    }
+
     public class Datum
     {
         [JsonProperty(propertyName: "fid")]
@@ -136,8 +155,6 @@ namespace Display.Models.Data
 
         [JsonProperty(propertyName: "uid")]
         public long Uid { get; set; }
-
-
 
         [JsonProperty(propertyName: "aid")]
         public int Aid { get; set; }

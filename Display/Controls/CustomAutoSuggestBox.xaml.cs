@@ -1,4 +1,5 @@
 ﻿
+using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -8,6 +9,7 @@ using System.Linq;
 using Windows.Foundation;
 using Display.Helper.FileProperties.Name;
 using Display.Models.Data;
+using Microsoft.UI.Xaml.Input;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -30,8 +32,14 @@ public sealed partial class CustomAutoSuggestBox : UserControl
     private async void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
         var searchText = sender.Text;
-        if (args.Reason is not (AutoSuggestionBoxTextChangeReason.UserInput or AutoSuggestionBoxTextChangeReason.ProgrammaticChange) || string.IsNullOrWhiteSpace(searchText))
+        if (args.Reason is not (AutoSuggestionBoxTextChangeReason.UserInput or AutoSuggestionBoxTextChangeReason.ProgrammaticChange))
             return;
+
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            ShowHistorySearch();
+            return;
+        }
 
         //过滤非法元素
         searchText = searchText.Replace("'", "");
@@ -40,16 +48,6 @@ public sealed partial class CustomAutoSuggestBox : UserControl
 
         var resultList = new List<object>();
         var item = await FileMatch.GetVideoInfoFromType(selectedTypes, searchText, 50);
-
-        var historyItem = new HistorySearchItem
-        {
-            KeywordList = new List<string>
-            {
-                "nihao",
-                "wohao"
-            }
-        };
-        resultList.Add(historyItem);
 
         if (item.Count == 0)
         {
@@ -84,7 +82,7 @@ public sealed partial class CustomAutoSuggestBox : UserControl
 
     private void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
     {
-        if (args.QueryText != "Data.VideoInfo")
+        if (args.QueryText != typeof(SearchHistory).FullName)
         {
             sender.DataContext = GetSelectedTypes();
 
@@ -93,6 +91,9 @@ public sealed partial class CustomAutoSuggestBox : UserControl
             {
                 QuerySubmitted?.Invoke(sender, args);
             }
+
+            //保存到数据库
+            DataAccess.Add.AddHistoryHistory(args.QueryText);
         }
 
         //初始化搜索框
@@ -113,10 +114,26 @@ public sealed partial class CustomAutoSuggestBox : UserControl
 
     private void NavViewSearchBox_GotFocus(object sender, RoutedEventArgs e)
     {
-        if (selectFoundMethodButton.Visibility == Visibility.Collapsed)
+        if (selectFoundMethodButton.Visibility != Visibility.Collapsed) return;
+
+        OpenAutoSuggestionBoxStoryboard.Begin();
+
+        ShowHistorySearch();
+    }
+
+    private void ShowHistorySearch()
+    {
+        var result = DataAccess.Get.GetAllSearchHistory();
+
+        if (result == null) return;
+
+        NavViewSearchBox.ItemsSource = new List<HistorySearchItem>
         {
-            OpenAutoSuggestionBoxStoryboard.Begin();
-        }
+            new()
+            {
+                KeywordList = result.ToList()
+            }
+        };
     }
 
     private void NavViewSearchBox_LostFocus(object sender, RoutedEventArgs e)
@@ -258,24 +275,35 @@ public sealed partial class CustomAutoSuggestBox : UserControl
         CloseAutoSuggestionBoxCompleted?.Invoke(sender, e);
     }
 
-    private bool _isBusy;
-    private void ListViewBase_OnItemClick(object sender, ItemClickEventArgs e)
-    {
-        if (e.ClickedItem is not string content) return;
-        _isBusy = true;
-        NavViewSearchBox.IsSuggestionListOpen = true;
-        NavViewSearchBox.Text = content;
-    }
 
     public event TypedEventHandler<object, string> SuggestionItemTapped;
-    private void ItemTapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
+    private void ItemTapped(object sender, TappedRoutedEventArgs e)
     {
         //准备动画
         ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", NavViewSearchBox);
 
-        SuggestionItemTapped?.Invoke(sender, NavViewSearchBox.Text);
+        var keyword = NavViewSearchBox.Text;
+        SuggestionItemTapped?.Invoke(sender, keyword);
+
+        DataAccess.Add.AddHistoryHistory(keyword);
     }
-    
+
+    private bool _isBusy;
+
+    private void SearchHistoryItem_OnTapped(object sender, TappedRoutedEventArgs e)
+    {
+        if (sender is not GridViewItem { Content: string keyword }) return;
+
+        _isBusy = true;
+        NavViewSearchBox.IsSuggestionListOpen = true;
+        NavViewSearchBox.Text = keyword;
+    }
+
+    private void ClearSearchHistoryClick(object sender, RoutedEventArgs e)
+    {
+        DataAccess.Delete.DeleteAllSearchHistory();
+        NavViewSearchBox.ItemsSource = null;
+    }
 }
 
 public class SuggestionBoxItemTemplateSelector : DataTemplateSelector
@@ -307,3 +335,4 @@ public class ItemsContainerStyleSelector : StyleSelector
         return item is HistorySearchItem ? NoPointerOverStyle : base.SelectStyleCore(item, container);
     }
 }
+

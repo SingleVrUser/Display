@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:data="using:Display.Models.Data"
+             xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
              mc:Ignorable="d">
 
     <UserControl.Resources>
@@ -50,17 +51,32 @@
 
             <DataTemplate x:Key="HistorySearchBox"
                           x:DataType="data:HistorySearchItem">
-                <GridView ItemsSource="{x:Bind KeywordList}"
-                          IsItemClickEnabled="True"
-                          ItemClick="ListViewBase_OnItemClick"
-                          Padding="0"
-                          Margin="0">
-                    <GridView.ItemTemplate>
-                        <DataTemplate x:DataType="x:String">
-                            <TextBlock Text="{x:Bind}"/>
-                        </DataTemplate>
-                    </GridView.ItemTemplate>
-                </GridView>
+
+                <Grid RowDefinitions="*,auto">
+                    <ItemsRepeater x:Name="WrapRepeater"
+                                   ItemsSource="{x:Bind KeywordList, Mode=OneWay}">
+                        <ItemsRepeater.Layout>
+                            <controls:WrapLayout x:Name="Wrap"
+                                                 HorizontalSpacing="5"
+                                                 VerticalSpacing="2" />
+                        </ItemsRepeater.Layout>
+
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="data:SearchHistory">
+                                <GridViewItem Content="{x:Bind Keyword}"
+                                              Tapped="SearchHistoryItem_OnTapped"/>
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+
+                    </ItemsRepeater>    
+
+                    <HyperlinkButton Grid.Row="1"
+                                     Content="清空"
+                                     HorizontalAlignment="Right"
+                                     Click="ClearSearchHistoryClick"
+                                     ClickMode="Press"/>
+                </Grid>
+                
             </DataTemplate>
 
             <DataTemplate x:Key="NotFoundedSuggestionBox"
@@ -133,6 +149,17 @@
                         </DiscreteObjectKeyFrame.Value>
                     </DiscreteObjectKeyFrame>
                 </ObjectAnimationUsingKeyFrames>
+
+
+                <!--<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="IsSuggestionListOpen"
+                                               Storyboard.TargetName="NavViewSearchBox"
+                                               EnableDependentAnimation="True">
+                    <DiscreteObjectKeyFrame KeyTime="0"
+                                            Value="False" />
+                    <DiscreteObjectKeyFrame KeyTime="0:0:0.1"
+                                            Value="True" />
+                </ObjectAnimationUsingKeyFrames>-->
+
             </Storyboard>
 
             <!--隐藏AutoSuggestionBox-->
@@ -173,6 +200,16 @@
                         </DiscreteObjectKeyFrame.Value>
                     </DiscreteObjectKeyFrame>
                 </ObjectAnimationUsingKeyFrames>
+
+                <!--<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="IsSuggestionListOpen"
+                                               Storyboard.TargetName="NavViewSearchBox"
+                                               EnableDependentAnimation="True">
+                    <DiscreteObjectKeyFrame KeyTime="0"
+                                            Value="True" />
+                    <DiscreteObjectKeyFrame KeyTime="0:0:0.1"
+                                            Value="False" />
+                </ObjectAnimationUsingKeyFrames>-->
+
             </Storyboard>
         </Grid.Resources>
 

@@ -129,6 +129,9 @@ partial class ThumbnailViewModel : ObservableObject
                 Debug.WriteLine("ThumbnailViewModel捕获到异常",ex.Message);
             }
         }
+
+        // 以防未截取到图片
+        Loading = false;
     }
 
     [RelayCommand]

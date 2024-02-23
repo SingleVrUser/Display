@@ -14,6 +14,8 @@ using Display.Helper.Network.Spider;
 using Display.Models.Spider;
 using Microsoft.Data.Sqlite;
 using static System.Int32;
+using LiveChartsCore.Themes;
+using static Display.Models.Data.DataAccess;
 
 namespace Display.Models.Data
 {
@@ -50,41 +52,41 @@ namespace Display.Models.Data
             db.Open();
 
             //文件信息
-            var tableCommand = "CREATE TABLE IF NOT " +
-                                  "EXISTS FilesInfo ( " +
-                                  "fid text," +
-                                  "uid integer," +
-                                  "aid integer," +
-                                  "cid TEXT," +
-                                  "n TEXT," +
-                                  "s integer," +
-                                  "sta integer," +
-                                  "pt TEXT," +
-                                  "pid TEXT," +
-                                  "pc TEXT," +
-                                  "p integer," +
-                                  "m integer," +
-                                  "t TEXT," +
-                                  "te integer," +
-                                  "tp integer," +
-                                  "d integer," +
-                                  "c integer," +
-                                  "sh integer," +
-                                  "e TEXT," +
-                                  "ico TEXT," +
-                                  "sha TEXT," +
-                                  "fdes TEXT," +
-                                  "q integer," +
-                                  "hdf integer," +
-                                  "fvs integer," +
-                                  "u TEXT," +
-                                  "iv integer," +
-                                  "current_time integer," +
-                                  "played_end integer," +
-                                  "last_time TEXT," +
-                                  "vdi integer," +
-                                  "play_long real," +
-                                  "PRIMARY KEY('pc')) ";
+            const string tableCommand = "CREATE TABLE IF NOT " +
+                                        "EXISTS FilesInfo ( " +
+                                        "fid text," +
+                                        "uid integer," +
+                                        "aid integer," +
+                                        "cid TEXT," +
+                                        "n TEXT," +
+                                        "s integer," +
+                                        "sta integer," +
+                                        "pt TEXT," +
+                                        "pid TEXT," +
+                                        "pc TEXT," +
+                                        "p integer," +
+                                        "m integer," +
+                                        "t TEXT," +
+                                        "te integer," +
+                                        "tp integer," +
+                                        "d integer," +
+                                        "c integer," +
+                                        "sh integer," +
+                                        "e TEXT," +
+                                        "ico TEXT," +
+                                        "sha TEXT," +
+                                        "fdes TEXT," +
+                                        "q integer," +
+                                        "hdf integer," +
+                                        "fvs integer," +
+                                        "u TEXT," +
+                                        "iv integer," +
+                                        "current_time integer," +
+                                        "played_end integer," +
+                                        "last_time TEXT," +
+                                        "vdi integer," +
+                                        "play_long real," +
+                                        "PRIMARY KEY('pc')) ";
 
             var createTable = new SqliteCommand(tableCommand, db);
             createTable.ExecuteNonQuery();
@@ -253,6 +255,13 @@ namespace Display.Models.Data
                                       "tadk_id integer," +
                                       "PRIMARY KEY('Name')" +
                                       ") ";
+            createTable.ExecuteNonQuery();
+
+
+            //搜索历史
+            createTable.CommandText = "CREATE TABLE IF NOT EXISTS SearchHistory (" +
+                                      "id INTEGER PRIMARY KEY," +
+                                      "keyword TEXT NO NULL UNIQUE)";
             createTable.ExecuteNonQuery();
         }
 
@@ -428,6 +437,20 @@ namespace Display.Models.Data
                 connection.Close();
                 connection.Dispose();
             }
+
+            public static void DeleteSearchHistoryById(long id, SqliteConnection connection = null)
+            {
+                var commandText = $"DELETE FROM SearchHistory WHERE id == {id}";
+                DataAccessHelper.ExecuteNonQuery(commandText, connection);
+            }
+
+            public static void DeleteAllSearchHistory(SqliteConnection connection = null)
+            {
+                var commandText = "DELETE FROM SearchHistory";
+                DataAccessHelper.ExecuteNonQuery(commandText, connection);
+            }
+
+
         }
 
         public class Update
@@ -1148,6 +1171,22 @@ namespace Display.Models.Data
                 }
 
 
+            }
+
+            
+
+            public static void AddHistoryHistory(string keyword, SqliteConnection connection=null)
+            {
+                if (string.IsNullOrWhiteSpace(keyword)) return;
+
+                var commandText = "INSERT OR IGNORE INTO SearchHistory VALUES (NULL,@keyword);";
+
+                var parameters = new List<SqliteParameter>
+                {
+                    new("@keyword", keyword)
+                };
+
+                DataAccessHelper.ExecuteNonQueryWithParameters(commandText, parameters, connection);
             }
 
         }
@@ -2106,12 +2145,18 @@ namespace Display.Models.Data
             public static bool GetIsAllSpiderSourceAttempt(string queryName, SqliteConnection connection = null)
             {
                 var commandText = $"SELECT Name FROM SpiderTask WHERE Name == '{queryName}' AND " +
-                                  $"libre == 'done' AND bus == 'done' AND Jav321 == 'done' AND Avmoo == 'done' AND Avsox == 'done' AND fc == 'done' AND db == 'done' " +
-                                  $"AND done == 0";
+                                  "libre == 'done' AND bus == 'done' AND Jav321 == 'done' AND Avmoo == 'done' AND Avsox == 'done' AND fc == 'done' AND db == 'done' " +
+                                  "AND done == 0";
 
                 var name = DataAccessHelper.ExecuteScalar<string>(commandText, connection);
 
                 return !string.IsNullOrEmpty(name);
+            }
+
+            public static SearchHistory[] GetAllSearchHistory(SqliteConnection connection = null)
+            {
+                var commandText = "SELECT * FROM SearchHistory";
+                return DataAccessHelper.ExecuteReaderGetArray<SearchHistory>(commandText, connection);
             }
         }
     }

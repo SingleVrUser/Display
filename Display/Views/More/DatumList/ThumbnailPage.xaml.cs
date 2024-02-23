@@ -5,7 +5,6 @@ using Display.Models.Data;
 using Microsoft.UI.Xaml.Navigation;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -47,18 +46,17 @@ public sealed partial class ThumbnailPage : Page
 
     private void ThumbnailList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        if (e.Action == NotifyCollectionChangedAction.Remove)
+        if (e.Action != NotifyCollectionChangedAction.Remove) return;
+
+        // 全部删除时
+        if (_viewModel.ThumbnailList.Count == 0)
         {
-            // 全部删除时
-            if (_viewModel.ThumbnailList.Count == 0)
-            {
-                TitleTextBlock.Visibility = Visibility.Collapsed;
-                ThumbnailInfoGrid.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                ImageViewer.SelectedIndex = 0;
-            }
+            TitleTextBlock.Visibility = Visibility.Collapsed;
+            ThumbnailInfoGrid.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            ImageViewer.SelectedIndex = 0;
         }
     }
 
