@@ -126,6 +126,7 @@
 
                                     <TextBox PlaceholderText="番号"
                                              HorizontalAlignment="Right"
+                                             MinWidth="120"
                                              Text="{x:Bind MatchName,Mode=TwoWay}" />
 
                                 </Grid>

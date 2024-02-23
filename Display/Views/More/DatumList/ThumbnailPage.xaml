@@ -73,7 +73,7 @@
 
             <customcontrols:ImageViewer.ContextFlyout>
                 <MenuFlyout>
-                    <MenuFlyoutItem Text="从115中删除"
+                    <MenuFlyoutItem Text="从115中删除该文件"
                                     Click="DeleteItemClicked">
                         <MenuFlyoutItem.Icon>
                             <FontIcon Glyph="&#xE107;" />

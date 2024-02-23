@@ -11,6 +11,7 @@ using Display.Models.Image;
 using FFmpeg.AutoGen.Abstractions;
 using Display.Models.Media;
 using Display.Helper.Date;
+using Display.Models.Data;
 
 namespace Display.Services;
 
@@ -57,6 +58,9 @@ public class ThumbnailGeneratorService : IThumbnailGeneratorService
         var increaseTime = vsd.Duration / (frameCount + 1);
         var currentTime = increaseTime;
 
+        // 非m3u8都要等待
+        var isWait = ! thumbnailGenerateOptions.UrlOptions.IsM3U8;
+
         for (var i = 0; i < frameCount; i++, currentTime += increaseTime)
         {
             var filePath = GetFilePath(thumbnailGenerateOptions, currentTime);
@@ -64,6 +68,8 @@ public class ThumbnailGeneratorService : IThumbnailGeneratorService
 
             if (!File.Exists(filePath))
             {
+                if (isWait) await GetInfoFromNetwork.RandomTimeDelay(10,20);
+
                 if (!vsd.TrySeekPosition(currentTime)) break;
 
                 AVFrame frame = default;

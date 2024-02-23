@@ -139,9 +139,8 @@ namespace Display.Controls
         
         private void NextButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!HaveNext) return;
             SelectedIndex++;
-
-            if (HaveNext) return;
 
             RightButton.Visibility = Visibility.Collapsed;
             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
@@ -149,9 +148,8 @@ namespace Display.Controls
 
         private void LastButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!HavePrevious) return;
             SelectedIndex--;
-
-            if (HavePrevious) return;
 
             LeftButton.Visibility = Visibility.Collapsed;
             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
@@ -216,11 +214,13 @@ namespace Display.Controls
 
         private void KeyboardAcceleratorLeft_OnInvoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
         {
+            if (!HavePrevious) return;
             SelectedIndex--;
         }
 
         private void KeyboardAcceleratorRight_OnInvoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
         {
+            if (!HaveNext) return;
             SelectedIndex++;
         }
 

@@ -14,13 +14,13 @@ internal static class FFmpegHelper
     {
         if (error >= 0) return error;
 
-        var message = av_strerror(error);
+        var message = av_strError(error);
         Debug.WriteLine(message);
         throw new ApplicationException(message);
 
     }
 
-    private static unsafe string av_strerror(int error)
+    private static unsafe string av_strError(int error)
     {
         var bufferSize = 1024;
         var buffer = stackalloc byte[bufferSize];
