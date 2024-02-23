@@ -21,13 +21,13 @@ mono_crash.*
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
-x64/
-x86/
+# x64/
+# x86/
 [Ww][Ii][Nn]32/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
-[Bb]in/
+# [Bb]in/
 [Oo]bj/
 [Oo]ut/
 [Ll]og/
@@ -366,5 +366,3 @@ FodyWeavers.xsd
 /Tests/Constant.cs
 /Tests/UserInfo.cs
 /Display/Display_TemporaryKey.pfx
-
-!**/avcodec-60.dll
