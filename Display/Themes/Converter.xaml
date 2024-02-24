@@ -4,7 +4,8 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:converter="using:Display.Converter">
+    xmlns:converter="using:Display.Converter"
+    xmlns:communityConverters="using:CommunityToolkit.WinUI.UI.Converters">
 
     <converter:BytesToSizeStrConverter x:Key="BytesToSizeStrConverter" />
     <converter:IsVideoToVisibilityConverter x:Key="IsVideoToVisibilityConverter" />
@@ -20,4 +21,5 @@
     <converter:ZeroToVisibleConverter x:Key="ZeroToVisibleConverter" />
     <converter:FloatToPercentageConverter x:Key="FloatToPercentageConverter" />
     <converter:TimeStampToStringConverter x:Key="TimeStampToStringConverter" />
+    <communityConverters:StringVisibilityConverter x:Key="StringVisibilityConverter"/>
 </ResourceDictionary>

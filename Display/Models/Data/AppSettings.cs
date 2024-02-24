@@ -410,15 +410,14 @@ public class AppSettings
     /// <summary>
     /// 播放方式
     /// </summary>
-    public static int PlayerSelection
+    public static Enums.PlayerType PlayerSelection
     {
         get => GetValue(DefaultValue.Player.Selection);
         set => SetValue(value);
     }
+    
 
-
-
-    public static int DefaultPlayQuality
+    public static Enums.PlayQuality DefaultPlayQuality
     {
         get => GetValue(DefaultValue.Player.DefaultQuality);
         set => SetValue(value);

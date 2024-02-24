@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Display.Helper.Network;
 using Display.Models.Data;
+using Display.Models.Data.Enums;
 using Display.Models.Media;
 using Display.Services.IncrementalCollection;
 using Microsoft.UI.Xaml;
@@ -288,20 +289,18 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
         if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
 
         var mediaPlayItem = new MediaPlayItem(info);
-        await PlayVideoHelper.PlayVideo(new Collection<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
+        await PlayVideoHelper.PlayVideo(new Collection<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this);
     }
 
     private async void Explorer_OnPlayWithPlayerClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info, Tag: string aTag }) return;
-
-        if (!int.TryParse(aTag, out var playerSelection)) return;
-
+        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info, Tag: PlayerType playerType }) return;
+        
         await Task.Delay(1);
 
 
         var mediaPlayItem = new MediaPlayItem(info);
-        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this, playerSelection: playerSelection);
+        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this, playerType: playerType);
     }
 }
 

@@ -6,11 +6,12 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:behaviors="using:CommunityToolkit.WinUI.UI.Behaviors"
       xmlns:local="using:Display.Views.More.DatumList"
+      xmlns:enums="using:Display.Models.Data.Enums"
       xmlns:customizeControls="using:Display.Controls"
       xmlns:data="using:Display.Models.Data"
       xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+      xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
       mc:Ignorable="d">
     <Page.Resources>
         <Style TargetType="TextBlock"
@@ -103,9 +104,8 @@
                             <MenuFlyoutSubItem.Icon>
                                 <FontIcon Glyph="&#xEE4A;" />
                             </MenuFlyoutSubItem.Icon>
-
                             <MenuFlyoutItem Text="WebView"
-                                            Tag="0"
+                                            Tag="{x:Bind enums:PlayerType.WebView}"
                                             Click="PlayWithPlayerButtonClick" />
 
                             <MenuFlyoutItem Text="PotPlayer"
@@ -460,14 +460,15 @@
                   DragOver="FileMove_DragOver"
                   AllowDrop="True">
 
-            <interactivity:Interaction.Behaviors>
-                <behaviors:QuickReturnHeaderBehavior />
-            </interactivity:Interaction.Behaviors>
 
             <ListView.Header>
                 <Grid MinHeight="30"
                       Background="{ThemeResource LayerFillColorDefaultBrush}"
                       ColumnDefinitions="44,*,140,70,12">
+
+                    <interactivity:Interaction.Behaviors>
+                        <behaviors:QuickReturnHeaderBehavior />
+                    </interactivity:Interaction.Behaviors>
 
                     <CheckBox x:Name="MultipleSelectedCheckBox"
                               Margin="14,0,0,0"

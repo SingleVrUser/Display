@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Media.Playback;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.WinUI.UI.Controls;
+using CommunityToolkit.WinUI.Controls;
 using Display.CustomWindows;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.Network.Spider;
@@ -463,7 +463,7 @@ public sealed partial class MainPage : Page,IDisposable
 
                 _cidInfos.Add(info);
 
-                var spiderManager = Manager.Current;
+                var spiderManager = Manager.Instance;
 
 
                 FindCidInfo_ProgressRing.Visibility = Visibility.Visible;

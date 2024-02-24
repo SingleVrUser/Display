@@ -5,12 +5,15 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:local="using:Display.Views.DetailInfo"
-      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:converter="using:Display.Converter"
-      xmlns:triggers="using:CommunityToolkit.WinUI.UI.Triggers"
+      xmlns:options="using:Display.Views.Settings.Options"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:data="using:Display.Models.Data"
+      xmlns:winUi="using:CommunityToolkit.WinUI"
+      xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
+      xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+      xmlns:spider="using:Display.Helper.Network.Spider"
       mc:Ignorable="d">
     <Page.Resources>
         <Style TargetType="Pivot">
@@ -36,7 +39,7 @@
             <VisualStateGroup>
                 <VisualState x:Name="validUrl">
                     <VisualState.StateTriggers>
-                        <triggers:RegexStateTrigger Value="{x:Bind SepcificUrl_TextBlock.Text, Mode=OneWay}"
+                        <winUi:RegexStateTrigger Value="{x:Bind SpecificUrl_TextBlock.Text, Mode=OneWay}"
                                                     Expression="[a-zA-z]+:\/\/[^\s]{5,}"
                                                     Options="IgnoreCase" />
                     </VisualState.StateTriggers>
@@ -65,30 +68,28 @@
                     </Grid.RowDefinitions>
 
                     <RelativePanel>
-                        <VariableSizedWrapGrid Orientation="Horizontal"
-                                               MaximumRowsOrColumns="5">
-                            <VariableSizedWrapGrid.Resources>
+
+                        <ItemsRepeater x:Name="SpiderCheckBoxGrid">
+                            <ItemsRepeater.Resources>
                                 <Style TargetType="CheckBox"
                                        BasedOn="{StaticResource DefaultCheckBoxStyle}">
                                     <Setter Property="MinWidth"
                                             Value="80" />
                                 </Style>
-                            </VariableSizedWrapGrid.Resources>
-                            <CheckBox Content="JavBus"
-                                      IsChecked="{x:Bind data:AppSettings.IsUseJavBus, Mode=TwoWay}" />
-                            <CheckBox Content="Jav321"
-                                      IsChecked="{x:Bind data:AppSettings.IsUseJav321, Mode=TwoWay}" />
-                            <CheckBox Content="AvMoo"
-                                      IsChecked="{x:Bind data:AppSettings.IsUseAvMoo, Mode=TwoWay}" />
-                            <CheckBox Content="AvSox"
-                                      IsChecked="{x:Bind data:AppSettings.IsUseAvSox, Mode=TwoWay}" />
-                            <CheckBox Content="libredmm"
-                                      IsChecked="{x:Bind data:AppSettings.IsUseLibreDmm, Mode=TwoWay}" />
-                            <CheckBox Content="Fc2Hub"
-                                      IsChecked="{x:Bind data:AppSettings.IsUseFc2Hub, Mode=TwoWay}" />
-                            <CheckBox Content="JavDB"
-                                      IsChecked="{x:Bind data:AppSettings.IsUseJavDb, Mode=TwoWay}" />
-                        </VariableSizedWrapGrid>
+                            </ItemsRepeater.Resources>
+
+                            <ItemsRepeater.Layout>
+                                <controls:WrapLayout VerticalSpacing="10"
+                                                     HorizontalSpacing="10" />
+                            </ItemsRepeater.Layout>
+
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate x:DataType="spider:InfoSpider">
+                                    <CheckBox Content="{x:Bind Name}" IsChecked="{x:Bind IsOn,Mode=TwoWay}"/>
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
+
 
                         <!--刷新-->
                         <Button  RelativePanel.AlignRightWithPanel="True"
@@ -99,7 +100,7 @@
                     </RelativePanel>
 
                     <ListView Grid.Row="2"
-                              ItemsSource="{x:Bind VideoInfos}"
+                              ItemsSource="{x:Bind _searchResultList}"
                               x:Name="NewInfo_ListView"
                               SelectionChanged="NewInfo_ListView_SelectionChanged">
                         <ListView.ItemTemplate>
@@ -200,7 +201,7 @@
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
                     <StackPanel Spacing="3">
-                        <TextBox x:Name="SepcificUrl_TextBlock"
+                        <TextBox x:Name="SpecificUrl_TextBlock"
                                  PlaceholderText="含有信息的网页地址"
                                  VerticalAlignment="Top" />
                         <TextBlock x:Name="UrlState"
@@ -222,7 +223,7 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <controls:ImageEx Source="{x:Bind VideoInfo.ImageUrl,Converter={StaticResource NotExistsImagePathConverter},Mode=OneWay}"
+                        <oldControls:ImageEx Source="{x:Bind _videoInfo.ImageUrl,Converter={StaticResource NotExistsImagePathConverter},Mode=OneWay}"
                                           CornerRadius="5" />
 
                         <StackPanel Grid.Column="1"
@@ -238,23 +239,23 @@
                             <TextBlock>
                                     <Run>番号</Run>
                                     <Run FontWeight="Bold"
-                                         Text="{x:Bind VideoInfo.trueName,Mode=OneWay}" />
+                                         Text="{x:Bind _videoInfo.trueName,Mode=OneWay}" />
                             </TextBlock>
 
                             <TextBlock>
                                     <Run>演员</Run>
-                                    <Run Text="{x:Bind VideoInfo.Actor,Mode=OneWay}" />
+                                    <Run Text="{x:Bind _videoInfo.Actor,Mode=OneWay}" />
                             </TextBlock>
 
                             <TextBlock>
                                     
                                 <Run>类别</Run>
-                                    <Run Text="{x:Bind VideoInfo.Category,Mode=OneWay}" />
+                                    <Run Text="{x:Bind _videoInfo.Category,Mode=OneWay}" />
                             </TextBlock>
 
                             <TextBlock>
                                     <Run>时间</Run>
-                                    <Run Text="{x:Bind VideoInfo.ReleaseTime,Mode=OneWay}" />
+                                    <Run Text="{x:Bind _videoInfo.ReleaseTime,Mode=OneWay}" />
                             </TextBlock>
                         </StackPanel>
 

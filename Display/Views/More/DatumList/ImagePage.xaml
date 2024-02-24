@@ -4,11 +4,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-            xmlns:uicontrols="using:CommunityToolkit.WinUI.UI.Controls"
             xmlns:controls="using:CommunityToolkit.WinUI.Controls"
             xmlns:customcontrols="using:Display.Controls"
             xmlns:data="using:Display.Models.Data"
-             mc:Ignorable="d">
+            xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
+            mc:Ignorable="d">
 
     <Grid RowDefinitions="50,*">
         <Grid.ColumnDefinitions>
@@ -112,7 +112,7 @@
                            Text="{x:Bind ViewModel.CurrentPhotoModel.FileInfo.Time, Converter={StaticResource NumberToDateTimeStrConverter}, Mode=OneWay}" />
             </Grid>
 
-            <uicontrols:AdaptiveGridView Grid.Row="1"
+            <oldControls:AdaptiveGridView Grid.Row="1"
                                          StretchContentForSingleRow="False"
                                          ItemHeight="68"
                                          DesiredWidth="90"
@@ -120,7 +120,7 @@
                                          HorizontalContentAlignment="Center"
                                          SelectedIndex="{x:Bind ImageViewer.SelectedIndex, Mode=TwoWay}"
                                          Header="预览列表">
-                <uicontrols:AdaptiveGridView.HeaderTemplate>
+                <oldControls:AdaptiveGridView.HeaderTemplate>
                     <DataTemplate>
                         <RelativePanel>
                             <TextBlock Text="{Binding}"
@@ -130,15 +130,15 @@
                                              Click="ClearImageClick"/>
                         </RelativePanel>
                     </DataTemplate>
-                </uicontrols:AdaptiveGridView.HeaderTemplate>
+                </oldControls:AdaptiveGridView.HeaderTemplate>
 
-                <uicontrols:AdaptiveGridView.ItemTemplate>
+                <oldControls:AdaptiveGridView.ItemTemplate>
                     <DataTemplate x:DataType="data:FilesInfo">
-                        <uicontrols:ImageEx Source="{x:Bind ThumbnailUrl}"
+                        <oldControls:ImageEx Source="{x:Bind ThumbnailUrl}"
                                             Height="60" />
                     </DataTemplate>
-                </uicontrols:AdaptiveGridView.ItemTemplate>
-            </uicontrols:AdaptiveGridView>
+                </oldControls:AdaptiveGridView.ItemTemplate>
+            </oldControls:AdaptiveGridView>
         </Grid>
 
         <controls:GridSplitter Grid.Row="1"

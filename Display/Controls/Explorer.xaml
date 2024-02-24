@@ -3,11 +3,11 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Display.Controls"
-    xmlns:uicontrols="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:data="using:Display.Models.Data"
+    xmlns:enums="using:Display.Models.Data.Enums"
     mc:Ignorable="d">
     <Control.Resources>
         <!--ListView 的 文件 DataTemplate-->
@@ -31,23 +31,23 @@
                                 </MenuFlyoutSubItem.Icon>
 
                                 <MenuFlyoutItem Text="WebView"
-                                                Tag="0"
+                                                Tag="{x:Bind enums:PlayerType.WebView}"
                                                 Click="PlayWithPlayerButtonClick" />
 
                                 <MenuFlyoutItem Text="PotPlayer"
-                                                Tag="1"
+                                                Tag="{x:Bind enums:PlayerType.PotPlayer}"
                                                 Click="PlayWithPlayerButtonClick" />
 
                                 <MenuFlyoutItem Text="mpv"
-                                                Tag="2"
+                                                Tag="{x:Bind enums:PlayerType.Mpv}"
                                                 Click="PlayWithPlayerButtonClick" />
 
                                 <MenuFlyoutItem Text="vlc"
-                                                Tag="3"
+                                                Tag="{x:Bind enums:PlayerType.Vlc}"
                                                 Click="PlayWithPlayerButtonClick" />
 
                                 <MenuFlyoutItem Text="MediaElement"
-                                                Tag="4"
+                                                Tag="{x:Bind enums:PlayerType.MediaElement}"
                                                 Click="PlayWithPlayerButtonClick" />
 
                             </MenuFlyoutSubItem>

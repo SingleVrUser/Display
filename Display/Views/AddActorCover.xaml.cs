@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -807,9 +808,9 @@ namespace Display.Views
             SmokeCancelGrid.Tapped -= SmokeCancelGrid_Tapped;
         }
 
-        private static Visibility IsShowFailList(ObservableCollection<string> List)
+        private static Visibility IsShowFailList(ICollection list)
         {
-            return List.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            return list.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void HyperlinkButton_Click(object sender, RoutedEventArgs e)

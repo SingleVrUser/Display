@@ -1,12 +1,12 @@
 ﻿<Page x:Class="Display.Views.ActorsPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-      xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:data="using:Display.Models.Data"
       xmlns:helper="using:Display.Helper.FileProperties.Name"
+      xmlns:animations="using:CommunityToolkit.WinUI.Animations"
+      xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
       mc:Ignorable="d"
       NavigationCacheMode="Enabled">
 
@@ -34,7 +34,7 @@
 
         </StackPanel>
 
-        <controls:AdaptiveGridView x:Name="BasicGridView"
+        <oldControls:AdaptiveGridView x:Name="BasicGridView"
                                    SingleSelectionFollowsFocus="False"
                                    Grid.Row="1"
                                    ItemHeight="140"
@@ -43,7 +43,7 @@
                                    ItemClick="BasicGridView_ItemClick"
                                    Padding="10,0"
                                    animations:ItemsReorderAnimation.Duration="00:00:00.0960000">
-            <controls:AdaptiveGridView.Header>
+            <oldControls:AdaptiveGridView.Header>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" />
@@ -88,7 +88,7 @@
 
                     </RelativePanel>
 
-                    <controls:Carousel x:Name="CarouselControl"
+                    <oldControls:Carousel x:Name="CarouselControl"
                                        Grid.Row="1"
                                        Margin="0,0,0,20"
                                        InvertPositive="False"
@@ -100,10 +100,10 @@
                                        Orientation="Horizontal"
                                        SelectedIndex="8"
                                        ItemsSource="{x:Bind actorPartInfo}">
-                        <controls:Carousel.EasingFunction>
+                        <oldControls:Carousel.EasingFunction>
                             <CubicEase EasingMode="EaseOut" />
-                        </controls:Carousel.EasingFunction>
-                        <controls:Carousel.ItemTemplate>
+                        </oldControls:Carousel.EasingFunction>
+                        <oldControls:Carousel.ItemTemplate>
                             <DataTemplate x:DataType="data:ActorInfo">
                                 <Image Width="300"
                                        Height="240"
@@ -114,14 +114,14 @@
                                        PointerExited="Img_PointerExited"
                                        ToolTipService.ToolTip="{x:Bind Name}" />
                             </DataTemplate>
-                        </controls:Carousel.ItemTemplate>
-                    </controls:Carousel>
+                        </oldControls:Carousel.ItemTemplate>
+                    </oldControls:Carousel>
                 </Grid>
 
 
-            </controls:AdaptiveGridView.Header>
+            </oldControls:AdaptiveGridView.Header>
 
-            <controls:AdaptiveGridView.ItemTemplate>
+            <oldControls:AdaptiveGridView.ItemTemplate>
                 <DataTemplate x:DataType="data:ActorInfo">
                     <Grid CornerRadius="5"
                           Padding="5,0"
@@ -133,7 +133,7 @@
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
 
-                        <controls:ImageEx x:Name="ActorImage"
+                        <oldControls:ImageEx x:Name="ActorImage"
                                           Source="{x:Bind ProfilePath}"
                                           PlaceholderStretch="Uniform"
                                           CornerRadius="5"
@@ -164,9 +164,9 @@
                         </RelativePanel>
                     </Grid>
                 </DataTemplate>
-            </controls:AdaptiveGridView.ItemTemplate>
+            </oldControls:AdaptiveGridView.ItemTemplate>
 
-        </controls:AdaptiveGridView>
+        </oldControls:AdaptiveGridView>
 
         <!--<GridView Grid.Row="2"
                 x:Name="BasicGridView"

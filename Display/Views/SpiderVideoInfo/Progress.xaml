@@ -118,7 +118,7 @@
                                              Fill="{x:Bind EllipseColor,Mode=OneWay}"
                                              RelativePanel.AlignRightWithPanel="True"
                                              RelativePanel.AlignVerticalCenterWithPanel="True"
-                                             Visibility="{x:Bind EllipseVisiable}"/>
+                                             Visibility="{x:Bind EllipseVisible}"/>
                                 </RelativePanel>
                                 
                                 <Grid Grid.Row="1"

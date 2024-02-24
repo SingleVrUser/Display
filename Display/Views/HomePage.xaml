@@ -4,20 +4,11 @@
       xmlns:local="using:Display.Views"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:data="using:Display.Models.Data"
-      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:customecontrol="using:Display.Controls"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+      xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
       mc:Ignorable="d">
-
-    <Page.Resources>
-        <Style TargetType="Image"
-               x:Key="newAddCoverResources">
-            <Setter Property="MaxWidth"
-                    Value="300" />
-        </Style>
-
-    </Page.Resources>
 
     <ScrollViewer>
         <VisualStateManager.VisualStateGroups>
@@ -79,7 +70,7 @@
                         </HyperlinkButton>-->
                     </RelativePanel>
 
-                    <Grid x:Name="mainImageShowGrid"
+                    <Grid x:Name="MainImageShowGrid"
                           Grid.Row="1"
                           MaxHeight="350"
                           ColumnSpacing="20"
@@ -94,7 +85,7 @@
                                 <RowDefinition Height="*" />
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
-                            <FlipView x:Name="randomImageFlipView"
+                            <FlipView x:Name="RandomImageFlipView"
                                       ItemsSource="{x:Bind _items}"
                                       Background="Transparent">
                                 <FlipView.ItemTemplate>
@@ -123,7 +114,7 @@
                         <ListView x:Name="videoInfoListView"
                                   Grid.Column="1"
                                   ItemsSource="{x:Bind _items}"
-                                  SelectedIndex="{x:Bind randomImageFlipView.SelectedIndex, Mode=TwoWay}"
+                                  SelectedIndex="{x:Bind RandomImageFlipView.SelectedIndex, Mode=TwoWay}"
                                   SelectionChanged="videoInfoListView_SelectionChanged">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="data:VideoInfo">
@@ -133,11 +124,11 @@
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
 
-                                        <controls:ImageEx Source="{x:Bind ImagePath}"
+                                        <oldControls:ImageEx Source="{x:Bind ImagePath}"
                                                           Width="120"
                                                           DecodePixelWidth="120"
                                                           CornerRadius="2">
-                                        </controls:ImageEx>
+                                        </oldControls:ImageEx>
 
                                         <StackPanel Grid.Column="1"
                                                     VerticalAlignment="Center"

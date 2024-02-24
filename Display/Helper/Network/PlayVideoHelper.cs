@@ -16,6 +16,7 @@ using Display.Helper.FileProperties.Name;
 using Display.Models.Media;
 using Display.Helper.UI;
 using Display.Models.Data;
+using Display.Models.Data.Enums;
 using SelectVideoToPlay = Display.Views.DetailInfo.SelectVideoToPlay;
 
 namespace Display.Helper.Network;
@@ -29,9 +30,9 @@ public class PlayVideoHelper
     /// <param name="xamlRoot"></param>
     /// <param name="playType"></param>
     /// <param name="lastPage"></param>
-    /// <param name="playerSelection"></param>
+    /// <param name="playerType"></param>
     /// <returns></returns>
-    public static async Task PlayVideo(IList<MediaPlayItem> playItems, XamlRoot xamlRoot = null, CustomMediaPlayerElement.PlayType playType = CustomMediaPlayerElement.PlayType.Success, Page lastPage = null, int playerSelection = -1)
+    public static async Task PlayVideo(IList<MediaPlayItem> playItems, XamlRoot xamlRoot = null, CustomMediaPlayerElement.PlayType playType = CustomMediaPlayerElement.PlayType.Success, Page lastPage = null, PlayerType playerType = PlayerType.None)
     {
         // 播放项不能为空
         var firstPlayItem = playItems?.FirstOrDefault();
@@ -53,29 +54,21 @@ public class PlayVideoHelper
             await dialog.ShowAsync();
         }
 
-        if (playerSelection == -1) playerSelection = AppSettings.PlayerSelection;
+        if (playerType == PlayerType.None) playerType = AppSettings.PlayerSelection;
 
         //选择播放器播放
-        switch (playerSelection)
+        switch (playerType)
         {
             //浏览器播放
             case 0:
                 VideoPlayWindow.CreateNewWindow(FileMatch.GetVideoPlayUrl(firstPlayItem.PickCode));
                 break;
             //PotPlayer播放
-            case 1:
-                await GlobalWebApi.PlayVideoWithPlayer(playItems, PlayMethod.Pot, xamlRoot);
-                break;
-            //mpv播放
-            case 2:
-                await GlobalWebApi.PlayVideoWithPlayer(playItems, PlayMethod.Mpv, xamlRoot);
-                break;
-            //vlc播放
-            case 3:
-                await GlobalWebApi.PlayVideoWithPlayer(playItems, PlayMethod.Vlc, xamlRoot);
+            case PlayerType.PotPlayer or PlayerType.Mpv or PlayerType.Vlc:
+                await GlobalWebApi.PlayVideoWithPlayer(playItems, playerType, xamlRoot);
                 break;
             //MediaElement播放
-            case 4:
+            case PlayerType.MediaElement:
                 MediaPlayWindow.CreateNewWindow(playItems, playType, lastPage);
                 break;
         }
@@ -90,7 +83,7 @@ public class PlayVideoHelper
     /// <param name="quality"></param>
     /// <param name="showWindow"></param>
     /// <param name="referrerUrl"></param>
-    public static async void Play115SourceVideoWithPotPlayer(IList<MediaPlayItem> playItems, string userAgent, string fileName, Const.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
+    public static async void Play115SourceVideoWithPotPlayer(IList<MediaPlayItem> playItems, string userAgent, string fileName, PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
     {
         var isFirst = true;
         foreach (var mediaPlayItem in playItems)
@@ -128,7 +121,7 @@ public class PlayVideoHelper
     /// <param name="quality"></param>
     /// <param name="showWindow"></param>
     /// <param name="referrerUrl"></param>
-    public static async void Play115SourceVideoWithMpv(IList<MediaPlayItem> playItems, string userAgent, string fileName, Const.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
+    public static async void Play115SourceVideoWithMpv(IList<MediaPlayItem> playItems, string userAgent, string fileName, PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
     {
         var arguments = string.Empty;
         foreach (var mediaPlayItem in playItems)
@@ -166,7 +159,7 @@ public class PlayVideoHelper
     /// <param name="quality"></param>
     /// <param name="showWindow"></param>
     /// <param name="referrerUrl"></param>
-    public static async void Play115SourceVideoWithVlc(IList<MediaPlayItem> playItems, string userAgent, string fileName, Const.PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
+    public static async void Play115SourceVideoWithVlc(IList<MediaPlayItem> playItems, string userAgent, string fileName, PlayQuality quality, bool showWindow = true, string referrerUrl = "https://115.com")
     {
         var arguments = string.Empty;
         foreach (var mediaPlayItem in playItems)

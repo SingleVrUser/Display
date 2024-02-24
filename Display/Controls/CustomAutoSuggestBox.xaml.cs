@@ -20,8 +20,8 @@ public sealed partial class CustomAutoSuggestBox : UserControl
 {
     //提交请求（按下Enter）
     public event TypedEventHandler<AutoSuggestBox, AutoSuggestBoxQuerySubmittedEventArgs> QuerySubmitted;
-    public event System.EventHandler<object> OpenAutoSuggestionBoxCompleted;
-    public event System.EventHandler<object> CloseAutoSuggestionBoxCompleted;
+    public event EventHandler<object> OpenAutoSuggestionBoxCompleted;
+    public event EventHandler<object> CloseAutoSuggestionBoxCompleted;
 
     public CustomAutoSuggestBox()
     {

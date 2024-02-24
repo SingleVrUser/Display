@@ -6,6 +6,7 @@ using Windows.Media.Playback;
 using Display.Extensions;
 using Display.Helper.FileProperties.Name;
 using Display.Models.Data;
+using Display.Models.Data.Enums;
 
 namespace Display.Models.Media
 {
@@ -168,18 +169,18 @@ namespace Display.Models.Media
             return quality.Url;
         }
 
-        public async Task<string> GetUrl(Const.PlayQuality quality)
+        public async Task<string> GetUrl(PlayQuality quality)
         {
             switch (quality)
             {
-                case Const.PlayQuality.M3U8:
+                case PlayQuality.M3U8:
                     {
                         var m3U8Infos = await GetM3U8Infos();
                         if (m3U8Infos == null || m3U8Infos.Count == 0) return await GetOriginalUrl();
 
                         return m3U8Infos.FirstOrDefault()?.Url;
                     }
-                case Const.PlayQuality.Origin:
+                case PlayQuality.Origin:
                     return await GetOriginalUrl();
                 default:
                     return null;

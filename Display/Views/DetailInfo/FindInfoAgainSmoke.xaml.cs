@@ -1,26 +1,54 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Display.Helper.Network.Spider;
 using Display.Models.Data;
+using Display.Views.Settings.Options;
+using Microsoft.Extensions.Options;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Data;
 
 namespace Display.Views.DetailInfo
 {
-    public sealed partial class FindInfoAgainSmoke : Page
+    public sealed partial class FindInfoAgainSmoke
     {
-        private string cidName { get; set; }
+        private string CidName { get; }
 
-        private ObservableCollection<VideoInfo> VideoInfos = new();
+        private readonly ObservableCollection<VideoInfo> _searchResultList = new();
 
-        private VideoInfo VideoInfo;
+        private readonly VideoInfo _videoInfo;  
 
         public FindInfoAgainSmoke(string cidName)
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
-            VideoInfo = new();
+            _videoInfo = new VideoInfo();
 
-            this.cidName = cidName;
+            CidName = cidName;
+
+            InitView();
+        }
+
+        private void InitView()
+        {
+            //var spiders = Manager.Spiders.Select(spider => new Spider(spider)).ToList();
+
+            //foreach (var spider in Manager.Spiders)
+            //{
+            //    spiders.Add(new Spider(spider));
+            //    //var toggleButton = new ToggleButton
+            //    //{
+            //    //    Content = spider.Name
+            //    //};
+
+            //    //var binding = new Binding { Source = spider, Path = new PropertyPath("IsOn"), Mode = BindingMode.TwoWay };
+            //    //toggleButton.SetBinding(ToggleButton.IsCheckedProperty, binding);
+            //    //SpiderCheckBoxGrid.Children.Add(toggleButton);
+            //}
+
+            SpiderCheckBoxGrid.ItemsSource = Manager.Spiders;
         }
 
 
@@ -28,12 +56,12 @@ namespace Display.Views.DetailInfo
         {
             ReCheckProgressRing.Visibility = Visibility.Visible;
 
-            var infos = await Manager.Current.DispatchSpiderInfosByCidInOrder(cidName);
+            var infos = await Manager.Instance.DispatchSpiderInfosByCidInOrder(CidName);
 
             if (infos.Count > 0)
             {
-                VideoInfos.Clear();
-                infos.ForEach(VideoInfos.Add);
+                _searchResultList.Clear();
+                infos.ForEach(_searchResultList.Add);
             }
 
             ReCheckProgressRing.Visibility = Visibility.Collapsed;
@@ -86,12 +114,12 @@ namespace Display.Views.DetailInfo
 
         private async void SearchInfoBySpecificUrlButton_Click(object sender, RoutedEventArgs e)
         {
-            string url = SepcificUrl_TextBlock.Text;
+            string url = SpecificUrl_TextBlock.Text;
 
             ReCheckProgressRing.Visibility = Visibility.Visible;
             ConfirmSpecificUrlButton.IsEnabled = false;
 
-            var info = await Manager.Current.DispatchSpiderInfoByDetailUrl(cidName, url, default);
+            var info = await Manager.Instance.DispatchSpiderInfoByDetailUrl(CidName, url, default);
 
             ReCheckProgressRing.Visibility = Visibility.Collapsed;
 
@@ -103,8 +131,8 @@ namespace Display.Views.DetailInfo
                 var name = item.Name;
                 var value = item.GetValue(info);
 
-                var newItem = VideoInfo.GetType().GetProperty(name);
-                newItem.SetValue(VideoInfo, value);
+                var newItem = _videoInfo.GetType().GetProperty(name);
+                newItem.SetValue(_videoInfo, value);
             }
 
             ConfirmSpecificUrlButton.IsEnabled = true;
@@ -114,10 +142,10 @@ namespace Display.Views.DetailInfo
         private void ConfirmSpecificUrlButton_Click(object sender, RoutedEventArgs e)
         {
             if (!(sender is Button button)) return;
-            if (VideoInfo == null) return;
+            if (_videoInfo == null) return;
 
             //修改一下
-            button.DataContext = VideoInfo;
+            button.DataContext = _videoInfo;
 
             ConfirmClick?.Invoke(button, e);
         }
