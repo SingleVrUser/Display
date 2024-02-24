@@ -6,43 +6,62 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using SpiderInfo = Display.Models.Spider.SpiderInfos;
-using Display.Helper.Network;
 using Display.Models.Data;
-using Display.Models.Spider;
+using static Display.Models.Spider.SpiderInfos;
 
 namespace Display.Helper.Network.Spider;
 
-public class JavDB
+public class JavDb : InfoSpider
 {
-    public const int Id = (int)SpiderInfo.SpiderSourceName.Javdb;
+    public override string Abbreviation => "db";
+    public override string Keywords => "JavDB";
+    public override SpiderSourceName Name => SpiderSourceName.Javdb;
+    public override bool IsOn
+    {
+        get => AppSettings.IsUseJavDb;
+        set => AppSettings.IsUseJavDb = value;
+    }
 
-    public const string Abbreviation = "db";
+    public override bool IsCookieEnable => true;
 
-    public const string Keywords = "JavDB";
+    public override string BaseUrl
+    {
+        get => AppSettings.JavDbBaseUrl;
+        set => AppSettings.JavDbBaseUrl = value;
+    }
 
-    public static Tuple<int, int> DelayRanges = new(3, 6);
+    public override Tuple<int, int> DelayRanges => new(3, 6);
+    public override bool IgnoreFc2 => false;
+    public static readonly char ManSymbol = '♂';
+    public static readonly char WomanSymbol = '♀';
 
-    public static readonly char manSymbol = '♂';
+    public override string Cookie
+    {
+        get => AppSettings.JavDbCookie;
+        set
+        {
+            AppSettings.JavDbCookie = value;
+            _client = CreateClient(value);
+        }
+    }
 
-    public static readonly char womanSymbol = '♀';
+    private static HttpClient _client;
 
-    public const bool IgnoreFc2 = false;
+    public override HttpClient Client =>
+        _client ??= CreateClient(Cookie);
 
-    public static bool IsOn => AppSettings.IsUseJavDb;
 
-    private static string baseUrl => AppSettings.JavDbBaseUrl;
-
-    private static HttpClient _clientWithJavDbCookie;
-    private static HttpClient ClientWithCookie =>
-        _clientWithJavDbCookie ??= GetInfoFromNetwork.CreateClient(
+    private static HttpClient CreateClient(string cookie)
+    {
+        return GetInfoFromNetwork.CreateClient(
             new Dictionary<string, string>
             {
-                { "cookie", AppSettings.JavDbCookie },
+                { "cookie", cookie },
                 { "user-agent", GetInfoFromNetwork.DownUserAgent }
             });
+    }
 
-    public static async Task<VideoInfo> SearchInfoFromCid(string cid, CancellationToken token)
+    public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
     {
         var isUseCookie = cid.Contains("FC");
 
@@ -56,7 +75,7 @@ public class JavDB
         Tuple<string, string> tuple;
         //访问fc内容需要cookie
         if (isUseCookie)
-            tuple = await RequestHelper.RequestHtml(ClientWithCookie, detailUrl, token);
+            tuple = await RequestHelper.RequestHtml(Client, detailUrl, token);
         else
             tuple = await RequestHelper.RequestHtml(Common.Client, detailUrl, token);
 
@@ -68,166 +87,61 @@ public class JavDB
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlString);
 
-        return await GetVideoInfoFromHtmlDoc(cid, detailUrl, htmlDoc);
+        return await GetInfoByHtmlDoc(cid, detailUrl, htmlDoc);
     }
 
-    private static async Task<string> GetDetailUrlFromCid(string CID, CancellationToken token)
+    public override async Task<VideoInfo> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
     {
-        var url = GetInfoFromNetwork.UrlCombine(baseUrl, $"search?q={CID}&f=all");
-
-        // 访问
-        var tuple = await RequestHelper.RequestHtml(Common.Client, url, token);
-        if (tuple == null) return null;
-
-        var strResult = tuple.Item2;
-        var htmlDoc = new HtmlDocument();
-        htmlDoc.LoadHtml(strResult);
-
-        var result = GetDetailUrlFromSearchResult(htmlDoc, CID);
-
-        return result;
-    }
-
-    private static string GetDetailUrlFromSearchResult(HtmlDocument htmlDoc, string CID)
-    {
-        string result = null;
-
-        var searchResultNodes = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class,'movie-list')]");
-
-        //搜索无果，退出
-        if (searchResultNodes == null) return null;
-
-        //分割通过正则匹配得到的CID
-        var splitResult = Common.SplitCid(CID);
-        if (splitResult == null) return null;
-
-        var leftCid = splitResult.Item1;
-        var rightCid = splitResult.Item2;
-
-        for (var i = 0; i < searchResultNodes.Count; i++)
-        {
-            var searchLeftCid = string.Empty;
-            var searchRightCid = string.Empty;
-
-            var movieList = searchResultNodes[i];
-            var titleSearch = movieList.SelectSingleNode(".//div[@class='video-title']/strong").InnerText;
-            var title = titleSearch.ToUpper();
-
-            var split_result = title.Split(new char[] { '-', '_' });
-            if (split_result.Length == 1)
-            {
-                var match_result = Regex.Match(title, @"([A-Z]+)(\d+)");
-                if (match_result.Success)
-                {
-                    searchLeftCid = match_result.Groups[1].Value;
-                    searchRightCid = match_result.Groups[2].Value;
-                }
-            }
-            else if (split_result.Length == 2)
-            {
-                searchLeftCid = split_result[0];
-                searchRightCid = split_result[1];
-            }
-            else if (split_result.Length == 3)
-            {
-                if (title.Contains("HEYDOUGA"))
-                {
-                    searchLeftCid = split_result[1];
-                    searchRightCid = split_result[2];
-                }
-                else
-                    return null;
-            }
-            else
-                return null;
-
-            if (searchLeftCid == leftCid
-                && (searchRightCid == rightCid
-                    || int.TryParse(rightCid, out var currentNum)
-                        && int.TryParse(searchRightCid, out var searchNum)
-                        && currentNum.Equals(searchNum)))
-            {
-                var detailUrl = searchResultNodes[i].SelectSingleNode(".//a").Attributes["href"].Value;
-                detailUrl = GetInfoFromNetwork.UrlCombine(AppSettings.JavDbBaseUrl, detailUrl);
-                result = detailUrl;
-                break;
-            }
-            else
-            {
-
-            }
-        }
-
-        return result;
-    }
-
-    public static async Task<VideoInfo> GetVideoInfoFromHtmlDoc(string CID, string detail_url, HtmlDocument htmlDoc)
-    {
-        // TODO之前已经访问过一次了，查看是否需要用Cookie再访问一次（Fc2）
-
-        //bool isUseCookie = CID.Contains("FC");
-
-        //if (isUseCookie && string.IsNullOrEmpty(AppSettings.javdb_Cookie)) return null;
-
-        ////访问fc内容需要cookie
-        //Tuple<string, string> tuple;
-        //if (isUseCookie)
-        //    tuple = await RequestHelper.RequestHtml(ClientWithCookie, detail_url);
-        //else
-        //    tuple = await RequestHelper.RequestHtml(Common.Client, detail_url);
-
-        //string strResult = tuple.Item2;
-        //if (string.IsNullOrEmpty(strResult)) return null;
-
-        var video_meta_panelNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='video-meta-panel']");
+        var videoMetaPanelNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='video-meta-panel']");
 
         //检查是不是没有登录
-        if (video_meta_panelNode == null)
+        if (videoMetaPanelNode == null)
         {
             var headingNode = htmlDoc.DocumentNode.SelectSingleNode("//p[@class='panel-heading']");
             //没有登录
             if (headingNode != null && headingNode.InnerText.Contains("登入"))
             {
-                var tuple = await RequestHelper.RequestHtml(ClientWithCookie, detail_url, default);
-                string htmlString = tuple.Item2;
+                var tuple = await RequestHelper.RequestHtml(Client, detailUrl, default);
+                var htmlString = tuple.Item2;
 
                 htmlDoc.LoadHtml(htmlString);
 
                 //再次检查信息 meta_panel
-                video_meta_panelNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='video-meta-panel']");
+                videoMetaPanelNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='video-meta-panel']");
 
                 //依旧不能用就退出
-                if (video_meta_panelNode == null) return null;
+                if (videoMetaPanelNode == null) return null;
             }
             else
                 return null;
         }
 
-        VideoInfo videoInfo = new VideoInfo();
-
-        videoInfo.busUrl = detail_url;
-
-        Uri Uri = new(detail_url);
-        string JavDBUrl = $"{Uri.Scheme}://{Uri.Host}";
-
-        var ImageUrl = video_meta_panelNode.SelectSingleNode(".//img[@class='video-cover']").Attributes["src"].Value;
-
-        if (!ImageUrl.Contains("http"))
+        var videoInfo = new VideoInfo
         {
-            ImageUrl = GetInfoFromNetwork.UrlCombine(JavDBUrl, ImageUrl);
+            busUrl = detailUrl
+        };
+
+        Uri uri = new(detailUrl);
+        var javDbUrl = $"{uri.Scheme}://{uri.Host}";
+
+        var imageUrl = videoMetaPanelNode.SelectSingleNode(".//img[@class='video-cover']").Attributes["src"].Value;
+
+        if (!imageUrl.Contains("http"))
+        {
+            imageUrl = GetInfoFromNetwork.UrlCombine(javDbUrl, imageUrl);
         }
 
-        var AttributeNodes = video_meta_panelNode.SelectNodes(".//div[contains(@class,'panel-block')]");
+        var attributeNodes = videoMetaPanelNode.SelectNodes(".//div[contains(@class,'panel-block')]");
 
-        videoInfo.trueName = CID;
+        videoInfo.trueName = cid;
         //信息
-        for (var i = 0; i < AttributeNodes.Count; i++)
+        for (var i = 0; i < attributeNodes.Count; i++)
         {
-            var keyNode = AttributeNodes[i].SelectSingleNode("strong");
+            var keyNode = attributeNodes[i].SelectSingleNode("strong");
             if (keyNode == null) continue;
             string key = keyNode.InnerText;
 
-            var valueNode = AttributeNodes[i].SelectSingleNode("span");
+            var valueNode = attributeNodes[i].SelectSingleNode("span");
 
             ////以网页的CID为准
             //if (key.Contains("番號"))
@@ -271,16 +185,15 @@ public class JavDB
                 var genderNodes = valueNode.SelectNodes("strong");
 
                 if (actorNodes == null) continue;
-                List<string> actorList = new List<string>();
+                var actorList = new List<string>();
 
 
-                for (int j = 0; j < actorNodes.Count; j++)
+                for (var j = 0; j < actorNodes.Count; j++)
                 {
                     var actorNode = actorNodes[j];
 
                     //♀ or ♂
                     var genderNode = genderNodes[j];
-
 
                     actorList.Add($"{actorNode.InnerText.Trim()}{genderNode.InnerText}");
                 }
@@ -289,30 +202,30 @@ public class JavDB
         }
 
         //标题
-        var TitleNode = htmlDoc.DocumentNode.SelectSingleNode(".//strong[@class='current-title']");
-        var title = TitleNode.InnerText;
+        var titleNode = htmlDoc.DocumentNode.SelectSingleNode(".//strong[@class='current-title']");
+        var title = titleNode.InnerText;
         videoInfo.Title = title.Replace(videoInfo.trueName, "").Trim();
 
         //下载封面
-        string SavePath = AppSettings.ImageSavePath;
-        string filePath = Path.Combine(SavePath, CID);
-        videoInfo.ImageUrl = ImageUrl;
-        videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(ImageUrl, filePath, CID);
+        var savePath = AppSettings.ImageSavePath;
+        var filePath = Path.Combine(savePath, cid);
+        videoInfo.ImageUrl = imageUrl;
+        videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(imageUrl, filePath, cid);
 
         //样品图片
-        var preview_imagesSingesNode = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class,'preview-images')]");
-        if (preview_imagesSingesNode != null)
+        var previewImagesSingesNode = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class,'preview-images')]");
+        if (previewImagesSingesNode != null)
         {
-            var preview_imagesNodes = preview_imagesSingesNode.SelectNodes(".//a[@class='tile-item']");
+            var previewImagesNodes = previewImagesSingesNode.SelectNodes(".//a[@class='tile-item']");
             List<string> sampleUrlList = new();
-            if (preview_imagesNodes != null)
+            if (previewImagesNodes != null)
             {
-                foreach (var node in preview_imagesNodes)
+                foreach (var node in previewImagesNodes)
                 {
                     var sampleImageUrl = node.Attributes["href"].Value;
                     if (!sampleImageUrl.Contains("http"))
                     {
-                        sampleImageUrl = GetInfoFromNetwork.UrlCombine(JavDBUrl, sampleImageUrl);
+                        sampleImageUrl = GetInfoFromNetwork.UrlCombine(javDbUrl, sampleImageUrl);
                     }
                     sampleUrlList.Add(sampleImageUrl);
                 }
@@ -323,22 +236,108 @@ public class JavDB
         return videoInfo;
     }
 
+    private async Task<string> GetDetailUrlFromCid(string cid, CancellationToken token)
+    {
+        var url = GetInfoFromNetwork.UrlCombine(BaseUrl, $"search?q={cid}&f=all");
+
+        // 访问
+        var tuple = await RequestHelper.RequestHtml(Common.Client, url, token);
+        if (tuple == null) return null;
+
+        var strResult = tuple.Item2;
+        var htmlDoc = new HtmlDocument();
+        htmlDoc.LoadHtml(strResult);
+
+        var result = GetDetailUrlFromSearchResult(htmlDoc, cid);
+
+        return result;
+    }
+
+    private static string GetDetailUrlFromSearchResult(HtmlDocument htmlDoc, string cid)
+    {
+        string result = null;
+
+        var searchResultNodes = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class,'movie-list')]");
+
+        //搜索无果，退出
+        if (searchResultNodes == null) return null;
+
+        //分割通过正则匹配得到的CID
+        var splitResult = Common.SplitCid(cid);
+        if (splitResult == null) return null;
+
+        var leftCid = splitResult.Item1;
+        var rightCid = splitResult.Item2;
+
+        for (var i = 0; i < searchResultNodes.Count; i++)
+        {
+            var searchLeftCid = string.Empty;
+            var searchRightCid = string.Empty;
+
+            var movieList = searchResultNodes[i];
+            var titleSearch = movieList.SelectSingleNode(".//div[@class='video-title']/strong").InnerText;
+            var title = titleSearch.ToUpper();
+
+            var split = title.Split('-', '_');
+            if (split.Length == 1)
+            {
+                var matchResult = Regex.Match(title, @"([A-Z]+)(\d+)");
+                if (matchResult.Success)
+                {
+                    searchLeftCid = matchResult.Groups[1].Value;
+                    searchRightCid = matchResult.Groups[2].Value;
+                }
+            }
+            else if (split.Length == 2)
+            {
+                searchLeftCid = split[0];
+                searchRightCid = split[1];
+            }
+            else if (split.Length == 3)
+            {
+                if (title.Contains("HEYDOUGA"))
+                {
+                    searchLeftCid = split[1];
+                    searchRightCid = split[2];
+                }
+                else
+                    return null;
+            }
+            else
+                return null;
+
+            if (searchLeftCid == leftCid
+                && (searchRightCid == rightCid
+                    || int.TryParse(rightCid, out var currentNum)
+                        && int.TryParse(searchRightCid, out var searchNum)
+                        && currentNum.Equals(searchNum)))
+            {
+                var detailUrl = searchResultNodes[i].SelectSingleNode(".//a").Attributes["href"].Value;
+                detailUrl = GetInfoFromNetwork.UrlCombine(AppSettings.JavDbBaseUrl, detailUrl);
+                result = detailUrl;
+                break;
+            }
+        }
+
+        return result;
+    }
+
     public static string TrimGenderFromActorName(string actorName)
     {
-        return actorName.TrimEnd(new char[] { manSymbol, womanSymbol });
+        return actorName.TrimEnd(ManSymbol, WomanSymbol);
     }
 
     public static string RemoveGenderFromActorListString(string actorListString)
     {
-        string result = actorListString;
+        var result = actorListString;
 
-        if (result.Contains(manSymbol))
+        if (result.Contains(ManSymbol))
         {
-            result = result.Replace(manSymbol, char.MinValue);
+            result = result.Replace(ManSymbol, char.MinValue);
         }
-        else if (result.Contains(womanSymbol))
+        else if (result.Contains(WomanSymbol))
         {
-            result = result.Replace(womanSymbol, char.MinValue);
+            result = result.Replace(WomanSymbol, char.MinValue);
         }
 
         return result;

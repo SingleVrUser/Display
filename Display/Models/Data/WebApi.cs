@@ -28,6 +28,7 @@ using Display.Models.Disk._115;
 using Display.Helper.Network;
 using Display.Helper.Date;
 using Display.CustomWindows;
+using Display.Models.Data.Enums;
 
 namespace Display.Models.Data
 {
@@ -1547,40 +1548,37 @@ namespace Display.Models.Data
         }
 
 
-
-        public enum PlayMethod { Pot, Mpv, Vlc }
-
         /// <summary>
         /// 原画播放
         /// </summary>
         /// <param name="playItems"></param>
-        /// <param name="playMethod"></param>
+        /// <param name="playerType"></param>
         /// <param name="xamlRoot"></param>
         /// <param name="progress"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public async Task PlayVideoWithPlayer(IList<MediaPlayItem> playItems, PlayMethod playMethod, XamlRoot xamlRoot, IProgress<int> progress = null)
+        public async Task PlayVideoWithPlayer(IList<MediaPlayItem> playItems, PlayerType playerType, XamlRoot xamlRoot, IProgress<int> progress = null)
         {
             string savePath;
             string ua;
 
             //检查播放器设置
-            switch (playMethod)
+            switch (playerType)
             {
-                case PlayMethod.Pot:
+                case PlayerType.PotPlayer:
                     savePath = AppSettings.PotPlayerExePath;
                     ua = GetInfoFromNetwork.DownUserAgent;
                     break;
-                case PlayMethod.Mpv:
+                case PlayerType.Mpv:
                     savePath = AppSettings.MpvExePath;
                     ua = GetInfoFromNetwork.DownUserAgent;
                     break;
-                case PlayMethod.Vlc:
+                case PlayerType.Vlc:
                     savePath = AppSettings.VlcExePath;
                     ua = GetInfoFromNetwork.DownUserAgent;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(playMethod), playMethod, null);
+                    throw new ArgumentOutOfRangeException(nameof(playerType), playerType, null);
             }
 
             //播放路径检查选择
@@ -1601,7 +1599,7 @@ namespace Display.Models.Data
                 return;
             }
 
-            var quality = (Const.PlayQuality)AppSettings.DefaultPlayQuality;
+            var quality = (Enums.PlayQuality)AppSettings.DefaultPlayQuality;
 
             //打开一层文件夹并添加可播放文件到List中
             playItems = await MediaPlayItem.OpenFolderThenInsertVideoFileToMediaPlayItem(playItems, GlobalWebApi);
@@ -1626,20 +1624,20 @@ namespace Display.Models.Data
             }
 
             //检查播放方式
-            switch (playMethod)
+            switch (playerType)
             {
-                case PlayMethod.Pot:
+                case PlayerType.PotPlayer:
                     PlayVideoHelper.Play115SourceVideoWithPotPlayer(playItems, userAgent: ua, savePath, quality, true);
                     break;
-                case PlayMethod.Mpv:
+                case PlayerType.Mpv:
                     PlayVideoHelper.Play115SourceVideoWithMpv(playItems, userAgent: ua, savePath, quality, false);
                     break;
-                case PlayMethod.Vlc:
+                case PlayerType.Vlc:
                     //vlc不支持带“; ”的user-agent
                     PlayVideoHelper.Play115SourceVideoWithVlc(playItems, userAgent: ua, savePath, quality, false);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(playMethod), playMethod, null);
+                    throw new ArgumentOutOfRangeException(nameof(playerType), playerType, null);
             }
         }
 

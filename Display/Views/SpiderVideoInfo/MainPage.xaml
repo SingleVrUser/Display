@@ -5,7 +5,6 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:data="using:Display.Models.Data"
       xmlns:customControls="using:Display.Controls"
-      xmlns:helper="using:Display.Helper.FileProperties.Name"
       mc:Ignorable="d">
 
     <Page.Resources>

@@ -6,10 +6,10 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:customcontrols="using:Display.Controls"
       xmlns:data="using:Display.Models.Data"
       xmlns:videoDisplay="using:Display.Views.More.DatumList.VideoDisplay"
+      xmlns:controls="using:CommunityToolkit.WinUI.Controls"
       mc:Ignorable="d">
 
     <Page.Resources>

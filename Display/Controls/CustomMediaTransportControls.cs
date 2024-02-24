@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Display.Models.Data;
+using Display.Models.Data.Enums;
 using Display.Models.Media;
+using static Display.Controls.CustomMediaPlayerElement;
 
 namespace Display.Controls;
 
@@ -241,9 +243,9 @@ public class CustomMediaTransportControls : MediaTransportControls
 
         //设置播放源
         List<Player> playerItemsSource = new() {
-            new Player(WebApi.PlayMethod.Vlc),
-            new Player(WebApi.PlayMethod.Mpv),
-            new Player(WebApi.PlayMethod.Pot)};
+            new Player(PlayerType.Vlc),
+            new Player(PlayerType.Mpv),
+            new Player(PlayerType.PotPlayer)};
 
         //播放器选择列表
         playerListView.ItemsSource = playerItemsSource;
@@ -258,12 +260,6 @@ public class CustomMediaTransportControls : MediaTransportControls
 
     private void QualityListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        //if (_isFirstQualityChanged)
-        //{
-        //    _isFirstQualityChanged = false;
-        //    return;
-        //}
-
         Debug.WriteLine("画质选项发生改变");
         if (_isSettingQualitySource) return;
 
@@ -307,13 +303,12 @@ public class CustomMediaTransportControls : MediaTransportControls
 
 public class Player
 {
-    public WebApi.PlayMethod PlayMethod;
+    public PlayerType PlayerType;
 
-    public string Name => PlayMethod.ToString();
+    public string Name => PlayerType.ToString();
 
-
-    public Player(WebApi.PlayMethod playerMethod)
+    public Player(PlayerType playerType)
     {
-        this.PlayMethod = playerMethod;
+        this.PlayerType = playerType;
     }
 }

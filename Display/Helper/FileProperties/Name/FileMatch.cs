@@ -9,6 +9,7 @@ using Windows.System;
 using Display.Models.Data;
 using Microsoft.UI.Xaml;
 using SharpCompress;
+using Windows.Storage.Pickers;
 
 namespace Display.Helper.FileProperties.Name;
 
@@ -352,7 +353,7 @@ public static class FileMatch
                     break;
                 //mini_act……_dialog_show
                 default:
-                    cookieList.Add(new CookieFormat() { name = key, value = value, session = true });
+                    cookieList.Add(new CookieFormat { name = key, value = value, session = true });
                     break;
             }
         }
@@ -361,8 +362,33 @@ public static class FileMatch
 
     public static async void LaunchFolder(string path)
     {
+        if (string.IsNullOrWhiteSpace(path)) return;
         var folder = await StorageFolder.GetFolderFromPathAsync(path);
         await Launcher.LaunchFolderAsync(folder);
+    }
+
+    public static async Task<StorageFolder> OpenFolder(object target, PickerLocationId suggestedStartLocation)
+    {
+        FolderPicker folderPicker = new();
+        folderPicker.FileTypeFilter.Add("*");
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(target);
+        folderPicker.SuggestedStartLocation = suggestedStartLocation;
+
+        WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hwnd);
+
+        return await folderPicker.PickSingleFolderAsync();
+    }
+
+    public static async Task<StorageFile> SelectFileAsync(Window window, IList<string> fileTypeFilters = null)
+    {
+        FileOpenPicker fileOpenPicker = new();
+        fileTypeFilters?.ForEach(fileOpenPicker.FileTypeFilter.Add);
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+        fileOpenPicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+
+        WinRT.Interop.InitializeWithWindow.Initialize(fileOpenPicker, hwnd);
+
+        return await fileOpenPicker.PickSingleFileAsync();
     }
 
     public static void CreateDirectoryIfNotExists(string savePath)

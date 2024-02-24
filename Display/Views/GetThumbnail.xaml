@@ -6,12 +6,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:data="using:Display.Models.Data"
-      xmlns:customcontrols="using:Display.Controls"
-    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-    xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
+    xmlns:customcontrols="using:Display.Controls"
+    xmlns:animations="using:CommunityToolkit.WinUI.Animations"
+    xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d">
     <Page.Resources>
-        <DataTemplate x:DataType="data:ThumbnailInfo" x:Key="ThumbnialInfoDataTemplate">
+        <DataTemplate x:DataType="data:ThumbnailInfo" x:Key="ThumbnailInfoDataTemplate">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -104,7 +104,7 @@
             <CheckBox x:Name="selectedCheckBox" Content="共选 0 项" CornerRadius="10" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
         </RelativePanel>
 
-        <controls:AdaptiveGridView
+        <oldControls:AdaptiveGridView
             Grid.Row="2"
             x:Name="BasicGridView"
             IsItemClickEnabled="True"
@@ -114,9 +114,9 @@
             SelectionMode="Multiple"
             SelectionChanged="BasicGridView_SelectionChanged"
             ItemsSource="{x:Bind thumbnailInfo}"
-            ItemTemplate="{StaticResource ThumbnialInfoDataTemplate}"
+            ItemTemplate="{StaticResource ThumbnailInfoDataTemplate}"
             animations:ItemsReorderAnimation.Duration="00:00:00.0960000">
-        </controls:AdaptiveGridView>
+        </oldControls:AdaptiveGridView>
 
         <!--<ProgressBar x:Name="TotalProgressBar" VerticalAlignment="Top" Visibility="Collapsed"/>-->
     </Grid>

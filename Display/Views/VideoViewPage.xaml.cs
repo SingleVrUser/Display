@@ -25,8 +25,7 @@ public sealed partial class VideoViewPage
     public VideoCoverDisplayClass _storeditem;
     public VideoViewPage()
     {
-
-        this.InitializeComponent();
+        InitializeComponent();
 
         Current = this;
 

@@ -2,14 +2,14 @@
     x:Class="Display.Views.AddActorCover"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:local="using:Display.Views"
+    xmlns:local="using:Display.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:customcontrols="using:Display.Controls"
-    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:customcontrols="using:Display.Controls"
     xmlns:data="using:Display.Models.Data"
-    xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
     xmlns:helper="using:Display.Helper.FileProperties.Name"
+    xmlns:animations1="using:CommunityToolkit.WinUI.Animations"
+    xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d">
     <Page.Resources>
 
@@ -23,7 +23,7 @@
                 PointerEntered="connectedElement_PointerEntered"
                 PointerExited="connectedElement_PointerExited">
                 <Grid Visibility="{x:Bind helper:FileMatch.ShowIfImageNull(ProfilePath),Mode=OneWay}">
-                    <controls:ImageEx Source="{x:Bind ProfilePath,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
+                    <oldControls:ImageEx Source="{x:Bind ProfilePath,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
 
                     <TextBlock Text="{x:Bind Name}" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" TextWrapping="Wrap" Margin="5"/>
 
@@ -31,7 +31,7 @@
                 </Grid>
 
                 <Grid Visibility="{x:Bind helper:FileMatch.ShowIfImageNotNull(ProfilePath),Mode=OneWay}">
-                    <controls:ImageEx Margin="0,0,0,20" x:Name="ActorImage" Source="{x:Bind ProfilePath,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
+                    <oldControls:ImageEx Margin="0,0,0,20" x:Name="ActorImage" Source="{x:Bind ProfilePath,Mode=OneWay}" PlaceholderSource="/Assets/NoPicture.jpg" PlaceholderStretch="Uniform"/>
 
                     <StackPanel VerticalAlignment="Bottom">
                         <RelativePanel Margin="5,0">
@@ -84,7 +84,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
-        <controls:AdaptiveGridView Grid.Row="1"
+        <oldControls:AdaptiveGridView Grid.Row="1"
                 x:Name="BasicGridView"
                 IsItemClickEnabled="True"
                 Padding="10,0"
@@ -93,8 +93,8 @@
                 SelectionMode="Multiple"
                 SelectionChanged="BasicGridView_SelectionChanged"
                 ItemTemplate="{StaticResource GirdViewTemplate}"
-                animations:ItemsReorderAnimation.Duration="00:00:00.0960000">
-        </controls:AdaptiveGridView>
+                animations1:ItemsReorderAnimation.Duration="00:00:00.0960000">
+        </oldControls:AdaptiveGridView>
 
         <Grid x:Name="SmokeGrid" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Collapsed" >
 

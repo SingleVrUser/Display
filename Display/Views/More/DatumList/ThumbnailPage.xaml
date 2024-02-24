@@ -8,10 +8,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:customcontrols="using:Display.Controls"
-    xmlns:uicontrols="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:data="using:Display.Models.Data"
     xmlns:viewModels="using:Display.ViewModels"
     xmlns:model="using:Display.Models.Image"
+    xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -125,7 +125,7 @@
                            Grid.Column="1"
                            Text="{x:Bind _viewModel.CurrentThumbnailItem.TimeStamp,Converter={StaticResource TimeStampToStringConverter}, Mode=OneWay}" />
             </Grid>
-            <uicontrols:AdaptiveGridView Grid.Row="1"
+            <oldControls:AdaptiveGridView Grid.Row="1"
                                          StretchContentForSingleRow="False"
                                          ItemsSource="{x:Bind ThumbnailsCvs.View}"
                                          SelectedIndex="{x:Bind ImageViewer.SelectedIndex, Mode=TwoWay}"
@@ -133,7 +133,7 @@
                                          DesiredWidth="90"
                                          HorizontalContentAlignment="Center">
 
-                <uicontrols:AdaptiveGridView.Header>
+                <oldControls:AdaptiveGridView.Header>
                     <RelativePanel>
                         <TextBlock Text="预览列表"
                                    Style="{StaticResource BodyTextBlockStyle}"
@@ -142,9 +142,9 @@
                                          RelativePanel.AlignRightWithPanel="True"
                                          Visibility="Collapsed"/>
                     </RelativePanel>
-                </uicontrols:AdaptiveGridView.Header>
+                </oldControls:AdaptiveGridView.Header>
 
-                <uicontrols:AdaptiveGridView.GroupStyle>
+                <oldControls:AdaptiveGridView.GroupStyle>
                     <GroupStyle>
                         <GroupStyle.HeaderTemplate>
                             <DataTemplate x:DataType="viewModels:GroupThumbnailCollection">
@@ -152,18 +152,18 @@
                             </DataTemplate>
                         </GroupStyle.HeaderTemplate>
                     </GroupStyle>
-                </uicontrols:AdaptiveGridView.GroupStyle>
+                </oldControls:AdaptiveGridView.GroupStyle>
 
-                <uicontrols:AdaptiveGridView.ItemTemplate>
+                <oldControls:AdaptiveGridView.ItemTemplate>
 
                     <DataTemplate x:DataType="model:LocalThumbnail">
-                        <uicontrols:ImageEx Source="{x:Bind Thumbnail}"
+                        <oldControls:ImageEx Source="{x:Bind Thumbnail}"
                                             Height="60" />
                     </DataTemplate>
-                </uicontrols:AdaptiveGridView.ItemTemplate>
+                </oldControls:AdaptiveGridView.ItemTemplate>
 
 
-            </uicontrols:AdaptiveGridView>
+            </oldControls:AdaptiveGridView>
         </Grid>
 
         <controls:GridSplitter Grid.Row="1"

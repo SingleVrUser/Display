@@ -6,11 +6,11 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:local="using:Display.Views.Sort115"
       xmlns:customcontrols="using:Display.Controls"
       xmlns:models="using:Display.Models.Disk._115"
       xmlns:viewModels="using:Display.ViewModels"
+      xmlns:controls="using:CommunityToolkit.WinUI.Controls"
       mc:Ignorable="d">
 
     <Page.DataContext>

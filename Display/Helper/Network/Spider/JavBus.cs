@@ -4,58 +4,57 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using SpiderInfo = Display.Models.Spider.SpiderInfos;
 using System.Threading;
-using Display.Helper.Network;
 using Display.Models.Data;
-using Display.Models.Spider;
+using static Display.Models.Spider.SpiderInfos;
+using HttpClient = System.Net.Http.HttpClient;
 
 namespace Display.Helper.Network.Spider;
 
-public class JavBus
+public class JavBus : InfoSpider
 {
-    public const int Id = (int)SpiderInfo.SpiderSourceName.Javbus;
+    public override SpiderSourceName Name => SpiderSourceName.Javbus;
+    public override string Abbreviation => "bus";
+    public override string Keywords => "JavBus";
 
-    public const string Abbreviation = "bus";
+    public override bool IsOn
+    {
+        get => AppSettings.IsUseJavBus;
+        set => AppSettings.IsUseJavBus = value;
+    }
 
-    public const string Keywords = "JavBus";
+    public override string BaseUrl
+    {
+        get => AppSettings.JavBusBaseUrl;
+        set => AppSettings.JavBusBaseUrl = value;
+    }
 
-    public static Tuple<int, int> DelayRanges = new(1, 3);
-
-    public const bool IgnoreFc2 = true;
-
-    public static bool IsOn => AppSettings.IsUseJavBus;
-
-    private static string BaseUrl => AppSettings.JavBusBaseUrl;
-
-    public static async Task<VideoInfo> SearchInfoFromCid(string cid, CancellationToken token)
+    private static HttpClient _client;
+    public override HttpClient Client =>
+        _client ??= GetInfoFromNetwork.CreateClient(
+            new Dictionary<string, string>
+            {
+                { "accept-language", "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2" },
+                { "user-agent", GetInfoFromNetwork.DownUserAgent }
+            }); 
+    public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
     {
         cid = cid.ToUpper();
 
         var splitCid = cid.Split("-");
         if (splitCid.Length != 2) return null;
 
-        string searchCid;
-
-        switch (splitCid[0])
+        var searchCid = splitCid[0] switch
         {
-            case "MIUM" or "MAAN":
-                searchCid = $"300{cid}";
-                break;
-            case "JAC":
-                searchCid = $"390{cid}";
-                break;
-            case "DSVR":
-                searchCid = $"3{cid}";
-                break;
-            default:
-                searchCid = cid;
-                break;
-        }
+            "MIUM" or "MAAN" => $"300{cid}",
+            "JAC" => $"390{cid}",
+            "DSVR" => $"3{cid}",
+            _ => cid
+        };
 
         var tmpUrl = GetInfoFromNetwork.UrlCombine(BaseUrl, searchCid);
 
-        var result = await RequestHelper.RequestHtml(Common.Client, tmpUrl, token);
+        var result = await RequestHelper.RequestHtml(Client, tmpUrl, token);
         if (result == null) return null;
 
         var detailUrl = result.Item1;
@@ -64,10 +63,9 @@ public class JavBus
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlString);
 
-        return await GetVideoInfoFromHtmlDoc(cid, detailUrl, htmlDoc);
+        return await GetInfoByHtmlDoc(cid, detailUrl, htmlDoc);
     }
-
-    public static async Task<VideoInfo> GetVideoInfoFromHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
+    public override async Task<VideoInfo> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
     {
         //搜索封面
         var imageUrlNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='col-md-9 screencap']//a//img");
@@ -114,78 +112,69 @@ public class JavBus
 
             var header = attributeNode.FirstChild.InnerText.Trim();
 
-            if (header == "發行日期:")
+            switch (header)
             {
-                videoInfo.ReleaseTime = attributeNode.LastChild.InnerText.Trim();
-            }
-            else if (header == "長度:")
-            {
-                videoInfo.Lengthtime = attributeNode.LastChild.InnerText.Trim().Replace("分鐘", "分钟");
-            }
-            else if (header == "導演:")
-            {
-                videoInfo.Director = attributeNode.LastChild.InnerText.Trim();
-            }
-            else if (header == "製作商:")
-            {
-                videoInfo.Producer = attributeNode.SelectSingleNode(".//a").InnerText.Trim();
-            }
-            else if (header == "發行商:")
-            {
-                videoInfo.Publisher = attributeNode.SelectSingleNode(".//a").InnerText.Trim();
-            }
-            else if (header == "系列:")
-            {
-                videoInfo.Series = attributeNode.SelectSingleNode(".//a").InnerText.Trim();
-            }
-            else if (header == "類別:")
-            {
-                var categoryNodes = attributeNodes[i + 1].SelectNodes(".//span/label");
-                List<string> categoryList = new List<string>();
-                foreach (var node in categoryNodes)
+                case "發行日期:":
+                    videoInfo.ReleaseTime = attributeNode.LastChild.InnerText.Trim();
+                    break;
+                case "長度:":
+                    videoInfo.Lengthtime = attributeNode.LastChild.InnerText.Trim().Replace("分鐘", "分钟");
+                    break;
+                case "導演:":
+                    videoInfo.Director = attributeNode.LastChild.InnerText.Trim();
+                    break;
+                case "製作商:":
+                    videoInfo.Producer = attributeNode.SelectSingleNode(".//a").InnerText.Trim();
+                    break;
+                case "發行商:":
+                    videoInfo.Publisher = attributeNode.SelectSingleNode(".//a").InnerText.Trim();
+                    break;
+                case "系列:":
+                    videoInfo.Series = attributeNode.SelectSingleNode(".//a").InnerText.Trim();
+                    break;
+                case "類別:":
                 {
-                    categoryList.Add(node.InnerText);
+                    var categoryNodes = attributeNodes[i + 1].SelectNodes(".//span/label");
+                    var categoryList = categoryNodes.Select(node => node.InnerText).ToList();
+                    videoInfo.Category = string.Join(",", categoryList);
+                    break;
                 }
-                videoInfo.Category = string.Join(",", categoryList);
-            }
-            else if (header == "演員")
-            {
-                if (i >= attributeNodes.Count - 1) continue;
-                var actorNodes = attributeNodes[i + 1].SelectNodes(".//span/a");
-                List<string> actorList = new();
-                foreach (var node in actorNodes)
+                case "演員" when i >= attributeNodes.Count - 1:
+                    continue;
+                case "演員":
                 {
-                    actorList.Add(node.InnerText);
+                    var actorNodes = attributeNodes[i + 1].SelectNodes(".//span/a");
+                    var actorList = actorNodes.Select(node => node.InnerText).ToList();
+                    videoInfo.Actor = string.Join(",", actorList);
+                    break;
                 }
-                videoInfo.Actor = string.Join(",", actorList);
             }
         }
 
         //下载封面
         if (!string.IsNullOrEmpty(imageUrl))
         {
-            string SavePath = AppSettings.ImageSavePath;
+            var savePath = AppSettings.ImageSavePath;
 
-            string filePath = Path.Combine(SavePath, cid);
+            var filePath = Path.Combine(savePath, cid);
             videoInfo.ImageUrl = imageUrl;
             videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(imageUrl, filePath, cid);
         }
 
-        var sampleBox_Nodes = htmlDoc.DocumentNode.SelectNodes("//a[@class='sample-box']");
+        var sampleBoxNodes = htmlDoc.DocumentNode.SelectNodes("//a[@class='sample-box']");
         List<string> sampleUrlList = new();
-        if (sampleBox_Nodes != null)
+        if (sampleBoxNodes == null) return videoInfo;
+
+        foreach (var node in sampleBoxNodes)
         {
-            foreach (var node in sampleBox_Nodes)
+            var sampleImageUrl = node.Attributes["href"].Value;
+            if (!sampleImageUrl.Contains("http"))
             {
-                string sampleImageUrl = node.Attributes["href"].Value;
-                if (!sampleImageUrl.Contains("http"))
-                {
-                    sampleImageUrl = GetInfoFromNetwork.UrlCombine(javBusUrl, sampleImageUrl);
-                }
-                sampleUrlList.Add(sampleImageUrl);
+                sampleImageUrl = GetInfoFromNetwork.UrlCombine(javBusUrl, sampleImageUrl);
             }
-            videoInfo.SampleImageList = string.Join(",", sampleUrlList);
+            sampleUrlList.Add(sampleImageUrl);
         }
+        videoInfo.SampleImageList = string.Join(",", sampleUrlList);
 
         return videoInfo;
     }

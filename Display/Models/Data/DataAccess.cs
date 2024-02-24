@@ -11,11 +11,8 @@ using Display.Extensions;
 using Display.Helper.Data;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.Network.Spider;
-using Display.Models.Spider;
 using Microsoft.Data.Sqlite;
 using static System.Int32;
-using LiveChartsCore.Themes;
-using static Display.Models.Data.DataAccess;
 
 namespace Display.Models.Data
 {
@@ -516,7 +513,7 @@ namespace Display.Models.Data
                         case "look_later" or "score" or "is_like" or "is_wm":
                             continue;
                         case "actor":
-                            value = JavDB.TrimGenderFromActorName(value);
+                            value = JavDb.TrimGenderFromActorName(value);
                             break;
                     }
 
@@ -665,21 +662,6 @@ namespace Display.Models.Data
             }
 
             /// <summary>
-            /// 更新SpiderTask表（源搜刮中，源搜刮完成，全部搜刮完成）
-            /// </summary>
-            /// <param name="name"></param>
-            /// <param name="spiderSource"></param>
-            /// <param name="spiderSourceStatus"></param>
-            /// <param name="isAllDone"></param>
-            /// <param name="connection"></param>
-            public static void UpdateSpiderTask(string name, Manager.SpiderSource spiderSource, SpiderInfos.SpiderStates spiderSourceStatus, bool isAllDone = false, SqliteConnection connection = null)
-            {
-                var command = $"update SpiderTask SET {spiderSource.Name} = '{spiderSourceStatus}' , done = {isAllDone} WHERE Name == '{name}'";
-
-                DataAccessHelper.ExecuteNonQuery(command, connection);
-            }
-
-            /// <summary>
             /// 更新SpiderLog中的Task_Id为已完成
             /// </summary>
             /// <param name="taskId"></param>
@@ -796,7 +778,7 @@ namespace Display.Models.Data
                     //去除演员性别标记
                     if (fieldName == "actor")
                     {
-                        value = JavDB.RemoveGenderFromActorListString(value);
+                        value = JavDb.RemoveGenderFromActorListString(value);
                     }
 
                     dictionary.Add($"@{fieldName}", $"{value}");
@@ -996,39 +978,6 @@ namespace Display.Models.Data
             }
 
             /// <summary>
-            /// 插入搜刮日志并返回Task_id
-            /// </summary>
-            /// <param Name="data"></param>
-            public static long AddSpiderLog()
-            {
-                using var db = new SqliteConnection(ConnectionString);
-                db.Open();
-
-                var command = new SqliteCommand()
-                {
-                    Connection = db
-                };
-
-                var addTime = DateTimeOffset.Now.ToUnixTimeSeconds();
-
-                //插入新记录
-                command.CommandText = $"INSERT INTO SpiderLog VALUES (NULL,@time,0);";
-                command.Parameters.AddWithValue("@time", addTime);
-                command.ExecuteReader();
-
-                //查询Task_ID
-                command = new SqliteCommand($"SELECT task_id FROM SpiderLog WHERE time == '{addTime}'", db);
-
-                var obj = command.ExecuteScalar();
-                if (obj == null) return 0;
-                var taskId = (long)obj;
-
-                db.Close();
-
-                return taskId;
-            }
-
-            /// <summary>
             /// 添加视频信息
             /// </summary>
             /// <param name="data"></param>
@@ -1062,7 +1011,7 @@ namespace Display.Models.Data
                 foreach (var actorName in actorList)
                 {
                     //查询Actor_ID
-                    SqliteCommand command = new($"SELECT id FROM ActorInfo WHERE Name == '{JavDB.TrimGenderFromActorName(actorName)}'", connection);
+                    SqliteCommand command = new($"SELECT id FROM ActorInfo WHERE Name == '{JavDb.TrimGenderFromActorName(actorName)}'", connection);
 
                     if (command.ExecuteScalar() is long actorId)
                     {
@@ -1114,15 +1063,15 @@ namespace Display.Models.Data
                     if (matchResult.Success)
                     {
                         singleActorName = matchResult.Groups[1].Value;
-                        isWoman = singleActorName.EndsWith(JavDB.manSymbol) ? 0 : 1;
-                        singleActorName = JavDB.TrimGenderFromActorName(singleActorName);
+                        isWoman = singleActorName.EndsWith(JavDb.ManSymbol) ? 0 : 1;
+                        singleActorName = JavDb.TrimGenderFromActorName(singleActorName);
 
                         otherNames = matchResult.Groups[2].Value.Split("、");
                     }
                     else
                     {
-                        isWoman = actorName.EndsWith(JavDB.manSymbol) ? 0 : 1;
-                        singleActorName = JavDB.TrimGenderFromActorName(actorName);
+                        isWoman = actorName.EndsWith(JavDb.ManSymbol) ? 0 : 1;
+                        singleActorName = JavDb.TrimGenderFromActorName(actorName);
                     }
                 }
                 else
@@ -1441,36 +1390,6 @@ namespace Display.Models.Data
                 var commandText = $"SELECT id FROM ActorInfo WHERE Name == '{name}'";
 
                 return DataAccessHelper.ExecuteScalar<long?>(commandText, connection) ?? -1;
-            }
-
-            /// <summary>
-            /// 获取可用搜刮任务的一个name
-            /// </summary>
-            /// <param name="spiderSource"></param>
-            /// <param name="connection"></param>
-            /// <returns></returns>
-            public static string GetOneSpiderTask(Manager.SpiderSource spiderSource, SqliteConnection connection)
-            {
-                var commandText = $"SELECT Name from SpiderTask WHERE Done == 0 AND " +
-                                  $"(libre != 'doing' AND bus != 'doing' AND Jav321 != 'doing' AND Avmoo != 'doing' AND Avsox != 'doing' AND fc != 'doing' AND db != 'doing' AND fc != 'doing') AND " +
-                                  $"{spiderSource.Name} == 'ready' LIMIT 1";
-
-                return DataAccessHelper.ExecuteScalar<string>(commandText,connection);
-            }
-
-            /// <summary>
-            /// 获取该番号搜刮未完成且该搜刮源的状态为ready的数量
-            /// </summary>
-            /// <param name="spiderSource"></param>
-            /// <param name="connection"></param>
-            /// <returns></returns>
-            public static int GetWaitSpiderTaskCount(Manager.SpiderSource spiderSource, SqliteConnection connection = null)
-            {
-                //TODO 分类讨论，考虑FC2的搜刮源
-                var commandText = $"SELECT count(Name) from SpiderTask WHERE Done == 0 AND {spiderSource.Name} == 'ready'";
-
-                return DataAccessHelper.ExecuteScalar<int>(commandText, connection);
-
             }
 
             private static string GetVideoInfoFilterStr(List<string> filterConditionList = null, string filterKeywords = null, Dictionary<string, string> rangesDicts = null)

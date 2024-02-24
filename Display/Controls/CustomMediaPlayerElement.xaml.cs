@@ -610,7 +610,7 @@ public sealed partial class CustomMediaPlayerElement
     {
         if (e.AddedItems.FirstOrDefault() is not Player player) return;
 
-        await _webApi.PlayVideoWithPlayer(_allMediaPlayItems, player.PlayMethod, XamlRoot);
+        await _webApi.PlayVideoWithPlayer(_allMediaPlayItems, player.PlayerType, XamlRoot);
     }
 
     private void ShowTeachingTip(string subTitle)

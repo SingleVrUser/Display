@@ -170,20 +170,7 @@ namespace Display.Views
                 PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, this.XamlRoot);
             }
         }
-
-
-        //private async void VideoInfoListView_ItemClick(object sender, ItemClickEventArgs e)
-        //{
-        //    if (e.ClickedItem is not Datum singleVideoInfo) return;
-
-        //    if (sender is not ListView { DataContext: string trueName }) return;
-
-        //    var mediaPlayItem = new MediaPlayItem(singleVideoInfo.pc, trueName, FilesInfo.FileType.File);
-
-        //    await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot , lastPage: this);
-        //}
-
-
+        
 
         /// <summary>
         /// 点击了删除键

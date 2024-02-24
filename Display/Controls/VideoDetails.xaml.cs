@@ -21,6 +21,7 @@ using Display.CustomWindows;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.UI;
 using Display.Models.Data;
+using Display.Models.Data.Enums;
 using Display.Views.DetailInfo;
 using Display.Views.More.DatumList;
 using Display.Views.SearchLink;
@@ -109,7 +110,7 @@ namespace Display.Controls
             List<string> thumbnailList = new();
 
             //来源为本地
-            if (AppSettings.ThumbnailOrigin == (int)Const.Origin.Local)
+            if (AppSettings.ThumbnailOrigin == (int)ThumbnailOrigin.Local)
             {
                 var folderFullName = Path.Combine(AppSettings.ImageSavePath, ResultInfo.trueName);
                 var theFolder = new DirectoryInfo(folderFullName);
@@ -128,7 +129,7 @@ namespace Display.Controls
 
             }
             //来源为网络
-            else if (AppSettings.ThumbnailOrigin == (int)Const.Origin.Web)
+            else if (AppSettings.ThumbnailOrigin == (int)ThumbnailOrigin.Web)
             {
                 var videoInfo = DataAccess.Get.GetSingleVideoInfoByTrueName(ResultInfo.trueName);
 

@@ -17,6 +17,7 @@ using Display.Helper.FileProperties.Name;
 using Display.Helper.Network;
 using Display.Models;
 using Display.Models.Data;
+using Display.Models.Data.Enums;
 using Display.Models.Media;
 using Display.Services.IncrementalCollection;
 using Display.ViewModels;
@@ -880,9 +881,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async void PlayWithPlayerButtonClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not (MenuFlyoutItem { Tag: string aTag } menuFlyoutItem)) return;
-        if (!int.TryParse(aTag, out var playerSelection)) return;
-
+        if (sender is not MenuFlyoutItem { Tag: PlayerType playerType } menuFlyoutItem) return;
 
         if (BaseExample.SelectedItems is null || BaseExample.SelectedItems.Count == 0)
         {
@@ -897,7 +896,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             var mediaPlayItems = BaseExample.SelectedItems.Cast<FilesInfo>()
                 .Where(x => x.Type == FilesInfo.FileType.Folder || x.IsVideo)
                 .Select(x => new MediaPlayItem(x)).ToList();
-            await PlayVideoHelper.PlayVideo(mediaPlayItems, this.XamlRoot, lastPage: this, playerSelection: playerSelection);
+            await PlayVideoHelper.PlayVideo(mediaPlayItems, this.XamlRoot, lastPage: this, playerType: playerType);
 
             return;
         }
@@ -908,8 +907,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         if (info.Type == FilesInfo.FileType.Folder || !info.IsVideo) return;
 
         var mediaPlayItem = new MediaPlayItem(info);
-
-        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this, playerSelection: playerSelection);
+        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this, playerType: playerType);
     }
 
     private async void MoveToNewFolderItemClick(object sender, RoutedEventArgs e)

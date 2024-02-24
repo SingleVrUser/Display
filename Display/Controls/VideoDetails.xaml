@@ -3,9 +3,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
-             xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
              xmlns:helper="using:Display.Helper.FileProperties.Name"
+             xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+             xmlns:animations="using:CommunityToolkit.WinUI.Animations"
+             xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
              mc:Ignorable="d">
 
     <Grid BorderThickness="0,1,0,0"
@@ -397,7 +398,7 @@
                                                      HorizontalContentAlignment="Stretch"
                                                      Header="缩略图">
 
-                        <controls:AdaptiveGridView x:Name="ThumbnailGridView"
+                        <oldControls:AdaptiveGridView x:Name="ThumbnailGridView"
                                                    SingleSelectionFollowsFocus="False"
                                                    IsItemClickEnabled="True"
                                                    ItemClick="ThumbnailGridView_ItemClick"
@@ -405,7 +406,7 @@
                                                    DesiredWidth="180"
                                                    animations:ItemsReorderAnimation.Duration="00:00:00.0960000">
 
-                            <controls:AdaptiveGridView.ItemTemplate>
+                            <oldControls:AdaptiveGridView.ItemTemplate>
                                 <DataTemplate x:DataType="x:String">
                                     <UserControl PointerEntered="EnLargeImage_OnPointerEntered"
                                                  PointerExited="EnLargeImage_OnPointerExited">
@@ -424,7 +425,7 @@
                                                 </VisualStateGroup>
                                             </VisualStateManager.VisualStateGroups>
 
-                                            <controls:ImageEx x:Name="Thumbnail_Image"
+                                            <oldControls:ImageEx x:Name="Thumbnail_Image"
                                                               Source="{x:Bind}"
                                                               Stretch="UniformToFill"
                                                               PlaceholderSource="/Assets/NoPicture.jpg"
@@ -448,8 +449,8 @@
                                     </UserControl>
 
                                 </DataTemplate>
-                            </controls:AdaptiveGridView.ItemTemplate>
-                        </controls:AdaptiveGridView>
+                            </oldControls:AdaptiveGridView.ItemTemplate>
+                        </oldControls:AdaptiveGridView>
                     </controls:HeaderedContentControl>
                 </Grid>
             </ScrollViewer>

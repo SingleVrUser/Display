@@ -134,7 +134,7 @@ namespace Display.Views
 
             if (image.DataContext is ActorInfo actorinfo)
             {
-                if (isActorInfoCurrentSelected(actorinfo))
+                if (IsActorInfoCurrentSelected(actorinfo))
                     GoToActorInfo(actorinfo);
             }
         }
@@ -172,7 +172,7 @@ namespace Display.Views
 
             if (image.DataContext is ActorInfo actorinfo)
             {
-                if (isActorInfoCurrentSelected(actorinfo))
+                if (IsActorInfoCurrentSelected(actorinfo))
                     ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
             }
         }
@@ -183,17 +183,15 @@ namespace Display.Views
 
             if (image.DataContext is ActorInfo actorinfo)
             {
-                if (isActorInfoCurrentSelected(actorinfo))
+                if (IsActorInfoCurrentSelected(actorinfo))
                     ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             }
         }
 
-        private bool isActorInfoCurrentSelected(ActorInfo actorinfo)
+        private bool IsActorInfoCurrentSelected(ActorInfo actorinfo)
         {
-            if ((CarouselControl.SelectedItem == null && CarouselControl.SelectedIndex == 8) || CarouselControl.SelectedItem != null && CarouselControl.SelectedItem == actorinfo)
-                return true;
-            else
-                return false;
+            return (CarouselControl.SelectedItem == null && CarouselControl.SelectedIndex == 8)
+                   || CarouselControl.SelectedItem != null && CarouselControl.SelectedItem == actorinfo;
         }
 
         private async void GetActorInfoButton_Click(object sender, RoutedEventArgs e)
@@ -369,7 +367,7 @@ namespace Display.Views
 
             //更新别名
             //别名
-            if (actorinfo.OtherNames != null && actorinfo.OtherNames.Count > 0)
+            if (actorinfo.OtherNames is { Count: > 0 })
             {
                 foreach (var otherName in actorinfo.OtherNames)
                 {

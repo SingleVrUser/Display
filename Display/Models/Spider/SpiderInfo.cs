@@ -4,24 +4,27 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Display.Helper.Network.Spider;
 using static Display.Models.Spider.SpiderInfos;
 
 namespace Display.Models.Spider;
 
 public class SpiderInfos
 {
-    public enum SpiderSourceName { Javbus, Jav321, Avmoo, Avsox, Libredmm, Fc2club, Javdb, Local }
+    public enum SpiderSourceName
+    {
+        Javbus, Jav321, Avmoo, Avsox, Libredmm, Fc2club, Javdb, Local
+    }
 
-    public enum SpiderStates { ready, doing, awaiting, done }
-
+    public enum SpiderStates { Ready, Doing, Awaiting, Done }
+        
 }
-
 
 public class SpiderInfo : INotifyPropertyChanged
 {
     public SpiderSourceName SpiderSource { get; set; }
 
-    public string Name { get; }
+    public string SearchName { get; set; }
 
     public SpiderStates State { get; set; }
     public bool IsEnable { get; set; }
@@ -29,19 +32,14 @@ public class SpiderInfo : INotifyPropertyChanged
     {
         get
         {
-            switch (State)
+            return State switch
             {
-                case SpiderStates.ready:
-                    return new SolidColorBrush(Colors.MediumSeaGreen);
-                case SpiderStates.doing:
-                    return new SolidColorBrush(Colors.MediumSeaGreen);
-                case SpiderStates.awaiting:
-                    return new SolidColorBrush(Colors.SkyBlue);
-                case SpiderStates.done:
-                    return new SolidColorBrush(Colors.LightGray);
-            }
-
-            return new SolidColorBrush(Colors.OrangeRed);
+                SpiderStates.Ready => new SolidColorBrush(Colors.MediumSeaGreen),
+                SpiderStates.Doing => new SolidColorBrush(Colors.MediumSeaGreen),
+                SpiderStates.Awaiting => new SolidColorBrush(Colors.SkyBlue),
+                SpiderStates.Done => new SolidColorBrush(Colors.LightGray),
+                _ => new SolidColorBrush(Colors.OrangeRed)
+            };
         }
 
     }
@@ -51,28 +49,9 @@ public class SpiderInfo : INotifyPropertyChanged
     /// </summary>
     public RequestStates RequestStates { get; set; }
 
-    private long _spidercount;
-    public long SpiderCount
-    {
-        get => _spidercount;
-        set
-        {
-            if (_spidercount == value) return;
+    public long SpiderCount { get; set; }
 
-            _spidercount = value;
-        }
-    }
-
-    public Visibility EllipseVisiable
-    {
-        get
-        {
-            if (IsEnable)
-                return Visibility.Visible;
-            else
-                return Visibility.Collapsed;
-        }
-    }
+    public Visibility EllipseVisible => IsEnable ? Visibility.Visible : Visibility.Collapsed;
 
     private string _message;
     public string Message
@@ -90,25 +69,16 @@ public class SpiderInfo : INotifyPropertyChanged
     }
 
     //初始化
-    public SpiderInfo(SpiderSourceName spiderSource, bool isEnable)
+    public SpiderInfo(InfoSpider spider)
     {
-        SpiderSource = spiderSource;
-        IsEnable = isEnable;
+        SpiderSource = spider.Name;
+
+        IsEnable = spider.IsOn;
 
         if (!IsEnable)
             Message = "已禁用";
     }
 
-    public SpiderInfo(SpiderSourceName spiderSource, string name)
-    {
-        SpiderSource = spiderSource;
-        Name = name;
-    }
-
-    public SpiderInfo(SpiderSourceName spiderSource)
-    {
-        SpiderSource = spiderSource;
-    }
 
     public event PropertyChangedEventHandler PropertyChanged;
     public void OnPropertyChanged([CallerMemberName] string propertyName = "")

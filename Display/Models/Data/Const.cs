@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Windows.Storage;
+using Display.Models.Data.Enums;
 
 namespace Display.Models.Data;
 
@@ -288,7 +289,7 @@ public static class Const
 
         public static class Player
         {
-            public const int Selection = 0;
+            public const PlayerType Selection = PlayerType.WebView;
 
             public static class VideoDisplay
             {
@@ -300,13 +301,13 @@ public static class Const
 
             public static class ExePath
             {
-                public const string Vlc = "";
-                public const string Mpv = "";
+                public const string Vlc = "vlc";
+                public const string Mpv = "mpv";
                 public const string PotPlayer = "";
             }
 
             //M3U8 = 0, Origin = 1
-            public const int DefaultQuality = 0;
+            public const Enums.PlayQuality DefaultQuality = Enums.PlayQuality.M3U8;
 
             //是否画质优先
             public const bool IsPlayBestQualityFirst = true;
@@ -323,15 +324,4 @@ public static class Const
     }
 
 
-
-    #region Enum
-
-    public enum PlayQuality
-    {
-        M3U8 = 0,
-        Origin = 1
-    }
-    public enum Origin { Local = 0, Web = 1 }
-
-    #endregion
 }
