@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Runtime.CompilerServices;
 using Display.Helper.Data;
-using DefaultValue = Display.Models.Data.Const.DefaultSettings;
+using DefaultValue = Display.Models.Data.Constant.DefaultSettings;
 
 namespace Display.Models.Data;
 

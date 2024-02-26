@@ -138,7 +138,7 @@ public sealed partial class SettingsPage: INotifyPropertyChanged
                 Name = "PotPlayer",
                 Path = AppSettings.PotPlayerExePath,
                 SavePathAction = path=>AppSettings.PotPlayerExePath = path,
-                ResetPathFunc = () => Const.DefaultSettings.Player.ExePath.PotPlayer
+                ResetPathFunc = () => Constant.DefaultSettings.Player.ExePath.PotPlayer
             },
             new()
             {
@@ -146,7 +146,7 @@ public sealed partial class SettingsPage: INotifyPropertyChanged
                 Name = "VLC",
                 Path = AppSettings.VlcExePath,
                 SavePathAction = path=>AppSettings.VlcExePath = path,
-                ResetPathFunc = () => Const.DefaultSettings.Player.ExePath.Vlc
+                ResetPathFunc = () => Constant.DefaultSettings.Player.ExePath.Vlc
             },
             new()
             {
@@ -154,7 +154,7 @@ public sealed partial class SettingsPage: INotifyPropertyChanged
                 Name = "MPV",
                 Path = AppSettings.MpvExePath,
                 SavePathAction = path=>AppSettings.MpvExePath = path,
-                ResetPathFunc = () => Const.DefaultSettings.Player.ExePath.Mpv
+                ResetPathFunc = () => Constant.DefaultSettings.Player.ExePath.Mpv
             },
             new()
             {

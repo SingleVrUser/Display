@@ -32,7 +32,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
-using static Display.Models.Data.Const;
+using static Display.Models.Data.Constant;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -883,31 +883,28 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         if (sender is not MenuFlyoutItem { Tag: PlayerType playerType } menuFlyoutItem) return;
 
-        if (BaseExample.SelectedItems is null || BaseExample.SelectedItems.Count == 0)
-        {
-            ShowTeachingTip("当前未选中文件");
-            return;
-        }
-
-        // 多个播放
+        List<MediaPlayItem> mediaPlayItems;
+        // 选项栏选中多个时，播放选中的
         if (BaseExample.SelectedItems.Count > 1)
         {
             //获取需要播放的文件
-            var mediaPlayItems = BaseExample.SelectedItems.Cast<FilesInfo>()
+            mediaPlayItems = BaseExample.SelectedItems.Cast<FilesInfo>()
                 .Where(x => x.Type == FilesInfo.FileType.Folder || x.IsVideo)
                 .Select(x => new MediaPlayItem(x)).ToList();
-            await PlayVideoHelper.PlayVideo(mediaPlayItems, this.XamlRoot, lastPage: this, playerType: playerType);
+        }
+        // 选项栏只选中一个，则忽略。以右键项为准
+        else
+        {
+            // 单个播放
+            if (menuFlyoutItem is not { DataContext: FilesInfo info }) return;
 
-            return;
+            if (info.Type == FilesInfo.FileType.Folder || !info.IsVideo) return;
+
+            mediaPlayItems = new List<MediaPlayItem> { new(info) };
         }
 
-        // 单个播放
-        if (menuFlyoutItem is not { DataContext: FilesInfo info }) return;
 
-        if (info.Type == FilesInfo.FileType.Folder || !info.IsVideo) return;
-
-        var mediaPlayItem = new MediaPlayItem(info);
-        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this, playerType: playerType);
+        await PlayVideoHelper.PlayVideo(mediaPlayItems, XamlRoot, lastPage: this, playerType: playerType);
     }
 
     private async void MoveToNewFolderItemClick(object sender, RoutedEventArgs e)

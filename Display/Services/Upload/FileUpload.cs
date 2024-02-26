@@ -19,7 +19,7 @@ namespace Display.Services.Upload
 {
     internal class FileUpload : UploadBase
     {
-        private const string AppVer = Const.DefaultSettings.Network._115.UploadAppVersion;
+        private const string AppVer = Constant.DefaultSettings.Network._115.UploadAppVersion;
 
         private static HttpClient _client;
         public static HttpClient Client
@@ -28,7 +28,7 @@ namespace Display.Services.Upload
             {
                 if (_client != null) return _client;
 
-                var headers = new Dictionary<string, string> { { "user-agent", Const.DefaultSettings.Network._115.UploadUserAgent } };
+                var headers = new Dictionary<string, string> { { "user-agent", Constant.DefaultSettings.Network._115.UploadUserAgent } };
 
                 var cookie = AppSettings._115_Cookie;
                 //cookie不为空且可用

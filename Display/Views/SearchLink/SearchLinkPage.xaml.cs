@@ -226,7 +226,7 @@ namespace Display.Views.SearchLink
             bool isDone = false;
             string result = null;
             // 需要验证账号
-            if (addTaskUrlInfo is { errcode: Const.Common.AccountAnomalyCode })
+            if (addTaskUrlInfo is { errcode: Constant.Common.AccountAnomalyCode })
             {
                 var window = WebApi.CreateWindowToVerifyAccount();
 

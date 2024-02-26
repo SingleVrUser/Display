@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
 using System.Threading.Tasks;
-using HttpHeaders = Display.Models.Data.Const.HttpHeaders;
+using HttpHeaders = Display.Models.Data.Constant.HttpHeaders;
 using System.Threading;
 using System.IO;
 using Display.Models.Upload;

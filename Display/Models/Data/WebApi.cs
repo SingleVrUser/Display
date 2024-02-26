@@ -1495,7 +1495,7 @@ namespace Display.Models.Data
             }
 
             // 检查账号是否异常
-            if (m3U8Infos.Count == 0 && strResult.Contains(Const.Common.AccountAnomalyTip))
+            if (m3U8Infos.Count == 0 && strResult.Contains(Constant.Common.AccountAnomalyTip))
             {
                 var window = CreateWindowToVerifyAccount();
 

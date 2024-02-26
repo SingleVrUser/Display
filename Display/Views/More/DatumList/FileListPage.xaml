@@ -109,19 +109,19 @@
                                             Click="PlayWithPlayerButtonClick" />
 
                             <MenuFlyoutItem Text="PotPlayer"
-                                            Tag="1"
+                                            Tag="{x:Bind enums:PlayerType.PotPlayer}"
                                             Click="PlayWithPlayerButtonClick" />
 
                             <MenuFlyoutItem Text="mpv"
-                                            Tag="2"
+                                            Tag="{x:Bind enums:PlayerType.Mpv}"
                                             Click="PlayWithPlayerButtonClick" />
 
                             <MenuFlyoutItem Text="vlc"
-                                            Tag="3"
+                                            Tag="{x:Bind enums:PlayerType.Vlc}"
                                             Click="PlayWithPlayerButtonClick" />
 
                             <MenuFlyoutItem Text="MediaElement"
-                                            Tag="4"
+                                            Tag="{x:Bind enums:PlayerType.MediaElement}"
                                             Click="PlayWithPlayerButtonClick" />
 
                         </MenuFlyoutSubItem>

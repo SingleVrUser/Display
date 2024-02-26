@@ -568,7 +568,7 @@ namespace Display.Models.Data
             get => _profilePath;
             set
             {
-                var path = !string.IsNullOrEmpty(value) ? value : Const.FileType.NoPicturePath;
+                var path = !string.IsNullOrEmpty(value) ? value : Constant.FileType.NoPicturePath;
                 if (_profilePath == path) return;
 
                 _profilePath = path;
@@ -836,7 +836,7 @@ namespace Display.Models.Data
                 if (_imagePath == value) return;
 
                 var path = value;
-                _imagePath = !string.IsNullOrEmpty(path) ? path : Const.FileType.NoPicturePath;
+                _imagePath = !string.IsNullOrEmpty(path) ? path : Constant.FileType.NoPicturePath;
                 OnPropertyChanged();
             }
         }
@@ -1164,7 +1164,7 @@ namespace Display.Models.Data
                     var videoQuality = GetVideoQualityFromVdi(data.vdi);
 
                     IconPath = videoQuality != null ? "ms-appx:///Assets/115/file_type/video_quality/" + videoQuality + ".svg"
-                        : Const.FileType.VideoSvgPath;
+                        : Constant.FileType.VideoSvgPath;
                 }
                 else if (!string.IsNullOrEmpty(data.ico))
                 {
@@ -1179,7 +1179,7 @@ namespace Display.Models.Data
                     ThumbnailUrl = data.u;
                 }
 
-                IconPath ??= Const.FileType.UnknownSvgPath;
+                IconPath ??= Constant.FileType.UnknownSvgPath;
             }
             //文件夹
             else if (data.fid == null && data.pid != null)
@@ -1188,7 +1188,7 @@ namespace Display.Models.Data
                 Id = data.cid;
                 Cid = (long)data.pid;
                 PickCode = data.pc;
-                IconPath = Const.FileType.FolderSvgPath;
+                IconPath = Constant.FileType.FolderSvgPath;
             }
 
         }
@@ -1231,7 +1231,7 @@ namespace Display.Models.Data
                 Id = data.Cid;
                 Cid = (long)data.Pid;
                 PickCode = data.PickCode;
-                IconPath = Const.FileType.FolderSvgPath;
+                IconPath = Constant.FileType.FolderSvgPath;
             }
             else if (data.Fid != null)
             {
@@ -1249,7 +1249,7 @@ namespace Display.Models.Data
                     var videoQuality = GetVideoQualityFromVdi(data.Vdi);
 
                     IconPath = videoQuality != null ? "ms-appx:///Assets/115/file_type/video_quality/" + videoQuality + ".svg"
-                        : Const.FileType.VideoSvgPath;
+                        : Constant.FileType.VideoSvgPath;
 
                 }
                 else if (!string.IsNullOrEmpty(data.Ico))
@@ -1265,7 +1265,7 @@ namespace Display.Models.Data
                     ThumbnailUrl = data.U;
                 }
 
-                IconPath ??= Const.FileType.UnknownSvgPath;
+                IconPath ??= Constant.FileType.UnknownSvgPath;
 
             }
 
@@ -1357,7 +1357,7 @@ namespace Display.Models.Data
             string iconPath = null;
 
             var isMatch = false;
-            foreach (var (key, values) in Const.FileType.FileTypeDictionary)
+            foreach (var (key, values) in Constant.FileType.FileTypeDictionary)
             {
                 if (isMatch)
                     break;
@@ -1371,14 +1371,14 @@ namespace Display.Models.Data
                     {
                         if (key3 != ico) continue;
 
-                        var tmpStringBuilder = new StringBuilder(Const.FileType.FileTypeBasePath).Append(key).Append('/').Append(key2).Append(".svg");
+                        var tmpStringBuilder = new StringBuilder(Constant.FileType.FileTypeBasePath).Append(key).Append('/').Append(key2).Append(".svg");
                         if (File.Exists(Path.Combine(Package.Current.InstalledLocation.Path, tmpStringBuilder.ToString())))
                         {
-                            iconPath = tmpStringBuilder.Insert(0, Const.FileType.MsUri).ToString();
+                            iconPath = tmpStringBuilder.Insert(0, Constant.FileType.MsUri).ToString();
                         }
                         else
                         {
-                            var newStringBuilder = new StringBuilder(Const.FileType.FileTypeFullBasePath).Append(key).Append('/').Append(key).Append(".svg");
+                            var newStringBuilder = new StringBuilder(Constant.FileType.FileTypeFullBasePath).Append(key).Append('/').Append(key).Append(".svg");
                             iconPath = newStringBuilder.ToString();
                         }
                         isMatch = true;
@@ -1387,12 +1387,12 @@ namespace Display.Models.Data
                 }
             }
 
-            return string.IsNullOrEmpty(iconPath) ? Const.FileType.UnknownSvgPath : iconPath;
+            return string.IsNullOrEmpty(iconPath) ? Constant.FileType.UnknownSvgPath : iconPath;
         }
 
         public static string GetTypeFromIcon(string ico)
         {
-            foreach (var (key, values) in Const.FileType.FileTypeDictionary)
+            foreach (var (key, values) in Constant.FileType.FileTypeDictionary)
             {
                 foreach (var (_, values2) in values)
                 {
@@ -1410,15 +1410,15 @@ namespace Display.Models.Data
 
         public static string GetFileIconFromType(FileType fileType)
         {
-            var iconUrl = Const.FileType.UnknownSvgPath;
+            var iconUrl = Constant.FileType.UnknownSvgPath;
 
             switch (fileType)
             {
                 case FileType.Folder:
-                    iconUrl = Const.FileType.FolderSvgPath;
+                    iconUrl = Constant.FileType.FolderSvgPath;
                     break;
                 case FileType.File:
-                    iconUrl = Const.FileType.UnknownSvgPath;
+                    iconUrl = Constant.FileType.UnknownSvgPath;
                     break;
             }
 
@@ -1629,7 +1629,7 @@ namespace Display.Models.Data
                 if (string.IsNullOrEmpty(_prifilePhotoPath))
                 {
                     //初始化
-                    _prifilePhotoPath = Const.FileType.NoPicturePath;
+                    _prifilePhotoPath = Constant.FileType.NoPicturePath;
 
                     //检查演员图片是否存在
                     string imagePath = Path.Combine(AppSettings.ActorInfoSavePath, name, "face.jpg");
@@ -2121,9 +2121,9 @@ namespace Display.Models.Data
         public string PickCode { get; set; }
 
         [JsonProperty(propertyName: "is_like")]
-        public int IsLike { get; set; } = 0;
+        public int IsLike { get; set; }
 
-        private double _score = 0;
+        private double _score;
 
         [JsonProperty(propertyName: "score")]
         public double Score
@@ -2140,7 +2140,7 @@ namespace Display.Models.Data
         public long LookLater { get; set; } = 0;
 
         [JsonProperty(propertyName: "image_path")]
-        public string ImagePath { get; set; } = Const.FileType.NoPicturePath;
+        public string ImagePath { get; set; } = Constant.FileType.NoPicturePath;
 
         [JsonProperty(propertyName: nameof(Datum))]
         public Datum Datum { get; set; }

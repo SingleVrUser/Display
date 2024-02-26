@@ -421,7 +421,7 @@ public sealed partial class MainPage : Page,IDisposable
     {
         VideoPlay_ListView.IsEnabled = false;
 
-        const string noPicturePath = Const.FileType.NoPicturePath;
+        const string noPicturePath = Constant.FileType.NoPicturePath;
 
         //搜刮
         foreach (var video in filesInfos)

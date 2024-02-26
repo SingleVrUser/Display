@@ -4,7 +4,7 @@ using Display.Models.Data.Enums;
 
 namespace Display.Models.Data;
 
-public static class Const
+public static class Constant
 {
     public static class Common
     {

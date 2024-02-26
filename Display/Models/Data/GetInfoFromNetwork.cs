@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -40,7 +39,7 @@ namespace Display.Models.Data
             set => _clientWithJavDBCookie = value;
         }
 
-        public static string DownUserAgent = Const.DefaultSettings.Network._115.DownUserAgent;
+        public static string DownUserAgent = Constant.DefaultSettings.Network._115.DownUserAgent;
 
         //public static string BuilderMediaElementUserAgent()
         //{
