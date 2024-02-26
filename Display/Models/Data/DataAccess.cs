@@ -286,7 +286,7 @@ namespace Display.Models.Data
 
             createTable.ExecuteNonQuery();
 
-            var wmProducer = Const.Info.WmProducer;
+            var wmProducer = Constant.Info.WmProducer;
 
             //插入常见的
             foreach (var name in wmProducer)
@@ -1137,9 +1137,7 @@ namespace Display.Models.Data
 
                 DataAccessHelper.ExecuteNonQueryWithParameters(commandText, parameters, connection);
             }
-
         }
-
 
         public class Get
         {

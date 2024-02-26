@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
-using HttpHeaders = Display.Models.Data.Const.HttpHeaders;
+using HttpHeaders = Display.Models.Data.Constant.HttpHeaders;
 
 namespace Display.Helper.Data
 {

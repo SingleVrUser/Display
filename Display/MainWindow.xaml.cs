@@ -626,7 +626,7 @@ namespace Display
             }
 
             // 需要验证账户
-            if (info.errcode == Const.Common.AccountAnomalyCode)
+            if (info.errcode == Constant.Common.AccountAnomalyCode)
             {
                 var window = WebApi.CreateWindowToVerifyAccount();
 
