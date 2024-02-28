@@ -15,6 +15,7 @@ using Display.ViewModels;
 using ImageViewModel = Display.ViewModels.ImageViewModel;
 using Display.Interfaces;
 using Display.Services;
+using System.Text;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -46,7 +47,7 @@ namespace Display
 
         public App()
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             _notificationManager = new NotificationManager();
 

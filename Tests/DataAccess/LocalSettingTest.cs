@@ -1,21 +1,30 @@
 ﻿using System.Diagnostics;
-using Display.Setting;
-using Display.Setting.Impl;
-using Display.Setting.Interfaces;
+using Microsoft.Extensions.Configuration;
+using Display.Helper.Data;
+using Tests.Models;
 
 namespace Tests.DataAccess;
 
 [TestClass]
 public class LocalSettingTest
 {
-    [ClassInitialize]
-    public static void Initialize(TestContext context)
+    [AssemblyInitialize]
+    public static async Task AssemblyInitialize(TestContext testContext)
     {
-        Debug.WriteLine(context);
+        var config = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .AddEnvironmentVariables()
+            .Build();
+
+        var settings = config.GetRequiredSection("Parent").Get<Parent>();
+
+        Debug.WriteLine(settings);
     }
+
 
     [TestMethod]
     public void SettingTest()
     {
+        Debug.WriteLine("123");
     }
 }

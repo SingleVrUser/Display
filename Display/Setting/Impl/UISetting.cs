@@ -4,12 +4,8 @@ using DefaultValue = Display.Models.Data.Constant.DefaultSettings;
 
 namespace Display.Setting.Impl;
 
-internal class UISetting : SettingBase, IUISetting
+internal class UISetting(ISettingProvider provider) : SettingBase(provider), IUISetting
 {
-    public UISetting(ISettingProvider provider) : base(provider)
-    {
-    }
-
     public bool IsShowFailListInDisplay
     {
         get => GetValue(DefaultValue.Ui.IsShowFailListInDisplay);

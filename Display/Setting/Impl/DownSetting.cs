@@ -4,12 +4,8 @@ using static Display.Models.Data.Constant.DefaultSettings;
 
 namespace Display.Setting.Impl;
 
-internal class DownSetting:SettingBase, IDownSetting
+internal class DownSetting(ISettingProvider provider) : SettingBase(provider), IDownSetting
 {
-    public DownSetting(ISettingProvider provider) : base(provider)
-    {
-    }
-
     public string DefaultDownMethod
     {
         get => GetValue(Network._115.DefaultDownMethod);
