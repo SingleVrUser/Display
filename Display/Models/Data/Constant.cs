@@ -180,15 +180,13 @@ public static class Constant
                 public const double Height = 300;
             }
 
-
             public const bool IsAutoAdjustImageSize = true;
 
 
             public const bool IsShowFailListInDisplay = false;
 
             //Local = 0, Web = 1
-            public const int ThumbnailOrigin = 1;
-
+            public const ThumbnailOriginType ThumbnailOrigin = ThumbnailOriginType.Web;
 
             public static class MainWindow
             {
@@ -201,8 +199,6 @@ public static class Constant
         {
             public const int GetActorInfoLastIndex = -1;
 
-
-
             public static class X1080X
             {
                 public const string UserAgent = "";
@@ -210,21 +206,18 @@ public static class Constant
 
             public static class _115
             {
+                private const string DownAppVersion = "8.3.0";
+                internal const string UploadAppVersion = "30.5.1";
 
-                public const string DownAppVersion = "8.3.0";
                 public const string DownUserAgent = $"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36 115Browser/{DownAppVersion}";
-
-                public const string UploadAppVersion = "30.5.1";
                 public const string UploadUserAgent = $"Mozilla/5.0 115disk/{UploadAppVersion}";
-
 
                 public const bool IsFindSub = true;
                 public const bool IsRecordDownRequest = true;
                 public const double DownUrlOverdueTime = 86400.0;
 
                 public const string DefaultDownMethod = "115";
-
-                public const string SavePathName = "根目录";
+                public const string SavePathShowName = "根目录";
                 public const long SavePathCid = 0;
             }
 
