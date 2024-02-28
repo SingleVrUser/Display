@@ -6,21 +6,12 @@ namespace Display.Setting;
 /**
  * 抽象类
  */
-internal abstract class SettingBase
+internal abstract class SettingBase(ISettingProvider provider)
 {
-    protected ISettingProvider Provider;
-
-    private SettingBase(){}
-
-    protected SettingBase(ISettingProvider provider)
-    {
-        Provider = provider;
-    }
-
     protected T GetValue<T>(T defaultValue = default, [CallerMemberName] string propertyName = null)
-        => Provider.GetValue(defaultValue, propertyName);
+        => provider.GetValue(defaultValue, propertyName);
 
     protected void SetValue<T>(T value, [CallerMemberName] string propertyName = null)
-        => Provider.SetValue(value, propertyName);
+        => provider.SetValue(value, propertyName);
 
 }

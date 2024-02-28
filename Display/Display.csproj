@@ -23,7 +23,7 @@
     <AppxPackageDir>D:\库\Desktop\打包\</AppxPackageDir>
     <PackageIcon>SmallTile.scale-125.png</PackageIcon>
     <Win32Resource>App.res</Win32Resource>
-    <LangVersion>11</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>

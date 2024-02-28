@@ -3,12 +3,8 @@ using Display.Setting.Interfaces;
 
 namespace Display.Setting.Impl;
 
-internal class CacheSetting : SettingBase, ICacheSetting
+internal class CacheSetting(ISettingProvider provider) : SettingBase(provider), ICacheSetting
 {
-    public CacheSetting(ISettingProvider provider) : base(provider)
-    {
-    }
-
     public int GetActorInfoLastIndex
     {
         get => GetValue(Constant.DefaultSettings.Network.GetActorInfoLastIndex);
