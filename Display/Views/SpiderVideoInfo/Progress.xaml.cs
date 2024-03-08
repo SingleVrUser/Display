@@ -4,8 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Display.CustomWindows;
 using Display.Helper.Date;
 using Display.Helper.FileProperties.Name;
@@ -18,6 +20,7 @@ using LiveChartsCore.Drawing;
 using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
+using Microsoft.AppCenter.Utils.Synchronization;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -25,6 +28,7 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using SkiaSharp;
 using WinUIEx;
+using WinUIEx.Messaging;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -71,7 +75,7 @@ namespace Display.Views.SpiderVideoInfo
             if (_failDatumList == null || _failDatumList.Count == 0) return;
 
             CurrentWindow.Closed += CurrentWindow_Closed;
-            _matchVideoResults ??= new List<MatchVideoResult>();
+            _matchVideoResults ??= [];
 
             foreach (var item in _failDatumList)
             {
@@ -85,7 +89,7 @@ namespace Display.Views.SpiderVideoInfo
             ShowProgress(_matchVideoResults.Count);
             
             if (s_cts.IsCancellationRequested) return;
-            await SpiderVideoInfo(_matchVideoResults);
+            await SpiderVideoInfo();
             if (s_cts.IsCancellationRequested) return;
 
 
@@ -105,7 +109,7 @@ namespace Display.Views.SpiderVideoInfo
 
             if (s_cts.IsCancellationRequested) return;
 
-            await SpiderVideoInfo(_matchVideoResults);
+            await SpiderVideoInfo();
 
             if (s_cts.IsCancellationRequested) return;
 
@@ -330,9 +334,9 @@ namespace Display.Views.SpiderVideoInfo
         /// <summary>
         /// 开始从网络中检索视频信息
         /// </summary>
-        private async Task SpiderVideoInfo(List<MatchVideoResult> matchVideoResults)
+        private async Task SpiderVideoInfo()
         {
-            if (matchVideoResults == null)
+            if (_matchVideoResults == null)
                 return;
 
             _network ??= new GetInfoFromNetwork();
@@ -343,14 +347,14 @@ namespace Display.Views.SpiderVideoInfo
             CountInfo_Grid.Visibility = Visibility.Visible;
             TopProgressRing.IsActive = true;
 
-            _failVideoNameList = new List<string>();
+            _failVideoNameList = [];
 
             var startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
 
             ProgressMore_TextBlock.Text = "失败数：0";
   
             //视频数量
-            var videoCount = matchVideoResults.Count(info => info.statusCode != 0);
+            var videoCount = _matchVideoResults.Count(info => info.statusCode != 0);
             AllVideoCount_Run.Text = videoCount.ToString();
 
             if (videoCount == 0)
@@ -360,10 +364,10 @@ namespace Display.Views.SpiderVideoInfo
             }
 
             //匹配成功的视频总数量（1：匹配成功，2：已添加（多集只保留一个番号））
-            var matchSuccessVideoCount = matchVideoResults.Where(item => item.statusCode == 1 || item.statusCode == 2).ToList().Count;
+            var matchSuccessVideoCount = _matchVideoResults.Where(item => item.statusCode is 1 or 2).ToList().Count;
 
             //匹配到的番号总数量
-            var totalCount = matchVideoResults.Where(item => !string.IsNullOrEmpty(item.MatchName)).ToList().Count;
+            var totalCount = _matchVideoResults.Where(item => !string.IsNullOrEmpty(item.MatchName)).ToList().Count;
             MatchCidCount_Run.Text = totalCount.ToString();
 
             if (totalCount == 0)
@@ -377,11 +381,10 @@ namespace Display.Views.SpiderVideoInfo
 
             //统计成功的名称
             var successCount = 0;
-            List<string> successVideoNameList = new();
+            List<string> successVideoNameList = [];
 
             var failCount = 0;
 
-            var i = 0;
             var spiderSourceProgress = new Progress<SpiderInfo>(progressPercent =>
             {
                 var gridViewItem = _spiderInfos.FirstOrDefault(item => item.SpiderSource == progressPercent.SpiderSource);
@@ -398,7 +401,6 @@ namespace Display.Views.SpiderVideoInfo
                 {
                     successCount++;
                     CidSuccessCount_Run.Text = successCount.ToString();
-                    successVideoNameList.Add(progressPercent.SearchName);
 
                     UpdateSpiderCartesianChart(SpiderInfos.SpiderSourceName.Local);
                 }
@@ -406,7 +408,6 @@ namespace Display.Views.SpiderVideoInfo
                 else if (progressPercent.RequestStates == RequestStates.fail)
                 {
                     failCount++;
-                    _failVideoNameList.Add(progressPercent.SearchName);
                     FailCount_Run.Text = failCount.ToString();
                     ProgressMore_TextBlock.Text = $"失败数：{failCount}";
                     UpdateSpiderCartesianChart(SpiderInfos.SpiderSourceName.Local);
@@ -415,13 +416,10 @@ namespace Display.Views.SpiderVideoInfo
                     CidSuccessRate_Run.Text = $"{(totalCount - _failVideoNameList.Count) * 100 / totalCount}%";
                 }
                 //搜刮源尝试搜刮
-                else if (progressPercent.State == Models.Spider.SpiderInfos.SpiderStates.Awaiting)
+                else if (progressPercent.State == SpiderInfos.SpiderStates.Awaiting)
                 {
                     UpdateSpiderCartesianChart(progressPercent.SpiderSource);
                 }
-
-                i++;
-                //System.Diagnostics.Debug.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>接受:{i} - {progressPercent.Name} - {progressPercent.SpiderSource} - {progressPercent.RequestStates} - {progressPercent.Message}");
 
                 //更新整体进度
                 var currentCount = successVideoNameList.Count + _failVideoNameList.Count;
@@ -440,7 +438,7 @@ namespace Display.Views.SpiderVideoInfo
             SearchResult_StackPanel.Visibility = Visibility.Visible;
             SearchProgress_TextBlock.Visibility = Visibility.Collapsed;
 
-            AllCount_Run.Text = matchVideoResults.Count.ToString();
+            AllCount_Run.Text = _matchVideoResults.Count.ToString();
             VideoCount_Run.Text = videoCount.ToString();
             FailCount_Run.Text = _failVideoNameList.Count.ToString();
 
@@ -461,33 +459,104 @@ namespace Display.Views.SpiderVideoInfo
         /// <returns></returns>
         private async Task SearchAllInfoMultiTask(IProgress<SpiderInfo> progress)
         {
-            var tasks = (from item in _spiderInfos.Where(item => item.IsEnable) where item.SpiderSource != SpiderInfos.SpiderSourceName.Local select Task.Run(() => StartSearchTask(item.SpiderSource, progress))).ToList();
+            // 挑选出启动的
+            var tasks = (
+                from item
+                    in _spiderInfos.Where(item => item.IsEnable)
+                where item.SpiderSource != SpiderInfos.SpiderSourceName.Local
+                select item
+            ).ToList();
 
-            //等待任务完成
-            await Task.WhenAll(tasks);
+            ////等待任务完成
+            //await Task.WhenAll(tasks);
 
-            //数据库源最后完成
-            //SpiderInfo currentSpiderInfo = new(SpiderInfos.SpiderSourceName.Local)
-            //{
-            //    State = SpiderInfos.SpiderStates.Done,
-            //    Message = "完成"
-            //};
-            //progress.Report(currentSpiderInfo);
+            var spiderManager = Manager.Instance;
+            foreach (var matchResult in _matchVideoResults.Where(i=>i.statusCode is 1))
+            {
+                var name = matchResult.MatchName;
+
+                var result = DataAccess.Get.GetOneTrueNameByName(name);
+
+                // 数据库没有
+                if (!string.IsNullOrEmpty(result)) continue;
+
+                foreach (var spiderInfo in tasks)
+                {
+                    var videoInfo = await spiderManager.DispatchSpecificSpiderInfoByCid(name, spiderInfo.SpiderSource, s_cts.Token);
+                    if (videoInfo is null) continue;
+
+                    // 添加搜刮信息到数据库（只有从搜刮源查找到的才添加）
+                    await DataAccess.Add.AddVideoInfo_ActorInfo_IsWmAsync(videoInfo); 
+                    break;
+                }
+            }
+
+            // 数据库源最后完成
+            SpiderInfo currentSpiderInfo = new(SpiderInfos.SpiderSourceName.Local, "完成", SpiderInfos.SpiderStates.Done);
+            progress.Report(currentSpiderInfo);
         }
 
         //锁
         private static readonly object MyLock = new();
 
-        /// <summary>
-        /// 创建SpiderTask
-        /// </summary>
-        /// <param name="spiderName"></param>
-        /// <param name="progress"></param>
-        /// <returns></returns>
-        private Task StartSearchTask(SpiderInfos.SpiderSourceName spiderName, IProgress<SpiderInfo> progress)
+        // 创建SpiderTask
+        private async Task StartSearchTask(SpiderInfo spiderInfo, IProgress<SpiderInfo> progress)
         {
             var spiderManager = Manager.Instance;
-            return Task.CompletedTask;
+
+            while (true)
+            {
+
+                // 从队列中查找cid
+                MatchVideoResult matchResult;
+                lock (MyLock)
+                {
+                    // 查找status==0的
+                    matchResult = _matchVideoResults.FirstOrDefault(result => result.statusCode is 2);
+                }
+
+                if (matchResult == null) break;
+
+                var name = matchResult.MatchName;
+
+                var result = DataAccess.Get.GetOneTrueNameByName(name);
+
+                // 数据库没有
+                if (string.IsNullOrEmpty(result))
+                {
+                    matchResult.statusCode = 3;
+                    progress.Report(new SpiderInfo(spiderInfo.SpiderSource, name, SpiderInfos.SpiderStates.Doing));
+
+                    var videoInfo = await spiderManager.DispatchSpecificSpiderInfoByCid(name, spiderInfo.SpiderSource, s_cts.Token);
+
+                    // 没搜索到
+                    if (videoInfo is null)
+                    {
+                        matchResult.statusCode = 2;
+                    }
+                    else
+                    {
+                        // 添加搜刮信息到数据库（只有从搜刮源查找到的才添加）
+                        await DataAccess.Add.AddVideoInfo_ActorInfo_IsWmAsync(videoInfo);
+                        matchResult.statusCode = 4;
+                    }
+                }
+                else
+                {
+                    matchResult.statusCode = 4;
+                }
+
+                matchResult.statusCode = -1;
+                progress.Report(new SpiderInfo(spiderInfo.SpiderSource, name, SpiderInfos.SpiderStates.Done));
+            }
+
+
+            //该搜刮源已结束
+
+
+            spiderInfo.State = SpiderInfos.SpiderStates.Done;
+            spiderInfo.Message = "完成";
+            progress.Report(spiderInfo);
 
             //SpiderInfo currentSpiderInfo;
             //while (true)
@@ -496,6 +565,7 @@ namespace Display.Views.SpiderVideoInfo
             //    if (s_cts.IsCancellationRequested) return;
 
             //    string name;
+
             //    if (string.IsNullOrEmpty(name))
             //    {
             //        currentSpiderInfo = new SpiderInfo(spiderName, name)
@@ -655,7 +725,7 @@ namespace Display.Views.SpiderVideoInfo
             args.Handled = true;
             var window = (sender as Window);
 
-            ContentDialog dialog = new ContentDialog
+            var dialog = new ContentDialog
             {
                 // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
                 XamlRoot = XamlRoot,
@@ -668,13 +738,13 @@ namespace Display.Views.SpiderVideoInfo
             };
 
             var result = await dialog.ShowAsync();
-            if (result == ContentDialogResult.Primary)
-            {
-                s_cts.Cancel();
+            if (result != ContentDialogResult.Primary) return;
 
-                window.Closed -= CurrentWindow_Closed;
-                window.Close();
-            }
+            await s_cts.CancelAsync();
+
+            if (window == null) return;
+            window.Closed -= CurrentWindow_Closed;
+            window.Close();
         }
 
         private void ResetMatchCountInfo(List<MatchVideoResult> matchVideoResults)

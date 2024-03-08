@@ -10,10 +10,11 @@ namespace Display.Helper.Network.Spider;
 
 public class Manager
 {
-    public static readonly InfoSpider[] Spiders = {
+    public static readonly InfoSpider[] Spiders =
+    [
         new JavBus(),
         new JavDb()
-    };
+    ];
 
     private static Manager _manager;
     public static Manager Instance

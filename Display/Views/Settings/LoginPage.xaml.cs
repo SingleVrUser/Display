@@ -65,8 +65,8 @@ namespace Display.Views.Settings
             UpdateState("login");
 
             //检查二维码登录状态
-            bool isLogined = false;
-            bool isError = false;
+            var isLogined = false;
+            var isError = false;
             for (int i = 0; i < 10; i++)
             {
                 //登录成功或发生错误
@@ -81,11 +81,11 @@ namespace Display.Views.Settings
                 }
 
                 //发送查询请求，可能为超长时长（服务器单次最大通讯时长30s）
-                QRCodeStatus qRCodeStatus = await webapi.GetQrCodeStatusAsync();
+                var qRCodeStatus = await webapi.GetQrCodeStatusAsync();
 
                 if (qRCodeStatus.state == 1)
                 {
-                    StatusInfo statusInfo = qRCodeStatus.data;
+                    var statusInfo = qRCodeStatus.data;
                     switch (statusInfo.status)
                     {
                         case 1:
