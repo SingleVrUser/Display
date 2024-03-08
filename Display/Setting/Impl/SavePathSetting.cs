@@ -4,12 +4,8 @@ using DefaultValue = Display.Models.Data.Constant.DefaultSettings;
 
 namespace Display.Setting.Impl;
 
-internal class SavePathSetting : SettingBase, ISavePathSetting
+internal class SavePathSetting(ISettingProvider provider) : SettingBase(provider), ISavePathSetting
 {
-    public SavePathSetting(ISettingProvider provider) : base(provider)
-    {
-    }
-
     public string ImageSavePath
     {
         get => GetValue(DefaultValue.App.SavePath.Image);

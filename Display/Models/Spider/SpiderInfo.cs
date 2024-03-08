@@ -23,9 +23,6 @@ public class SpiderInfos
 public class SpiderInfo : INotifyPropertyChanged
 {
     public SpiderSourceName SpiderSource { get; set; }
-
-    public string SearchName { get; set; }
-
     public SpiderStates State { get; set; }
     public bool IsEnable { get; set; }
     public Brush EllipseColor
@@ -66,6 +63,14 @@ public class SpiderInfo : INotifyPropertyChanged
             OnPropertyChanged(nameof(EllipseColor));
             OnPropertyChanged(nameof(SpiderCount));
         }
+    }
+
+    public SpiderInfo(SpiderSourceName spiderSourceName, string message, SpiderStates status)
+    {
+        SpiderSource = spiderSourceName;
+        IsEnable = true;
+        Message = message;
+        State = status;
     }
 
     //初始化

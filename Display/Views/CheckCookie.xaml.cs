@@ -27,7 +27,7 @@ namespace Display.Views
 
         private List<Cookie_key_value> FormatCookie(string cookie)
         {
-            CookieDict_List = new List<Cookie_key_value>();
+            CookieDict_List = [];
 
             //cookie不为空且可用
             if (!string.IsNullOrEmpty(cookie))
@@ -39,10 +39,10 @@ namespace Display.Views
                     index++;
                     cookie = cookies;
                     var item = cookies.Split('=');
-                    string key = item[0].Trim();
-                    string value = item.Length > 1 ? item[1].Trim() : string.Empty;
+                    var key = item[0].Trim();
+                    var value = item.Length > 1 ? item[1].Trim() : string.Empty;
 
-                    CookieDict_List.Add(new Cookie_key_value() { index = index, key = key, value = value }); ;
+                    CookieDict_List.Add(new Cookie_key_value { index = index, key = key, value = value });
                 }
             }
             return CookieDict_List;

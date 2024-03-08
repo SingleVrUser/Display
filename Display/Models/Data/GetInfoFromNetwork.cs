@@ -149,7 +149,7 @@ namespace Display.Models.Data
             //不存在
             if (!File.Exists(localPath) || isReplaceExistsImage)
             {
-                int maxTryCount = 3;
+                var maxTryCount = 3;
 
                 if (headers != null)
                 {

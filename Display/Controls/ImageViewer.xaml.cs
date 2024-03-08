@@ -142,6 +142,8 @@ namespace Display.Controls
             if (!HaveNext) return;
             SelectedIndex++;
 
+            if (HaveNext) return;
+
             RightButton.Visibility = Visibility.Collapsed;
             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
@@ -151,6 +153,7 @@ namespace Display.Controls
             if (!HavePrevious) return;
             SelectedIndex--;
 
+            if (HavePrevious) return;
             LeftButton.Visibility = Visibility.Collapsed;
             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
@@ -232,7 +235,5 @@ namespace Display.Controls
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
     }
-
 }

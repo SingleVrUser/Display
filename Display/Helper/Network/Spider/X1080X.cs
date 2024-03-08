@@ -238,7 +238,6 @@ namespace Display.Helper.Network.Spider
         {
             var txt = cid.Replace('-', '+').Replace(' ', '+');
 
-
             var postValues = new Dictionary<string, string>
             {
                 //{ "mod", "search"},
@@ -246,10 +245,10 @@ namespace Display.Helper.Network.Spider
                 { "srchtype", "title"},
                 { "srchtxt", txt},
                 { "mod", "forum"},
-                { "searchsubmit", "true"},
+                { "searchsubmit", "true"}
             };
 
-            List<Forum1080SearchResult> detailInfos = new();
+            List<Forum1080SearchResult> detailInfos = [];
             var nextPageUrl = $"{BaseUrl}search.php?searchsubmit=yes";
 
             while (!string.IsNullOrEmpty(nextPageUrl))
