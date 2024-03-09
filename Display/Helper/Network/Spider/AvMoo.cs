@@ -49,15 +49,15 @@ public class AvMoo
 
     private static async Task<string> GetDetailUrlFromCID(string CID, CancellationToken token)
     {
-        string url = GetInfoFromNetwork.UrlCombine(baseUrl, $"cn/search/{CID}");
+        var url = GetInfoFromNetwork.UrlCombine(baseUrl, $"cn/search/{CID}");
 
         // 访问
-        Tuple<string, string> result = await RequestHelper.RequestHtml(Common.Client, url, token);
+        var result = await RequestHelper.RequestHtml(Common.Client, url, token);
         if (result == null) return null;
 
-        string htmlString = result.Item2;
+        var htmlString = result.Item2;
 
-        HtmlDocument htmlDoc = new HtmlDocument();
+        var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlString);
 
         htmlString = GetDetailUrlFromSearchResult(htmlDoc, CID);
@@ -92,7 +92,7 @@ public class AvMoo
             var movie_list = SearchResultNodes[i];
             var title = movie_list.SelectSingleNode(".//div[@class='photo-info']/span/date").InnerText.ToUpper();
 
-            var split_result = title.Split(new char[] { '-', '_' });
+            var split_result = title.Split(['-', '_']);
             if (split_result.Length == 1)
             {
                 var match_result = Regex.Match(title, @"([A-Z]+)(\d+)");

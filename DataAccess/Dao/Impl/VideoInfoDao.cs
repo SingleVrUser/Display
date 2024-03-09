@@ -1,6 +1,5 @@
 ﻿using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
-using DataAccess.Vo;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Dao.Impl;
