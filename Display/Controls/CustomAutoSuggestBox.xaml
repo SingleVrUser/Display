@@ -58,13 +58,14 @@
                         <ItemsRepeater.Layout>
                             <controls:WrapLayout x:Name="Wrap"
                                                  HorizontalSpacing="5"
-                                                 VerticalSpacing="2" />
+                                                 VerticalSpacing="2"/>
                         </ItemsRepeater.Layout>
 
                         <ItemsRepeater.ItemTemplate>
                             <DataTemplate x:DataType="data:SearchHistory">
                                 <GridViewItem Content="{x:Bind Keyword}"
-                                              Tapped="SearchHistoryItem_OnTapped"/>
+                                              Tapped="SearchHistoryItem_OnTapped"
+                                              Padding="10,0"/>
                             </DataTemplate>
                         </ItemsRepeater.ItemTemplate>
 

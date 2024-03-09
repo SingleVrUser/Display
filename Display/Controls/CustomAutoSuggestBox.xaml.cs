@@ -64,6 +64,12 @@ public sealed partial class CustomAutoSuggestBox : UserControl
         {
             //Resources.TryGetValue("FoundedSuggestionBox", out var context);
             //NavViewSearchBox.ItemTemplate = context as DataTemplate;
+
+            if (AppSettings.IsUseX1080X)
+            {
+                resultList.Add("点击搜索资源");
+            }
+
             item.ForEach(resultList.Add);
         }
         sender.ItemsSource = resultList;

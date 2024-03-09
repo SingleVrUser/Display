@@ -162,7 +162,7 @@ public class JavBus : InfoSpider
         }
 
         var sampleBoxNodes = htmlDoc.DocumentNode.SelectNodes("//a[@class='sample-box']");
-        List<string> sampleUrlList = new();
+        List<string> sampleUrlList = [];
         if (sampleBoxNodes == null) return videoInfo;
 
         foreach (var node in sampleBoxNodes)

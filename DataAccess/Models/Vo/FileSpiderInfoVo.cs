@@ -1,4 +1,4 @@
-﻿namespace DataAccess.Vo;
+﻿namespace DataAccess.Models.Vo;
 
 public class FileSpiderInfoVo
 {
