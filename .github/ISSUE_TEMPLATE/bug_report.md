@@ -2,8 +2,8 @@
 name: 反馈BUG
 about: 创建报告帮助我们改进
 title: ''
-labels: 'bug'
-assignees: 'SingleVrUser'
+labels: bug
+assignees: SingleVrUser
 
 ---
 
