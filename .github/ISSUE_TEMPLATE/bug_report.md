@@ -1,38 +1,27 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+name: 报告BUG
+about: 创建报告帮助我们改进
 title: ''
-labels: ''
-assignees: ''
+labels: 'bug'
+assignees: 'SingleVrUser'
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+**描述问题**
+对出现的问题进行清晰且简洁的描述。
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**复现步骤**
+复现问题的步骤：
+1. 前往……
+2. 点击……
+3. 滚动到……
+4. 看到错误
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+**期望行为**
+清晰且简洁地描述你期望发生什么。
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**系统信息:**
+ - 操作系统: [如，win10, win11]
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
-
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+**额外信息**
+在此添加关于问题的其他信息.
