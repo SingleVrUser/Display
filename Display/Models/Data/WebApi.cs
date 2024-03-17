@@ -1468,7 +1468,7 @@ namespace Display.Models.Data
         public async Task<List<m3u8Info>> GetM3U8InfoByPickCode(string pickCode)
         {
             Debug.WriteLine($"获取{pickCode}中的m3u8链接");
-            List<m3u8Info> m3U8Infos = new();
+            List<m3u8Info> m3U8Infos = [];
 
             string strResult;
             try
@@ -1478,10 +1478,12 @@ namespace Display.Models.Data
             catch (Exception ex)
             {
                 Debug.WriteLine("获取m3u8链接时发生错误：" + ex.Message);
-                return null;
+                return [];
             }
 
-            var lineList = strResult.Split(new[] { '\n' });
+            if (string.IsNullOrWhiteSpace(strResult)) return [];
+
+            var lineList = strResult.Split(['\n']);
             for (var i = 0; i < lineList.Length; i++)
             {
                 // TODO: 部分m3u8文件中的Audio与Video分开，目前未针对这种情况进行处理
@@ -1528,7 +1530,6 @@ namespace Display.Models.Data
 
             //排序
             m3U8Infos = m3U8Infos.OrderByDescending(x => x.Bandwidth).ToList();
-
 
             Debug.WriteLine("成功获取M3U8链接");
 

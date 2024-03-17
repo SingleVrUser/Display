@@ -326,7 +326,7 @@ public sealed partial class MainPage : Page,IDisposable
         return menuFlyout;
     }
     
-    private async System.Threading.Tasks.Task AddMediaElement(FilesInfo file, string videoUrl = null, int addIndex = -1)
+    private async Task AddMediaElement(FilesInfo file, string videoUrl = null, int addIndex = -1)
     {
         videoUrl ??= await GetVideoUrl(file);
         if (videoUrl == null) return;
@@ -621,7 +621,7 @@ public sealed partial class MainPage : Page,IDisposable
         _cidInfos.Remove(removeCid);
     }
 
-    private void RemovePlayingVideo(MediaPlayerElement mediaPlayerElement)
+    private void RemovePlayingVideo(FrameworkElement mediaPlayerElement)
     {
         if (mediaPlayerElement.Tag is not MediaPlayerWithStreamSource oldMediaPlayerWithStreamSource) return;
 
