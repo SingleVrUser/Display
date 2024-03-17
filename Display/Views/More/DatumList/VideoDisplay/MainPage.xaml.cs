@@ -367,9 +367,9 @@ public sealed partial class MainPage : Page,IDisposable
                 sliderControl.StepFrequency = 1000 / sender.PlaybackSession.NaturalDuration.TotalSeconds;
                 sliderControl.SmallChange = 1000 / sender.PlaybackSession.NaturalDuration.TotalSeconds;
             });
-
-
         };
+
+        mediaPlayerElement.GotFocus += MediaPlayerElement_GotFocus;
 
         if (addIndex == -1)
         {
@@ -381,6 +381,17 @@ public sealed partial class MainPage : Page,IDisposable
         }
 
     }
+
+    private void MediaPlayerElement_GotFocus(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MediaPlayerElement focusMedia) return;
+
+        var index = Video_UniformGrid.Children.IndexOf(focusMedia);
+
+        if(VideoPlay_ListView.SelectedIndex != index && VideoPlay_ListView.Items.Count > index)
+            VideoPlay_ListView.SelectedIndex = index;
+    }
+
 
     private static void ChangMediaPlayerPositionWhenMediaOpened(MediaPlayer sender)
     {
