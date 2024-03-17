@@ -32,6 +32,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
+using SharpCompress;
 using static Display.Models.Data.Constant;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -109,10 +110,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     private void FilesInfos_WebPathChanged(WebPath[] obj)
     {
         _units.Clear();
-        foreach (var path in FilesInfos.WebPaths)
-        {
-            _units.Add(new ExplorerItem { Name = path.name, Id = path.cid });
-        }
+        FilesInfos.WebPaths?.ForEach(path => _units.Add(new ExplorerItem { Name = path.name, Id = path.cid }));
+
     }
 
     private void FilesInfos_GetFileInfoCompleted(object sender, GetFileInfoCompletedEventArgs e)
