@@ -24,98 +24,6 @@
     </Page.Resources>
 
     <Pivot>
-        <!--<PivotItem>
-            <PivotItem.Header>
-                <TextBlock FontSize="15">
-                    下载
-                    <Run Foreground="{StaticResource SecondRunForeground}"> (</Run>
-                    <Run Text="{x:Bind downloadVM.DownloadCollection.Count, Mode=OneWay}"
-                         Foreground="{StaticResource SecondRunForeground}" />
-                    <Run Foreground="{StaticResource SecondRunForeground}">)</Run>
-                </TextBlock>
-            </PivotItem.Header>
-            <ListView ItemsSource="{x:Bind downloadVM.DownloadCollection}"
-                      SelectionMode="None">
-
-                <ListView.ItemTemplate>
-                    <DataTemplate  x:DataType="models:DownloadSubItem">
-                        <Grid RowDefinitions="auto,*,6"
-                              Height="70"
-                              ColumnDefinitions="*,auto,auto"
-                              Padding="5"
-                              Margin="0,5"
-                              ColumnSpacing="5"
-                              RowSpacing="5"
-                              CornerRadius="5"
-                              BorderBrush="LightGray"
-                              BorderThickness="1">
-
-                            <Grid.ContextFlyout>
-                                <MenuBarItemFlyout>
-                                    <MenuFlyoutItem Text="打开目录"
-                                                    Command="{x:Bind OpenCurrentFolderAsyncCommand}" />
-                                </MenuBarItemFlyout>
-                            </Grid.ContextFlyout>
-
-                            <TextBlock Grid.Row="0"
-                                       Text="{x:Bind Name}"
-                                       Style="{ThemeResource BodyTextBlockStyle}"
-                                       Grid.ColumnSpan="2" />
-
-                            <TextBlock Grid.Row="1"
-                                       Text="{x:Bind ProgressContent,Mode=OneWay}"
-                                       Style="{ThemeResource CaptionTextBlockStyle}"
-                                       VerticalAlignment="Bottom"
-                                       Opacity="0.5" />
-
-                            <TextBlock Grid.Row="1"
-                                       Grid.Column="1"
-                                       Text="{x:Bind Content,Mode=OneWay}"
-                                       Style="{ThemeResource CaptionTextBlockStyle}"
-                                       VerticalAlignment="Bottom"
-                                       Opacity="0.5" />
-
-                            <ProgressBar Grid.Row="2"
-                                         Grid.ColumnSpan="2"
-                                         x:Name="DownProgressBar"
-                                         IsIndeterminate="{x:Bind ProgressIsIndeterminate,Mode=OneWay}"
-                                         ShowError="{x:Bind ProgressShowError,Mode=OneWay}"
-                                         ShowPaused="{x:Bind ProgressShowPaused,Mode=OneWay}"
-                                         Visibility="{x:Bind ProgressVisibility, Mode=OneWay}"
-                                         Value="{x:Bind Position, Mode=OneWay}"
-                                         Maximum="{x:Bind Maximum,Mode=OneWay}" />
-
-                            <StackPanel Grid.Column="2"
-                                        Grid.RowSpan="3">
-                                <HyperlinkButton Visibility="{x:Bind DownButtonVisibility,Mode=OneWay}"
-                                                 Margin="0"
-                                                 Command="{x:Bind DownCurrentFileAsyncCommand}">
-                                    <FontIcon FontFamily="Segoe Fluent Icons"
-                                              Glyph="&#xE118;"
-                                              Style="{StaticResource CommonFontIconStyle}" />
-                                </HyperlinkButton>
-
-                                <HyperlinkButton Visibility="{x:Bind PauseButtonVisibility,Mode=OneWay}"
-                                                 Command="{x:Bind PauseCurrentFileAsyncCommand}">
-                                    <FontIcon FontFamily="Segoe Fluent Icons"
-                                              Glyph="&#xE103;"
-                                              Style="{StaticResource CommonFontIconStyle}" />
-                                </HyperlinkButton>
-
-                                <HyperlinkButton Visibility="{x:Bind DeleteButtonVisibility,Mode=OneWay}"
-                                                 Command="{x:Bind DeleteCurrentFileAsyncCommand}">
-                                    <FontIcon FontFamily="Segoe Fluent Icons"
-                                              Glyph="&#xE10A;"
-                                              Style="{StaticResource CommonFontIconStyle}" />
-                                </HyperlinkButton>
-
-                            </StackPanel>
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </PivotItem>-->
-
         <PivotItem>
             <PivotItem.Header>
                 <TextBlock FontSize="15">
@@ -184,7 +92,7 @@
                                 <HyperlinkButton Visibility="{x:Bind UploadButtonVisibility,Mode=OneWay}"
                                                  Command="{x:Bind ResumeCommand}"
                                                  Margin="0">
-                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                    <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                               Glyph="&#xE11C;"
                                               Style="{StaticResource CommonFontIconStyle}" />
                                 </HyperlinkButton>
@@ -192,7 +100,7 @@
                                 <!--暂停-->
                                 <HyperlinkButton Visibility="{x:Bind PauseButtonVisibility,Mode=OneWay}"
                                                  Command="{x:Bind PauseCommand}">
-                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                    <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                               Glyph="&#xE103;"
                                               Style="{StaticResource CommonFontIconStyle}" />
                                 </HyperlinkButton>
@@ -200,7 +108,7 @@
                                 <!--删除-->
                                 <HyperlinkButton Visibility="{x:Bind DeleteButtonVisibility,Mode=OneWay}"
                                                  Command="{x:Bind DeleteAsyncCommand}">
-                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                    <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                               Glyph="&#xE10A;"
                                               Style="{StaticResource CommonFontIconStyle}" />
                                 </HyperlinkButton>

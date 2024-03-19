@@ -53,9 +53,9 @@ namespace Display.Views.Settings
 
 
             QRCodeInfo qrcodeInfo = await webapi.GetQrCodeInfo();
-            if (imageGrid.Visibility == Visibility.Visible)
+            if (ImageGrid.Visibility == Visibility.Visible)
             {
-                imageGrid.Visibility = Visibility.Collapsed;
+                ImageGrid.Visibility = Visibility.Collapsed;
             }
 
             //显示二维码
@@ -155,7 +155,7 @@ namespace Display.Views.Settings
             await image.SetSourceAsync(stream);
 
             //QRLoadingRing.IsActive = false;
-            QRCodeImage.Source = image;
+            QrCodeImage.Source = image;
         }
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace Display.Views.Settings
             if (webapi.TokenInfo != null && webapi.TokenInfo.data != null)
             {
                 //QRLoadingRing.IsActive = true;
-                QRCodeImage.Source = new BitmapImage(new Uri(webapi.TokenInfo.data.face.face_l));
+                QrCodeImage.Source = new BitmapImage(new Uri(webapi.TokenInfo.data.face.face_l));
                 //HiddenToggleSwitch.IsOn = await webapi.IsHiddenModel();
                 //HidenStackPanel.Visibility = Visibility.Visible;
                 //QRLoadingRing.IsActive = false;
@@ -239,20 +239,20 @@ namespace Display.Views.Settings
         {
             //termsOfUseContentDialog.Content = new ContentsPage.CheckCookie(CookieInputTextBox.Text);
             //await termsOfUseContentDialog.ShowAsync();
-            checkCookieTip.Content = new CheckCookie(CookieInputTextBox.Text);
-            checkCookieTip.IsOpen = true;
+            CheckCookieTip.Content = new CheckCookie(CookieInputTextBox.Text);
+            CheckCookieTip.IsOpen = true;
 
         }
 
         private void CookieInputTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (CookieInputTextBox.Text != "" && checkCookieButton.IsEnabled == false)
+            if (CookieInputTextBox.Text != "" && CheckCookieButton.IsEnabled == false)
             {
-                checkCookieButton.IsEnabled = true;
+                CheckCookieButton.IsEnabled = true;
             }
-            else if (CookieInputTextBox.Text == "" && checkCookieButton.IsEnabled == true)
+            else if (CookieInputTextBox.Text == "" && CheckCookieButton.IsEnabled == true)
             {
-                checkCookieButton.IsEnabled = false;
+                CheckCookieButton.IsEnabled = false;
             }
         }
 
@@ -274,14 +274,14 @@ namespace Display.Views.Settings
         private void updateSweepQRCodeTip()
         {
             //QRCodeConfirmTip显示时，SweepQRCodeTip隐藏
-            if (QRCodeConfirmTip.Visibility == Visibility.Visible && sweepQRCodeTip.Visibility == Visibility.Visible)
+            if (QrCodeConfirmTip.Visibility == Visibility.Visible && SweepQrCodeTip.Visibility == Visibility.Visible)
             {
-                sweepQRCodeTip.Visibility = Visibility.Collapsed;
+                SweepQrCodeTip.Visibility = Visibility.Collapsed;
             }
             //QRCodeConfirmTip隐藏时，SweepQRCodeTip显示
-            else if (QRCodeConfirmTip.Visibility == Visibility.Collapsed && sweepQRCodeTip.Visibility == Visibility.Collapsed)
+            else if (QrCodeConfirmTip.Visibility == Visibility.Collapsed && SweepQrCodeTip.Visibility == Visibility.Collapsed)
             {
-                sweepQRCodeTip.Visibility = Visibility.Visible;
+                SweepQrCodeTip.Visibility = Visibility.Visible;
             }
         }
 
@@ -296,39 +296,39 @@ namespace Display.Views.Settings
             switch (type)
             {
                 case "info":
-                    QRCodeConfirmTip.Background = new SolidColorBrush(Colors.LimeGreen);
+                    QrCodeConfirmTip.Background = new SolidColorBrush(Colors.LimeGreen);
                     break;
                 //要求刷新
                 case "fresh":
                     _waitfresh = true;
-                    RefreshQRCode_Grid.Opacity = 1;
-                    QRCodeConfirmTip.Background = new SolidColorBrush(Colors.SandyBrown);
+                    RefreshQrCodeGrid.Opacity = 1;
+                    QrCodeConfirmTip.Background = new SolidColorBrush(Colors.SandyBrown);
                     break;
                 case "error":
-                    QRCodeConfirmTip.Background = new SolidColorBrush(Colors.OrangeRed);
+                    QrCodeConfirmTip.Background = new SolidColorBrush(Colors.OrangeRed);
                     break;
             }
 
-            (QRCodeConfirmTip.Children.Where(x => x is TextBlock).FirstOrDefault() as TextBlock).Text = showName;
+            (QrCodeConfirmTip.Children.Where(x => x is TextBlock).FirstOrDefault() as TextBlock).Text = showName;
 
             //显示
-            if (visibility == Visibility.Visible && QRCodeConfirmTip.Visibility == Visibility.Collapsed)
+            if (visibility == Visibility.Visible && QrCodeConfirmTip.Visibility == Visibility.Collapsed)
             {
-                QRCodeConfirmTip.Visibility = Visibility.Visible;
+                QrCodeConfirmTip.Visibility = Visibility.Visible;
             }
             //隐藏
-            else if (visibility == Visibility.Collapsed && QRCodeConfirmTip.Visibility == Visibility.Visible)
+            else if (visibility == Visibility.Collapsed && QrCodeConfirmTip.Visibility == Visibility.Visible)
             {
-                QRCodeConfirmTip.Visibility = Visibility.Collapsed;
+                QrCodeConfirmTip.Visibility = Visibility.Collapsed;
             }
         }
 
         private void RefreshQRCode_Grid_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            RefreshQRCode_Grid.Opacity = 1;
-            if (QRCodeImage.Source == null)
+            RefreshQrCodeGrid.Opacity = 1;
+            if (QrCodeImage.Source == null)
             {
-                imageGrid.Visibility = Visibility.Collapsed;
+                ImageGrid.Visibility = Visibility.Collapsed;
             }
             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
         }
@@ -338,11 +338,11 @@ namespace Display.Views.Settings
             //等待二维码刷新就一直显示
             if (!_waitfresh)
             {
-                RefreshQRCode_Grid.Opacity = 0;
+                RefreshQrCodeGrid.Opacity = 0;
             }
-            if (QRCodeImage.Source == null)
+            if (QrCodeImage.Source == null)
             {
-                imageGrid.Visibility = Visibility.Visible;
+                ImageGrid.Visibility = Visibility.Visible;
             }
             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }

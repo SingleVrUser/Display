@@ -16,8 +16,6 @@ using ImageViewModel = Display.ViewModels.ImageViewModel;
 using Display.Interfaces;
 using Display.Services;
 using Microsoft.Extensions.Configuration;
-using Microsoft.EntityFrameworkCore.Metadata;
-using System.Drawing;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
@@ -81,6 +79,7 @@ namespace Display
                         // Views and ViewModels
                         .AddSingleton<IThumbnailGeneratorService, ThumbnailGeneratorService>()
                         .AddTransient<ImageViewModel>()
+                        .AddTransient<SettingViewModel>()
                         .AddTransient<ThumbnailViewModel>();
                 })
                 .Build();

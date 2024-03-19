@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Runtime.CompilerServices;
-using Display.Helper.Data;
 using Display.Models.Data.Enums;
 using DefaultValue = Display.Models.Data.Constant.DefaultSettings;
 
@@ -10,14 +9,14 @@ public class AppSettings
 {
     private static T GetValue<T>(T defaultValue = default, [CallerMemberName] string propertyName = null)
     {
-        return string.IsNullOrEmpty(propertyName) ? defaultValue : Settings.GetValue(propertyName, defaultValue);
+        return string.IsNullOrEmpty(propertyName) ? defaultValue : Helper.Data.Settings.GetValue(propertyName, defaultValue);
     }
 
     private static void SetValue<T>(T value, [CallerMemberName] string propertyName = null)
     {
         if (string.IsNullOrEmpty(propertyName)) return;
 
-        Settings.SetValue(propertyName, value);
+        Helper.Data.Settings.SetValue(propertyName, value);
     }
 
     public static bool IsPlayBestQualityFirst

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Display.Views.Settings.CommonPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Display.Views.Settings"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:data="using:Display.Models.Data"
+    xmlns:ui="using:CommunityToolkit.WinUI.UI"
+    xmlns:enums="using:Display.Models.Data.Enums"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <Style TargetType="controls:SettingsCard"
+               BasedOn="{StaticResource BaseSettingsCardStyle}" />
+    </Page.Resources>
+
+    <StackPanel Style="{StaticResource SettingStackPanel}">
+
+        <!--标题：启动-->
+        <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}"
+                   Text="启动" />
+        <controls:SettingsCard Header="初始页">
+
+            <ComboBox SelectedIndex="{x:Bind data:AppSettings.StartPageIndex, Mode=TwoWay}">
+                <x:String>主页</x:String>
+                <x:String>展示</x:String>
+                <x:String>演员一览</x:String>
+                <x:String>其他</x:String>
+                <x:String>设置</x:String>
+            </ComboBox>
+
+        </controls:SettingsCard>
+        <controls:SettingsCard Header="左侧导航">
+
+            <ToggleSwitch OnContent="展开"
+                          OffContent="紧凑"
+                          IsOn="{x:Bind data:AppSettings.IsNavigationViewPaneOpen,Mode=TwoWay}" />
+
+        </controls:SettingsCard>
+        <controls:SettingsCard Header="检查更新">
+
+            <ToggleSwitch OnContent="开启"
+                          OffContent="关闭"
+                          IsOn="{x:Bind data:AppSettings.IsCheckUpdate,Mode=TwoWay}" />
+        </controls:SettingsCard>
+
+        <!--标题：显示-->
+        <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}"
+                   Text="显示" />
+        <controls:SettingsCard Header="缩略图来源">
+            <ComboBox RelativePanel.AlignRightWithPanel="True"
+                      ItemsSource="{ui:EnumValues Type=enums:ThumbnailOriginType}"
+                      SelectedItem="{x:Bind data:AppSettings.ThumbnailOriginType, Mode=TwoWay}" />
+        </controls:SettingsCard>
+
+    </StackPanel>
+</Page>

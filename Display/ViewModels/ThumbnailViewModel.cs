@@ -13,7 +13,7 @@ using Display.Models.Media;
 
 namespace Display.ViewModels;
 
-partial class ThumbnailViewModel : ObservableObject
+partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGeneratorService) : ObservableObject
 {
     private string _videoUrl;
     private List<FilesInfo> _fileInfos;
@@ -21,7 +21,7 @@ partial class ThumbnailViewModel : ObservableObject
     [ObservableProperty]
     private bool _loading;
 
-    public ObservableCollection<GroupThumbnailCollection> ThumbnailList = new();
+    public ObservableCollection<GroupThumbnailCollection> ThumbnailList = [];
 
     [ObservableProperty]
     private FilesInfo _currentFileItem;
@@ -30,12 +30,6 @@ partial class ThumbnailViewModel : ObservableObject
     private LocalThumbnail _currentThumbnailItem;
 
     private readonly WebApi _webApi = WebApi.GlobalWebApi;
-    private readonly IThumbnailGeneratorService _thumbnailService;
-
-    public ThumbnailViewModel(IThumbnailGeneratorService thumbnailGeneratorService)
-    {
-        _thumbnailService = thumbnailGeneratorService;
-    }
 
     public void SetCurrentItem(object dst)
     {
@@ -121,7 +115,7 @@ partial class ThumbnailViewModel : ObservableObject
             try
             {
                 Debug.WriteLine("开始获取缩略图");
-                await _thumbnailService.DecodeAllFramesToImages(thumbnailGenerateOptions, progress);
+                await thumbnailGeneratorService.DecodeAllFramesToImages(thumbnailGenerateOptions, progress);
                 Debug.WriteLine("成功获取缩略图");
             }
             catch (Exception ex)
