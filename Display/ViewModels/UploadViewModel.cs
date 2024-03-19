@@ -13,7 +13,7 @@ namespace Display.ViewModels
         private static UploadViewModel _uploadVm;
         public static UploadViewModel Instance => _uploadVm ??= new UploadViewModel();
 
-        public ObservableCollection<Services.UploadSubItem> UploadCollection = new();
+        public ObservableCollection<Services.UploadSubItem> UploadCollection = [];
 
         public void AddUploadTask(string filePath, long cid, Action<FileUploadResult> finishAction = null)
         {

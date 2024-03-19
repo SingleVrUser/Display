@@ -16,6 +16,7 @@ using System.Linq;
 using Windows.System;
 using Windows.Foundation;
 using Display.CustomWindows;
+using Display.Helper.Data;
 using Display.Helper.FileProperties.Name;
 using Display.Models.Media;
 using Display.Helper.UI;
@@ -166,15 +167,14 @@ namespace Display
         /// <summary>
         /// 定义访问的页面
         /// </summary>
-        private readonly List<(string Tag, Type Page)> _pages = new()
-        {
-            ("home",typeof(HomePage)),
-            ("videoView",typeof (VideoViewPage)),
-            ("actorsView",typeof(ActorsPage)),
-            ("setting",typeof(SettingsPage)),
-            ("more",typeof(MorePage)),
-            ("settings",typeof(SettingsPage)),
-        };
+        private readonly List<(string Tag, Type Page)> _pages =
+        [
+            ("home", typeof(HomePage)),
+            ("videoView", typeof(VideoViewPage)),
+            ("actorsView", typeof(ActorsPage)),
+            ("more", typeof(MorePage)),
+            ("settings", typeof(Views.Settings.MainPage))
+        ];
 
         /// <summary>
         /// NavView加载
@@ -694,14 +694,6 @@ namespace Display
             BasePage.ShowTeachingTip(LightDismissTeachingTip, subtitle, actionContent, actionButtonClick);
         }
 
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-            ShowTeachingTip("It's easier than ever to see control samples in both light and dark theme!", "测试", (_,_) =>
-            {
-                Debug.WriteLine("成功调用");
-            });
-        }
-
         private void CtrlF_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
         {
             if (args.Element is not CustomAutoSuggestBox suggestionBox) return;
@@ -709,10 +701,14 @@ namespace Display
             suggestionBox.Focus(FocusState.Programmatic);
         }
 
+        /// <summary>
+        /// 显示115任务窗口
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TaskButtonClick(object sender, TappedRoutedEventArgs e)
         {
             TaskPage.ShowSingleWindow();
         }
-
     }
 }

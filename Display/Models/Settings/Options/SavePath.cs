@@ -2,14 +2,13 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Windows.Storage.Pickers;
-using Microsoft.UI.Xaml;
 using Display.Helper.FileProperties.Name;
 using Display.Models.Data.Enums;
+using Microsoft.UI.Xaml;
 
+namespace Display.Models.Settings.Options;
 
-namespace Display.Views.Settings.Options;
-
-class SavePath : INotifyPropertyChanged
+internal class SavePath : INotifyPropertyChanged
 {
     public string Name { get; set; }
 
@@ -34,7 +33,7 @@ class SavePath : INotifyPropertyChanged
     public Action<string> SaveAction { get; set; }
 
     public Action SaveSamePathAction { get; set; }
-    
+
     public SavePath(string originPath)
     {
         OriginPath = originPath;

@@ -83,6 +83,14 @@
     <None Remove="Views\DetailInfo\EditInfo.xaml" />
     <None Remove="Views\OfflineDown\FailListPage.xaml" />
     <None Remove="Views\SearchLink\SearchLinkPage.xaml" />
+    <None Remove="Views\Settings\AccountPage.xaml" />
+    <None Remove="Views\Settings\CommonPage.xaml" />
+    <None Remove="Views\Settings\DownPage.xaml" />
+    <None Remove="Views\Settings\MainPage.xaml" />
+    <None Remove="Views\Settings\PathPage.xaml" />
+    <None Remove="Views\Settings\PlayPage.xaml" />
+    <None Remove="Views\Settings\SearchPage.xaml" />
+    <None Remove="Views\Settings\SpiderPage.xaml" />
     <None Remove="Views\Sort115\MainPage.xaml" />
     <None Remove="Views\Sort115\Settings18Page.xaml" />
     <None Remove="Views\SpiderVideoInfo\Progress.xaml" />
@@ -225,6 +233,30 @@
     <None Update="Control\FolderControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>
+    <Page Update="Views\Settings\DownPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\Settings\PlayPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\Settings\SearchPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\Settings\SpiderPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\Settings\CommonPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\Settings\PathPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\Settings\AccountPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\Settings\MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Control\RangeSlider.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:Display"
              xmlns:ui="using:Windows.UI"
-             xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls">
+             xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
+             xmlns:controls="using:CommunityToolkit.WinUI.Controls">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -22,7 +23,12 @@
                 <!--控件颜色-->
                 <ResourceDictionary>
                     <!--<ui:Color x:Key="ColorChecked">#8cb3ff</ui:Color>-->
-
+                    <ui:Color x:Key="ColorDefault">#FBFBFB</ui:Color>
+                    <ui:Color x:Key="ColorSecondary">#8CB3FF</ui:Color>
+                    <ui:Color x:Key="ColorTertiary">#0E6BE9</ui:Color>
+                    <ui:Color x:Key="ColorLightEmphasize">#DAE5FF</ui:Color>
+                    <ui:Color x:Key="ControlColorDefault">#FFFFFF</ui:Color>
+                    <ui:Color x:Key="ControlColorBorder">#c7c7c9</ui:Color>
                     <ui:Color x:Key="MediaPlayerBackground">#18191b</ui:Color>
 
                     <SolidColorBrush x:Key="CustomToggleButtonBackgroundChecked"
@@ -43,67 +49,110 @@
                     <SolidColorBrush x:Key="CardBackgroundFillColorDefaultBrush"
                                      Color="{ThemeResource SystemAltHighColor}"/>
 
+                    <SolidColorBrush x:Key="CircleBorderBrush"
+                                     Color="{StaticResource ControlColorBorder}" />
+
+                    <SolidColorBrush x:Key="CircleLightBorderBrush"
+                                     Color="{StaticResource ControlColorBorder}"
+                                     Opacity=".4" />
 
                 </ResourceDictionary>
 
+                <!--设置卡片-->
                 <ResourceDictionary>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="FontFamily"
-                                Value="霞鹜文楷" />
-                    </Style>
-
-                    <Style TargetType="oldControls:ImageEx">
-                        <!--<Setter Property="PlaceholderSource" Value="/Assets/ImageExPlaceholder.jpg"/>-->
-                        <Setter Property="PlaceholderStretch" Value="UniformToFill"/>
-                        <Setter Property="EnableLazyLoading" Value="True"/>
-                    </Style>
-
-                    <!--单选按钮-->
-                    <Style x:Key="RadioButtonCustomizeStyle"
-                           TargetType="RadioButton">
-                        <Setter Property="Background"
-                                Value="{ThemeResource RadioButtonBackground}" />
-                        <Setter Property="Foreground"
-                                Value="{ThemeResource RadioButtonForeground}" />
-                        <Setter Property="BorderBrush"
-                                Value="{ThemeResource RadioButtonBorderBrush}" />
+                    <x:Double x:Key="SettingsMaxWidth">1000</x:Double>
+                    <x:Double x:Key="SettingsCardPadding">5</x:Double>
+                    <Style x:Key="SettingStackPanel" TargetType="StackPanel">
+                        <Setter Property="Spacing"
+                                Value="{StaticResource SettingsCardPadding}"/>
+                        <Setter Property="MaxWidth"
+                                Value="{StaticResource SettingsMaxWidth}"/>
                         <Setter Property="Padding"
-                                Value="8" />
-                        <Setter Property="HorizontalAlignment"
-                                Value="Left" />
-                        <Setter Property="VerticalAlignment"
-                                Value="Center" />
-                        <Setter Property="HorizontalContentAlignment"
-                                Value="Left" />
-                        <Setter Property="VerticalContentAlignment"
-                                Value="Top" />
-                        <Setter Property="FontFamily"
-                                Value="Segoe Fluent Icons" />
-                        <Setter Property="FontSize"
-                                Value="{ThemeResource ControlContentThemeFontSize}" />
-                        <Setter Property="MinWidth"
-                                Value="5" />
-                        <Setter Property="UseSystemFocusVisuals"
-                                Value="True" />
-                        <Setter Property="FocusVisualMargin"
-                                Value="-7,-3,-7,-3" />
-                        <Setter Property="CornerRadius"
-                                Value="6" />
+                                Value="10" />
+                    </Style>
+                    <Style x:Key="SettingsSectionHeaderStyle"
+                           BasedOn="{StaticResource BodyStrongTextBlockStyle}"
+                           TargetType="TextBlock">
+                        <Style.Setters>
+                            <Setter Property="Margin"
+                                    Value="1,10,0,6" />
+                        </Style.Setters>
+                    </Style>
 
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="RadioButton">
-                                    <Grid x:Name="RootGrid"
-                                          Background="{TemplateBinding Background}"
-                                          BorderThickness="{TemplateBinding BorderThickness}"
-                                          BorderBrush="{TemplateBinding BorderBrush}"
-                                          CornerRadius="{TemplateBinding CornerRadius}">
+                    <Style x:Key="SettingsPivotStyle" TargetType="Pivot">
+                        <Setter Property="Margin"
+                                Value="-15,-20,0,0" />
+                    </Style>
 
-                                        <VisualStateManager.VisualStateGroups>
-                                            <VisualStateGroup x:Name="CommonStates">
-                                                <VisualState x:Name="Normal" />
-                                                <VisualState x:Name="PointerOver">
-                                                    <!--<Storyboard>
+                    <Style x:Key="BaseSettingsCardStyle"
+                           TargetType="controls:SettingsCard">
+                        <Setter Target="MaxWidth"
+                                Value="{StaticResource SettingsMaxWidth}" />
+                    </Style>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+            <!-- Other app resources here -->
+
+
+            <Style TargetType="TextBlock">
+                <Setter Property="FontFamily"
+                        Value="霞鹜文楷" />
+            </Style>
+
+            <Style TargetType="oldControls:ImageEx">
+                <!--<Setter Property="PlaceholderSource" Value="/Assets/ImageExPlaceholder.jpg"/>-->
+                <Setter Property="PlaceholderStretch"
+                        Value="UniformToFill" />
+                <Setter Property="EnableLazyLoading"
+                        Value="True" />
+            </Style>
+
+            <!--单选按钮-->
+            <Style x:Key="RadioButtonCustomizeStyle"
+                   TargetType="RadioButton">
+                <Setter Property="Background"
+                        Value="{ThemeResource RadioButtonBackground}" />
+                <Setter Property="Foreground"
+                        Value="{ThemeResource RadioButtonForeground}" />
+                <Setter Property="BorderBrush"
+                        Value="{ThemeResource RadioButtonBorderBrush}" />
+                <Setter Property="Padding"
+                        Value="8" />
+                <Setter Property="HorizontalAlignment"
+                        Value="Left" />
+                <Setter Property="VerticalAlignment"
+                        Value="Center" />
+                <Setter Property="HorizontalContentAlignment"
+                        Value="Left" />
+                <Setter Property="VerticalContentAlignment"
+                        Value="Top" />
+                <Setter Property="FontFamily"
+                        Value="Segoe Fluent Icons" />
+                <Setter Property="FontSize"
+                        Value="{ThemeResource ControlContentThemeFontSize}" />
+                <Setter Property="MinWidth"
+                        Value="5" />
+                <Setter Property="UseSystemFocusVisuals"
+                        Value="True" />
+                <Setter Property="FocusVisualMargin"
+                        Value="-7,-3,-7,-3" />
+                <Setter Property="CornerRadius"
+                        Value="6" />
+
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="RadioButton">
+                            <Grid x:Name="RootGrid"
+                                  Background="{TemplateBinding Background}"
+                                  BorderThickness="{TemplateBinding BorderThickness}"
+                                  BorderBrush="{TemplateBinding BorderBrush}"
+                                  CornerRadius="{TemplateBinding CornerRadius}">
+
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal" />
+                                        <VisualState x:Name="PointerOver">
+                                            <!--<Storyboard>
                                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
                                                                                        Storyboard.TargetProperty="Foreground">
                                                             <DiscreteObjectKeyFrame KeyTime="0"
@@ -121,9 +170,9 @@
                                                         </ObjectAnimationUsingKeyFrames>
 
                                                     </Storyboard>-->
-                                                </VisualState>
-                                                <VisualState x:Name="Pressed">
-                                                    <!--<Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <!--<Storyboard>
                                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
                                                                                        Storyboard.TargetProperty="Foreground">
                                                             <DiscreteObjectKeyFrame KeyTime="0"
@@ -141,89 +190,79 @@
                                                         </ObjectAnimationUsingKeyFrames>
 
                                                     </Storyboard>-->
-                                                </VisualState>
-                                                <VisualState x:Name="Disabled">
-                                                    <Storyboard>
-                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
-                                                                                       Storyboard.TargetProperty="Foreground">
-                                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                                    Value="{ThemeResource RadioButtonForegroundDisabled}" />
-                                                        </ObjectAnimationUsingKeyFrames>
-                                                        
-                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootGrid"
-                                                                                       Storyboard.TargetProperty="Background">
-                                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                                    Value="{ThemeResource RadioButtonBackgroundDisabled}" />
-                                                        </ObjectAnimationUsingKeyFrames>
-                                                        
-                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootGrid"
-                                                                                       Storyboard.TargetProperty="BorderBrush">
-                                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                                    Value="{ThemeResource RadioButtonBorderBrushDisabled}" />
-                                                        </ObjectAnimationUsingKeyFrames>
+                                        </VisualState>
+                                        <VisualState x:Name="Disabled">
+                                            <Storyboard>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
+                                                                               Storyboard.TargetProperty="Foreground">
+                                                    <DiscreteObjectKeyFrame KeyTime="0"
+                                                                            Value="{ThemeResource RadioButtonForegroundDisabled}" />
+                                                </ObjectAnimationUsingKeyFrames>
 
-                                                    </Storyboard>
-                                                </VisualState>
-                                            </VisualStateGroup>
-                                            <VisualStateGroup x:Name="CheckStates">
-                                                <VisualState x:Name="Checked">
-                                                    <Storyboard>
-                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="myGrid"
-                                                                                       Storyboard.TargetProperty="Background">
-                                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                                    Value="{StaticResource CustomToggleButtonBackgroundChecked}" />
-                                                        </ObjectAnimationUsingKeyFrames>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootGrid"
+                                                                               Storyboard.TargetProperty="Background">
+                                                    <DiscreteObjectKeyFrame KeyTime="0"
+                                                                            Value="{ThemeResource RadioButtonBackgroundDisabled}" />
+                                                </ObjectAnimationUsingKeyFrames>
 
-                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
-                                                                                       Storyboard.TargetProperty="Foreground">
-                                                            <DiscreteObjectKeyFrame KeyTime="0"
-                                                                                    Value="{ThemeResource ToggleButtonForegroundChecked}" />
-                                                        </ObjectAnimationUsingKeyFrames> 
-                                                    </Storyboard>
-                                                </VisualState>
-                                                <VisualState x:Name="Unchecked" />
-                                                <VisualState x:Name="Indeterminate" />
-                                            </VisualStateGroup>
-                                        </VisualStateManager.VisualStateGroups>
-                                        <Grid x:Name="myGrid"
-                                              VerticalAlignment="Top">
-                                            <ContentPresenter x:Name="ContentPresenter"
-                                                              AutomationProperties.AccessibilityView="Raw"
-                                                              ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                              Content="{TemplateBinding Content}"
-                                                              ContentTransitions="{TemplateBinding ContentTransitions}"
-                                                              Foreground="{TemplateBinding Foreground}"
-                                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                              Margin="{TemplateBinding Padding}"
-                                                              TextWrapping="Wrap"
-                                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                                        </Grid>
-                                    </Grid>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RootGrid"
+                                                                               Storyboard.TargetProperty="BorderBrush">
+                                                    <DiscreteObjectKeyFrame KeyTime="0"
+                                                                            Value="{ThemeResource RadioButtonBorderBrushDisabled}" />
+                                                </ObjectAnimationUsingKeyFrames>
 
-                </ResourceDictionary>
-            </ResourceDictionary.MergedDictionaries>
-            <!-- Other app resources here -->
+                                            </Storyboard>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                    <VisualStateGroup x:Name="CheckStates">
+                                        <VisualState x:Name="Checked">
+                                            <Storyboard>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="myGrid"
+                                                                               Storyboard.TargetProperty="Background">
+                                                    <DiscreteObjectKeyFrame KeyTime="0"
+                                                                            Value="{StaticResource CustomToggleButtonBackgroundChecked}" />
+                                                </ObjectAnimationUsingKeyFrames>
+
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
+                                                                               Storyboard.TargetProperty="Foreground">
+                                                    <DiscreteObjectKeyFrame KeyTime="0"
+                                                                            Value="{ThemeResource ToggleButtonForegroundChecked}" />
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Unchecked" />
+                                        <VisualState x:Name="Indeterminate" />
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <Grid x:Name="myGrid"
+                                      VerticalAlignment="Top">
+                                    <ContentPresenter x:Name="ContentPresenter"
+                                                      AutomationProperties.AccessibilityView="Raw"
+                                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                      Content="{TemplateBinding Content}"
+                                                      ContentTransitions="{TemplateBinding ContentTransitions}"
+                                                      Foreground="{TemplateBinding Foreground}"
+                                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                      Margin="{TemplateBinding Padding}"
+                                                      TextWrapping="Wrap"
+                                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                                </Grid>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
 
-            <!--重置TeachingTip宽度-->
-            <x:Double x:Key="TeachingTipMaxWidth">700</x:Double>
+
 
             <!--<x:Double x:Key="ContentDialogMaxWidth">900</x:Double>-->
 
-            <!--颜色-->
-            <ui:Color x:Key="ColorDefault">#FBFBFB</ui:Color>
-            <ui:Color x:Key="ColorSecondary">#8CB3FF</ui:Color>
-            <ui:Color x:Key="ColorTertiary">#0E6BE9</ui:Color>
-            <ui:Color x:Key="ColorLightEmphasize">#DAE5FF</ui:Color>
-            <ui:Color x:Key="ControlColorDefault">#FFFFFF</ui:Color>
-            <ui:Color x:Key="ControlColorBorder">#c7c7c9</ui:Color>
-
             <!--数值-->
             <Thickness x:Key="AppBarButtonCompactMargin">0,-5,0,-20</Thickness>
+
+            <!--重置TeachingTip宽度-->
+            <x:Double x:Key="TeachingTipMaxWidth">700</x:Double>
 
             <!--样式-->
 
@@ -269,11 +308,6 @@
                         Value="Wrap" />
             </Style>
 
-            <SolidColorBrush x:Key="CircleBorderBrush"
-                             Color="{StaticResource ControlColorBorder}" />
-
-            <SolidColorBrush x:Key="CircleLightBorderBrush"
-                             Color="{StaticResource ControlColorBorder}" Opacity=".4"/>
 
 
             <Style x:Key="NoClickAutoSuggestBoxStyle"

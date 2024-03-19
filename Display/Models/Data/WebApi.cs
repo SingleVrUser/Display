@@ -1537,16 +1537,7 @@ namespace Display.Models.Data
         }
 
 
-        public static Microsoft.UI.Xaml.Window CreateWindowToVerifyAccount()
-        {
-            var window = new CommonWindow("验证账号", 360, 560);
-            var page = new VerifyAccountPage(window);
-
-            window.Content = page;
-
-            return window;
-            ;
-        }
+        public static Window CreateWindowToVerifyAccount() => VerifyAccountPage.CreateVerifyAccountWindow();
 
 
         /// <summary>
@@ -1578,6 +1569,9 @@ namespace Display.Models.Data
                     savePath = AppSettings.VlcExePath;
                     ua = GetInfoFromNetwork.DownUserAgent;
                     break;
+                case PlayerType.WebView:
+                case PlayerType.MediaElement:
+                case PlayerType.None:
                 default:
                     throw new ArgumentOutOfRangeException(nameof(playerType), playerType, null);
             }

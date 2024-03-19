@@ -94,7 +94,6 @@
                 </customcontrols:CustomAutoSuggestBox.KeyboardAccelerators>
             </customcontrols:CustomAutoSuggestBox>
             
-            <!--<Button Grid.Column="2" Content="测试" Click="ButtonBase_OnClick" HorizontalAlignment="Center"/>-->
         </Grid>
 
         <NavigationView x:Name="NavView"
@@ -150,8 +149,8 @@
             <NavigationView.PaneFooter>
                 <StackPanel Orientation="Vertical" Margin="0,10">
                     <NavigationViewItem Content="下载"
-                                        Icon="Download"
-                                        Tapped="CloudDownButtonClick">
+                                    Icon="Download"
+                                    Tapped="CloudDownButtonClick">
                     </NavigationViewItem>
 
                     <NavigationViewItem Content="任务"

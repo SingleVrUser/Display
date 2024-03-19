@@ -6,8 +6,8 @@ using Microsoft.UI.Xaml.Controls;
 using Newtonsoft.Json;
 using System;
 using System.IO;
-using Display.Models.Data;
 using Display.Models.Disk._115;
+using Display.CustomWindows;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -23,37 +23,32 @@ namespace Display.Views
 
         public bool IsSucceeded;
 
-        private readonly Microsoft.UI.Xaml.Window _currentWindow;
+        private readonly Window _currentWindow;
 
-        //private string sign;
-
-
-        public VerifyAccountPage(Microsoft.UI.Xaml.Window window)
+        private VerifyAccountPage()
         {
             this.InitializeComponent();
 
+            var window = new CommonWindow("验证账号", 360, 560);
             _currentWindow = window;
 
             Browser.webview.Source = new Uri(RequestUrl);
-
             Browser.WebMessageReceived += Browser_WebMessageReceived;
 
+            window.Content = this;
             window.Closed += Window_Closed;
+        }
+
+        public static Window CreateVerifyAccountWindow()
+        {
+            var verifyAccountPage = new VerifyAccountPage();
+            return verifyAccountPage._currentWindow;
         }
 
         private void Window_Closed(object sender, WindowEventArgs args)
         {
             VerifyAccountCompleted?.Invoke(this, IsSucceeded);
         }
-
-        //private string GetSign()
-        //{
-        //    if(sign!=null) return sign;
-
-        //    //var result = WebApi.GlobalWebApi.GetVerifyAccountInfo();
-
-        //    return string.Empty;
-        //}
 
         public event EventHandler<bool> VerifyAccountCompleted;
         private async void Browser_WebMessageReceived(Microsoft.Web.WebView2.Core.CoreWebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2WebResourceResponseReceivedEventArgs args)

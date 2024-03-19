@@ -5,9 +5,9 @@ using Display.Helper.FileProperties.Name;
 using Display.Models.Data.Enums;
 using Microsoft.UI.Xaml;
 
-namespace Display.Views.Settings.Options;
+namespace Display.Models.Settings.Options;
 
-class Player : INotifyPropertyChanged
+internal class Player : INotifyPropertyChanged
 {
     public string Name { get; set; }
 
@@ -20,7 +20,7 @@ class Player : INotifyPropertyChanged
         get => _path;
         set
         {
-            if(_path == value) return;  
+            if (_path == value) return;
             _path = value;
             OnPropertyChanged();
         }

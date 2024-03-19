@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Display.Views.Settings.PlayPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Display.Views.Settings"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:options="using:Display.Models.Settings.Options"
+    xmlns:winUi="using:CommunityToolkit.WinUI"
+    xmlns:data="using:Display.Models.Data"
+    xmlns:enums="using:Display.Models.Data.Enums"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <Style TargetType="controls:SettingsCard"
+               BasedOn="{StaticResource BaseSettingsCardStyle}" />
+
+    </Page.Resources>
+
+    <StackPanel Style="{StaticResource SettingStackPanel}">
+
+        <controls:SettingsCard Header="默认播放">
+            <ComboBox RelativePanel.AlignRightWithPanel="True"
+                      ItemsSource="{x:Bind _players}"
+                      SelectedItem="{x:Bind CurrentPlayer,Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="options:Player">
+                        <TextBlock Text="{x:Bind Name}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </controls:SettingsCard>
+
+        <controls:SettingsExpander Header="{x:Bind CurrentPlayer.Name, Mode=OneWay}">
+            <controls:SettingsExpander.Items>
+                <controls:SettingsCard Header="程序位置"
+                                       HorizontalContentAlignment="Stretch"
+                                       ContentAlignment="Vertical">
+                    <RelativePanel>
+                        <TextBox Text="{x:Bind CurrentPlayer.Path,Mode=OneWay}"
+                                 Width="600"
+                                 RelativePanel.AlignLeftWithPanel="True" />
+                        <Button Content="修改"
+                                Click="{x:Bind CurrentPlayer.UploadPathButtonClick}" />
+                        <Button Content="打开路径"
+                                Click="{x:Bind CurrentPlayer.OpenPathButtonClick, Mode=OneWay}"
+                                RelativePanel.AlignRightWithPanel="True" />
+                    </RelativePanel>
+                </controls:SettingsCard>
+
+                <controls:SettingsCard Header="清晰度">
+                    <ComboBox ItemsSource="{winUi:EnumValues Type=enums:PlayQuality}"/>
+                </controls:SettingsCard>
+                <controls:SettingsCard Header="加载字幕">
+                    <ToggleSwitch OnContent="启动"
+                                  OffContent="关闭"/>
+                </controls:SettingsCard>
+            </controls:SettingsExpander.Items>
+        </controls:SettingsExpander>
+
+    </StackPanel>
+</Page>

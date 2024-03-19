@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Display.Helper.Network.Spider;
 using Microsoft.UI.Xaml;
 
-namespace Display.Views.Settings.Options;
+namespace Display.Models.Settings.Options;
 
-class Spider :INotifyPropertyChanged
+internal class Spider : INotifyPropertyChanged
 {
     public InfoSpider Instance { get; set; }
 
