@@ -1,14 +1,14 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Display.Helper.Network.Spider;
+using Display.Providers.Spider;
 using Microsoft.UI.Xaml;
 
 namespace Display.Models.Settings.Options;
 
 internal class Spider : INotifyPropertyChanged
 {
-    public InfoSpider Instance { get; set; }
+    public BaseSpider Instance { get; set; }
 
     private string _cookie;
 
@@ -25,11 +25,11 @@ internal class Spider : INotifyPropertyChanged
 
     public Action<string> SaveCookieAction { get; set; }
 
-    public Spider(InfoSpider infoInstance)
+    public Spider(BaseSpider baseInstance)
     {
-        Instance = infoInstance;
+        Instance = baseInstance;
 
-        Cookie = infoInstance.Cookie;
+        Cookie = baseInstance.Cookie;
     }
 
     public void UpdateCookie(object sender, RoutedEventArgs e)

@@ -11,7 +11,7 @@ using Display.Helper.Date;
 using Display.Models.Data;
 using Display.Models.Spider;
 
-namespace Display.Helper.Network.Spider;
+namespace Display.Providers.Spider;
 
 public class Fc2hub
 {

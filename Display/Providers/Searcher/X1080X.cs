@@ -20,8 +20,9 @@ using Display.Models.Spider;
 using Display.Helper.UI;
 using Display.Helper.Network;
 using Display.Models.Data;
+using Display.Providers.Spider;
 
-namespace Display.Helper.Network.Spider
+namespace Display.Providers.Searcher
 {
     public class X1080X
     {
@@ -342,8 +343,6 @@ namespace Display.Helper.Network.Spider
 
                 detailUrlInfos.Add(GetForum1080FromNode(pbwNode, title, detailUrl));
             }
-
-
 
             string nextPageUrl = string.Empty;
             //是否有下一页

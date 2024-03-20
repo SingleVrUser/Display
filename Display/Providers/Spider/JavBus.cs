@@ -8,10 +8,11 @@ using System.Threading;
 using Display.Models.Data;
 using static Display.Models.Spider.SpiderInfos;
 using HttpClient = System.Net.Http.HttpClient;
+using Display.Helper.Network;
 
-namespace Display.Helper.Network.Spider;
+namespace Display.Providers.Spider;
 
-public class JavBus : InfoSpider
+public class JavBus : BaseSpider
 {
     public override SpiderSourceName Name => SpiderSourceName.Javbus;
     public override string Abbreviation => "bus";
@@ -36,7 +37,7 @@ public class JavBus : InfoSpider
             {
                 { "accept-language", "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2" },
                 { "user-agent", GetInfoFromNetwork.DownUserAgent }
-            }); 
+            });
     public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
     {
         cid = cid.ToUpper();
@@ -133,21 +134,21 @@ public class JavBus : InfoSpider
                     videoInfo.Series = attributeNode.SelectSingleNode(".//a").InnerText.Trim();
                     break;
                 case "類別:":
-                {
-                    var categoryNodes = attributeNodes[i + 1].SelectNodes(".//span/label");
-                    var categoryList = categoryNodes.Select(node => node.InnerText).ToList();
-                    videoInfo.Category = string.Join(",", categoryList);
-                    break;
-                }
+                    {
+                        var categoryNodes = attributeNodes[i + 1].SelectNodes(".//span/label");
+                        var categoryList = categoryNodes.Select(node => node.InnerText).ToList();
+                        videoInfo.Category = string.Join(",", categoryList);
+                        break;
+                    }
                 case "演員" when i >= attributeNodes.Count - 1:
                     continue;
                 case "演員":
-                {
-                    var actorNodes = attributeNodes[i + 1].SelectNodes(".//span/a");
-                    var actorList = actorNodes.Select(node => node.InnerText).ToList();
-                    videoInfo.Actor = string.Join(",", actorList);
-                    break;
-                }
+                    {
+                        var actorNodes = attributeNodes[i + 1].SelectNodes(".//span/a");
+                        var actorList = actorNodes.Select(node => node.InnerText).ToList();
+                        videoInfo.Actor = string.Join(",", actorList);
+                        break;
+                    }
             }
         }
 

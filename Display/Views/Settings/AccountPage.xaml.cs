@@ -7,7 +7,9 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using System;
 using System.Diagnostics;
 using Windows.ApplicationModel.DataTransfer;
+using Microsoft.UI.Xaml.Navigation;
 using UserInfo = Display.Controls.UserInfo;
+using CommunityToolkit.WinUI.Behaviors;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -17,9 +19,8 @@ namespace Display.Views.Settings;
 /// <summary>
 /// An empty page that can be used on its own or navigated to within a Frame.
 /// </summary>
-public sealed partial class AccountPage : Page
+public sealed partial class AccountPage : RootPage
 {
-
     private static readonly WebApi WebApi = WebApi.GlobalWebApi;
 
     public AccountPage()
@@ -50,7 +51,6 @@ public sealed partial class AccountPage : Page
         UserInfoControl.Userinfo = WebApi.UserInfo?.data;
     }
 
-
     /// <summary>
     /// 更新用户信息
     /// </summary>
@@ -70,8 +70,6 @@ public sealed partial class AccountPage : Page
         UpdateLoginStatus();
 
     }
-
-
 
     private void LoginButton_Click(object sender, RoutedEventArgs e)
     {
@@ -144,10 +142,8 @@ public sealed partial class AccountPage : Page
         //把数据包放到剪贴板里
         Clipboard.SetContent(dataPackage);
 
-        //ShowTeachingTip("已复制");
-        Debug.WriteLine("已复制");
+        ShowTeachingTip("已复制");
     }
-
 
     /// <summary>
     /// 导出Cookies
@@ -159,8 +155,7 @@ public sealed partial class AccountPage : Page
         var cookies = CookieBox.Password;
         if (string.IsNullOrEmpty(cookies))
         {
-            //ShowTeachingTip("输入为空");
-            Debug.WriteLine("输入为空");
+            ShowTeachingTip("输入为空");
             return;
         }
 
@@ -180,8 +175,7 @@ public sealed partial class AccountPage : Page
         var text = await dataPackageView.GetTextAsync();
         if (text != clipboardText) return;
 
-        //ShowTeachingTip("已添加到剪贴板");
-        Debug.WriteLine("已添加到剪贴板");
+        ShowTeachingTip("已添加到剪贴板");
     }
 
     /// <summary>
@@ -201,8 +195,7 @@ public sealed partial class AccountPage : Page
     {
         DataAccess.Delete.DeleteTable(DataAccess.TableName.DownHistory);
 
-        //ShowTeachingTip("已清空");
-        Debug.WriteLine("已清空");
+        ShowTeachingTip("已清空");
     }
 
 

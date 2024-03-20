@@ -58,10 +58,12 @@
 
                 </ResourceDictionary>
 
+
                 <!--设置卡片-->
                 <ResourceDictionary>
                     <x:Double x:Key="SettingsMaxWidth">1000</x:Double>
                     <x:Double x:Key="SettingsCardPadding">5</x:Double>
+
                     <Style x:Key="SettingStackPanel" TargetType="StackPanel">
                         <Setter Property="Spacing"
                                 Value="{StaticResource SettingsCardPadding}"/>
@@ -253,10 +255,12 @@
                 </Setter>
             </Style>
 
-
-
-
-            <!--<x:Double x:Key="ContentDialogMaxWidth">900</x:Double>-->
+            <!--消息提示-->
+            <Style x:Key="MessageInfoBar" TargetType="InfoBar">
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+                <Setter Property="VerticalAlignment" Value="Top"/>
+            </Style>
 
             <!--数值-->
             <Thickness x:Key="AppBarButtonCompactMargin">0,-5,0,-20</Thickness>

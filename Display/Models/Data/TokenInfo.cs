@@ -1826,9 +1826,10 @@ namespace Display.Models.Data
         public string jsonrpc { get; set; }
         public string method { get; set; }
         public string id { get; set; }
+
+        [JsonProperty(propertyName: "params")]
         public string[] _params { get; set; }
     }
-
 
     public class Aria2GlobalOptionRequest
     {

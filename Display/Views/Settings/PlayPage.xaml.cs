@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -12,7 +13,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Display.Views.Settings;
 
-public sealed partial class PlayPage : INotifyPropertyChanged
+public sealed partial class PlayPage
 {
     private Player[] _players;
     private Player _currentPlayer;
@@ -24,19 +25,23 @@ public sealed partial class PlayPage : INotifyPropertyChanged
             if (_currentPlayer == value) return;
             _currentPlayer = value;
             AppSettings.PlayerSelection = _currentPlayer.Own;
-            OnPropertyChanged();
         }
     }
 
     public PlayPage()
     {
-        this.InitializeComponent();
-
         InitOption();
+
+        this.InitializeComponent();
     }
 
     private void InitOption()
     {
+        var bitmapIcon = new BitmapIcon
+        {
+            UriSource = new Uri("ms-appx:///Assets/potplayer-logo.png")
+        };
+
         // ²¥·ÅÆ÷
         _players =
         [
@@ -50,8 +55,20 @@ public sealed partial class PlayPage : INotifyPropertyChanged
             },
             new Player
             {
+                Own = PlayerType.MediaElement,
+                Name = "MediaElement",
+                IsNeedPath = false,
+            }
+            ,
+            new Player
+            {
                 Own = PlayerType.PotPlayer,
                 Name = "PotPlayer",
+                Icon = new BitmapIcon
+                {
+                    ShowAsMonochrome = false,
+                    UriSource = new Uri("ms-appx:///Assets/Logo/potplayer-logo.png")
+                },
                 Path = AppSettings.PotPlayerExePath,
                 SavePathAction = path=>AppSettings.PotPlayerExePath = path,
                 ResetPathFunc = () => Constant.DefaultSettings.Player.ExePath.PotPlayer
@@ -60,6 +77,11 @@ public sealed partial class PlayPage : INotifyPropertyChanged
             {
                 Own = PlayerType.Vlc,
                 Name = "VLC",
+                Icon = new BitmapIcon
+                {
+                    ShowAsMonochrome = false,
+                    UriSource = new Uri("ms-appx:///Assets/Logo/vlc-logo.png")
+                },
                 Path = AppSettings.VlcExePath,
                 SavePathAction = path=>AppSettings.VlcExePath = path,
                 ResetPathFunc = () => Constant.DefaultSettings.Player.ExePath.Vlc
@@ -67,16 +89,15 @@ public sealed partial class PlayPage : INotifyPropertyChanged
             new Player
             {
                 Own = PlayerType.Mpv,
-                Name = "MPV",
+                Name = "mpv",
+                Icon = new BitmapIcon
+                {
+                    ShowAsMonochrome = false,
+                    UriSource = new Uri("ms-appx:///Assets/Logo/mpv-logo.png")
+                },
                 Path = AppSettings.MpvExePath,
                 SavePathAction = path=>AppSettings.MpvExePath = path,
                 ResetPathFunc = () => Constant.DefaultSettings.Player.ExePath.Mpv
-            },
-            new Player
-            {
-                Own = PlayerType.MediaElement,
-                Name = "MediaElement",
-                IsNeedPath = false,
             }
         ];
 

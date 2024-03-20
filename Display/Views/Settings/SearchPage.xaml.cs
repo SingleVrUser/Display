@@ -2,7 +2,7 @@ using Display.Models.Data;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Diagnostics;
-using Display.Helper.Network.Spider;
+using Display.Providers.Searcher;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -10,7 +10,7 @@ using Display.Helper.Network.Spider;
 namespace Display.Views.Settings;
 
 
-public sealed partial class SearchPage : Page
+public sealed partial class SearchPage : RootPage
 {
     public SearchPage()
     {
@@ -32,11 +32,10 @@ public sealed partial class SearchPage : Page
 
         AppSettings.SavePath115Cid = explorerItem.Id;
 
-        SavePath115NameTextBlock.Text = explorerItem.Name;
+        SavePath115CidTextBlock.Description = explorerItem.Name;
         SavePath115CidTextBlock.Text = explorerItem.Id.ToString();
 
-        //ShowTeachingTip("设置成功");
-        Debug.WriteLine("设置成功");
+        ShowTeachingTip("设置成功");
     }
 
 
@@ -44,8 +43,7 @@ public sealed partial class SearchPage : Page
     {
         AppSettings.X1080XBaseUrl = X1080UrlTextBox.Text;
 
-        //ShowTeachingTip("修改完成");
-        Debug.WriteLine("修改完成");
+        ShowTeachingTip("修改完成");
     }
 
     private void X1080XCookieChange(object sender, RoutedEventArgs e)
@@ -56,8 +54,7 @@ public sealed partial class SearchPage : Page
 
         X1080X.TryChangedClientHeader("cookie", AppSettings.X1080XCookie);
 
-        //ShowTeachingTip("修改完成");
-        Debug.WriteLine("修改完成");
+        ShowTeachingTip("修改完成");
     }
 
     private void X1080XUserAgentChange(object sender, RoutedEventArgs e)
@@ -66,11 +63,8 @@ public sealed partial class SearchPage : Page
 
         X1080X.TryChangedClientHeader("user-agent", AppSettings.X1080XCookie);
 
-        //ShowTeachingTip("修改完成");
-        Debug.WriteLine("修改完成");
+        ShowTeachingTip("修改完成");
     }
-
-
 
     private async void Save115SavePathButtonClick(object sender, RoutedEventArgs e)
     {
@@ -80,17 +74,15 @@ public sealed partial class SearchPage : Page
 
         if (cidInfo != null)
         {
-            SavePath115NameTextBlock.Text = cidInfo.file_name;
+            SavePath115CidTextBlock.Description = cidInfo.file_name;
             AppSettings.SavePath115Name = cidInfo.file_name;
             AppSettings.SavePath115Cid = cid;
 
-            //ShowTeachingTip("保存成功");
-            Debug.WriteLine("保存成功");
+            ShowTeachingTip("保存成功");
         }
         else
         {
-            //ShowTeachingTip("保存失败");
-            Debug.WriteLine("保存失败");
+            ShowTeachingTip("保存失败");
         }
     }
 

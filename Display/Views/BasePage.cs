@@ -23,7 +23,7 @@ namespace Display.Views
             await ShowTeachingTip(lightDismissTeachingTip,subtitle, actionContent, actionButtonClick, 2);
         }
 
-        private static async System.Threading.Tasks.Task ShowTeachingTip(TeachingTip lightDismissTeachingTip, string subtitle,
+        private static async Task ShowTeachingTip(TeachingTip lightDismissTeachingTip, string subtitle,
             object content = null, TypedEventHandler<TeachingTip, object> actionButtonClick = null, int delaySecond = 1)
         {
             if (lightDismissTeachingTip.IsOpen) lightDismissTeachingTip.IsOpen = false;

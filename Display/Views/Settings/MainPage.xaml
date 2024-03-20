@@ -7,7 +7,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:settings="using:Display.Models.Settings"
-      mc:Ignorable="d"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
+    mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Page.Resources>
@@ -24,24 +26,33 @@
         <x:Double x:Key="OpenPaneLength">120</x:Double>
     </Page.Resources>
 
-    <SplitView IsPaneOpen="True"
-               OpenPaneLength="{StaticResource OpenPaneLength}"
-               DisplayMode="Inline">
-        <SplitView.Pane>
-            <ListView Margin="0,12,0,0"
-                      SelectionMode="Single"
-                      ItemTemplate="{StaticResource NavLinkItemTemplate}"
-                      ItemsSource="{x:Bind  _viewModel.NavLinks}"
-                      SelectedItem="{x:Bind _viewModel.CurrentLink,Mode=TwoWay}"
-                      SelectionChanged="Selector_OnSelectionChanged" />
-        </SplitView.Pane>
+    <Grid>
+        <SplitView IsPaneOpen="True"
+                   OpenPaneLength="{StaticResource OpenPaneLength}"
+                   DisplayMode="Inline">
+            <SplitView.Pane>
+                <ListView Margin="0,12,0,0"
+                          SelectionMode="Single"
+                          ItemTemplate="{StaticResource NavLinkItemTemplate}"
+                          ItemsSource="{x:Bind  _viewModel.NavLinks}"
+                          SelectedItem="{x:Bind _viewModel.CurrentLink,Mode=TwoWay}"
+                          SelectionChanged="Selector_OnSelectionChanged" />
+            </SplitView.Pane>
 
-        <Frame x:Name="SettingFrame">
-            <Frame.ContentTransitions>
-                <TransitionCollection>
-                    <EntranceThemeTransition />
-                </TransitionCollection>
-            </Frame.ContentTransitions>
-        </Frame>
-    </SplitView>
+            <Frame x:Name="SettingFrame">
+                <Frame.ContentTransitions>
+                    <TransitionCollection>
+                        <EntranceThemeTransition />
+                    </TransitionCollection>
+                </Frame.ContentTransitions>
+            </Frame>
+        </SplitView>
+
+        <InfoBar Style="{StaticResource MessageInfoBar}">
+            <interactivity:Interaction.Behaviors>
+                <behaviors:StackedNotificationsBehavior x:Name="NotificationQueue" />
+            </interactivity:Interaction.Behaviors>
+        </InfoBar>
+    </Grid>
+
 </Page>

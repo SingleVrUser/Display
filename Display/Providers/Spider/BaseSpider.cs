@@ -6,9 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using static Display.Models.Spider.SpiderInfos;
 
-namespace Display.Helper.Network.Spider;
+namespace Display.Providers.Spider;
 
-public abstract class InfoSpider
+public abstract class BaseSpider
 {
     public abstract SpiderSourceName Name { get; }
     public abstract bool IsOn { get; set; }
@@ -28,8 +28,9 @@ public abstract class InfoSpider
     public virtual string Cookie { get; set; }
 
     public abstract Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token);
+
     public abstract Task<VideoInfo> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc);
-    
+
     public bool IsSearch(string cid)
     {
         if (!IsOn) return false;

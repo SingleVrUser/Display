@@ -1,8 +1,6 @@
-using Display.Helper.Network.Spider;
-using Display.Models.Data;
+using Display.Managers;
 using Display.Models.Settings.Options;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +11,7 @@ using System.Linq;
 
 namespace Display.Views.Settings;
 
-public sealed partial class SpiderPage : Page
+public sealed partial class SpiderPage : RootPage
 {
     private List<Spider> _spiders;
 
@@ -28,7 +26,7 @@ public sealed partial class SpiderPage : Page
     {
         _spiders = [];
         // 搜刮源
-        foreach (var spider in Manager.Spiders)
+        foreach (var spider in SpiderManager.Spiders)
         {
             _spiders.Add(new Spider(spider)
             {
@@ -51,12 +49,11 @@ public sealed partial class SpiderPage : Page
         if (sender is not ToggleButton) return;
 
         //至少选择一个搜刮源
-        var isOneTurnOn = Manager.Spiders.Any(spider => spider.IsOn);
+        var isOneTurnOn = SpiderManager.Spiders.Any(spider => spider.IsOn);
 
         if (isOneTurnOn) return;
 
-        //ShowTeachingTip("请至少选择一个搜刮源，否则无法正常搜刮");
-        Debug.WriteLine("请至少选择一个搜刮源，否则无法正常搜刮");
+        ShowTeachingTip("请至少选择一个搜刮源，否则无法正常搜刮");
     }
 
 

@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Display.Models.Data;
 
-namespace Display.Helper.Network.Spider;
+namespace Display.Providers.Spider;
 
 public class Common
 {

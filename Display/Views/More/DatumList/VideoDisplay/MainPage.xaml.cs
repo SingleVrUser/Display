@@ -14,7 +14,6 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.Controls;
 using Display.CustomWindows;
 using Display.Helper.FileProperties.Name;
-using Display.Helper.Network.Spider;
 using Display.Helper.UI;
 using Display.Models.Data;
 using Display.Services;
@@ -27,6 +26,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SharpCompress;
+using Display.Managers;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -474,7 +474,7 @@ public sealed partial class MainPage : Page,IDisposable
 
                 _cidInfos.Add(info);
 
-                var spiderManager = Manager.Instance;
+                var spiderManager = SpiderManager.Instance;
 
 
                 FindCidInfo_ProgressRing.Visibility = Visibility.Visible;
@@ -488,7 +488,6 @@ public sealed partial class MainPage : Page,IDisposable
                 if (videoInfo == null || info.CancellationTokenSource.Token.IsCancellationRequested) continue;
                 
                 info.UpdateInfo(videoInfo);
-
             }
         }
 

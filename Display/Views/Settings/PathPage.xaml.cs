@@ -15,7 +15,7 @@ using Microsoft.UI.Xaml;
 
 namespace Display.Views.Settings;
 
-public sealed partial class PathPage : Page
+public sealed partial class PathPage : RootPage
 {
 
     private SavePath[] _savePaths;
@@ -32,8 +32,7 @@ public sealed partial class PathPage : Page
 
         void SaveSamePathAction()
         {
-            //ShowTeachingTip("选择目录与原目录相同，未修改");
-            Debug.WriteLine("选择目录与原目录相同，未修改");
+            ShowTeachingTip("选择目录与原目录相同，未修改");
         }
 
         // 保存路径
@@ -91,8 +90,7 @@ public sealed partial class PathPage : Page
         string imagePath = DataAccess.Get.GetOneActorProfilePath();
         if (string.IsNullOrEmpty(imagePath))
         {
-            //ShowTeachingTip("保存地址修改完成");
-            Debug.WriteLine("保存地址修改完成");
+            ShowTeachingTip("保存地址修改完成");
             return;
         }
 
@@ -119,14 +117,12 @@ public sealed partial class PathPage : Page
         if (result == ContentDialogResult.Primary)
         {
             //修改数据库图片地址
-            DataAccess.Update.UpdateActorProfilePath(updateImagePathPage.srcPath, updateImagePathPage.dstPath);
-            //ShowTeachingTip("修改完成，部分修改内容重启后生效");
-            Debug.WriteLine("修改完成，部分修改内容重启后生效");
+            DataAccess.Update.UpdateActorProfilePath(updateImagePathPage.SrcPath, updateImagePathPage.DstPath);
+            ShowTeachingTip("修改完成，部分修改内容重启后生效");
         }
         else
         {
-            //ShowTeachingTip("演员保存地址修改完成");
-            Debug.WriteLine("演员保存地址修改完成");
+            ShowTeachingTip("演员保存地址修改完成");
         }
     }
 
@@ -145,8 +141,7 @@ public sealed partial class PathPage : Page
         string imagePath = DataAccess.Get.GetOneImagePath();
         if (string.IsNullOrEmpty(imagePath))
         {
-            //ShowTeachingTip("图片保存地址修改完成");
-            Debug.WriteLine("图片保存地址修改完成");
+            ShowTeachingTip("图片保存地址修改完成");
             return;
         }
 
@@ -173,14 +168,12 @@ public sealed partial class PathPage : Page
         if (result == ContentDialogResult.Primary)
         {
             //修改数据库图片地址
-            DataAccess.Update.UpdateAllImagePath(updateImagePathPage.srcPath, updateImagePathPage.dstPath);
-            //ShowTeachingTip("修改完成，部分修改内容重启后生效");
-            Debug.WriteLine("修改完成，部分修改内容重启后生效");
+            DataAccess.Update.UpdateAllImagePath(updateImagePathPage.SrcPath, updateImagePathPage.DstPath);
+            ShowTeachingTip("修改完成，部分修改内容重启后生效");
         }
         else
         {
-            //ShowTeachingTip("图片保存地址修改完成");
-            Debug.WriteLine("图片保存地址修改完成");
+            ShowTeachingTip("图片保存地址修改完成");
         }
     }
 
@@ -250,10 +243,9 @@ public sealed partial class PathPage : Page
         successParagraph.Inlines.Add(new Run { Text = "如需删除原数据文件，请关闭应用后自行删除" });
         successRichTextBlock.Blocks.Add(successParagraph);
 
-        // TODO 更新数据库文件
-        //ShowTeachingTip(successRichTextBlock);
-        //await Task.Delay(3000);
-        //FileMatch.LaunchFolder(src);
+        ShowTeachingTip(successRichTextBlock);
+        await Task.Delay(3000);
+        FileMatch.LaunchFolder(src);
     }
 
 }

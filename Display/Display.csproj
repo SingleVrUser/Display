@@ -69,6 +69,9 @@
     <None Remove="Assets\icons8-page-96.png" />
     <None Remove="Assets\ImageExPlaceholder.jpg" />
     <None Remove="Assets\NoPicture.jpg" />
+    <None Remove="Assets\Logo\mpv-logo.png" />
+    <None Remove="Assets\Logo\potplayer-logo.png" />
+    <None Remove="Assets\Logo\vlc-logo.png" />
     <None Remove="Assets\SmallTile.scale-100.png" />
     <None Remove="Assets\StoreLogo.png" />
     <None Remove="Assets\Svg\accounting_banking_business_calculate_calculator_icon.svg" />
