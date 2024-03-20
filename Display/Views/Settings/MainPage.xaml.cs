@@ -14,11 +14,11 @@ public sealed partial class MainPage : Page
     {
         _viewModel = App.GetService<SettingViewModel>();
 
-        this.InitializeComponent();
+        InitializeComponent();
     }
 
     private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        SettingFrame.Navigate(_viewModel.CurrentLink.NavPageType, null);
+        SettingFrame.Navigate(_viewModel.CurrentLink.NavPageType, NotificationQueue);
     }
 }

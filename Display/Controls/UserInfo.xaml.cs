@@ -90,4 +90,5 @@ public sealed partial class UserInfo : UserControl
         NoLogin,
         Login
     }
+
 }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Display.CustomWindows;
 using Display.Helper.Date;
 using Display.Helper.FileProperties.Name;
-using Display.Helper.Network.Spider;
+using Display.Managers;
 using Display.Models.Data;
 using Display.Models.Spider;
 using LiveChartsCore;
@@ -175,7 +175,7 @@ namespace Display.Views.SpiderVideoInfo
         {
             CartesianChart.Visibility = Visibility.Visible;
 
-            _spiderInfos = Manager.Spiders.Select(spider => new SpiderInfo(spider)).ToList();
+            _spiderInfos = SpiderManager.Spiders.Select(spider => new SpiderInfo(spider)).ToList();
 
             //按IsEnable排序
             _spiderInfos = _spiderInfos.OrderByDescending(item => item.IsEnable).ToList();
@@ -466,7 +466,7 @@ namespace Display.Views.SpiderVideoInfo
             ////等待任务完成
             //await Task.WhenAll(tasks);
 
-            var spiderManager = Manager.Instance;
+            var spiderManager = SpiderManager.Instance;
             foreach (var matchResult in _matchVideoResults.Where(i=>i.statusCode is 1))
             {
                 var name = matchResult.MatchName;
@@ -498,7 +498,7 @@ namespace Display.Views.SpiderVideoInfo
         // 创建SpiderTask
         private async Task StartSearchTask(SpiderInfo spiderInfo, IProgress<SpiderInfo> progress)
         {
-            var spiderManager = Manager.Instance;
+            var spiderManager = SpiderManager.Instance;
 
             while (true)
             {

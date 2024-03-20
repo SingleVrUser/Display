@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using SpiderInfo = Display.Models.Spider.SpiderInfos;
 using System.Threading;
 using Display.Models.Data;
+using Display.Helper.Network;
 
-namespace Display.Helper.Network.Spider;
+namespace Display.Providers.Spider;
 
 public class Jav321
 {

@@ -21,6 +21,7 @@ using Display.Helper.FileProperties.Name;
 using Display.Models.Media;
 using Display.Helper.UI;
 using Display.Helper.Network;
+using Display.Managers;
 using Display.Models.Data;
 using Display.Views.More.DatumList;
 using Display.Views.OfflineDown;
@@ -709,6 +710,11 @@ namespace Display
         private void TaskButtonClick(object sender, TappedRoutedEventArgs e)
         {
             TaskPage.ShowSingleWindow();
+        }
+
+        private async void TestClick(object sender, TappedRoutedEventArgs e)
+        {
+            await SpiderManager.Instance.DispatchSpiderInfosByCidInOrder("cid-s");
         }
     }
 }

@@ -8,10 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Display.Models.Data;
 using static Display.Models.Spider.SpiderInfos;
+using Display.Helper.Network;
 
-namespace Display.Helper.Network.Spider;
+namespace Display.Providers.Spider;
 
-public class JavDb : InfoSpider
+public class JavDb : BaseSpider
 {
     public override string Abbreviation => "db";
     public override string Keywords => "JavDB";

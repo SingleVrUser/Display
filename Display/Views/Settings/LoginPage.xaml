@@ -1,4 +1,4 @@
-﻿<Page x:Class="Display.Views.Settings.LoginPage"
+﻿<local:RootPage x:Class="Display.Views.Settings.LoginPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:local="using:Display.Views.Settings"
@@ -188,4 +188,4 @@
 
     </Grid>
 
-</Page>
+</local:RootPage>

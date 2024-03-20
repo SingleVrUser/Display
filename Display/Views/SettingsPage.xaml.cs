@@ -1,31 +1,8 @@
 ﻿
 using CommunityToolkit.WinUI.Behaviors;
-using Display.Helper.FileProperties.Name;
-using Display.Helper.Network.Spider;
-using Display.Models.Data;
-using Display.Views.Settings;
-using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Documents;
-using Microsoft.UI.Xaml.Media;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Windows.Storage.Pickers;
-using Display.Models.Data.Enums;
-using Display.Models.Settings.Options;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

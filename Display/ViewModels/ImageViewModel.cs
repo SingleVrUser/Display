@@ -18,9 +18,9 @@ namespace Display.ViewModels
     public partial class ImageViewModel:ObservableObject
     {
         [ObservableProperty]
-        private List<Models.Image.SubImageModel> _photos = new();
+        private List<Models.Image.SubImageModel> _photos = [];
 
-        public readonly ObservableCollection<FilesInfo> Infos = new();
+        public readonly ObservableCollection<FilesInfo> Infos = [];
 
         [ObservableProperty]
         private bool _loading;

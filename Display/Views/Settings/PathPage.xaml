@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Page
+<local:RootPage
     x:Class="Display.Views.Settings.PathPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -11,7 +11,7 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Page.Resources>
+    <local:RootPage.Resources>
         <Style TargetType="controls:SettingsCard"
                BasedOn="{StaticResource BaseSettingsCardStyle}" />
 
@@ -36,7 +36,7 @@
                 </RelativePanel>
             </controls:SettingsCard>
         </DataTemplate>
-    </Page.Resources>
+    </local:RootPage.Resources>
 
 
     <StackPanel Style="{StaticResource SettingStackPanel}">
@@ -46,4 +46,4 @@
             
         </ItemsRepeater>
     </StackPanel>
-</Page>
+</local:RootPage>

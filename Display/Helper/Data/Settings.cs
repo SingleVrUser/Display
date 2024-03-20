@@ -13,7 +13,11 @@ internal static class Settings
     {
         if (string.IsNullOrEmpty(key)) return;
 
-        if (value is string or int or double)
+        if (value is null)
+        {
+            LocalSettings.Values.Remove(key);
+        }
+        else if (value is string or int or double)
         {
             LocalSettings.Values[key] = value;
         }

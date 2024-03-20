@@ -4,8 +4,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Display.Helper.Network.Spider;
 using static Display.Models.Spider.SpiderInfos;
+using Display.Providers.Spider;
 
 namespace Display.Models.Spider;
 
@@ -74,7 +74,7 @@ public class SpiderInfo : INotifyPropertyChanged
     }
 
     //初始化
-    public SpiderInfo(InfoSpider spider)
+    public SpiderInfo(BaseSpider spider)
     {
         SpiderSource = spider.Name;
 

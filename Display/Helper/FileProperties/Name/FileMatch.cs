@@ -379,6 +379,13 @@ public static class FileMatch
         return await folderPicker.PickSingleFolderAsync();
     }
 
+    public static void OpenFolderWithSystemExplorer(string folder)
+    {
+        if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder))return;
+
+        LaunchFolder(folder);
+    }
+
     public static async Task<StorageFile> SelectFileAsync(Window window, IList<string> fileTypeFilters = null)
     {
         FileOpenPicker fileOpenPicker = new();

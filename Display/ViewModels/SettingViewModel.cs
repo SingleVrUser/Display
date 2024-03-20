@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Display.Helper.Network.Spider;
 using Display.Models.Settings;
 using Display.Views.Settings;
 
@@ -21,7 +20,7 @@ internal partial class SettingViewModel : ObservableObject
 
     public SettingViewModel()
     {
-        _currentLink = NavLinks[2];
+        _currentLink = NavLinks[3];
     }
 
     [ObservableProperty]

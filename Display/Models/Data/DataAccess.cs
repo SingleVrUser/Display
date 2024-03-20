@@ -10,9 +10,9 @@ using Windows.Storage;
 using Display.Extensions;
 using Display.Helper.Data;
 using Display.Helper.FileProperties.Name;
-using Display.Helper.Network.Spider;
 using Microsoft.Data.Sqlite;
 using static System.Int32;
+using Display.Providers.Spider;
 
 namespace Display.Models.Data
 {

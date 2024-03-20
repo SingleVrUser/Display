@@ -1,5 +1,5 @@
 using System.Collections.ObjectModel;
-using Display.Helper.Network.Spider;
+using Display.Managers;
 using Display.Models.Data;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -27,7 +27,7 @@ namespace Display.Views.DetailInfo
 
         private void InitView()
         {
-            SpiderCheckBoxGrid.ItemsSource = Manager.Spiders;
+            SpiderCheckBoxGrid.ItemsSource = SpiderManager.Spiders;
         }
 
 
@@ -35,7 +35,7 @@ namespace Display.Views.DetailInfo
         {
             ReCheckProgressRing.Visibility = Visibility.Visible;
 
-            var infos = await Manager.Instance.DispatchSpiderInfosByCidInOrder(CidName);
+            var infos = await SpiderManager.Instance.DispatchSpiderInfosByCidInOrder(CidName);
 
             if (infos.Count > 0)
             {
@@ -98,7 +98,7 @@ namespace Display.Views.DetailInfo
             ReCheckProgressRing.Visibility = Visibility.Visible;
             ConfirmSpecificUrlButton.IsEnabled = false;
 
-            var info = await Manager.Instance.DispatchSpiderInfoByDetailUrl(CidName, url, default);
+            var info = await SpiderManager.Instance.DispatchSpiderInfoByDetailUrl(CidName, url, default);
 
             ReCheckProgressRing.Visibility = Visibility.Collapsed;
 

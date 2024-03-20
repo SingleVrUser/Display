@@ -4,12 +4,15 @@ using System.Runtime.CompilerServices;
 using Display.Helper.FileProperties.Name;
 using Display.Models.Data.Enums;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Display.Models.Settings.Options;
 
 internal class Player : INotifyPropertyChanged
 {
     public string Name { get; set; }
+
+    public BitmapIcon Icon { get; set; }
 
     public PlayerType Own { get; set; }
 
@@ -29,7 +32,6 @@ internal class Player : INotifyPropertyChanged
     public Action<string> SavePathAction { get; set; }
     public Func<string> ResetPathFunc { get; set; }
 
-
     public bool IsLoadSubOptionOn { get; set; } = true;
 
     public bool IsNeedPath { get; set; } = true;
@@ -39,8 +41,9 @@ internal class Player : INotifyPropertyChanged
     public async void UploadPathButtonClick(object sender, RoutedEventArgs e)
     {
         var file = await FileMatch.SelectFileAsync(App.AppMainWindow,
-            new[] { ".exe", ".com" });
-        if (file == null) return;
+            [".exe", ".com"]);
+
+        if (file is null) return;
 
         Path = file.Path;
         SavePathAction?.Invoke(file.Path);

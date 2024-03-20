@@ -800,7 +800,7 @@ namespace Display.Models.Data
         }
 
         /// <summary>
-        /// 请求115浏览器下载
+        /// 请求115浏览器下载，似乎不能用了
         /// </summary>
         /// <param name="videoInfoList"></param>
         /// <returns></returns>
@@ -822,15 +822,16 @@ namespace Display.Models.Data
             //PARAM
             downRequest.param = new Param_Request
             {
-                count = downRequest.param.list.Count,
-                list = new List<Down_Request>(),
+                count = videoInfoList.Count,
+                list = [],
                 ref_url = $"https://115.com/?cid={videoInfoList[0].Cid}&offset=0&mode=wangpan"
             };
 
             foreach (var videoInfo in videoInfoList)
             {
                 var isDir = videoInfo.Uid == 0;
-                downRequest.param.list.Add(new Down_Request() { n = videoInfo.Name, pc = videoInfo.PickCode, is_dir = isDir });
+                downRequest.param.list.Add(new Down_Request()
+                    { n = videoInfo.Name, pc = videoInfo.PickCode, is_dir = isDir });
             }
 
             var url = string.Empty;
