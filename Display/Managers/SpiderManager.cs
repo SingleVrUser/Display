@@ -275,7 +275,7 @@ public class SpiderManager
     /// 任务完成后
     /// </summary>
     /// <param name="item"></param>
-    private void DoWhenNameIsAllSearched(SearchItem item)
+    private async void DoWhenNameIsAllSearched(SearchItem item)
     {
         // 搜索失败
         if (item.Info is null)
@@ -287,9 +287,13 @@ public class SpiderManager
 
         // 搜刮成功
         ItemTaskSuccessAction?.Invoke(item.Name);
+
         _successNameInfos.Enqueue(item.Info);
 
         // TODO 当_nameInfos达到指定数量时才添加进数据库
+        await DataAccess.Add.AddVideoInfo_ActorInfo_IsWmAsync(item.Info);
+        DataAccess.Delete.DeletedSingleFileToInfoByTrueName(item.Name);
+
     }
 
     /// <summary>

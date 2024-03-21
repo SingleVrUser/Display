@@ -369,11 +369,24 @@ namespace Display.Models.Data
             }
 
             /// <summary>
-            /// 删除中间表FileToInfo中的指定数据
+            /// 删除中间表FileToInfo中的指定数据，通过PickCode
             /// </summary>
-            public static void DeleteSingleFileToInfo(string pc, SqliteConnection connection)
+            public static void DeleteSingleFileToInfoByPickCode(string pc, SqliteConnection connection)
             {
                 var command = $"DELETE FROM FileToInfo WHERE file_pickcode == '{pc}' COLLATE NOCASE";
+
+                DataAccessHelper.ExecuteNonQuery(command, connection);
+            }
+
+            /// <summary>
+            /// 删除中间表FileToInfo中的指定数据，通过TrueName
+            /// 匹配成功的，TrueName必定不为空
+            /// </summary>
+            /// <param name="trueName"></param>
+            /// <param name="connection"></param>
+            public static void DeletedSingleFileToInfoByTrueName(string trueName, SqliteConnection connection = null)
+            {
+                var command = $"DELETE FROM FileToInfo WHERE truename == '{trueName}' COLLATE NOCASE";
 
                 DataAccessHelper.ExecuteNonQuery(command, connection);
             }
@@ -389,10 +402,10 @@ namespace Display.Models.Data
                 connection.Open();
 
                 // 先删除 FilesInfo
-                Delete.DeleteSingleFilesInfo(pc, connection);
+                DeleteSingleFilesInfo(pc, connection);
 
                 // 后删除中间表 FileToInfo
-                Delete.DeleteSingleFileToInfo(pc, connection);
+                DeleteSingleFileToInfoByPickCode(pc, connection);
 
                 connection.Close();
             }
