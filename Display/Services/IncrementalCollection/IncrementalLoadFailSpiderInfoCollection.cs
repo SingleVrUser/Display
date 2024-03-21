@@ -22,7 +22,7 @@ public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<Fail
         else
             Clear();
 
-        newItems.ForEach(item => Add(new(item)));
+        newItems?.ForEach(item => Add(new FailDatum(item)));
     }
 
     public void SetShowType(FailType showType)
@@ -47,6 +47,10 @@ public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<Fail
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
         var failLists = await DataAccess.Get.GetFailFileInfoWithDatum(Items.Count, (int)count, showType: ShowType);
+        if (failLists is null)
+        {
+            return new LoadMoreItemsResult(0);
+        }
 
         if (failLists.Length < count)
         {

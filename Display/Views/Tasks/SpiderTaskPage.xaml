@@ -6,8 +6,7 @@
     xmlns:local="using:Display.Views.Tasks"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    mc:Ignorable="d">
 
 
     <Page.Resources>
@@ -37,7 +36,7 @@
                      Spacing="10" />
     </Page.Resources>
 
-    <Grid RowDefinitions="auto, auto, auto,*">
+    <Grid RowDefinitions="auto, auto, auto,*" Padding="10" RowSpacing="5">
         <ProgressBar Grid.Row="0"
                      Maximum="{x:Bind _viewModel.MaxProgressValue, Mode=OneWay}"
                      Value="{x:Bind _viewModel.CurrentProgressValue, Mode=OneWay}"
@@ -61,16 +60,14 @@
             <!--搜刮源-->
             <ItemsRepeater ItemsSource="{x:Bind _viewModel.SpiderNames,Mode=OneWay}"
                            ItemTemplate="{StaticResource OnSpidersDataTemplate}"
-                           Layout="{StaticResource OnSpiderLayout}"
-                           Margin="10">
+                           Layout="{StaticResource OnSpiderLayout}">
             </ItemsRepeater>
 
             <!--失败-->
             <ItemsRepeater
                            ItemsSource="{x:Bind _viewModel.FailNameCollection, Mode=OneWay}"
                            ItemTemplate="{StaticResource FailDataTemplate}"
-                           Layout="{StaticResource FailDataLayout}"
-                           Margin="10">
+                           Layout="{StaticResource FailDataLayout}">
             </ItemsRepeater>
         </StackPanel>
 

@@ -148,11 +148,6 @@
             <!--页脚-->
             <NavigationView.PaneFooter>
                 <StackPanel Orientation="Vertical" Margin="0,10">
-                    <NavigationViewItem Content="测试"
-                                    Icon="Download"
-                                    Tapped="TestClick">
-                    </NavigationViewItem>
-
                     <NavigationViewItem Content="下载"
                                     Icon="Download"
                                     Tapped="CloudDownButtonClick">

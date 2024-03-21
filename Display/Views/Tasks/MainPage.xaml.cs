@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using System;
 using Display.CustomWindows;
 using Display.Helper.UI;
 using Display.Models.Settings;
@@ -30,13 +31,18 @@ namespace Display.Views.Tasks
         /// <summary>
         /// 仅允许打开单个窗口
         /// </summary>
-        public static void ShowSingleWindow()
+        public static void ShowSingleWindow(Type pageType = null)
         {
+            pageType ??= typeof(UploadTaskPage);
+
             if (_window == null)
             {
+                var page = new MainPage();
+                page.SetPage(pageType);
+
                 _window = new CommonWindow("传输任务", 842, 537)
                 {
-                    Content = new MainPage()
+                    Content = page
                 };
                 _window.Closed += (_, _) =>
                 {
@@ -46,8 +52,18 @@ namespace Display.Views.Tasks
             }
             else
             {
+                if (_window.Content is MainPage page)
+                {
+                    page.SetPage(pageType);
+                }
+
                 WindowHelper.SetForegroundWindow(_window);
             }
+        }
+
+        public void SetPage(Type pageType)
+        {
+            _viewModel.SetCurrentLink(pageType);
         }
 
         /// <summary>
@@ -59,7 +75,7 @@ namespace Display.Views.Tasks
         {
             if (args.SelectedItem is not NavLink currentLink) return;
 
-            _viewModel.CurrentLink = currentLink;
+            //_viewModel.CurrentLink = currentLink;
             ContentFrame.Navigate(currentLink.NavPageType, null);
         }
 
