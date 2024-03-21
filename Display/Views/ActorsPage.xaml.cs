@@ -338,7 +338,7 @@ namespace Display.Views
                     var firstOrDefault = actorInfos.FirstOrDefault();
 
                     //数据库中无头像
-                    if (firstOrDefault is { ProfilePath: Const.FileType.NoPicturePath })
+                    if (firstOrDefault is { ProfilePath: Constant.FileType.NoPicturePath })
                     {
                         var filePath = Path.Combine(AppSettings.ActorInfoSavePath, actorName);
 

@@ -1,9 +1,4 @@
 ﻿using Display.Models.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Tests.Helper
 {
@@ -20,7 +15,7 @@ namespace Tests.Helper
 
                 var headers = new Dictionary<string, string>
                 {
-                    { "user-agent", Const.DefaultSettings.Network._115.UploadUserAgent },
+                    { "user-agent", Constant.DefaultSettings.Network._115.UploadUserAgent },
                     { "Cookie", Cookie }
                 };
 
@@ -39,7 +34,7 @@ namespace Tests.Helper
 
                 var headers = new Dictionary<string, string>
                 {
-                    { "user-agent", Const.DefaultSettings.Network._115.DownUserAgent },
+                    { "user-agent", Constant.DefaultSettings.Network._115.DownUserAgent },
                     { "Cookie", Cookie }
                 };
 

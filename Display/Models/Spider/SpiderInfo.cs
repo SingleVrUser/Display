@@ -4,8 +4,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Display.Helper.Network.Spider;
 using static Display.Models.Spider.SpiderInfos;
+using Display.Providers.Spider;
 
 namespace Display.Models.Spider;
 
@@ -23,9 +23,6 @@ public class SpiderInfos
 public class SpiderInfo : INotifyPropertyChanged
 {
     public SpiderSourceName SpiderSource { get; set; }
-
-    public string SearchName { get; set; }
-
     public SpiderStates State { get; set; }
     public bool IsEnable { get; set; }
     public Brush EllipseColor
@@ -68,8 +65,16 @@ public class SpiderInfo : INotifyPropertyChanged
         }
     }
 
+    public SpiderInfo(SpiderSourceName spiderSourceName, string message, SpiderStates status)
+    {
+        SpiderSource = spiderSourceName;
+        IsEnable = true;
+        Message = message;
+        State = status;
+    }
+
     //初始化
-    public SpiderInfo(InfoSpider spider)
+    public SpiderInfo(BaseSpider spider)
     {
         SpiderSource = spider.Name;
 

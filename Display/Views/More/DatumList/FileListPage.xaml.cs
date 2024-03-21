@@ -15,13 +15,13 @@ using Windows.Storage;
 using ByteSizeLib;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.Network;
-using Display.Models;
 using Display.Models.Data;
 using Display.Models.Data.Enums;
 using Display.Models.Media;
 using Display.Services.IncrementalCollection;
 using Display.ViewModels;
 using Display.Views.More.Import115DataToLocalDataAccess;
+using Display.Views.Tasks;
 using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Text;
@@ -32,7 +32,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
-using static Display.Models.Data.Const;
+using SharpCompress;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -109,10 +109,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     private void FilesInfos_WebPathChanged(WebPath[] obj)
     {
         _units.Clear();
-        foreach (var path in FilesInfos.WebPaths)
-        {
-            _units.Add(new ExplorerItem { Name = path.name, Id = path.cid });
-        }
+        FilesInfos.WebPaths?.ForEach(path => _units.Add(new ExplorerItem { Name = path.name, Id = path.cid }));
+
     }
 
     private void FilesInfos_GetFileInfoCompleted(object sender, GetFileInfoCompletedEventArgs e)
@@ -498,9 +496,11 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             // 标记当前文件夹，避免切换文件夹后才上传成功导致的错误文件（UI）添加，影响显示
             var currentFolderCid = CurrentExplorerItem.Id;
 
+            var uploadViewModel = App.GetService<UploadViewModel>();
+
             foreach (var storageFile in storageFiles)
             {
-                UploadViewModel.Instance.AddUploadTask(storageFile.Path, currentFolderCid, result =>
+                uploadViewModel.AddUploadTask(storageFile.Path, currentFolderCid, result =>
                 {
                     if (!result.Success) return;
 
@@ -512,7 +512,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             }
 
             //添加任务后显示传输任务窗口
-            TaskPage.ShowSingleWindow();
+            Tasks.MainPage.ShowSingleWindow();
         }
     }
 
@@ -883,31 +883,28 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         if (sender is not MenuFlyoutItem { Tag: PlayerType playerType } menuFlyoutItem) return;
 
-        if (BaseExample.SelectedItems is null || BaseExample.SelectedItems.Count == 0)
-        {
-            ShowTeachingTip("当前未选中文件");
-            return;
-        }
-
-        // 多个播放
+        List<MediaPlayItem> mediaPlayItems;
+        // 选项栏选中多个时，播放选中的
         if (BaseExample.SelectedItems.Count > 1)
         {
             //获取需要播放的文件
-            var mediaPlayItems = BaseExample.SelectedItems.Cast<FilesInfo>()
+            mediaPlayItems = BaseExample.SelectedItems.Cast<FilesInfo>()
                 .Where(x => x.Type == FilesInfo.FileType.Folder || x.IsVideo)
                 .Select(x => new MediaPlayItem(x)).ToList();
-            await PlayVideoHelper.PlayVideo(mediaPlayItems, this.XamlRoot, lastPage: this, playerType: playerType);
+        }
+        // 选项栏只选中一个，则忽略。以右键项为准
+        else
+        {
+            // 单个播放
+            if (menuFlyoutItem is not { DataContext: FilesInfo info }) return;
 
-            return;
+            if (info.Type == FilesInfo.FileType.Folder || !info.IsVideo) return;
+
+            mediaPlayItems = new List<MediaPlayItem> { new(info) };
         }
 
-        // 单个播放
-        if (menuFlyoutItem is not { DataContext: FilesInfo info }) return;
 
-        if (info.Type == FilesInfo.FileType.Folder || !info.IsVideo) return;
-
-        var mediaPlayItem = new MediaPlayItem(info);
-        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this, playerType: playerType);
+        await PlayVideoHelper.PlayVideo(mediaPlayItems, XamlRoot, lastPage: this, playerType: playerType);
     }
 
     private async void MoveToNewFolderItemClick(object sender, RoutedEventArgs e)

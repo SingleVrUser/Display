@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -21,26 +20,25 @@ namespace Display.Models.Data
             set => _client = value;
         }
 
-        private static HttpClient _clientWithJavDBCookie;
-        public static HttpClient ClientWithJavDBCookie
+        private static HttpClient _clientWithJavDbCookie;
+        public static HttpClient ClientWithJavDbCookie
         {
             get
             {
-                if (_clientWithJavDBCookie == null)
-                {
-                    _clientWithJavDBCookie = CreateClient(new Dictionary<string, string>() {
-                        {"cookie",AppSettings.JavDbCookie },
-                        {"user-agent" ,DownUserAgent}
-                    });
-                }
+                if (_clientWithJavDbCookie != null) return _clientWithJavDbCookie;
 
-                return _clientWithJavDBCookie;
+                _clientWithJavDbCookie = CreateClient(new Dictionary<string, string>() {
+                    {"cookie",AppSettings.JavDbCookie },
+                    {"user-agent" ,DownUserAgent}
+                });
+
+                return _clientWithJavDbCookie;
             }
 
-            set => _clientWithJavDBCookie = value;
+            set => _clientWithJavDbCookie = value;
         }
 
-        public static string DownUserAgent = Const.DefaultSettings.Network._115.DownUserAgent;
+        public static string DownUserAgent = Constant.DefaultSettings.Network._115.DownUserAgent;
 
         //public static string BuilderMediaElementUserAgent()
         //{
@@ -150,7 +148,7 @@ namespace Display.Models.Data
             //不存在
             if (!File.Exists(localPath) || isReplaceExistsImage)
             {
-                int maxTryCount = 3;
+                var maxTryCount = 3;
 
                 if (headers != null)
                 {

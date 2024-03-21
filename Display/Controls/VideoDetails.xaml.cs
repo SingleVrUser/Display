@@ -110,7 +110,7 @@ namespace Display.Controls
             List<string> thumbnailList = new();
 
             //来源为本地
-            if (AppSettings.ThumbnailOrigin == (int)ThumbnailOrigin.Local)
+            if (AppSettings.ThumbnailOriginType == (int)ThumbnailOriginType.Local)
             {
                 var folderFullName = Path.Combine(AppSettings.ImageSavePath, ResultInfo.trueName);
                 var theFolder = new DirectoryInfo(folderFullName);
@@ -129,7 +129,7 @@ namespace Display.Controls
 
             }
             //来源为网络
-            else if (AppSettings.ThumbnailOrigin == (int)ThumbnailOrigin.Web)
+            else if (AppSettings.ThumbnailOriginType == ThumbnailOriginType.Web)
             {
                 var videoInfo = DataAccess.Get.GetSingleVideoInfoByTrueName(ResultInfo.trueName);
 
@@ -587,7 +587,7 @@ namespace Display.Controls
         private void OpenDirectory_Click(object sender, RoutedEventArgs e)
         {
             var imagePath = Path.GetDirectoryName(ResultInfo.ImagePath);
-            if (imagePath == Const.FileType.NoPicturePath)
+            if (imagePath == Constant.FileType.NoPicturePath)
             {
                 return;
             }

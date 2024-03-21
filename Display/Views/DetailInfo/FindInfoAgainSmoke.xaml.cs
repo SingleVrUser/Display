@@ -1,22 +1,19 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using Display.Helper.Network.Spider;
+using Display.Managers;
 using Display.Models.Data;
-using Display.Views.Settings.Options;
-using Microsoft.Extensions.Options;
+using Display.Models.Settings.Options;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
 
 namespace Display.Views.DetailInfo
 {
     public sealed partial class FindInfoAgainSmoke
     {
+        private readonly SpiderManager _spiderManager = App.GetService<SpiderManager>();
+
         private string CidName { get; }
 
-        private readonly ObservableCollection<VideoInfo> _searchResultList = new();
+        private readonly ObservableCollection<VideoInfo> _searchResultList = [];
 
         private readonly VideoInfo _videoInfo;  
 
@@ -33,22 +30,7 @@ namespace Display.Views.DetailInfo
 
         private void InitView()
         {
-            //var spiders = Manager.Spiders.Select(spider => new Spider(spider)).ToList();
-
-            //foreach (var spider in Manager.Spiders)
-            //{
-            //    spiders.Add(new Spider(spider));
-            //    //var toggleButton = new ToggleButton
-            //    //{
-            //    //    Content = spider.Name
-            //    //};
-
-            //    //var binding = new Binding { Source = spider, Path = new PropertyPath("IsOn"), Mode = BindingMode.TwoWay };
-            //    //toggleButton.SetBinding(ToggleButton.IsCheckedProperty, binding);
-            //    //SpiderCheckBoxGrid.Children.Add(toggleButton);
-            //}
-
-            SpiderCheckBoxGrid.ItemsSource = Manager.Spiders;
+            SpiderCheckBoxGrid.ItemsSource = SpiderManager.Spiders;
         }
 
 
@@ -56,7 +38,7 @@ namespace Display.Views.DetailInfo
         {
             ReCheckProgressRing.Visibility = Visibility.Visible;
 
-            var infos = await Manager.Instance.DispatchSpiderInfosByCidInOrder(CidName);
+            var infos = await _spiderManager.DispatchSpiderInfosByCidInOrder(CidName);
 
             if (infos.Count > 0)
             {
@@ -96,8 +78,8 @@ namespace Display.Views.DetailInfo
         /// <param Name="e"></param>
         private void Confirm_Button_Click(object sender, RoutedEventArgs e)
         {
-            if (!(NewInfo_ListView.SelectedItem is VideoInfo videoInfo)) return;
-            if (!(sender is Button button)) return;
+            if (NewInfo_ListView.SelectedItem is not VideoInfo videoInfo) return;
+            if (sender is not Button button) return;
 
             //修改一下
             button.DataContext = videoInfo;
@@ -114,12 +96,12 @@ namespace Display.Views.DetailInfo
 
         private async void SearchInfoBySpecificUrlButton_Click(object sender, RoutedEventArgs e)
         {
-            string url = SpecificUrl_TextBlock.Text;
+            var url = SpecificUrl_TextBlock.Text;
 
             ReCheckProgressRing.Visibility = Visibility.Visible;
             ConfirmSpecificUrlButton.IsEnabled = false;
 
-            var info = await Manager.Instance.DispatchSpiderInfoByDetailUrl(CidName, url, default);
+            var info = await _spiderManager.DispatchSpiderInfoByDetailUrl(CidName, url, default);
 
             ReCheckProgressRing.Visibility = Visibility.Collapsed;
 
@@ -132,7 +114,7 @@ namespace Display.Views.DetailInfo
                 var value = item.GetValue(info);
 
                 var newItem = _videoInfo.GetType().GetProperty(name);
-                newItem.SetValue(_videoInfo, value);
+                newItem?.SetValue(_videoInfo, value);
             }
 
             ConfirmSpecificUrlButton.IsEnabled = true;
@@ -141,7 +123,7 @@ namespace Display.Views.DetailInfo
 
         private void ConfirmSpecificUrlButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!(sender is Button button)) return;
+            if (sender is not Button button) return;
             if (_videoInfo == null) return;
 
             //修改一下

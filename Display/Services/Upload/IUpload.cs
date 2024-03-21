@@ -31,7 +31,7 @@ namespace Display.Services.Upload
         public Task Init();
         public Task<T> Start();
         public void Pause();
-        public Task Stop();
+        public void Stop();
 
         public event Action<long> PositionCallback;
         public event Action<int> ProgressChanged;

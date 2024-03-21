@@ -19,8 +19,6 @@ namespace Display.Services.Upload
         private readonly long _fileSize;
         private readonly FastUploadResult _fastUploadResult;
         private readonly IProgress<long> _progress;
-        private readonly CancellationTokenSource _source = new();
-        private CancellationToken Token => _source.Token;
 
         private string _uploadId;
         private long _partSize;
@@ -42,7 +40,6 @@ namespace Display.Services.Upload
                 return _uploadMethod;
             }
         }
-
 
         private UploadState _state;
         public UploadState State
@@ -68,6 +65,7 @@ namespace Display.Services.Upload
         /// <param name="stream"></param>
         /// <param name="fastUploadResult"></param>
         /// <param name="progress"></param>
+        /// <param name="token"></param>
         public AliyunOss(HttpClient client, FileStream stream, FastUploadResult fastUploadResult, IProgress<long> progress)
         {
             _httpClient = client;
@@ -75,15 +73,13 @@ namespace Display.Services.Upload
             _fileSize = stream.Length;
             _fastUploadResult = fastUploadResult;
             _progress = progress;
-
         }
 
-        private async Task<OssUploadResult> SimpleUpload()
+        private async Task<OssUploadResult> SimpleUpload(CancellationToken token)
         {
             State = UploadState.OssUploading;
 
-            // 上传测试
-            var simpleUpload = new SimpleUpload(SingleOssClient, _stream, _ossToken, _fastUploadResult);
+            var simpleUpload = new SimpleUpload(SingleOssClient, _stream, _ossToken, _fastUploadResult, token);
             var uploadResult = await simpleUpload.Start();
 
             State = uploadResult is { state: true } ? UploadState.Succeed : UploadState.Faulted;
@@ -91,12 +87,12 @@ namespace Display.Services.Upload
             return uploadResult;
         }
 
-        private async Task<OssUploadResult> MultipartUpload()
+        private async Task<OssUploadResult> MultipartUpload(CancellationToken token)
         {
             State = UploadState.OssUploading;
 
-            _eTagList ??= new List<string>();
-            _multipartUpload = new MultipartUpload(SingleOssClient, _stream, _ossToken, _fastUploadResult, _progress, _eTagList);
+            _eTagList ??= [];
+            _multipartUpload = new MultipartUpload(SingleOssClient, _stream, _ossToken, _fastUploadResult, _progress, _eTagList, token);
 
             // 获取UploadId
             if (string.IsNullOrEmpty(_uploadId)) _uploadId = await _multipartUpload.GetUploadId();
@@ -123,34 +119,33 @@ namespace Display.Services.Upload
             return uploadResult;
         }
 
-        public async Task<OssUploadResult> Start()
+        public async Task<OssUploadResult> Start(CancellationToken token)
         {
             if (!_isInitSucceed) return null;
 
             return UploadMethod switch
             {
-                UploadMethod.Simple => await SimpleUpload(),
-                UploadMethod.Multipart => await MultipartUpload(),
+                UploadMethod.Simple => await SimpleUpload(token),
+                UploadMethod.Multipart => await MultipartUpload(token),
                 _ => null
             };
         }
 
         public void Dispose()
         {
-            _source.Cancel();
-            _source.Dispose();
+            //_source.Dispose();
 
             GC.SuppressFinalize(this);
         }
 
-        public async Task Init()
+        public async Task Init(CancellationToken token)
         {
             if (_isInitSucceed) return;
 
             State = UploadState.Initializing;
 
             // 获取上传需要的 ossToken
-            var ossToken = await _httpClient.SendAsync<OssToken>(HttpMethod.Get, GetTokenUrl, Token);
+            var ossToken = await _httpClient.SendAsync<OssToken>(HttpMethod.Get, GetTokenUrl, token);
 
             if (ossToken != null)
             {
@@ -170,7 +165,8 @@ namespace Display.Services.Upload
 
             State = UploadState.Paused;
             _eTagList = _multipartUpload.ETagList;
-            _multipartUpload.Stop();
+            
+            //_multipartUpload.Stop();
         }
 
         public Task Stop()
@@ -178,10 +174,10 @@ namespace Display.Services.Upload
             if (UploadMethod != UploadMethod.Multipart) return Task.CompletedTask;
 
             State = UploadState.Canceled;
-            Dispose();
+            //_source.Cancel();
+
             return Task.CompletedTask;
         }
-
     }
 
     internal enum UploadMethod

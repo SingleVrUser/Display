@@ -99,7 +99,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     private void StartMatchName_ButtonClick(object sender, RoutedEventArgs e)
     {
         //从本地数据库中搜刮
-        if (LocalDataRadioButton.IsChecked == true)
+        if (LocalDataItem.IsSelected)
         {
             SpiderFromLocalData();
         }
@@ -263,24 +263,23 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
 
     private void ShowData_RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (e.AddedItems[0] is RadioButton radioButton)
-        {
-            switch (radioButton.Name)
-            {
-                //本地数据库
-                case nameof(LocalDataRadioButton):
-                    FailShowTypeComboBox.SelectionChanged -= FailTypeComboBoxChanged;
-                    break;
-                //搜刮失败
-                case nameof(MatchFailRadioButton):
-                    if (FailShowTypeComboBox.SelectionBoxItem == null)
-                    {
-                        ChangedFailListType(ShowAllFailComboBoxItem);
-                    }
+        if (e.AddedItems[0] is not ListViewItem item) return;
 
-                    FailShowTypeComboBox.SelectionChanged += FailTypeComboBoxChanged;
-                    break;
-            }
+        switch (item.Name)
+        {
+            //本地数据库
+            case nameof(LocalDataItem):
+                FailShowTypeComboBox.SelectionChanged -= FailTypeComboBoxChanged;
+                break;
+            //搜刮失败
+            case nameof(MatchFailItem):
+                if (FailShowTypeComboBox.SelectionBoxItem == null)
+                {
+                    ChangedFailListType(ShowAllFailComboBoxItem);
+                }
+
+                FailShowTypeComboBox.SelectionChanged += FailTypeComboBoxChanged;
+                break;
         }
     }
 

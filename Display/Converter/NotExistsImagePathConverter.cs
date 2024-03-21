@@ -19,7 +19,7 @@ public class NotExistsImagePathConverter : IValueConverter
             return imageSource;
         }
 
-        imageSource = new BitmapImage(new Uri(Const.FileType.NoPicturePath));
+        imageSource = new BitmapImage(new Uri(Constant.FileType.NoPicturePath));
 
         return imageSource;
     }

@@ -5,6 +5,8 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:data="using:Display.Models.Data"
       xmlns:customControls="using:Display.Controls"
+      xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+      xmlns:winUi="using:CommunityToolkit.WinUI"
       mc:Ignorable="d">
 
     <Page.Resources>
@@ -52,9 +54,8 @@
                         <ColumnDefinition Width="auto" />
                     </Grid.ColumnDefinitions>
 
-
                     <TextBlock VerticalAlignment="Center"
-                               Visibility="{x:Bind MatchFailRadioButton.IsChecked,Mode=OneWay}"
+                               Visibility="{x:Bind MatchFailItem.IsSelected,Mode=OneWay}"
                                HorizontalAlignment="Right"
                                Margin="0,0,20,0">
                         
@@ -70,7 +71,7 @@
                     <ComboBox x:Name="FailShowTypeComboBox"
                               MinWidth="100"
                               VerticalAlignment="Center"
-                              Visibility="{x:Bind MatchFailRadioButton.IsChecked,Mode=OneWay}"
+                              Visibility="{x:Bind MatchFailItem.IsSelected,Mode=OneWay}"
                               SelectedIndex="0"
                               Grid.Column="1">
                         <ComboBoxItem x:Name="ShowAllFailComboBoxItem" Content="所有" />
@@ -78,7 +79,20 @@
                         <ComboBoxItem x:Name="ShowSpiderFailComboBoxItem" Content="搜刮失败" />
                     </ComboBox>
 
-                    <RadioButtons SelectedIndex="0"
+                    <controls:Segmented Grid.Column="2"
+                                        SelectedIndex="0"
+                                        HorizontalAlignment="Right"
+                                        SelectionMode="Single"
+                                        SelectionChanged="ShowData_RadioButtons_SelectionChanged">
+                        <controls:SegmentedItem  x:Name="LocalDataItem"
+                                                 Icon="{winUi:FontIcon Glyph=&#xE930;}"
+                                                 ToolTipService.ToolTip="匹配成功" />
+                        <controls:SegmentedItem x:Name="MatchFailItem"
+                                                Icon="{winUi:FontIcon Glyph=&#xEA39;}"
+                                                ToolTipService.ToolTip="匹配失败" />
+                    </controls:Segmented>
+
+                    <!--<RadioButtons SelectedIndex="0"
                                   Grid.Column="2"
                                   MaxColumns="2"
                                   CharacterSpacing="30"
@@ -95,7 +109,7 @@
                                      HorizontalContentAlignment="Center"
                                      Style="{StaticResource RadioButtonCustomizeStyle}"
                                      ToolTipService.ToolTip="匹配失败" />
-                    </RadioButtons>
+                    </RadioButtons>-->
 
                 </Grid>
             </RelativePanel>
@@ -107,13 +121,13 @@
                 <customControls:Explorer x:Name="Explorer"
                                          ItemClick="ExplorerItemClick"
                                          ItemInvoked="TreeView_ItemInvoked"
-                                         Visibility="{x:Bind LocalDataRadioButton.IsChecked,Mode=OneWay}"
+                                         Visibility="{x:Bind LocalDataItem.IsSelected,Mode=OneWay}"
                                          PlayVideoClick="Explorer_OnPlayVideoClick"
                                          PlayWithPlayerClick="Explorer_OnPlayWithPlayerClick"/>
 
                 <!--失败列表-->
                 <Grid x:Name="FailListGrid"
-                      Visibility="{x:Bind MatchFailRadioButton.IsChecked,Mode=OneWay}">
+                      Visibility="{x:Bind MatchFailItem.IsSelected,Mode=OneWay}">
                     <ListView x:Name="FailListView"
                               SelectionChanged="FailListView_SelectionChanged"
                               ItemsSource="{x:Bind FailList,Mode=OneWay}">

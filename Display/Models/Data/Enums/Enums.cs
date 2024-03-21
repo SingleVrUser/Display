@@ -16,7 +16,7 @@ public enum PlayQuality
     Origin = 1
 }
 
-public enum ThumbnailOrigin { Local = 0, Web = 1 }
+public enum ThumbnailOriginType { Local = 0, Web = 1 }
 
 public enum SavePathEnum
 {

@@ -19,7 +19,7 @@ public class Forum1080SearchResult
 
 }
 
-public class Forum1080AttachmentInfo
+public class Forum1080AttachmentInfo(string url, AttmnType type)
 {
     private string _aid;
 
@@ -39,24 +39,17 @@ public class Forum1080AttachmentInfo
         }
     }
 
-    public string Url { get; set; }
+    public string Url { get; set; } = url;
 
     public string Name { get; set; }
 
     public string Size { get; set; }
 
-    public AttmnType Type { get; set; }
+    public AttmnType Type { get; set; } = type;
 
     public int Expense { get; set; } = 0;
 
     public int DownCount { get; set; }
-
-    public Forum1080AttachmentInfo(string url, AttmnType type)
-    {
-        Url = url;
-        Type = type;
-    }
-
 }
 
 public class AttmnFileInfo
