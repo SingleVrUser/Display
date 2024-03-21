@@ -434,7 +434,7 @@ public sealed partial class MainPage : Page,IDisposable
 
         const string noPicturePath = Constant.FileType.NoPicturePath;
 
-        var _spiderManager = App.GetService<SpiderManager>();
+        var spiderManager = App.GetService<SpiderManager>();
 
         //搜刮
         foreach (var video in filesInfos)
@@ -480,7 +480,7 @@ public sealed partial class MainPage : Page,IDisposable
 
                 // 直接使用await spiderManager.DispatchSpiderInfoByCidInOrder会阻塞UI线程
                 var videoInfo = await Task.Run(async () =>
-                    await _spiderManager.DispatchSpiderInfoByCidInOrder(trueName, info.CancellationTokenSource.Token));
+                    await spiderManager.DispatchSpiderInfoByCidInOrder(trueName, info.CancellationTokenSource.Token));
 
                 FindCidInfo_ProgressRing.Visibility = Visibility.Collapsed;
 
@@ -822,7 +822,7 @@ public sealed partial class MainPage : Page,IDisposable
             Debug.WriteLine("开始搜刮信息");
 
             // 搜索信息
-            await FindAndShowInfosFromInternet(new[] { videoInfo });
+            await FindAndShowInfosFromInternet([videoInfo]);
         }
         // 没有下一集，则修改布局
         else
