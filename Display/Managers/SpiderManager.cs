@@ -35,28 +35,10 @@ public class SpiderManager
     /// </summary>
     private readonly Random _random = new();
 
-    private static BaseSpider[] _spiders;
-    public static BaseSpider[] Spiders
-    {
-        get
-        {
-            return _spiders ??= [
-                new JavBus(),
-                new JavDb()
-            ];
-        }
-    }
-
-    private static SpiderManager _spiderManager;
-    public static SpiderManager Instance
-    {
-        get
-        {
-            _spiderManager ??= new SpiderManager();
-
-            return _spiderManager;
-        }
-    }
+    public static BaseSpider[] Spiders = [
+        new JavBus(),
+        new JavDb()
+    ];
 
     #region 单线程
 
@@ -325,7 +307,7 @@ public class SpiderManager
         _cancellationTokenSource ??= new CancellationTokenSource();
 
         // 只启动未启动的搜刮源
-        var tasks = _spiders
+        var tasks = Spiders
             .Where(i => !i.IsRunning)
             .Select(spider => RunTaskBySingleSpider(spider, _cancellationTokenSource.Token)).ToArray();
 
@@ -346,6 +328,22 @@ public class SpiderManager
         _cancellationTokenSource?.Dispose();
         _cancellationTokenSource = null;
     }
+
+
+    public List<string> GetFailNames()
+    {
+        _failureNameInfos.Enqueue("nihao");
+        _failureNameInfos.Enqueue("wohao");
+        _failureNameInfos.Enqueue("dajiahao");
+        return _failureNameInfos.ToList();
+    }
+
+    public List<string> GetOnSpiderNames()
+    {
+        return Spiders.Where(item => item.IsOn).Select(item => item.Abbreviation).ToList();
+    }
+
+    public int GetLeftNameCount() => _taskItemQueue.Count;
 
     public event Action<string> ItemTaskFailAction;
     public event Action<string> ItemTaskSuccessAction;

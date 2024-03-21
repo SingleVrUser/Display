@@ -428,11 +428,13 @@ public sealed partial class MainPage : Page,IDisposable
         await FindAndShowInfosFromInternet(_playingVideoInfos.ToArray());
     }
 
-    private async System.Threading.Tasks.Task FindAndShowInfosFromInternet(IEnumerable<FilesInfo> filesInfos)
+    private async Task FindAndShowInfosFromInternet(IEnumerable<FilesInfo> filesInfos)
     {
         VideoPlay_ListView.IsEnabled = false;
 
         const string noPicturePath = Constant.FileType.NoPicturePath;
+
+        var _spiderManager = App.GetService<SpiderManager>();
 
         //搜刮
         foreach (var video in filesInfos)
@@ -473,15 +475,12 @@ public sealed partial class MainPage : Page,IDisposable
                 var info = new CidInfo(trueName, noPicturePath);
 
                 _cidInfos.Add(info);
-
-                var spiderManager = SpiderManager.Instance;
-
-
+                
                 FindCidInfo_ProgressRing.Visibility = Visibility.Visible;
 
                 // 直接使用await spiderManager.DispatchSpiderInfoByCidInOrder会阻塞UI线程
                 var videoInfo = await Task.Run(async () =>
-                    await spiderManager.DispatchSpiderInfoByCidInOrder(trueName, info.CancellationTokenSource.Token));
+                    await _spiderManager.DispatchSpiderInfoByCidInOrder(trueName, info.CancellationTokenSource.Token));
 
                 FindCidInfo_ProgressRing.Visibility = Visibility.Collapsed;
 

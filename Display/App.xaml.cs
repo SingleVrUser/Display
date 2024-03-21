@@ -19,6 +19,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
+using Display.Managers;
 
 
 namespace Display
@@ -77,6 +78,9 @@ namespace Display
                         .AddSingleton<UploadViewModel>()
                         .AddSingleton<TaskViewModel>()
 
+                        .AddSingleton<SpiderManager>()
+
+                        .AddTransient<SpiderTaskViewModel>()
                         .AddTransient<ImageViewModel>()
                         .AddTransient<SettingViewModel>()
                         .AddTransient<ThumbnailViewModel>();
