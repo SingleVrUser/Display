@@ -20,7 +20,7 @@ internal partial class SettingViewModel : ObservableObject
 
     public SettingViewModel()
     {
-        _currentLink = NavLinks[3];
+        _currentLink = NavLinks[0];
     }
 
     [ObservableProperty]

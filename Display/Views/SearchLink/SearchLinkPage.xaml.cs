@@ -260,7 +260,7 @@ namespace Display.Views.SearchLink
             // 上传字幕，如果需要
             if (!string.IsNullOrEmpty(srtPath))
             {
-                await FileUpload.SimpleUpload(srtPath, cid, uploadInfo.user_id, uploadInfo.userkey);
+                await FileUploadService.SimpleUpload(srtPath, cid, uploadInfo.user_id, uploadInfo.userkey);
             }
 
             isDone = addTaskUrlInfo is { state: true };

@@ -3,20 +3,19 @@ using System.Diagnostics;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Display.Models;
+using Display.Models.Upload;
 using Display.Services.Upload;
 using Display.ViewModels;
 using Microsoft.UI.Xaml;
 
 namespace Display.Services;
 
-internal partial class UploadSubItem : ObservableObject
+internal partial class UploadSubItem(string path, long cid) : ObservableObject
 {
-    private readonly long _saveFolderCid;
-    private FileUpload _fileUpload;
+    private FileUploadService _fileUploadService;
 
-    public readonly string UploadFilePath;
-    public readonly string Name;
+    public readonly string UploadFilePath = path;
+    public readonly string Name = Path.GetFileName(path);
     public bool IsFinish;
 
     [ObservableProperty]
@@ -51,16 +50,12 @@ internal partial class UploadSubItem : ObservableObject
     [ObservableProperty]
     private int _position;
 
-    public UploadSubItem(string path, long cid)
-    {
-        UploadFilePath = path;
-        Name = Path.GetFileName(path);
-        _saveFolderCid = cid;
-            
-    }
+    public UploadState State;
 
-    private void FileUpload_StateChanged(UploadState state)
+    private void FileUploadServiceStateChanged(UploadState state)
     {
+        State = state;
+
         switch (state)
         {
             case UploadState.Initializing:
@@ -137,23 +132,22 @@ internal partial class UploadSubItem : ObservableObject
             return;
         }
 
-        _fileUpload = new FileUpload(UploadFilePath, _saveFolderCid);
+        _fileUploadService = new FileUploadService(UploadFilePath, cid);
 
-        // new FileUpload(……)中的设置Content
-        ProgressContent = _fileUpload.Content;
-        var length = _fileUpload.Length;
-        _fileUpload.ContentChanged += c => ProgressContent = c;
-        _fileUpload.StateChanged += FileUpload_StateChanged;
-        _fileUpload.PositionCallback += p =>
+        ProgressContent = _fileUploadService.Content;
+        var length = _fileUploadService.Length;
+        _fileUploadService.ContentChanged += c => ProgressContent = c;
+        _fileUploadService.StateChanged += FileUploadServiceStateChanged;
+        _fileUploadService.PositionCallback += p =>
         {
             Position = p==0 ? 0 : length == p ? Maximum : (int)(Maximum * (p/(double)length));
         };
 
-        await _fileUpload.Init();
+        await _fileUploadService.Init();
 
-        await _fileUpload.Start();
+        await _fileUploadService.Start();
 
-        UploadFinish?.Invoke(_fileUpload.FileUploadResult);
+        UploadFinish?.Invoke(_fileUploadService.FileUploadResult);
     }
 
     private bool _running;
@@ -176,20 +170,19 @@ internal partial class UploadSubItem : ObservableObject
     [RelayCommand]
     private void Resume()
     {
-        _fileUpload?.Resume();
+        _fileUploadService?.Resume();
     }
 
     [RelayCommand]
     private void Pause()
     {
-        _fileUpload?.Pause();
+        _fileUploadService?.Pause();
     }
-
 
     [RelayCommand]
     private void DeleteAsync()
     {
-        _fileUpload?.Stop();
-        UploadViewModel.Instance.UploadCollection.Remove(this);
+        _fileUploadService?.Stop();
+        App.GetService<UploadViewModel>().UploadCollection.Remove(this);
     }
 }

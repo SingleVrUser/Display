@@ -10,11 +10,16 @@ namespace Display.Providers.Spider;
 
 public abstract class BaseSpider
 {
+    public bool IsRunning { get; set; }
+
     public abstract SpiderSourceName Name { get; }
     public abstract bool IsOn { get; set; }
     public abstract string Abbreviation { get; }
 
     public virtual bool IsCookieEnable => false;
+
+    public virtual int MinDelaySecond { get; set; } = 2;
+    public virtual int MaxDelaySecond { get; set; } = 5;
 
     /**
      * 标题包含的关键词，据此判断使用什么解析HtmlDoc

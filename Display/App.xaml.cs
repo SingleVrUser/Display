@@ -20,14 +20,9 @@ using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace Display
 {
-    /// <summary>
-    /// Provides application-specific behavior to supplement the default Application class.
-    /// </summary>
     public partial class App : Application
     {
         public static Window AppMainWindow;
@@ -67,7 +62,7 @@ namespace Display
 
         private static IHost ConfigureHost()
         {
-            return Microsoft.Extensions.Hosting.Host
+            return Host
                 .CreateDefaultBuilder()
                 .ConfigureAppConfiguration(builder => builder
                     .AddUserSecrets<App>())
@@ -78,6 +73,10 @@ namespace Display
                         //.AddSingleton<IThumbnailService, ThumbnailService>()
                         // Views and ViewModels
                         .AddSingleton<IThumbnailGeneratorService, ThumbnailGeneratorService>()
+
+                        .AddSingleton<UploadViewModel>()
+                        .AddSingleton<TaskViewModel>()
+
                         .AddTransient<ImageViewModel>()
                         .AddTransient<SettingViewModel>()
                         .AddTransient<ThumbnailViewModel>();
