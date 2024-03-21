@@ -10,6 +10,8 @@
              xmlns:data="using:Display.Models.Data"
              xmlns:helper="using:Display.Helper.FileProperties.Name"
              xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
+             xmlns:winUi="using:CommunityToolkit.WinUI"
+             xmlns:controls="using:CommunityToolkit.WinUI.Controls"
              mc:Ignorable="d"
              CacheMode="BitmapCache">
 
@@ -775,32 +777,48 @@
                                          FailCoverTemplate="{StaticResource FailCoverTemplate}" />
     </Control.Resources>
 
-    <Grid>
-        <Grid.RowDefinitions>
+    <Grid RowDefinitions="auto,auto,*,auto,47">
+        <!--<Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="47" />
-        </Grid.RowDefinitions>
+        </Grid.RowDefinitions>-->
 
-        <!--提示信息-->
+        <!--提示信息--><!--
         <InfoBar RelativePanel.AlignLeftWithPanel="True"
                  IsOpen="False"
                  Severity="Informational"
                  Title="Title"
                  x:Name="InfoBar"
-                 Message="Essential app message for your users to be informed of, acknowledge, or take action on." />
+                 Message="Essential app message for your users to be informed of, acknowledge, or take action on." />-->
 
         <RelativePanel Grid.Row="0" Margin="10,2">
             <!--搜索框（匹配失败列表显示时显示）-->
-            <local:FileAutoSuggestBox Grid.Row="1"
-                                      x:Name="FailInfoSuggestBox"
-                                      TextChanged="FileAutoSuggestBox_TextChanged"
-                                      Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource BoolToVisibleConverter}}"
-                                      RelativePanel.AlignVerticalCenterWithPanel="True" />
+            <local:FileAutoSuggestBox
+                x:Name="FailInfoSuggestBox"
+                TextChanged="FileAutoSuggestBox_TextChanged"
+                Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource BoolToVisibleConverter}}"
+                RelativePanel.AlignVerticalCenterWithPanel="True" />
 
-            <RadioButtons x:Name="FailShowChanged_RadioButtons"
+            <controls:Segmented x:Name="FailShowChanged_RadioButtons"
+                                HorizontalAlignment="Right"
+                                RelativePanel.AlignRightWithPanel="True"
+                                SelectionChanged="ShowData_RadioButtons_SelectionChanged"
+                                Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource BoolToVisibleConverter}}">
+                <controls:SegmentedItem  x:Name="AllFailRadioButton"
+                                         Icon="{winUi:FontIcon Glyph=&#xE0A2;}"
+                                         ToolTipService.ToolTip="全部" />
+                <controls:SegmentedItem x:Name="FailLike_RadioButton"
+                                        Icon="{winUi:FontIcon Glyph=&#xE006;}"
+                                        ToolTipService.ToolTip="喜欢" />
+                <controls:SegmentedItem x:Name="FailLookLater_RadioButton"
+                                        Icon="{winUi:FontIcon Glyph=&#xE13B;}"
+                                        ToolTipService.ToolTip="稍后观看" />
+            </controls:Segmented>
+
+            <!--<RadioButtons x:Name="FailShowChanged_RadioButtons"
                           SelectedIndex="0"
                           Grid.Column="2"
                           MaxColumns="3"
@@ -828,7 +846,7 @@
                              HorizontalContentAlignment="Center"
                              Style="{StaticResource RadioButtonCustomizeStyle}"
                              ToolTipService.ToolTip="稍后观看" />
-            </RadioButtons>
+            </RadioButtons>-->
         </RelativePanel>
 
         <!--封面预览-->
@@ -1012,19 +1030,21 @@
                         Spacing="5"
                         RelativePanel.AlignVerticalCenterWithPanel="True">
 
-                <!--<ToggleSwitch x:Name="ShowType_ToggleSwitch"
-                              VerticalAlignment="Center"
-                              MinWidth="120"
-                              OnContent="匹配失败"
-                              OffContent="匹配成功"
-                              Opacity="0.3"
-                              PointerEntered="ShowType_ToggleSwitch_PointerEntered"
-                              PointerExited="ShowType_ToggleSwitch_PointerExited"
-                              IsOn="{x:Bind IsShowFailListView,Mode=TwoWay}">
-                </ToggleSwitch>-->
+                <controls:Segmented x:Name="ShowType_RadioButtons"
+                                    HorizontalAlignment="Left"
+                                    SelectionMode="Single"
+                                    SelectionChanged="ShowType_RadioButtons_SelectionChanged"
+                                    Visibility="{x:Bind IsShowSucAndFailSwitchButton}">
+                    <controls:SegmentedItem  x:Name="SuccessData_RadioButton"
+                                             Icon="{winUi:FontIcon Glyph=&#xE930;}"
+                                             ToolTipService.ToolTip="匹配成功" />
+                    <controls:SegmentedItem x:Name="FailData_RadioButton"
+                                            Icon="{winUi:FontIcon Glyph=&#xEA39;}"
+                                            ToolTipService.ToolTip="匹配失败" />
+                </controls:Segmented>
 
-                <RadioButtons x:Name="ShowType_RadioButtons"
-                              Grid.Column="2"
+
+                <!--<RadioButtons x:Name="ShowType_RadioButtons"
                               MaxColumns="2"
                               CharacterSpacing="30"
                               SelectionChanged="ShowType_RadioButtons_SelectionChanged"
@@ -1033,47 +1053,30 @@
                                  Content="&#xE930;"
                                  FontSize="20"
                                  HorizontalContentAlignment="Center"
-                                 FontFamily="Segoe Fluent Icons"
                                  Style="{StaticResource RadioButtonCustomizeStyle}"
                                  ToolTipService.ToolTip="匹配成功" />
                     <RadioButton x:Name="FailData_RadioButton"
                                  Content="&#xEA39;"
                                  FontSize="20"
-                                 FontFamily="Segoe Fluent Icons"
                                  HorizontalContentAlignment="Center"
                                  Style="{StaticResource RadioButtonCustomizeStyle}"
                                  ToolTipService.ToolTip="匹配失败" />
-                </RadioButtons>
+                </RadioButtons>-->
 
-                <AppBarButton x:Name="OrderButton"
-                              Margin="0,0,0,-16"
-                              IsCompact="True">
-
+                <Button x:Name="OrderButton"
+                        FontFamily="{StaticResource SymbolThemeFontFamily}"
+                        Content="&#xE174;">
                     <ToolTipService.ToolTip>
                         <ToolTip x:Uid="sortToolTip" />
                     </ToolTipService.ToolTip>
-                    <AppBarButton.Content>
-                        <FontIcon FontFamily="Segoe Fluent Icons"
-                                  Glyph="&#xE174;" />
-                    </AppBarButton.Content>
-
-                </AppBarButton>
+                </Button>
 
                 <ToggleButton x:Name="FilterToggleButton"
                               IsEnabled="True"
-                              BorderThickness="0"
-                              FontFamily="Segoe Fluent Icons"
+                              FontFamily="{StaticResource SymbolThemeFontFamily}"
                               Content="&#xE16E;"
-                              FontSize="18"
-                              Foreground="Gray"
                               Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay}"
-                              Background="Transparent"
-                              Unchecked="Filter_ToggleButton_Unchecked">
-                    <ToggleButton.Resources>
-                        <SolidColorBrush x:Key="ToggleButtonBackgroundPointerOver"
-                                         Color="{ThemeResource SystemAccentColor}" />
-                    </ToggleButton.Resources>
-                </ToggleButton>
+                              Unchecked="Filter_ToggleButton_Unchecked"/>
 
             </StackPanel>
 
@@ -1104,7 +1107,7 @@
                     <ToggleButton x:Name="IsAutoAdjustImageSizeToggleButton"
                                   Grid.Column="1"
                                   Content="&#xE167;"
-                                  FontFamily="Segoe Fluent Icons"
+                                  FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   IsChecked="{x:Bind data:AppSettings.IsAutoAdjustImageSize,Mode=TwoWay}"
                                   Checked="AutoAdjustImageSize_ToggleButton_Checked"
                                   Unchecked="AutoAdjustImageSize_ToggleButton_UnChecked"
@@ -1142,7 +1145,6 @@
             </Grid>
 
         </RelativePanel>
-
 
         <!--TeachingTip-->
         <TeachingTip Grid.Row="0" x:Name="FailList_TeachingTip"

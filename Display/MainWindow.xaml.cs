@@ -716,7 +716,7 @@ namespace Display
 
         private async void TestClick(object sender, TappedRoutedEventArgs e)
         {
-            await SpiderManager.Instance.DispatchSpiderInfosByCidInOrder("cid-s");
+            await App.GetService<SpiderManager>().DispatchSpiderInfosByCidInOrder("cid-s");
         }
     }
 }

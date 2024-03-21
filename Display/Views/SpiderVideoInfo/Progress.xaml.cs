@@ -466,7 +466,8 @@ namespace Display.Views.SpiderVideoInfo
             ////等待任务完成
             //await Task.WhenAll(tasks);
 
-            var spiderManager = SpiderManager.Instance;
+
+            var spiderManager = App.GetService<SpiderManager>();
             foreach (var matchResult in _matchVideoResults.Where(i=>i.statusCode is 1))
             {
                 var name = matchResult.MatchName;
@@ -498,7 +499,7 @@ namespace Display.Views.SpiderVideoInfo
         // 创建SpiderTask
         private async Task StartSearchTask(SpiderInfo spiderInfo, IProgress<SpiderInfo> progress)
         {
-            var spiderManager = SpiderManager.Instance;
+            var spiderManager = App.GetService<SpiderManager>();
 
             while (true)
             {

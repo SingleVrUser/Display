@@ -49,7 +49,7 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
+  <!--<ItemGroup>
     <Content Remove="Assets\BadgeLogo.scale-100.png" />
     <Content Remove="Assets\BadgeLogo.scale-125.png" />
     <Content Remove="Assets\BadgeLogo.scale-150.png" />
@@ -58,9 +58,9 @@
     <Content Remove="Assets\icons8-text-96.png" />
     <Content Remove="Assets\SplashScreen.png" />
     <Content Remove="Assets\Win32Resources.res" />
-  </ItemGroup>
+  </ItemGroup>-->
 
-  <ItemGroup>
+  <!--<ItemGroup>
     <None Remove="app.manifest" />
     <None Remove="Assets\115favicon.ico" />
     <None Remove="Assets\115\mountain.svg" />
@@ -126,6 +126,7 @@
     <None Remove="VideoPlayWindow.xaml" />
     <None Remove="Views\BrowserPage.xaml" />
     <None Remove="Views\MorePage.xaml" />
+    <None Remove="Views\Tasks\SpiderTaskPage.xaml" />
     <None Remove="Views\Tasks\UploadTaskPage.xaml" />
     <None Remove="Views\VerifyAccountPage.xaml" />
     <None Remove="CustomWindows\CommonWindow.xaml" />
@@ -133,7 +134,7 @@
     <None Remove="CustomWindows\MediaPlayWindow.xaml" />
     <None Remove="CustomWindows\SingleFrameWindow.xaml" />
     <None Remove="CustomWindows\StartWindow.xaml" />
-  </ItemGroup>
+  </ItemGroup>-->
 
   <ItemGroup>
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -166,6 +167,7 @@
     <PackageReference Include="CommunityToolkit.WinUI.Collections" Version="8.0.240109" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.HeaderedControls" Version="8.0.240109" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.MetadataControl" Version="8.0.240109" />
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.Segmented" Version="8.0.240109" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.0.240109" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.Sizers" Version="8.0.240109" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.TokenizingTextBox" Version="8.0.240109" />
@@ -243,6 +245,9 @@
     <None Update="Control\FolderControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>
+    <Page Update="Views\Tasks\SpiderTaskPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Views\Tasks\UploadTaskPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

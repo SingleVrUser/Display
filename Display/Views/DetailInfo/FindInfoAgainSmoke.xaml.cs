@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using Display.Managers;
 using Display.Models.Data;
+using Display.Models.Settings.Options;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -8,6 +9,8 @@ namespace Display.Views.DetailInfo
 {
     public sealed partial class FindInfoAgainSmoke
     {
+        private readonly SpiderManager _spiderManager = App.GetService<SpiderManager>();
+
         private string CidName { get; }
 
         private readonly ObservableCollection<VideoInfo> _searchResultList = [];
@@ -35,7 +38,7 @@ namespace Display.Views.DetailInfo
         {
             ReCheckProgressRing.Visibility = Visibility.Visible;
 
-            var infos = await SpiderManager.Instance.DispatchSpiderInfosByCidInOrder(CidName);
+            var infos = await _spiderManager.DispatchSpiderInfosByCidInOrder(CidName);
 
             if (infos.Count > 0)
             {
@@ -98,7 +101,7 @@ namespace Display.Views.DetailInfo
             ReCheckProgressRing.Visibility = Visibility.Visible;
             ConfirmSpecificUrlButton.IsEnabled = false;
 
-            var info = await SpiderManager.Instance.DispatchSpiderInfoByDetailUrl(CidName, url, default);
+            var info = await _spiderManager.DispatchSpiderInfoByDetailUrl(CidName, url, default);
 
             ReCheckProgressRing.Visibility = Visibility.Collapsed;
 

@@ -8,16 +8,15 @@ internal partial class TaskViewModel : ObservableObject
 {
     public NavLink[] NavLinks =
     [
-        new NavLink { Label = "上传", Glyph = "\uF6FA", NavPageType = typeof(UploadTaskPage)}
+        new NavLink { Label = "上传", Glyph = "\uF6FA", NavPageType = typeof(UploadTaskPage)},
+        new NavLink { Label = "搜刮", Glyph = "\uF6FA", NavPageType = typeof(SpiderTaskPage)}
     ];
-
-    private readonly UploadViewModel _uploadViewModel = App.GetService<UploadViewModel>();
 
     [ObservableProperty]
     private NavLink _currentLink;
 
     public TaskViewModel()
     {
-        _currentLink = NavLinks[0];
+        _currentLink = NavLinks[^1];
     }
 }

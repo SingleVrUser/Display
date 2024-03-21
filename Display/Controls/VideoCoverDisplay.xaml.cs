@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using Display.Services.IncrementalCollection;
 using SharpCompress;
 using Display.Models.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Display.Controls;
 
@@ -115,12 +116,12 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         //显示成功的排序
         if (isShowSuccessFlyout)
         {
-            OrderButton.Flyout = this.Resources["SuccessOrderFlyout"] as Flyout;
+            OrderButton.Flyout = Resources["SuccessOrderFlyout"] as Flyout;
         }
         //显示失败的排序
         else
         {
-            OrderButton.Flyout = this.Resources["FailOrderFlyout"] as Flyout;
+            OrderButton.Flyout = Resources["FailOrderFlyout"] as Flyout;
         }
     }
 
@@ -572,26 +573,18 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             case "名称":
                 newGlyph = "\xE185";
                 SuccessListOrderBy = "truename";
-                //FileGrid = isUpSort ? new List<VideoCoverDisplayClass>(FileGrid.OrderBy(item => item.truename)) : new List<VideoCoverDisplayClass>(FileGrid.OrderByDescending(item => item.truename));
-
                 break;
             case "演员":
                 newGlyph = "\xE13D";
                 SuccessListOrderBy = "actor";
-                //FileGrid = isUpSort ? new List<VideoCoverDisplayClass>(FileGrid.OrderBy(item => item.actor)) : new List<VideoCoverDisplayClass>(FileGrid.OrderByDescending(item => item.actor));
-
                 break;
             case "年份":
                 newGlyph = "\xEC92";
                 SuccessListOrderBy = "releasetime";
-                //FileGrid = isUpSort ? new List<VideoCoverDisplayClass>(FileGrid.OrderBy(item => item.realeaseYear)) : new List<VideoCoverDisplayClass>(FileGrid.OrderByDescending(item => item.realeaseYear));
-
                 break;
             case "随机":
                 newGlyph = "\xF463";
                 SuccessListOrderBy = "random";
-                //Random rnd = new Random();
-                //FileGrid = new List<VideoCoverDisplayClass>(FileGrid.OrderByDescending(item => rnd.Next()));
                 break;
             default:
                 newGlyph = "\xE185";
@@ -600,10 +593,9 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         }
 
         //更新首图标
-        var orderFontIcon = OrderButton.Content as FontIcon;
-        if (orderFontIcon.Glyph != newGlyph)
+        if (OrderButton.Content is string content && content != newGlyph)
         {
-            OrderButton.Content = new FontIcon() { FontFamily = new FontFamily("Segoe Fluent Icons"), Glyph = newGlyph };
+            OrderButton.Content = newGlyph;
         }
 
         LoadDstSuccessInfoCollection();
@@ -673,10 +665,9 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
                 break;
         }
         //更新首图标
-        var orderFontIcon = OrderButton.Content as FontIcon;
-        if (orderFontIcon.Glyph != newGlyph)
+        if(OrderButton.Content is string content && content != newGlyph)
         {
-            OrderButton.Content = new FontIcon() { FontFamily = new FontFamily("Segoe Fluent Icons"), Glyph = newGlyph };
+            OrderButton.Content = newGlyph;
         }
 
         //更新数据
@@ -689,7 +680,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         AllFailInfoCollection.OrderBy = FailListOrderBy;
         AllFailInfoCollection.IsDesc = FailListIsDesc;
         var lists = await DataAccess.Get.GetFailFileInfoWithDatum(0, 30, _localCheckText, orderBy: FailListOrderBy, isDesc: FailListIsDesc);
-        lists.ForEach(AllFailInfoCollection.Add);
+        lists?.ForEach(AllFailInfoCollection.Add);
 
 
     }
@@ -746,10 +737,9 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
     private void ShowType_RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (e.AddedItems[0] is not RadioButton button) return;
+        if (e.AddedItems[0] is not ListViewItem item) return;
 
-
-        switch (button.Name)
+        switch (item.Name)
         {
             //匹配成功
             case nameof(SuccessData_RadioButton):
@@ -869,18 +859,20 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         {
             switch (FailGridView.ItemsSource)
             {
-                case IncrementalLoadFailDatumInfoCollection allFailCollection:
+                case IncrementalLoadFailDatumInfoCollection { Count: > 0 } allFailCollection:
                     FailGridView.ScrollIntoView(allFailCollection.First());
                     break;
-                case IncrementalLoadFailInfoCollection failCollection:
+                case IncrementalLoadFailInfoCollection { Count: > 0 } failCollection:
                     FailGridView.ScrollIntoView(failCollection.First());
                     break;
             }
         }
         else
         {
-            if (BasicGridView.ItemsSource is IncrementalLoadSuccessInfoCollection successCollection)
+            if (BasicGridView.ItemsSource is IncrementalLoadSuccessInfoCollection { Count: > 0 } successCollection)
+            {
                 BasicGridView.ScrollIntoView(successCollection.First());
+            }
         }
 
     }
@@ -1082,22 +1074,23 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
     private void ShowData_RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (e.AddedItems[0] is RadioButton)
-        {
-            //IsShowFailListView = true;
-            InitFailCollection();
-        }
+        InitFailCollection();
     }
 
     private async void InitFailCollection()
     {
-        if (FailShowChanged_RadioButtons.SelectedItem is not RadioButton radioButton) return;
+        if (FailShowChanged_RadioButtons.SelectedItem is null)
+        {
+            FailShowChanged_RadioButtons.SelectedIndex = 0;
+            return;
+        }
 
+        if (FailShowChanged_RadioButtons.SelectedItem is not ListViewItem item) return;
 
         bool isShowAllFail;
 
         //更新GridView的来源
-        switch (radioButton.Name)
+        switch (item.Name)
         {
             //喜欢
             case nameof(FailLike_RadioButton):
@@ -1118,7 +1111,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             case nameof(FailLookLater_RadioButton):
                 if (LikeOrLookLaterFailInfoCollection == null)
                 {
-                    LikeOrLookLaterFailInfoCollection = new(FailInfoShowType.look_later);
+                    LikeOrLookLaterFailInfoCollection = new IncrementalLoadFailInfoCollection(FailInfoShowType.look_later);
                 }
                 else if (LikeOrLookLaterFailInfoCollection.ShowType != FailInfoShowType.look_later)
                 {
@@ -1133,7 +1126,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
             default:
                 if (AllFailInfoCollection == null || !string.IsNullOrEmpty(_localCheckText))
                 {
-                    AllFailInfoCollection = new IncrementalLoadFailDatumInfoCollection();
+                    AllFailInfoCollection = [];
                     AllFailInfoCollection.SetOrder(FailListOrderBy, FailListIsDesc);
                     AllFailInfoCollection.SetFilter(_localCheckText);
                     await AllFailInfoCollection.LoadData();
