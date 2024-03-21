@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Display.Models.Upload;
 using Display.Services.Upload;
 
 namespace Display.ViewModels
@@ -9,9 +10,6 @@ namespace Display.ViewModels
     internal class UploadViewModel : ObservableObject
     {
         private const int MaxUploadCount = 3;
-
-        private static UploadViewModel _uploadVm;
-        public static UploadViewModel Instance => _uploadVm ??= new UploadViewModel();
 
         public ObservableCollection<Services.UploadSubItem> UploadCollection = [];
 
@@ -53,7 +51,8 @@ namespace Display.ViewModels
             // 剩余上传数
             var leftCount = MaxUploadCount - runningCount;
 
-            var uploadItems = UploadCollection.Where(i => !i.IsFinish && !i.Running).Take(leftCount);
+            var uploadItems = UploadCollection.Where(i =>
+                !i.IsFinish && !i.Running && i.State != UploadState.Paused).Take(leftCount);
 
             foreach (var item in uploadItems)
             {

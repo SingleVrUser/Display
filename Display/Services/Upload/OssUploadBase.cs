@@ -31,13 +31,20 @@ namespace Display.Services.Upload
         protected readonly string SecurityToken;
         protected readonly string BaseUrl;
 
-        protected readonly CancellationTokenSource Cts = new();
-        protected CancellationToken Token => Cts.Token;
+        public UploadState State
+        {
+            get;
+            set;
+        }
 
-        protected OssUploadBase(HttpClient client, FileStream stream, OssToken ossToken, FastUploadResult fastUploadResult)
+        //protected readonly CancellationTokenSource Cts = new();
+        protected readonly CancellationToken Token;
+
+        protected OssUploadBase(HttpClient client, FileStream stream, OssToken ossToken, FastUploadResult fastUploadResult, CancellationToken token)
         {
             Client = client;
             Stream = stream;
+            Token = token;
             FileSize = stream.Length;
 
             EndpointUri = new Uri(Endpoint);
@@ -83,8 +90,8 @@ namespace Display.Services.Upload
 
         public void Dispose()
         {
-            Cts.Cancel();
-            Cts.Dispose();
+            //Cts.Cancel();
+            //Cts.Dispose();
 
             GC.SuppressFinalize(this);
         }

@@ -34,6 +34,12 @@
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnablePreviewMsixTooling)'=='true'">
     <ProjectCapability Include="Msix" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Views\Task\**" />
+    <EmbeddedResource Remove="Views\Task\**" />
+    <None Remove="Views\Task\**" />
+    <Page Remove="Views\Task\**" />
+  </ItemGroup>
 
 
   <ItemGroup>
@@ -120,6 +126,7 @@
     <None Remove="VideoPlayWindow.xaml" />
     <None Remove="Views\BrowserPage.xaml" />
     <None Remove="Views\MorePage.xaml" />
+    <None Remove="Views\Tasks\UploadTaskPage.xaml" />
     <None Remove="Views\VerifyAccountPage.xaml" />
     <None Remove="CustomWindows\CommonWindow.xaml" />
     <None Remove="CustomWindows\LoginWindow.xaml" />
@@ -236,6 +243,9 @@
     <None Update="Control\FolderControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>
+    <Page Update="Views\Tasks\UploadTaskPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Views\Settings\DownPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -406,5 +416,8 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Remove="Views\DetailInfo\EditInfo.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Remove="Views\Task\**" />
   </ItemGroup>
 </Project>

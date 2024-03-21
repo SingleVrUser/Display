@@ -15,13 +15,13 @@ using Windows.Storage;
 using ByteSizeLib;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.Network;
-using Display.Models;
 using Display.Models.Data;
 using Display.Models.Data.Enums;
 using Display.Models.Media;
 using Display.Services.IncrementalCollection;
 using Display.ViewModels;
 using Display.Views.More.Import115DataToLocalDataAccess;
+using Display.Views.Tasks;
 using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Text;
@@ -33,7 +33,6 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using SharpCompress;
-using static Display.Models.Data.Constant;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -497,9 +496,11 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             // 标记当前文件夹，避免切换文件夹后才上传成功导致的错误文件（UI）添加，影响显示
             var currentFolderCid = CurrentExplorerItem.Id;
 
+            var uploadViewModel = App.GetService<UploadViewModel>();
+
             foreach (var storageFile in storageFiles)
             {
-                UploadViewModel.Instance.AddUploadTask(storageFile.Path, currentFolderCid, result =>
+                uploadViewModel.AddUploadTask(storageFile.Path, currentFolderCid, result =>
                 {
                     if (!result.Success) return;
 
@@ -511,7 +512,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             }
 
             //添加任务后显示传输任务窗口
-            TaskPage.ShowSingleWindow();
+            Tasks.MainPage.ShowSingleWindow();
         }
     }
 

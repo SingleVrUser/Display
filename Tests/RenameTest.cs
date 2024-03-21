@@ -22,7 +22,7 @@ namespace Tests
         public async Task RenameForced(string pickCode, long id, long cid, string totalSha1, string newName, long length)
         {
             // 通过秒传上传一份
-            var result = await FileUpload.UploadAgainByFastUpload(_downloadClient,pickCode, cid, totalSha1, newName, length,UserId, UserKey, token: Token);
+            var result = await FileUploadService.UploadAgainByFastUpload(_downloadClient,pickCode, cid, totalSha1, newName, length,UserId, UserKey, token: Token);
             Assert.IsNotNull(result);
 
             var newPickCode = result.pickcode;

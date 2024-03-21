@@ -6,18 +6,20 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 using HttpHeaders = Display.Models.Data.Constant.HttpHeaders;
 
 namespace Display.Services.Upload
 {
-    internal class SimpleUpload : OssUploadBase
+    internal class SimpleUpload(
+        HttpClient client,
+        FileStream stream,
+        OssToken ossToken,
+        FastUploadResult fastUploadResult,
+        CancellationToken token)
+        : OssUploadBase(client, stream, ossToken, fastUploadResult, token)
     {
-        public SimpleUpload(HttpClient client,FileStream stream, OssToken ossToken, FastUploadResult fastUploadResult)
-            : base(client,stream, ossToken, fastUploadResult)
-        {
-        }
-
         public override async Task<OssUploadResult> Start()
         {
             const string contentType = "application/octet-stream";

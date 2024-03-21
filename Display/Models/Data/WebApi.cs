@@ -451,7 +451,7 @@ namespace Display.Models.Data
 
                 if (torrentCidInfo != null && uploadInfo != null)
                 {
-                    await FileUpload.SimpleUpload(torrentPath, torrentCidInfo.cid, uploadInfo.user_id, uploadInfo.userkey);
+                    await FileUploadService.SimpleUpload(torrentPath, torrentCidInfo.cid, uploadInfo.user_id, uploadInfo.userkey);
                 }
 
                 // 再次检查网盘中是否有该torrent
@@ -622,11 +622,11 @@ namespace Display.Models.Data
             var userKey = uploadInfo.userkey;
 
             // 通过秒传上传一份
-            var result = await FileUpload.UploadAgainByFastUpload(FileUpload.Client, data.PickCode, data.Cid, data.Sha1, newName, data.Size, userId, userKey);
+            var result = await FileUploadService.UploadAgainByFastUpload(FileUploadService.Client, data.PickCode, data.Cid, data.Sha1, newName, data.Size, userId, userKey);
             if (result == null || string.IsNullOrEmpty(result.pickcode)) return false;
 
             // 删除原文件
-            return await DeleteFiles(FileUpload.Client, data.Cid, new[] { (long)data.Id! });
+            return await DeleteFiles(FileUploadService.Client, data.Cid, new[] { (long)data.Id! });
         }
         public enum OrderBy
         {

@@ -27,7 +27,9 @@ using Display.Views.More.DatumList;
 using Display.Views.OfflineDown;
 using Display.Views.SearchLink;
 using Display.Views.Settings;
+using Display.Views.Tasks;
 using WinUIEx;
+using MainPage = Display.Views.Tasks.MainPage;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -709,7 +711,7 @@ namespace Display
         /// <param name="e"></param>
         private void TaskButtonClick(object sender, TappedRoutedEventArgs e)
         {
-            TaskPage.ShowSingleWindow();
+            MainPage.ShowSingleWindow();
         }
 
         private async void TestClick(object sender, TappedRoutedEventArgs e)
