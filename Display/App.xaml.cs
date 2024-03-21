@@ -15,47 +15,82 @@ using Display.ViewModels;
 using ImageViewModel = Display.ViewModels.ImageViewModel;
 using Display.Interfaces;
 using Display.Services;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
+using Display.Managers;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace Display
 {
-    /// <summary>
-    /// Provides application-specific behavior to supplement the default Application class.
-    /// </summary>
     public partial class App : Application
     {
         public static Window AppMainWindow;
 
         private static NotificationManager _notificationManager;
-        
-        private static readonly IHost Host = Microsoft.Extensions.Hosting.Host
-            .CreateDefaultBuilder()
-            .ConfigureServices((_, services) =>
-            {
-                services
-                    // Services
-                    //.AddSingleton<IThumbnailService, ThumbnailService>()
-                    // Views and ViewModels
-                    .AddSingleton<IThumbnailGeneratorService, ThumbnailGeneratorService>()
-                    .AddTransient<ImageViewModel>()
-                    .AddTransient<ThumbnailViewModel>();
-            })
-            .Build();
+
+        private static IHost _host;
 
         public App()
         {
-            this.InitializeComponent();
+            _host = ConfigureHost();
+
+            InitAppCenter();
+
+            InitializeComponent();
 
             _notificationManager = new NotificationManager();
 
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
         }
 
+
+        /**
+         * 使用AppCenter收集奔溃信息，目前测试中，仅开发者可用
+         */
+        private void InitAppCenter()
+        {
+            var configuration = GetService<IConfiguration>();
+            var secret = configuration["AppCenterSecret"];
+            if (string.IsNullOrEmpty(secret)) return;
+
+            AppCenter.Start(secret, typeof(Analytics), typeof(Crashes));
+
+            //// 模拟崩溃
+            //Crashes.GenerateTestCrash();
+        }
+
+        private static IHost ConfigureHost()
+        {
+            return Host
+                .CreateDefaultBuilder()
+                .ConfigureAppConfiguration(builder => builder
+                    .AddUserSecrets<App>())
+                .ConfigureServices((_, services) =>
+                {
+                    services
+                        // Services
+                        //.AddSingleton<IThumbnailService, ThumbnailService>()
+                        // Views and ViewModels
+                        .AddSingleton<IThumbnailGeneratorService, ThumbnailGeneratorService>()
+
+                        .AddSingleton<UploadViewModel>()
+                        .AddSingleton<TaskViewModel>()
+
+                        .AddSingleton<SpiderManager>()
+
+                        .AddTransient<SpiderTaskViewModel>()
+                        .AddTransient<ImageViewModel>()
+                        .AddTransient<SettingViewModel>()
+                        .AddTransient<ThumbnailViewModel>();
+                })
+                .Build();
+        }
+
         public static T GetService<T>() where T : class
         {
-            return Host.Services.GetService(typeof(T)) as T ??
+            return _host.Services.GetService(typeof(T)) as T ??
                    throw new ArgumentException(
                        $"Service {typeof(T)} not found. Did you forget to register the service?");
         }

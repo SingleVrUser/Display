@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media.Playback;
-using Display.Extensions;
 using Display.Helper.FileProperties.Name;
 using Display.Models.Data;
 using Display.Models.Data.Enums;

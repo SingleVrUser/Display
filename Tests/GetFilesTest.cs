@@ -13,7 +13,7 @@ namespace Tests
         private const long RootCid = 0;
         private const int UserId = UserInfo.UserId;
         private const string UserKey = UserInfo.UserKey;
-        private const string AppVer = Const.DefaultSettings.Network._115.UploadAppVersion;
+        private const string AppVer = Constant.DefaultSettings.Network._115.UploadAppVersion;
 
         private readonly HttpClient _client = RequestHelper.UploadClient;
 

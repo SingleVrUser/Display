@@ -35,14 +35,14 @@ namespace Display.Views.More.Import115DataToLocalDataAccess
 
         public Progress()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         public Progress(List<FilesInfo> fileInfos)
         {
             InitializeComponent();
 
-            this._fileInfos = fileInfos;
+            _fileInfos = fileInfos;
         }
 
         public void CreateWindow()
@@ -55,7 +55,6 @@ namespace Display.Views.More.Import115DataToLocalDataAccess
             window.Content = this;
             window.Activate();
         }
-
 
         private async void CurrentWindow_Closed(object sender, WindowEventArgs args)
         {
@@ -78,7 +77,7 @@ namespace Display.Views.More.Import115DataToLocalDataAccess
             var result = await dialog.ShowAsync();
             if (result != ContentDialogResult.Primary) return;
 
-            s_cts.Cancel();
+            await s_cts.CancelAsync();
 
             window.Closed -= CurrentWindow_Closed;
             window.Close();
@@ -244,9 +243,9 @@ namespace Display.Views.More.Import115DataToLocalDataAccess
         }
 
         //文件总数（包括文件夹）
-        private int _successCount = 0;
-        private int _overallCount = 0;
-        private int _folderCount = 0;
+        private int _successCount;
+        private int _overallCount;
+        private int _folderCount;
 
         private static void TryToast(string title, string content)
         {
@@ -281,7 +280,7 @@ namespace Display.Views.More.Import115DataToLocalDataAccess
 
         private async void OpenSavePathButton_Click(object sender, RoutedEventArgs e)
         {
-            StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(AppSettings.DataAccessSavePath);
+            var folder = await StorageFolder.GetFolderFromPathAsync(AppSettings.DataAccessSavePath);
 
             await Launcher.LaunchFolderAsync(folder);
         }
@@ -305,22 +304,20 @@ namespace Display.Views.More.Import115DataToLocalDataAccess
                 var result = await dialog.ShowAsync();
                 if (result == ContentDialogResult.Primary)
                 {
-                    tryFrameGoBack();
+                    TryFrameGoBack();
                 }
             }
             else
             {
-                tryFrameGoBack();
+                TryFrameGoBack();
             }
         }
 
-        private void tryFrameGoBack()
+        private void TryFrameGoBack()
         {
-            if (Frame.CanGoBack)
-            {
-                Frame.GoBack();
-                s_cts.Cancel();
-            }
+            if (!Frame.CanGoBack) return;
+            Frame.GoBack();
+            s_cts.Cancel();
         }
 
         private void GetFolderCategory_Expander_Loaded(object sender, RoutedEventArgs e)

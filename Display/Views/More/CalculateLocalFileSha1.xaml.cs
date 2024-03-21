@@ -212,7 +212,7 @@ namespace Display.Views.More
         public FilesInfo.FileType FileType { get; set; } = FilesInfo.FileType.File;
         public long FilesCount { get; set; } = 1;
         public string Icon;
-        public string IconPath => FileType == FilesInfo.FileType.File ? FilesInfo.GetPathFromIcon(Icon) : Const.FileType.FolderSvgPath;
+        public string IconPath => FileType == FilesInfo.FileType.File ? FilesInfo.GetPathFromIcon(Icon) : Constant.FileType.FolderSvgPath;
 
         public string Size;
         public string FullPath;

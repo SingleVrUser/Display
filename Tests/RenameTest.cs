@@ -9,7 +9,7 @@ namespace Tests
     {
         private const int UserId = UserInfo.UserId;
         private const string UserKey = UserInfo.UserKey;
-        private const string AppVer = Const.DefaultSettings.Network._115.UploadAppVersion;
+        private const string AppVer = Constant.DefaultSettings.Network._115.UploadAppVersion;
 
         private readonly HttpClient _uploadClient = RequestHelper.UploadClient;
         private readonly HttpClient _downloadClient = RequestHelper.DownloadClient;
@@ -22,7 +22,7 @@ namespace Tests
         public async Task RenameForced(string pickCode, long id, long cid, string totalSha1, string newName, long length)
         {
             // 通过秒传上传一份
-            var result = await FileUpload.UploadAgainByFastUpload(_downloadClient,pickCode, cid, totalSha1, newName, length,UserId, UserKey, token: Token);
+            var result = await FileUploadService.UploadAgainByFastUpload(_downloadClient,pickCode, cid, totalSha1, newName, length,UserId, UserKey, token: Token);
             Assert.IsNotNull(result);
 
             var newPickCode = result.pickcode;

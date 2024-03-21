@@ -16,16 +16,20 @@ using System.Linq;
 using Windows.System;
 using Windows.Foundation;
 using Display.CustomWindows;
+using Display.Helper.Data;
 using Display.Helper.FileProperties.Name;
 using Display.Models.Media;
 using Display.Helper.UI;
 using Display.Helper.Network;
+using Display.Managers;
 using Display.Models.Data;
 using Display.Views.More.DatumList;
 using Display.Views.OfflineDown;
 using Display.Views.SearchLink;
 using Display.Views.Settings;
+using Display.Views.Tasks;
 using WinUIEx;
+using MainPage = Display.Views.Tasks.MainPage;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -166,15 +170,14 @@ namespace Display
         /// <summary>
         /// 定义访问的页面
         /// </summary>
-        private readonly List<(string Tag, Type Page)> _pages = new()
-        {
-            ("home",typeof(HomePage)),
-            ("videoView",typeof (VideoViewPage)),
-            ("actorsView",typeof(ActorsPage)),
-            ("setting",typeof(SettingsPage)),
-            ("more",typeof(MorePage)),
-            ("settings",typeof(SettingsPage)),
-        };
+        private readonly List<(string Tag, Type Page)> _pages =
+        [
+            ("home", typeof(HomePage)),
+            ("videoView", typeof(VideoViewPage)),
+            ("actorsView", typeof(ActorsPage)),
+            ("more", typeof(MorePage)),
+            ("settings", typeof(Views.Settings.MainPage))
+        ];
 
         /// <summary>
         /// NavView加载
@@ -333,7 +336,7 @@ namespace Display
 
         private void NavigationViewControl_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)
         {
-            AppTitleBar.Margin = new Thickness()
+            AppTitleBar.Margin = new Thickness
             {
                 Left = sender.CompactPaneLength * (sender.DisplayMode == NavigationViewDisplayMode.Minimal ? 2 : 1),
                 Top = AppTitleBar.Margin.Top,
@@ -626,7 +629,7 @@ namespace Display
             }
 
             // 需要验证账户
-            if (info.errcode == Const.Common.AccountAnomalyCode)
+            if (info.errcode == Constant.Common.AccountAnomalyCode)
             {
                 var window = WebApi.CreateWindowToVerifyAccount();
 
@@ -694,14 +697,6 @@ namespace Display
             BasePage.ShowTeachingTip(LightDismissTeachingTip, subtitle, actionContent, actionButtonClick);
         }
 
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-            ShowTeachingTip("It's easier than ever to see control samples in both light and dark theme!", "测试", (_,_) =>
-            {
-                Debug.WriteLine("成功调用");
-            });
-        }
-
         private void CtrlF_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
         {
             if (args.Element is not CustomAutoSuggestBox suggestionBox) return;
@@ -709,9 +704,14 @@ namespace Display
             suggestionBox.Focus(FocusState.Programmatic);
         }
 
+        /// <summary>
+        /// 显示115任务窗口
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TaskButtonClick(object sender, TappedRoutedEventArgs e)
         {
-            TaskPage.ShowSingleWindow();
+            MainPage.ShowSingleWindow();
         }
 
     }

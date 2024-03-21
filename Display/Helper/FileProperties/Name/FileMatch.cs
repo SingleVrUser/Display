@@ -379,6 +379,13 @@ public static class FileMatch
         return await folderPicker.PickSingleFolderAsync();
     }
 
+    public static void OpenFolderWithSystemExplorer(string folder)
+    {
+        if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder))return;
+
+        LaunchFolder(folder);
+    }
+
     public static async Task<StorageFile> SelectFileAsync(Window window, IList<string> fileTypeFilters = null)
     {
         FileOpenPicker fileOpenPicker = new();
@@ -404,14 +411,14 @@ public static class FileMatch
     //临时方法
     public static Visibility ShowIfImageNotNull(string imagePath)
     {
-        return imagePath == Const.FileType.NoPicturePath ? Visibility.Collapsed : Visibility.Visible;
+        return imagePath == Constant.FileType.NoPicturePath ? Visibility.Collapsed : Visibility.Visible;
 
     }
 
     //临时方法
     public static Visibility ShowIfImageNull(string imagePath)
     {
-        return imagePath == Const.FileType.NoPicturePath ? Visibility.Visible : Visibility.Collapsed;
+        return imagePath == Constant.FileType.NoPicturePath ? Visibility.Visible : Visibility.Collapsed;
     }
 
     public static IEnumerable<T> OrderByNatural<T>(this IEnumerable<T> items, Func<T, string> selector, StringComparer stringComparer = null)

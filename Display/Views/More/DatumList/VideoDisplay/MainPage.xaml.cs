@@ -14,7 +14,6 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.Controls;
 using Display.CustomWindows;
 using Display.Helper.FileProperties.Name;
-using Display.Helper.Network.Spider;
 using Display.Helper.UI;
 using Display.Models.Data;
 using Display.Services;
@@ -27,6 +26,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SharpCompress;
+using Display.Managers;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -326,7 +326,7 @@ public sealed partial class MainPage : Page,IDisposable
         return menuFlyout;
     }
     
-    private async System.Threading.Tasks.Task AddMediaElement(FilesInfo file, string videoUrl = null, int addIndex = -1)
+    private async Task AddMediaElement(FilesInfo file, string videoUrl = null, int addIndex = -1)
     {
         videoUrl ??= await GetVideoUrl(file);
         if (videoUrl == null) return;
@@ -367,9 +367,9 @@ public sealed partial class MainPage : Page,IDisposable
                 sliderControl.StepFrequency = 1000 / sender.PlaybackSession.NaturalDuration.TotalSeconds;
                 sliderControl.SmallChange = 1000 / sender.PlaybackSession.NaturalDuration.TotalSeconds;
             });
-
-
         };
+
+        mediaPlayerElement.GotFocus += MediaPlayerElement_GotFocus;
 
         if (addIndex == -1)
         {
@@ -381,6 +381,17 @@ public sealed partial class MainPage : Page,IDisposable
         }
 
     }
+
+    private void MediaPlayerElement_GotFocus(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MediaPlayerElement focusMedia) return;
+
+        var index = Video_UniformGrid.Children.IndexOf(focusMedia);
+
+        if(VideoPlay_ListView.SelectedIndex != index && VideoPlay_ListView.Items.Count > index)
+            VideoPlay_ListView.SelectedIndex = index;
+    }
+
 
     private static void ChangMediaPlayerPositionWhenMediaOpened(MediaPlayer sender)
     {
@@ -417,11 +428,13 @@ public sealed partial class MainPage : Page,IDisposable
         await FindAndShowInfosFromInternet(_playingVideoInfos.ToArray());
     }
 
-    private async System.Threading.Tasks.Task FindAndShowInfosFromInternet(IEnumerable<FilesInfo> filesInfos)
+    private async Task FindAndShowInfosFromInternet(IEnumerable<FilesInfo> filesInfos)
     {
         VideoPlay_ListView.IsEnabled = false;
 
-        const string noPicturePath = Const.FileType.NoPicturePath;
+        const string noPicturePath = Constant.FileType.NoPicturePath;
+
+        var spiderManager = App.GetService<SpiderManager>();
 
         //搜刮
         foreach (var video in filesInfos)
@@ -462,10 +475,7 @@ public sealed partial class MainPage : Page,IDisposable
                 var info = new CidInfo(trueName, noPicturePath);
 
                 _cidInfos.Add(info);
-
-                var spiderManager = Manager.Instance;
-
-
+                
                 FindCidInfo_ProgressRing.Visibility = Visibility.Visible;
 
                 // 直接使用await spiderManager.DispatchSpiderInfoByCidInOrder会阻塞UI线程
@@ -477,7 +487,6 @@ public sealed partial class MainPage : Page,IDisposable
                 if (videoInfo == null || info.CancellationTokenSource.Token.IsCancellationRequested) continue;
                 
                 info.UpdateInfo(videoInfo);
-
             }
         }
 
@@ -621,7 +630,7 @@ public sealed partial class MainPage : Page,IDisposable
         _cidInfos.Remove(removeCid);
     }
 
-    private void RemovePlayingVideo(MediaPlayerElement mediaPlayerElement)
+    private void RemovePlayingVideo(FrameworkElement mediaPlayerElement)
     {
         if (mediaPlayerElement.Tag is not MediaPlayerWithStreamSource oldMediaPlayerWithStreamSource) return;
 
@@ -813,7 +822,7 @@ public sealed partial class MainPage : Page,IDisposable
             Debug.WriteLine("开始搜刮信息");
 
             // 搜索信息
-            await FindAndShowInfosFromInternet(new[] { videoInfo });
+            await FindAndShowInfosFromInternet([videoInfo]);
         }
         // 没有下一集，则修改布局
         else

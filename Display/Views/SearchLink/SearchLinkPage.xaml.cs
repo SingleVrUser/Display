@@ -8,9 +8,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Display.Helper.Network.Spider;
 using Display.Models.Data;
 using Display.Models.Spider;
+using Display.Providers.Searcher;
 using Display.Services.Upload;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -226,7 +226,7 @@ namespace Display.Views.SearchLink
             bool isDone = false;
             string result = null;
             // 需要验证账号
-            if (addTaskUrlInfo is { errcode: Const.Common.AccountAnomalyCode })
+            if (addTaskUrlInfo is { errcode: Constant.Common.AccountAnomalyCode })
             {
                 var window = WebApi.CreateWindowToVerifyAccount();
 
@@ -260,7 +260,7 @@ namespace Display.Views.SearchLink
             // 上传字幕，如果需要
             if (!string.IsNullOrEmpty(srtPath))
             {
-                await FileUpload.SimpleUpload(srtPath, cid, uploadInfo.user_id, uploadInfo.userkey);
+                await FileUploadService.SimpleUpload(srtPath, cid, uploadInfo.user_id, uploadInfo.userkey);
             }
 
             isDone = addTaskUrlInfo is { state: true };

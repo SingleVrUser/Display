@@ -451,7 +451,7 @@ namespace Display.Models.Data
 
                 if (torrentCidInfo != null && uploadInfo != null)
                 {
-                    await FileUpload.SimpleUpload(torrentPath, torrentCidInfo.cid, uploadInfo.user_id, uploadInfo.userkey);
+                    await FileUploadService.SimpleUpload(torrentPath, torrentCidInfo.cid, uploadInfo.user_id, uploadInfo.userkey);
                 }
 
                 // 再次检查网盘中是否有该torrent
@@ -622,11 +622,11 @@ namespace Display.Models.Data
             var userKey = uploadInfo.userkey;
 
             // 通过秒传上传一份
-            var result = await FileUpload.UploadAgainByFastUpload(FileUpload.Client, data.PickCode, data.Cid, data.Sha1, newName, data.Size, userId, userKey);
+            var result = await FileUploadService.UploadAgainByFastUpload(FileUploadService.Client, data.PickCode, data.Cid, data.Sha1, newName, data.Size, userId, userKey);
             if (result == null || string.IsNullOrEmpty(result.pickcode)) return false;
 
             // 删除原文件
-            return await DeleteFiles(FileUpload.Client, data.Cid, new[] { (long)data.Id! });
+            return await DeleteFiles(FileUploadService.Client, data.Cid, new[] { (long)data.Id! });
         }
         public enum OrderBy
         {
@@ -800,7 +800,7 @@ namespace Display.Models.Data
         }
 
         /// <summary>
-        /// 请求115浏览器下载
+        /// 请求115浏览器下载，似乎不能用了
         /// </summary>
         /// <param name="videoInfoList"></param>
         /// <returns></returns>
@@ -822,15 +822,16 @@ namespace Display.Models.Data
             //PARAM
             downRequest.param = new Param_Request
             {
-                count = downRequest.param.list.Count,
-                list = new List<Down_Request>(),
+                count = videoInfoList.Count,
+                list = [],
                 ref_url = $"https://115.com/?cid={videoInfoList[0].Cid}&offset=0&mode=wangpan"
             };
 
             foreach (var videoInfo in videoInfoList)
             {
                 var isDir = videoInfo.Uid == 0;
-                downRequest.param.list.Add(new Down_Request() { n = videoInfo.Name, pc = videoInfo.PickCode, is_dir = isDir });
+                downRequest.param.list.Add(new Down_Request()
+                    { n = videoInfo.Name, pc = videoInfo.PickCode, is_dir = isDir });
             }
 
             var url = string.Empty;
@@ -1468,7 +1469,7 @@ namespace Display.Models.Data
         public async Task<List<m3u8Info>> GetM3U8InfoByPickCode(string pickCode)
         {
             Debug.WriteLine($"获取{pickCode}中的m3u8链接");
-            List<m3u8Info> m3U8Infos = new();
+            List<m3u8Info> m3U8Infos = [];
 
             string strResult;
             try
@@ -1478,10 +1479,12 @@ namespace Display.Models.Data
             catch (Exception ex)
             {
                 Debug.WriteLine("获取m3u8链接时发生错误：" + ex.Message);
-                return null;
+                return [];
             }
 
-            var lineList = strResult.Split(new[] { '\n' });
+            if (string.IsNullOrWhiteSpace(strResult)) return [];
+
+            var lineList = strResult.Split(['\n']);
             for (var i = 0; i < lineList.Length; i++)
             {
                 // TODO: 部分m3u8文件中的Audio与Video分开，目前未针对这种情况进行处理
@@ -1495,7 +1498,7 @@ namespace Display.Models.Data
             }
 
             // 检查账号是否异常
-            if (m3U8Infos.Count == 0 && strResult.Contains(Const.Common.AccountAnomalyTip))
+            if (m3U8Infos.Count == 0 && strResult.Contains(Constant.Common.AccountAnomalyTip))
             {
                 var window = CreateWindowToVerifyAccount();
 
@@ -1529,23 +1532,13 @@ namespace Display.Models.Data
             //排序
             m3U8Infos = m3U8Infos.OrderByDescending(x => x.Bandwidth).ToList();
 
-
             Debug.WriteLine("成功获取M3U8链接");
 
             return m3U8Infos;
         }
 
 
-        public static Microsoft.UI.Xaml.Window CreateWindowToVerifyAccount()
-        {
-            var window = new CommonWindow("验证账号", 360, 560);
-            var page = new VerifyAccountPage(window);
-
-            window.Content = page;
-
-            return window;
-            ;
-        }
+        public static Window CreateWindowToVerifyAccount() => VerifyAccountPage.CreateVerifyAccountWindow();
 
 
         /// <summary>
@@ -1577,6 +1570,9 @@ namespace Display.Models.Data
                     savePath = AppSettings.VlcExePath;
                     ua = GetInfoFromNetwork.DownUserAgent;
                     break;
+                case PlayerType.WebView:
+                case PlayerType.MediaElement:
+                case PlayerType.None:
                 default:
                     throw new ArgumentOutOfRangeException(nameof(playerType), playerType, null);
             }

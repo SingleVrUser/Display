@@ -62,11 +62,22 @@ namespace Display.Services.Upload
 
         public abstract Task Init();
 
+        /// <summary>
+        /// 开始
+        /// </summary>
+        /// <returns></returns>
         public abstract Task<bool> Start();
 
+        /// <summary>
+        /// 暂停
+        /// </summary>
+        /// <returns></returns>
         public abstract void Pause();
 
-        public abstract Task Stop();
+        /// <summary>
+        /// 停止
+        /// </summary>
+        public abstract void Stop();
 
         public bool Running => State is UploadState.Initializing or UploadState.FastUploading or UploadState.OssUploading;
 

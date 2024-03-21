@@ -313,11 +313,11 @@ namespace Display.Controls
             }
             else
             {
-                itemsList = GetFilesFromItems(folder.Id, FilesInfo.FileType.Folder).ToList();
+                itemsList = GetFilesFromItems(folder.Id, FilesInfo.FileType.Folder)?.ToList();
                 //itemsList = DataAccess.GetFolderListByPid(folder.Cid);
             }
 
-            if (itemsList.Count == 0)
+            if (itemsList is not {Count: >0})
             {
                 // The item is a folder, but it's empty. Leave HasUnrealizedChildren = true so
                 // that the chevron appears, but don't try to process children that aren't there.

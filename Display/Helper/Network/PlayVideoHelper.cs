@@ -75,7 +75,7 @@ public class PlayVideoHelper
     }
 
     /// <summary>
-    /// PotPlayer播放（原画）
+    /// PotPlayer播放
     /// </summary>
     /// <param name="playItems"></param>
     /// <param name="userAgent"></param>
@@ -99,6 +99,7 @@ public class PlayVideoHelper
                 arguments += " /current";
                 StartProcess(fileName, arguments, exitedHandler: (_, _) =>
                 {
+                    // TODO 保存退出时的时间点
                     Debug.WriteLine("Process_Exited");
                 });
                 await Task.Delay(10000);
@@ -151,7 +152,7 @@ public class PlayVideoHelper
     }
 
     /// <summary>
-    /// vlc播放（原画）
+    /// vlc播放
     /// </summary>
     /// <param name="playItems"></param>
     /// <param name="userAgent"></param>
@@ -197,15 +198,13 @@ public class PlayVideoHelper
     /// <param name="exitedHandler"></param>
     private static async void StartProcess(string fileName, string arguments, bool showWindow = false, EventHandler exitedHandler = null)
     {
-        using var process = new Process()
+        using var process = new Process();
+        process.StartInfo = new ProcessStartInfo
         {
-            StartInfo = new ProcessStartInfo()
-            {
-                FileName = fileName,
-                Arguments = arguments,
-                UseShellExecute = false,
-                CreateNoWindow = !showWindow
-            }
+            FileName = fileName,
+            Arguments = arguments,
+            UseShellExecute = false,
+            CreateNoWindow = !showWindow
         };
 
         if (exitedHandler != null)
@@ -223,10 +222,13 @@ public class PlayVideoHelper
         }
     }
 
-
+    /// <summary>
+    /// 弹出对话框，决定是播放全部还是播放选中
+    /// </summary>
+    /// <param name="multisetList"></param>
+    /// <param name="xamlRoot"></param>
     public static async void ShowSelectedVideoToPlayPage(List<Datum> multisetList, XamlRoot xamlRoot)
     {
-        //var multisetList = videoInfoList.ToList();
         multisetList = multisetList.OrderBy(item => item.Name).ToList();
 
         var newPage = new SelectVideoToPlay(multisetList);
@@ -247,9 +249,7 @@ public class PlayVideoHelper
 
         if (result == ContentDialogResult.Primary)
             newPage.PlayAllVideos();
-        else if (result == ContentDialogResult.Secondary)
-            newPage.PlaySelectedVideos();
-
+        else if
+            (result == ContentDialogResult.Secondary) newPage.PlaySelectedVideos();
     }
-
 }
