@@ -332,9 +332,9 @@ public class SpiderManager
 
     public List<string> GetFailNames()
     {
-        _failureNameInfos.Enqueue("nihao");
-        _failureNameInfos.Enqueue("wohao");
-        _failureNameInfos.Enqueue("dajiahao");
+        //_failureNameInfos.Enqueue("nihao");
+        //_failureNameInfos.Enqueue("wohao");
+        //_failureNameInfos.Enqueue("dajiahao");
         return _failureNameInfos.ToList();
     }
 

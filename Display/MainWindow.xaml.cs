@@ -714,9 +714,5 @@ namespace Display
             MainPage.ShowSingleWindow();
         }
 
-        private async void TestClick(object sender, TappedRoutedEventArgs e)
-        {
-            await App.GetService<SpiderManager>().DispatchSpiderInfosByCidInOrder("cid-s");
-        }
     }
 }

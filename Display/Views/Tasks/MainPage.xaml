@@ -11,13 +11,13 @@
     xmlns:settings="using:Display.Models.Settings"
     mc:Ignorable="d">
 
-
     <Grid>
         <NavigationView x:Name="ContentNavigationView"
                         PaneDisplayMode="Top"
                         IsBackButtonVisible="Collapsed"
                         IsSettingsVisible="False"
                         MenuItemsSource="{x:Bind _viewModel.NavLinks}"
+                        SelectedItem="{x:Bind _viewModel.CurrentLink,Mode=TwoWay}"
                         SelectionChanged="ContentNavigationView_OnSelectionChanged">
 
             <NavigationView.MenuItemTemplate>

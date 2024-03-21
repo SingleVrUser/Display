@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System;
+using System.Linq;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Display.Models.Settings;
 using Display.Views.Tasks;
 
@@ -15,8 +17,13 @@ internal partial class TaskViewModel : ObservableObject
     [ObservableProperty]
     private NavLink _currentLink;
 
-    public TaskViewModel()
+    public void SetCurrentLink(Type pageType)
     {
-        _currentLink = NavLinks[^1];
+        var link = NavLinks.FirstOrDefault(link => link.NavPageType == pageType);
+
+        if (link is null) return;
+
+        CurrentLink = link;
     }
+
 }
