@@ -10,6 +10,7 @@ using Display.Models.Data;
 using Microsoft.UI.Xaml;
 using SharpCompress;
 using Windows.Storage.Pickers;
+using Display.Constants;
 
 namespace Display.Helper.FileProperties.Name;
 
@@ -411,14 +412,14 @@ public static class FileMatch
     //临时方法
     public static Visibility ShowIfImageNotNull(string imagePath)
     {
-        return imagePath == Constant.FileType.NoPicturePath ? Visibility.Collapsed : Visibility.Visible;
+        return imagePath == Constants.FileType.NoPicturePath ? Visibility.Collapsed : Visibility.Visible;
 
     }
 
     //临时方法
     public static Visibility ShowIfImageNull(string imagePath)
     {
-        return imagePath == Constant.FileType.NoPicturePath ? Visibility.Visible : Visibility.Collapsed;
+        return imagePath == Constants.FileType.NoPicturePath ? Visibility.Visible : Visibility.Collapsed;
     }
 
     public static IEnumerable<T> OrderByNatural<T>(this IEnumerable<T> items, Func<T, string> selector, StringComparer stringComparer = null)

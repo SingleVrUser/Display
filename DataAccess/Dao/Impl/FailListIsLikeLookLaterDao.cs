@@ -1,7 +1,6 @@
 ﻿using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using DataAccess.Models.Enum;
-using System.Linq;
 
 namespace DataAccess.Dao.Impl;
 

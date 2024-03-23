@@ -28,6 +28,7 @@ using Display.Views.SearchLink;
 using DownDialogContent = Display.Views.DetailInfo.DownDialogContent;
 using FileInfoInCidSmoke = Display.Views.DetailInfo.FileInfoInCidSmoke;
 using FindInfoAgainSmoke = Display.Views.DetailInfo.FindInfoAgainSmoke;
+using Display.Constants;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -587,7 +588,7 @@ namespace Display.Controls
         private void OpenDirectory_Click(object sender, RoutedEventArgs e)
         {
             var imagePath = Path.GetDirectoryName(ResultInfo.ImagePath);
-            if (imagePath == Constant.FileType.NoPicturePath)
+            if (imagePath == Constants.FileType.NoPicturePath)
             {
                 return;
             }

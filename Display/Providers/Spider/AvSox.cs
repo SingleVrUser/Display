@@ -96,7 +96,7 @@ public class AvSox
 
             string title = title_search.ToUpper();
 
-            var split_result = title.Split(new char[] { '-', '_' });
+            var split_result = title.Split(['-', '_']);
             //没有分隔符，尝试正则匹配（n167）
             if (split_result.Length == 1)
             {

@@ -1,14 +1,10 @@
 ﻿using Display.Setting.Interfaces;
-using DefaultValue = Display.Models.Data.Constant.DefaultSettings;
+using DefaultValue = Display.Constants.DefaultSettings;
 
 namespace Display.Setting.Impl;
 
-internal class UpdateSetting: SettingBase,IUpdateSetting
+internal class UpdateSetting(ISettingProvider provider) : SettingBase(provider), IUpdateSetting
 {
-    public UpdateSetting(ISettingProvider provider) : base(provider)
-    {
-    }
-
     /// <summary>
     /// 是否已经升级了数据库(从0.1.16.14)
     /// </summary>

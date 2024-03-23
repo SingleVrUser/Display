@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Devices.Geolocation;
+using Display.Models.Settings.Options;
 
 namespace Display.Providers.Downloader;
 

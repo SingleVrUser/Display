@@ -1,7 +1,14 @@
-﻿using System.IO;
+﻿using System.Drawing;
+using System.IO;
 using System.Runtime.CompilerServices;
+using CommunityToolkit.WinUI.UI.Controls;
+using Display.Constants;
 using Display.Models.Data.Enums;
-using DefaultValue = Display.Models.Data.Constant.DefaultSettings;
+using Display.Models.Settings;
+using Display.Models.Settings.Options;
+using static Display.Constants.DefaultSettings;
+using DefaultValue = Display.Constants.DefaultSettings;
+using MenuItem = Display.Models.Settings.MenuItem;
 
 namespace Display.Models.Data;
 
@@ -30,7 +37,7 @@ public class AppSettings
     /// </summary>
     public static bool IsAutoPlayInVideoDisplay
     {
-        get => GetValue(DefaultValue.Player.VideoDisplay.IsAutoPlay);
+        get => GetValue(DefaultSettings.Player.VideoDisplay.IsAutoPlay);
         set => SetValue(value);
     }
 
@@ -39,7 +46,7 @@ public class AppSettings
     /// </summary>
     public static double AutoPlayPositionPercentage
     {
-        get => GetValue(DefaultValue.Player.VideoDisplay.AutoPlayPositionPercentage);
+        get => GetValue(DefaultSettings.Player.VideoDisplay.AutoPlayPositionPercentage);
         set => SetValue(value);
     }
 
@@ -48,25 +55,25 @@ public class AppSettings
     /// </summary>
     public static double MaxVideoPlayCount
     {
-        get => GetValue(DefaultValue.Player.VideoDisplay.MaxVideoPlayCount);
+        get => GetValue(DefaultSettings.Player.VideoDisplay.MaxVideoPlayCount);
         set => SetValue(value);
     }
 
     public static string VlcExePath
     {
-        get => GetValue(DefaultValue.Player.ExePath.Vlc);
+        get => GetValue(DefaultSettings.Player.ExePath.Vlc);
         set => SetValue(value);
     }
 
     public static string MpvExePath
     {
-        get => GetValue(DefaultValue.Player.ExePath.Mpv);
+        get => GetValue(DefaultSettings.Player.ExePath.Mpv);
         set => SetValue(value);
     }
 
     public static string PotPlayerExePath
     {
-        get => GetValue(DefaultValue.Player.ExePath.PotPlayer);
+        get => GetValue(DefaultSettings.Player.ExePath.PotPlayer);
         set => SetValue(value);
     }
 
@@ -75,13 +82,13 @@ public class AppSettings
     /// </summary>
     public static PlayerType PlayerSelection
     {
-        get => GetValue(DefaultValue.Player.Selection);
+        get => GetValue(DefaultSettings.Player.Selection);
         set => SetValue(value);
     }
 
     public static PlayQuality DefaultPlayQuality
     {
-        get => GetValue(DefaultValue.Player.DefaultQuality);
+        get => GetValue(DefaultSettings.Player.DefaultQuality);
         set => SetValue(value);
     }
 
@@ -90,7 +97,7 @@ public class AppSettings
     /// </summary>
     public static bool IsFindSub
     {
-        get => GetValue(DefaultValue.Network._115.IsFindSub);
+        get => GetValue(Network._115.IsFindSub);
         set => SetValue(value);
     }
 
@@ -99,7 +106,7 @@ public class AppSettings
     /// </summary>
     public static bool IsUpdatedDataAccessFrom014
     {
-        get => GetValue(DefaultValue.App.IsUpdatedDataAccessFrom014);
+        get => GetValue(DefaultSettings.App.IsUpdatedDataAccessFrom014);
         set => SetValue(value);
     }
 
@@ -108,19 +115,19 @@ public class AppSettings
     /// </summary>
     public static string IgnoreUpdateAppVersion
     {
-        get => GetValue(DefaultValue.App.IgnoreUpdateAppVersion);
+        get => GetValue(DefaultSettings.App.IgnoreUpdateAppVersion);
         set => SetValue(value);
     }
 
     public static bool IsAutoSpiderInVideoDisplay
     {
-        get => GetValue(DefaultValue.Player.VideoDisplay.IsSpiderVideoInfo);
+        get => GetValue(DefaultSettings.Player.VideoDisplay.IsSpiderVideoInfo);
         set => SetValue(value);
     }
 
     public static string LibreDmmBaseUrl
     {
-        get => GetValue(DefaultValue.Network.BaseUrl.LibreDmm);
+        get => GetValue(Network.BaseUrl.LibreDmm);
         set => SetValue(value);
     }
 
@@ -129,7 +136,7 @@ public class AppSettings
     /// </summary>
     public static bool IsUseJav321
     {
-        get => GetValue(DefaultValue.Network.Open.Jav321);
+        get => GetValue(Network.Open.Jav321);
         set => SetValue(value);
     }
 
@@ -138,7 +145,7 @@ public class AppSettings
     /// </summary>
     public static bool IsUseFc2Hub
     {
-        get => GetValue(DefaultValue.Network.Open.Fc2Hub);
+        get => GetValue(Network.Open.Fc2Hub);
         set => SetValue(value);
     }
 
@@ -147,7 +154,7 @@ public class AppSettings
     /// </summary>
     public static bool IsUseLibreDmm
     {
-        get => GetValue(DefaultValue.Network.Open.LibreDmm);
+        get => GetValue(Network.Open.LibreDmm);
         set => SetValue(value);
     }
 
@@ -156,7 +163,7 @@ public class AppSettings
     /// </summary>
     public static bool IsUseX1080X
     {
-        get => GetValue(DefaultValue.Network.Open.X1080X);
+        get => GetValue(Network.Open.X1080X);
         set => SetValue(value);
     }
 
@@ -166,7 +173,7 @@ public class AppSettings
     /// 
     public static string JavBusBaseUrl
     {
-        get => GetValue(DefaultValue.Network.BaseUrl.JavBus);
+        get => GetValue(Network.BaseUrl.JavBus);
         set => SetValue(value);
     }
 
@@ -176,7 +183,7 @@ public class AppSettings
     /// 
     public static string AvMooBaseUrl
     {
-        get => GetValue(DefaultValue.Network.BaseUrl.AvMoo);
+        get => GetValue(Network.BaseUrl.AvMoo);
         set => SetValue(value);
     }
 
@@ -186,7 +193,7 @@ public class AppSettings
     /// 
     public static string AvSoxBaseUrl
     {
-        get => GetValue(DefaultValue.Network.BaseUrl.AvSox);
+        get => GetValue(Network.BaseUrl.AvSox);
         set => SetValue(value);
     }
 
@@ -196,7 +203,7 @@ public class AppSettings
     /// 
     public static string Jav321BaseUrl
     {
-        get => GetValue(DefaultValue.Network.BaseUrl.Jav321);
+        get => GetValue(Network.BaseUrl.Jav321);
         set => SetValue(value);
     }
 
@@ -205,7 +212,7 @@ public class AppSettings
     /// </summary>
     public static string JavDbBaseUrl
     {
-        get => GetValue(DefaultValue.Network.BaseUrl.JavDb);
+        get => GetValue(Network.BaseUrl.JavDb);
         set => SetValue(value);
     }
 
@@ -214,7 +221,7 @@ public class AppSettings
     /// </summary>
     public static string Fc2HubBaseUrl
     {
-        get => GetValue(DefaultValue.Network.BaseUrl.Fc2Hub);
+        get => GetValue(Network.BaseUrl.Fc2Hub);
         set => SetValue(value);
     }
 
@@ -224,13 +231,13 @@ public class AppSettings
     /// 
     public static string MinnanoAvBaseUrl
     {
-        get => GetValue(DefaultValue.Network.BaseUrl.MinnanoAv);
+        get => GetValue(Network.BaseUrl.MinnanoAv);
         set => SetValue(value);
     }
 
     public static string X1080XBaseUrl
     {
-        get => GetValue(DefaultValue.Network.BaseUrl.X080X);
+        get => GetValue(Network.BaseUrl.X080X);
         set => SetValue(value);
     }
 
@@ -239,7 +246,7 @@ public class AppSettings
     /// </summary>
     public static string JavDbCookie
     {
-        get => GetValue(DefaultValue.Network.Cookie.JavDb);
+        get => GetValue(Network.Cookie.JavDb);
         set => SetValue(value);
     }
 
@@ -248,7 +255,7 @@ public class AppSettings
     /// </summary>
     public static string X1080XCookie
     {
-        get => GetValue(DefaultValue.Network.Cookie.X1080X);
+        get => GetValue(Network.Cookie.X1080X);
         set => SetValue(value);
     }
 
@@ -257,7 +264,7 @@ public class AppSettings
     /// </summary>
     public static string X1080XUa
     {
-        get => GetValue(DefaultValue.Network.X1080X.UserAgent);
+        get => GetValue(Network.X1080X.UserAgent);
         set => SetValue(value);
     }
 
@@ -266,7 +273,7 @@ public class AppSettings
     /// </summary>
     public static bool IsUseJavDb
     {
-        get => GetValue(DefaultValue.Network.Open.JavDb);
+        get => GetValue(Network.Open.JavDb);
         set => SetValue(value);
     }
 
@@ -275,7 +282,7 @@ public class AppSettings
     /// </summary>
     public static bool IsUseJavBus
     {
-        get => GetValue(DefaultValue.Network.Open.JavBus);
+        get => GetValue(Network.Open.JavBus);
         set => SetValue(value);
     }
 
@@ -284,7 +291,7 @@ public class AppSettings
     /// </summary>
     public static bool IsUseAvMoo
     {
-        get => GetValue(DefaultValue.Network.Open.AvMoo);
+        get => GetValue(Network.Open.AvMoo);
         set => SetValue(value);
     }
 
@@ -293,7 +300,7 @@ public class AppSettings
     /// </summary>
     public static bool IsUseAvSox
     {
-        get => GetValue(DefaultValue.Network.Open.AvSox);
+        get => GetValue(Network.Open.AvSox);
         set => SetValue(value);
     }
 
@@ -302,7 +309,7 @@ public class AppSettings
     /// </summary>
     public static bool IsNavigationViewPaneOpen
     {
-        get => GetValue(DefaultValue.Ui.MainWindow.IsNavigationViewPaneOpen);
+        get => GetValue(Ui.MainWindow.IsNavigationViewPaneOpen);
         set => SetValue(value);
     }
 
@@ -311,7 +318,7 @@ public class AppSettings
     /// </summary>
     public static bool IsCheckUpdate
     {
-        get => GetValue(DefaultValue.App.IsCheckUpdate);
+        get => GetValue(DefaultSettings.App.IsCheckUpdate);
         set => SetValue(value);
     }
 
@@ -320,7 +327,13 @@ public class AppSettings
     /// </summary>
     public static int StartPageIndex
     {
-        get => GetValue(DefaultValue.Ui.MainWindow.StartPageIndex);
+        get => GetValue(Ui.MainWindow.StartPageIndex);
+        set => SetValue(value);
+    }
+
+    public static NavigationViewItemEnum StartPageEnum
+    {
+        get => GetValue(Ui.MainWindow.StartPageEnum);
         set => SetValue(value);
     }
 
@@ -329,7 +342,7 @@ public class AppSettings
     /// </summary>
     public static bool IsToastAfterImportDataAccess
     {
-        get => GetValue(DefaultValue.Handle.IsToastAfterImportDataAccess);
+        get => GetValue(Handle.IsToastAfterImportDataAccess);
         set => SetValue(value);
     }
 
@@ -339,7 +352,7 @@ public class AppSettings
     /// 
     public static bool IsSpiderAfterImportDataAccess
     {
-        get => GetValue(DefaultValue.Handle.IsSpiderAfterImportDataAccess);
+        get => GetValue(Handle.IsSpiderAfterImportDataAccess);
         set => SetValue(value);
     }
 
@@ -348,7 +361,7 @@ public class AppSettings
     /// </summary>
     public static string _115_Cookie
     {
-        get => GetValue(DefaultValue.Network.Cookie._115);
+        get => GetValue(Network.Cookie._115);
         set => SetValue(value);
     }
 
@@ -357,7 +370,7 @@ public class AppSettings
     /// </summary>
     public static bool IsRecordDownRequest
     {
-        get => GetValue(DefaultValue.Network._115.IsRecordDownRequest);
+        get => GetValue(Network._115.IsRecordDownRequest);
         set => SetValue(value);
     }
 
@@ -366,19 +379,19 @@ public class AppSettings
     /// </summary>
     public static double DownUrlOverdueTime
     {
-        get => GetValue(DefaultValue.Network._115.DownUrlOverdueTime);
+        get => GetValue(Network._115.DownUrlOverdueTime);
         set => SetValue(value);
     }
 
     public static string SavePath115Name
     {
-        get => GetValue(DefaultValue.Network._115.SavePathShowName);
+        get => GetValue(Network._115.SavePathShowName);
         set => SetValue(value);
     }
 
     public static long SavePath115Cid
     {
-        get => GetValue(DefaultValue.Network._115.SavePathCid);
+        get => GetValue(Network._115.SavePathCid);
         set => SetValue(value);
     }
 
@@ -387,7 +400,7 @@ public class AppSettings
     /// </summary>
     public static int GetActorInfoLastIndex
     {
-        get => GetValue(DefaultValue.Network.GetActorInfoLastIndex);
+        get => GetValue(Network.GetActorInfoLastIndex);
         set => SetValue(value);
     }
 
@@ -396,7 +409,7 @@ public class AppSettings
     /// </summary>
     public static string ImageSavePath
     {
-        get => GetValue(DefaultValue.App.SavePath.Image);
+        get => GetValue(DefaultSettings.App.SavePath.Image);
         set => SetValue(value);
     }
 
@@ -405,7 +418,7 @@ public class AppSettings
     /// </summary>
     public static string SubSavePath
     {
-        get => GetValue(DefaultValue.App.SavePath.Sub);
+        get => GetValue(DefaultSettings.App.SavePath.Sub);
         set => SetValue(value);
     }
 
@@ -414,19 +427,19 @@ public class AppSettings
     /// </summary>
     public static string ActorInfoSavePath
     {
-        get => GetValue(DefaultValue.App.SavePath.Actor);
+        get => GetValue(DefaultSettings.App.SavePath.Actor);
         set => SetValue(value);
     }
 
     public static string X1080XAttmnSavePath
     {
-        get => GetValue(DefaultValue.App.SavePath.Attmn);
+        get => GetValue(DefaultSettings.App.SavePath.Attmn);
         set => SetValue(value);
     }
 
     public static string DataSavePath
     {
-        get => GetValue(DefaultValue.App.SavePath.Data);
+        get => GetValue(DefaultSettings.App.SavePath.Data);
         set => SetValue(value);
     }
 
@@ -440,13 +453,13 @@ public class AppSettings
     /// </summary>
     public static string DataAccessSavePath
     {
-        get => GetValue(DefaultValue.App.SavePath.DataAccess);
+        get => GetValue(DefaultSettings.App.SavePath.DataAccess);
         set => SetValue(value);
     }
 
     public static string DefaultDownMethod
     {
-        get => GetValue(DefaultValue.Network._115.DefaultDownMethod);
+        get => GetValue(Network._115.DefaultDownMethod);
         set => SetValue(value);
     }
 
@@ -458,7 +471,7 @@ public class AppSettings
 
     public static string BitCometSavePath
     {
-        get => GetValue(DefaultValue.App.SavePath.BitCometDown);
+        get => GetValue(DefaultSettings.App.SavePath.BitCometDown);
         set => SetValue(value);
     }
 
@@ -470,7 +483,7 @@ public class AppSettings
 
     public static string Aria2SavePath
     {
-        get => GetValue(DefaultValue.App.SavePath.Aria2);
+        get => GetValue(DefaultSettings.App.SavePath.Aria2);
         set => SetValue(value);
     }
 
@@ -479,7 +492,7 @@ public class AppSettings
     /// </summary>
     public static bool IsShowFailListInDisplay
     {
-        get => GetValue(DefaultValue.Ui.IsShowFailListInDisplay);
+        get => GetValue(Ui.IsShowFailListInDisplay);
         set => SetValue(value);
     }
 
@@ -488,7 +501,7 @@ public class AppSettings
     /// </summary>
     public static double ImageWidth
     {
-        get => GetValue(DefaultValue.Ui.ImageSize.Width);
+        get => GetValue(Ui.ImageSize.Width);
         set => SetValue(value);
     }
 
@@ -497,7 +510,7 @@ public class AppSettings
     /// </summary>
     public static double ImageHeight
     {
-        get => GetValue(DefaultValue.Ui.ImageSize.Height);
+        get => GetValue(Ui.ImageSize.Height);
         set => SetValue(value);
     }
 
@@ -506,7 +519,7 @@ public class AppSettings
     /// </summary>
     public static bool IsAutoAdjustImageSize
     {
-        get => GetValue(DefaultValue.Ui.IsAutoAdjustImageSize);
+        get => GetValue(Ui.IsAutoAdjustImageSize);
         set => SetValue(value);
     }
 
@@ -515,15 +528,26 @@ public class AppSettings
     /// </summary>
     public static ThumbnailOriginType ThumbnailOriginType
     {
-        get => GetValue(DefaultValue.Ui.ThumbnailOrigin);
+        get => GetValue(Ui.ThumbnailOrigin);
+        set => SetValue(value);
+    }
+
+
+    public static MenuItem[] MenuItemsArray
+    {
+        get => GetValue(NavigationViewItem.DefaultMenuItems);
+        set => SetValue(value);
+    }
+
+    public static MenuItem[] FootMenuItemsArray
+    {
+        get => GetValue(NavigationViewItem.DefaultFootMenuItems);
+        set => SetValue(value);
+    }
+
+    public static MoreMenuItem[] MoreMenuItemsArray
+    {
+        get => GetValue(NavigationViewItem.DefaultMoreMenuItems);
         set => SetValue(value);
     }
 }
-
-public class DownApiSettings
-{
-    public string UserName { get; set; }
-    public string Password { get; set; }
-    public string ApiUrl { get; set; }
-}
-

@@ -14,10 +14,10 @@ public class Common
 {
     public static readonly HttpClient Client = GetInfoFromNetwork.CommonClient;
 
-    public static Tuple<string, string> SplitCid(string cid)
+    public static Tuple<string, string> SplitCid(string cid, bool needSingleKeyword = false)
     {
-        string leftCid;
-        string rightCid;
+        string leftCid = null;
+        string rightCid = null;
 
         if (cid.Contains("H_"))
         {
@@ -33,8 +33,16 @@ public class Common
             {
                 var matchResult = Regex.Match(cid, @"([A-Z]+)(\d+)");
 
-                leftCid = matchResult.Groups[1].Value;
-                rightCid = matchResult.Groups[2].Value;
+                if (matchResult.Success)
+                {
+                    leftCid = matchResult.Groups[1].Value;
+                    rightCid = matchResult.Groups[2].Value;
+                }
+                // 纯字母或纯数字
+                else if(needSingleKeyword)
+                {
+                    return new Tuple<string, string>(cid, null);
+                }
             }
             else if (splitResult.Length == 2)
             {
@@ -60,9 +68,11 @@ public class Common
 
     public static async Task<VideoInfo> AnalysisHtmlDocInfoFromAvSoxOrAvMoo(string CID, string detail_url, HtmlDocument htmlDoc)
     {
-        VideoInfo videoInfo = new();
-        videoInfo.trueName = CID;
-        videoInfo.busUrl = detail_url;
+        VideoInfo videoInfo = new()
+        {
+            trueName = CID,
+            busUrl = detail_url
+        };
 
         //封面图
         string CoverUrl = null;

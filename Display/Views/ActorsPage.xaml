@@ -98,8 +98,7 @@
                                        ItemRotationY="45"
                                        ItemRotationZ="0"
                                        Orientation="Horizontal"
-                                       SelectedIndex="8"
-                                       ItemsSource="{x:Bind actorPartInfo}">
+                                       ItemsSource="{x:Bind _actorPartInfo}">
                         <oldControls:Carousel.EasingFunction>
                             <CubicEase EasingMode="EaseOut" />
                         </oldControls:Carousel.EasingFunction>
@@ -116,6 +115,7 @@
                             </DataTemplate>
                         </oldControls:Carousel.ItemTemplate>
                     </oldControls:Carousel>
+
                 </Grid>
 
 

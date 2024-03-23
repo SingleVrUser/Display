@@ -20,6 +20,7 @@ using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
 using Display.Managers;
+using Display.ViewModels.Sub;
 
 
 namespace Display
@@ -80,6 +81,12 @@ namespace Display
 
                         .AddSingleton<SpiderManager>()
 
+                        .AddSingleton<NavigationItemViewModel>()
+
+                        .AddTransient<MoreNavigationItemViewModel>()
+                        .AddTransient<MorePageViewModel>()
+                        .AddTransient<UIShowSettingViewModel>()
+                        .AddTransient<MainWindowViewModel>()
                         .AddTransient<SpiderTaskViewModel>()
                         .AddTransient<ImageViewModel>()
                         .AddTransient<SettingViewModel>()

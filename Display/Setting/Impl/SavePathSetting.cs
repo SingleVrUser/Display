@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using Display.Setting.Interfaces;
-using DefaultValue = Display.Models.Data.Constant.DefaultSettings;
+using DefaultValue = Display.Constants.DefaultSettings;
 
 namespace Display.Setting.Impl;
 

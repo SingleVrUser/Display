@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Display.Models.Data;
+using Display.Constants;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -212,7 +213,7 @@ namespace Display.Views.More
         public FilesInfo.FileType FileType { get; set; } = FilesInfo.FileType.File;
         public long FilesCount { get; set; } = 1;
         public string Icon;
-        public string IconPath => FileType == FilesInfo.FileType.File ? FilesInfo.GetPathFromIcon(Icon) : Constant.FileType.FolderSvgPath;
+        public string IconPath => FileType == FilesInfo.FileType.File ? FilesInfo.GetPathFromIcon(Icon) : Constants.FileType.FolderSvgPath;
 
         public string Size;
         public string FullPath;

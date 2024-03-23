@@ -28,6 +28,7 @@ using Windows.Storage;
 using Windows.System.Display;
 using Windows.Web.Http;
 using Display.CustomWindows;
+using Display.Constants;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -488,7 +489,7 @@ public sealed partial class CustomMediaPlayerElement
                 DataAccess.Update.UpdateSingleFailInfo(pickCode, "is_like", IsLike.ToString());
 
                 //需要截图
-                if (failInfo.ImagePath == Constant.FileType.NoPicturePath || !File.Exists(failInfo.ImagePath))
+                if (failInfo.ImagePath == Constants.FileType.NoPicturePath || !File.Exists(failInfo.ImagePath))
                 {
                     var capPath = await ScreenShotAsync(pickCode);
                     DataAccess.Update.UpdateSingleFailInfo(pickCode, "image_path", capPath);
@@ -544,7 +545,7 @@ public sealed partial class CustomMediaPlayerElement
                 DataAccess.Update.UpdateSingleFailInfo(pickCode, "look_later", LookLater.ToString());
 
                 //需要添加截图
-                if (failInfo.ImagePath == Constant.FileType.NoPicturePath || !File.Exists(failInfo.ImagePath))
+                if (failInfo.ImagePath == FileType.NoPicturePath || !File.Exists(failInfo.ImagePath))
                 {
                     var capPath = await ScreenShotAsync(pickCode);
                     DataAccess.Update.UpdateSingleFailInfo(pickCode, "image_path", capPath);

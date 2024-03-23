@@ -7,6 +7,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:data="using:Display.Models.Data"
         xmlns:winUiEx="using:WinUIEx"
+        xmlns:settings="using:Display.Models.Settings"
         mc:Ignorable="d">
 
     <Grid x:Name="RootGrid">
@@ -47,6 +48,8 @@
                     </customcontrols:CustomAutoSuggestBox>
                 </Grid>
             </DataTemplate>
+
+
         </Grid.Resources>
 
         <!--标题栏-->
@@ -99,6 +102,8 @@
         <NavigationView x:Name="NavView"
                         Canvas.ZIndex="0"
                         Loaded="NavView_Loaded"
+                        MenuItemsSource="{x:Bind _viewModel.NavigationItemViewModel.MenuItems}"
+                        FooterMenuItemsSource="{x:Bind _viewModel.NavigationItemViewModel.FootMenuItems}"
                         SelectionChanged="NavView_SelectionChanged"
                         IsBackButtonVisible="Visible"
                         IsBackEnabled="False"
@@ -115,50 +120,19 @@
             <NavigationView.Resources>
                 <Thickness x:Key="NavigationViewMinimalHeaderMargin">-65,43,0,3</Thickness>
                 <Thickness x:Key="NavigationViewHeaderMargin">15,3,0,3</Thickness>
-                <!--<VisualStateGroup x:Name="PaneStateListSizeGroup">
-                    <VisualState x:Name="ListSizeFull"/>
-                    <VisualState x:Name="ListSizeCompact">
-                        <VisualState.Setters>
-                            <Setter Target="NavView.PaneContentGrid.Width" Value="100"/>
-                        </VisualState.Setters>
-                    </VisualState>
-                </VisualStateGroup>-->
             </NavigationView.Resources>
 
             <!--菜单-->
-            <NavigationView.MenuItems>
-                <NavigationViewItem Content="主页"
-                                    Tag="home"
-                                    Icon="Home"/>
-                <NavigationViewItemSeparator />
-
-                <NavigationViewItem Content="展示"
-                                    Tag="videoView"
-                                    Icon="Caption"/>
-
-                <NavigationViewItem Content="演员"
-                                    Tag="actorsView"
-                                    Icon="Contact"/>
-
-                <NavigationViewItem Content="其他"
-                                    Tag="more"
-                                    Icon="More"/>
-            </NavigationView.MenuItems>
-
-            <!--页脚-->
-            <NavigationView.PaneFooter>
-                <StackPanel Orientation="Vertical" Margin="0,10">
-                    <NavigationViewItem Content="下载"
-                                    Icon="Download"
-                                    Tapped="CloudDownButtonClick">
-                    </NavigationViewItem>
-
-                    <NavigationViewItem Content="任务"
-                                        Icon="Sort"
-                                        Tapped="TaskButtonClick">
-                    </NavigationViewItem>
-                </StackPanel>
-            </NavigationView.PaneFooter>
+            <NavigationView.MenuItemTemplate>
+                <DataTemplate x:DataType="settings:MenuItem">
+                    <NavigationViewItem Content="{x:Bind Content}"
+                                        Icon="{x:Bind Icon}"
+                                        Tag="{x:Bind PageEnum}"
+                                        SelectsOnInvoked="{x:Bind CanSelected}"
+                                        Tapped="UIElement_OnTapped"
+                                        Visibility="{x:Bind IsVisible,Mode=OneWay}"/>
+                </DataTemplate>
+            </NavigationView.MenuItemTemplate>
 
             <Frame x:Name="ContentFrame"
                    NavigationFailed="ContentFrame_NavigationFailed"

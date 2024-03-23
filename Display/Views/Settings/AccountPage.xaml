@@ -11,6 +11,7 @@
     xmlns:customControls="using:Display.Controls"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:data="using:Display.Models.Data"
+    xmlns:winUi="using:CommunityToolkit.WinUI"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -71,6 +72,10 @@
                     </StackPanel>
                 </RelativePanel>
             </controls:SettingsCard>
+
+            <controls:SettingsCard Header="二维码登录"
+                                   HeaderIcon="{winUi:FontIcon Glyph=&#xED14;}"
+                                   IsClickEnabled="True"/>
 
             <controls:SettingsCard Header="请求间隔"
                                    Content="1s" />

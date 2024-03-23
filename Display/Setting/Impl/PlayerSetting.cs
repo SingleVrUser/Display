@@ -1,15 +1,11 @@
 ﻿using Display.Models.Data.Enums;
 using Display.Setting.Interfaces;
-using DefaultValue = Display.Models.Data.Constant.DefaultSettings;
+using DefaultValue = Display.Constants.DefaultSettings;
 
 namespace Display.Setting.Impl;
 
-internal class PlayerSetting : SettingBase, IPlayerSetting
+internal class PlayerSetting(ISettingProvider provider) : SettingBase(provider), IPlayerSetting
 {
-    public PlayerSetting(ISettingProvider provider) : base(provider)
-    {
-    }
-
     public bool IsPlayBestQualityFirst
     {
         get => GetValue(DefaultValue.Player.IsPlayBestQualityFirst);

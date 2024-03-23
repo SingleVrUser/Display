@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Display.Constants;
 
 namespace Display.Models.Data
 {
@@ -38,7 +39,7 @@ namespace Display.Models.Data
             set => _clientWithJavDbCookie = value;
         }
 
-        public static string DownUserAgent = Constant.DefaultSettings.Network._115.DownUserAgent;
+        public static string DownUserAgent = Constants.DefaultSettings.Network._115.DownUserAgent;
 
         //public static string BuilderMediaElementUserAgent()
         //{

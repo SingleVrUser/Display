@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Display.Constants;
 using Display.Models.Data;
 using Display.Models.Data.Enums;
 using Display.Models.Settings.Options;
@@ -71,7 +72,7 @@ public sealed partial class PlayPage
                 },
                 Path = AppSettings.PotPlayerExePath,
                 SavePathAction = path=>AppSettings.PotPlayerExePath = path,
-                ResetPathFunc = () => Constant.DefaultSettings.Player.ExePath.PotPlayer
+                ResetPathFunc = () => Constants.DefaultSettings.Player.ExePath.PotPlayer
             },
             new Player
             {
@@ -84,7 +85,7 @@ public sealed partial class PlayPage
                 },
                 Path = AppSettings.VlcExePath,
                 SavePathAction = path=>AppSettings.VlcExePath = path,
-                ResetPathFunc = () => Constant.DefaultSettings.Player.ExePath.Vlc
+                ResetPathFunc = () => Constants.DefaultSettings.Player.ExePath.Vlc
             },
             new Player
             {
@@ -97,7 +98,7 @@ public sealed partial class PlayPage
                 },
                 Path = AppSettings.MpvExePath,
                 SavePathAction = path=>AppSettings.MpvExePath = path,
-                ResetPathFunc = () => Constant.DefaultSettings.Player.ExePath.Mpv
+                ResetPathFunc = () => Constants.DefaultSettings.Player.ExePath.Mpv
             }
         ];
 

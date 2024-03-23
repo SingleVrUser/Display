@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Display.Constants;
 using Display.Models.Data;
 using Display.Models.Spider;
 using Display.Providers.Searcher;
@@ -226,7 +227,7 @@ namespace Display.Views.SearchLink
             bool isDone = false;
             string result = null;
             // 需要验证账号
-            if (addTaskUrlInfo is { errcode: Constant.Common.AccountAnomalyCode })
+            if (addTaskUrlInfo is { errcode: Constants.Account.AccountAnomalyCode })
             {
                 var window = WebApi.CreateWindowToVerifyAccount();
 

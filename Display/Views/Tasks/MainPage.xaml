@@ -21,8 +21,8 @@
                         SelectionChanged="ContentNavigationView_OnSelectionChanged">
 
             <NavigationView.MenuItemTemplate>
-                <DataTemplate x:DataType="settings:NavLink">
-                    <TextBlock Text="{x:Bind Label}" />
+                <DataTemplate x:DataType="settings:MenuItem">
+                    <TextBlock Text="{x:Bind Content}" />
                 </DataTemplate>
             </NavigationView.MenuItemTemplate>
 

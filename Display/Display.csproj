@@ -174,26 +174,26 @@
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
     <PackageReference Include="FFmpeg.AutoGen.Abstractions" Version="6.1.0" />
     <PackageReference Include="FFmpeg.AutoGen.Bindings.DynamicallyLoaded" Version="6.1.0" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.58" />
-    <PackageReference Include="K4os.Compression.LZ4" Version="1.3.6" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.59" />
+    <PackageReference Include="K4os.Compression.LZ4" Version="1.3.8" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WinUI" Version="2.0.0-beta.330" />
     <PackageReference Include="Microsoft.AppCenter" Version="5.0.3" />
     <PackageReference Include="Microsoft.AppCenter.Analytics" Version="5.0.3" />
     <PackageReference Include="Microsoft.AppCenter.Crashes" Version="5.0.3" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.13" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.240211001" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.2428" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240311000" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.3233" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="OpenCvSharp4" Version="4.8.0.20230708" />
+    <PackageReference Include="OpenCvSharp4" Version="4.9.0.20240103" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
     <PackageReference Include="QRCoder" Version="1.4.3" />
-    <PackageReference Include="SharpCompress" Version="0.34.1" />
-    <PackageReference Include="SQLitePCLRaw.bundle_winsqlite3" Version="2.1.6" />
-    <PackageReference Include="WinUIEx" Version="2.3.3" />
+    <PackageReference Include="SharpCompress" Version="0.36.0" />
+    <PackageReference Include="SQLitePCLRaw.bundle_winsqlite3" Version="2.1.8" />
+    <PackageReference Include="WinUIEx" Version="2.3.4" />
     <!--<Manifest Include="$(ApplicationManifest)" />-->
   </ItemGroup>
 
@@ -245,6 +245,9 @@
     <None Update="Control\FolderControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>
+    <Page Update="Views\Settings\UIShowPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Views\Tasks\SpiderTaskPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -266,7 +269,7 @@
     <Page Update="Views\Settings\CommonPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Views\Settings\PathPage.xaml">
+    <Page Update="Views\Settings\StoragePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Views\Settings\AccountPage.xaml">
@@ -424,5 +427,8 @@
   </ItemGroup>
   <ItemGroup>
     <PRIResource Remove="Views\Task\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Views\Settings\UIShowPage.xaml" />
   </ItemGroup>
 </Project>

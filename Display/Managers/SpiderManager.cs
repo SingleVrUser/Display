@@ -292,7 +292,7 @@ public class SpiderManager
 
         // TODO 当_nameInfos达到指定数量时才添加进数据库
         await DataAccess.Add.AddVideoInfo_ActorInfo_IsWmAsync(item.Info);
-        DataAccess.Delete.DeletedSingleFileToInfoByTrueName(item.Name);
+        DataAccess.Update.UpdateFileToInfo(item.Name, true);
 
     }
 

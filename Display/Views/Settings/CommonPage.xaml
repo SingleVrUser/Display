@@ -20,37 +20,12 @@
 
     <StackPanel Style="{StaticResource SettingStackPanel}">
 
-        <!--标题：启动-->
-        <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}"
-                   Text="启动" />
-        <controls:SettingsCard Header="初始页">
-
-            <ComboBox SelectedIndex="{x:Bind data:AppSettings.StartPageIndex, Mode=TwoWay}">
-                <x:String>主页</x:String>
-                <x:String>展示</x:String>
-                <x:String>演员一览</x:String>
-                <x:String>其他</x:String>
-                <x:String>设置</x:String>
-            </ComboBox>
-
-        </controls:SettingsCard>
-        <controls:SettingsCard Header="左侧导航">
-
-            <ToggleSwitch OnContent="展开"
-                          OffContent="紧凑"
-                          IsOn="{x:Bind data:AppSettings.IsNavigationViewPaneOpen,Mode=TwoWay}" />
-
-        </controls:SettingsCard>
         <controls:SettingsCard Header="检查更新">
 
             <ToggleSwitch OnContent="开启"
                           OffContent="关闭"
                           IsOn="{x:Bind data:AppSettings.IsCheckUpdate,Mode=TwoWay}" />
         </controls:SettingsCard>
-
-        <!--标题：显示-->
-        <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}"
-                   Text="显示" />
         <controls:SettingsCard Header="缩略图来源">
             <ComboBox RelativePanel.AlignRightWithPanel="True"
                       ItemsSource="{ui:EnumValues Type=enums:ThumbnailOriginType}"

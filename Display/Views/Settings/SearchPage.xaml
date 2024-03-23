@@ -13,9 +13,6 @@
 
     <StackPanel Style="{StaticResource SettingStackPanel}">
 
-        <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}"
-                   Text="通用" />
-
         <controls:SettingsCard Header="保存路径"
                                ContentAlignment="Vertical"
                                HorizontalContentAlignment="Stretch">

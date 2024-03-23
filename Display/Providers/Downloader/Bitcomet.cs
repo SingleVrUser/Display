@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Net;
 using Windows.System;
+using Display.Models.Settings.Options;
 
 namespace Display.Providers.Downloader;
 

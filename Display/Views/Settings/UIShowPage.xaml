@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<local:RootPage
+    x:Class="Display.Views.Settings.UIShowPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Display.Views.Settings"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:data="using:Display.Models.Data"
+    xmlns:settings="using:Display.Models.Settings"
+    xmlns:converters="using:CommunityToolkit.WinUI.UI.Converters"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <local:RootPage.Resources>
+        <converters:BoolToObjectConverter x:Key="BoolToObjectConverter"
+                                                   FalseValue="&#xED1A;"
+                                                   TrueValue="&#xE7B3;" />
+
+        <Style TargetType="controls:SettingsCard"
+               BasedOn="{StaticResource BaseSettingsCardStyle}" />
+
+        <Style x:Key="MenuItemListStyle"
+               TargetType="ListView">
+            <Setter Property="CanDragItems"
+                    Value="True" />
+            <Setter Property="CanReorderItems"
+                    Value="True" />
+            <Setter Property="AllowDrop"
+                    Value="True" />
+            <Setter Property="IsItemClickEnabled"
+                    Value="True" />
+            <Setter Property="CharacterSpacing"
+                    Value="5" />
+            <Setter Property="SelectionMode"
+                    Value="None" />
+            <Setter Property="MinHeight"
+                    Value="30" />
+        </Style>
+
+
+        <DataTemplate x:Key="MenuItemsTemplate"
+                      x:DataType="settings:BaseMenuItem">
+            <Grid ColumnDefinitions="auto, *, auto"
+                  ColumnSpacing="10">
+                <FontIcon Glyph="{x:Bind Glyph}" />
+                <TextBlock Grid.Column="1"
+                           Text="{x:Bind Content}"
+                           VerticalAlignment="Center" />
+                <ToggleButton Grid.Column="2"
+                              IsChecked="{x:Bind IsVisible, Converter={StaticResource BoolNegationConverter}, Mode=TwoWay}"
+                              BorderThickness="0"
+                              Background="Transparent">
+                    <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                              Glyph="{x:Bind IsVisible, Converter={StaticResource BoolToObjectConverter},Mode=OneWay}" />
+                </ToggleButton>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="MoreMenuItemsTemplate"
+                      x:DataType="settings:BaseMenuItem">
+            <Grid ColumnDefinitions="auto, *, auto"
+                  ColumnSpacing="10">
+                <Image Height="20" Source="{x:Bind Glyph}"/>
+                <TextBlock Grid.Column="1"
+                           Text="{x:Bind Content}"
+                           VerticalAlignment="Center" />
+                <ToggleButton Grid.Column="2"
+                              IsChecked="{x:Bind IsVisible, Converter={StaticResource BoolNegationConverter}, Mode=TwoWay}"
+                              BorderThickness="0"
+                              Background="Transparent">
+                    <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                              Glyph="{x:Bind IsVisible, Converter={StaticResource BoolToObjectConverter},Mode=OneWay}" />
+                </ToggleButton>
+            </Grid>
+        </DataTemplate>
+
+    </local:RootPage.Resources>
+
+    <ScrollViewer>
+        <Grid>
+            <StackPanel Style="{StaticResource SettingStackPanel}">
+                <!--标题：启动-->
+                <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}"
+                           Text="启动" />
+                <controls:SettingsCard Header="初始页">
+                    <ComboBox ItemsSource="{x:Bind _startPageList}"
+                              DisplayMemberPath="Name"
+                              SelectedValuePath="PageEnum"
+                              SelectedItem="{x:Bind _defaultStartPageItem}"
+                              SelectionChanged="Selector_OnSelectionChanged" />
+
+                </controls:SettingsCard>
+                <controls:SettingsCard Header="左侧导航">
+
+                    <ToggleSwitch OnContent="展开"
+                                  OffContent="紧凑"
+                                  IsOn="{x:Bind data:AppSettings.IsNavigationViewPaneOpen,Mode=TwoWay}" />
+
+                </controls:SettingsCard>
+
+                <!--标题：菜单栏-->
+                <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}"
+                           Text="菜单栏" />
+
+                <controls:SettingsCard Header="侧边栏顶部"
+                                       HorizontalContentAlignment="Stretch"
+                                       ContentAlignment="Vertical">
+                    <ListView x:Name="MenuItemListView"
+                              ItemsSource="{x:Bind _viewModel.NavigationItemViewModel.MenuItems}"
+                              ItemTemplate="{StaticResource MenuItemsTemplate}"
+                              Style="{StaticResource MenuItemListStyle}"
+                              DragItemsStarting="FootListView_OnDragItemsStarting"
+                              DragOver="MenuItemListView_OnDragOver"
+                              Drop="UIElement_OnDrop" />
+                </controls:SettingsCard>
+
+                <controls:SettingsCard Header="侧边栏底部"
+                                       HorizontalContentAlignment="Stretch"
+                                       ContentAlignment="Vertical">
+
+                    <ListView x:Name="FootMenuItemListView"
+                              ItemsSource="{x:Bind _viewModel.NavigationItemViewModel.FootMenuItems}"
+                              ItemTemplate="{StaticResource MenuItemsTemplate}"
+                              Style="{StaticResource MenuItemListStyle}"
+                              DragItemsStarting="FootListView_OnDragItemsStarting"
+                              DragOver="MenuItemListView_OnDragOver"
+                              Drop="UIElement_OnDrop" />
+                </controls:SettingsCard>
+
+                <controls:SettingsCard Header="更多页"
+                                       HorizontalContentAlignment="Stretch"
+                                       ContentAlignment="Vertical">
+
+                    <ListView ItemsSource="{x:Bind _viewModel.MoreNavigationItemViewModel.MoreMenuItems}"
+                              ItemTemplate="{StaticResource MoreMenuItemsTemplate}"
+                              Style="{StaticResource MenuItemListStyle}" />
+                </controls:SettingsCard>
+
+            </StackPanel>
+        </Grid>
+
+    </ScrollViewer>
+    
+</local:RootPage>

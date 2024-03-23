@@ -7,10 +7,10 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.Storage.Pickers;
 using Display.Helper.FileProperties.Name;
-using Display.Models.Data;
 using crypto;
 using FFmpeg.AutoGen.Abstractions;
 using Microsoft.UI.Xaml.Controls;
+using Display.Models.Settings.Options;
 
 namespace Display.Providers.Downloader;
 

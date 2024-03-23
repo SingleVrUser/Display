@@ -12,6 +12,7 @@ using Display.Helper.Date;
 using Display.Helper.FileProperties.Name;
 using Display.Managers;
 using Display.Models.Data;
+using Display.Models.Data.Enums;
 using Display.Models.Spider;
 using Display.Views.Tasks;
 using LiveChartsCore;
@@ -42,7 +43,7 @@ namespace Display.Views.SpiderVideoInfo
         private readonly CancellationTokenSource s_cts = new();
         private readonly List<string> _selectedFilesNameList;
         private List<Datum> _fileList = [];
-        private readonly List<FailDatum> _failDatumList = new();
+        private readonly List<FailDatum> _failDatumList = [];
 
         private List<MatchVideoResult> _matchVideoResults;
         private GetInfoFromNetwork _network;
@@ -450,7 +451,7 @@ namespace Display.Views.SpiderVideoInfo
             spiderManager.AddTask(list);
 
             // 展示页面
-            Tasks.MainPage.ShowSingleWindow(typeof(SpiderTaskPage));
+            Tasks.MainPage.ShowSingleWindow(NavigationViewItemEnum.SpiderTask);
 
             TopProgressRing.IsActive = false;
         }

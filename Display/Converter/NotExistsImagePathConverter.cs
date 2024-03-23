@@ -1,4 +1,4 @@
-﻿using Display.Models.Data;
+﻿using Display.Constants;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
@@ -19,7 +19,7 @@ public class NotExistsImagePathConverter : IValueConverter
             return imageSource;
         }
 
-        imageSource = new BitmapImage(new Uri(Constant.FileType.NoPicturePath));
+        imageSource = new BitmapImage(new Uri(Constants.FileType.NoPicturePath));
 
         return imageSource;
     }

@@ -17,6 +17,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Display.Services.IncrementalCollection;
+using Display.Constants;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -28,8 +29,8 @@ namespace Display.Views
     /// </summary>
     public sealed partial class ActorsPage : Page
     {
-        IncrementalLoadActorInfoCollection actorinfo;
-        ObservableCollection<ActorInfo> actorPartInfo = new();
+        private IncrementalLoadActorInfoCollection _actorInfo;
+        private readonly ObservableCollection<ActorInfo> _actorPartInfo = [];
 
         public static ActorsPage Current;
 
@@ -41,7 +42,7 @@ namespace Display.Views
 
         public ActorsPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             Current = this;
 
@@ -52,11 +53,11 @@ namespace Display.Views
         {
             ProgressRing.IsActive = true;
 
-            actorinfo = new IncrementalLoadActorInfoCollection(new Dictionary<string, bool> { { "is_like", true }, { "prifile_path", true } });
-            BasicGridView.ItemsSource = actorinfo;
-            await actorinfo.LoadData();
+            _actorInfo = new IncrementalLoadActorInfoCollection(new Dictionary<string, bool> { { "is_like", true }, { "prifile_path", true } });
+            BasicGridView.ItemsSource = _actorInfo;
+            await _actorInfo.LoadData();
 
-            TotalCount_TextBlock.Text = actorinfo.AllCount.ToString();
+            TotalCount_TextBlock.Text = _actorInfo.AllCount.ToString();
 
             LoadActorPartInfo();
 
@@ -73,12 +74,16 @@ namespace Display.Views
             ProgressRing.IsActive = false;
         }
         
-        private async void LoadActorPartInfo(int count = 30)
+        private async void LoadActorPartInfo(int count = 14)
         {
-            var infos = await DataAccess.Get.GetActorInfo(count, 0, orderByList: new() { { "RANDOM()", false } },
-                                                                filterList: new() { "prifile_path != ''" });
+            var infos = await DataAccess.Get.GetActorInfo(count, 0, orderByList: new Dictionary<string, bool> { { "RANDOM()", false } },
+                                                                filterList: ["prifile_path != ''"]);
 
-            infos?.ForEach(info => actorPartInfo.Add(info));
+            if (infos is null) return;
+
+            infos.ForEach(_actorPartInfo.Add);
+
+            CarouselControl.SelectedIndex = _actorPartInfo.Count / 2;
 
         }
 
@@ -91,17 +96,17 @@ namespace Display.Views
         {
             if (BasicGridView.ContainerFromItem(e.ClickedItem) is not GridViewItem container) return;
 
-            var actorinfo = container.Content as ActorInfo;
+            var actorInfo = container.Content as ActorInfo;
 
             _navigationType = navigationAnimationType.gridView;
-            _storeditem = actorinfo;
+            _storeditem = actorInfo;
 
-            GoToActorInfo(actorinfo);
+            GoToActorInfo(actorInfo);
         }
 
-        private void GoToActorInfo(ActorInfo actorinfo)
+        private void GoToActorInfo(ActorInfo actorInfo)
         {
-            Tuple<List<string>, string, bool> typeAndName = new(new() { "actor" }, actorinfo.Name, false);
+            Tuple<List<string>, string, bool> typeAndName = new(["actor"], actorInfo.Name, false);
             Frame.Navigate(typeof(ActorInfoPage), typeAndName);
         }
 
@@ -117,25 +122,25 @@ namespace Display.Views
 
         private void UpdateRandomCover_Click(object sender, RoutedEventArgs e)
         {
-            actorPartInfo.Clear();
+            _actorPartInfo.Clear();
             LoadActorPartInfo();
 
-            CarouselControl.SelectedIndex = actorPartInfo.Count / 2;
+            CarouselControl.SelectedIndex = _actorPartInfo.Count / 2;
         }
 
         private void Image_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            if (!(sender is Image image)) return;
+            if (sender is not Image image) return;
 
             _navigationType = navigationAnimationType.image;
             _storedimage = image;
 
             ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", _storedimage);
 
-            if (image.DataContext is ActorInfo actorinfo)
+            if (image.DataContext is ActorInfo actorInfo)
             {
-                if (IsActorInfoCurrentSelected(actorinfo))
-                    GoToActorInfo(actorinfo);
+                if (IsActorInfoCurrentSelected(actorInfo))
+                    GoToActorInfo(actorInfo);
             }
         }
 
@@ -144,54 +149,53 @@ namespace Display.Views
             base.OnNavigatedTo(e);
 
             // 过渡动画
-            ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("BackConnectedAnimation");
-            if (animation != null)
+            var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("BackConnectedAnimation");
+            if (animation == null) return;
+
+            if (_navigationType == navigationAnimationType.image)
             {
-                if (_navigationType == navigationAnimationType.image)
+                if (_storedimage != null)
                 {
-                    if (_storedimage != null)
-                    {
-                        animation.TryStart(_storedimage);
-                    }
+                    animation.TryStart(_storedimage);
                 }
-                else if (_navigationType == navigationAnimationType.gridView)
+            }
+            else if (_navigationType == navigationAnimationType.gridView)
+            {
+                //开始动画
+                if (_storeditem != null)
                 {
                     //开始动画
-                    if (_storeditem != null)
-                    {
-                        //开始动画
-                        await BasicGridView.TryStartConnectedAnimationAsync(animation, _storeditem, "ActorImage");
-                    }
+                    await BasicGridView.TryStartConnectedAnimationAsync(animation, _storeditem, "ActorImage");
                 }
             }
         }
 
         private void Img_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            if (!(sender is Image image)) return;
+            if (sender is not Image image) return;
 
-            if (image.DataContext is ActorInfo actorinfo)
+            if (image.DataContext is ActorInfo actorInfo)
             {
-                if (IsActorInfoCurrentSelected(actorinfo))
+                if (IsActorInfoCurrentSelected(actorInfo))
                     ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
             }
         }
 
         private void Img_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            if (!(sender is Image image)) return;
+            if (sender is not Image image) return;
 
-            if (image.DataContext is ActorInfo actorinfo)
+            if (image.DataContext is ActorInfo actorInfo)
             {
-                if (IsActorInfoCurrentSelected(actorinfo))
+                if (IsActorInfoCurrentSelected(actorInfo))
                     ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
             }
         }
 
-        private bool IsActorInfoCurrentSelected(ActorInfo actorinfo)
+        private bool IsActorInfoCurrentSelected(ActorInfo actorInfo)
         {
             return (CarouselControl.SelectedItem == null && CarouselControl.SelectedIndex == 8)
-                   || CarouselControl.SelectedItem != null && CarouselControl.SelectedItem == actorinfo;
+                   || CarouselControl.SelectedItem != null && CarouselControl.SelectedItem == actorInfo;
         }
 
         private async void GetActorInfoButton_Click(object sender, RoutedEventArgs e)
@@ -199,15 +203,15 @@ namespace Display.Views
             if (sender is not Button button) return;
             button.IsEnabled = false;
 
-            string baseUrl = AppSettings.MinnanoAvBaseUrl;
+            var baseUrl = AppSettings.MinnanoAvBaseUrl;
 
             //检查搜刮页是否可用
-            bool canUse = await GetInfoFromNetwork.CheckUrlUseful(baseUrl);
+            var canUse = await GetInfoFromNetwork.CheckUrlUseful(baseUrl);
 
             if (!canUse)
             {
                 button.IsEnabled = true;
-                ContentDialog dialog = new ContentDialog()
+                var dialog = new ContentDialog
                 {
                     XamlRoot = XamlRoot,
                     Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
@@ -221,16 +225,16 @@ namespace Display.Views
 
             var infos = await DataAccess.Get.GetActorInfo(-1);
 
-            int allCount = infos.Length;
+            var allCount = infos.Length;
             if (allCount == 0) return;
 
             if (!ToastGetActorInfoWithProgressBar.SendToast(allCount)) return;
 
             //创建断点续传文件
-            string savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "ActorInfo");
+            var savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "ActorInfo");
             if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
-            StorageFolder storageFolder = await StorageFolder.GetFolderFromPathAsync(savePath);
-            StorageFile sampleFile = await storageFolder.CreateFileAsync("getting.json", CreationCollisionOption.ReplaceExisting);
+            var storageFolder = await StorageFolder.GetFolderFromPathAsync(savePath);
+            var sampleFile = await storageFolder.CreateFileAsync("getting.json", CreationCollisionOption.ReplaceExisting);
             await FileIO.WriteTextAsync(sampleFile, JsonSerializer.Serialize(infos));
 
             await GetActorsInfo(infos);
@@ -246,7 +250,7 @@ namespace Display.Views
             var filePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "ActorInfo", "getting.json");
             if (File.Exists(filePath))
             {
-                string jsonString = await File.ReadAllTextAsync(filePath);
+                var jsonString = await File.ReadAllTextAsync(filePath);
                 var infos = JsonSerializer.Deserialize<ActorInfo[]>(jsonString);
 
                 await GetActorsInfo(infos, AppSettings.GetActorInfoLastIndex);
@@ -269,13 +273,13 @@ namespace Display.Views
 
         private static async Task GetActorsInfo(ActorInfo[] infos, int startIndex = 0)
         {
-            int allCount = infos.Length;
+            var allCount = infos.Length;
             if (allCount == 0) return;
 
             if (!ToastGetActorInfoWithProgressBar.SendToast(startIndex, allCount)) return;
 
-            bool isStart = false;
-            for (int i = 0; i < allCount; i++)
+            var isStart = false;
+            for (var i = 0; i < allCount; i++)
             {
                 if (!isStart)
                 {
@@ -319,16 +323,16 @@ namespace Display.Views
             if (Regex.Match(actorName, @"\d+").Success) return null;
 
             //从网站中获取信息
-            var actorinfo = await GetActorInfoFromNetwork.SearchInfoFromMinnanoAv(actorName, default);
-            if (actorinfo == null) return null;
+            var actorInfo = await GetActorInfoFromNetwork.SearchInfoFromMinnanoAv(actorName, default);
+            if (actorInfo == null) return null;
 
             var actorId = DataAccess.Get.GetIdInActor_Names(actorName);
             if (actorId == -1) return null;
 
-            DataAccess.Update.UpdateActorInfo(actorId, actorinfo);
+            DataAccess.Update.UpdateActorInfo(actorId, actorInfo);
 
             //获取到的信息有头像
-            if (!string.IsNullOrEmpty(actorinfo.ImageUrl))
+            if (!string.IsNullOrEmpty(actorInfo.ImageUrl))
             {
                 //查询本地数据库中的数据
                 var actorInfos = await DataAccess.Get.GetActorInfo(1, filterList: new List<string> { $"id == '{actorId}'" });
@@ -338,27 +342,27 @@ namespace Display.Views
                     var firstOrDefault = actorInfos.FirstOrDefault();
 
                     //数据库中无头像
-                    if (firstOrDefault is { ProfilePath: Constant.FileType.NoPicturePath })
+                    if (firstOrDefault is { ProfilePath: Constants.FileType.NoPicturePath })
                     {
                         var filePath = Path.Combine(AppSettings.ActorInfoSavePath, actorName);
 
-                        Uri infoUri = new(actorinfo.InfoUrl);
+                        Uri infoUri = new(actorInfo.InfoUrl);
 
-                        var prifilePath = await GetInfoFromNetwork.DownloadFile(actorinfo.ImageUrl, filePath, "face", headers: new()
+                        var profilePath = await GetInfoFromNetwork.DownloadFile(actorInfo.ImageUrl, filePath, "face", headers: new()
                         {
                             {"Host",infoUri.Host },
-                            {"Referer", actorinfo.InfoUrl }
+                            {"Referer", actorInfo.InfoUrl }
                         });
 
                         //更新头像
-                        DataAccess.Update.UpdateActorInfoProfilePath(actorId, prifilePath);
+                        DataAccess.Update.UpdateActorInfoProfilePath(actorId, profilePath);
 
-                        actorinfo.ProfilePath = prifilePath;
+                        actorInfo.ProfilePath = profilePath;
                     }
                     //数据库中有头像
                     else if (firstOrDefault != null)
                     {
-                         actorinfo.ProfilePath = firstOrDefault.ProfilePath;
+                         actorInfo.ProfilePath = firstOrDefault.ProfilePath;
                     }
 
                 }
@@ -367,21 +371,21 @@ namespace Display.Views
 
             //更新别名
             //别名
-            if (actorinfo.OtherNames is { Count: > 0 })
+            if (actorInfo.OtherNames is { Count: > 0 })
             {
-                foreach (var otherName in actorinfo.OtherNames)
+                foreach (var otherName in actorInfo.OtherNames)
                 {
                     DataAccess.Add.AddOrIgnoreActor_Names(actorId, otherName);
                 }
             }
 
             //更新bwh
-            if (!string.IsNullOrEmpty(actorinfo.Bwh))
+            if (!string.IsNullOrEmpty(actorInfo.Bwh))
             {
-                DataAccess.Add.AddOrIgnoreBwh(actorinfo.Bwh, actorinfo.Bust, actorinfo.Waist, actorinfo.Hips);
+                DataAccess.Add.AddOrIgnoreBwh(actorInfo.Bwh, actorInfo.Bust, actorInfo.Waist, actorInfo.Hips);
             }
 
-            return actorinfo;
+            return actorInfo;
         }
 
         public void ShowButtonWithShowToastAgain()

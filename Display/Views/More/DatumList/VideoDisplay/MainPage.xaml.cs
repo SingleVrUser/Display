@@ -27,6 +27,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SharpCompress;
 using Display.Managers;
+using Display.Constants;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -432,7 +433,7 @@ public sealed partial class MainPage : Page,IDisposable
     {
         VideoPlay_ListView.IsEnabled = false;
 
-        const string noPicturePath = Constant.FileType.NoPicturePath;
+        const string noPicturePath = Constants.FileType.NoPicturePath;
 
         var spiderManager = App.GetService<SpiderManager>();
 

@@ -60,13 +60,12 @@
                     </MenuFlyout>
                 </Grid.ContextFlyout>
 
-                <Grid ColumnSpacing="8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+                <Grid ColumnSpacing="8"
+                      RowDefinitions="auto,auto"
+                      ColumnDefinitions="auto,*,auto">
 
-                    <Image Height="30"
+                    <Image Grid.RowSpan="2"
+                           Height="30"
                            Width="30">
                         <Image.Source>
                             <SvgImageSource UriSource="{x:Bind IconPath}"
@@ -75,11 +74,26 @@
                         </Image.Source>
                     </Image>
 
-                    <TextBlock Grid.Column="1"
+                    <TextBlock Grid.Row="0"
+                               Grid.Column="1"
+                               Grid.ColumnSpan="2"
                                Text="{x:Bind Name}"
                                Style="{StaticResource ValueText}"
                                Tapped="OpenFolder_Tapped"
                                HorizontalAlignment="Left" />
+
+                    <TextBlock Grid.Row="1"
+                               Grid.Column="1"
+                               Text="{x:Bind Time, Converter={StaticResource NumberToDateTimeStrConverter}}"
+                               Opacity="0.5"/>
+
+                    <TextBlock Grid.Row="1"
+                               Grid.Column="2"
+                               HorizontalAlignment="Right"
+                               Text="{x:Bind Size, Converter={StaticResource FileSizeToFriendlyStringConverter}}"
+                               Visibility="{x:Bind Size, Converter={StaticResource GreaterThanZeroToVisibilityConverter}}"
+                               Opacity="0.5"/>
+
                 </Grid>
 
                 <!--<TextBlock  Grid.Column="1"

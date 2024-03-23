@@ -1,13 +1,14 @@
-﻿using Display.Models.Version;
+﻿using Display.Models.Data;
+using Display.Models.Version;
 using Newtonsoft.Json;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 
-namespace Display.Models.Data;
+namespace Display.Helper.Network;
 
-public static class AppInfo
+public static class AppUpdateHelper
 {
     private const string LatestReleaseUrl = "https://api.github.com/repos/SingleVrUser/Display/releases/latest";
 

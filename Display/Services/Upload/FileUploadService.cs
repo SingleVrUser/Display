@@ -13,12 +13,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Display.Helper.Network;
 using static System.String;
+using Display.Constants;
 
 namespace Display.Services.Upload
 {
     internal class FileUploadService : UploadBase
     {
-        public const string AppVer = Constant.DefaultSettings.Network._115.UploadAppVersion;
+        public const string AppVer = DefaultSettings.Network._115.UploadAppVersion;
 
         private static HttpClient _client;
         public static HttpClient Client
@@ -27,7 +28,7 @@ namespace Display.Services.Upload
             {
                 if (_client != null) return _client;
 
-                var headers = new Dictionary<string, string> { { "user-agent", Constant.DefaultSettings.Network._115.UploadUserAgent } };
+                var headers = new Dictionary<string, string> { { "user-agent", DefaultSettings.Network._115.UploadUserAgent } };
 
                 var cookie = AppSettings._115_Cookie;
                 //cookie不为空且可用
