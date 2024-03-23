@@ -54,7 +54,7 @@
 
                 <Grid RowDefinitions="*,auto">
                     <ItemsRepeater x:Name="WrapRepeater"
-                                   ItemsSource="{x:Bind KeywordList, Mode=OneWay}">
+                                   ItemsSource="{x:Bind KeywordArray, Mode=OneWay}">
                         <ItemsRepeater.Layout>
                             <controls:WrapLayout x:Name="Wrap"
                                                  HorizontalSpacing="5"

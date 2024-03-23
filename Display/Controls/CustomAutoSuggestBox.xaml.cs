@@ -137,7 +137,7 @@ public sealed partial class CustomAutoSuggestBox : UserControl
         {
             new()
             {
-                KeywordList = result.ToList()
+                KeywordArray = result
             }
         };
     }
