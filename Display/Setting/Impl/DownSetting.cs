@@ -1,6 +1,6 @@
-﻿using Display.Setting.Interfaces;
+﻿using Display.Constants;
+using Display.Setting.Interfaces;
 using Display.Setting.Models;
-using static Display.Models.Data.Constant.DefaultSettings;
 
 namespace Display.Setting.Impl;
 
@@ -8,7 +8,7 @@ internal class DownSetting(ISettingProvider provider) : SettingBase(provider), I
 {
     public string DefaultDownMethod
     {
-        get => GetValue(Network._115.DefaultDownMethod);
+        get => GetValue(DefaultSettings.Network._115.DefaultDownMethod);
         set => SetValue(value);
     }
 

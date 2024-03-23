@@ -2,8 +2,10 @@
 // Licensed under the MIT License.
 
 using System;
+using Display.Constants;
 using Display.CustomWindows;
 using Display.Helper.UI;
+using Display.Models.Data.Enums;
 using Display.Models.Settings;
 using Display.ViewModels;
 using Microsoft.UI.Xaml.Controls;
@@ -31,14 +33,12 @@ namespace Display.Views.Tasks
         /// <summary>
         /// 仅允许打开单个窗口
         /// </summary>
-        public static void ShowSingleWindow(Type pageType = null)
+        public static void ShowSingleWindow(NavigationViewItemEnum pageEnum = NavigationViewItemEnum.UploadTask)
         {
-            pageType ??= typeof(UploadTaskPage);
-
             if (_window == null)
             {
                 var page = new MainPage();
-                page.SetPage(pageType);
+                page.SetPage(pageEnum);
 
                 _window = new CommonWindow("传输任务", 842, 537)
                 {
@@ -54,16 +54,16 @@ namespace Display.Views.Tasks
             {
                 if (_window.Content is MainPage page)
                 {
-                    page.SetPage(pageType);
+                    page.SetPage(pageEnum);
                 }
 
                 WindowHelper.SetForegroundWindow(_window);
             }
         }
 
-        public void SetPage(Type pageType)
+        public void SetPage(NavigationViewItemEnum pageEnum)
         {
-            _viewModel.SetCurrentLink(pageType);
+            _viewModel.SetCurrentLink(pageEnum);
         }
 
         /// <summary>
@@ -73,10 +73,13 @@ namespace Display.Views.Tasks
         /// <param name="args"></param>
         private void ContentNavigationView_OnSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            if (args.SelectedItem is not NavLink currentLink) return;
+            if (args.SelectedItem is not MenuItem currentLink) return;
 
-            //_viewModel.CurrentLink = currentLink;
-            ContentFrame.Navigate(currentLink.NavPageType, null);
+            if (PageTypeAndEnum.PageTypeAndEnumDict.TryGetValue(currentLink.PageEnum, out var pageType))
+            {
+                ContentFrame.Navigate(pageType);
+            }
+
         }
 
     }

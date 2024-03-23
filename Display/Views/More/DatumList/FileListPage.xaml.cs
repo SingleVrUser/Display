@@ -204,7 +204,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     private void ChangedOrderIcon(WebApi.OrderBy orderBy, int asc)
     {
 
-        Run[] orderIconRunList = { TimeRun, NameRun, SizeRun };
+        Run[] orderIconRunList = [TimeRun, NameRun, SizeRun];
 
         Run run;
 
@@ -268,7 +268,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (_transferStationFiles == null)
         {
-            _transferStationFiles = new ObservableCollection<TransferStationFiles>();
+            _transferStationFiles = [];
             TransferStationListView.ItemsSource = _transferStationFiles;
         };
 

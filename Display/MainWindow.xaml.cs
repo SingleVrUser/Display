@@ -13,23 +13,24 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Windows.System;
 using Windows.Foundation;
 using Display.CustomWindows;
-using Display.Helper.Data;
 using Display.Helper.FileProperties.Name;
 using Display.Models.Media;
 using Display.Helper.UI;
 using Display.Helper.Network;
-using Display.Managers;
 using Display.Models.Data;
+using Display.ViewModels;
 using Display.Views.More.DatumList;
 using Display.Views.OfflineDown;
 using Display.Views.SearchLink;
 using Display.Views.Settings;
-using Display.Views.Tasks;
-using WinUIEx;
 using MainPage = Display.Views.Tasks.MainPage;
+using Display.Constants;
+using Display.Models.Settings;
+using Display.Models.Data.Enums;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -41,7 +42,9 @@ namespace Display
     /// </summary>
     public sealed partial class MainWindow
     {
-        private AppWindow _appwindow;
+        private readonly MainWindowViewModel _viewModel = App.GetService<MainWindowViewModel>();
+
+        private AppWindow _appWindow;
 
         private bool _isPanelOpen;
 
@@ -57,9 +60,9 @@ namespace Display
         /// </summary>
         private void SetStyle()
         {
-            _appwindow = App.GetAppWindow(this);
+            _appWindow = App.GetAppWindow(this);
 
-            _appwindow.SetIcon(Path.Combine(Windows.ApplicationModel.Package.Current.InstalledLocation.Path, "Assets/pokeball.ico"));
+            _appWindow.SetIcon(Path.Combine(Windows.ApplicationModel.Package.Current.InstalledLocation.Path, "Assets/pokeball.ico"));
 
             Title = "Display";
 
@@ -77,7 +80,7 @@ namespace Display
             if (AppWindowTitleBar.IsCustomizationSupported())
             {
                 NavView.AlwaysShowHeader = false;
-                var titleBar = _appwindow.TitleBar;
+                var titleBar = _appWindow.TitleBar;
                 titleBar.ExtendsContentIntoTitleBar = true;
                 titleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
                 titleBar.ButtonBackgroundColor = Colors.Transparent;
@@ -114,22 +117,22 @@ namespace Display
 
         private void AppTitleBar_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            SetDragRegionForCustomTitleBar(_appwindow);
+            SetDragRegionForCustomTitleBar(_appWindow);
         }
 
         private void AppTitleBar_Loaded(object sender, RoutedEventArgs e)
         {
             // 设置拖拽区域
-            SetDragRegionForCustomTitleBar(_appwindow);
+            SetDragRegionForCustomTitleBar(_appWindow);
         }
         private void CloseAutoSuggestionBoxCompleted(object sender, object e)
         {
-            SetDragRegionForCustomTitleBar(_appwindow);
+            SetDragRegionForCustomTitleBar(_appWindow);
         }
 
         private void OpenAutoSuggestionBoxCompleted(object sender, object e)
         {
-            SetDragRegionForCustomTitleBar(_appwindow);
+            SetDragRegionForCustomTitleBar(_appWindow);
         }
 
         /// <summary>
@@ -166,19 +169,6 @@ namespace Display
 
         }
 
-
-        /// <summary>
-        /// 定义访问的页面
-        /// </summary>
-        private readonly List<(string Tag, Type Page)> _pages =
-        [
-            ("home", typeof(HomePage)),
-            ("videoView", typeof(VideoViewPage)),
-            ("actorsView", typeof(ActorsPage)),
-            ("more", typeof(MorePage)),
-            ("settings", typeof(Views.Settings.MainPage))
-        ];
-
         /// <summary>
         /// NavView加载
         /// </summary>
@@ -186,28 +176,8 @@ namespace Display
         /// <param name="e"></param>
         private void NavView_Loaded(object sender, RoutedEventArgs e)
         {
-            //数据文件存在
-            if (File.Exists(DataAccess.DbPath))
-            {
-                switch (AppSettings.StartPageIndex)
-                {
-                    case 0:
-                        NavView.SelectedItem = NavView.MenuItems[0];
-                        break;
-                    case 1:
-                        NavView.SelectedItem = NavView.MenuItems[2];
-                        break;
-                    case 2:
-                        NavView.SelectedItem = NavView.MenuItems[3];
-                        break;
-                    case 3:
-                        NavView.SelectedItem = NavView.MenuItems[4];
-                        break;
-                    case 4:
-                        NavView.SelectedItem = NavView.SettingsItem;
-                        break;
-                }
-            }
+            var selectItem = _viewModel.NavigationItemViewModel.GetMenuItem(AppSettings.StartPageEnum, NavView.SettingsItem);
+            if (selectItem != null) NavView.SelectedItem = selectItem;
 
             //在这里检查应用更新
             TryCheckAppUpdate();
@@ -221,7 +191,7 @@ namespace Display
             if (!AppSettings.IsCheckUpdate)
                 return;
 
-            var releaseCheck = await AppInfo.GetLatestReleaseCheck();
+            var releaseCheck = await AppUpdateHelper.GetLatestReleaseCheck();
 
             if (releaseCheck == null) return;
 
@@ -247,7 +217,7 @@ namespace Display
             {
                 //下载
                 case ContentDialogResult.Primary:
-                    var installUrl = AppInfo.IsWindows11() ? $"ms-appinstaller:?source={releaseCheck.AppAsset.browser_download_url}" : $"{releaseCheck.AppAsset.browser_download_url}";
+                    var installUrl = AppUpdateHelper.IsWindows11() ? $"ms-appinstaller:?source={releaseCheck.AppAsset.browser_download_url}" : $"{releaseCheck.AppAsset.browser_download_url}";
 
                     await Launcher.LaunchUriAsync(new Uri(installUrl));
                     break;
@@ -260,7 +230,6 @@ namespace Display
                     return;
             }
         }
-
 
         /// <summary>
         /// NavigationView的选择改变
@@ -275,31 +244,25 @@ namespace Display
 
             if (args.IsSettingsSelected)
             {
-                NavView_Navigate("settings", args.RecommendedNavigationTransitionInfo);
+                NavView_Navigate(NavigationViewItemEnum.SettingPage, args.RecommendedNavigationTransitionInfo);
             }
-            else
+            else if(args.SelectedItem is MenuItem item)
             {
-                var navItemTag = args.SelectedItemContainer.Tag.ToString();
-                NavView_Navigate(navItemTag, args.RecommendedNavigationTransitionInfo);
+                NavView_Navigate(item.PageEnum, args.RecommendedNavigationTransitionInfo);
             }
         }
 
         /// <summary>
         /// 页面跳转
         /// </summary>
-        /// <param name="navItemTag"></param>
+        /// <param name="pageEnum"></param>
         /// <param name="transitionInfo"></param>
-        private void NavView_Navigate(string navItemTag, NavigationTransitionInfo transitionInfo)
+        private void NavView_Navigate(NavigationViewItemEnum pageEnum, NavigationTransitionInfo transitionInfo)
         {
-            var item = _pages.FirstOrDefault(p => p.Tag == navItemTag);
-            var page = item.Page;
-            var preNavPageType = ContentFrame.CurrentSourcePageType;
+            if (!PageTypeAndEnum.PageTypeAndEnumDict.TryGetValue(pageEnum, out var pageType)) return;
 
-            //当前页面不跳转
-            if (page is not null && preNavPageType != page)
-            {
-                ContentFrame.Navigate(page, null, transitionInfo);
-            }
+            ContentFrame.Navigate(pageType, null, transitionInfo);
+
         }
         private bool _navigating;
         private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
@@ -307,19 +270,6 @@ namespace Display
             _navigating = true;
             // 可以返回就激活返回键
             NavView.IsBackEnabled = ContentFrame.CanGoBack;
-
-            if (e.Content is SettingsPage)
-            {
-                NavView.Header = "设置";
-                NavView.SelectedItem = (NavigationViewItem)NavView.SettingsItem;
-            }
-            else if(e.Content is Page page)
-            {
-                var item = _pages.FirstOrDefault(p => page.GetType() == p.Page);
-                
-                NavView.Header = item.Tag;
-                NavView.SelectedItem = (NavigationViewItem)NavView.MenuItems.FirstOrDefault(x => x is NavigationViewItem view && (string)view.Tag == item.Tag);
-            }
 
             _navigating = false;
         }
@@ -371,7 +321,6 @@ namespace Display
             TryGoBack();
         }
 
-
         private void GoBack_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
         {
             TryGoBack();
@@ -380,60 +329,6 @@ namespace Display
         private void GoForward_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
         {
             TryGoForward();
-        }
-
-        /// <summary>
-        /// 搜索框中的选项被选中
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        private async void SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
-        {
-            if (args.SelectedItem is string content && content.Contains("点击搜索资源"))
-            {
-                // 搜索资源
-                //输入框的内容
-                var searchContent = sender.Text;
-                if (string.IsNullOrEmpty(searchContent)) return;
-
-                var tupleResult = await SearchLinkPage.ShowInContentDialog(searchContent, RootGrid.XamlRoot);
-
-                // 用户取消操作
-                if (tupleResult == null) return;
-
-                var (isSucceed, msg) = tupleResult;
-
-                if (isSucceed)
-                {
-                    ShowTeachingTip(msg, "打开所在目录", (_, _) =>
-                    {
-                        // 打开所在目录
-                        CommonWindow.CreateAndShowWindow(new FileListPage(AppSettings.SavePath115Cid));
-                    });
-                }
-                else
-                {
-                    ShowTeachingTip(msg);
-                }
-
-                return;
-            }
-            
-            if (args.SelectedItem is not VideoInfo nowItem) return;
-
-            //选中的是失败项
-            if (nowItem is FailVideoInfo failVideoInfo)
-            {
-                var mediaPlayItem = new MediaPlayItem(failVideoInfo);
-                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, ((Page)ContentFrame.Content).XamlRoot);
-            }
-            //正常点击
-            else
-            {
-                //加载应用记录的图片默认大小
-                var newItem = new VideoCoverDisplayClass(nowItem, AppSettings.ImageWidth, AppSettings.ImageHeight);
-                ContentFrame.Navigate(typeof(DetailInfoPage), newItem, new SuppressNavigationTransitionInfo());
-            }
         }
 
         private async void CustomAutoSuggestBox_OnSuggestionItemTapped(object sender, string searchContent)
@@ -474,7 +369,7 @@ namespace Display
             if (nowItem is FailVideoInfo failVideoInfo)
             {
                 var mediaPlayItem = new MediaPlayItem(failVideoInfo);
-                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, ((Page)ContentFrame.Content).XamlRoot);
+                await PlayVideoHelper.PlayVideo([mediaPlayItem], ((Page)ContentFrame.Content).XamlRoot);
             }
             //正常点击
             else
@@ -505,7 +400,7 @@ namespace Display
         /// <param Name="e"></param>
         private void fullScreenWindowButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
+            if (_appWindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
             {
                 EnterFullScreen();
             }
@@ -533,10 +428,10 @@ namespace Display
         /// </summary>
         private void EnterFullScreen()
         {
-            if (_appwindow.Presenter.Kind == AppWindowPresenterKind.FullScreen) return;
+            if (_appWindow.Presenter.Kind == AppWindowPresenterKind.FullScreen) return;
 
             _isPanelOpen = NavView.IsPaneOpen;
-            _appwindow.SetPresenter(AppWindowPresenterKind.FullScreen);
+            _appWindow.SetPresenter(AppWindowPresenterKind.FullScreen);
             NavView.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftMinimal;
 
             //监听ESC退出
@@ -548,11 +443,11 @@ namespace Display
         /// </summary>
         private void CancelFullScreen()
         {
-            if (_appwindow.Presenter.Kind != AppWindowPresenterKind.FullScreen) return;
+            if (_appWindow.Presenter.Kind != AppWindowPresenterKind.FullScreen) return;
 
             NavView.PaneDisplayMode = NavigationViewPaneDisplayMode.Auto;
             NavView.IsPaneOpen = _isPanelOpen;
-            _appwindow.SetPresenter(AppWindowPresenterKind.Default);
+            _appWindow.SetPresenter(AppWindowPresenterKind.Default);
 
             //取消监听
             RootGrid.KeyDown -= RootGrid_KeyDown;
@@ -573,18 +468,13 @@ namespace Display
             FileMatch.LaunchFolder(AppSettings.DataAccessSavePath);
         }
 
-        private void CloudDownButtonClick(object sender, TappedRoutedEventArgs e)
-        {
-            CreateCloudDownContentDialog();
-        }
-
         private async void CreateCloudDownContentDialog(string defaultLink = "")
         {
             var downPage = new OfflineDownPage(defaultLink);
 
             var contentDialog = new ContentDialog
             {
-                XamlRoot = this.RootGrid.XamlRoot,
+                XamlRoot = RootGrid.XamlRoot,
                 Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
                 Title = "添加链接任务",
                 PrimaryButtonText = "开始下载",
@@ -629,7 +519,7 @@ namespace Display
             }
 
             // 需要验证账户
-            if (info.errcode == Constant.Common.AccountAnomalyCode)
+            if (info.errcode == Constants.Account.AccountAnomalyCode)
             {
                 var window = WebApi.CreateWindowToVerifyAccount();
 
@@ -647,7 +537,7 @@ namespace Display
             }
 
             var failList = !string.IsNullOrEmpty(info.error_msg)
-                ? new List<AddTaskUrlInfo> { info } // 单链接
+                ? [info] // 单链接
                 : info.result?.Where(x => !string.IsNullOrEmpty(x.error_msg)).ToList();  // 多链接
 
             if (failList == null || failList.Count == 0)
@@ -704,15 +594,24 @@ namespace Display
             suggestionBox.Focus(FocusState.Programmatic);
         }
 
-        /// <summary>
-        /// 显示115任务窗口
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TaskButtonClick(object sender, TappedRoutedEventArgs e)
+        private void UIElement_OnTapped(object sender, TappedRoutedEventArgs e)
         {
-            MainPage.ShowSingleWindow();
+            if (sender is not NavigationViewItem item) return;
+
+            if(item.Tag is not NavigationViewItemEnum pageEnum) return;
+
+            switch (pageEnum)
+            {
+                case NavigationViewItemEnum.DownPage:
+                    CreateCloudDownContentDialog();
+                    break;
+                case NavigationViewItemEnum.TaskPage:
+                    DispatcherQueue.TryEnqueue(() =>
+                        MainPage.ShowSingleWindow());
+                    break;
+            }
         }
+
 
     }
 }

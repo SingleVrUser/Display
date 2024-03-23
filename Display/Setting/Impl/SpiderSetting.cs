@@ -1,17 +1,12 @@
-﻿using Display.Models.Data;
-using Display.Setting.Interfaces;
+﻿using Display.Setting.Interfaces;
 using Display.Setting.Models;
 
-using DefaultValue = Display.Models.Data.Constant.DefaultSettings;
+using DefaultValue = Display.Constants.DefaultSettings;
 
 namespace Display.Setting.Impl;
 
-internal class SpiderSetting : SettingBase, ISpiderSetting
+internal class SpiderSetting(ISettingProvider provider) : SettingBase(provider), ISpiderSetting
 {
-    public SpiderSetting(ISettingProvider provider) : base(provider)
-    {
-    }
-
     public bool IsAutoSpiderInVideoDisplay
     {
         get => GetValue(DefaultValue.Player.VideoDisplay.IsSpiderVideoInfo);

@@ -1,14 +1,10 @@
 ﻿using Display.Setting.Interfaces;
-using DefaultValue = Display.Models.Data.Constant.DefaultSettings;
+using DefaultValue = Display.Constants.DefaultSettings;
 
 namespace Display.Setting.Impl;
 
-internal class StartSetting : SettingBase, IStartSetting
+internal class StartSetting(ISettingProvider provider) : SettingBase(provider), IStartSetting
 {
-    public StartSetting(ISettingProvider provider) : base(provider)
-    {
-    }
-
     public bool IsNavigationViewPaneOpen
     {
         get => GetValue(DefaultValue.Ui.MainWindow.IsNavigationViewPaneOpen);

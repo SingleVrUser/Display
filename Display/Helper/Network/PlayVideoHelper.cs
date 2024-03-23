@@ -247,9 +247,14 @@ public class PlayVideoHelper
 
         var result = await dialog.ShowAsync();
 
-        if (result == ContentDialogResult.Primary)
-            newPage.PlayAllVideos();
-        else if
-            (result == ContentDialogResult.Secondary) newPage.PlaySelectedVideos();
+        switch (result)
+        {
+            case ContentDialogResult.Primary:
+                newPage.PlayAllVideos();
+                break;
+            case ContentDialogResult.Secondary:
+                newPage.PlaySelectedVideos();
+                break;
+        }
     }
 }

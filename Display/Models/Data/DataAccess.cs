@@ -13,6 +13,7 @@ using Display.Helper.FileProperties.Name;
 using Microsoft.Data.Sqlite;
 using static System.Int32;
 using Display.Providers.Spider;
+using Display.Constants;
 
 namespace Display.Models.Data
 {
@@ -286,7 +287,7 @@ namespace Display.Models.Data
 
             createTable.ExecuteNonQuery();
 
-            var wmProducer = Constant.Info.WmProducer;
+            var wmProducer = Constants.WmInfo.WmProducer;
 
             //插入常见的
             foreach (var name in wmProducer)
@@ -374,19 +375,6 @@ namespace Display.Models.Data
             public static void DeleteSingleFileToInfoByPickCode(string pc, SqliteConnection connection)
             {
                 var command = $"DELETE FROM FileToInfo WHERE file_pickcode == '{pc}' COLLATE NOCASE";
-
-                DataAccessHelper.ExecuteNonQuery(command, connection);
-            }
-
-            /// <summary>
-            /// 删除中间表FileToInfo中的指定数据，通过TrueName
-            /// 匹配成功的，TrueName必定不为空
-            /// </summary>
-            /// <param name="trueName"></param>
-            /// <param name="connection"></param>
-            public static void DeletedSingleFileToInfoByTrueName(string trueName, SqliteConnection connection = null)
-            {
-                var command = $"DELETE FROM FileToInfo WHERE truename == '{trueName}' COLLATE NOCASE";
 
                 DataAccessHelper.ExecuteNonQuery(command, connection);
             }
@@ -675,18 +663,6 @@ namespace Display.Models.Data
             }
 
             /// <summary>
-            /// 更新SpiderLog中的Task_Id为已完成
-            /// </summary>
-            /// <param name="taskId"></param>
-            /// <param name="connection"></param>
-            public static void UpdateSpiderLogDone(long taskId, SqliteConnection connection)
-            {
-                var command = $"UPDATE SpiderLog SET done = 1 WHERE task_id == {taskId}";
-
-                DataAccessHelper.ExecuteNonQuery(command, connection);
-            }
-
-            /// <summary>
             /// 更新VideoInfo数据（不包括个性化的内容（喜欢，稍后观看，评分））
             /// </summary>
             /// <param name="videoInfo"></param>
@@ -778,7 +754,7 @@ namespace Display.Models.Data
 
             private static void AddVideoInfo(VideoInfo data, SqliteConnection connection)
             {
-                Dictionary<string, string> dictionary = new();
+                Dictionary<string, string> dictionary = [];
                 foreach (var item in data.GetType().GetProperties())
                 {
                     if (!item.TryGetJsonName(out var fieldName)) continue;
@@ -800,12 +776,7 @@ namespace Display.Models.Data
                 //添加信息，如果已经存在则跳过
                 var commandText = $"INSERT OR IGNORE INTO VideoInfo VALUES ({string.Join(",", dictionary.Keys)});";
 
-                var parameters = new List<SqliteParameter>();
-
-                foreach (var item in dictionary)
-                {
-                    parameters.Add(new SqliteParameter(item.Key, item.Value));
-                }
+                var parameters = dictionary.Select(item => new SqliteParameter(item.Key, item.Value)).ToList();
 
                 DataAccessHelper.ExecuteNonQueryWithParameters(commandText, parameters, connection);
             }
@@ -1003,7 +974,7 @@ namespace Display.Models.Data
                 AddVideoInfo(data, connection);
 
                 //添加演员信息
-                AddActorInfoByActorInfo(data, new List<string> { data.trueName }, connection);
+                AddActorInfoByActorInfo(data, [data.trueName], connection);
 
                 //添加是否步兵
                 AddOrReplaceIs_Wm(data.trueName, data.Producer, data.IsWm, connection);

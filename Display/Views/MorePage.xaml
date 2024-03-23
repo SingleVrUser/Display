@@ -4,9 +4,10 @@
       xmlns:local="using:Display.Views"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:settings="using:Display.Models.Settings"
       mc:Ignorable="d">
     <Grid>
-        <GridView ItemsSource="{x:Bind DataSource}"
+        <GridView ItemsSource="{x:Bind _viewModel.MoreMenuItems}"
                   Margin="10"
                   IsItemClickEnabled="True"
                   SelectionMode="None"
@@ -21,7 +22,7 @@
             </GridView.ItemContainerStyle>
 
             <GridView.ItemTemplate>
-                <DataTemplate x:DataType="local:FunctionModule">
+                <DataTemplate x:DataType="settings:MoreMenuItem">
                     <Grid>
                         <StackPanel Width="180"
                                     Height="200"
@@ -32,10 +33,10 @@
                                     Spacing="5"
                                     Background="{ThemeResource LayerFillColorDefaultBrush}">
                             <Image Height="55"
-                                   Source="{x:Bind IconPath}"
+                                   Source="{x:Bind Glyph}"
                                    Margin="0,30,0,20" />
                             <TextBlock HorizontalAlignment="Center"
-                                       Text="{x:Bind Name}"
+                                       Text="{x:Bind Content}"
                                        FontWeight="ExtraBold"
                                        FontSize="15" />
                             <TextBlock TextWrapping="WrapWholeWords"

@@ -15,12 +15,12 @@ using Microsoft.UI.Xaml;
 
 namespace Display.Views.Settings;
 
-public sealed partial class PathPage : RootPage
+public sealed partial class StoragePage : RootPage
 {
 
     private SavePath[] _savePaths;
 
-    public PathPage()
+    public StoragePage()
     {
         this.InitializeComponent();
 

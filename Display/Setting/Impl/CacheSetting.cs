@@ -1,4 +1,4 @@
-﻿using Display.Models.Data;
+﻿using Display.Constants;
 using Display.Setting.Interfaces;
 
 namespace Display.Setting.Impl;
@@ -7,7 +7,7 @@ internal class CacheSetting(ISettingProvider provider) : SettingBase(provider), 
 {
     public int GetActorInfoLastIndex
     {
-        get => GetValue(Constant.DefaultSettings.Network.GetActorInfoLastIndex);
+        get => GetValue(Constants.DefaultSettings.Network.GetActorInfoLastIndex);
         set => SetValue(value);
     }
 }

@@ -29,6 +29,7 @@ using Display.Helper.Network;
 using Display.Helper.Date;
 using Display.CustomWindows;
 using Display.Models.Data.Enums;
+using Display.Constants;
 
 namespace Display.Models.Data
 {
@@ -1498,7 +1499,7 @@ namespace Display.Models.Data
             }
 
             // 检查账号是否异常
-            if (m3U8Infos.Count == 0 && strResult.Contains(Constant.Common.AccountAnomalyTip))
+            if (m3U8Infos.Count == 0 && strResult.Contains(Constants.Account.AccountAnomalyTip))
             {
                 var window = CreateWindowToVerifyAccount();
 

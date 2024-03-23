@@ -9,7 +9,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
-using HttpHeaders = Display.Models.Data.Constant.HttpHeaders;
+using HttpHeaders = Display.Constants.HttpHeaders;
 
 namespace Display.Services.Upload
 {

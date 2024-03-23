@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Display.Constants;
+using Display.Models.Data.Enums;
 using Display.Models.Settings;
 using Display.Views.Tasks;
 
@@ -8,21 +10,19 @@ namespace Display.ViewModels;
 
 internal partial class TaskViewModel : ObservableObject
 {
-    public NavLink[] NavLinks =
+    public MenuItem[] NavLinks =
     [
-        new NavLink { Label = "上传", Glyph = "\uF6FA", NavPageType = typeof(UploadTaskPage)},
-        new NavLink { Label = "搜刮", Glyph = "\uF6FA", NavPageType = typeof(SpiderTaskPage)}
+        new MenuItem("上传", "\uF6FA", NavigationViewItemEnum.UploadTask),
+        new MenuItem("搜刮", "\uF6FA", NavigationViewItemEnum.SpiderTask), 
     ];
 
     [ObservableProperty]
-    private NavLink _currentLink;
+    private MenuItem _currentLink;
 
-    public void SetCurrentLink(Type pageType)
+    public void SetCurrentLink(NavigationViewItemEnum pageEnum)
     {
-        var link = NavLinks.FirstOrDefault(link => link.NavPageType == pageType);
-
+        var link = NavLinks.FirstOrDefault(link => link.PageEnum == pageEnum);
         if (link is null) return;
-
         CurrentLink = link;
     }
 

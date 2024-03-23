@@ -157,28 +157,12 @@ namespace Display.Views
             else if (videoInfoList.Count == 1)
             {
                 var mediaPlayItem = new MediaPlayItem(videoInfoList[0]);
-                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
+                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, lastPage: this);
             }
 
             //有多集
             else
             {
-                //List<Datum> multisetList = new();
-                //foreach (var info in videoInfoList)
-                //{
-                //    multisetList.Add(info);
-                //}
-
-                //multisetList = multisetList.OrderBy(item => item.n).ToList();
-
-                //ContentsPage.DetailInfo.SelectVideoToPlay newPage = new(multisetList, videoInfo.truename);
-                //newPage.ContentListView.ItemClick += ContentListView_ItemClick; ;
-
-                //videoPlayButton.Flyout = new Flyout()
-                //{
-                //    Content = newPage
-                //};
-
                 PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, XamlRoot);
             }
         }

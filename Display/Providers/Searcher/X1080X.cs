@@ -303,20 +303,16 @@ namespace Display.Providers.Searcher
             }
 
             //分割通过正则匹配得到的CID
-            var splitResult = Common.SplitCid(cid.ToUpper());
+            var splitResult = Common.SplitCid(cid.ToUpper(), true);
             if (splitResult == null) return null;
 
             var leftCid = splitResult.Item1;
             var rightCid = splitResult.Item2;
 
-            List<Forum1080SearchResult> detailUrlInfos = new();
+            List<Forum1080SearchResult> detailUrlInfos = [];
 
-            for (var i = 0; i < searchResultNodes.Count; i++)
+            foreach (var pbwNode in searchResultNodes)
             {
-                string searchLeftCid;
-                string searchRightCid;
-
-                var pbwNode = searchResultNodes[i];
                 var titleNode = pbwNode.SelectSingleNode(".//h3[@class='xs3']/a");
                 var title = titleNode.InnerText;
                 var upperText = title.ToUpper();
@@ -324,17 +320,27 @@ namespace Display.Providers.Searcher
                 var matchResult = Regex.Match(upperText, @$"({leftCid}).*?0?(\d+)");
                 if (matchResult.Success)
                 {
-                    searchLeftCid = matchResult.Groups[1].Value;
-                    searchRightCid = matchResult.Groups[2].Value;
+                    var searchLeftCid = matchResult.Groups[1].Value;
+                    var searchRightCid = matchResult.Groups[2].Value;
+
+                    // 输入的只有一个, 只要包含即匹配
+                    if (rightCid == null)
+                    {
+
+                    }
+                    //精确匹配
+                    else if (searchLeftCid != leftCid
+                             || searchRightCid != rightCid
+                             && (!TryParse(rightCid, out var currentNum)
+                                 || !TryParse(searchRightCid, out var searchNum)
+                                 || !currentNum.Equals(searchNum)))
+                    {
+                         continue;
+                    }
                 }
                 else
                     continue;
 
-                if (searchLeftCid != leftCid
-                    || searchRightCid != rightCid
-                        && (!TryParse(rightCid, out var currentNum)
-                            || !TryParse(searchRightCid, out var searchNum)
-                            || !currentNum.Equals(searchNum))) continue;
 
                 var detailUrl = titleNode.GetAttributeValue("href", null);
                 if (detailUrl == null) continue;
@@ -344,7 +350,7 @@ namespace Display.Providers.Searcher
                 detailUrlInfos.Add(GetForum1080FromNode(pbwNode, title, detailUrl));
             }
 
-            string nextPageUrl = string.Empty;
+            var nextPageUrl = string.Empty;
             //是否有下一页
             var nextPageNode = htmlDoc.DocumentNode.SelectSingleNode(".//a[@class='nxt']");
             if (nextPageNode != null)

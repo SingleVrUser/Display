@@ -1,3 +1,4 @@
+using Display.Constants;
 using Display.ViewModels;
 using Microsoft.UI.Xaml.Controls;
 
@@ -19,6 +20,9 @@ public sealed partial class MainPage : Page
 
     private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        SettingFrame.Navigate(_viewModel.CurrentLink.NavPageType, NotificationQueue);
+        if (PageTypeAndEnum.PageTypeAndEnumDict.TryGetValue(_viewModel.CurrentLink.PageEnum, out var pageType))
+        {
+            SettingFrame.Navigate(pageType);
+        }
     }
 }

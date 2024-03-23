@@ -14,12 +14,12 @@
 
     <Page.Resources>
         <DataTemplate x:Key="NavLinkItemTemplate"
-                      x:DataType="settings:NavLink">
+                      x:DataType="settings:MenuItem">
             <StackPanel Orientation="Horizontal"
                         Spacing="10">
                 <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                           Glyph="{x:Bind Glyph}" />
-                <TextBlock Text="{x:Bind Label}" />
+                <TextBlock Text="{x:Bind Content}" />
             </StackPanel>
         </DataTemplate>
 

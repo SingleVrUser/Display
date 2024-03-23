@@ -22,4 +22,9 @@
     <converter:FloatToPercentageConverter x:Key="FloatToPercentageConverter" />
     <converter:TimeStampToStringConverter x:Key="TimeStampToStringConverter" />
     <communityConverters:StringVisibilityConverter x:Key="StringVisibilityConverter"/>
+    <communityConverters:BoolNegationConverter x:Key="BoolNegationConverter" />
+    <communityConverters:FileSizeToFriendlyStringConverter x:Key="FileSizeToFriendlyStringConverter" />
+    <communityConverters:DoubleToVisibilityConverter x:Key="GreaterThanZeroToVisibilityConverter" GreaterThan="0" />
+
+
 </ResourceDictionary>

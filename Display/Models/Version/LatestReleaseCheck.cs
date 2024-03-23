@@ -2,7 +2,7 @@
 
 using System;
 using System.Linq;
-using Display.Models.Data;
+using Display.Helper.Network;
 
 namespace Display.Models.Version;
 
@@ -12,8 +12,8 @@ public class LatestReleaseCheck
     {
         ReleaseInfo = releaseInfo;
         LatestVersion = releaseInfo.TagName.ToLower().Replace("v", "");
-        CurrentVersion = AppInfo.GetPackageVersion();
-        CurrentArchitecture = AppInfo.GetPackageArchitecture();
+        CurrentVersion = AppUpdateHelper.GetPackageVersion();
+        CurrentArchitecture = AppUpdateHelper.GetPackageArchitecture();
         AppAsset = releaseInfo.assets.FirstOrDefault(asset => asset.name.Contains(CurrentArchitecture));
         MoreInfoUrl = releaseInfo.html_url;
         CanUpdate = CurrentVersion != LatestVersion && AppAsset != null;
