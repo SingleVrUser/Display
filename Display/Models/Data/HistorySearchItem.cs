@@ -4,5 +4,5 @@ namespace Display.Models.Data;
 
 public class HistorySearchItem
 {
-    public List<SearchHistory> KeywordList { get; set; }
+    public SearchHistory[] KeywordArray { get; set; }
 }

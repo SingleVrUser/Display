@@ -2056,7 +2056,7 @@ namespace Display.Models.Data
 
             public static SearchHistory[] GetAllSearchHistory(SqliteConnection connection = null)
             {
-                var commandText = "SELECT * FROM SearchHistory";
+                var commandText = "SELECT * FROM SearchHistory order by id desc";
                 return DataAccessHelper.ExecuteReaderGetArray<SearchHistory>(commandText, connection);
             }
         }
