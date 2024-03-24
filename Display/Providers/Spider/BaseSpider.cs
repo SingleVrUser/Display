@@ -13,19 +13,21 @@ public abstract class BaseSpider
     public bool IsRunning { get; set; }
 
     public abstract SpiderSourceName Name { get; }
-    public abstract bool IsOn { get; set; }
     public abstract string Abbreviation { get; }
+
+    /**
+     * 标题包含的关键词，据此判断使用什么解析HtmlDoc
+     */
+    public abstract string Keywords { get; }
+
+    public abstract bool IsOn { get; set; }
+    public abstract string BaseUrl { get; set; }
 
     public virtual bool IsCookieEnable => false;
 
     public virtual int MinDelaySecond { get; set; } = 2;
     public virtual int MaxDelaySecond { get; set; } = 5;
 
-    /**
-     * 标题包含的关键词，据此判断使用什么解析HtmlDoc
-     */
-    public abstract string Keywords { get; }
-    public abstract string BaseUrl { get; set; }
     public virtual Tuple<int, int> DelayRanges => new(1, 3);
     public virtual HttpClient Client => Common.Client;
     public virtual bool IgnoreFc2 => true;
@@ -36,6 +38,8 @@ public abstract class BaseSpider
 
     public abstract Task<VideoInfo> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc);
 
+    public CancellationTokenSource CancellationTokenSource { get; set; }
+
     public bool IsSearch(string cid)
     {
         if (!IsOn) return false;
@@ -43,7 +47,16 @@ public abstract class BaseSpider
         var isFc2 = cid.Contains("FC2");
 
         //“是Fc2且忽略FC2” 或者 “是Fc2且只有Fc2”
-        // 满足以上条件，跳过该搜刮源
-        return (!isFc2 || !IgnoreFc2) && (isFc2 || !OnlyFc2);
+        // 1. 是Fc2
+        //   忽略Fc2   False
+        //   其他      True
+
+        // 2. 不是Fc2
+        //   只搜刮Fc2    False
+        //   其他         True
+
+        // 满足以上条件，则使用该搜刮源
+
+        return (isFc2 && !IgnoreFc2) || (!isFc2 && !OnlyFc2);
     }
 }

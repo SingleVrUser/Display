@@ -121,16 +121,16 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
             return;
         }
 
-        List<FailDatum> failDatums = FailList.Where(item => !string.IsNullOrEmpty(item.MatchName)).ToList();
+        var failDatumList = FailList.Where(item => !string.IsNullOrEmpty(item.MatchName)).ToList();
 
-        if (failDatums.Count == 0)
+        if (failDatumList.Count == 0)
         {
             ShowTeachingTip("未填写任何番号，请填写后继续");
             return;
         }
 
         //创建进度窗口
-        var page = new Progress(failDatums);
+        var page = new Progress(failDatumList);
         page.CreateWindow();
     }
 

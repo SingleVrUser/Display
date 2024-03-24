@@ -166,7 +166,7 @@ namespace Display.Helper.Data
 
             while (reader.Read())
             {
-                data ??= new List<T>();
+                data ??= [];
                 data.Add(reader.Export<T>());
             }
 

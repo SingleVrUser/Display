@@ -38,6 +38,7 @@ public class JavBus : BaseSpider
                 { "accept-language", "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2" },
                 { "user-agent", GetInfoFromNetwork.DownUserAgent }
             });
+
     public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
     {
         cid = cid.ToUpper();

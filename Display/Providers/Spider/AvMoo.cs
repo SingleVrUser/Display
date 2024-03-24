@@ -6,51 +6,58 @@ using SpiderInfo = Display.Models.Spider.SpiderInfos;
 using System.Threading;
 using Display.Models.Data;
 using Display.Helper.Network;
+using static Display.Models.Spider.SpiderInfos;
 
 namespace Display.Providers.Spider;
 
-public class AvMoo
+public class AvMoo: BaseSpider
 {
-    public const int Id = (int)SpiderInfo.SpiderSourceName.Avmoo;
+    public override SpiderSourceName Name => SpiderSourceName.Avmoo;
 
-    public const string Abbreviation = "Avmoo";
+    public override string Abbreviation => "Avmoo";
 
-    public const string Keywords = "AVMOO";
+    public override string Keywords => "AVMOO";
 
-    public static Tuple<int, int> DelayRanges = new(1, 2);
+    public override bool IgnoreFc2 => false;
 
-    public const bool IgnoreFc2 = true;
-
-    public static bool IsOn => AppSettings.IsUseAvMoo;
-
-
-    private static string baseUrl => AppSettings.AvMooBaseUrl;
-
-    public static async Task<VideoInfo> SearchInfoFromCID(string CID, CancellationToken token)
+    public override bool IsOn
     {
-        CID = CID.ToUpper();
+        get => AppSettings.IsUseAvMoo;
+        set => AppSettings.IsUseAvMoo = value;
+    }
 
-        var detail_url = await GetDetailUrlFromCID(CID, token);
+    public override string BaseUrl
+    {
+        get => AppSettings.AvMooBaseUrl;
+        set => AppSettings.AvMooBaseUrl = value;
+    }
+
+    public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
+    {
+        cid = cid.ToUpper();
+
+        var detailUrl = await GetDetailUrlFromCid(cid, token);
+
         //搜索无果，退出
-        if (detail_url == null) return null;
+        if (detailUrl == null) return null;
 
-        Tuple<string, string> result = await RequestHelper.RequestHtml(Common.Client, detail_url, token);
+        var result = await RequestHelper.RequestHtml(Common.Client, detailUrl, token);
         if (result == null) return null;
 
-        string htmlString = result.Item2;
+        var htmlString = result.Item2;
 
         if (string.IsNullOrEmpty(htmlString)) return null;
 
-        HtmlDocument htmlDoc = new HtmlDocument();
+        var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlString);
 
-        return await GetVideoInfoFromHtmlDoc(CID, detail_url, htmlDoc);
+        return await GetInfoByHtmlDoc(cid, detailUrl, htmlDoc);
 
     }
 
-    private static async Task<string> GetDetailUrlFromCID(string CID, CancellationToken token)
+    private async Task<string> GetDetailUrlFromCid(string cid, CancellationToken token)
     {
-        var url = GetInfoFromNetwork.UrlCombine(baseUrl, $"cn/search/{CID}");
+        var url = GetInfoFromNetwork.UrlCombine(BaseUrl, $"cn/search/{cid}");
 
         // 访问
         var result = await RequestHelper.RequestHtml(Common.Client, url, token);
@@ -61,89 +68,56 @@ public class AvMoo
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlString);
 
-        htmlString = GetDetailUrlFromSearchResult(htmlDoc, CID);
-
-        return htmlString;
+        return GetDetailUrlFromSearchResult(htmlDoc, cid);
     }
 
-    private static string GetDetailUrlFromSearchResult(HtmlDocument htmlDoc, string CID)
+    private static string GetDetailUrlFromSearchResult(HtmlDocument htmlDoc, string cid)
     {
-        string result = null;
-
         //是否提示搜索失败
         var alertNode = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class,'alert-danger')]");
         if (alertNode != null) return null;
 
-        var SearchResultNodes = htmlDoc.DocumentNode.SelectNodes("//div[@id='waterfall']/div[@class='item']");
+        var searchResultNodes = htmlDoc.DocumentNode.SelectNodes("//div[@id='waterfall']/div[@class='item']");
 
         //搜索无果，退出
-        if (SearchResultNodes == null) return null;
+        if (searchResultNodes == null) return null;
 
         //分割通过正则匹配得到的CID
-        var spliteResult = Common.SplitCid(CID);
-        if (spliteResult == null) return null;
+        var splitCid = Common.SplitCid(cid);
+        if (splitCid == null) return null;
 
-        string left_cid = spliteResult.Item1;
-        string right_cid = spliteResult.Item2;
+        var leftCid = splitCid.Item1;
+        var rightCid = splitCid.Item2;
 
-        string search_left_cid;
-        string search_right_cid;
-        for (var i = 0; i < SearchResultNodes.Count; i++)
+        foreach (var movieList in searchResultNodes)
         {
-            var movie_list = SearchResultNodes[i];
-            var title = movie_list.SelectSingleNode(".//div[@class='photo-info']/span/date").InnerText.ToUpper();
+            var upperTitle = movieList.SelectSingleNode(".//div[@class='photo-info']/span/date").InnerText.ToUpper();
 
-            var split_result = title.Split(['-', '_']);
-            if (split_result.Length == 1)
+            if(!Common.IsSearchResultMatch(leftCid,rightCid, upperTitle)) continue;
+
+            var detailUrl = movieList.SelectSingleNode(".//a[@class='movie-box']").Attributes["href"].Value;
+
+            //只有“//”没有“http(s)://”
+            if (!detailUrl.Contains("http") && detailUrl.Contains("//"))
             {
-                var match_result = Regex.Match(title, @"([A-Z]+)(\d+)");
-                if (match_result == null) continue;
-                search_left_cid = match_result.Groups[1].Value;
-                search_right_cid = match_result.Groups[2].Value;
+                detailUrl = $"https:{detailUrl}";
             }
-            else if (split_result.Length == 2)
-            {
-                search_left_cid = split_result[0];
-                search_right_cid = split_result[1];
-            }
-            else
-                continue;
 
-            int currentNum;
-            int searchNum;
-
-            if (search_left_cid == left_cid
-                     && (search_right_cid == right_cid
-                            || int.TryParse(right_cid, out currentNum)
-                                    && int.TryParse(search_right_cid, out searchNum)
-                                        && currentNum.Equals(searchNum)))
-            {
-                var detail_url = SearchResultNodes[i].SelectSingleNode(".//a[@class='movie-box']").Attributes["href"].Value;
-
-                //只有“//”没有“http(s)://”
-                if (!detail_url.Contains("http") && detail_url.Contains("//"))
-                {
-                    detail_url = $"https:{detail_url}";
-                }
-
-                result = detail_url;
-                break;
-            }
-            else
-                continue;
+            return detailUrl;
         }
 
-        return result;
+        return null;
     }
 
 
-    public static async Task<VideoInfo> GetVideoInfoFromHtmlDoc(string CID, string detail_url, HtmlDocument htmlDoc)
+    public override async Task<VideoInfo> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
     {
-        var info = await Common.AnalysisHtmlDocInfoFromAvSoxOrAvMoo(CID, detail_url, htmlDoc);
+        var info = await Common.AnalysisHtmlDocInfoFromAvSoxOrAvMoo(cid, detailUrl, htmlDoc);
         if (info == null) return null;
 
         info.IsWm = 0;
 
         return info;
     }
+
 }

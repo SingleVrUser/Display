@@ -66,6 +66,33 @@ public class Common
         return new Tuple<string, string>(leftCid, rightCid);
     }
 
+    public static bool IsSearchResultMatch(string leftCid, string rightCid, string upperText)
+    {
+        // 输入的只有一个, 只要包含即匹配
+        if (rightCid == null)
+        {
+            if (!upperText.Contains(leftCid)) return false;
+        }
+        //精确匹配
+        else
+        {
+            var matchResult = Regex.Match(upperText, @$"({leftCid}).*?0?(\d+)");
+            if (!matchResult.Success) return false;
+
+            var searchLeftCid = matchResult.Groups[1].Value;
+            var searchRightCid = matchResult.Groups[2].Value;
+
+            if (searchLeftCid != leftCid
+                || searchRightCid != rightCid
+                && (!int.TryParse(rightCid, out var currentNum)
+                    || !int.TryParse(searchRightCid, out var searchNum)
+                    || !currentNum.Equals(searchNum)))
+                return false;
+        }
+
+        return true;
+    }
+
     public static async Task<VideoInfo> AnalysisHtmlDocInfoFromAvSoxOrAvMoo(string CID, string detail_url, HtmlDocument htmlDoc)
     {
         VideoInfo videoInfo = new()

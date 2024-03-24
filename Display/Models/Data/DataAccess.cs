@@ -903,36 +903,6 @@ namespace Display.Models.Data
             }
 
             /// <summary>
-            /// 添加搜刮任务
-            /// </summary>
-            /// <param name="name"></param>
-            /// <param name="taskId"></param>
-            /// <param name="connection"></param>
-            public static void AddSpiderTask(string name, long taskId,SqliteConnection connection = null)
-            {
-                const string commandText = "INSERT OR REPLACE INTO SpiderTask VALUES (@Name,@bus,@Jav321,@Avmoo,@Avsox,@libre,@fc,@db,@done,@task_id);";
-
-                //fc只有javdb，fc2club能刮
-                var isFc = FileMatch.IsFc2(name);
-
-                var parameters = new List<SqliteParameter>
-                {
-                    new("@Name", name),
-                    new ("@bus", !isFc && AppSettings.IsUseJavBus ? "ready" : "done"),
-                    new ("@Jav321", !isFc && AppSettings.IsUseJav321 ? "ready" : "done"),
-                    new ("@Avmoo", !isFc && AppSettings.IsUseAvMoo ? "ready" : "done"),
-                    new ("@Avsox", AppSettings.IsUseAvSox ? "ready" : "done"),
-                    new ("@libre", !isFc && AppSettings.IsUseLibreDmm ? "ready" : "done"),
-                    new ("@fc", isFc && AppSettings.IsUseFc2Hub ? "ready" : "done"),
-                    new ("@db", AppSettings.IsUseJavDb ? "ready" : "done"),
-                    new ("@done", false),
-                    new ("@task_id", taskId)
-                };
-
-                DataAccessHelper.ExecuteNonQueryWithParameters(commandText, parameters, connection);
-            }
-
-            /// <summary>
             /// 插入ActorInfo
             /// </summary>
             /// <param name="info"></param>

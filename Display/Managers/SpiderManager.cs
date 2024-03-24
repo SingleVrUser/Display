@@ -35,10 +35,27 @@ public class SpiderManager
     /// </summary>
     private readonly Random _random = new();
 
-    public static BaseSpider[] Spiders = [
-        new JavBus(),
-        new JavDb()
-    ];
+    private static BaseSpider[] _spiders;
+
+    public static BaseSpider[] Spiders
+    {
+        get
+        {
+            if (_spiders != null) return _spiders;
+
+            _spiders =
+            [
+                new JavBus(),
+                new JavDb(),
+                new AvMoo(),
+                new AvSox(),
+                new Fc2Hub(),
+                new LibreDmm()
+            ];
+
+            return _spiders;
+        }
+    }
 
     #region 单线程
 
@@ -130,33 +147,6 @@ public class SpiderManager
     #region 多线程
 
     /// <summary>
-    /// 获取当前cid的VideoInfo列表信息，所有搜刮源同步执行，所有搜刮源都搜一遍
-    /// </summary>
-    /// <param name="cid"></param>
-    /// <param name="token"></param>
-    /// <returns>多条VideoInfo</returns>
-    public async Task<List<VideoInfo>> DispatchSpiderInfosByCidInOrder(string cid, CancellationToken token = default)
-    {
-        cid = cid.ToUpper();
-
-        ConcurrentQueue<VideoInfo> videoInfoQueue = [];
-        var tasks = Spiders.Where(spider => spider.IsSearch(cid))
-            .Select(spider =>
-            {
-                return Task.Run(async () =>
-                {
-                    var info = await spider.GetInfoByCid(cid, token);
-                    if (info != null) videoInfoQueue.Enqueue(info);
-                }, token);
-            }).ToArray();
-
-        // 等待所有任务结束
-        await Task.WhenAll(tasks);
-
-        return videoInfoQueue.ToList();
-    }
-
-    /// <summary>
     /// 运行启动的搜刮源，搜刮任务队列
     /// </summary>
     /// <param name="spider"></param>
@@ -190,81 +180,87 @@ public class SpiderManager
             }
 
             // 之前搜索过了，跳过
-            if (item.SpiderHashCode.Contains(spider.GetHashCode()))
+            if (item.DoneSpiderNameArray.Contains(spider.Name))
             {
                 // 归还
                 _taskItemQueue.Enqueue(item);
-
+                await Task.Delay(1000, token); // 必须延迟，不然可能会强占资源（一直取出、归还）
                 continue;
             }
 
-            try
+            // 当前搜刮源可以搜索该资源
+            if (spider.IsSearch(item.Name))
             {
-                var second = TimeSpan.FromSeconds(_random.Next(spider.MinDelaySecond,
-                    spider.MaxDelaySecond));
-                Debug.WriteLine($"{spider.Name}等待 {second.TotalSeconds} s");
-
-                await Task.Delay(second, token); // 当queue只有一个时，调用这个，会一直阻塞当前线程
-                //Thread.Sleep(second); // 使用这个，后面的Execute报错，但捕获不了
-
-                if (token.IsCancellationRequested) break;
-
-                Debug.WriteLine($"{spider.Name}开始搜索: {item.Name}");
-                var newInfo = await spider.GetInfoByCid(item.Name, token);
-
-                if (newInfo is null)
+                try
                 {
-                    Debug.WriteLine("搜索结果为空");
-                    continue;
+                    var second = TimeSpan.FromSeconds(_random.Next(spider.MinDelaySecond,
+                        spider.MaxDelaySecond));
+                    Debug.WriteLine($"{spider.Name}等待 {second.TotalSeconds} s");
+
+                    await Task.Delay(second, token); // 当queue只有一个时，调用这个，会一直阻塞当前线程
+                    //Thread.Sleep(second); // 使用这个，后面的Execute报错，但捕获不了
+
+                    if (token.IsCancellationRequested) break;
+
+                    Debug.WriteLine($"{spider.Name}开始搜索: {item.Name}");
+                    var newInfo = await spider.GetInfoByCid(item.Name, token);
+
+                    if (newInfo is null)
+                    {
+                        Debug.WriteLine("搜索结果为空");
+                    }
+                    else
+                    {
+                        item.AddInfo(newInfo);
+                        Debug.WriteLine(item.IsCompleted ? "成功" : "成功但不完整");
+                    }
+
                 }
-
-                item.AddInfo(newInfo);
-
-                Debug.WriteLine(item.IsCompleted ? "成功" : "成功但不完整");
-            }
-            catch (TaskCanceledException)
-            {
-                Debug.WriteLine("任务被取消了");
-            }
-            // 失败了
-            catch (Exception e)
-            {
-                Debug.WriteLine($"发生错误了:{e.Message}");
-            }
-            finally
-            {
-                // 向Item项添加当前id
-                item.SpiderHashCode.Enqueue(spider.GetHashCode());
-
-                // 所有字段搜索完成
-                if (item.IsCompleted)
+                catch (TaskCanceledException)
                 {
-                    DoWhenNameIsAllSearched(item);
+                    Debug.WriteLine("任务被取消了");
                 }
-                // 没搜索完整，但全部的搜刮源都搜索过了
-                // 不归还
-                else if (item.SpiderHashCode.Count >= Spiders.Length)
+                // 失败了
+                catch (Exception e)
                 {
-                    DoWhenNameIsAllSearched(item);
-                }
-                else
-                {
-                    // 归还到任务队列
-                    _taskItemQueue.Enqueue(item);
+                    Debug.WriteLine($"发生错误了:{e.Message}");
                 }
             }
 
-            if (_taskItemQueue.Count > Spiders.Length) continue;
+            // 向Item项添加当前id
+            item.DoneSpiderNameArray.Enqueue(spider.Name);
 
+            int? onSpiderCount = null;
 
-            // 如果剩下的都是搜索过的
+            // 所有字段搜索完成
+            var isThisNameDone = item.IsCompleted;
+
+            // 没搜索完整，但全部的正在启动的搜刮源都搜索过了
+            if (!isThisNameDone)
+            {
+                onSpiderCount = Spiders.Count(curSpider => curSpider.IsOn);
+
+                Debug.WriteLine(onSpiderCount);
+                isThisNameDone = item.DoneSpiderNameArray.Count >= onSpiderCount;
+            }
+
+            if (isThisNameDone)
+            {
+                DoWhenNameIsAllSearched(item);
+                continue;
+            }
+
+            // 归还到任务队列
+            _taskItemQueue.Enqueue(item);
+
+            // 以下代码在待处理队列小于正在启动的搜刮队列时使用
+            if (_taskItemQueue.Count > onSpiderCount) continue;
+
+            // 如果剩下的待处理队列都是该搜刮源搜索过的，则退出该搜刮源的搜索
             var queueArray = _taskItemQueue.ToArray();
             if (queueArray.All(
-                    searchItem => searchItem.SpiderHashCode.Contains(spider.GetHashCode()))
-               )
-            {
-                break;
-            }
+                    searchItem => searchItem.DoneSpiderNameArray.Contains(spider.Name))
+               ) break;
         }
 
         Debug.WriteLine($"当前搜刮源完成: {spider.Name}");
@@ -296,6 +292,35 @@ public class SpiderManager
 
     }
 
+
+    /// <summary>
+    /// 获取当前cid的VideoInfo列表信息，所有搜刮源同步执行，所有搜刮源都搜一遍
+    /// </summary>
+    /// <param name="cid"></param>
+    /// <param name="token"></param>
+    /// <returns>多条VideoInfo</returns>
+    public async Task<List<VideoInfo>> DispatchSpiderInfosByCidInOrder(string cid, CancellationToken token = default)
+    {
+        cid = cid.ToUpper();
+
+        ConcurrentQueue<VideoInfo> videoInfoQueue = [];
+        var tasks = Spiders
+            .Where(spider => spider.IsSearch(cid))
+            .Select(spider =>
+            {
+                return Task.Run(async () =>
+                {
+                    var info = await spider.GetInfoByCid(cid, token);
+                    if (info != null) videoInfoQueue.Enqueue(info);
+                }, token);
+            }).ToArray();
+
+        // 等待所有任务结束
+        await Task.WhenAll(tasks);
+
+        return videoInfoQueue.ToList();
+    }
+
     /// <summary>
     /// 批量添加任务
     /// </summary>
@@ -308,11 +333,14 @@ public class SpiderManager
             _taskItemQueue.Enqueue(new SearchItem(name));
         }
 
+        //记录当前任务队列的个数
+        LeftNameCount = _taskItemQueue.Count;
+
         _cancellationTokenSource ??= new CancellationTokenSource();
 
         // 只启动未启动的搜刮源
         var tasks = Spiders
-            .Where(i => !i.IsRunning)
+            .Where(i => i.IsOn && !i.IsRunning)
             .Select(spider => RunTaskBySingleSpider(spider, _cancellationTokenSource.Token)).ToArray();
 
         // 没有需要启动的搜刮源就退出
@@ -330,24 +358,18 @@ public class SpiderManager
     {
         _cancellationTokenSource?.Cancel();
         _cancellationTokenSource?.Dispose();
+
         _cancellationTokenSource = null;
     }
 
-
-    public List<string> GetFailNames()
+    public string[] GetFailNames()
     {
-        //_failureNameInfos.Enqueue("nihao");
-        //_failureNameInfos.Enqueue("wohao");
-        //_failureNameInfos.Enqueue("dajiahao");
-        return _failureNameInfos.ToList();
+        return _failureNameInfos.ToArray();
     }
 
-    public List<string> GetOnSpiderNames()
-    {
-        return Spiders.Where(item => item.IsOn).Select(item => item.Abbreviation).ToList();
-    }
+    public string[] SpiderNames => Spiders.Where(item => item.IsOn).Select(item => item.Abbreviation).ToArray();
 
-    public int GetLeftNameCount() => _taskItemQueue.Count;
+    public int LeftNameCount { get; set; }
 
     public event Action<string> ItemTaskFailAction;
     public event Action<string> ItemTaskSuccessAction;
@@ -357,7 +379,7 @@ public class SpiderManager
 
     private record SearchItem(string Name)
     {
-        public ConcurrentQueue<int> SpiderHashCode { get; } = [];
+        public ConcurrentQueue<SpiderSourceName> DoneSpiderNameArray { get; } = [];
 
         public VideoInfo Info { get; private set; }
 

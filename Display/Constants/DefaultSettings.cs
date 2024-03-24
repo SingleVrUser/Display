@@ -59,13 +59,12 @@ public static class DefaultSettings
         {
             public const string LibreDmm = "https://www.Libredmm.com/";
             public const string JavBus = "https://www.Javbus.com/";
-            public const string AvMoo = "https://Avmoo.click/";
+            public const string AvMoo = "https://avmoo.online/";
             public const string AvSox = "https://Avsox.click/";
-            public const string Jav321 = "https://www.Jav321.com/";
             public const string JavDb = "https://Javdb.com/";
             public const string Fc2Hub = "https://fc2hub.com/";
             public const string MinnanoAv = "http://www.minnano-av.com/";
-            public const string X080X = "https://x555x.me/";
+            public const string X080X = "https://ai1080.art/";
         }
 
         public static class Cookie
@@ -80,7 +79,6 @@ public static class DefaultSettings
             public const bool JavBus = true;
             public const bool AvMoo = true;
             public const bool AvSox = true;
-            public const bool Jav321 = true;
             public const bool Fc2Hub = true;
             public const bool LibreDmm = true;
             public const bool JavDb = false;

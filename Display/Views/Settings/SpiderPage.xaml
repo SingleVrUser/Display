@@ -28,14 +28,8 @@
                 <controls:SettingsExpander.Items>
                     <controls:SettingsCard Header="地址" HorizontalContentAlignment="Stretch"
                                            ContentAlignment="Vertical">
-                        <RelativePanel>
-                            <TextBox Width="600"
-                                     Text="{x:Bind Instance.BaseUrl, Mode=OneWay}" />
-                            <Button Content="检查"
-                                    IsEnabled="False"
-                                    RelativePanel.AlignRightWithPanel="True"
-                                    RelativePanel.AlignBottomWithPanel="True" />
-                        </RelativePanel>
+                        <TextBox MinWidth="600"
+                                 Text="{x:Bind Instance.BaseUrl, Mode=OneWay}" />
                     </controls:SettingsCard>
 
                     <controls:SettingsCard Header="Cookie"

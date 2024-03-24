@@ -128,7 +128,7 @@ namespace Display.Views.SearchLink
 
             var url = info.Url;
             var attachmentInfos = await X1080X.GetDownLinkFromUrl(url);
-            Debug.WriteLine($"获取到下载链接({attachmentInfos.Count})");
+            Debug.WriteLine($"获取到下载链接({attachmentInfos.Length})");
 
             //选择第一个不需要点数的
             var attmnInfo = attachmentInfos.FirstOrDefault(x => x.Expense == 0);
@@ -139,7 +139,7 @@ namespace Display.Views.SearchLink
             {
                 // 磁力
                 case AttmnType.Magnet:
-                    return await RequestOfflineDown(cid, new List<string> { attmnInfo.Url });
+                    return await RequestOfflineDown(cid, [attmnInfo.Url]);
                 case AttmnType.Rar:
                 {
                     var rarPath = await X1080X.TryDownAttmn(attmnInfo.Url, attmnInfo.Name);
@@ -224,7 +224,7 @@ namespace Display.Views.SearchLink
 
             var addTaskUrlInfo = await webApi.AddTaskUrl(links, cid, uploadInfo.user_id, offlineSpaceInfo.sign, offlineSpaceInfo.time);
 
-            bool isDone = false;
+            var isDone = false;
             string result = null;
             // 需要验证账号
             if (addTaskUrlInfo is { errcode: Constants.Account.AccountAnomalyCode })

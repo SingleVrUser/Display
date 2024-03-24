@@ -6,15 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Display.CustomWindows;
-using Display.Helper.Date;
 using Display.Helper.FileProperties.Name;
 using Display.Managers;
 using Display.Models.Data;
 using Display.Models.Data.Enums;
 using Display.Models.Spider;
-using Display.Views.Tasks;
 using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.Drawing;
@@ -60,10 +57,10 @@ namespace Display.Views.SpiderVideoInfo
             this.Loaded += PageLoaded;
         }
 
-        public Progress(List<FailDatum> failDatums)
+        public Progress(List<FailDatum> failDatumList)
         {
             this.InitializeComponent();
-            this._failDatumList = failDatums;
+            this._failDatumList = failDatumList;
             this.Loaded += ReSpiderPageLoaded;
         }
 

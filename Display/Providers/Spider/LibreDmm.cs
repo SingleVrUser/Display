@@ -1,65 +1,68 @@
-﻿using HtmlAgilityPack;
+﻿using System.Security.Cryptography;
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using SpiderInfo = Display.Models.Spider.SpiderInfos;
 using Display.Helper.Network;
 using Display.Models.Data;
 using Display.Models.Spider;
+using HtmlAgilityPack;
+using static Display.Constants.DefaultSettings.Network;
+using System.Linq;
 
 namespace Display.Providers.Spider;
 
-public class LibreDmm
+public class LibreDmm : BaseSpider
 {
-    public const int Id = (int)SpiderInfo.SpiderSourceName.Libredmm;
+    public override SpiderInfos.SpiderSourceName Name => SpiderInfos.SpiderSourceName.Libredmm;
+    public override string Abbreviation => "libre";
+    public override string Keywords => "LibreFanza";
 
-    public const string Abbreviation = "libre";
-
-    public const string Keywords = "LibreFanza";
-
-    public static Tuple<int, int> DelayRanges = new(1, 2);
-
-    public const bool IgnoreFc2 = true;
-
-    public static bool IsOn => AppSettings.IsUseLibreDmm;
-
-    private static string baseUrl => AppSettings.LibreDmmBaseUrl;
-
-    public static async Task<VideoInfo> SearchInfoFromCID(string CID, CancellationToken token)
+    public override bool IsOn
     {
-        CID = CID.ToUpper();
-        string url = GetInfoFromNetwork.UrlCombine(baseUrl, $"movies/{CID}");
-
-        Tuple<string, string> result = await RequestHelper.RequestHtml(Common.Client, url, token);
-        if (result == null) return null;
-
-        string detail_url = result.Item1;
-        string htmlString = result.Item2;
-
-        HtmlDocument htmlDoc = new HtmlDocument();
-        htmlDoc.LoadHtml(htmlString);
-
-        return await GetVideoInfoFromHtmlDoc(CID, detail_url, htmlDoc);
+        get => AppSettings.IsUseLibreDmm;
+        set => AppSettings.IsUseLibreDmm = value;
     }
 
-    public static async Task<VideoInfo> GetVideoInfoFromHtmlDoc(string CID, string detail_url, HtmlDocument htmlDoc)
+    public override string BaseUrl
+    {
+        get => AppSettings.LibreDmmBaseUrl;
+        set => AppSettings.LibreDmmBaseUrl = value;
+    }
+    public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
+    {
+        cid = cid.ToUpper();
+        var url = GetInfoFromNetwork.UrlCombine(BaseUrl, $"movies/{cid}");
+
+        var result = await RequestHelper.RequestHtml(Common.Client, url, token);
+        if (result == null) return null;
+
+        var detailUrl = result.Item1;
+        var htmlString = result.Item2;
+
+        var htmlDoc = new HtmlDocument();
+        htmlDoc.LoadHtml(htmlString);
+
+        return await GetInfoByHtmlDoc(cid, detailUrl, htmlDoc);
+    }
+
+    public override async Task<VideoInfo> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
     {
         //搜索封面
-        string ImageUrl = null;
-        var ImageUrlNode = htmlDoc.DocumentNode.SelectSingleNode("//img[@class='img-fluid']");
-        if (ImageUrlNode != null)
+        string imageUrl = null;
+        var imageUrlNode = htmlDoc.DocumentNode.SelectSingleNode("//img[@class='img-fluid']");
+        if (imageUrlNode != null)
         {
-            ImageUrl = ImageUrlNode.Attributes["src"].Value;
+            imageUrl = imageUrlNode.Attributes["src"].Value;
         }
 
-        VideoInfo videoInfo = new VideoInfo();
-        videoInfo.busUrl = detail_url;
-        videoInfo.trueName = CID;
-
-        //dmm肯定没有步兵
-        videoInfo.IsWm = 0;
+        var videoInfo = new VideoInfo
+        {
+            busUrl = detailUrl,
+            trueName = cid,
+            //dmm肯定没有步兵
+            IsWm = 0
+        };
 
         var titleNode = htmlDoc.DocumentNode.SelectSingleNode("//h1");
         if (titleNode != null)
@@ -81,8 +84,8 @@ public class LibreDmm
                     videoInfo.Director = valueNodes[i].InnerText.Trim();
                     break;
                 case "Genres":
-                    var generesNodes = valueNodes[i].SelectNodes("ul/li");
-                    videoInfo.Category = string.Join(",", generesNodes.Select(x => x.InnerText.Trim()));
+                    var genresNodes = valueNodes[i].SelectNodes("ul/li");
+                    videoInfo.Category = string.Join(",", genresNodes.Select(x => x.InnerText.Trim()));
                     break;
                 case "Labels":
                     videoInfo.Series = valueNodes[i].InnerText.Trim();
@@ -105,13 +108,12 @@ public class LibreDmm
         }
 
         //下载封面
-        if (!string.IsNullOrEmpty(ImageUrl))
-        {
-            string SavePath = AppSettings.ImageSavePath;
-            string filePath = Path.Combine(SavePath, CID);
-            videoInfo.ImageUrl = ImageUrl;
-            videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(ImageUrl, filePath, CID);
-        }
+        if (string.IsNullOrEmpty(imageUrl)) return videoInfo;
+
+        var savePath = AppSettings.ImageSavePath;
+        var filePath = Path.Combine(savePath, cid);
+        videoInfo.ImageUrl = imageUrl;
+        videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(imageUrl, filePath, cid);
 
         return videoInfo;
     }
