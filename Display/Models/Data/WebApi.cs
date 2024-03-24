@@ -286,6 +286,12 @@ namespace Display.Models.Data
 
             if (webFileInfo.state)
             {
+                //  下级目录为空
+                if (webFileInfo.data is null)
+                {
+                    return getFilesProgressInfo;
+                }
+
                 foreach (var item in webFileInfo.data)
                 {
                     if (token.IsCancellationRequested)
@@ -332,7 +338,7 @@ namespace Display.Models.Data
                         getFilesProgressInfo.FilesCount++;
 
                         var cpm = 60 / (NowDate - lastDate);
-                        progress?.Report(new GetFileProgressIProgress() { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
+                        progress?.Report(new GetFileProgressIProgress { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
 
                         getFilesProgressInfo.AddToDataAccessList.Add(item);
                     }
