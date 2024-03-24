@@ -1540,9 +1540,9 @@ namespace Display.Models.Data
 
         public int AllCount => FolderCount + FilesCount;
 
-        public List<long?> FailCid { get; set; } = new();
+        public List<long?> FailCid { get; set; } = [];
 
-        public List<Datum> AddToDataAccessList = new();
+        public List<Datum> AddToDataAccessList = [];
     }
     //报告进度和状态
     public class GetFileProgressIProgress
