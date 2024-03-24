@@ -338,6 +338,16 @@ public class AppSettings
     }
 
     /// <summary>
+    /// 115导入数据库 进程界面 的 任务完成后 关闭窗口
+    /// </summary>
+    /// 
+    public static bool IsCloseWindowAfterImportDataAccess
+    {
+        get => GetValue(Handle.IsCloseWindowAfterImportDataAccess);
+        set => SetValue(value);
+    }
+
+    /// <summary>
     /// 115的Cookie
     /// </summary>
     public static string _115_Cookie

@@ -28,7 +28,7 @@
         </Style>
     </Page.Resources>
 
-    <Grid>
+    <Grid Padding="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
@@ -45,18 +45,8 @@
                        FontSize="15"/>
         </StackPanel>
 
-        <Grid Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="200" />
-                <RowDefinition Height="auto" />
-                <RowDefinition MaxHeight="400"
-                               MinHeight="200" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="2*" />
-            </Grid.ColumnDefinitions>
+        <Grid Grid.Row="1" RowDefinitions="200,auto,400,200"
+              ColumnDefinitions="*,*,2*">
 
             <!--选中的文件夹-->
             <Grid Grid.ColumnSpan="2" Style="{StaticResource GridWithBrush}">
@@ -92,7 +82,7 @@
                 </StackPanel>
             </Grid>
 
-            <Grid Grid.Row="2"
+            <!--<Grid Grid.Row="2" Grid.Column="0"
                   x:Name="SpiderInfo_Grid"
                   Style="{StaticResource GridWithBrush}">
                 <GridView x:Name="SpiderInfo_GridView" SelectionMode="None">
@@ -153,9 +143,14 @@
                                     LegendPosition="Right"
                                     LegendBackground="Transparent">
                 </lvc:CartesianChart>
+            </Grid>-->
+
+            <Grid Grid.Row="2" Grid.ColumnSpan="2">
+                <TextBlock Text="搜刮任务将转移到任务窗口" Opacity="0.5" HorizontalAlignment="Center"/>
             </Grid>
 
-            <Grid Style="{StaticResource GridWithBrush}"
+
+            <!--<Grid Style="{StaticResource GridWithBrush}"
                   Grid.Row="1"
                   Grid.ColumnSpan="2"
                   RowSpacing="10"
@@ -177,10 +172,10 @@
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
 
-                <!--<Grid.ColumnDefinitions>
+                --><!--<Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>-->
+                </Grid.ColumnDefinitions>--><!--
 
                 <TextBlock Opacity="0.5" FontSize="14">
                     <Run>总视频数量:</Run>
@@ -206,7 +201,7 @@
                     <Run>番号搜刮成功率:</Run>
                     <Run x:Name="CidSuccessRate_Run">100%</Run>
                 </TextBlock>
-            </Grid>
+            </Grid>-->
 
             <!--获取信息--><!--
             <Grid x:Name="VideoInfo_Grid"
@@ -291,7 +286,7 @@
                                                StringValue="{x:Bind videoInfo.actor, Mode=OneWay}" />
             </Grid>-->
 
-            <!--进度环-->
+            <!--进度环--><!--
             <Grid x:Name="ProgressRing_Grid"
                   Style="{StaticResource GridWithBrush}"
                   Grid.Row="1"
@@ -309,7 +304,7 @@
                             Spacing="10"
                             Grid.Column="1"
                             Grid.ColumnSpan="2">
-                    <!--进度环-->
+                    --><!--进度环--><!--
                     <Grid RowSpacing="10">
                         <StackPanel HorizontalAlignment="Center"
                                     VerticalAlignment="Center">
@@ -367,8 +362,8 @@
                     </TextBlock>
                 </StackPanel>
 
-                <!--更多-->
-                <HyperlinkButton Grid.ColumnSpan="4"
+                --><!--更多--><!--
+                <HyperlinkButton Grid.Column="0" Grid.ColumnSpan="4"
                                  Content="&#xE10C;"
                                  FontFamily="Segoe Fluent Icons"
                                  HorizontalAlignment="Right"
@@ -379,8 +374,8 @@
                             <TextBlock x:Name="ProgressMore_TextBlock"/>
                         </Flyout>
                     </FlyoutBase.AttachedFlyout>
-                </HyperlinkButton>
-            </Grid>
+                </HyperlinkButton>--><!--
+            </Grid>-->
         </Grid>
 
         <TeachingTip Grid.Row="0" x:Name="JavDbCookieVisiable_TeachingTip"

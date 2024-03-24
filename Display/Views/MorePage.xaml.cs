@@ -16,14 +16,13 @@ namespace Display.Views;
 
 public sealed partial class MorePage : Page
 {
-    private MorePageViewModel _viewModel = App.GetService<MorePageViewModel>();
+    private readonly MorePageViewModel _viewModel = App.GetService<MorePageViewModel>();
     
     public MorePage()
     {
         this.InitializeComponent();
 
     }
-
 
     private void GridView_ItemClick(object sender, ItemClickEventArgs e)
     {

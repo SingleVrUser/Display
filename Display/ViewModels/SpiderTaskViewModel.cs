@@ -42,8 +42,8 @@ internal partial class SpiderTaskViewModel : ObservableObject
             if (ShowPause) return;
 
             IsTaskRunning = false;
-            MaxProgressValue = 0;
-            CurrentProgressValue = 0;
+            //MaxProgressValue = 0;
+            //CurrentProgressValue = 0;
         };
         SpiderNames = _manager.SpiderNames;
         FailNameCollection = new ObservableCollection<string>(_manager.GetFailNames());

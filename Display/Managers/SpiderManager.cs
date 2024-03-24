@@ -8,13 +8,13 @@ using static Display.Models.Spider.SpiderInfos;
 using Display.Helper.Network;
 using Display.Providers.Spider;
 using System.Collections.Concurrent;
-using Display.Helper.Data;
 using System;
 using System.Diagnostics;
+using Display.Models.Spider;
 
 namespace Display.Managers;
 
-public class SpiderManager
+public partial class SpiderManager
 {
     private CancellationTokenSource _cancellationTokenSource;
 
@@ -165,15 +165,16 @@ public class SpiderManager
                 // 任务队列为空的情况，还要考虑有Spider取出了，正在处理中，可能存在处理不成功的情况
                 if (_taskItemQueue.IsEmpty)
                 {
-                    bool isAllStop;
+                    bool isContinue;
                     lock (Spiders)
                     {
-                        // 其他的正在开始
-                        isAllStop = Spiders.All(currentSpider => currentSpider.Equals(spider) || !currentSpider.IsRunning);
+                        // 其他运行中的搜刮源
+                        isContinue = Spiders.Any(curSpider => curSpider.HandleItem != null &&
+                            !curSpider.HandleItem.DoneSpiderNameArray.Contains(spider.Name));
                     }
 
-                    await Task.Delay(1000, token); // 必须延迟，不然Exec前的等待会一直堵塞（例:当queue里只有一个）
-                    if (isAllStop) break;
+                    await Task.Delay(100, token); // 必须延迟，不然Exec前的等待会一直堵塞（例:当queue里只有一个）
+                    if (!isContinue) break;
                 }
 
                 continue;
@@ -182,11 +183,20 @@ public class SpiderManager
             // 之前搜索过了，跳过
             if (item.DoneSpiderNameArray.Contains(spider.Name))
             {
+                // 能运行到这，说明数量很少了（队列先进先出）
+
                 // 归还
                 _taskItemQueue.Enqueue(item);
-                await Task.Delay(1000, token); // 必须延迟，不然可能会强占资源（一直取出、归还）
+
+                await Task.Delay(100, token); // 必须延迟，不然会强占资源（一直取出、归还）
+
+                // 如果剩下的待处理的包括正在处理的队列都是该搜刮源搜索过的，则退出该搜刮源的搜索
+                if (IsLeftNamesSpiderDone(spider)) break;
+
                 continue;
             }
+
+            spider.HandleItem = item;
 
             // 当前搜刮源可以搜索该资源
             if (spider.IsSearch(item.Name))
@@ -229,20 +239,20 @@ public class SpiderManager
 
             // 向Item项添加当前id
             item.DoneSpiderNameArray.Enqueue(spider.Name);
-
-            int? onSpiderCount = null;
-
+            
             // 所有字段搜索完成
             var isThisNameDone = item.IsCompleted;
 
             // 没搜索完整，但全部的正在启动的搜刮源都搜索过了
             if (!isThisNameDone)
             {
-                onSpiderCount = Spiders.Count(curSpider => curSpider.IsOn);
+                var onSpiderCount = Spiders.Count(curSpider => curSpider.IsOn);
 
                 Debug.WriteLine(onSpiderCount);
                 isThisNameDone = item.DoneSpiderNameArray.Count >= onSpiderCount;
             }
+
+            spider.HandleItem = null;
 
             if (isThisNameDone)
             {
@@ -253,18 +263,23 @@ public class SpiderManager
             // 归还到任务队列
             _taskItemQueue.Enqueue(item);
 
-            // 以下代码在待处理队列小于正在启动的搜刮队列时使用
-            if (_taskItemQueue.Count > onSpiderCount) continue;
-
-            // 如果剩下的待处理队列都是该搜刮源搜索过的，则退出该搜刮源的搜索
-            var queueArray = _taskItemQueue.ToArray();
-            if (queueArray.All(
-                    searchItem => searchItem.DoneSpiderNameArray.Contains(spider.Name))
-               ) break;
+            // 如果剩下的待处理的包括正在处理的队列都是该搜刮源搜索过的，则退出该搜刮源的搜索
+            if (IsLeftNamesSpiderDone(spider)) break;
         }
 
         Debug.WriteLine($"当前搜刮源完成: {spider.Name}");
         lock (Spiders) spider.IsRunning = false;
+    }
+
+    private bool IsLeftNamesSpiderDone(BaseSpider curSpider)
+    {
+        var spiders = Spiders.Where(spider => spider.IsOn).ToArray();
+        var queueArray = _taskItemQueue.ToArray();
+
+        return queueArray.All(item => item.DoneSpiderNameArray.Contains(curSpider.Name)) &&
+               spiders.All(spider => spider.HandleItem ==null ||
+                                     (spider.HandleItem != null && spider.HandleItem.DoneSpiderNameArray.Contains(curSpider.Name))
+                                     );
     }
 
     /// <summary>
@@ -348,6 +363,8 @@ public class SpiderManager
 
         await Task.WhenAll(tasks);
 
+        Debug.WriteLine("所有搜刮源完成搜刮");
+
         TaskCompletedAction?.Invoke();
     }
 
@@ -376,45 +393,5 @@ public class SpiderManager
     public event Action TaskCompletedAction;
 
     #endregion
-
-    private record SearchItem(string Name)
-    {
-        public ConcurrentQueue<SpiderSourceName> DoneSpiderNameArray { get; } = [];
-
-        public VideoInfo Info { get; private set; }
-
-        public bool IsCompleted { get; private set; }
-
-        public void AddInfo(VideoInfo info)
-        {
-            if (Info == null)
-            {
-                Info = info;
-                IsCompleted = ClassHelper.InfoIsCompleted(info);
-            }
-            else
-            {
-                UpdateInfo(info);
-            }
-        }
-
-        private void UpdateInfo(VideoInfo info)
-        {
-            // 新数据为完整的，直接替换
-            if (ClassHelper.InfoIsCompleted(Info))
-            {
-                Info = info;
-                IsCompleted = true;
-            }
-            else
-            {
-                var oldInfo = Info;
-                IsCompleted = ClassHelper.UpdateOldInfoByNew(ref oldInfo, info);
-                Info = oldInfo;
-            }
-
-        }
-    }
-
 }
 
