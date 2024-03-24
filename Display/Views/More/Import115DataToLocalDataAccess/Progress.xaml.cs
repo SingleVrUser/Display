@@ -219,7 +219,7 @@ namespace Display.Views.More.Import115DataToLocalDataAccess
             // 2.获取数据，获取所有文件的全部信息（大小和数量）
             await webapi.GetAllFileInfoToDataAccess(filesWithoutRootList, s_cts.Token, progress);
 
-            if (s_cts.Token.IsCancellationRequested) return;
+            currentWindow.Closed -= CurrentWindow_Closed;
 
             //搜刮完成,是否自动搜刮
             if (AppSettings.IsSpiderAfterImportDataAccess && _overallCount != 0)
@@ -239,7 +239,10 @@ namespace Display.Views.More.Import115DataToLocalDataAccess
                 page.CreateWindow();
             }
 
-            currentWindow.Closed -= CurrentWindow_Closed;
+            if (AppSettings.IsCloseWindowAfterImportDataAccess)
+            {
+                currentWindow.Close();
+            }
         }
 
         //文件总数（包括文件夹）

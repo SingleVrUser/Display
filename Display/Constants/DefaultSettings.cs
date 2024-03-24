@@ -90,6 +90,7 @@ public static class DefaultSettings
     {
         public const bool IsToastAfterImportDataAccess = false;
         public const bool IsSpiderAfterImportDataAccess = true;
+        public const bool IsCloseWindowAfterImportDataAccess = true;
     }
 
     public static class App

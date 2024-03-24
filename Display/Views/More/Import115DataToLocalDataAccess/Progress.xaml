@@ -31,12 +31,16 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
                     </Grid.ColumnDefinitions>
                     <ToggleButton Content="搜刮"
                                   IsChecked="{x:Bind data:AppSettings.IsSpiderAfterImportDataAccess,Mode=TwoWay}"/>
-                    <ToggleButton Content="通知"
-                                  Grid.Column="1"
+                    <ToggleButton Grid.Column="1"
+                                  Content="通知"
                                   IsChecked="{x:Bind data:AppSettings.IsToastAfterImportDataAccess,Mode=TwoWay}" />
+                    <ToggleButton Grid.Column="2"
+                                  Content="关闭"
+                                  IsChecked="{x:Bind data:AppSettings.IsCloseWindowAfterImportDataAccess,Mode=TwoWay}" />
                 </Grid>
             </StackPanel>
         </RelativePanel>

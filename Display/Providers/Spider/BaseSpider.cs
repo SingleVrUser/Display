@@ -4,6 +4,8 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Display.Models.Spider;
+using Display.Setting.Models;
 using static Display.Models.Spider.SpiderInfos;
 
 namespace Display.Providers.Spider;
@@ -11,6 +13,8 @@ namespace Display.Providers.Spider;
 public abstract class BaseSpider
 {
     public bool IsRunning { get; set; }
+
+    public SearchItem HandleItem { get; set; }
 
     public abstract SpiderSourceName Name { get; }
     public abstract string Abbreviation { get; }

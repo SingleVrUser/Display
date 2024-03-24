@@ -154,6 +154,10 @@ public class JavDb : BaseSpider
             {
                 videoInfo.Lengthtime = valueNode.InnerText.Trim().Replace(" 分鍾", "分钟");
             }
+            else if (key.Contains("導演"))
+            {
+                videoInfo.Director = valueNode.InnerText;
+            }
             else if (key.Contains("片商") || key.Contains("賣家"))
             {
                 videoInfo.Producer = valueNode.InnerText;
@@ -180,7 +184,6 @@ public class JavDb : BaseSpider
 
                 if (actorNodes == null) continue;
                 var actorList = new List<string>();
-
 
                 for (var j = 0; j < actorNodes.Count; j++)
                 {

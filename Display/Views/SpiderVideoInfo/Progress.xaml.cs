@@ -43,9 +43,9 @@ namespace Display.Views.SpiderVideoInfo
         private readonly List<FailDatum> _failDatumList = [];
 
         private List<MatchVideoResult> _matchVideoResults;
-        private GetInfoFromNetwork _network;
-        private List<SpiderInfo> _spiderInfos;
-        private List<string> _failVideoNameList;
+        //private GetInfoFromNetwork _network;
+        //private List<SpiderInfo> _spiderInfos;
+        //private List<string> _failVideoNameList;
 
         public Window CurrentWindow;
 
@@ -81,8 +81,8 @@ namespace Display.Views.SpiderVideoInfo
                 DataAccess.Add.AddFileToInfo(item.Datum.PickCode, item.MatchName, isReplace: true);
             }
 
-            //显示进度环
-            ShowProgress(_matchVideoResults.Count);
+            ////显示进度环
+            //ShowProgress(_matchVideoResults.Count);
             
             if (s_cts.IsCancellationRequested) return;
             await SpiderVideoInfo();
@@ -91,7 +91,6 @@ namespace Display.Views.SpiderVideoInfo
             CurrentWindow.Closed -= CurrentWindow_Closed;
 
             TopProgressRing.IsActive = false;
-            TotalProgress_TextBlock.Text = "搜刮任务已移交给后台";
         }
 
         private async void PageLoaded(object sender, RoutedEventArgs e)
@@ -148,85 +147,85 @@ namespace Display.Views.SpiderVideoInfo
 
             var totalCount = _matchVideoResults.Where(item => !string.IsNullOrEmpty(item.MatchName)).ToList().Count;
 
-            //显示进度环
-            ShowProgress(totalCount);
+            ////显示进度环
+            //ShowProgress(totalCount);
 
             TopProgressRing.IsActive = false;
         }
 
-        private void ShowProgress(int totalCount)
-        {
-            //初始化进度环
-            ProgressRing_Grid.Visibility = Visibility.Visible;
-            overallProgress.Maximum = totalCount;
-            overallProgress.Value = 0;
-            countProgress_TextBlock.Text = $"0/{totalCount}";
+        //private void ShowProgress(int totalCount)
+        //{
+        //    //初始化进度环
+        //    ProgressRing_Grid.Visibility = Visibility.Visible;
+        //    overallProgress.Maximum = totalCount;
+        //    overallProgress.Value = 0;
+        //    countProgress_TextBlock.Text = $"0/{totalCount}";
 
-            //初始化显示信息
-            SearchProgress_TextBlock.Visibility = Visibility.Visible;
-            SearchResult_StackPanel.Visibility = Visibility.Collapsed;
-            ProgressRing_StackPanel.SetValue(Grid.ColumnSpanProperty, 2);
+        //    //初始化显示信息
+        //    SearchProgress_TextBlock.Visibility = Visibility.Visible;
+        //    SearchResult_StackPanel.Visibility = Visibility.Collapsed;
+        //    ProgressRing_StackPanel.SetValue(Grid.ColumnSpanProperty, 2);
 
-        }
+        //}
 
-        private void ShowSpiderInfoList()
-        {
-            CartesianChart.Visibility = Visibility.Visible;
+        //private void ShowSpiderInfoList()
+        //{
+        //    CartesianChart.Visibility = Visibility.Visible;
 
-            _spiderInfos = SpiderManager.Spiders.Select(spider => new SpiderInfo(spider)).ToList();
+        //    _spiderInfos = SpiderManager.Spiders.Select(spider => new SpiderInfo(spider)).ToList();
 
-            //按IsEnable排序
-            _spiderInfos = _spiderInfos.OrderByDescending(item => item.IsEnable).ToList();
+        //    //按IsEnable排序
+        //    _spiderInfos = _spiderInfos.OrderByDescending(item => item.IsEnable).ToList();
 
-            SpiderInfo_GridView.ItemsSource = _spiderInfos;
-        }
+        //    SpiderInfo_GridView.ItemsSource = _spiderInfos;
+        //}
 
-        /// <summary>
-        /// 显示各个搜刮源搜刮数量柱状图
-        /// </summary>
-        private void ShowSpiderCartesianChart()
-        {
-            if (_spiderInfos == null || _spiderInfos.Count == 0) return;
+        ///// <summary>
+        ///// 显示各个搜刮源搜刮数量柱状图
+        ///// </summary>
+        //private void ShowSpiderCartesianChart()
+        //{
+        //    if (_spiderInfos == null || _spiderInfos.Count == 0) return;
 
-            CartesianChart.Visibility = Visibility.Visible;
+        //    CartesianChart.Visibility = Visibility.Visible;
 
-            var spiderSourceReady = _spiderInfos.Where(item => item.IsEnable).ToList();
+        //    var spiderSourceReady = _spiderInfos.Where(item => item.IsEnable).ToList();
 
-            ISeries[] series =
-                    spiderSourceReady
-                        .Select(x => new RowSeries<ObservableValue>
-                        {
-                            Values = new[] { new ObservableValue(x.SpiderCount) },
-                            Name = x.SpiderSource.ToString(),
-                            Stroke = null,
-                            MaxBarWidth = 25,
-                            DataLabelsPaint = new SolidColorPaint(new SKColor(245, 245, 245)),
-                            DataLabelsPosition = DataLabelsPosition.End,
-                            DataLabelsTranslate = new LvcPoint(-1, 0),
-                            DataLabelsFormatter = point => $"{point.Context.Series.Name} {point.PrimaryValue}"
-                        })
-                        .OrderByDescending(x => ((ObservableValue[])x.Values!)[0].Value)
-                        .ToArray();
-            Axis[] xAxes =
-            [
-                new Axis { SeparatorsPaint = new SolidColorPaint(new SKColor(220, 220, 220)) }
-            ];
-            Axis[] yAxes =
-            [
-                new Axis { IsVisible = false }
-            ];
+        //    ISeries[] series =
+        //            spiderSourceReady
+        //                .Select(x => new RowSeries<ObservableValue>
+        //                {
+        //                    Values = new[] { new ObservableValue(x.SpiderCount) },
+        //                    Name = x.SpiderSource.ToString(),
+        //                    Stroke = null,
+        //                    MaxBarWidth = 25,
+        //                    DataLabelsPaint = new SolidColorPaint(new SKColor(245, 245, 245)),
+        //                    DataLabelsPosition = DataLabelsPosition.End,
+        //                    DataLabelsTranslate = new LvcPoint(-1, 0),
+        //                    DataLabelsFormatter = point => $"{point.Context.Series.Name} {point.PrimaryValue}"
+        //                })
+        //                .OrderByDescending(x => ((ObservableValue[])x.Values!)[0].Value)
+        //                .ToArray();
+        //    Axis[] xAxes =
+        //    [
+        //        new Axis { SeparatorsPaint = new SolidColorPaint(new SKColor(220, 220, 220)) }
+        //    ];
+        //    Axis[] yAxes =
+        //    [
+        //        new Axis { IsVisible = false }
+        //    ];
 
-            CartesianChart.Series = series;
-            CartesianChart.XAxes = xAxes;
-            CartesianChart.YAxes = yAxes;
-        }
+        //    CartesianChart.Series = series;
+        //    CartesianChart.XAxes = xAxes;
+        //    CartesianChart.YAxes = yAxes;
+        //}
 
-        private void UpdateSpiderCartesianChart(SpiderInfos.SpiderSourceName spiderSource)
-        {
-            var item = CartesianChart.Series.FirstOrDefault(item => item.Name == spiderSource.ToString());
+        //private void UpdateSpiderCartesianChart(SpiderInfos.SpiderSourceName spiderSource)
+        //{
+        //    var item = CartesianChart.Series.FirstOrDefault(item => item.Name == spiderSource.ToString());
 
-            ((ObservableValue[])item.Values)[0].Value += 1;
-        }
+        //    ((ObservableValue[])item.Values)[0].Value += 1;
+        //}
 
         /// <summary>
         /// 显示饼形图
@@ -330,10 +329,10 @@ namespace Display.Views.SpiderVideoInfo
         /// <summary>
         /// 开始从网络中检索视频信息
         /// </summary>
-        private async Task SpiderVideoInfo()
+        private Task SpiderVideoInfo()
         {
             if (_matchVideoResults == null)
-                return;
+                return Task.CompletedTask;
 
             //_network ??= new GetInfoFromNetwork();
             //ShowSpiderInfoList();
@@ -451,52 +450,53 @@ namespace Display.Views.SpiderVideoInfo
             Tasks.MainPage.ShowSingleWindow(NavigationViewItemEnum.SpiderTask);
 
             TopProgressRing.IsActive = false;
+            return Task.CompletedTask;
         }
 
-        /// <summary>
-        /// 每个搜刮源分配一个线程（数据来源与本地数据库）
-        /// </summary>
-        /// <returns></returns>
-        private async Task SearchAllInfoMultiTask(IProgress<SpiderInfo> progress)
-        {
-            // 挑选出启动的
-            var tasks = (
-                from item
-                    in _spiderInfos.Where(item => item.IsEnable)
-                where item.SpiderSource != SpiderInfos.SpiderSourceName.Local
-                select item
-            ).ToList();
+        ///// <summary>
+        ///// 每个搜刮源分配一个线程（数据来源与本地数据库）
+        ///// </summary>
+        ///// <returns></returns>
+        //private async Task SearchAllInfoMultiTask(IProgress<SpiderInfo> progress)
+        //{
+        //    // 挑选出启动的
+        //    var tasks = (
+        //        from item
+        //            in _spiderInfos.Where(item => item.IsEnable)
+        //        where item.SpiderSource != SpiderInfos.SpiderSourceName.Local
+        //        select item
+        //    ).ToList();
 
-            ////等待任务完成
-            //await Task.WhenAll(tasks);
+        //    ////等待任务完成
+        //    //await Task.WhenAll(tasks);
 
 
-            var spiderManager = App.GetService<SpiderManager>();
+        //    var spiderManager = App.GetService<SpiderManager>();
 
-            foreach (var matchResult in _matchVideoResults.Where(i=>i.statusCode is 1))
-            {
-                var name = matchResult.MatchName;
+        //    foreach (var matchResult in _matchVideoResults.Where(i=>i.statusCode is 1))
+        //    {
+        //        var name = matchResult.MatchName;
 
-                var result = DataAccess.Get.GetOneTrueNameByName(name);
+        //        var result = DataAccess.Get.GetOneTrueNameByName(name);
 
-                // 数据库没有
-                if (!string.IsNullOrEmpty(result)) continue;
+        //        // 数据库没有
+        //        if (!string.IsNullOrEmpty(result)) continue;
 
-                foreach (var spiderInfo in tasks)
-                {
-                    var videoInfo = await spiderManager.DispatchSpecificSpiderInfoByCid(name, spiderInfo.SpiderSource, s_cts.Token);
-                    if (videoInfo is null) continue;
+        //        foreach (var spiderInfo in tasks)
+        //        {
+        //            var videoInfo = await spiderManager.DispatchSpecificSpiderInfoByCid(name, spiderInfo.SpiderSource, s_cts.Token);
+        //            if (videoInfo is null) continue;
 
-                    // 添加搜刮信息到数据库（只有从搜刮源查找到的才添加）
-                    await DataAccess.Add.AddVideoInfo_ActorInfo_IsWmAsync(videoInfo); 
-                    break;
-                }
-            }
+        //            // 添加搜刮信息到数据库（只有从搜刮源查找到的才添加）
+        //            await DataAccess.Add.AddVideoInfo_ActorInfo_IsWmAsync(videoInfo); 
+        //            break;
+        //        }
+        //    }
 
-            // 数据库源最后完成
-            SpiderInfo currentSpiderInfo = new(SpiderInfos.SpiderSourceName.Local, "完成", SpiderInfos.SpiderStates.Done);
-            progress.Report(currentSpiderInfo);
-        }
+        //    // 数据库源最后完成
+        //    SpiderInfo currentSpiderInfo = new(SpiderInfos.SpiderSourceName.Local, "完成", SpiderInfos.SpiderStates.Done);
+        //    progress.Report(currentSpiderInfo);
+        //}
 
         /// <summary>
         /// 当前窗口请求关闭，显示关闭提示，如确定关闭则退出当前所有进程
@@ -530,65 +530,65 @@ namespace Display.Views.SpiderVideoInfo
             window.Close();
         }
 
-        private void ResetMatchCountInfo(List<MatchVideoResult> matchVideoResults)
-        {
-            overallProgress.Maximum = matchVideoResults.Count;
-            countProgress_TextBlock.Text = $"{overallProgress.Value}/{matchVideoResults.Count}";
-            if (matchVideoResults.Count == 0)
-            {
-                percentProgress_TextBlock.Text = $"100%";
-            }
-        }
+        //private void ResetMatchCountInfo(List<MatchVideoResult> matchVideoResults)
+        //{
+        //    overallProgress.Maximum = matchVideoResults.Count;
+        //    countProgress_TextBlock.Text = $"{overallProgress.Value}/{matchVideoResults.Count}";
+        //    if (matchVideoResults.Count == 0)
+        //    {
+        //        percentProgress_TextBlock.Text = $"100%";
+        //    }
+        //}
 
-        #region 鼠标手势变化
-        private void FailCountTextBlock_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
-        }
-        private void FailCountTextBlock_PointerExited(object sender, PointerRoutedEventArgs e)
-        {
+        //#region 鼠标手势变化
+        //private void FailCountTextBlock_PointerEntered(object sender, PointerRoutedEventArgs e)
+        //{
+        //    ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
+        //}
+        //private void FailCountTextBlock_PointerExited(object sender, PointerRoutedEventArgs e)
+        //{
 
-            ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
-        }
-        #endregion
+        //    ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
+        //}
+        //#endregion
 
-        /// <summary>
-        /// 点击“失败数：xx”显示失败列表
-        /// </summary>
-        /// <param Name="sender"></param>
-        /// <param Name="e"></param>
-        private async void askLookFailResult_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            var dialog = new ContentDialog
-            {
-                // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
-                XamlRoot = XamlRoot,
-                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
-                Title = "失败列表",
-                CloseButtonText = "返回",
-                DefaultButton = ContentDialogButton.Close
-            };
+        ///// <summary>
+        ///// 点击“失败数：xx”显示失败列表
+        ///// </summary>
+        ///// <param Name="sender"></param>
+        ///// <param Name="e"></param>
+        //private async void askLookFailResult_Tapped(object sender, TappedRoutedEventArgs e)
+        //{
+        //    var dialog = new ContentDialog
+        //    {
+        //        // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
+        //        XamlRoot = XamlRoot,
+        //        Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+        //        Title = "失败列表",
+        //        CloseButtonText = "返回",
+        //        DefaultButton = ContentDialogButton.Close
+        //    };
 
-            var contentGrid = new Grid();
-            contentGrid.Children.Add(new ListView() { ItemsSource = _failVideoNameList });
-            dialog.Content = contentGrid;
+        //    var contentGrid = new Grid();
+        //    contentGrid.Children.Add(new ListView() { ItemsSource = _failVideoNameList });
+        //    dialog.Content = contentGrid;
 
-            await dialog.ShowAsync();
-        }
+        //    await dialog.ShowAsync();
+        //}
 
-        /// <summary>
-        /// 点击了进度中的更多
-        /// </summary>
-        /// <param Name="sender"></param>
-        /// <param Name="e"></param>
-        private void ProgressMore_Click(object sender, RoutedEventArgs e)
-        {
-            FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
-        }
+        ///// <summary>
+        ///// 点击了进度中的更多
+        ///// </summary>
+        ///// <param Name="sender"></param>
+        ///// <param Name="e"></param>
+        //private void ProgressMore_Click(object sender, RoutedEventArgs e)
+        //{
+        //    FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
+        //}
 
         public void CreateWindow()
         {
-            var window = new CommonWindow("搜刮进度");
+            var window = new CommonWindow("匹配名称");
             CurrentWindow = window;
             window.SetWindowSize(950, 730);
             window.Content = this;
