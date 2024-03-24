@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -64,6 +65,7 @@ public class JavDb : BaseSpider
 
     public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
     {
+        cid = cid.ToUpper();
         var isUseCookie = cid.Contains("FC");
 
         if (isUseCookie && string.IsNullOrEmpty(AppSettings.JavDbCookie)) return null;
@@ -136,20 +138,14 @@ public class JavDb : BaseSpider
 
         videoInfo.trueName = cid;
         //信息
-        for (var i = 0; i < attributeNodes.Count; i++)
+        foreach (var currentNode in attributeNodes)
         {
-            var keyNode = attributeNodes[i].SelectSingleNode("strong");
+            var keyNode = currentNode.SelectSingleNode("strong");
             if (keyNode == null) continue;
-            string key = keyNode.InnerText;
+            var key = keyNode.InnerText;
 
-            var valueNode = attributeNodes[i].SelectSingleNode("span");
+            var valueNode = currentNode.SelectSingleNode("span");
 
-            ////以网页的CID为准
-            //if (key.Contains("番號"))
-            //{
-            //    videoInfo.truename = valueNode.InnerText;
-            //    CID = videoInfo.truename;
-            //}
             if (key.Contains("日期"))
             {
                 videoInfo.ReleaseTime = valueNode.InnerText;
@@ -173,11 +169,8 @@ public class JavDb : BaseSpider
             else if (key.Contains("類別"))
             {
                 var categoryNodes = valueNode.SelectNodes("a");
-                List<string> categoryList = new List<string>();
-                foreach (var node in categoryNodes)
-                {
-                    categoryList.Add(node.InnerText);
-                }
+                List<string> categoryList = [];
+                categoryList.AddRange(categoryNodes.Select(node => node.InnerText));
                 videoInfo.Category = string.Join(",", categoryList);
             }
             else if (key.Contains("演員"))
@@ -215,24 +208,22 @@ public class JavDb : BaseSpider
 
         //样品图片
         var previewImagesSingesNode = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class,'preview-images')]");
-        if (previewImagesSingesNode != null)
+        if (previewImagesSingesNode == null) return videoInfo;
+
+        var previewImagesNodes = previewImagesSingesNode.SelectNodes(".//a[@class='tile-item']");
+        List<string> sampleUrlList = [];
+        if (previewImagesNodes == null) return videoInfo;
+
+        foreach (var node in previewImagesNodes)
         {
-            var previewImagesNodes = previewImagesSingesNode.SelectNodes(".//a[@class='tile-item']");
-            List<string> sampleUrlList = new();
-            if (previewImagesNodes != null)
+            var sampleImageUrl = node.Attributes["href"].Value;
+            if (!sampleImageUrl.Contains("http"))
             {
-                foreach (var node in previewImagesNodes)
-                {
-                    var sampleImageUrl = node.Attributes["href"].Value;
-                    if (!sampleImageUrl.Contains("http"))
-                    {
-                        sampleImageUrl = GetInfoFromNetwork.UrlCombine(javDbUrl, sampleImageUrl);
-                    }
-                    sampleUrlList.Add(sampleImageUrl);
-                }
-                videoInfo.SampleImageList = string.Join(",", sampleUrlList);
+                sampleImageUrl = GetInfoFromNetwork.UrlCombine(javDbUrl, sampleImageUrl);
             }
+            sampleUrlList.Add(sampleImageUrl);
         }
+        videoInfo.SampleImageList = string.Join(",", sampleUrlList);
 
         return videoInfo;
     }
@@ -256,8 +247,6 @@ public class JavDb : BaseSpider
 
     private static string GetDetailUrlFromSearchResult(HtmlDocument htmlDoc, string cid)
     {
-        string result = null;
-
         var searchResultNodes = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class,'movie-list')]");
 
         //搜索无果，退出
@@ -270,57 +259,54 @@ public class JavDb : BaseSpider
         var leftCid = splitResult.Item1;
         var rightCid = splitResult.Item2;
 
-        for (var i = 0; i < searchResultNodes.Count; i++)
+        foreach (var movieList in searchResultNodes)
         {
             var searchLeftCid = string.Empty;
             var searchRightCid = string.Empty;
 
-            var movieList = searchResultNodes[i];
             var titleSearch = movieList.SelectSingleNode(".//div[@class='video-title']/strong").InnerText;
             var title = titleSearch.ToUpper();
 
             var split = title.Split('-', '_');
-            if (split.Length == 1)
+            switch (split.Length)
             {
-                var matchResult = Regex.Match(title, @"([A-Z]+)(\d+)");
-                if (matchResult.Success)
+                case 1:
                 {
-                    searchLeftCid = matchResult.Groups[1].Value;
-                    searchRightCid = matchResult.Groups[2].Value;
+                    var matchResult = Regex.Match(title, @"([A-Z]+)(\d+)");
+                    if (matchResult.Success)
+                    {
+                        searchLeftCid = matchResult.Groups[1].Value;
+                        searchRightCid = matchResult.Groups[2].Value;
+                    }
+
+                    break;
                 }
-            }
-            else if (split.Length == 2)
-            {
-                searchLeftCid = split[0];
-                searchRightCid = split[1];
-            }
-            else if (split.Length == 3)
-            {
-                if (title.Contains("HEYDOUGA"))
-                {
+                case 2:
+                    searchLeftCid = split[0];
+                    searchRightCid = split[1];
+                    break;
+                case 3 when title.Contains("HEYDOUGA"):
                     searchLeftCid = split[1];
                     searchRightCid = split[2];
-                }
-                else
+                    break;
+                case 3:
+                    return null;
+                default:
                     return null;
             }
-            else
-                return null;
 
-            if (searchLeftCid == leftCid
-                && (searchRightCid == rightCid
-                    || int.TryParse(rightCid, out var currentNum)
-                        && int.TryParse(searchRightCid, out var searchNum)
-                        && currentNum.Equals(searchNum)))
-            {
-                var detailUrl = searchResultNodes[i].SelectSingleNode(".//a").Attributes["href"].Value;
-                detailUrl = GetInfoFromNetwork.UrlCombine(AppSettings.JavDbBaseUrl, detailUrl);
-                result = detailUrl;
-                break;
-            }
+            if (searchLeftCid != leftCid
+                || (searchRightCid != rightCid
+                    && (!int.TryParse(rightCid, out var currentNum)
+                        || !int.TryParse(searchRightCid, out var searchNum)
+                        || !currentNum.Equals(searchNum)))) continue;
+
+            var detailUrl = movieList.SelectSingleNode(".//a").Attributes["href"].Value;
+            detailUrl = GetInfoFromNetwork.UrlCombine(AppSettings.JavDbBaseUrl, detailUrl);
+            return detailUrl;
         }
 
-        return result;
+        return null;
     }
 
     public static string TrimGenderFromActorName(string actorName)

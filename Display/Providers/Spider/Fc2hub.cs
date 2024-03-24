@@ -1,71 +1,72 @@
 ﻿using HtmlAgilityPack;
-using Newtonsoft.Json;
-using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using SpiderInfo = Display.Models.Spider.SpiderInfos;
-using Display.Helper.Network;
-using Display.Helper.Date;
 using Display.Models.Data;
 using Display.Models.Spider;
+using Display.Helper.Network;
+using Display.Helper.Date;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace Display.Providers.Spider;
 
-public class Fc2hub
+public class Fc2Hub : BaseSpider
 {
-    public const int Id = (int)SpiderInfo.SpiderSourceName.Fc2club;
+    public override SpiderInfos.SpiderSourceName Name => SpiderInfos.SpiderSourceName.Fc2club;
 
-    public const string Abbreviation = "fc";
+    public override string Abbreviation => "fc";
+    public override string Keywords => "Fc2hub.com";
 
-    public const string Keywords = "Fc2hub.com";
+    public override bool IgnoreFc2 => false;
+    public override bool OnlyFc2 => true;
 
-    public static Tuple<int, int> DelayRanges = new(1, 2);
-
-    public const bool OnlyFc2 = true;
-
-    public const bool IgnoreFc2 = false;
-
-    public static bool IsOn => AppSettings.IsUseFc2Hub;
-
-    private static string baseUrl => AppSettings.Fc2HubBaseUrl;
-
-    public static async Task<VideoInfo> SearchInfoFromCID(string CID, CancellationToken token)
+    public override bool IsOn
     {
-        string url = GetInfoFromNetwork.UrlCombine(baseUrl, $"search?kw={CID.Replace("FC2-", "")}");
+        get => AppSettings.IsUseFc2Hub;
+        set => AppSettings.IsUseFc2Hub = value;
+    }
+    public override string BaseUrl
+    {
+        get => AppSettings.Fc2HubBaseUrl;
+        set => AppSettings.Fc2HubBaseUrl = value;
+    }
+    public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
+    {
+        var url = GetInfoFromNetwork.UrlCombine(BaseUrl, $"search?kw={cid.Replace("FC2-", "")}");
 
-        Tuple<string, string> result = await RequestHelper.RequestHtml(Common.Client, url, token);
+        var result = await RequestHelper.RequestHtml(Common.Client, url, token);
         if (result == null) return null;
 
-        string detail_url = result.Item1;
-        string htmlString = result.Item2;
+        var detailUrl = result.Item1;
+        var htmlString = result.Item2;
 
-        HtmlDocument htmlDoc = new HtmlDocument();
+        var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlString);
 
-        return await GetVideoInfoFromHtmlDoc(CID, detail_url, htmlDoc);
+        return await GetInfoByHtmlDoc(cid, detailUrl, htmlDoc);
     }
 
-    public static async Task<VideoInfo> GetVideoInfoFromHtmlDoc(string CID, string detail_url, HtmlDocument htmlDoc)
+    public override async Task<VideoInfo> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
     {
-        VideoInfo videoInfo = new VideoInfo();
-        videoInfo.busUrl = detail_url;
-        //默认是步兵
-        videoInfo.IsWm = 1;
+        var videoInfo = new VideoInfo
+        {
+            busUrl = detailUrl,
+            IsWm = 1
+        };
 
-        var jsons = htmlDoc.DocumentNode.SelectNodes("//script[@type='application/ld+json']");
+        var jsonCollection = htmlDoc.DocumentNode.SelectNodes("//script[@type='application/ld+json']");
 
-        if (jsons == null || jsons.Count == 0) return null;
+        if (jsonCollection == null || jsonCollection.Count == 0) return null;
 
-        var jsonString = jsons.Last().InnerText;
+        var jsonString = jsonCollection.Last().InnerText;
 
         var json = JsonConvert.DeserializeObject<FcJson>(jsonString);
 
         if (json.name == null || json.image == null) return null;
 
         videoInfo.Title = json.name;
-        videoInfo.trueName = CID;
+        videoInfo.trueName = cid;
         videoInfo.ReleaseTime = json.datePublished.Replace("/", "-");
         //PTxHxMxS转x分钟
         videoInfo.Lengthtime = DateHelper.ConvertPtTimeToTotalMinute(json.duration);
@@ -79,10 +80,10 @@ public class Fc2hub
             videoInfo.Actor = string.Join(",", json.actor);
 
 
-        string ImageUrl = string.Empty;
+        var imageUrl = string.Empty;
         if (json.image != null)
         {
-            ImageUrl = json.image;
+            imageUrl = json.image;
         }
         else
         {
@@ -90,18 +91,17 @@ public class Fc2hub
 
             if (imageNode != null)
             {
-                ImageUrl = imageNode.GetAttributeValue("content", string.Empty);
+                imageUrl = imageNode.GetAttributeValue("content", string.Empty);
             }
         }
 
-        ////下载封面
-        if (!string.IsNullOrEmpty(ImageUrl))
-        {
-            string SavePath = AppSettings.ImageSavePath;
-            string filePath = Path.Combine(SavePath, CID);
-            videoInfo.ImageUrl = ImageUrl;
-            videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(ImageUrl, filePath, CID);
-        }
+        if (string.IsNullOrEmpty(imageUrl)) return videoInfo;
+
+        //下载封面
+        var savePath = AppSettings.ImageSavePath;
+        var filePath = Path.Combine(savePath, cid);
+        videoInfo.ImageUrl = imageUrl;
+        videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(imageUrl, filePath, cid);
 
         return videoInfo;
     }

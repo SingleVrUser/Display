@@ -227,7 +227,7 @@ namespace Display.Views.More.Import115DataToLocalDataAccess
                 //提示将会开始搜刮
                 WillStartSpiderTaskTip.IsOpen = true;
 
-                await Task.Delay(3000, s_cts.Token);
+                await Task.Delay(1000, s_cts.Token);
 
                 if (s_cts.Token.IsCancellationRequested) return;
 

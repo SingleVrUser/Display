@@ -67,7 +67,7 @@ namespace Display.Controls
             ////查询该视频对应的演员列表
             var actorList = await DataAccess.Get.GetActorInfoByVideoName(ResultInfo.trueName);
 
-            for (var i = 0; i < actorList.Length; i++)
+            for (var i = 0; i < actorList?.Length; i++)
             {
                 var actor = actorList[i];
                 var actorImageControl = new Controls.ActorImage(actor, ResultInfo.ReleaseTime);

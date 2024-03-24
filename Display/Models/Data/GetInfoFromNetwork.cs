@@ -70,8 +70,8 @@ namespace Display.Models.Data
         public static string UrlCombine(string uri1, string uri2)
         {
 
-            Uri baseUri = new Uri(uri1);
-            Uri myUri = new Uri(baseUri, uri2);
+            var baseUri = new Uri(uri1);
+            var myUri = new Uri(baseUri, uri2);
             return myUri.ToString();
         }
 
@@ -99,13 +99,12 @@ namespace Display.Models.Data
         /// <summary>
         /// 等待startSecond到endSecond秒后继续，文本控件showText提示正在倒计时
         /// </summary>
-        /// <param Name="startSecond"></param>
-        /// <param Name="endSecond"></param>
-        /// <param Name="showText"></param>
+        /// <param name="startSecond"></param>
+        /// <param name="endSecond"></param>
         public static async Task RandomTimeDelay(int startSecond, int endSecond)
         {
             //随机等待1-10s
-            int randomSecond = new Random().Next(startSecond, endSecond);
+            var randomSecond = new Random().Next(startSecond, endSecond);
 
             //倒计时
             await Task.Delay(randomSecond * 1000);

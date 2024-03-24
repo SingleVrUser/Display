@@ -132,15 +132,6 @@ public class AppSettings
     }
 
     /// <summary>
-    /// 是否使用Jav321
-    /// </summary>
-    public static bool IsUseJav321
-    {
-        get => GetValue(Network.Open.Jav321);
-        set => SetValue(value);
-    }
-
-    /// <summary>
     /// 是否使用Fc2Hub
     /// </summary>
     public static bool IsUseFc2Hub
@@ -194,16 +185,6 @@ public class AppSettings
     public static string AvSoxBaseUrl
     {
         get => GetValue(Network.BaseUrl.AvSox);
-        set => SetValue(value);
-    }
-
-    /// <summary>
-    /// Jav321网址
-    /// </summary>
-    /// 
-    public static string Jav321BaseUrl
-    {
-        get => GetValue(Network.BaseUrl.Jav321);
         set => SetValue(value);
     }
 

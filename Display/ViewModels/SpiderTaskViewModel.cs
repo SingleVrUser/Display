@@ -23,7 +23,7 @@ internal partial class SpiderTaskViewModel : ObservableObject
     private bool _isTaskRunning;
 
     [ObservableProperty]
-    private List<string> _spiderNames;
+    private string[] _spiderNames;
 
     public ObservableCollection<string> FailNameCollection;
 
@@ -34,7 +34,7 @@ internal partial class SpiderTaskViewModel : ObservableObject
 
     private void InitData()
     {
-        MaxProgressValue = _manager.GetLeftNameCount();
+        MaxProgressValue = _manager.LeftNameCount;
         IsTaskRunning = MaxProgressValue > 0;
         _manager.ItemTaskSuccessAction += _ => CurrentProgressValue++;
         _manager.TaskCompletedAction += () =>
@@ -45,7 +45,7 @@ internal partial class SpiderTaskViewModel : ObservableObject
             MaxProgressValue = 0;
             CurrentProgressValue = 0;
         };
-        SpiderNames = _manager.GetOnSpiderNames();
+        SpiderNames = _manager.SpiderNames;
         FailNameCollection = new ObservableCollection<string>(_manager.GetFailNames());
     }
 

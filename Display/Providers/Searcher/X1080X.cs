@@ -5,16 +5,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Runtime.InteropServices.ComTypes;
-using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Windows.Devices.Lights;
-using Windows.Media.Protection.PlayReady;
 using SharpCompress.Readers;
 using static System.Int32;
-using System.Reflection.PortableExecutable;
-using Windows.System.Profile;
 using System.Web;
 using Display.Models.Spider;
 using Display.Helper.UI;
@@ -30,23 +24,24 @@ namespace Display.Providers.Searcher
 
         public static bool IsOn => AppSettings.IsUseX1080X;
 
+        //private static readonly string[] ExpectType = ["4K超清", "高清有碼", "BT綜合區"];
+
         private static HttpClient _client;
-
-        private static readonly string[] ExpectType = { "4K超清", "高清有碼", "BT綜合區" };
-
         public static HttpClient Client
         {
             get
             {
+                if(_client != null) return _client;
+
                 var headers = new Dictionary<string, string>
                 {
                     {"user-agent",AppSettings.X1080XUa},
                     {"cookie",AppSettings.X1080XCookie},
                     {"referer",$"{BaseUrl}forum.php"}
                 };
-                return _client ??= GetInfoFromNetwork.CreateClient(headers);
+                _client = GetInfoFromNetwork.CreateClient(headers);
+                return _client;
             }
-            set => _client = value;
         }
 
         public static void TryChangedClientHeader(string key, string value)
@@ -61,7 +56,7 @@ namespace Display.Providers.Searcher
             _client.DefaultRequestHeaders.Add(key, value);
         }
 
-        public static async Task<List<Forum1080AttachmentInfo>> GetDownLinkFromUrl(string url)
+        public static async Task<Forum1080AttachmentInfo[]> GetDownLinkFromUrl(string url)
         {
             var result = await RequestHelper.RequestHtml(Client, url, default);
 
@@ -73,9 +68,9 @@ namespace Display.Providers.Searcher
             return GetAttmnInfoFromHtml(htmlDoc);
         }
 
-        private static List<Forum1080AttachmentInfo> GetAttmnInfoFromHtml(HtmlDocument htmlDoc)
+        private static Forum1080AttachmentInfo[] GetAttmnInfoFromHtml(HtmlDocument htmlDoc)
         {
-            HashSet<Forum1080AttachmentInfo> links = new();
+            HashSet<Forum1080AttachmentInfo> links = [];
 
             // 先查找磁力链接
             var codeNodes = htmlDoc.DocumentNode.SelectNodes(".//div[contains(@id,'code')]");
@@ -93,7 +88,7 @@ namespace Display.Providers.Searcher
 
             if (links.Count > 0)
             {
-                return links.ToList();
+                return links.ToArray();
             }
 
             //附件
@@ -105,7 +100,7 @@ namespace Display.Providers.Searcher
                 var attmnSpanNode = htmlDoc.DocumentNode.SelectNodes(".//span[contains(@id,'attach_')]");
                 if (attmnSpanNode == null)
                 {
-                    return links.ToList();
+                    return links.ToArray();
                 }
 
                 foreach (var spanNode in attmnSpanNode)
@@ -144,12 +139,12 @@ namespace Display.Providers.Searcher
                         {
                             attmnInfo.Size = result.Groups[1].Value;
 
-                            if (TryParse(result.Groups[2].Value, out int count))
+                            if (TryParse(result.Groups[2].Value, out var count))
                             {
                                 attmnInfo.DownCount = count;
                             }
 
-                            if (TryParse(result.Groups[4].Value, out int countResult))
+                            if (TryParse(result.Groups[4].Value, out var countResult))
                             {
                                 attmnInfo.Expense = countResult;
                             }
@@ -161,7 +156,7 @@ namespace Display.Providers.Searcher
 
                 }
 
-                return links.ToList();
+                return links.ToArray();
             }
 
             // 普通附件
@@ -208,7 +203,7 @@ namespace Display.Providers.Searcher
 
             }
 
-            return links.ToList();
+            return links.ToArray();
         }
 
         private static AttmnType GetAttmnTypeFromName(string name)
@@ -317,30 +312,7 @@ namespace Display.Providers.Searcher
                 var title = titleNode.InnerText;
                 var upperText = title.ToUpper();
 
-                var matchResult = Regex.Match(upperText, @$"({leftCid}).*?0?(\d+)");
-                if (matchResult.Success)
-                {
-                    var searchLeftCid = matchResult.Groups[1].Value;
-                    var searchRightCid = matchResult.Groups[2].Value;
-
-                    // 输入的只有一个, 只要包含即匹配
-                    if (rightCid == null)
-                    {
-
-                    }
-                    //精确匹配
-                    else if (searchLeftCid != leftCid
-                             || searchRightCid != rightCid
-                             && (!TryParse(rightCid, out var currentNum)
-                                 || !TryParse(searchRightCid, out var searchNum)
-                                 || !currentNum.Equals(searchNum)))
-                    {
-                         continue;
-                    }
-                }
-                else
-                    continue;
-
+                if(!Common.IsSearchResultMatch(leftCid, rightCid, upperText)) continue;
 
                 var detailUrl = titleNode.GetAttributeValue("href", null);
                 if (detailUrl == null) continue;

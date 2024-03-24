@@ -2,12 +2,15 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Windows.Storage;
 using Windows.System;
+using Display.Managers;
 using Display.Models.Data;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Display.Models.Settings.Options;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -42,7 +45,7 @@ namespace Display.Views.SpiderVideoInfo
 
         private void InitializeView()
         {
-            ConditionCheckItems = new();
+            ConditionCheckItems = [];
 
             //显示UI
 
@@ -56,59 +59,47 @@ namespace Display.Views.SpiderVideoInfo
 
             ConditionCheckItems.Add(ImageItem);
 
-            AddSpiderMethod(AppSettings.IsUseJavBus, "访问 JavBus", AppSettings.JavBusBaseUrl);
+            var spiders = SpiderManager.Spiders;
 
-            AddSpiderMethod(AppSettings.IsUseJav321, "访问 Jav321", AppSettings.Jav321BaseUrl);
+            var onSpiders = spiders.Where(spider=> spider.IsOn);
 
-            AddSpiderMethod(AppSettings.IsUseAvMoo, "访问 AvMoo", AppSettings.AvMooBaseUrl);
-
-            AddSpiderMethod(AppSettings.IsUseAvSox, "访问 AvSox", AppSettings.AvSoxBaseUrl);
-
-            AddSpiderMethod(AppSettings.IsUseLibreDmm, "访问 LibreDmm", AppSettings.LibreDmmBaseUrl);
-
-            AddSpiderMethod(AppSettings.IsUseFc2Hub, "访问 Fc2hub", AppSettings.Fc2HubBaseUrl);
-
-            AddSpiderMethod(AppSettings.IsUseJavDb, "访问 JavDB", AppSettings.JavDbBaseUrl);
-
-            //至少选择一个搜刮源
-            if (!(AppSettings.IsUseJavBus || AppSettings.IsUseLibreDmm || AppSettings.IsUseFc2Hub || AppSettings.IsUseJavDb))
+            if (!onSpiders.Any())
             {
                 spiderOrigin_TextBlock.Visibility = Visibility.Visible;
+                return;
+            }
+
+            foreach (var spider in SpiderManager.Spiders)
+            {
+                ConditionCheckItems.Add(new ConditionCheck
+                {
+                    Condition = $"访问{spider.Abbreviation}",
+                    CheckUrl = spider.BaseUrl,
+                });
             }
 
             Check_Condition();
         }
-
-        private void AddSpiderMethod(bool isAdd, string tip, string url)
-        {
-            if (isAdd)
-            {
-                ConditionCheckItems.Add(new ConditionCheck()
-                {
-                    Condition = tip,
-                    CheckUrl = url,
-                });
-            }
-        }
-
+        
         private async void ImageCheckButton_Click(object sender, RoutedEventArgs e)
         {
-            var item = (sender as HyperlinkButton).DataContext as ConditionCheck;
-            StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(item.CheckUrl as String);
+            if (sender is not HyperlinkButton { DataContext: ConditionCheck item }) return;
+
+            var folder = await StorageFolder.GetFolderFromPathAsync(item.CheckUrl);
 
             await Launcher.LaunchFolderAsync(folder);
         }
 
         private async void Check_Condition()
         {
-            bool isAllSuccess = true;
+            var isAllSuccess = true;
             foreach (var item in ConditionCheckItems)
             {
                 item.Status = Status.Doing;
 
                 if (item.CheckUrl.Contains("http"))
                 {
-                    bool isUseful = await GetInfoFromNetwork.CheckUrlUseful(item.CheckUrl);
+                    var isUseful = await GetInfoFromNetwork.CheckUrlUseful(item.CheckUrl);
 
                     //网络有用
                     if (isUseful)
@@ -124,43 +115,16 @@ namespace Display.Views.SpiderVideoInfo
                 //图片路径检查
                 else
                 {
-                    bool isExistsImageSavePath = Directory.Exists(item.CheckUrl);
-                    if (isExistsImageSavePath)
-                    {
-                        item.Status = Status.Success;
-                    }
-                    else
-                    {
-                        item.Status = Status.Error;
-                    }
+                    var isExistsImageSavePath = Directory.Exists(item.CheckUrl);
+
+                    item.Status = isExistsImageSavePath ? Status.Success : Status.Error;
                 }
 
             }
 
-            if (isAllSuccess)
-            {
-                tryUpdateLastPageStatus(Status.Success);
-            }
-            else
-            {
-                tryUpdateLastPageStatus(Status.Error);
-                Error_TextBlock.Visibility = Visibility.Visible;
-            }
-
-
+            if (!isAllSuccess) Error_TextBlock.Visibility = Visibility.Visible;
         }
 
-
-        /// <summary>
-        /// 更新上一页面的状态信息
-        /// </summary>
-        private void tryUpdateLastPageStatus(Status status)
-        {
-            //if (lastPage != null)
-            //{
-            //    lastPage.LoginCheck.status = status;
-            //}
-        }
         private void ClickOne_Click(object sender, RoutedEventArgs e)
         {
             Check_Condition();
