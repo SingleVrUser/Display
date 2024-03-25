@@ -1,6 +1,5 @@
 ﻿using Microsoft.UI.Input;
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Display.Helper.UI

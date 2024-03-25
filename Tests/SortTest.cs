@@ -1,6 +1,5 @@
-﻿using System.Diagnostics;
-using System.Text.RegularExpressions;
-using Display.Helper.FileProperties.Name;
+﻿using Display.Helper.FileProperties.Name;
+using System.Diagnostics;
 
 namespace Tests
 {
@@ -21,7 +20,7 @@ namespace Tests
         [TestMethod]
         public void MatchNameTest()
         {
-            foreach (var (src,dst) in _sampleFileDictionary)
+            foreach (var (src, dst) in _sampleFileDictionary)
             {
                 var destinationName = FileMatch.MatchName(src).ToUpper();
                 Debug.WriteLine(destinationName);

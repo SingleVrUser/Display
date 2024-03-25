@@ -1,16 +1,13 @@
-﻿using HtmlAgilityPack;
-using System;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using SpiderInfo = Display.Models.Spider.SpiderInfos;
-using System.Threading;
+﻿using Display.Helper.Network;
 using Display.Models.Data;
-using Display.Helper.Network;
+using HtmlAgilityPack;
+using System.Threading;
+using System.Threading.Tasks;
 using static Display.Models.Spider.SpiderInfos;
 
 namespace Display.Providers.Spider;
 
-public class AvMoo: BaseSpider
+public class AvMoo : BaseSpider
 {
     public override SpiderSourceName Name => SpiderSourceName.Avmoo;
 
@@ -93,7 +90,7 @@ public class AvMoo: BaseSpider
         {
             var upperTitle = movieList.SelectSingleNode(".//div[@class='photo-info']/span/date").InnerText.ToUpper();
 
-            if(!Common.IsSearchResultMatch(leftCid,rightCid, upperTitle)) continue;
+            if (!Common.IsSearchResultMatch(leftCid, rightCid, upperTitle)) continue;
 
             var detailUrl = movieList.SelectSingleNode(".//a[@class='movie-box']").Attributes["href"].Value;
 

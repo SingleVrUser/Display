@@ -68,7 +68,7 @@ namespace Display.Helper.Date
 
             return ts.ToString(formatStr);
         }
-        
+
 
         public static string ConvertPtTimeToTotalMinute(string ptTimeStr)
         {

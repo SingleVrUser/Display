@@ -18,7 +18,7 @@ namespace Display.Views;
 /// An empty page that can be used on its own or navigated to within a Frame.
 /// </summary> 
 public sealed partial class VideoViewPage
-{   
+{
     public static VideoViewPage Current;
 
     //为返回动画做准备（需启动缓存）
@@ -32,7 +32,7 @@ public sealed partial class VideoViewPage
         //启动缓存（为了返回无需过长等待，也为了返回动画）
         NavigationCacheMode = NavigationCacheMode.Enabled;
     }
-        
+
     private async void SingleVideoPlay_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not Grid videoPlayGrid) return;
@@ -51,7 +51,7 @@ public sealed partial class VideoViewPage
         }
 
         if (string.IsNullOrEmpty(mediaPlayItem.PickCode)) return;
-            
+
         await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, playType: CustomMediaPlayerElement.PlayType.Fail);
     }
 

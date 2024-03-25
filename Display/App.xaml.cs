@@ -1,26 +1,26 @@
-﻿using Microsoft.UI;
+﻿using Display.CustomWindows;
+using Display.Helper.Notifications;
+using Display.Helper.UI;
+using Display.Interfaces;
+using Display.Managers;
+using Display.Models.Data;
+using Display.Services;
+using Display.ViewModels;
+using Display.ViewModels.Sub;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.IO;
-using Display.CustomWindows;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using WinRT.Interop;
-using Display.Helper.UI;
-using Display.Models.Data;
-using Display.Helper.Notifications;
-using Display.ViewModels;
 using ImageViewModel = Display.ViewModels.ImageViewModel;
-using Display.Interfaces;
-using Display.Services;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AppCenter;
-using Microsoft.AppCenter.Analytics;
-using Microsoft.AppCenter.Crashes;
-using Display.Managers;
-using Display.ViewModels.Sub;
 
 
 namespace Display

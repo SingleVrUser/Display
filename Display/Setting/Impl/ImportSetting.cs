@@ -1,6 +1,5 @@
 ﻿using Display.Setting.Interfaces;
 using static Display.Constants.DefaultSettings;
-using DefaultValue = Display.Constants.DefaultSettings;
 
 namespace Display.Setting.Impl;
 

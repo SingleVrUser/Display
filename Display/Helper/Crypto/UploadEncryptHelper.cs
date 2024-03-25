@@ -1,5 +1,4 @@
-﻿using Display.Models;
-using K4os.Compression.LZ4;
+﻿using K4os.Compression.LZ4;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -145,7 +144,7 @@ namespace Display.Helper.Crypto
             return tokenMd5;
         }
 
-        public static T DecryptReceiveData<T>(byte[] data, byte[] aesKey, byte[] aesIv) where T:new()
+        public static T DecryptReceiveData<T>(byte[] data, byte[] aesKey, byte[] aesIv) where T : new()
         {
             var cipherText = new byte[data.Length - 12];
 

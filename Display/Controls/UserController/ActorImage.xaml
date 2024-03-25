@@ -1,5 +1,5 @@
 ﻿<UserControl
-    x:Class="Display.Controls.ActorImage"
+    x:Class="Display.Controls.UserController.ActorImage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Display.Controls"
@@ -13,16 +13,14 @@
             <MenuFlyoutItem Text="获取信息"
                             Click="GetInfoMenuFlyoutItem_Click">
                 <MenuFlyoutItem.Icon>
-                    <FontIcon FontFamily="Segoe Fluent Icons"
-                              Glyph="&#xE11A;" />
+                    <FontIcon Glyph="&#xE11A;" />
                 </MenuFlyoutItem.Icon>
             </MenuFlyoutItem>
             
             <MenuFlyoutItem Text="喜欢"
                             Click="LikeMenuFlyoutItem_Click">
                 <MenuFlyoutItem.Icon>
-                    <FontIcon FontFamily="Segoe Fluent Icons"
-                              Glyph="&#xE00B;"
+                    <FontIcon Glyph="&#xE00B;"
                               Foreground="OrangeRed" />
                 </MenuFlyoutItem.Icon>
             </MenuFlyoutItem>
@@ -44,15 +42,15 @@
                Source="{x:Bind ActorInfo.ProfilePath,Mode=OneWay}"/>
 
         <FontIcon
-            Grid.Row="0" x:Name="LikeFontIcon"
+            Grid.Row="0"
+            x:Name="LikeFontIcon"
             Visibility="Collapsed"
-            FontFamily="Segoe Fluent Icons"
-                  Glyph="&#xE00B;"
-                  Foreground="OrangeRed"
-                  Opacity="1"
-                  FontSize="30"
-                  HorizontalAlignment="Right"
-                  VerticalAlignment="Top"/>
+            Glyph="&#xE00B;"
+            Foreground="OrangeRed"
+            Opacity="1"
+            FontSize="30"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"/>
 
         <TextBlock x:Name="ShowText"
                    HorizontalAlignment="Center"
@@ -63,10 +61,10 @@
         <Border Grid.Row="0" Background="{StaticResource AngleMarkBackground}" VerticalAlignment="Top" HorizontalAlignment="Right" CornerRadius="8"
                 Padding="2,0"
                 Margin="5"
-                Visibility="{x:Bind WorkYearDiff_TextBlock.Visibility}">
-            <TextBlock x:Name="WorkYearDiff_TextBlock"
+                Visibility="{x:Bind WorkYearDiffTextBlock.Visibility}">
+            <TextBlock x:Name="WorkYearDiffTextBlock"
                 FontSize="20"
-                FontFamily="Segoe UI"
+                FontFamily="{StaticResource SymbolThemeFontFamily}"
                 Foreground="White"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"

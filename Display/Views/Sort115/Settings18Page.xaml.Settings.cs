@@ -15,7 +15,8 @@ namespace Display.Views.Sort115
 
         public static Sort115Settings Settings
         {
-            get{
+            get
+            {
                 if (_settings == null)
                 {
                     EnsureSettings();

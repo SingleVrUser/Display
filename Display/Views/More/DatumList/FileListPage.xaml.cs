@@ -1,17 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Windows.ApplicationModel.DataTransfer;
-using Windows.Storage;
 using ByteSizeLib;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.Network;
@@ -21,7 +10,6 @@ using Display.Models.Media;
 using Display.Services.IncrementalCollection;
 using Display.ViewModels;
 using Display.Views.More.Import115DataToLocalDataAccess;
-using Display.Views.Tasks;
 using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Text;
@@ -33,6 +21,17 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using SharpCompress;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -568,7 +567,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     public void RemoveFileById(long id)
     {
-        var info = FilesInfos.FirstOrDefault(info=>info.Id == id);
+        var info = FilesInfos.FirstOrDefault(info => info.Id == id);
         if (info == null) return;
 
         FilesInfos.Remove(info);
@@ -1236,9 +1235,9 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
 
         if (info == null) return;
-        
+
         // 双击事件
-        if (_lastInfo == info &&(nowTime - _lastTapTime).TotalMilliseconds < 300)  // 300毫秒内连续两次点击视为双击
+        if (_lastInfo == info && (nowTime - _lastTapTime).TotalMilliseconds < 300)  // 300毫秒内连续两次点击视为双击
         {
             _lastTapTime = nowTime;
 
@@ -1317,7 +1316,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     }
 
     #endregion
-    
+
 
     public event PropertyChangedEventHandler PropertyChanged;
 
@@ -1361,7 +1360,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             return;
         }
 
-        SearchResultListView.ItemsSource = result.data.Select(x=>new FilesInfo(x)).ToList();
+        SearchResultListView.ItemsSource = result.data.Select(x => new FilesInfo(x)).ToList();
     }
 
     private void SearchTeachingTip_OnClosed(TeachingTip sender, TeachingTipClosedEventArgs args)
@@ -1378,7 +1377,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         // 打开文件夹
         if (info.Type == FilesInfo.FileType.Folder)
         {
-            if(info.Id == null) return;
+            if (info.Id == null) return;
 
             await OpenFolder((long)info.Id);
             return;

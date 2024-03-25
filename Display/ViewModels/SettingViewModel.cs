@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Display.Models.Data.Enums;
 using Display.Models.Settings;
-using Display.Views.Settings;
 
 namespace Display.ViewModels;
 

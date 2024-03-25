@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Display.Models.Upload;
 using Display.Services.Upload;
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Display.ViewModels
 {

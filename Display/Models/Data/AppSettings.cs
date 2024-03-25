@@ -1,11 +1,9 @@
-﻿using System.Drawing;
-using System.IO;
-using System.Runtime.CompilerServices;
-using CommunityToolkit.WinUI.UI.Controls;
-using Display.Constants;
+﻿using Display.Constants;
 using Display.Models.Data.Enums;
 using Display.Models.Settings;
 using Display.Models.Settings.Options;
+using System.IO;
+using System.Runtime.CompilerServices;
 using static Display.Constants.DefaultSettings;
 using DefaultValue = Display.Constants.DefaultSettings;
 using MenuItem = Display.Models.Settings.MenuItem;

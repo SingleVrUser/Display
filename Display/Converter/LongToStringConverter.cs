@@ -1,6 +1,5 @@
 ﻿using Microsoft.UI.Xaml.Data;
 using System;
-using Display.Models.Data;
 
 namespace Display.Converter;
 
@@ -12,7 +11,7 @@ public class LongToStringConverter : IValueConverter
         {
             return (int)doubleValue;
         }
-        else if(value is int intValue)
+        else if (value is int intValue)
         {
             return intValue;
         }

@@ -1,5 +1,4 @@
-﻿using Display.Constants;
-using Display.Setting.Interfaces;
+﻿using Display.Setting.Interfaces;
 
 namespace Display.Setting.Impl;
 

@@ -1,4 +1,10 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Display.Helper.Data;
+using Display.Helper.UI;
+using Display.Models.Data;
+using Microsoft.UI.Xaml;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -6,16 +12,10 @@ using System.IO;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Display.Helper.Data;
-using Display.Helper.UI;
-using Display.Models.Data;
-using Microsoft.UI.Xaml;
 
 namespace Display.ViewModels
 {
-    public partial class ImageViewModel:ObservableObject
+    public partial class ImageViewModel : ObservableObject
     {
         [ObservableProperty]
         private List<Models.Image.SubImageModel> _photos = [];
@@ -33,7 +33,7 @@ namespace Display.ViewModels
 
         [ObservableProperty]
         private Models.Image.SubImageModel _currentPhotoModel;
-        
+
         public async Task SetDataAndCurrentIndex(List<FilesInfo> files, int currentIndex)
         {
             _currentIndex = currentIndex;
@@ -104,7 +104,7 @@ namespace Display.ViewModels
 
 
             var window = WindowHelper.GetWindowForElement(element);
-            if(window == null) return;
+            if (window == null) return;
 
             var saveFile = await SelectSaveImageAsync(fileName, window);
             if (saveFile is null) return;
@@ -124,7 +124,7 @@ namespace Display.ViewModels
             var filePath = LocalCacheHelper.GetCacheFilePath(_currentPhotoModel.FileInfo.Name);
             if (filePath == null) return;
             await Windows.System.Launcher.LaunchUriAsync(new Uri(filePath));
-        } 
+        }
 
         private async Task<StorageFile> SelectSaveImageAsync(string name, Window window)
         {

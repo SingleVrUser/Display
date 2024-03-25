@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Display.Helper.Network;
+﻿using Display.Helper.Network;
 using Display.Models.Data;
 using Display.Models.Media;
 using Microsoft.UI.Xaml.Controls;
+using System.Collections.Generic;
+using System.Linq;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -39,7 +39,7 @@ namespace Display.Views.DetailInfo
 
         private async void PlayVideos(IEnumerable<Datum> infos)
         {
-            var playItems = infos.Select(x=>new MediaPlayItem(x)).ToList();
+            var playItems = infos.Select(x => new MediaPlayItem(x)).ToList();
 
             await PlayVideoHelper.PlayVideo(playItems, this.XamlRoot, lastPage: this);
         }

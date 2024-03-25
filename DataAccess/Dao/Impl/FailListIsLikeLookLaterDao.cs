@@ -10,7 +10,7 @@ public class FailListIsLikeLookLaterDao : DaoImpl<FailListIslikeLookLater>, IFai
     {
         return DbSet
             .Skip(position)
-            .Where(i=> showType == FailInfoShowType.Like ? i.IsLike == 1 : i.LookLater != 0)
+            .Where(i => showType == FailInfoShowType.Like ? i.IsLike == 1 : i.LookLater != 0)
             .Take(take)
             .ToList();
     }

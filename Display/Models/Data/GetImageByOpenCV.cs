@@ -1,4 +1,5 @@
-﻿using OpenCvSharp;
+﻿using Display.Helper.FileProperties.Name;
+using OpenCvSharp;
 using OpenCvSharp.Dnn;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
-using Display.Helper.FileProperties.Name;
 
 namespace Display.Models.Data
 {

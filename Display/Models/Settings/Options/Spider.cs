@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Display.Providers.Spider;
+using Microsoft.UI.Xaml;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Display.Providers.Spider;
-using Microsoft.UI.Xaml;
 
 namespace Display.Models.Settings.Options;
 

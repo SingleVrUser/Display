@@ -1,15 +1,15 @@
-using System;
-using System.Collections;
-using System.Diagnostics;
-using Microsoft.UI.Xaml;
 using Display.Models.Image;
 using Microsoft.UI.Input;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media.Imaging;
+using System;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using ScrollViewerViewChangedEventArgs = Microsoft.UI.Xaml.Controls.ScrollViewerViewChangedEventArgs;
 using UserControl = Microsoft.UI.Xaml.Controls.UserControl;
-using Microsoft.UI.Xaml.Data;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -31,7 +31,7 @@ namespace Display.Controls
             get => GetValue(ItemsSourceProperty);
             set => SetValue(ItemsSourceProperty, value);
         }
-        
+
         private int TotalCount
         {
             get
@@ -60,10 +60,10 @@ namespace Display.Controls
                     return (BaseImage)collectionView.CurrentItem;
                 }
 
-                if(ItemsSource is not IList list) return null;
+                if (ItemsSource is not IList list) return null;
 
                 // IList<T extends BaseImage>类型
-                if(list.Count == 0) return null;
+                if (list.Count == 0) return null;
                 var aObject = list[0];
                 if (aObject is BaseImage)
                 {
@@ -136,7 +136,7 @@ namespace Display.Controls
             ShowImage.Source = bitmapImage;
             MyScrollViewer.ChangeView(null, null, factor > 1 ? 1 : (float)factor);  // disableZoomAnimal会导致缩放失效
         }
-        
+
         private void NextButton_Click(object sender, RoutedEventArgs e)
         {
             if (!HaveNext) return;

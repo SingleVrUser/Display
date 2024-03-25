@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Display.Models.Image;
+using FFmpeg.AutoGen.Abstractions;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using Display.Models.Image;
-using FFmpeg.AutoGen.Abstractions;
 using static System.Int64;
 
 namespace Display.Helper.Media;
@@ -79,7 +79,7 @@ public sealed unsafe class VideoStreamDecoder : IDisposable
 
     public void Dispose()
     {
-        var pFrame = _pFrame;;
+        var pFrame = _pFrame; ;
         ffmpeg.av_frame_free(&pFrame);
 
         var pPacket = _pPacket;
@@ -90,7 +90,7 @@ public sealed unsafe class VideoStreamDecoder : IDisposable
 
         ffmpeg.avcodec_close(_pCodecContext);
 
-        if(_pFormatContext->video_codec_id != AVCodecID.AV_CODEC_ID_NONE)
+        if (_pFormatContext->video_codec_id != AVCodecID.AV_CODEC_ID_NONE)
         {
             var pFormatContext = _pFormatContext;
             ffmpeg.avformat_close_input(&pFormatContext);

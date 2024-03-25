@@ -1,10 +1,12 @@
-﻿using Microsoft.UI.Input;
+﻿using Display.Models.Data;
+using Display.Services.IncrementalCollection;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
+using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,10 +15,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Display.Services.IncrementalCollection;
-using SharpCompress;
-using Display.Models.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace Display.Controls;
 
@@ -665,7 +663,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
                 break;
         }
         //更新首图标
-        if(OrderButton.Content is string content && content != newGlyph)
+        if (OrderButton.Content is string content && content != newGlyph)
         {
             OrderButton.Content = newGlyph;
         }
@@ -841,7 +839,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         System.Diagnostics.Debug.WriteLine($"失败项的搜索框输入：{_localCheckText}");
 
-        
+
         AllFailInfoCollection.SetFilter(_localCheckText);
         //AllFailInfoCollection = new IncrementalLoadFailDatumInfoCollection { filterName = _localCheckText, OrderBy = FailListOrderBy, IsDesc = FailListIsDesc };
         //FailGridView.ItemsSource = AllFailInfoCollection;
@@ -1039,7 +1037,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
     private void Filter_ToggleButton_Unchecked(object sender, RoutedEventArgs e)
     {
-        if (_filterRanges is not {Count:>0}) return;
+        if (_filterRanges is not { Count: > 0 }) return;
 
         _filterRanges = null;
         InfosFilter.UncheckAllToggleSplitButton();

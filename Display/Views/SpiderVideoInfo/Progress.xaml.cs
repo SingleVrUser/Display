@@ -1,29 +1,20 @@
 ﻿// Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Display.CustomWindows;
 using Display.Helper.FileProperties.Name;
 using Display.Managers;
 using Display.Models.Data;
 using Display.Models.Data.Enums;
-using Display.Models.Spider;
 using LiveChartsCore;
-using LiveChartsCore.Defaults;
-using LiveChartsCore.Drawing;
-using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
-using LiveChartsCore.SkiaSharpView.Painting;
-using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Input;
-using SkiaSharp;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -83,7 +74,7 @@ namespace Display.Views.SpiderVideoInfo
 
             ////显示进度环
             //ShowProgress(_matchVideoResults.Count);
-            
+
             if (s_cts.IsCancellationRequested) return;
             await SpiderVideoInfo();
             if (s_cts.IsCancellationRequested) return;
@@ -128,7 +119,7 @@ namespace Display.Views.SpiderVideoInfo
             _fileList = await DataAccess.Get.GetAllFilesInFolderListAsync(_fileList);
 
             //除去文件夹
-            _fileList = _fileList.Where(item => item.Fid!=null).ToList();
+            _fileList = _fileList.Where(item => item.Fid != null).ToList();
 
             //去除重复文件
             var newDictList = new Dictionary<string, Datum>();
@@ -256,7 +247,7 @@ namespace Display.Views.SpiderVideoInfo
                     var videoQuality = FilesInfo.GetVideoQualityFromVdi(info.Vdi);
 
                     UpdateFileStaticstics(info, videoInfo, videoQuality);
-                }   
+                }
                 //其他文件
                 else
                 {
@@ -441,7 +432,7 @@ namespace Display.Views.SpiderVideoInfo
             //SearchMessage_TextBlock.Text = $"⏱总耗时：{DateHelper.ConvertDoubleToLengthStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime)}";
             //TopProgressRing.IsActive = false;
 
-            var list = _matchVideoResults.Where(item=>!string.IsNullOrEmpty(item.MatchName))
+            var list = _matchVideoResults.Where(item => !string.IsNullOrEmpty(item.MatchName))
                 .Select(match => match.MatchName).ToList();
             var spiderManager = App.GetService<SpiderManager>();
             spiderManager.AddTask(list);

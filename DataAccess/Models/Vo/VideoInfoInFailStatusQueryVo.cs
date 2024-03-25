@@ -17,7 +17,7 @@ public class VideoInfoInFailStatusQueryVo
     public string? Name { get; set; }
 
     public bool IsRandom { get; set; }
-    
+
     public SpiderFailType ShowType { get; set; }
 
 

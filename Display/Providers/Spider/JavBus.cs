@@ -1,14 +1,14 @@
-﻿using HtmlAgilityPack;
+﻿using Display.Helper.Network;
+using Display.Models.Data;
+using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Threading;
-using Display.Models.Data;
+using System.Threading.Tasks;
 using static Display.Models.Spider.SpiderInfos;
 using HttpClient = System.Net.Http.HttpClient;
-using Display.Helper.Network;
 
 namespace Display.Providers.Spider;
 

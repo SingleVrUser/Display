@@ -1,8 +1,8 @@
 ﻿using ByteSizeLib;
-using Display.Services.Upload;
-using Microsoft.UI;
+using Display.Helper.Date;
+using Display.Models.Disk._115;
+using Display.Models.Upload;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,14 +15,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Windows.ApplicationModel;
 using static Display.Models.Data.FilesInfo;
-using static SkiaSharp.HarfBuzz.SKShaper;
-using System.Reflection;
-using System.Reflection.Metadata;
-using Display.Extensions;
-using Display.Models.Disk._115;
-using Display.Helper.Date;
-using Display.Models.Upload;
-using Display.Constants;
 
 namespace Display.Models.Data
 {
@@ -960,7 +952,7 @@ namespace Display.Models.Data
             Score = videoInfo.Score;
         }
 
-        public VideoCoverDisplayClass(VideoInfo videoInfo, double imgWidth, double imgHeight): this(videoInfo)
+        public VideoCoverDisplayClass(VideoInfo videoInfo, double imgWidth, double imgHeight) : this(videoInfo)
         {
             //图片大小
             imageHeight = imgHeight;

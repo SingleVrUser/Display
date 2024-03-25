@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using Display.Models.Data;
+using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,7 +7,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Display.Models.Data;
 
 namespace Display.Providers.Spider;
 
@@ -39,7 +39,7 @@ public class Common
                     rightCid = matchResult.Groups[2].Value;
                 }
                 // 纯字母或纯数字
-                else if(needSingleKeyword)
+                else if (needSingleKeyword)
                 {
                     return new Tuple<string, string>(cid, null);
                 }

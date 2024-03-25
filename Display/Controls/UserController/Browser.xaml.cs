@@ -1,45 +1,41 @@
-﻿
+﻿using Display.Models.Data;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.Web.WebView2.Core;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Windows.Storage;
-using Microsoft.Web.WebView2.Core;
 using Windows.Foundation;
-using Display.Models.Data;
+using Windows.Storage;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Display.Controls
+namespace Display.Controls.UserController
 {
     public sealed partial class Browser : UserControl
     {
-        ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+        private ApplicationDataContainer _localSettings = ApplicationData.Current.LocalSettings;
 
         public Browser()
         {
             this.InitializeComponent();
 
-            webview.Source = new Uri("https://115.com/?cid=0&offset=0&mode=wangpan");
+            WebView.Source = new Uri("https://115.com/?cid=0&offset=0&mode=wangpan");
 
-            webview.CoreWebView2Initialized += Webview_CoreWebView2Initialized;
+            WebView.CoreWebView2Initialized += WebViewCoreWebView2Initialized;
 
         }
 
 
-        private void Webview_CoreWebView2Initialized(WebView2 sender, CoreWebView2InitializedEventArgs args)
+        private void WebViewCoreWebView2Initialized(WebView2 sender, CoreWebView2InitializedEventArgs args)
         {
-            //webview.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
-            //var item2 = webview.ExecuteScriptAsync($"window.open('https://baidu.com','_blank');");
-
             var cookie = AppSettings._115_Cookie;
             //cookie不为空且可用
             if (!string.IsNullOrEmpty(cookie))
             {
-                webview.CoreWebView2.CookieManager.DeleteAllCookies();
+                WebView.CoreWebView2.CookieManager.DeleteAllCookies();
 
                 var cookiesList = cookie.Split(';');
                 foreach (var cookies in cookiesList)
@@ -50,24 +46,24 @@ namespace Display.Controls
                     AddCookie(key, value);
                 }
             }
-            
-            webview.CoreWebView2.WebResourceResponseReceived += CoreWebView2_WebResourceResponseReceived; ;
+
+            WebView.CoreWebView2.WebResourceResponseReceived += CoreWebView2_WebResourceResponseReceived; ;
         }
-        
+
         public event TypedEventHandler<CoreWebView2, CoreWebView2WebResourceResponseReceivedEventArgs> WebMessageReceived;
         private void CoreWebView2_WebResourceResponseReceived(CoreWebView2 sender, CoreWebView2WebResourceResponseReceivedEventArgs args)
         {
-            WebMessageReceived?.Invoke(sender,args);
+            WebMessageReceived?.Invoke(sender, args);
         }
 
         private void AddCookie(string key, string value)
         {
-            var cookie = webview.CoreWebView2.CookieManager.CreateCookie(key, value, ".115.com", "/");
-            webview.CoreWebView2.CookieManager.AddOrUpdateCookie(cookie);
+            var cookie = WebView.CoreWebView2.CookieManager.CreateCookie(key, value, ".115.com", "/");
+            WebView.CoreWebView2.CookieManager.AddOrUpdateCookie(cookie);
         }
 
 
-        private void webview_NavigationStarting(WebView2 sender, CoreWebView2NavigationStartingEventArgs args)
+        private void WebView_NavigationStarting(WebView2 sender, CoreWebView2NavigationStartingEventArgs args)
         {
             NavigationProgressBar.Visibility = Visibility.Visible;
 
@@ -75,24 +71,24 @@ namespace Display.Controls
 
         private async void HiddenWaterMark()
         {
-            await webview.ExecuteScriptAsync(
+            await WebView.ExecuteScriptAsync(
                 @"var tag = document.getElementsByTagName('div');for(var i=0;i<tag.length;i++){if(tag[i].className.indexOf('fp-') != -1){tag[i].remove();console.log(""删除水印"")}};");
         }
 
         private async void HiddenAdvertising()
         {
-            await webview.ExecuteScriptAsync(
+            await WebView.ExecuteScriptAsync(
                 "document.getElementById('mini-dialog').remove()");
 
-            await webview.ExecuteScriptAsync(
+            await WebView.ExecuteScriptAsync(
                 "document.getElementById('js_common_mini-dialog').remove()");
 
-            await webview.ExecuteScriptAsync(
+            await WebView.ExecuteScriptAsync(
                 "document.getElementById('js_common_act-enter').remove()");
         }
 
 
-        private void webview_NavigationCompleted(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs args)
+        private void WebView_NavigationCompleted(WebView2 sender, CoreWebView2NavigationCompletedEventArgs args)
         {
             NavigationProgressBar.Visibility = Visibility.Collapsed;
 
@@ -107,7 +103,7 @@ namespace Display.Controls
         /// <returns></returns>
         public async Task<List<SelectedItem>> GetSelectedItems()
         {
-            if (webview == null)
+            if (WebView == null)
             {
                 return null;
             }
@@ -115,7 +111,7 @@ namespace Display.Controls
             List<SelectedItem> selectedItemList = new();
 
             //选择文件夹和文件
-            string inputElementsIdAndValueAsJsonString = await webview.ExecuteScriptAsync(
+            string inputElementsIdAndValueAsJsonString = await WebView.ExecuteScriptAsync(
                 "Array.from(" +
                         "document.getElementById('js_center_main_box').getElementsByTagName('iframe')[0].contentDocument.getElementsByClassName('list-contents')[0].getElementsByTagName('li')" +
                     ").filter(" +

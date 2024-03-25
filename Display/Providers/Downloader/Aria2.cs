@@ -1,17 +1,16 @@
-﻿using System;
-using System.Net;
-using Display.Models.Data;
+﻿using Display.Models.Data;
+using Display.Models.Settings.Options;
 using Newtonsoft.Json;
+using System;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Windows.Devices.Geolocation;
-using Display.Models.Settings.Options;
 
 namespace Display.Providers.Downloader;
 
-internal class Aria2: BaseDownloader
+internal class Aria2 : BaseDownloader
 {
     public override string Name => "Aria2";
 

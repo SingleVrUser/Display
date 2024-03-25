@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
-using System;
 using Display.Constants;
 using Display.CustomWindows;
 using Display.Helper.UI;

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Display.Models.Upload;
 using Display.Services.Upload;
 using Display.ViewModels;
 using Microsoft.UI.Xaml;
+using System;
+using System.Diagnostics;
+using System.IO;
 
 namespace Display.Services;
 
@@ -140,7 +140,7 @@ internal partial class UploadSubItem(string path, long cid) : ObservableObject
         _fileUploadService.StateChanged += FileUploadServiceStateChanged;
         _fileUploadService.PositionCallback += p =>
         {
-            Position = p==0 ? 0 : length == p ? Maximum : (int)(Maximum * (p/(double)length));
+            Position = p == 0 ? 0 : length == p ? Maximum : (int)(Maximum * (p / (double)length));
         };
 
         await _fileUploadService.Init();

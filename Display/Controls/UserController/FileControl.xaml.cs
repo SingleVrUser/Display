@@ -46,7 +46,7 @@ namespace Display.Controls
             {
                 SetValue(TypeProperty, value);
 
-                SetValue(IconTextProperty, Type == FileType.Folder? "\xE8B7": "\xE160");
+                SetValue(IconTextProperty, Type == FileType.Folder ? "\xE8B7" : "\xE160");
             }
         }
         private string IconText

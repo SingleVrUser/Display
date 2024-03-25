@@ -1,12 +1,18 @@
 ﻿using Display.Extensions;
 using Display.Helper.Crypto;
+using Display.Helper.Date;
+using Display.Helper.Network;
+using Display.Models.Data.Enums;
+using Display.Models.Disk._115;
+using Display.Models.Media;
 using Display.Services.Upload;
-using Display.Views;
+using Display.Views.Settings.Account;
 using HtmlAgilityPack;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -21,15 +27,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using SharpCompress;
 using static System.Int32;
-using Display.Models.Media;
-using Display.Models.Disk._115;
-using Display.Helper.Network;
-using Display.Helper.Date;
-using Display.CustomWindows;
-using Display.Models.Data.Enums;
-using Display.Constants;
 
 namespace Display.Models.Data
 {
@@ -838,7 +836,7 @@ namespace Display.Models.Data
             {
                 var isDir = videoInfo.Uid == 0;
                 downRequest.param.list.Add(new Down_Request()
-                    { n = videoInfo.Name, pc = videoInfo.PickCode, is_dir = isDir });
+                { n = videoInfo.Name, pc = videoInfo.PickCode, is_dir = isDir });
             }
 
             var url = string.Empty;

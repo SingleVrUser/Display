@@ -1,24 +1,20 @@
 ﻿
+using Display.Helper.FileProperties.Name;
+using Display.Models.Settings.Options;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using Windows.Storage.Pickers;
-using Display.Helper.FileProperties.Name;
-using crypto;
-using FFmpeg.AutoGen.Abstractions;
-using Microsoft.UI.Xaml.Controls;
-using Display.Models.Settings.Options;
 
 namespace Display.Providers.Downloader;
 
 internal abstract class BaseDownloader : INotifyPropertyChanged
 {
     public abstract string Name { get; }
-    public abstract string Description { get;}
-    public abstract string ApiPlaceholder { get;}
+    public abstract string Description { get; }
+    public abstract string ApiPlaceholder { get; }
     public abstract string ApiText { get; set; }
     public abstract string SavePath { get; set; }
 
@@ -27,7 +23,7 @@ internal abstract class BaseDownloader : INotifyPropertyChanged
         var apiSetting = MatchApiSetting();
         if (apiSetting == null)
         {
-            ShowWarn("Api设置","请检查格式是否正确");
+            ShowWarn("Api设置", "请检查格式是否正确");
             return;
         }
         SetApiSetting(apiSetting);
@@ -84,7 +80,7 @@ internal abstract class BaseDownloader : INotifyPropertyChanged
         => setting is null ? string.Empty : $"{setting.ApiUrl} (部分隐藏)";
     protected abstract DownApiSettings MatchApiSetting();
     protected abstract void SetSavePath(string newPath);
-    protected abstract void SetApiSetting(DownApiSettings  settings);
+    protected abstract void SetApiSetting(DownApiSettings settings);
     protected abstract void CheckApiOk(DownApiSettings curSetting);
 
     public event PropertyChangedEventHandler PropertyChanged;

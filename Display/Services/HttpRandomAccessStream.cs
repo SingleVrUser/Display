@@ -89,7 +89,7 @@ namespace Display.Services
 
             Position = position;
         }
-        
+
         void IDisposable.Dispose()
         {
             _inputStream?.Dispose();
@@ -161,7 +161,7 @@ namespace Display.Services
                 response = await _client.SendRequestAsync(
                         request,
                         HttpCompletionOption.ResponseHeadersRead).AsTask(cancellationToken: cancellationToken);
-                
+
             }
             catch (TaskCanceledException ex)
             {

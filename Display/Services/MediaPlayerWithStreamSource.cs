@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Display.Helper.Encode;
+using Display.Models.Data;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -6,8 +8,6 @@ using System.Threading.Tasks;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Media.Streaming.Adaptive;
-using Display.Helper.Encode;
-using Display.Models.Data;
 
 namespace Display.Services
 {
@@ -25,10 +25,10 @@ namespace Display.Services
             Url = url;
             FilesInfo = filesInfo;
         }
-        
-        public static async Task<MediaPlayerWithStreamSource> CreateMediaPlayer(string videoUrl,SubInfo subInfo = null ,FilesInfo filesInfo=null)
+
+        public static async Task<MediaPlayerWithStreamSource> CreateMediaPlayer(string videoUrl, SubInfo subInfo = null, FilesInfo filesInfo = null)
         {
-            var mediaPlayerWithStreamSource = new MediaPlayerWithStreamSource(videoUrl,filesInfo);
+            var mediaPlayerWithStreamSource = new MediaPlayerWithStreamSource(videoUrl, filesInfo);
 
             var mediaPlayer = mediaPlayerWithStreamSource.MediaPlayer;
 

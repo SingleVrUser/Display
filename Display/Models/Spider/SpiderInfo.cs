@@ -1,11 +1,11 @@
 ﻿using Display.Models.Data;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml;
+using Display.Providers.Spider;
 using Microsoft.UI;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using static Display.Models.Spider.SpiderInfos;
-using Display.Providers.Spider;
 
 namespace Display.Models.Spider;
 
@@ -17,7 +17,7 @@ public class SpiderInfos
     }
 
     public enum SpiderStates { Ready, Doing, Awaiting, Done }
-        
+
 }
 
 public class SpiderInfo : INotifyPropertyChanged

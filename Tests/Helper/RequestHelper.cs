@@ -1,5 +1,4 @@
-﻿using Display.Constants;
-using Display.Models.Data;
+﻿using Display.Models.Data;
 
 namespace Tests.Helper
 {

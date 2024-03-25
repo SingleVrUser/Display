@@ -1,8 +1,8 @@
-﻿using System;
-using CommunityToolkit.WinUI.Behaviors;
+﻿using CommunityToolkit.WinUI.Behaviors;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using System;
 
 namespace Display.Views.Settings;
 

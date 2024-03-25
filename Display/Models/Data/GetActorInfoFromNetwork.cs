@@ -1,11 +1,11 @@
 ﻿
+using Display.Helper.Network;
 using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Threading;
-using Display.Helper.Network;
+using System.Threading.Tasks;
 
 namespace Display.Models.Data;
 

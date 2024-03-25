@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Display.Models.Data;
+using Microsoft.UI.Xaml.Data;
+using SharpCompress;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Display.Models.Data;
-using Microsoft.UI.Xaml.Data;
-using SharpCompress;
 
 namespace Display.Services.IncrementalCollection;
 

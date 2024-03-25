@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Display.Helper.Date;
+﻿using Display.Helper.Date;
 using Microsoft.UI.Xaml.Data;
+using System;
 
 namespace Display.Converter;
 

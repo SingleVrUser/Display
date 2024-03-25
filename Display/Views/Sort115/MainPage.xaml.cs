@@ -1,12 +1,12 @@
+using Display.CustomWindows;
+using Display.Models.Data;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
-using Display.CustomWindows;
-using Display.Models.Data;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using Sort115HomeModel = Display.Models.Disk._115.Sort115HomeModel;
 using SpiderInfo = Display.Models.Spider.SpiderInfos;
 
@@ -66,7 +66,7 @@ public sealed partial class MainPage : Page
         foreach (var info in files)
         {
             var existsInfo = ViewModel.SelectedFiles.FirstOrDefault(i => i.Info.Id == info.Id);
-            if(existsInfo!=null) continue;
+            if (existsInfo != null) continue;
 
             ViewModel.SelectedFiles.Add(new Sort115HomeModel(info));
         }
@@ -88,7 +88,7 @@ public sealed partial class MainPage : Page
                 // 使用更大的 MaxWidth
                 ["ContentDialogMaxWidth"] = 700
             }
-        }.ShowAsync(); 
+        }.ShowAsync();
 
         if (result == ContentDialogResult.Primary)
         {

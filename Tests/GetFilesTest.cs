@@ -1,5 +1,4 @@
-﻿using Display.Constants;
-using Display.Extensions;
+﻿using Display.Extensions;
 using Display.Helper.Crypto;
 using Display.Services.Upload;
 using Tests.Helper;
@@ -26,7 +25,7 @@ namespace Tests
         /// <returns></returns>
         [TestMethod]
         public async Task GetFilesByDesktopTest()
-        {   
+        {
             var aesKey = UploadKey.Instance.AesKey;
             var aesIv = UploadKey.Instance.AesIv;
             var clientPublicKey = UploadKey.Instance.ClientPublicKey;
@@ -58,7 +57,7 @@ namespace Tests
             var contentBytes = await response.Content.ReadAsByteArrayAsync(Token);
 
             var result = UploadEncryptHelper.DecryptReceiveData<FileInfo.Desktop.Info>(contentBytes, aesKey: aesKey, aesIv: aesIv);
-            
+
             Assert.AreEqual(result.state, true);
             Assert.AreEqual(result.cid, RootCid);
             Assert.AreEqual(result.offset, 0);

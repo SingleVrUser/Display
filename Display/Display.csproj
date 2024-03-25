@@ -144,16 +144,12 @@
     <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
-    <Content Include="Views\ActorInfoPage.xaml" />
-    <Content Include="Views\ActorInfoPage.xaml.cs" />
     <Content Include="Views\ActorsPage.xaml" />
     <Content Include="Views\ActorsPage.xaml.cs" />
     <Content Include="Views\DetailInfoPage.xaml" />
     <Content Include="Views\DetailInfoPage.xaml.cs" />
     <Content Include="Views\HomePage.xaml" />
     <Content Include="Views\HomePage.xaml.cs" />
-    <Content Include="Views\SettingsPage.xaml" />
-    <Content Include="Views\SettingsPage.xaml.cs" />
     <Content Include="Views\VideoViewPage.xaml" />
     <Content Include="Views\VideoViewPage.xaml.cs" />
   </ItemGroup>
@@ -324,7 +320,7 @@
     <Page Update="Views\BrowserPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Views\ActorInfoPage.xaml">
+    <Page Update="Views\VideoCoverPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Views\ActorsPage.xaml">
@@ -334,9 +330,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Views\HomePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\SettingsPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Views\VideoViewPage.xaml">
@@ -430,5 +423,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Views\Settings\UIShowPage.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controls\UserController\" />
+    <Folder Include="Views\Other\" />
   </ItemGroup>
 </Project>

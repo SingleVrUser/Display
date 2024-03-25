@@ -1,10 +1,9 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
-using System;
-using System.Diagnostics;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -48,7 +47,7 @@ namespace Display.Controls
         public event EventHandler<RoutedEventArgs> PrimaryButtonClick;
         private void PrimaryButton_OnClick(object sender, RoutedEventArgs e)
         {
-            PrimaryButtonClick?.Invoke(sender,e);
+            PrimaryButtonClick?.Invoke(sender, e);
         }
 
         public event EventHandler<RoutedEventArgs> CancelButtonClick;

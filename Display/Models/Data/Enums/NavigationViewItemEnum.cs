@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Display.Models.Data.Enums;
+﻿namespace Display.Models.Data.Enums;
 
 public enum NavigationViewItemEnum
 {
@@ -27,7 +25,7 @@ public enum NavigationViewItemEnum
     SpiderSetting,
     SearchSetting,
     StorageSetting,
-    DownSetting,    
+    DownSetting,
 
     //更多页
     FilePage,

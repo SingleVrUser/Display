@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Display.Extensions;
+using Display.Models.Data;
+using Microsoft.UI.Xaml.Data;
+using SharpCompress;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Display.Extensions;
-using Display.Models.Data;
-using Microsoft.UI.Xaml.Data;
-using SharpCompress;
 
 namespace Display.Services.IncrementalCollection;
 
@@ -98,7 +98,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         get => _webPaths;
         set
         {
-            if(_webPaths == value) return;
+            if (_webPaths == value) return;
 
             _webPaths = value;
 
@@ -110,7 +110,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
     {
         Debug.WriteLine($"从网络中获取文件列表:{offset}-{limit + offset}");
         var filesInfo = await WebApi.GetFileAsync(Cid, limit, offset, orderBy: OrderBy.GetDescription(), asc: Asc, isOnlyFolder: IsOnlyFolder);
-        if(filesInfo == null) return null;
+        if (filesInfo == null) return null;
 
         WebPaths = filesInfo.path;
         AllCount = filesInfo.count;
@@ -142,8 +142,8 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
             return 0;
         }
 
-        filesInfo.data.ForEach(i=>Add(new FilesInfo(i)));
-        
+        filesInfo.data.ForEach(i => Add(new FilesInfo(i)));
+
         HasMoreItems = AllCount > Count;
         Debug.WriteLine($"[{Count}/{AllCount}] HasMoreItems = {HasMoreItems}");
 

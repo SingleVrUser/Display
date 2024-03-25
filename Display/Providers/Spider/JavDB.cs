@@ -1,4 +1,6 @@
-﻿using HtmlAgilityPack;
+﻿using Display.Helper.Network;
+using Display.Models.Data;
+using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,9 +9,7 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Display.Models.Data;
 using static Display.Models.Spider.SpiderInfos;
-using Display.Helper.Network;
 
 namespace Display.Providers.Spider;
 
@@ -274,16 +274,16 @@ public class JavDb : BaseSpider
             switch (split.Length)
             {
                 case 1:
-                {
-                    var matchResult = Regex.Match(title, @"([A-Z]+)(\d+)");
-                    if (matchResult.Success)
                     {
-                        searchLeftCid = matchResult.Groups[1].Value;
-                        searchRightCid = matchResult.Groups[2].Value;
-                    }
+                        var matchResult = Regex.Match(title, @"([A-Z]+)(\d+)");
+                        if (matchResult.Success)
+                        {
+                            searchLeftCid = matchResult.Groups[1].Value;
+                            searchRightCid = matchResult.Groups[2].Value;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
                 case 2:
                     searchLeftCid = split[0];
                     searchRightCid = split[1];

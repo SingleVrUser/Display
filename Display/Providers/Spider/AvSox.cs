@@ -1,10 +1,10 @@
-﻿using HtmlAgilityPack;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Display.Helper.Network;
 using Display.Models.Data;
 using Display.Models.Spider;
-using Display.Helper.Network;
+using HtmlAgilityPack;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Display.Providers.Spider;
 
@@ -95,13 +95,13 @@ public class AvSox : BaseSpider
             switch (splitSearchResult.Length)
             {
                 case 1:
-                {
-                    var matchResult = Regex.Match(title, @"^([A-Z]+)(\d+)$");
-                    if (!matchResult.Success) continue;
-                    searchLeftCid = matchResult.Groups[1].Value;
-                    searchRightCid = matchResult.Groups[2].Value;
-                    break;
-                }
+                    {
+                        var matchResult = Regex.Match(title, @"^([A-Z]+)(\d+)$");
+                        if (!matchResult.Success) continue;
+                        searchLeftCid = matchResult.Groups[1].Value;
+                        searchRightCid = matchResult.Groups[2].Value;
+                        break;
+                    }
                 //有且只有两个分隔符（HEYZO-2934）
                 case 2:
                     searchLeftCid = splitSearchResult[0];

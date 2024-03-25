@@ -1,16 +1,16 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using Windows.Foundation;
 using CommunityToolkit.WinUI.Collections;
 using CommunityToolkit.WinUI.Controls;
 using Display.Models.Data;
 using Display.Services.IncrementalCollection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using Windows.Foundation;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -113,7 +113,7 @@ public sealed partial class EditInfo : Page
             }
             else
             {
-                actors_suggestion.SetFilter(new () { $"name LIKE '%{sender.Text}%'" });
+                actors_suggestion.SetFilter(new() { $"name LIKE '%{sender.Text}%'" });
             }
 
             if (actors_suggestion.Count == 0) await actors_suggestion.LoadData(20);

@@ -1,4 +1,6 @@
-﻿
+﻿using Display.Helper.Date;
+using Display.Helper.FileProperties.Name;
+using Display.Models.Data;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -10,14 +12,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
-using Display.Helper.Date;
-using Display.Helper.FileProperties.Name;
-using Display.Models.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Display.Views
+namespace Display.Views.More
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
@@ -46,11 +45,6 @@ namespace Display.Views
                 thumbnailInfo.Add(new ThumbnailInfo(item));
             }
         }
-
-        //private void BasicGridView_Loaded(object sender, RoutedEventArgs e)
-        //{
-        //    LoadedData();
-        //}
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {

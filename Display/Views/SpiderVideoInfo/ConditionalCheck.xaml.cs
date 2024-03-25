@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Display.Managers;
+using Display.Models.Data;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -6,11 +10,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Windows.Storage;
 using Windows.System;
-using Display.Managers;
-using Display.Models.Data;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Display.Models.Settings.Options;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -61,7 +60,7 @@ namespace Display.Views.SpiderVideoInfo
 
             var spiders = SpiderManager.Spiders;
 
-            var onSpiders = spiders.Where(spider=> spider.IsOn);
+            var onSpiders = spiders.Where(spider => spider.IsOn);
 
             if (!onSpiders.Any())
             {
@@ -80,7 +79,7 @@ namespace Display.Views.SpiderVideoInfo
 
             Check_Condition();
         }
-        
+
         private async void ImageCheckButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is not HyperlinkButton { DataContext: ConditionCheck item }) return;

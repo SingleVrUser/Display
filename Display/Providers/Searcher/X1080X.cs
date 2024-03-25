@@ -1,5 +1,11 @@
-﻿using System;
+﻿using Display.Helper.Network;
+using Display.Helper.UI;
+using Display.Models.Data;
+using Display.Models.Spider;
+using Display.Providers.Spider;
 using HtmlAgilityPack;
+using SharpCompress.Readers;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -7,14 +13,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using SharpCompress.Readers;
-using static System.Int32;
 using System.Web;
-using Display.Models.Spider;
-using Display.Helper.UI;
-using Display.Helper.Network;
-using Display.Models.Data;
-using Display.Providers.Spider;
+using static System.Int32;
 
 namespace Display.Providers.Searcher
 {
@@ -31,7 +31,7 @@ namespace Display.Providers.Searcher
         {
             get
             {
-                if(_client != null) return _client;
+                if (_client != null) return _client;
 
                 var headers = new Dictionary<string, string>
                 {
@@ -312,7 +312,7 @@ namespace Display.Providers.Searcher
                 var title = titleNode.InnerText;
                 var upperText = title.ToUpper();
 
-                if(!Common.IsSearchResultMatch(leftCid, rightCid, upperText)) continue;
+                if (!Common.IsSearchResultMatch(leftCid, rightCid, upperText)) continue;
 
                 var detailUrl = titleNode.GetAttributeValue("href", null);
                 if (detailUrl == null) continue;

@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using Display.Models.Version;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using Windows.System;
-using Display.Models.Version;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
