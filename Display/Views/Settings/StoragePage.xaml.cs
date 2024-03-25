@@ -1,17 +1,16 @@
-using Display.Models.Data.Enums;
-using Display.Models.Data;
-using Display.Models.Settings.Options;
-using Microsoft.UI.Xaml.Controls;
-using Windows.Storage.Pickers;
 using Display.Helper.FileProperties.Name;
+using Display.Models.Data;
+using Display.Models.Data.Enums;
+using Display.Models.Settings.Options;
+using Microsoft.UI;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI;
-using System.Threading.Tasks;
 using System;
-using System.Diagnostics;
 using System.IO;
-using Microsoft.UI.Xaml;
+using System.Threading.Tasks;
+using Windows.Storage.Pickers;
 
 namespace Display.Views.Settings;
 

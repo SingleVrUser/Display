@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using Display.Helper.FileProperties.Name;
+using Display.Models.Data;
+using Display.Models.Data.Enums;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media.Playback;
-using Display.Helper.FileProperties.Name;
-using Display.Models.Data;
-using Display.Models.Data.Enums;
 
 namespace Display.Models.Media
 {

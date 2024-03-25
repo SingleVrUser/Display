@@ -1,14 +1,12 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Display.Models.Data.Enums;
+using Display.Models.Media;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Display.Models.Data;
-using Display.Models.Data.Enums;
-using Display.Models.Media;
-using static Display.Controls.CustomMediaPlayerElement;
 
-namespace Display.Controls;
+namespace Display.Controls.CustomController;
 
 public class CustomMediaTransportControls : MediaTransportControls
 {
@@ -37,7 +35,7 @@ public class CustomMediaTransportControls : MediaTransportControls
 
         base.OnApplyTemplate();
 
-        OnApplyTemplateCompleted?.Invoke(sender:null,e:null);
+        OnApplyTemplateCompleted?.Invoke(sender: null, e: null);
     }
 
     private AppBarToggleButton _likeButton;
@@ -151,7 +149,7 @@ public class CustomMediaTransportControls : MediaTransportControls
         //显示喜欢/稍后观看
         LikeButton.IsEnabled = true;
         LikeButton.IsChecked = isLike;
-        
+
         LookLaterButton.IsEnabled = true;
         LookLaterButton.IsChecked = lookLater;
 
@@ -177,7 +175,6 @@ public class CustomMediaTransportControls : MediaTransportControls
         LikeButton.IsEnabled = false;
         LookLaterButton.IsEnabled = false;
     }
-
 
     public void TrySetScreenButton()
     {
@@ -207,13 +204,10 @@ public class CustomMediaTransportControls : MediaTransportControls
         QualityListView.SelectionChanged += QualityListView_SelectionChanged;
     }
 
-    //private bool _isFirstQualityChanged;
     private bool _isSettingQualitySource;
-    public void SetQualityListSource(List<Quality> qualityItemsSource,int qualityIndex)
+    public void SetQualityListSource(List<Quality> qualityItemsSource, int qualityIndex)
     {
         if (QualityListView == null) return;
-
-        //_isFirstQualityChanged = true;
 
         _isSettingQualitySource = true;
 
@@ -242,10 +236,12 @@ public class CustomMediaTransportControls : MediaTransportControls
         playerListView.ItemTemplate = qualityDataTemplate;
 
         //设置播放源
-        List<Player> playerItemsSource = new() {
+        List<Player> playerItemsSource =
+        [
             new Player(PlayerType.Vlc),
             new Player(PlayerType.Mpv),
-            new Player(PlayerType.PotPlayer)};
+            new Player(PlayerType.PotPlayer)
+        ];
 
         //播放器选择列表
         playerListView.ItemsSource = playerItemsSource;
@@ -300,15 +296,9 @@ public class CustomMediaTransportControls : MediaTransportControls
     }
 }
 
-
-public class Player
+public class Player(PlayerType playerType)
 {
-    public PlayerType PlayerType;
+    public PlayerType PlayerType = playerType;
 
     public string Name => PlayerType.ToString();
-
-    public Player(PlayerType playerType)
-    {
-        this.PlayerType = playerType;
-    }
 }

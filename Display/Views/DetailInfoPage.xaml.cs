@@ -1,4 +1,7 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Display.Helper.Network;
+using Display.Models.Data;
+using Display.Models.Media;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -8,9 +11,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using Windows.Foundation;
-using Display.Models.Media;
-using Display.Helper.Network;
-using Display.Models.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -79,7 +79,7 @@ namespace Display.Views
             if (e.NavigationMode == NavigationMode.Back)
             {
                 //指定页面
-                if (e.SourcePageType == typeof(VideoViewPage) || e.SourcePageType == typeof(HomePage) || e.SourcePageType == typeof(ActorInfoPage))
+                if (e.SourcePageType == typeof(VideoViewPage) || e.SourcePageType == typeof(HomePage) || e.SourcePageType == typeof(VideoCoverPage))
                 {
                     //无Cover_Image，退出
                     //例：不存在Image中Source指向的图片文件
@@ -118,7 +118,7 @@ namespace Display.Views
             //准备动画
             ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", clickButton);
             animation.Configuration = new BasicConnectedAnimationConfiguration();
-            Frame.Navigate(typeof(ActorInfoPage), TypesAndName);
+            Frame.Navigate(typeof(VideoCoverPage), TypesAndName);
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace Display.Views
             Tuple<List<string>, string, bool> TypesAndName = new(new() { "category" }, LabelName, false);
 
             ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", clickButton);
-            Frame.Navigate(typeof(ActorInfoPage), TypesAndName);
+            Frame.Navigate(typeof(VideoCoverPage), TypesAndName);
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace Display.Views
                 PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, this.XamlRoot);
             }
         }
-        
+
 
         /// <summary>
         /// 点击了删除键

@@ -1,13 +1,13 @@
-﻿using HtmlAgilityPack;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Display.Helper.Date;
+using Display.Helper.Network;
 using Display.Models.Data;
 using Display.Models.Spider;
-using Display.Helper.Network;
-using Display.Helper.Date;
+using HtmlAgilityPack;
 using Newtonsoft.Json;
+using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Display.Providers.Spider;
 

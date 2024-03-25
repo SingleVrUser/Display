@@ -1,8 +1,8 @@
-﻿using System.IO;
-using Windows.ApplicationModel;
-using Display.Helper.UI;
+﻿using Display.Helper.UI;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using System.IO;
+using Windows.ApplicationModel;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -16,7 +16,7 @@ namespace Display.CustomWindows
     {
         private const string DefaultTitle = "Display";
 
-        public CommonWindow(string title = DefaultTitle, int width=0,int height=0)
+        public CommonWindow(string title = DefaultTitle, int width = 0, int height = 0)
         {
             InitializeComponent();
             Title = title;
@@ -37,7 +37,7 @@ namespace Display.CustomWindows
             WindowHelper.TrackWindow(this);
         }
 
-        public static void CreateAndShowWindow(Page page,string title= DefaultTitle, int width = 0, int height = 0)
+        public static void CreateAndShowWindow(Page page, string title = DefaultTitle, int width = 0, int height = 0)
         {
             var window = new CommonWindow(title, width, height)
             {

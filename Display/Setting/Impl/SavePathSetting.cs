@@ -1,5 +1,5 @@
-﻿using System.IO;
-using Display.Setting.Interfaces;
+﻿using Display.Setting.Interfaces;
+using System.IO;
 using DefaultValue = Display.Constants.DefaultSettings;
 
 namespace Display.Setting.Impl;

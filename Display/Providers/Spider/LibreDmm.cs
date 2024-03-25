@@ -1,14 +1,11 @@
-﻿using System.Security.Cryptography;
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Display.Helper.Network;
+﻿using Display.Helper.Network;
 using Display.Models.Data;
 using Display.Models.Spider;
 using HtmlAgilityPack;
-using static Display.Constants.DefaultSettings.Network;
+using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Display.Providers.Spider;
 

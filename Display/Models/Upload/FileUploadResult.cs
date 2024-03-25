@@ -1,5 +1,5 @@
-﻿using System;
-using Display.Models.Data;
+﻿using Display.Models.Data;
+using System;
 
 namespace Display.Models.Upload;
 
@@ -25,12 +25,12 @@ public class FileUploadResult(string name)
     {
         get
         {
-            if(_isVideo!=null) return (bool)_isVideo;
+            if (_isVideo != null) return (bool)_isVideo;
 
             _isVideo = FilesInfo.GetTypeFromIcon(Name.Split('.')[^1]) == "video";
             return (bool)_isVideo;
         }
-        set=>_isVideo = value;
+        set => _isVideo = value;
     }
 
     public void SetFromOssUploadResult(OssUploadResult uploadResult)

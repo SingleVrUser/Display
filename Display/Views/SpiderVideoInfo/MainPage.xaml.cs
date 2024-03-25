@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using Display.Helper.Network;
+﻿using Display.Helper.Network;
 using Display.Models.Data;
 using Display.Models.Data.Enums;
 using Display.Models.Media;
 using Display.Services.IncrementalCollection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -136,7 +136,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
 
     private void ShowTeachingTip(string content)
     {
-        BasePage.ShowTeachingTip(SelectNullTeachingTip,content);
+        BasePage.ShowTeachingTip(SelectNullTeachingTip, content);
     }
 
     /// <summary>
@@ -201,7 +201,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     /// <param Name="args"></param>
     private void TreeView_ItemInvoked(TreeView sender, TreeViewItemInvokedEventArgs args)
     {
-        if (args.InvokedItem is not TreeViewNode{Content:ExplorerItem content}) return;
+        if (args.InvokedItem is not TreeViewNode { Content: ExplorerItem content }) return;
 
         if (FileInfoShow_Grid.Visibility == Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
         SelectedDatum = content.datum;
@@ -294,7 +294,7 @@ public sealed partial class MainPage : Page, INotifyPropertyChanged
     private async void Explorer_OnPlayWithPlayerClick(object sender, RoutedEventArgs e)
     {
         if (sender is not MenuFlyoutItem { DataContext: FilesInfo info, Tag: PlayerType playerType }) return;
-        
+
         await Task.Delay(1);
 
 

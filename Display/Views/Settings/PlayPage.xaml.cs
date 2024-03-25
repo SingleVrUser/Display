@@ -1,13 +1,12 @@
+using Display.Models.Data;
+using Display.Models.Data.Enums;
+using Display.Models.Settings.Options;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Display.Constants;
-using Display.Models.Data;
-using Display.Models.Data.Enums;
-using Display.Models.Settings.Options;
-using Microsoft.UI.Xaml.Controls;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

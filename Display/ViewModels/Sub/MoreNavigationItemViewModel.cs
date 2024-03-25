@@ -1,7 +1,7 @@
 ﻿using Display.Models.Data;
+using Display.Models.Settings;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using Display.Models.Settings;
 
 namespace Display.ViewModels.Sub;
 

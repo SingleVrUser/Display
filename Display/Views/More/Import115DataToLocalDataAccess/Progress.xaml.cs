@@ -1,4 +1,10 @@
-﻿using System;
+﻿using Display.CustomWindows;
+using Display.Helper.Date;
+using Display.Models.Data;
+using Microsoft.Toolkit.Uwp.Notifications;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -7,12 +13,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.System;
-using Display.CustomWindows;
-using Display.Helper.Date;
-using Display.Models.Data;
-using Microsoft.Toolkit.Uwp.Notifications;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -100,14 +100,14 @@ namespace Display.Views.More.Import115DataToLocalDataAccess
                 if (info.Type == FilesInfo.FileType.File)
                 {
                     filesWithoutRootList.Add(info);
-                    _overallCount ++;
+                    _overallCount++;
 
                     FileCategoryCollection.Add(new FileCategory(info.Datum));
                 }
                 // 文件夹
                 else
                 {
-                    if(info.Id == null) continue;
+                    if (info.Id == null) continue;
 
                     var cid = (long)info.Id;
 
@@ -171,38 +171,38 @@ namespace Display.Views.More.Import115DataToLocalDataAccess
                         //updateSendSpeed(progressPercent.sendCountPerSecond);
                         break;
                     case ProgressStatus.done:
-                    {
-                        //全部完成
-                        if (_successCount == _overallCount)
                         {
-                            GetInfos_Progress.status = Status.Success;
+                            //全部完成
+                            if (_successCount == _overallCount)
+                            {
+                                GetInfos_Progress.status = Status.Success;
 
-                            //通知
-                            TryToast("任务已完成", $"{_overallCount}条数据添加进数据库 👏");
+                                //通知
+                                TryToast("任务已完成", $"{_overallCount}条数据添加进数据库 👏");
+                            }
+                            else
+                            {
+                                Fail_Expander.Visibility = Visibility.Visible;
+                                GetInfos_Progress.status = Status.Pause;
+
+                                Fail_Expander.IsExpanded = true;
+
+                                Fail_ListView.ItemsSource = progressPercent.getFilesProgressInfo?.FailCid;
+                                FailCount_TextBlock.Text = progressPercent.getFilesProgressInfo?.FailCid.Count.ToString();
+
+                                //通知
+                                TryToast("任务已结束", $"完成情况：{_successCount}/{_overallCount}，问题不大 😋");
+                            }
+
+                            //剩余时间改总耗时
+                            leftTimeTitle_Run.Text = "总耗时：";
+                            leftTime_Run.Text = DateHelper.ConvertDoubleToLengthStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime);
+
+                            cps_TextBlock.Visibility = Visibility.Collapsed;
+                            GetFolderCategory_Expander.IsExpanded = true;
+                            GetInfos_Progress.Visibility = Visibility.Collapsed;
+                            break;
                         }
-                        else
-                        {
-                            Fail_Expander.Visibility = Visibility.Visible;
-                            GetInfos_Progress.status = Status.Pause;
-
-                            Fail_Expander.IsExpanded = true;
-
-                            Fail_ListView.ItemsSource = progressPercent.getFilesProgressInfo?.FailCid;
-                            FailCount_TextBlock.Text = progressPercent.getFilesProgressInfo?.FailCid.Count.ToString();
-
-                            //通知
-                            TryToast("任务已结束", $"完成情况：{_successCount}/{_overallCount}，问题不大 😋");
-                        }
-
-                        //剩余时间改总耗时
-                        leftTimeTitle_Run.Text = "总耗时：";
-                        leftTime_Run.Text = DateHelper.ConvertDoubleToLengthStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime);
-
-                        cps_TextBlock.Visibility = Visibility.Collapsed;
-                        GetFolderCategory_Expander.IsExpanded = true;
-                        GetInfos_Progress.Visibility = Visibility.Collapsed;
-                        break;
-                    }
                     case ProgressStatus.cancel:
                         Debug.WriteLine("退出进程");
                         break;
@@ -234,7 +234,7 @@ namespace Display.Views.More.Import115DataToLocalDataAccess
                 WillStartSpiderTaskTip.IsOpen = false;
 
                 var fileNameList = FileCategoryCollection.Select(item => item.file_name).ToList();
-                var page = new SpiderVideoInfo.Progress(fileNameList, filesWithoutRootList.Select(x=>x.Datum).ToList());
+                var page = new SpiderVideoInfo.Progress(fileNameList, filesWithoutRootList.Select(x => x.Datum).ToList());
                 //创建搜刮进度窗口
                 page.CreateWindow();
             }

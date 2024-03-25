@@ -1,4 +1,6 @@
 ﻿
+using Display.Models.Data;
+using Microsoft.Data.Sqlite;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -7,10 +9,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Display.Helper;
-using Microsoft.Data.Sqlite;
-using Microsoft.UI.Xaml.Input;
-using Display.Models.Data;
 
 namespace Display.Controls
 {
@@ -103,7 +101,7 @@ namespace Display.Controls
 
             //位于根目录下的文件夹
             var data = GetFilesFromItems(0, FilesInfo.FileType.Folder);
-            if(data == null) return list;
+            if (data == null) return list;
 
             foreach (var item in data)
             {
@@ -117,7 +115,7 @@ namespace Display.Controls
                     HasUnrealizedChildren = hasUnrealizedChildren,
                     datum = item
                 };
-                
+
                 list.Add(folders);
             }
 
@@ -317,7 +315,7 @@ namespace Display.Controls
                 //itemsList = DataAccess.GetFolderListByPid(folder.Cid);
             }
 
-            if (itemsList is not {Count: >0})
+            if (itemsList is not { Count: > 0 })
             {
                 // The item is a folder, but it's empty. Leave HasUnrealizedChildren = true so
                 // that the chevron appears, but don't try to process children that aren't there.
@@ -564,7 +562,7 @@ namespace Display.Controls
             {
                 connection = new SqliteConnection(DataAccess.ConnectionString);
                 connection.Open();
-            }   
+            }
 
             foreach (var node in nodeChildren)
             {
@@ -577,7 +575,7 @@ namespace Display.Controls
                 var treeViewNodes = node.Children;
                 if (treeViewNodes.Count != 0)
                 {
-                    DeletedNodeAndDataAccessByCid(treeViewNodes, cid ,connection);
+                    DeletedNodeAndDataAccessByCid(treeViewNodes, cid, connection);
                 }
             }
 
@@ -597,9 +595,9 @@ namespace Display.Controls
         public event RoutedEventHandler PlayWithPlayerClick;
         private void PlayWithPlayerButtonClick(object sender, RoutedEventArgs e)
         {
-            PlayWithPlayerClick?.Invoke(sender,e);
+            PlayWithPlayerClick?.Invoke(sender, e);
         }
-        
+
     }
 
     public class lastUnAllShowFolderItem

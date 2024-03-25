@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Display.Helper.Data;
 using Display.Interfaces;
 using Display.Models.Data;
 using Display.Models.Image;
 using Display.Models.Media;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Linq;
 
 namespace Display.ViewModels;
 
@@ -120,7 +120,7 @@ partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGeneratorSe
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("ThumbnailViewModel捕获到异常",ex.Message);
+                Debug.WriteLine("ThumbnailViewModel捕获到异常", ex.Message);
             }
         }
 
@@ -168,7 +168,7 @@ public class GroupThumbnailCollection : ObservableCollection<object>
     public readonly string Title;
     public readonly bool HasM3U8;
 
-    public GroupThumbnailCollection(FilesInfo info): base(new ObservableCollection<LocalThumbnail>())
+    public GroupThumbnailCollection(FilesInfo info) : base(new ObservableCollection<LocalThumbnail>())
     {
         Title = info.NameWithoutExtension;
         PickCode = info.PickCode;

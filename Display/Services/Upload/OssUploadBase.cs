@@ -1,17 +1,17 @@
-﻿using System;
+﻿using Display.Helper.Data;
+using Display.Models.Upload;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using HttpHeaders = Display.Constants.HttpHeaders;
-using System.Threading;
-using System.IO;
-using Display.Models.Upload;
-using Display.Helper.Data;
 
 namespace Display.Services.Upload
 {
-    internal abstract class OssUploadBase:IDisposable
+    internal abstract class OssUploadBase : IDisposable
     {
         private const string Endpoint = "http://oss-cn-shenzhen.aliyuncs.com";
 

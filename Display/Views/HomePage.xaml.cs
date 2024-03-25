@@ -1,4 +1,5 @@
 ﻿using Display.Models.Data;
+using Display.Services.IncrementalCollection;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -9,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Display.Services.IncrementalCollection;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -41,11 +41,11 @@ namespace Display.Views
             NavigationCacheMode = NavigationCacheMode.Required;
 
             _items = new IncrementalLoadSuccessInfoCollection();
-            _items.SetOrder("random",true);
+            _items.SetOrder("random", true);
 
             LoadCover();
         }
-        
+
         private async void LoadCover()
         {
             //随机获取20个视频，每次启动自动获取一遍
@@ -229,14 +229,14 @@ namespace Display.Views
         {
             Tuple<List<string>, string, bool> TypesAndName = new(new() { "is_like" }, "1", false);
 
-            Frame.Navigate(typeof(ActorInfoPage), TypesAndName);
+            Frame.Navigate(typeof(VideoCoverPage), TypesAndName);
         }
 
         private void MoreLookLaterVideoClick(object sender, RoutedEventArgs e)
         {
             Tuple<List<string>, string, bool> TypesAndName = new(new() { "look_later" }, "1", false);
 
-            Frame.Navigate(typeof(ActorInfoPage), TypesAndName);
+            Frame.Navigate(typeof(VideoCoverPage), TypesAndName);
         }
 
         private async void RefreshNewestVideoButtonClick(object sender, RoutedEventArgs e)
@@ -247,7 +247,7 @@ namespace Display.Views
             {
                 _recentCoverList.Add(new VideoCoverDisplayClass(videoInfo, 500, 300));
             }
-            
+
         }
 
         private async void RefreshLookLaterVideoButtonClick(object sender, RoutedEventArgs e)

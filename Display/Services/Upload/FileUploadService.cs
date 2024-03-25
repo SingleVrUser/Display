@@ -1,5 +1,7 @@
-﻿using Display.Extensions;
+﻿using Display.Constants;
+using Display.Extensions;
 using Display.Helper.Crypto;
+using Display.Helper.Network;
 using Display.Models.Data;
 using Display.Models.Upload;
 using System;
@@ -11,9 +13,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Display.Helper.Network;
 using static System.String;
-using Display.Constants;
 
 namespace Display.Services.Upload
 {
@@ -433,7 +433,7 @@ namespace Display.Services.Upload
                     //Debug.WriteLine(i);
                 }
             );
-            _totalSha1 = await HashHelper.ComputeSha1ByStream(_stream, Token,progress);
+            _totalSha1 = await HashHelper.ComputeSha1ByStream(_stream, Token, progress);
 
             if (IsNullOrEmpty(_totalSha1))
             {

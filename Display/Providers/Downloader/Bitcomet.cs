@@ -1,12 +1,9 @@
-﻿using System;
-using Display.Models.Data;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using System.Net.Http;
-using System.Net;
-using Windows.System;
+﻿using Display.Models.Data;
 using Display.Models.Settings.Options;
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Text.RegularExpressions;
 
 namespace Display.Providers.Downloader;
 

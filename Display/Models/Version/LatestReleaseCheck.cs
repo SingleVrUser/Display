@@ -1,8 +1,8 @@
 ﻿
 
+using Display.Helper.Network;
 using System;
 using System.Linq;
-using Display.Helper.Network;
 
 namespace Display.Models.Version;
 

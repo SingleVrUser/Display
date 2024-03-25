@@ -1,11 +1,10 @@
 ﻿using Display.Models.Data;
+using Display.Models.Spider;
 using HtmlAgilityPack;
 using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Display.Models.Spider;
-using Display.Setting.Models;
 using static Display.Models.Spider.SpiderInfos;
 
 namespace Display.Providers.Spider;

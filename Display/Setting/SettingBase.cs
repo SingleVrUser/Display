@@ -1,5 +1,5 @@
-﻿using System.Runtime.CompilerServices;
-using Display.Setting.Interfaces;
+﻿using Display.Setting.Interfaces;
+using System.Runtime.CompilerServices;
 
 namespace Display.Setting;
 

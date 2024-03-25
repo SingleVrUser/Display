@@ -1,10 +1,10 @@
-using System;
-using System.Linq;
 using Display.CustomWindows;
 using Display.Models.Data;
 using Display.Views.More.DatumList;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System;
+using System.Linq;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -39,7 +39,7 @@ namespace Display.Views.DetailInfo
             //从数据库中获取根目录信息
             var folderToRootList = DataAccess.Get.GetRootByCid(folderCid);
 
-            return string.Join(" > ", folderToRootList.Select(x=>x.Name));
+            return string.Join(" > ", folderToRootList.Select(x => x.Name));
         }
 
         private void OpenCurrentFolderItem_OnClick(object sender, RoutedEventArgs e)

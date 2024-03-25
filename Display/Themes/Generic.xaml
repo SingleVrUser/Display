@@ -3178,4 +3178,18 @@
         </Setter>
     </Style>
 
+
+    <Style TargetType="local2:CustomControl1" xmlns:local2="using:Display.CustomWindows">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local2:CustomControl1">
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

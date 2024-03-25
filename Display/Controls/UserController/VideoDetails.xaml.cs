@@ -1,4 +1,13 @@
-﻿using Microsoft.UI.Input;
+﻿using Display.CustomWindows;
+using Display.Helper.FileProperties.Name;
+using Display.Helper.UI;
+using Display.Models.Data;
+using Display.Models.Data.Enums;
+using Display.Views;
+using Display.Views.DetailInfo;
+using Display.Views.More.DatumList;
+using Display.Views.SearchLink;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -11,24 +20,14 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.Foundation;
 using Windows.Foundation.Metadata;
 using Windows.Storage;
 using Windows.Storage.Streams;
-using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
-using Display.Views;
-using Windows.Foundation;
-using Display.CustomWindows;
-using Display.Helper.FileProperties.Name;
-using Display.Helper.UI;
-using Display.Models.Data;
-using Display.Models.Data.Enums;
-using Display.Views.DetailInfo;
-using Display.Views.More.DatumList;
-using Display.Views.SearchLink;
 using DownDialogContent = Display.Views.DetailInfo.DownDialogContent;
 using FileInfoInCidSmoke = Display.Views.DetailInfo.FileInfoInCidSmoke;
 using FindInfoAgainSmoke = Display.Views.DetailInfo.FindInfoAgainSmoke;
-using Display.Constants;
+using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -70,7 +69,7 @@ namespace Display.Controls
             for (var i = 0; i < actorList?.Length; i++)
             {
                 var actor = actorList[i];
-                var actorImageControl = new Controls.ActorImage(actor, ResultInfo.ReleaseTime);
+                var actorImageControl = new ActorImage(actor, ResultInfo.ReleaseTime);
 
                 if (!string.IsNullOrEmpty(actor.Name))
                     actorImageControl.Click += ActorButtonOnClick;
@@ -389,7 +388,7 @@ namespace Display.Controls
 
                 // Set the image source to the selected bitmap
                 var bitmapImage = new BitmapImage();
-                    
+
                 await bitmapImage.SetSourceAsync(fileStream);
                 CoverImage.Source = bitmapImage;
             }
@@ -455,7 +454,7 @@ namespace Display.Controls
                 animation = ThumbnailGridView.PrepareConnectedAnimation("forwardAnimation", item,
                     "Thumbnail_Image");
             }
-                
+
             var imagePath = e.ClickedItem as string;
 
             //之前未赋值
@@ -703,7 +702,7 @@ namespace Display.Controls
                 VisualStateManager.GoToState(sender as Control, "EnlargeButtonShown", true);
             }
         }
-        
+
         private void EnLargeImage_OnPointerExited(object sender, PointerRoutedEventArgs e)
         {
             if (e.Pointer.PointerDeviceType is PointerDeviceType.Mouse or PointerDeviceType.Pen)

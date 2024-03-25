@@ -1,4 +1,7 @@
-﻿using Microsoft.UI.Input;
+﻿using Display.Helper.Date;
+using Display.Models.Data;
+using Display.Services.IncrementalCollection;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -18,9 +21,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using static System.String;
-using Display.Helper.Date;
-using Display.Models.Data;
-using Display.Services.IncrementalCollection;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using Display.Helper.Data;
 using Display.Models.Data;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using ImageViewModel = Display.ViewModels.ImageViewModel;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -13,7 +13,7 @@ using ImageViewModel = Display.ViewModels.ImageViewModel;
 
 namespace Display.Views.More.DatumList
 {
-    public sealed partial class ImagePage:Page
+    public sealed partial class ImagePage : Page
     {
         public ImageViewModel ViewModel { get; }
 
@@ -33,7 +33,7 @@ namespace Display.Views.More.DatumList
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
-        {   
+        {
             base.OnNavigatedTo(e);
 
             if (e.Parameter is not Tuple<List<FilesInfo>, int> tuple) return;
@@ -104,7 +104,7 @@ namespace Display.Views.More.DatumList
         {
             VisualStateManager.GoToState(this, "ShowTopPanel", true);
             if (InfoGrid.Visibility == Visibility.Collapsed)
-            { 
+            {
                 MoreButton.Visibility = Visibility.Visible;
             }
         }

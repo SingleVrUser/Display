@@ -5,11 +5,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using System;
-using System.Diagnostics;
 using Windows.ApplicationModel.DataTransfer;
-using Microsoft.UI.Xaml.Navigation;
 using UserInfo = Display.Controls.UserInfo;
-using CommunityToolkit.WinUI.Behaviors;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

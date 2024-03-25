@@ -1,11 +1,10 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Display.Models.Data;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.Web.WebView2.Core;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Display.Models.Data;
 
 namespace Display.Views.More
 {
@@ -15,11 +14,11 @@ namespace Display.Views.More
         {
             this.InitializeComponent();
 
-            Browser.webview.Source = new Uri(url);
+            Browser.WebView.Source = new Uri(url);
 
             window.Closed += (sender, args) =>
             {
-                Browser.webview.Close();
+                Browser.WebView.Close();
             };
 
             //是否显示下载按钮
@@ -31,11 +30,11 @@ namespace Display.Views.More
                 Aria2DownItem.Click += Aria2Down_Click;
 
                 // 加载完成后显示
-                Browser.webview.NavigationCompleted += Webview_NavigationCompleted;
+                Browser.WebView.NavigationCompleted += WebViewNavigationCompleted;
             }
         }
 
-        private void Webview_NavigationCompleted(WebView2 sender, CoreWebView2NavigationCompletedEventArgs args)
+        private void WebViewNavigationCompleted(WebView2 sender, CoreWebView2NavigationCompletedEventArgs args)
         {
             //加载完成显示下载按钮
             DownButton.Visibility = Visibility.Visible;
@@ -109,9 +108,9 @@ namespace Display.Views.More
 
         private void GoBack_KeyboardAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
         {
-            if (!Browser.webview.CanGoBack) return;
+            if (!Browser.WebView.CanGoBack) return;
 
-            Browser.webview.GoBack();
+            Browser.WebView.GoBack();
         }
     }
 

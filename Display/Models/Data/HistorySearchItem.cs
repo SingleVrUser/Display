@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Display.Models.Data;
+﻿namespace Display.Models.Data;
 
 public class HistorySearchItem
 {

@@ -2,14 +2,15 @@
 <!-- Licensed under the MIT License. -->
 
 <Page
-    x:Class="Display.Views.VerifyAccountPage"
+    x:Class="Display.Views.Settings.Account.VerifyAccountPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Display.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Display.Controls"
+    xmlns:userController="using:Display.Controls.UserController"
     mc:Ignorable="d">
 
-    <controls:Browser x:Name="Browser" />
+    <userController:Browser x:Name="Browser" />
 </Page>

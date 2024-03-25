@@ -1,23 +1,16 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using Display.CustomWindows;
+using Display.Models.Disk._115;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using Newtonsoft.Json;
 using System;
 using System.IO;
-using Display.Models.Disk._115;
-using Display.CustomWindows;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
-namespace Display.Views
+namespace Display.Views.Settings.Account
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
-    public sealed partial class VerifyAccountPage : Page
+    public sealed partial class VerifyAccountPage
     {
         private static string RequestUrl => $"https://captchaapi.115.com/?ac=security_code&type=web&cb=Close911_{DateTimeOffset.Now.ToUnixTimeMilliseconds()}";
 
@@ -27,12 +20,12 @@ namespace Display.Views
 
         private VerifyAccountPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             var window = new CommonWindow("验证账号", 360, 560);
             _currentWindow = window;
 
-            Browser.webview.Source = new Uri(RequestUrl);
+            Browser.WebView.Source = new Uri(RequestUrl);
             Browser.WebMessageReceived += Browser_WebMessageReceived;
 
             window.Content = this;

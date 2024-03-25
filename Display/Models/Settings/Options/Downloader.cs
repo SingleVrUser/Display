@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Display.Helper.FileProperties.Name;
-using Display.Models.Data.Enums;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 
 namespace Display.Models.Settings.Options;
 

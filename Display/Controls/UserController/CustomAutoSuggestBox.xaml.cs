@@ -1,15 +1,14 @@
 ﻿
-using System;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Animation;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using Windows.Foundation;
 using Display.Helper.FileProperties.Name;
 using Display.Models.Data;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media.Animation;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Windows.Foundation;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

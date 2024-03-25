@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace Display.Setting.Interfaces;
+﻿namespace Display.Setting.Interfaces;
 
 internal abstract class ISettingProvider
 {

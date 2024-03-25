@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Display.Managers;
+using System.Collections.ObjectModel;
 
 namespace Display.ViewModels;
 

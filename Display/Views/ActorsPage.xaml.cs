@@ -1,5 +1,6 @@
 ﻿using Display.Helper.Notifications;
 using Display.Models.Data;
+using Display.Services.IncrementalCollection;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -16,17 +17,11 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
-using Display.Services.IncrementalCollection;
-using Display.Constants;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace Display.Views
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
+
     public sealed partial class ActorsPage : Page
     {
         private IncrementalLoadActorInfoCollection _actorInfo;
@@ -35,10 +30,10 @@ namespace Display.Views
         public static ActorsPage Current;
 
         //过渡动画用
-        private enum navigationAnimationType { image, gridView };
-        private navigationAnimationType _navigationType;
-        private ActorInfo _storeditem;
-        private Image _storedimage;
+        private enum NavigationAnimationType { Image, GridView };
+        private NavigationAnimationType _navigationType;
+        private ActorInfo _storedItem;
+        private Image _storedImage;
 
         public ActorsPage()
         {
@@ -73,7 +68,7 @@ namespace Display.Views
 
             ProgressRing.IsActive = false;
         }
-        
+
         private async void LoadActorPartInfo(int count = 14)
         {
             var infos = await DataAccess.Get.GetActorInfo(count, 0, orderByList: new Dictionary<string, bool> { { "RANDOM()", false } },
@@ -98,8 +93,8 @@ namespace Display.Views
 
             var actorInfo = container.Content as ActorInfo;
 
-            _navigationType = navigationAnimationType.gridView;
-            _storeditem = actorInfo;
+            _navigationType = NavigationAnimationType.GridView;
+            _storedItem = actorInfo;
 
             GoToActorInfo(actorInfo);
         }
@@ -107,7 +102,7 @@ namespace Display.Views
         private void GoToActorInfo(ActorInfo actorInfo)
         {
             Tuple<List<string>, string, bool> typeAndName = new(["actor"], actorInfo.Name, false);
-            Frame.Navigate(typeof(ActorInfoPage), typeAndName);
+            Frame.Navigate(typeof(VideoCoverPage), typeAndName);
         }
 
         private void Grid_PointerEntered(object sender, PointerRoutedEventArgs e)
@@ -132,10 +127,10 @@ namespace Display.Views
         {
             if (sender is not Image image) return;
 
-            _navigationType = navigationAnimationType.image;
-            _storedimage = image;
+            _navigationType = NavigationAnimationType.Image;
+            _storedImage = image;
 
-            ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", _storedimage);
+            ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", _storedImage);
 
             if (image.DataContext is ActorInfo actorInfo)
             {
@@ -152,20 +147,20 @@ namespace Display.Views
             var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("BackConnectedAnimation");
             if (animation == null) return;
 
-            if (_navigationType == navigationAnimationType.image)
+            if (_navigationType == NavigationAnimationType.Image)
             {
-                if (_storedimage != null)
+                if (_storedImage != null)
                 {
-                    animation.TryStart(_storedimage);
+                    animation.TryStart(_storedImage);
                 }
             }
-            else if (_navigationType == navigationAnimationType.gridView)
+            else if (_navigationType == NavigationAnimationType.GridView)
             {
                 //开始动画
-                if (_storeditem != null)
+                if (_storedItem != null)
                 {
                     //开始动画
-                    await BasicGridView.TryStartConnectedAnimationAsync(animation, _storeditem, "ActorImage");
+                    await BasicGridView.TryStartConnectedAnimationAsync(animation, _storedItem, "ActorImage");
                 }
             }
         }
@@ -362,7 +357,7 @@ namespace Display.Views
                     //数据库中有头像
                     else if (firstOrDefault != null)
                     {
-                         actorInfo.ProfilePath = firstOrDefault.ProfilePath;
+                        actorInfo.ProfilePath = firstOrDefault.ProfilePath;
                     }
 
                 }

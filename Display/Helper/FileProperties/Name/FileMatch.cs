@@ -1,16 +1,15 @@
-﻿using System;
+﻿using Display.Models.Data;
+using Microsoft.UI.Xaml;
+using SharpCompress;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
-using Windows.System;
-using Display.Models.Data;
-using Microsoft.UI.Xaml;
-using SharpCompress;
 using Windows.Storage.Pickers;
-using Display.Constants;
+using Windows.System;
 
 namespace Display.Helper.FileProperties.Name;
 
@@ -382,7 +381,7 @@ public static class FileMatch
 
     public static void OpenFolderWithSystemExplorer(string folder)
     {
-        if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder))return;
+        if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder)) return;
 
         LaunchFolder(folder);
     }

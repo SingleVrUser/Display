@@ -1,5 +1,20 @@
-﻿using Display.Controls;
+﻿using Display.Constants;
+using Display.Controls;
+using Display.CustomWindows;
+using Display.Helper.FileProperties.Name;
+using Display.Helper.Network;
+using Display.Helper.UI;
+using Display.Models.Data;
+using Display.Models.Data.Enums;
+using Display.Models.Media;
+using Display.Models.Settings;
+using Display.ViewModels;
 using Display.Views;
+using Display.Views.More.DatumList;
+using Display.Views.OfflineDown;
+using Display.Views.SearchLink;
+using Display.Views.Settings;
+using Display.Views.Settings.Account;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -12,23 +27,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Windows.System;
 using Windows.Foundation;
-using Display.CustomWindows;
-using Display.Helper.FileProperties.Name;
-using Display.Models.Media;
-using Display.Helper.UI;
-using Display.Helper.Network;
-using Display.Models.Data;
-using Display.ViewModels;
-using Display.Views.More.DatumList;
-using Display.Views.OfflineDown;
-using Display.Views.SearchLink;
-using Display.Views.Settings;
+using Windows.System;
 using MainPage = Display.Views.Tasks.MainPage;
-using Display.Constants;
-using Display.Models.Settings;
-using Display.Models.Data.Enums;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -236,7 +237,7 @@ namespace Display
         /// <param name="args"></param>
         private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            if(args.SelectedItem == null) return;
+            if (args.SelectedItem == null) return;
 
             if (_navigating) return;
 
@@ -244,7 +245,7 @@ namespace Display
             {
                 NavView_Navigate(NavigationViewItemEnum.SettingPage, args.RecommendedNavigationTransitionInfo);
             }
-            else if(args.SelectedItem is MenuItem item)
+            else if (args.SelectedItem is MenuItem item)
             {
                 NavView_Navigate(item.PageEnum, args.RecommendedNavigationTransitionInfo);
             }
@@ -388,7 +389,7 @@ namespace Display
         {
             var types = sender.DataContext as List<string>;
 
-            ContentFrame.Navigate(typeof(ActorInfoPage), new Tuple<List<string>, string, bool>(types, sender.Text, true), new SuppressNavigationTransitionInfo());
+            ContentFrame.Navigate(typeof(VideoCoverPage), new Tuple<List<string>, string, bool>(types, sender.Text, true), new SuppressNavigationTransitionInfo());
         }
 
         /// <summary>
@@ -596,7 +597,7 @@ namespace Display
         {
             if (sender is not NavigationViewItem item) return;
 
-            if(item.Tag is not NavigationViewItemEnum pageEnum) return;
+            if (item.Tag is not NavigationViewItemEnum pageEnum) return;
 
             switch (pageEnum)
             {

@@ -1,8 +1,7 @@
-﻿using System;
-using System.Text.Json.Serialization;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Display.Models.Data.Enums;
 using Microsoft.UI.Xaml.Controls;
+using System.Text.Json.Serialization;
 
 namespace Display.Models.Settings;
 

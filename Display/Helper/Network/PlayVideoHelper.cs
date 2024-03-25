@@ -1,22 +1,22 @@
 ﻿
 using Display.Controls;
+using Display.CustomWindows;
+using Display.Helper.FileProperties.Name;
+using Display.Helper.UI;
+using Display.Models.Data;
+using Display.Models.Data.Enums;
+using Display.Models.Media;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web;
 using static Display.Models.Data.WebApi;
-using Display.CustomWindows;
-using Display.Helper.FileProperties.Name;
-using Display.Models.Media;
-using Display.Helper.UI;
-using Display.Models.Data;
-using Display.Models.Data.Enums;
 using SelectVideoToPlay = Display.Views.DetailInfo.SelectVideoToPlay;
 
 namespace Display.Helper.Network;

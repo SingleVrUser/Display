@@ -1,13 +1,9 @@
 ﻿#nullable enable
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
 using Display.Helper.Data;
 using Display.Helper.Network;
-using Microsoft.UI.Xaml.Media.Imaging;
-using Windows.Storage;
 using Display.Models.Data;
+using System;
+using System.Threading.Tasks;
 
 namespace Display.Models.Image;
 

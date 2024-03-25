@@ -1,13 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using Display.Models.Data;
 using Display.Models.Data.Enums;
 using Display.Models.Settings;
 using Display.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -97,7 +97,7 @@ public sealed partial class UIShowPage
 
     private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (e.RemovedItems is { Count:0 }) return;
+        if (e.RemovedItems is { Count: 0 }) return;
 
         if (e.AddedItems[0] is PageEnumAndName pageEnumAndName)
         {

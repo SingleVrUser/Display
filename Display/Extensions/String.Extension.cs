@@ -1,7 +1,4 @@
-﻿using ByteSizeLib;
-using System;
-
-namespace Display.Extensions
+﻿namespace Display.Extensions
 {
     internal static class String
     {
@@ -34,6 +31,6 @@ namespace Display.Extensions
                     return false;
             }
             return true;
-        }   
+        }
     }
 }

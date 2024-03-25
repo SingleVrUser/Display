@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using Display.Helper.Crypto;
+using Display.Models.Upload;
+using Display.Services.Upload;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using Display.Helper.Crypto;
-using Display.Models.Upload;
-using Display.Services.Upload;
 
 namespace Display.Helper.Network;
 
@@ -57,7 +57,7 @@ internal static class UploadHelper
     /// <param name="userKey"></param>
     /// <param name="userIdMd5"></param>
     /// <returns></returns>
-    public static Dictionary<string, string> BuildDataForm(long cid, string fileId, string name, long length,int userId, string userKey,out string userIdMd5)
+    public static Dictionary<string, string> BuildDataForm(long cid, string fileId, string name, long length, int userId, string userKey, out string userIdMd5)
     {
         var target = "U_1_" + cid;
         var sign = UploadEncryptHelper.GetSign(userId, fileId, target, userKey);

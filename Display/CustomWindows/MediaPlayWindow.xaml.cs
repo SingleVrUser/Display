@@ -1,10 +1,6 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using Windows.ApplicationModel.DataTransfer;
 using Display.Helper.UI;
 using Display.Models.Data;
 using Display.Models.Media;
@@ -13,6 +9,10 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using Windows.ApplicationModel.DataTransfer;
 using static Display.Controls.CustomMediaPlayerElement;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -103,7 +103,7 @@ public sealed partial class MediaPlayWindow
     public static MediaPlayWindow CreateNewWindow(IList<MediaPlayItem> playItems, PlayType playType, Page lastPage)
     {
         MediaPlayWindow newWindow = new(playItems, lastPage);
-        
+
         newWindow.Activate();
 
         return newWindow;
@@ -264,7 +264,7 @@ public sealed partial class MediaPlayWindow
         if (e.DataView.Properties.Values.FirstOrDefault() is not List<FilesInfo> addInfos) return;
 
         var addMediaPlayItems = new List<MediaPlayItem>();
-        addInfos.ForEach(info => {addMediaPlayItems.Add(new MediaPlayItem(info));});
+        addInfos.ForEach(info => { addMediaPlayItems.Add(new MediaPlayItem(info)); });
 
         var allMediaPlayItems = MediaControl.ReLoad(addMediaPlayItems);
 
@@ -279,7 +279,7 @@ public sealed partial class MediaPlayWindow
         e.AcceptedOperation = DataPackageOperation.Link;
         e.DragUIOverride.Caption = "播放";
     }
-    
+
     private void MediaControl_OnDeleteFileClick(MediaPlayItem item)
     {
         if (_lastPage is FileListPage fileListPage && _lastPage.IsLoaded && item.Fid != null)

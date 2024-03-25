@@ -2,6 +2,9 @@
 // Licensed under the MIT License.
 
 using ByteSizeLib;
+using Display.Constants;
+using Display.Controls.CustomController;
+using Display.CustomWindows;
 using Display.Models.Data;
 using Display.Models.Media;
 using Display.Services;
@@ -27,8 +30,6 @@ using Windows.Media.Streaming.Adaptive;
 using Windows.Storage;
 using Windows.System.Display;
 using Windows.Web.Http;
-using Display.CustomWindows;
-using Display.Constants;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -202,9 +203,9 @@ public sealed partial class CustomMediaPlayerElement
         _playIndex = index;
 
         var playItem = _allMediaPlayItems[(int)index];
-        
+
         //修改
-        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal,  ()=>
+        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
         {
             // 修改标题
             _window.ChangedWindowTitle($"播放- {playItem.Title}");
@@ -228,7 +229,7 @@ public sealed partial class CustomMediaPlayerElement
     private static async Task TryLoadSub(MediaPlayItem playItem)
     {
         var mediaPlaybackItem = playItem.MediaPlaybackItem;
-        if(mediaPlaybackItem == null) return;
+        if (mediaPlaybackItem == null) return;
 
         // 之前已添加，退出
         if (mediaPlaybackItem.Source.ExternalTimedMetadataTracks.Count != 0) return;
@@ -260,7 +261,7 @@ public sealed partial class CustomMediaPlayerElement
     private async void SetQualityList(MediaPlayItem playItem)
     {
         var list = await playItem.GetQualities();
-        mediaTransportControls.SetQualityListSource(list,_qualityIndex);
+        mediaTransportControls.SetQualityListSource(list, _qualityIndex);
     }
 
     private void SetButton(MediaPlayItem playItem)
@@ -272,7 +273,7 @@ public sealed partial class CustomMediaPlayerElement
         var videoInfo = playItem.GetVideoInfo();
 
         // 先判断是否为成功，后判断是否为失败
-        if(videoInfo == null)
+        if (videoInfo == null)
         {
             var failInfo = playItem.GetFailInfo();
 
@@ -308,7 +309,7 @@ public sealed partial class CustomMediaPlayerElement
             mediaTransportControls.DisableScreenButton();
         }
     }
-    
+
     private async void Binder_Binding(MediaBinder sender, MediaBindingEventArgs args)
     {
         _isBindingCurrentItem = true;
@@ -343,7 +344,7 @@ public sealed partial class CustomMediaPlayerElement
 
             if (stream.CanRead)
             {
-                args.SetStream(stream,"video/mp4");
+                args.SetStream(stream, "video/mp4");
             }
         }
 
@@ -403,13 +404,13 @@ public sealed partial class CustomMediaPlayerElement
             Debug.WriteLine("成功设置进度条");
         });
     }
-    
+
 
     private void QualityChanged(object sender, SelectionChangedEventArgs e)
     {
         //设置currentItem以及Binder_Binding时不计入改变
         if (_isChangedCurrentItem || _isBindingCurrentItem) return;
-        
+
         if (sender is not ListView { ItemsSource: List<Quality> list }) return;
         if (e.AddedItems.FirstOrDefault() is not Quality quality) return;
 
@@ -524,7 +525,8 @@ public sealed partial class CustomMediaPlayerElement
             DataAccess.Update.UpdateSingleDataFromVideoInfo(trueName, "look_later", LookLater.ToString());
 
             if (LookLater != 0) ShowTeachingTip("已添加进稍后观看");
-        }else
+        }
+        else
         {
             var failInfo = playItem.GetFailInfo();
 
@@ -616,13 +618,13 @@ public sealed partial class CustomMediaPlayerElement
 
     private void ShowTeachingTip(string subTitle)
     {
-        BasePage.ShowTeachingTip(PlayerTeachingTip,subTitle);
+        BasePage.ShowTeachingTip(PlayerTeachingTip, subTitle);
     }
 
     private void OnOnApplyTemplateCompleted(object sender, EventArgs e)
     {
-        if(!Resources.TryGetValue("QualityDataTemplate", out var qualityDataTemplateValue) || qualityDataTemplateValue is not DataTemplate qualityDataTemplate) return;
-        if(!Resources.TryGetValue("PlayerDataTemplate", out var playerDataTemplateValue) || playerDataTemplateValue is not DataTemplate playerDataTemplate) return;
+        if (!Resources.TryGetValue("QualityDataTemplate", out var qualityDataTemplateValue) || qualityDataTemplateValue is not DataTemplate qualityDataTemplate) return;
+        if (!Resources.TryGetValue("PlayerDataTemplate", out var playerDataTemplateValue) || playerDataTemplateValue is not DataTemplate playerDataTemplate) return;
 
         mediaTransportControls.InitQuality(qualityDataTemplate);
         mediaTransportControls.InitPlayer(playerDataTemplate);
@@ -633,7 +635,7 @@ public sealed partial class CustomMediaPlayerElement
     public event EventHandler<RoutedEventArgs> RightButtonClick;
     private void MediaTransportControls_OnRightButtonClick(object sender, RoutedEventArgs e)
     {
-        RightButtonClick?.Invoke(sender,e);
+        RightButtonClick?.Invoke(sender, e);
     }
 
     private TimeSpan _changedPositionTimeSpan = TimeSpan.MinValue;
@@ -852,14 +854,14 @@ public sealed partial class CustomMediaPlayerElement
 
         if (playItem.IsRequestOriginal)
         {
-            infos.Add("下载链接",await playItem.GetOriginalUrl());
+            infos.Add("下载链接", await playItem.GetOriginalUrl());
         }
 
         infos.Add("userAgent", GetInfoFromNetwork.DownUserAgent);
 
         await InfoPage.ShowInContentDialog(XamlRoot, infos, "媒体信息");
     }
-    
+
     private async void DeleteFileFrom115Button_Click(object sender, RoutedEventArgs e)
     {
         var playItem = _allMediaPlayItems[(int)_playIndex];

@@ -1,11 +1,11 @@
 ﻿
+using Display.Models.Data;
 using Display.Views;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using System.Collections.ObjectModel;
-using Display.Models.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -15,10 +15,10 @@ namespace Display.Controls
     public sealed partial class MultipleCoverShow : UserControl
     {
         public static readonly DependencyProperty MoreButtonVisibilityProperty =
-            DependencyProperty.Register(nameof(MoreButtonVisibility), typeof(Visibility), typeof(ActorInfoPage), PropertyMetadata.Create(() => Visibility.Collapsed));
-        
+            DependencyProperty.Register(nameof(MoreButtonVisibility), typeof(Visibility), typeof(VideoCoverPage), PropertyMetadata.Create(() => Visibility.Collapsed));
+
         public static readonly DependencyProperty RefreshButtonVisibilityProperty =
-            DependencyProperty.Register(nameof(RefreshButtonVisibility), typeof(Visibility), typeof(ActorInfoPage), PropertyMetadata.Create(() => Visibility.Collapsed));
+            DependencyProperty.Register(nameof(RefreshButtonVisibility), typeof(Visibility), typeof(VideoCoverPage), PropertyMetadata.Create(() => Visibility.Collapsed));
 
         //是否显示MoreButton
         public Visibility MoreButtonVisibility
@@ -60,7 +60,7 @@ namespace Display.Controls
         {
             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
-        
+
         public event RoutedEventHandler MoreClick;
         private void MoreButton_Click(object sender, RoutedEventArgs e)
         {
@@ -70,7 +70,7 @@ namespace Display.Controls
         public event RoutedEventHandler RefreshClick;
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
-            RefreshClick?.Invoke(sender,e);
+            RefreshClick?.Invoke(sender, e);
         }
     }
 }

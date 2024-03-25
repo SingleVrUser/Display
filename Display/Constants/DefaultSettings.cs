@@ -1,6 +1,6 @@
-﻿using Windows.Storage;
-using Display.Models.Data.Enums;
+﻿using Display.Models.Data.Enums;
 using Display.Models.Settings;
+using Windows.Storage;
 
 namespace Display.Constants;
 public static class DefaultSettings

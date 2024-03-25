@@ -95,6 +95,9 @@
             </ResourceDictionary.MergedDictionaries>
             <!-- Other app resources here -->
 
+            <Style TargetType="FontIcon">
+                <Setter Property="FontFamily" Value="{StaticResource SymbolThemeFontFamily}"/>
+            </Style>
 
             <Style TargetType="TextBlock">
                 <Setter Property="FontFamily"

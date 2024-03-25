@@ -1,4 +1,5 @@
-﻿using Microsoft.UI;
+﻿using Display.Models.Data;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -12,8 +13,6 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
-using Display.Models.Data;
-using Display.Constants;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

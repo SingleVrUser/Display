@@ -1,11 +1,11 @@
-﻿using System;
-using Display.Models.Data.Enums;
+﻿using Display.Models.Data.Enums;
 using Display.Views;
-using System.Collections.Generic;
-using Display.Views.Settings;
-using Display.Views.Tasks;
 using Display.Views.More;
 using Display.Views.OfflineDown;
+using Display.Views.Settings;
+using Display.Views.Tasks;
+using System;
+using System.Collections.Generic;
 
 namespace Display.Constants;
 

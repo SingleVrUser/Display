@@ -1,6 +1,11 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using Display.CustomWindows;
+using Display.Models.Data;
+using Display.Views.More.DatumList;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,11 +14,6 @@ using System.Text.RegularExpressions;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Storage;
-using Display.CustomWindows;
-using Display.Models.Data;
-using Display.Views.More.DatumList;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -57,7 +57,7 @@ namespace Display.Views.OfflineDown
             DownPathComboBox.SelectedIndex = 0;
 
         }
-        
+
         private void TextBox_OnSelectionChanged(object sender, RoutedEventArgs e)
         {
             if (sender is not TextBox textBox) return;
@@ -142,10 +142,10 @@ namespace Display.Views.OfflineDown
 
             var items = await e.DataView.GetStorageItemsAsync();
 
-            var rarItems = items.Where(i => i.IsOfType(StorageItemTypes.File) && i is StorageFile { FileType: ".torrent" }).Select(x=>x as StorageFile).ToArray();
+            var rarItems = items.Where(i => i.IsOfType(StorageItemTypes.File) && i is StorageFile { FileType: ".torrent" }).Select(x => x as StorageFile).ToArray();
 
             var length = rarItems.Length;
-            
+
             var isSucceed = false;
             string content;
             switch (length)
@@ -155,30 +155,30 @@ namespace Display.Views.OfflineDown
                     break;
                 // 单个torrent
                 case 1:
-                    (isSucceed,content) = await WebApi.GlobalWebApi.CreateTorrentOfflineDown(downPath.file_id, rarItems.First().Path);
+                    (isSucceed, content) = await WebApi.GlobalWebApi.CreateTorrentOfflineDown(downPath.file_id, rarItems.First().Path);
                     break;
                 // 多个
                 default:
-                {
-                    var failCount = 0;
-                    for(var i = 1; i <= length;i++)
                     {
-                        var file = rarItems[i];
+                        var failCount = 0;
+                        for (var i = 1; i <= length; i++)
+                        {
+                            var file = rarItems[i];
 
-                        Debug.WriteLine(file.FileType);
+                            Debug.WriteLine(file.FileType);
 
-                        ShowTeachingTip($"添加torrent任务中：{i}/{length}" + (failCount > 0 ? "，失败数:{failCount}" : string.Empty));
+                            ShowTeachingTip($"添加torrent任务中：{i}/{length}" + (failCount > 0 ? "，失败数:{failCount}" : string.Empty));
 
-                        var (isCurrentSucceed, _)= await WebApi.GlobalWebApi.CreateTorrentOfflineDown(
-                            downPath.file_id, file.Path);
-                                
-                        if (!isCurrentSucceed) failCount++;
+                            var (isCurrentSucceed, _) = await WebApi.GlobalWebApi.CreateTorrentOfflineDown(
+                                downPath.file_id, file.Path);
+
+                            if (!isCurrentSucceed) failCount++;
+                        }
+
+                        isSucceed = length != failCount;
+                        content = $"添加torrent任务完成 （{length}个）" + (failCount > 0 ? "，失败数:{failCount}" : string.Empty);
+                        break;
                     }
-
-                    isSucceed = length != failCount;
-                    content = $"添加torrent任务完成 （{length}个）" + (failCount > 0 ? "，失败数:{failCount}" : string.Empty);
-                    break;
-                }
             }
 
             // 有成功项的话，添加打开目录的按钮

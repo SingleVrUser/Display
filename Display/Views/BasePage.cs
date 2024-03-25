@@ -1,9 +1,7 @@
-﻿
-using System;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 
 namespace Display.Views
 {
@@ -11,7 +9,7 @@ namespace Display.Views
     {
         public static async void ShowTeachingTip(TeachingTip lightDismissTeachingTip, string subtitle, string content = null)
         {
-            object tipContent = !string.IsNullOrEmpty(content) ? new TextBlock {Text = content, TextTrimming = TextTrimming.CharacterEllipsis }
+            object tipContent = !string.IsNullOrEmpty(content) ? new TextBlock { Text = content, TextTrimming = TextTrimming.CharacterEllipsis }
                                                                 : null;
 
             await ShowTeachingTip(lightDismissTeachingTip, subtitle, tipContent);
@@ -19,8 +17,8 @@ namespace Display.Views
 
         public static async void ShowTeachingTip(TeachingTip lightDismissTeachingTip, string subtitle,
             string actionContent, TypedEventHandler<TeachingTip, object> actionButtonClick)
-        {       
-            await ShowTeachingTip(lightDismissTeachingTip,subtitle, actionContent, actionButtonClick, 2);
+        {
+            await ShowTeachingTip(lightDismissTeachingTip, subtitle, actionContent, actionButtonClick, 2);
         }
 
         private static async Task ShowTeachingTip(TeachingTip lightDismissTeachingTip, string subtitle,
@@ -43,7 +41,7 @@ namespace Display.Views
 
             lightDismissTeachingTip.IsOpen = true;
 
-            await Task.Delay(delaySecond*1000);
+            await Task.Delay(delaySecond * 1000);
 
             if (lightDismissTeachingTip.IsOpen) lightDismissTeachingTip.IsOpen = false;
 

@@ -116,7 +116,8 @@ namespace Display.Extensions
                 else if (type == typeof(double))
                 {
                     propertyInfo.SetValue(data, reader.GetNullableFieldValue<long>(fieldName));
-                }else if (type == typeof(Datum))
+                }
+                else if (type == typeof(Datum))
                 {
                     propertyInfo.SetValue(data, reader.Export<Datum>());
                 }

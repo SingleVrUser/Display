@@ -1,14 +1,14 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Display.Controls;
+using Display.Helper.Network;
+using Display.Models.Data;
+using Display.Models.Media;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static Display.Controls.CustomMediaPlayerElement;
-using Display.Models.Media;
-using Display.Helper.Network;
-using Display.Models.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -17,14 +17,14 @@ namespace Display.Views
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
-    public sealed partial class ActorInfoPage : Page
+    /// </summary>e
+    public sealed partial class VideoCoverPage : Page
     {
         //为返回动画做准备（需启动缓存）
-        public VideoCoverDisplayClass _storeditem;
+        public VideoCoverDisplayClass StoredItem;
 
 
-        public ActorInfoPage()
+        public VideoCoverPage()
         {
             //启动缓存（为了返回无需过长等待，也为了返回动画）
             NavigationCacheMode = NavigationCacheMode.Enabled;
@@ -43,7 +43,7 @@ namespace Display.Views
             //指定页面
             if (e.SourcePageType != typeof(ActorsPage)) return;
 
-            var animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("BackConnectedAnimation", videoControl.HeaderCover);
+            var animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("BackConnectedAnimation", VideoControl.HeaderCover);
 
             //返回动画应迅速
             animation.Configuration = new DirectConnectedAnimationConfiguration();
@@ -57,46 +57,46 @@ namespace Display.Views
             {
                 //过渡动画
                 case NavigationMode.Back:
-                {
-                    var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("BackConnectedAnimation");
-                    if (animation != null)
                     {
-                        videoControl.StartAnimation(animation, _storeditem);
-                    }
-
-                    break;
-                }
-                case NavigationMode.New:
-                {
-                    var item = e.Parameter;
-                    if (item == null) return;
-                    //需要显示的是搜索结果
-                    if (item is Tuple<List<string>, string, bool> tuple)
-                    {
-                        Tuple<List<string>, string> typesAndName = new(tuple.Item1, tuple.Item2);
-
-                        LoadShowInfo(typesAndName, tuple.Item3);
-                    }
-                    else
-                    {
-                        return;
-                    }
-
-                    var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("ForwardConnectedAnimation");
-                    if (animation != null)
-                    {
-                        if (tuple.Item1.Count == 1 && tuple.Item1.FirstOrDefault() == "actor")
+                        var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("BackConnectedAnimation");
+                        if (animation != null)
                         {
-                            animation.TryStart(videoControl.HeaderCover);
+                            VideoControl.StartAnimation(animation, StoredItem);
+                        }
+
+                        break;
+                    }
+                case NavigationMode.New:
+                    {
+                        var item = e.Parameter;
+                        if (item == null) return;
+                        //需要显示的是搜索结果
+                        if (item is Tuple<List<string>, string, bool> tuple)
+                        {
+                            Tuple<List<string>, string> typesAndName = new(tuple.Item1, tuple.Item2);
+
+                            LoadShowInfo(typesAndName, tuple.Item3);
                         }
                         else
                         {
-                            animation.TryStart(videoControl.showNameTextBlock);
+                            return;
                         }
-                    }
 
-                    break;
-                }
+                        var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("ForwardConnectedAnimation");
+                        if (animation != null)
+                        {
+                            if (tuple.Item1.Count == 1 && tuple.Item1.FirstOrDefault() == "actor")
+                            {
+                                animation.TryStart(VideoControl.HeaderCover);
+                            }
+                            else
+                            {
+                                animation.TryStart(VideoControl.showNameTextBlock);
+                            }
+                        }
+
+                        break;
+                    }
                 case NavigationMode.Forward:
                     break;
                 case NavigationMode.Refresh:
@@ -108,19 +108,21 @@ namespace Display.Views
 
         private void LoadShowInfo(Tuple<List<string>, string> typesAndName, bool isFuzzyQueryActor)
         {
-            videoControl.ReLoadSearchResult(typesAndName.Item1, typesAndName.Item2, isFuzzyQueryActor);
+            VideoControl.ReLoadSearchResult(typesAndName.Item1, typesAndName.Item2, isFuzzyQueryActor);
         }
 
         /// <summary>
         /// 选项选中后跳转至详情页
         /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnClicked(object sender, RoutedEventArgs e)
         {
             var item = (sender as Button)?.DataContext as VideoCoverDisplayClass;
 
             //准备动画
             //videoControl.PrepareAnimation(item);
-            _storeditem = item;
+            StoredItem = item;
             Frame.Navigate(typeof(DetailInfoPage), item, new EntranceNavigationTransitionInfo());
         }
 
@@ -138,13 +140,13 @@ namespace Display.Views
             if (videoInfo is FailVideoInfo failVideoInfo)
             {
                 var mediaPlayItem = new MediaPlayItem(failVideoInfo);
-                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, playType: PlayType.Fail);
+                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.Fail);
                 return;
             }
 
             var videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(videoInfo.trueName);
 
-            _storeditem = videoInfo;
+            StoredItem = videoInfo;
 
             //没有
             if (videoInfoList == null || videoInfoList.Count == 0)
@@ -157,7 +159,7 @@ namespace Display.Views
             else if (videoInfoList.Count == 1)
             {
                 var mediaPlayItem = new MediaPlayItem(videoInfoList[0]);
-                await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, lastPage: this);
+                await PlayVideoHelper.PlayVideo([mediaPlayItem], XamlRoot, lastPage: this);
             }
 
             //有多集
@@ -171,10 +173,10 @@ namespace Display.Views
         {
             if (e.ClickedItem is not Datum singleVideoInfo) return;
 
-            if (sender is not ListView { DataContext: string trueName }) return;
-            
+            if (sender is not ListView { DataContext: string }) return;
+
             var mediaPlayItem = new MediaPlayItem(singleVideoInfo);
-            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, XamlRoot, lastPage: this);
+            await PlayVideoHelper.PlayVideo([mediaPlayItem], XamlRoot, lastPage: this);
         }
 
         private async void SingleVideoPlayClick(object sender, RoutedEventArgs e)
@@ -182,7 +184,7 @@ namespace Display.Views
             if (sender is not Grid { DataContext: Datum datum }) return;
 
             var mediaPlayItem = new MediaPlayItem(datum);
-            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, playType: PlayType.Fail);
+            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.Fail);
         }
     }
 

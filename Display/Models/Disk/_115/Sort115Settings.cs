@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Display.Models.Data;
+using System;
+using System.Collections.Generic;
 
 namespace Display.Models.Disk._115;
 

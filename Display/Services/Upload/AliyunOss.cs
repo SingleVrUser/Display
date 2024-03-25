@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Display.Services.Upload
 {
-    internal class AliyunOss:IDisposable
+    internal class AliyunOss : IDisposable
     {
         private const string GetTokenUrl = "https://uplb.115.com/3.0/gettoken.php";
 
@@ -34,7 +34,7 @@ namespace Display.Services.Upload
         {
             get
             {
-                if(_uploadMethod != UploadMethod.None) return _uploadMethod;
+                if (_uploadMethod != UploadMethod.None) return _uploadMethod;
 
                 _uploadMethod = _fileSize < Upload.MultipartUpload.NormalPartSize ? UploadMethod.Simple : UploadMethod.Multipart;
                 return _uploadMethod;
@@ -115,7 +115,7 @@ namespace Display.Services.Upload
             {
                 State = uploadResult is { state: true } ? UploadState.Succeed : UploadState.Faulted;
             }
-           
+
             return uploadResult;
         }
 
@@ -165,7 +165,7 @@ namespace Display.Services.Upload
 
             State = UploadState.Paused;
             _eTagList = _multipartUpload.ETagList;
-            
+
             //_multipartUpload.Stop();
         }
 

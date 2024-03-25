@@ -1,9 +1,8 @@
-using System.Collections.ObjectModel;
 using Display.Managers;
 using Display.Models.Data;
-using Display.Models.Settings.Options;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System.Collections.ObjectModel;
 
 namespace Display.Views.DetailInfo
 {
@@ -15,7 +14,7 @@ namespace Display.Views.DetailInfo
 
         private readonly ObservableCollection<VideoInfo> _searchResultList = [];
 
-        private readonly VideoInfo _videoInfo;  
+        private readonly VideoInfo _videoInfo;
 
         public FindInfoAgainSmoke(string cidName)
         {

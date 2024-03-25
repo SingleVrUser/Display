@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Display.Helper.FileProperties.Name;
+using Display.Models.Data.Enums;
+using Microsoft.UI.Xaml;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Windows.Storage.Pickers;
-using Display.Helper.FileProperties.Name;
-using Display.Models.Data.Enums;
-using Microsoft.UI.Xaml;
 
 namespace Display.Models.Settings.Options;
 

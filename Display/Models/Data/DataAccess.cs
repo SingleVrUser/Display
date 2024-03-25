@@ -1,4 +1,9 @@
-﻿using System;
+﻿using Display.Extensions;
+using Display.Helper.Data;
+using Display.Helper.FileProperties.Name;
+using Display.Providers.Spider;
+using Microsoft.Data.Sqlite;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -7,13 +12,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
-using Display.Extensions;
-using Display.Helper.Data;
-using Display.Helper.FileProperties.Name;
-using Microsoft.Data.Sqlite;
 using static System.Int32;
-using Display.Providers.Spider;
-using Display.Constants;
 
 namespace Display.Models.Data
 {
@@ -299,7 +298,7 @@ namespace Display.Models.Data
             }
 
         }
-        
+
         /// <summary>
         /// 创建数据文件
         /// </summary>
@@ -468,7 +467,7 @@ namespace Display.Models.Data
                 if (videoInfoList == null || videoInfoList.Length == 0) return;
 
                 foreach (var videoInfo in videoInfoList)
-                {   
+                {
                     var actorStr = videoInfo.Actor;
 
                     var actorList = actorStr.Split(",");
@@ -587,7 +586,7 @@ namespace Display.Models.Data
             /// <param name="id"></param>
             /// <param name="isWoman"></param>
             /// <param name="connection"></param>
-            public static void UpdateActorInfoIsWoman(long id, int isWoman,SqliteConnection connection)
+            public static void UpdateActorInfoIsWoman(long id, int isWoman, SqliteConnection connection)
             {
                 var command = $"UPDATE ActorInfo SET is_woman = '{isWoman}' WHERE id = '{id}'";
 
@@ -619,7 +618,7 @@ namespace Display.Models.Data
             {
                 var command = $"UPDATE VideoInfo SET {key} = '{value}' WHERE truename = '{trueName}'";
 
-                DataAccessHelper.ExecuteNonQuery(command,connection);
+                DataAccessHelper.ExecuteNonQuery(command, connection);
             }
 
             /// <summary>
@@ -633,7 +632,7 @@ namespace Display.Models.Data
             {
                 var command = $"UPDATE ActorInfo SET {key} = '{value}' WHERE id = '{id}'";
 
-                DataAccessHelper.ExecuteNonQuery(command,connection);
+                DataAccessHelper.ExecuteNonQuery(command, connection);
             }
 
             /// <summary>
@@ -646,7 +645,7 @@ namespace Display.Models.Data
             {
                 var command = $"update VideoInfo set imagepath = REPLACE(imagepath,'{srcPath}','{dstPath}')";
 
-                DataAccessHelper.ExecuteNonQuery(command,connection);
+                DataAccessHelper.ExecuteNonQuery(command, connection);
             }
 
             /// <summary>
@@ -655,11 +654,11 @@ namespace Display.Models.Data
             /// <param name="srcPath"></param>
             /// <param name="dstPath"></param>
             /// <param name="connection"></param>
-            public static void UpdateActorProfilePath(string srcPath, string dstPath, SqliteConnection connection=null)
+            public static void UpdateActorProfilePath(string srcPath, string dstPath, SqliteConnection connection = null)
             {
                 var command = $"update ActorInfo set prifile_path = REPLACE(prifile_path,'{srcPath}','{dstPath}')";
 
-                DataAccessHelper.ExecuteNonQuery(command,connection);
+                DataAccessHelper.ExecuteNonQuery(command, connection);
             }
 
             /// <summary>
@@ -697,7 +696,7 @@ namespace Display.Models.Data
             /// <param name="data"></param>
             /// <param name="connection"></param>
             /// <returns></returns>
-            public static async Task AddFilesInfoAsync(Datum data,SqliteConnection connection = null)
+            public static async Task AddFilesInfoAsync(Datum data, SqliteConnection connection = null)
             {
                 var keyList = new List<string>();
                 foreach (var item in data.GetType().GetProperties())
@@ -707,7 +706,7 @@ namespace Display.Models.Data
 
                     if (!item.TryGetJsonName(out var fieldName)) continue;
 
-                    keyList.Add("@"+ fieldName);
+                    keyList.Add("@" + fieldName);
                 }
 
                 //唯一值（pc）重复 则代替 （replace）
@@ -719,12 +718,12 @@ namespace Display.Models.Data
                     ////fl为数组，应添加进新表中，一对多。目前暂不考虑，故跳过
                     //if (item.Name == "Fl") continue;
 
-                    if(!item.TryGetJsonName(out var fieldName)) continue;
-                    
+                    if (!item.TryGetJsonName(out var fieldName)) continue;
+
                     parameters.Add(new SqliteParameter("@" + fieldName, $"{item.GetValue(data)}"));
                 }
 
-                await DataAccessHelper.ExecuteNonQueryWithParametersAsync(commandText,parameters, connection);
+                await DataAccessHelper.ExecuteNonQueryWithParametersAsync(commandText, parameters, connection);
             }
 
             /// <summary>
@@ -843,7 +842,7 @@ namespace Display.Models.Data
                 DataAccessHelper.ExecuteNonQueryWithParameters(commandText, parameters, connection);
             }
 
-            public static void AddOrIgnoreActor_Video(long actorId, string videoName,SqliteConnection connection)
+            public static void AddOrIgnoreActor_Video(long actorId, string videoName, SqliteConnection connection)
             {
                 const string commandText = "INSERT OR IGNORE INTO Actor_Video VALUES (@actor_id,@video_name)";
 
@@ -1076,9 +1075,9 @@ namespace Display.Models.Data
 
             }
 
-            
 
-            public static void AddHistoryHistory(string keyword, SqliteConnection connection=null)
+
+            public static void AddHistoryHistory(string keyword, SqliteConnection connection = null)
             {
                 if (string.IsNullOrWhiteSpace(keyword)) return;
 
@@ -1105,8 +1104,8 @@ namespace Display.Models.Data
             {
                 var commandText =
                     $"SELECT * FROM FilesInfo,FileToInfo WHERE FilesInfo.pc == FileToInfo.file_pickcode AND FileToInfo.truename == '{trueName}' COLLATE NOCASE";
-                
-                return await DataAccessHelper.ExecuteReaderGetArrayAsync<Datum>(commandText,connection);
+
+                return await DataAccessHelper.ExecuteReaderGetArrayAsync<Datum>(commandText, connection);
             }
 
             /// <summary>
@@ -1119,7 +1118,7 @@ namespace Display.Models.Data
             {
                 var commandText = $"SELECT * from VideoInfo WHERE truename = '{trueName}' LIMIT 1";
 
-                return DataAccessHelper.ExecuteReaderGetSingle<VideoInfo>(commandText,connection);
+                return DataAccessHelper.ExecuteReaderGetSingle<VideoInfo>(commandText, connection);
             }
 
             /// <summary>
@@ -1142,22 +1141,22 @@ namespace Display.Models.Data
                         $"SELECT truename FROM VideoInfo WHERE truename COLLATE NOCASE in ('{name}', '{name.Replace("-", "_")}', '{name.Replace("-", "")}') Limit 1";
                 }
 
-                return DataAccessHelper.ExecuteScalar<string>(commandText,connection);
+                return DataAccessHelper.ExecuteScalar<string>(commandText, connection);
             }
 
             public static FailInfo GetSingleFailInfoByPickCode(string pc, SqliteConnection connection = null)
-            {   
+            {
                 var commandText =
                     $"SELECT info.*,fail.is_like, fail.score, fail.look_later, fail.image_path  FROM FailList_islike_looklater as fail LEFT JOIN FilesInfo as info on info.pc = fail.pc WHERE fail.pc = '{pc}' LIMIT 1";
 
-                return DataAccessHelper.ExecuteReaderGetSingle<FailInfo>(commandText,connection);
+                return DataAccessHelper.ExecuteReaderGetSingle<FailInfo>(commandText, connection);
             }
 
             /// <summary>
             /// 查询失败列表（FailInfo格式）
             /// </summary>
             /// <returns></returns>
-            public static async Task<FailInfo[]> GetFailFileInfoWithFailInfo(int offset = 0, int limit = -1, FailInfoShowType showType = FailInfoShowType.like, SqliteConnection connection=null)
+            public static async Task<FailInfo[]> GetFailFileInfoWithFailInfo(int offset = 0, int limit = -1, FailInfoShowType showType = FailInfoShowType.like, SqliteConnection connection = null)
             {
                 var showTypeStr = showType == FailInfoShowType.like ? " WHERE is_like = 1" : " WHERE look_later != 0";
 
@@ -1171,7 +1170,7 @@ namespace Display.Models.Data
             /// 查询失败列表（Datum格式）
             /// </summary>
             /// <returns></returns>
-            public static async Task<Datum[]> GetFailFileInfoWithDatum(int offset = 0, int limit = -1, string n = null, string orderBy = null, bool isDesc = false, FailType showType = FailType.All, SqliteConnection connection=null)
+            public static async Task<Datum[]> GetFailFileInfoWithDatum(int offset = 0, int limit = -1, string n = null, string orderBy = null, bool isDesc = false, FailType showType = FailType.All, SqliteConnection connection = null)
             {
                 var orderStr = GetOrderStr(orderBy, isDesc);
 
@@ -1187,7 +1186,7 @@ namespace Display.Models.Data
                 var commandText =
                     $"SELECT * FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{showTypeStr}{queryStr}{orderStr} LIMIT {limit} offset {offset} ";
 
-                return await DataAccessHelper.ExecuteReaderGetArrayAsync<Datum>(commandText,connection);
+                return await DataAccessHelper.ExecuteReaderGetArrayAsync<Datum>(commandText, connection);
             }
 
             public static int GetCountOfFailFileInfoWithDatum(int offset = 0, int limit = -1, string n = null, string orderBy = null, bool isDesc = false, FailType showType = FailType.All, SqliteConnection connection = null)
@@ -1211,7 +1210,7 @@ namespace Display.Models.Data
                 var commandText =
                     $"SELECT COUNT(pc) FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{showTypeStr}{queryStr} LIMIT {limit} offset {offset} ";
 
-                return DataAccessHelper.ExecuteScalar<int>(commandText,connection);
+                return DataAccessHelper.ExecuteScalar<int>(commandText, connection);
             }
 
             /// <summary>
@@ -1220,7 +1219,7 @@ namespace Display.Models.Data
             /// <param name="filterList"></param>
             /// <param name="connection"></param>
             /// <returns></returns>
-            public static int GetCountOfActorInfo(IEnumerable<string> filterList = null,SqliteConnection connection =null)
+            public static int GetCountOfActorInfo(IEnumerable<string> filterList = null, SqliteConnection connection = null)
             {
                 var filterStr = string.Empty;
                 if (filterList != null)
@@ -1275,7 +1274,7 @@ namespace Display.Models.Data
             /// <param name="rangesDicts"></param>
             /// <param name="connection"></param>
             /// <returns></returns>
-            public static int GetCountOfVideoInfo(List<string> filterConditionList = null, string filterKeywords = null, Dictionary<string, string> rangesDicts = null,SqliteConnection connection =null)
+            public static int GetCountOfVideoInfo(List<string> filterConditionList = null, string filterKeywords = null, Dictionary<string, string> rangesDicts = null, SqliteConnection connection = null)
             {
                 //筛选
                 var filterStr = GetVideoInfoFilterStr(filterConditionList, filterKeywords, rangesDicts);
@@ -1311,7 +1310,7 @@ namespace Display.Models.Data
             /// 获取一张演员头像的地址
             /// </summary>
             /// <returns></returns>
-            public static string GetOneActorProfilePath(SqliteConnection connection=null)
+            public static string GetOneActorProfilePath(SqliteConnection connection = null)
             {
                 var commandText = "SELECT prifile_path from ActorInfo WHERE prifile_path != '' limit 1";
                 return DataAccessHelper.ExecuteScalar<string>(commandText, connection);
@@ -1429,7 +1428,7 @@ namespace Display.Models.Data
             /// <param name="isFuzzyQueryActor"></param>
             /// <param name="connection"></param>
             /// <returns></returns>
-            public static async Task<VideoInfo[]> GetVideoInfo(int limit = 1, int offset = 0, string orderBy = null, bool isDesc = false, List<string> filterConditionList = null, string filterKeywords = null, Dictionary<string, string> rangesDicts = null, bool isFuzzyQueryActor = true, SqliteConnection connection= null)
+            public static async Task<VideoInfo[]> GetVideoInfo(int limit = 1, int offset = 0, string orderBy = null, bool isDesc = false, List<string> filterConditionList = null, string filterKeywords = null, Dictionary<string, string> rangesDicts = null, bool isFuzzyQueryActor = true, SqliteConnection connection = null)
             {
                 var orderStr = GetOrderStr(orderBy, isDesc);
                 //筛选
@@ -1455,7 +1454,7 @@ namespace Display.Models.Data
                 return await DataAccessHelper.ExecuteReaderGetArrayAsync<VideoInfo>(commandText, connection);
             }
 
-            public static async Task<ActorInfo[]> GetActorInfo(int limit = 1, int offset = 0, Dictionary<string, bool> orderByList = null, List<string> filterList = null,SqliteConnection connection=null)
+            public static async Task<ActorInfo[]> GetActorInfo(int limit = 1, int offset = 0, Dictionary<string, bool> orderByList = null, List<string> filterList = null, SqliteConnection connection = null)
             {
                 var orderStr = string.Empty;
                 if (orderByList != null)
@@ -1483,7 +1482,7 @@ namespace Display.Models.Data
 
 
 
-                return await DataAccessHelper.ExecuteReaderGetArrayAsync<ActorInfo>(commandText,connection);
+                return await DataAccessHelper.ExecuteReaderGetArrayAsync<ActorInfo>(commandText, connection);
             }
 
             public static async Task<ActorInfo[]> GetActorInfoByVideoName(string videoName, SqliteConnection connection = null)
@@ -1491,7 +1490,7 @@ namespace Display.Models.Data
                 var commandText =
                     $"SELECT actors.*,bwh.bust,bwh.waist,bwh.hips, COUNT(id) as video_count FROM ( SELECT ActorInfo.* FROM ActorInfo, VideoInfo, Actor_Video WHERE VideoInfo.truename == '{videoName}' AND VideoInfo.truename == Actor_Video.video_name AND Actor_Video.actor_id == ActorInfo.id ) AS actors LEFT JOIN Actor_Video ON Actor_Video.actor_id = actors.id LEFT JOIN bwh ON actors.bwh = bwh.bwh GROUP BY id";
 
-                return await DataAccessHelper.ExecuteReaderGetArrayAsync<ActorInfo>(commandText,connection);
+                return await DataAccessHelper.ExecuteReaderGetArrayAsync<ActorInfo>(commandText, connection);
             }
 
             /// <summary>
@@ -1555,7 +1554,7 @@ namespace Display.Models.Data
                     commandText = $"SELECT * from VideoInfo WHERE actor LIKE '%{actorName}%'";
                 }
 
-                return DataAccessHelper.ExecuteReaderGetArray<VideoInfo>(commandText,connection);
+                return DataAccessHelper.ExecuteReaderGetArray<VideoInfo>(commandText, connection);
             }
 
             /// <summary>
@@ -1578,7 +1577,7 @@ namespace Display.Models.Data
                 var commandText = $"SELECT * from VideoInfo WHERE truename LIKE '%{leftName}%{rightNumber}%'";
 
 
-                return DataAccessHelper.ExecuteReaderGetArray<VideoInfo>(commandText,connection);
+                return DataAccessHelper.ExecuteReaderGetArray<VideoInfo>(commandText, connection);
             }
 
             /// <summary>
@@ -1589,12 +1588,12 @@ namespace Display.Models.Data
             /// <param name="limit"></param>
             /// <param name="connection"></param>
             /// <returns></returns>
-            public static VideoInfo[] GetVideoInfoBySomeType(string type, string label, int limit,SqliteConnection connection = null)
+            public static VideoInfo[] GetVideoInfoBySomeType(string type, string label, int limit, SqliteConnection connection = null)
             {
                 var commandText = string.IsNullOrEmpty(label) ? $"SELECT * from VideoInfo WHERE {type} == '' LIMIT {limit}"
                                                             : $"SELECT * from VideoInfo WHERE {type} LIKE '%{label}%' LIMIT {limit}";
 
-                return DataAccessHelper.ExecuteReaderGetArray<VideoInfo>(commandText,connection);
+                return DataAccessHelper.ExecuteReaderGetArray<VideoInfo>(commandText, connection);
             }
 
             /// <summary>
@@ -1608,7 +1607,7 @@ namespace Display.Models.Data
 
                 var leftName = tuple.Item1.Replace("FC2", "FC");
                 var rightNumber = tuple.Item2;
-                    
+
                 if (rightNumber.StartsWith("0"))
                 {
                     var matchResult = Regex.Match(rightNumber, @"0*(\d+)");
@@ -1624,7 +1623,7 @@ namespace Display.Models.Data
                 if (tmpList == null) return null;
 
                 var data = new List<Datum>();
-            
+
                 //进一步筛选，通过右侧数字
                 // '%xxx%57%' 会选出 057、157、257之类的
                 foreach (var datum in tmpList)
@@ -1658,7 +1657,7 @@ namespace Display.Models.Data
             public static Datum[] GetFolderListByPid(long pid, int limit = -1)
             {
                 var command = $"SELECT * FROM FilesInfo WHERE pid == {pid} LIMIT {limit}";
-            
+
                 return DataAccessHelper.ExecuteReaderGetArray<Datum>(command, null);
             }
 
@@ -1732,7 +1731,7 @@ namespace Display.Models.Data
                 var commandText =
                     $"SELECT * FROM VideoInfo WHERE look_later != 0 ORDER BY look_later DESC LIMIT {count}";
 
-                return await DataAccessHelper.ExecuteReaderGetArrayAsync<VideoInfo>(commandText,connection);
+                return await DataAccessHelper.ExecuteReaderGetArrayAsync<VideoInfo>(commandText, connection);
             }
 
             /// <summary>
@@ -1822,7 +1821,7 @@ namespace Display.Models.Data
 
                     if (pid == 0)
                     {
-                        folderToRootList.Add(new Datum { Cid =0, Name = "根目录" });
+                        folderToRootList.Add(new Datum { Cid = 0, Name = "根目录" });
                         break;
                     }
                 }
@@ -1987,9 +1986,9 @@ namespace Display.Models.Data
                     if (currentFile.Fid == null)
                     {
                         // 获取当前文件夹下所有的文件夹和文件
-                        var newDataList = GetListByCid(currentFile.Cid, connection:connection);
+                        var newDataList = GetListByCid(currentFile.Cid, connection: connection);
 
-                        if(newDataList == null) continue;
+                        if (newDataList == null) continue;
 
                         var fileInFolderList = GetAllFilesInFolderList(newDataList.ToList(), connection);
 

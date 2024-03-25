@@ -1,4 +1,7 @@
 ﻿
+using Display.CustomWindows;
+using Display.Models.Data;
+using Display.Views.Settings.Account;
 using Microsoft.UI;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -11,8 +14,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
-using Display.CustomWindows;
-using Display.Models.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -24,64 +25,52 @@ namespace Display.Views.Settings
     /// </summary>
     public sealed partial class LoginPage : RootPage
     {
-        private Window window;
-        private WebApi webapi;
+        private readonly Window _window;
+        private readonly WebApi _webapi;
         private DispatcherTimer _qrTimer;
-        private bool _waitfresh = false;
+        private bool _waitFresh;
 
         public LoginPage()
         {
             this.InitializeComponent();
 
-            //appWindow = App.getAppWindow(this);
-            window = LoginWindow.m_window;
+            _window = LoginWindow.m_window;
+            _window.ExtendsContentIntoTitleBar = true;
+            _window.SetTitleBar(AppTitleBar);
 
-            window.ExtendsContentIntoTitleBar = true;
-            window.SetTitleBar(AppTitleBar);
-
-            webapi = WebApi.GlobalWebApi;
+            _webapi = WebApi.GlobalWebApi;
         }
 
         private void Grid_Loaded(object sender, RoutedEventArgs e)
         {
-            tryLogin();
+            TryLogin();
         }
 
-        private async void tryLogin()
+        private async void TryLogin()
         {
-            //Task.Run(() => webapi.GetQRCodeInfo());
-
-
-            QRCodeInfo qrcodeInfo = await webapi.GetQrCodeInfo();
+            var qrcodeInfo = await _webapi.GetQrCodeInfo();
             if (ImageGrid.Visibility == Visibility.Visible)
-            {
                 ImageGrid.Visibility = Visibility.Collapsed;
-            }
 
             //显示二维码
-            QRCodeShow(qrcodeInfo.data.qrcode);
+            QrCodeShow(qrcodeInfo.data.qrcode);
 
             //状态：登录中
-            UpdateState("login");
+            UpdateState();
 
             //检查二维码登录状态
-            var isLogined = false;
+            var isLogin = false;
             var isError = false;
-            for (int i = 0; i < 10; i++)
+            for (var i = 0; i < 10; i++)
             {
                 //登录成功或发生错误
-                if (isLogined || isError)
-                {
-                    break;
-                }
+                if (isLogin || isError) break;
+
                 //二维码已更新
-                else if (qrcodeInfo.data.uid != WebApi.QrCodeInfo.data.uid)
-                {
-                    return;
-                }
+                if (qrcodeInfo.data.uid != WebApi.QrCodeInfo.data.uid) return;
 
                 //发送查询请求，可能为超长时长（服务器单次最大通讯时长30s）
-                var qRCodeStatus = await webapi.GetQrCodeStatusAsync();
+                var qRCodeStatus = await _webapi.GetQrCodeStatusAsync();
 
                 if (qRCodeStatus.state == 1)
                 {
@@ -93,7 +82,7 @@ namespace Display.Views.Settings
                             break;
                         case 2:
                             UpdateState("wait", "登录成功", "info");
-                            isLogined = true;
+                            isLogin = true;
                             break;
                         case -2:
                             UpdateState("wait", statusInfo.msg, "fresh");
@@ -114,33 +103,32 @@ namespace Display.Views.Settings
             }
 
             //成功登录后，检查网络状态（内含存储Cookie），关闭窗口
-            if (isLogined)
-            {
-                await webapi.NetworkVerifyTokenAsync();
-                await showSuccessAndExite();
-            }
+            if (!isLogin) return;
+
+            await _webapi.NetworkVerifyTokenAsync();
+            await ShowSuccessAndExit();
         }
 
-        private async Task showSuccessAndExite()
+        private async Task ShowSuccessAndExit()
         {
             //显示成功提示
             SuccessTip.IsOpen = true;
 
             //等待2秒后退出
             await Task.Delay(2000);
-            window.Close();
+            _window.Close();
         }
 
         /// <summary>
         /// 展示二维码
         /// </summary>
-        /// <param Name="Text"></param>
-        private async void QRCodeShow(string Text)
+        /// <param name="text"></param>
+        private async void QrCodeShow(string text)
         {
-            QRCodeGenerator qrGenerator = new QRCodeGenerator();
-            QRCodeData qrCodeData = qrGenerator.CreateQrCode(Text, QRCodeGenerator.ECCLevel.Q);
-            PngByteQRCode qrCode = new PngByteQRCode(qrCodeData);
-            byte[] qrCodeAsPngByteArr = qrCode.GetGraphic(20);
+            var qrGenerator = new QRCodeGenerator();
+            var qrCodeData = qrGenerator.CreateQrCode(text, QRCodeGenerator.ECCLevel.Q);
+            using var qrCode = new PngByteQRCode(qrCodeData);
+            var qrCodeAsPngByteArr = qrCode.GetGraphic(20);
 
             //e.g. Windows 10 Universal App (UAP)
             using var stream = new InMemoryRandomAccessStream();
@@ -165,8 +153,10 @@ namespace Display.Views.Settings
         {
             if (_qrTimer == null)
             {
-                _qrTimer = new DispatcherTimer();
-                _qrTimer.Interval = TimeSpan.FromSeconds(3);
+                _qrTimer = new DispatcherTimer
+                {
+                    Interval = TimeSpan.FromSeconds(3)
+                };
                 _qrTimer.Tick += OnQRTimerTickAsync;
             }
 
@@ -176,17 +166,16 @@ namespace Display.Views.Settings
         /// <summary>
         /// 监听二维码请求结果
         /// </summary>
-        /// <param Name="sender"></param>
-        /// <param Name="e"></param>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void OnQRTimerTickAsync(object sender, object e)
         {
-            var result = await webapi.NetworkVerifyTokenAsync();
+            var result = await _webapi.NetworkVerifyTokenAsync();
 
             //成功登录
             if (result.state == 1)
             {
-                StopQRLoginListener();
-                return;
+                StopQrLoginListener();
             }
             //发生错误
             else if (result.error != null)
@@ -199,7 +188,7 @@ namespace Display.Views.Settings
                 else
                 {
                     //停止监听
-                    StopQRLoginListener();
+                    StopQrLoginListener();
 
                     //显示错误信息
                     UpdateState("errorOccurred", result.message, "error");
@@ -207,41 +196,27 @@ namespace Display.Views.Settings
 
             }
 
-
-            //if (await NetworkVerifyTokenAsync())
-            //{
-            //}
         }
 
         /// <summary>
         /// 暂停监听是否登录
         /// </summary>
-        internal void StopQRLoginListener()
+        internal void StopQrLoginListener()
         {
             _qrTimer?.Stop();
             _qrTimer = null;
 
-            //QRCodeImage.Source = null;
-
-            //LoginButton.IsEnabled = false;
-
-            if (webapi.TokenInfo != null && webapi.TokenInfo.data != null)
+            if (_webapi.TokenInfo is { data: not null })
             {
-                //QRLoadingRing.IsActive = true;
-                QrCodeImage.Source = new BitmapImage(new Uri(webapi.TokenInfo.data.face.face_l));
-                //HiddenToggleSwitch.IsOn = await webapi.IsHiddenModel();
-                //HidenStackPanel.Visibility = Visibility.Visible;
-                //QRLoadingRing.IsActive = false;
+                QrCodeImage.Source = new BitmapImage(new Uri(_webapi.TokenInfo.data.face.face_l));
+
             }
         }
 
         private void CheckCookieButton_Click(object sender, RoutedEventArgs e)
         {
-            //termsOfUseContentDialog.Content = new ContentsPage.CheckCookie(CookieInputTextBox.Text);
-            //await termsOfUseContentDialog.ShowAsync();
             CheckCookieTip.Content = new CheckCookie(CookieInputTextBox.Text);
             CheckCookieTip.IsOpen = true;
-
         }
 
         private void CookieInputTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -300,7 +275,7 @@ namespace Display.Views.Settings
                     break;
                 //要求刷新
                 case "fresh":
-                    _waitfresh = true;
+                    _waitFresh = true;
                     RefreshQrCodeGrid.Opacity = 1;
                     QrCodeConfirmTip.Background = new SolidColorBrush(Colors.SandyBrown);
                     break;
@@ -336,7 +311,7 @@ namespace Display.Views.Settings
         private void RefreshQRCode_Grid_PointerExited(object sender, PointerRoutedEventArgs e)
         {
             //等待二维码刷新就一直显示
-            if (!_waitfresh)
+            if (!_waitFresh)
             {
                 RefreshQrCodeGrid.Opacity = 0;
             }
@@ -349,8 +324,8 @@ namespace Display.Views.Settings
 
         private void RefreshQRCode_Grid_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            _waitfresh = false;
-            tryLogin();
+            _waitFresh = false;
+            TryLogin();
         }
 
         private async void CookieInputButton_Click(object sender, RoutedEventArgs e)
@@ -362,11 +337,11 @@ namespace Display.Views.Settings
             }
             else
             {
-                var result = await webapi.TryRefreshCookie(CookieInputTextBox.Text);
+                var result = await _webapi.TryRefreshCookie(CookieInputTextBox.Text);
                 //Cookie有用
                 if (result)
                 {
-                    await showSuccessAndExite();
+                    await ShowSuccessAndExit();
                 }
                 else
                 {

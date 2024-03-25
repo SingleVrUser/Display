@@ -32,8 +32,8 @@ internal static class Settings
 
     public static T GetValue<T>(string key, T defaultValue = default)
     {
-        if(string.IsNullOrEmpty(key)) return defaultValue;
-            
+        if (string.IsNullOrEmpty(key)) return defaultValue;
+
         var value = LocalSettings.Values[key];
 
         switch (value)

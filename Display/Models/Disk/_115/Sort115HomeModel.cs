@@ -3,7 +3,7 @@ using Display.Models.Data;
 
 namespace Display.Models.Disk._115;
 
-public partial class Sort115HomeModel:ObservableObject
+public partial class Sort115HomeModel : ObservableObject
 {
     public FilesInfo Info;
 

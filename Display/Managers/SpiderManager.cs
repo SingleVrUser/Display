@@ -1,16 +1,16 @@
-﻿using HtmlAgilityPack;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Threading;
+﻿using Display.Helper.Network;
 using Display.Models.Data;
-using static Display.Models.Spider.SpiderInfos;
-using Display.Helper.Network;
-using Display.Providers.Spider;
-using System.Collections.Concurrent;
-using System;
-using System.Diagnostics;
 using Display.Models.Spider;
+using Display.Providers.Spider;
+using HtmlAgilityPack;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using static Display.Models.Spider.SpiderInfos;
 
 namespace Display.Managers;
 
@@ -239,7 +239,7 @@ public partial class SpiderManager
 
             // 向Item项添加当前id
             item.DoneSpiderNameArray.Enqueue(spider.Name);
-            
+
             // 所有字段搜索完成
             var isThisNameDone = item.IsCompleted;
 
@@ -277,7 +277,7 @@ public partial class SpiderManager
         var queueArray = _taskItemQueue.ToArray();
 
         return queueArray.All(item => item.DoneSpiderNameArray.Contains(curSpider.Name)) &&
-               spiders.All(spider => spider.HandleItem ==null ||
+               spiders.All(spider => spider.HandleItem == null ||
                                      (spider.HandleItem != null && spider.HandleItem.DoneSpiderNameArray.Contains(curSpider.Name))
                                      );
     }

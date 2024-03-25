@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Display.Helper.FileProperties.Name;
 using Display.Models.Data;
 using Microsoft.UI.Xaml;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using Settings18Page = Display.Views.Sort115.Settings18Page;
 
 namespace Display.ViewModels
@@ -31,7 +31,7 @@ namespace Display.ViewModels
 
         public void SetFiles(List<FilesInfo> files)
         {
-            foreach (var info in files.Where(info => info is { Type: FilesInfo.FileType.File }).OrderBy(info=>info.Type))
+            foreach (var info in files.Where(info => info is { Type: FilesInfo.FileType.File }).OrderBy(info => info.Type))
             {
                 SelectedFiles.Add(new Models.Disk._115.Sort115HomeModel(info));
             }
@@ -90,7 +90,7 @@ namespace Display.ViewModels
             // 正式开始整理
             foreach (var info in infos)
             {
-                if(info.Status == Status.Error) continue;
+                if (info.Status == Status.Error) continue;
 
                 var destinationPathArray = info.DestinationPathName.Split("\\");
 
@@ -122,7 +122,7 @@ namespace Display.ViewModels
                     }
                 }
                 // 多集
-                else if(destinationPathArray.Length == 2)
+                else if (destinationPathArray.Length == 2)
                 {
                     var destinationPath = destinationPathArray[1];
 

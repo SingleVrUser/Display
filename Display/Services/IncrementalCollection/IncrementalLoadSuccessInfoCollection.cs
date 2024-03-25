@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Display.Models.Data;
+using Microsoft.UI.Xaml.Data;
+using SharpCompress;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Display.Models.Data;
-using Microsoft.UI.Xaml.Data;
-using SharpCompress;
 
 namespace Display.Services.IncrementalCollection;
 
@@ -96,7 +96,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
 
         //在最后的时候加载匹配失败的
         //用于展示搜索结果
-        if (lists==null || lists.Length < DefaultCount)
+        if (lists == null || lists.Length < DefaultCount)
         {
             HasMoreItems = false;
 

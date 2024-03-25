@@ -1,11 +1,11 @@
-﻿using System;
-using System.Diagnostics;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Display.Controls;
 using Display.Models.Disk._115;
 using Display.Views.Settings;
 using Microsoft.UI.Xaml;
+using System;
+using System.Diagnostics;
 using Settings18Page = Display.Views.Sort115.Settings18Page;
 
 namespace Display.ViewModels
@@ -113,7 +113,7 @@ namespace Display.ViewModels
         {
             var contentPage = new SelectedFolderPage();
 
-            var newContentDialog =  CreateSelectedFolderDialog(contentPage);
+            var newContentDialog = CreateSelectedFolderDialog(contentPage);
 
             newContentDialog.PrimaryButtonClick += (_, _) =>
             {
@@ -128,7 +128,7 @@ namespace Display.ViewModels
 
             var newContentDialog = new CustomContentDialog(contentPage);
 
-            var cancelHandler = new EventHandler<RoutedEventArgs>((_,_) =>
+            var cancelHandler = new EventHandler<RoutedEventArgs>((_, _) =>
             {
                 _currentPage.Content = tmpContent;
             });
