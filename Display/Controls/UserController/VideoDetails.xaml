@@ -108,7 +108,7 @@
                     <AppBarButton Label="搜索资源"
                                   Click="FindVideoAppBarButton_Click">
                         <AppBarButton.Icon>
-                            <FontIcon FontFamily="Segoe Fluent Icons"
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                       Glyph="&#xE95A;" />
                         </AppBarButton.Icon>
 
@@ -216,7 +216,7 @@
                                 <SolidColorBrush Color="Gray"
                                                  Opacity="0.1" />
                             </Grid.Background>
-                            <FontIcon FontFamily="Segoe Fluent Icons"
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                       Glyph="&#xF5B0;"
                                       Foreground="{ThemeResource SystemAccentColor}"
                                       FontSize="50" />
@@ -226,7 +226,7 @@
                                     <MenuFlyoutItem Text="打开所在目录"
                                                     Click="OpenDirectory_Click">
                                         <MenuFlyoutItem.Icon>
-                                            <FontIcon FontFamily="Segoe Fluent Icons"
+                                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                                       Glyph="&#xE8B7;" />
                                         </MenuFlyoutItem.Icon>
                                     </MenuFlyoutItem>
@@ -263,7 +263,7 @@
                                              CornerRadius="10"
                                              Padding="5"
                                              ToolTipService.ToolTip="{x:Bind ResultInfo.busUrl,Mode=OneWay}">
-                                <FontIcon FontFamily="Segoe Fluent Icons"
+                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                           Glyph="&#xF6FA;"
                                           Foreground="LightGray"
                                           Opacity="0.3" />

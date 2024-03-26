@@ -8,6 +8,9 @@ using System.Diagnostics;
 
 namespace Display.Controls.CustomController;
 
+/// <summary>
+/// 自定义MediaPlayer重的TransportControls
+/// </summary>
 public class CustomMediaTransportControls : MediaTransportControls
 {
     public event EventHandler<RoutedEventArgs> FullWindow;

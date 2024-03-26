@@ -2,57 +2,57 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Display.Helper.UI
+namespace Display.Helper.UI;
+
+internal static class CursorHelper
 {
-    public class CursorHelper
+    private const string ModuleName = "Display";
+
+    /// <summary>
+    /// 获取鼠标闲置时间
+    /// </summary>
+    /// <param name="inputInfo"></param>
+    /// <returns></returns>
+    [DllImport("user32.dll")]
+    public static extern bool GetLastInputInfo(ref LastInputInfo inputInfo);
+
+    /// <summary>
+    /// 设置鼠标状态的计数器（非状态）
+    /// </summary>
+    /// <param name="bShow"></param>
+    /// <returns></returns>
+    [DllImport("user32.dll", EntryPoint = "ShowCursor", CharSet = CharSet.Auto)]
+    public static extern int ShowCursor(bool bShow);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct LastInputInfo
     {
+        [MarshalAs(UnmanagedType.U4)] public int cbSize;
+        [MarshalAs(UnmanagedType.U4)] public uint dwTime;
+    }
 
-        /// <summary>
-        /// 获取鼠标闲置时间
-        /// </summary>
-        /// <param name="plii"></param>
-        /// <returns></returns>
-        [DllImport("user32.dll")]
-        public static extern bool GetLastInputInfo(ref LASTINPUTINFO plii);
+    private static InputCursor _hiddenCursor;
+    public static InputCursor GetHiddenCursor()
+    {
+        if (_hiddenCursor == null)
+            _hiddenCursor = InputDesktopResourceCursor.CreateFromModule(ModuleName, 205);
+        return _hiddenCursor;
+    }
 
-        /// <summary>
-        /// 设置鼠标状态的计数器（非状态）
-        /// </summary>
-        /// <param name="bShow"></param>
-        /// <returns></returns>
-        [DllImport("user32.dll", EntryPoint = "ShowCursor", CharSet = CharSet.Auto)]
-        public static extern int ShowCursor(bool bShow);
+    private static InputCursor _zoomCursor;
+    public static InputCursor GetZoomCursor()
+    {
+        if (_zoomCursor == null)
+            _zoomCursor = InputDesktopResourceCursor.CreateFromModule(ModuleName, 206);
+        return _zoomCursor;
+    }
 
-        [StructLayout(LayoutKind.Sequential)]
-        public struct LASTINPUTINFO
-        {
-            [MarshalAs(UnmanagedType.U4)] public int cbSize;
-            [MarshalAs(UnmanagedType.U4)] public uint dwTime;
-        }
+    public static long GetIdleTick()
+    {
+        var vLastInputInfo = new LastInputInfo();
+        vLastInputInfo.cbSize = Marshal.SizeOf(vLastInputInfo);
+        if (!GetLastInputInfo(ref vLastInputInfo)) return 0;
 
-        private static InputCursor _hiddenCursor;
-        public static InputCursor GetHiddenCursor()
-        {
-            if (_hiddenCursor == null)
-                _hiddenCursor = InputDesktopResourceCursor.CreateFromModule("Display", 205);
-            return _hiddenCursor;
-        }
-
-        private static InputCursor _zoomCursor;
-        public static InputCursor GetZoomCursor()
-        {
-            if (_zoomCursor == null)
-                _zoomCursor = InputDesktopResourceCursor.CreateFromModule("Display", 206);
-            return _zoomCursor;
-        }
-
-        public static long GetIdleTick()
-        {
-            var vLastInputInfo = new LASTINPUTINFO();
-            vLastInputInfo.cbSize = Marshal.SizeOf(vLastInputInfo);
-            if (!GetLastInputInfo(ref vLastInputInfo)) return 0;
-
-            return Environment.TickCount - vLastInputInfo.dwTime;
-        }
+        return Environment.TickCount - vLastInputInfo.dwTime;
     }
 }

@@ -172,7 +172,7 @@
                         Margin="5"
                         CornerRadius="9"
                         BorderThickness="1">
-                    <FontIcon FontFamily="Segoe Fluent Icons"
+                    <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                               Glyph="&#xE160;"
                               FontSize="40"
                               Margin="12" />
@@ -218,7 +218,7 @@
                 <AppBarButton Label="{x:Bind ViewModel.ButtonName,Mode=OneWay}"
                               Command="{x:Bind ViewModel.StartCommand}">
                     <AppBarButton.Icon>
-                        <FontIcon FontFamily="Segoe Fluent Icons"
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xE76C;" />
                     </AppBarButton.Icon>
                 </AppBarButton>
@@ -245,7 +245,7 @@
                                    RelativePanel.AlignVerticalCenterWithPanel="True"
                                    Margin="2" />
                         <FontIcon x:Name="VideoInfoIcon"
-                                  FontFamily="Segoe Fluent Icons"
+                                  FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xE946;"
                                   FontSize="15"
                                   Foreground="Gray"

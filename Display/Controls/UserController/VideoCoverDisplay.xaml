@@ -77,38 +77,38 @@
                 </ListView.Resources>
                 <ListView.Items>
                     <StackPanel>
-                        <FontIcon FontFamily="Segoe Fluent Icons"
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xE185;" />
                         <TextBlock Text="名称" />
                         <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                  FontFamily="Segoe Fluent Icons"
+                                  FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xE015;" />
                     </StackPanel>
 
                     <StackPanel>
-                        <FontIcon FontFamily="Segoe Fluent Icons"
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xE13D;" />
                         <TextBlock Text="演员" />
                         <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                  FontFamily="Segoe Fluent Icons"
+                                  FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xE015;" />
                     </StackPanel>
 
                     <StackPanel>
-                        <FontIcon FontFamily="Segoe Fluent Icons"
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xEC92;" />
                         <TextBlock Text="年份" />
                         <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                  FontFamily="Segoe Fluent Icons"
+                                  FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xE015;" />
                     </StackPanel>
 
                     <StackPanel>
-                        <FontIcon FontFamily="Segoe Fluent Icons"
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xF463;" />
                         <TextBlock Text="随机" />
                         <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                  FontFamily="Segoe Fluent Icons"
+                                  FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xF143;" />
                     </StackPanel>
 
@@ -142,39 +142,39 @@
                 </ListView.Resources>
                 <ListView.Items>
                     <StackPanel>
-                        <FontIcon FontFamily="Segoe Fluent Icons"
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xE185;" />
                         <TextBlock Text="名称" />
                         <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                  FontFamily="Segoe Fluent Icons"
+                                  FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xE015;" />
                     </StackPanel>
 
                     <StackPanel>
-                        <FontIcon FontFamily="Segoe Fluent Icons"
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xE2AD;" />
                         <TextBlock Text="时间" />
                         <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                  FontFamily="Segoe Fluent Icons"
+                                  FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xE015;" />
                     </StackPanel>
 
                     <StackPanel>
-                        <FontIcon FontFamily="Segoe Fluent Icons"
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xEB05;" />
                         <TextBlock Text="大小" />
                         <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                  FontFamily="Segoe Fluent Icons"
+                                  FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xE015;" />
                     </StackPanel>
 
 
                     <StackPanel>
-                        <FontIcon FontFamily="Segoe Fluent Icons"
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xF463;" />
                         <TextBlock Text="随机" />
                         <FontIcon Style="{StaticResource UpOrDownSortStyle}"
-                                  FontFamily="Segoe Fluent Icons"
+                                  FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xF143;" />
                     </StackPanel>
 
@@ -241,7 +241,7 @@
 
                         <RelativePanel>
                             <!--喜欢就显示爱心-->
-                            <FontIcon FontFamily="Segoe Fluent Icons"
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                       Glyph="&#xE00B;"
                                       Foreground="OrangeRed"
                                       Opacity="1"
@@ -518,7 +518,7 @@
                                 PointerExited="Button_PointerExited"
                                 ToolTipService.ToolTip="播放">
 
-                            <FontIcon FontFamily="Segoe Fluent Icons"
+                            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                       Glyph="&#xF5B0;"
                                       Foreground="{ThemeResource SystemAccentColor}"
                                       FontSize="50" />
@@ -836,13 +836,13 @@
                              Content="&#xE006;"
                              FontSize="20"
                              HorizontalContentAlignment="Center"
-                             FontFamily="Segoe Fluent Icons"
+                             FontFamily="{StaticResource SymbolThemeFontFamily}"
                              Style="{StaticResource RadioButtonCustomizeStyle}"
                              ToolTipService.ToolTip="喜欢" />
                 <RadioButton x:Name="FailLookLater_RadioButton"
                              Content="&#xE13B;"
                              FontSize="20"
-                             FontFamily="Segoe Fluent Icons"
+                             FontFamily="{StaticResource SymbolThemeFontFamily}"
                              HorizontalContentAlignment="Center"
                              Style="{StaticResource RadioButtonCustomizeStyle}"
                              ToolTipService.ToolTip="稍后观看" />

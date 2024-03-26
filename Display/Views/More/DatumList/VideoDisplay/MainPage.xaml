@@ -221,7 +221,7 @@
                                                     <MenuFlyout>
                                                         <MenuFlyoutItem Text="定位" Click="LocationFileClick">
                                                             <MenuFlyoutItem.Icon>
-                                                                <FontIcon FontFamily="Segoe Fluent Icons"
+                                                                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                                                           Glyph="&#xE81D;" />
                                                             </MenuFlyoutItem.Icon>
                                                         </MenuFlyoutItem>
@@ -321,7 +321,7 @@
                                           PointerExited="Video_UniformGrid_OnPointerExited"/>
 
                     <HyperlinkButton x:Name="SplitViewOpenButton" Foreground="White"
-                                     FontFamily="Segoe Fluent Icons"
+                                     FontFamily="{StaticResource SymbolThemeFontFamily}"
                                      Content="&#xF745;"
                                      HorizontalAlignment="Right"
                                      Click="InfoGridVisibilityButton_Click"

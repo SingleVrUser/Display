@@ -132,7 +132,7 @@
                 <Setter Property="VerticalContentAlignment"
                         Value="Top" />
                 <Setter Property="FontFamily"
-                        Value="Segoe Fluent Icons" />
+                        Value="{StaticResource SymbolThemeFontFamily}" />
                 <Setter Property="FontSize"
                         Value="{ThemeResource ControlContentThemeFontSize}" />
                 <Setter Property="MinWidth"

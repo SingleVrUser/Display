@@ -365,7 +365,7 @@
                 --><!--更多--><!--
                 <HyperlinkButton Grid.Column="0" Grid.ColumnSpan="4"
                                  Content="&#xE10C;"
-                                 FontFamily="Segoe Fluent Icons"
+                                 FontFamily="{StaticResource SymbolThemeFontFamily}"
                                  HorizontalAlignment="Right"
                                  VerticalAlignment="Top"
                                  Click="ProgressMore_Click">

@@ -67,7 +67,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Button FontFamily="Segoe Fluent Icons"
+        <Button FontFamily="{StaticResource SymbolThemeFontFamily}"
                 Content="&#xE11A;"
                 CornerRadius="15"
                 Padding="8"
