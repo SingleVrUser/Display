@@ -3,7 +3,11 @@ using System;
 
 namespace Display.Converter;
 
-public class OneToTrueConverter : IValueConverter
+/// <summary>
+/// 1 => true
+/// other => false
+/// </summary>
+internal class OneToTrueConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {

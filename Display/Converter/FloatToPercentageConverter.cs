@@ -3,7 +3,10 @@ using System;
 
 namespace Display.Converter;
 
-public class FloatToPercentageConverter : IValueConverter
+/// <summary>
+/// 0.7 => 70%
+/// </summary>
+internal class FloatToPercentageConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {

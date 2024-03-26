@@ -6,7 +6,10 @@ using System;
 
 namespace Display.Converter;
 
-public class NumberToLengthStrConverter : IValueConverter
+/// <summary>
+/// 59 => 59秒
+/// </summary>
+internal class NumberToLengthStrConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
@@ -14,8 +17,8 @@ public class NumberToLengthStrConverter : IValueConverter
         {
             int intValue => DateHelper.ConvertDoubleToLengthStr(intValue),
             double doubleValue => DateHelper.ConvertDoubleToLengthStr(doubleValue),
-            string numOrStringValue when !numOrStringValue.IsNumber() => numOrStringValue,
-            string numOrStringValue => DateHelper.ConvertDoubleToLengthStr(int.Parse(numOrStringValue)),
+            string stringValue when !stringValue.IsNumber() => stringValue,
+            string numValue => DateHelper.ConvertDoubleToLengthStr(int.Parse(numValue)),
             _ => throw new NotImplementedException()
         };
     }

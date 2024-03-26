@@ -4,7 +4,10 @@ using System;
 
 namespace Display.Converter;
 
-public class NullToCollapsedConverter : IValueConverter
+/// <summary>
+/// null / "" / 0 => Collapsed
+/// </summary>
+internal class NullToCollapsedConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
