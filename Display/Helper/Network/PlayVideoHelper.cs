@@ -2,7 +2,7 @@
 using Display.Controls;
 using Display.CustomWindows;
 using Display.Helper.FileProperties.Name;
-using Display.Helper.UI;
+using Display.Helper.Notifications;
 using Display.Models.Data;
 using Display.Models.Data.Enums;
 using Display.Models.Media;

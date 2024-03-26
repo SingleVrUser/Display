@@ -3,16 +3,11 @@ using System;
 
 namespace Display.Converter;
 
-public class IsVideoToBoolConverter : IValueConverter
+public class OneToTrueConverter : IValueConverter
 {
-    public Object Convert(object value, Type targetType, object parameter, string language)
+    public object Convert(object value, Type targetType, object parameter, string language)
     {
-        if (value is 1)
-        {
-            return true;
-        }
-
-        return false;
+        return value is 1;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)

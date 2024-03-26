@@ -17,7 +17,7 @@
                     <Grid.ContextFlyout>
                         <MenuFlyout>
                             <MenuFlyoutItem Text="在默认应用播放"
-                                            IsEnabled="{x:Bind Datum.Iv, Converter={StaticResource IsVideoToBoolConverter}}"
+                                            IsEnabled="{x:Bind Datum.Iv, Converter={StaticResource OneToTrueConverter}}"
                                             Click="PlayVideoButton_Click">
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon Glyph="&#xEE4A;" />
@@ -25,7 +25,7 @@
                             </MenuFlyoutItem>
 
                             <MenuFlyoutSubItem Text="在其他应用播放"
-                                               IsEnabled="{x:Bind Datum.Iv, Converter={StaticResource IsVideoToBoolConverter}}">
+                                               IsEnabled="{x:Bind Datum.Iv, Converter={StaticResource OneToTrueConverter}}">
                                 <MenuFlyoutSubItem.Icon>
                                     <FontIcon Glyph="&#xEE4A;" />
                                 </MenuFlyoutSubItem.Icon>
@@ -83,7 +83,7 @@
                         <Grid.ContextFlyout>
                             <MenuFlyout>
                                 <MenuFlyoutItem Text="在默认应用播放"
-                                                IsEnabled="{x:Bind Datum.Iv, Converter={StaticResource IsVideoToBoolConverter}}"
+                                                IsEnabled="{x:Bind Datum.Iv, Converter={StaticResource OneToTrueConverter}}"
                                                 Click="PlayVideoButton_Click">
                                     <MenuFlyoutItem.Icon>
                                         <FontIcon Glyph="&#xEE4A;" />
@@ -91,7 +91,7 @@
                                 </MenuFlyoutItem>
 
                                 <MenuFlyoutSubItem Text="在其他应用播放"
-                                                   IsEnabled="{x:Bind Datum.Iv, Converter={StaticResource IsVideoToBoolConverter}}">
+                                                   IsEnabled="{x:Bind Datum.Iv, Converter={StaticResource OneToTrueConverter}}">
                                     <MenuFlyoutSubItem.Icon>
                                         <FontIcon Glyph="&#xEE4A;" />
                                     </MenuFlyoutSubItem.Icon>

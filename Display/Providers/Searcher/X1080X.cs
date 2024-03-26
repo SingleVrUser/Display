@@ -1,5 +1,5 @@
 ﻿using Display.Helper.Network;
-using Display.Helper.UI;
+using Display.Helper.Notifications;
 using Display.Models.Data;
 using Display.Models.Spider;
 using Display.Providers.Spider;

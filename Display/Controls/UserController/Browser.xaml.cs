@@ -8,6 +8,8 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Storage;
+using Display.Helper.Data;
+using SharpCompress;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -32,19 +34,12 @@ namespace Display.Controls.UserController
         private void WebViewCoreWebView2Initialized(WebView2 sender, CoreWebView2InitializedEventArgs args)
         {
             var cookie = AppSettings._115_Cookie;
+
             //cookie不为空且可用
             if (!string.IsNullOrEmpty(cookie))
             {
                 WebView.CoreWebView2.CookieManager.DeleteAllCookies();
-
-                var cookiesList = cookie.Split(';');
-                foreach (var cookies in cookiesList)
-                {
-                    var item = cookies.Split('=');
-                    var key = item[0].Trim();
-                    var value = item[1].Trim();
-                    AddCookie(key, value);
-                }
+                CookieHelper.ProductCookieKeyValue(cookie).ForEach(item=>AddCookie(item.Key, item.Value));
             }
 
             WebView.CoreWebView2.WebResourceResponseReceived += CoreWebView2_WebResourceResponseReceived; ;
@@ -62,11 +57,9 @@ namespace Display.Controls.UserController
             WebView.CoreWebView2.CookieManager.AddOrUpdateCookie(cookie);
         }
 
-
         private void WebView_NavigationStarting(WebView2 sender, CoreWebView2NavigationStartingEventArgs args)
         {
             NavigationProgressBar.Visibility = Visibility.Visible;
-
         }
 
         private async void HiddenWaterMark()

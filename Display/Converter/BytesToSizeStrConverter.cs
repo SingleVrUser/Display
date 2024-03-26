@@ -18,7 +18,7 @@ public class BytesToSizeStrConverter : IValueConverter
             return string.Empty;
         }
 
-        ByteSize size = value switch
+        var size = value switch
         {
             double doubleValue => ByteSize.FromBytes(doubleValue),
             long longValue => ByteSize.FromBytes(longValue),

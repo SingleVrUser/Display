@@ -1,32 +1,33 @@
-﻿using Display.Views.Settings;
+﻿using System;
+using Display.Views.Settings;
+using Display.Views.Settings.Account;
+using Microsoft.UI.Xaml.Controls;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+namespace Display.CustomWindows;
 
-namespace Display.CustomWindows
+public sealed partial class LoginWindow
 {
-    /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
-    /// </summary>
-    public sealed partial class LoginWindow
+    public LoginWindow(Page page)
     {
-        //private AppWindow appWindow;
-        //private WebApi webapi;
-        //private DispatcherTimer _qrTimer;
+        InitializeComponent();
 
-        public static Microsoft.UI.Xaml.Window m_window;
-
-        public LoginWindow()
-        {
-            this.InitializeComponent();
-
-            m_window = this;
-            //appWindow = App.getAppWindow(this);
-
-            LoginPage loginPage = new LoginPage();
-            this.Content = loginPage;
-
-        }
-
+        ExtendsContentIntoTitleBar = true;
+        SetTitleBar(AppTitleBar);
+        RootContent.Content = page;
     }
+
+    public static void ShowLoginWindow(Action closeAction)
+    {
+        var loginPage = new LoginPage();
+        var loginWindow = new LoginWindow(loginPage);
+
+        loginPage.LoginCompletedAction = () =>
+        {
+            loginWindow.Close();
+            closeAction.Invoke();
+        };
+        loginWindow.Activate();
+    }
+
+
 }

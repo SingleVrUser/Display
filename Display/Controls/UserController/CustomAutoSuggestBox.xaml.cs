@@ -1,21 +1,17 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Windows.Foundation;
 using Display.Helper.FileProperties.Name;
 using Display.Models.Data;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Windows.Foundation;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+namespace Display.Controls.UserController;
 
-namespace Display.Controls;
-
-public sealed partial class CustomAutoSuggestBox : UserControl
+public sealed partial class CustomAutoSuggestBox
 {
     //提交请求（按下Enter）
     public event TypedEventHandler<AutoSuggestBox, AutoSuggestBoxQuerySubmittedEventArgs> QuerySubmitted;
@@ -55,15 +51,10 @@ public sealed partial class CustomAutoSuggestBox : UserControl
             {
                 content += "，点击搜索资源";
             }
-            //NavViewSearchBox.ItemTemplate = Resources["NotFoundedSuggestionBox"] as DataTemplate;
-            //sender.ItemsSource = new List<string> { content };
             resultList.Add(content);
         }
         else
         {
-            //Resources.TryGetValue("FoundedSuggestionBox", out var context);
-            //NavViewSearchBox.ItemTemplate = context as DataTemplate;
-
             if (AppSettings.IsUseX1080X)
             {
                 resultList.Add("点击搜索资源");

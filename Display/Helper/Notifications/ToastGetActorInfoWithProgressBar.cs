@@ -8,7 +8,7 @@ using Windows.ApplicationModel;
 
 namespace Display.Helper.Notifications;
 
-class ToastGetActorInfoWithProgressBar
+internal class ToastGetActorInfoWithProgressBar
 {
     public const int NotifyId = 1;
 
@@ -33,7 +33,7 @@ class ToastGetActorInfoWithProgressBar
 
         var appNotification = new AppNotificationBuilder()
             .AddArgument("action", "ToastClick")
-            .AddArgument(Common.notificationTag, NotifyId.ToString())
+            .AddArgument(NotifyConstant.NotificationTag, NotifyId.ToString())
 
             .SetAppLogoOverride(new Uri("file://" + Path.Combine(Package.Current.InstalledLocation.Path, "Assets/NoPicture.jpg")), AppNotificationImageCrop.Circle)
             .AddText("获取演员信息")

@@ -24,6 +24,7 @@ using Windows.Foundation;
 using Windows.Foundation.Metadata;
 using Windows.Storage;
 using Windows.Storage.Streams;
+using Display.Controls.UserController;
 using DownDialogContent = Display.Views.DetailInfo.DownDialogContent;
 using FileInfoInCidSmoke = Display.Views.DetailInfo.FileInfoInCidSmoke;
 using FindInfoAgainSmoke = Display.Views.DetailInfo.FindInfoAgainSmoke;

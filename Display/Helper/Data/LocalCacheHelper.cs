@@ -70,14 +70,14 @@ namespace Display.Helper.Data
             return await Launcher.LaunchFolderPathAsync(CachePath);
         }
 
-        public static async void ClearAllCacheIfSizeTooLarge()
+        public static void ClearAllCacheIfSizeTooLarge()
         {
             if (!Directory.Exists(CachePath)) return;
 
-            // 检查缓存占用大小
-            var folder = await StorageFolder.GetFolderFromPathAsync(CachePath);
+            //// 检查缓存占用大小
+            //var folder = await StorageFolder.GetFolderFromPathAsync(CachePath);
 
-            DirectoryInfo directoryInfo = new DirectoryInfo(CachePath);
+            var directoryInfo = new DirectoryInfo(CachePath);
 
             long length = 0;
             var files = directoryInfo.GetFiles();
