@@ -16,6 +16,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
+using Display.Controls.UserController;
 using static Display.Models.Data.WebApi;
 using SelectVideoToPlay = Display.Views.DetailInfo.SelectVideoToPlay;
 

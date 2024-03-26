@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
-using static Display.Controls.CustomMediaPlayerElement;
+using static Display.Controls.UserController.CustomMediaPlayerElement;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -133,7 +133,7 @@ public sealed partial class MediaPlayWindow
 
         VisualStateManager.GoToState(MyUserControl, "FullWindow", true);
 
-        VisualStateManager.GoToState(MediaControl.mediaTransportControls, "FullWindowState", true);
+        VisualStateManager.GoToState(MediaControl.MediaTransportControls, "FullWindowState", true);
 
     }
 
@@ -154,7 +154,7 @@ public sealed partial class MediaPlayWindow
 
         VisualStateManager.GoToState(MyUserControl, "NoFullWindow", true);
 
-        VisualStateManager.GoToState(MediaControl.mediaTransportControls, "NoFullWindowState", true);
+        VisualStateManager.GoToState(MediaControl.MediaTransportControls, "NoFullWindowState", true);
     }
 
     private void RootGrid_KeyDown(object sender, KeyRoutedEventArgs e)

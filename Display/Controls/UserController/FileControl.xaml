@@ -42,7 +42,7 @@
                 Width="40"
                 CornerRadius="20"
                 BorderThickness="1">
-            <FontIcon FontFamily="Segoe Fluent Icons"
+            <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                       Glyph="{x:Bind IconText,Mode=OneWay}"
                       FontSize="16" />
         </Border>

@@ -1,6 +1,20 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Windows.Media;
+using Windows.Media.Core;
+using Windows.Media.Playback;
+using Windows.Media.Streaming.Adaptive;
+using Windows.Storage;
+using Windows.System.Display;
+using Windows.Web.Http;
 using ByteSizeLib;
 using Display.Constants;
 using Display.Controls.CustomController;
@@ -16,25 +30,12 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using SharpCompress;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Windows.Media;
-using Windows.Media.Core;
-using Windows.Media.Playback;
-using Windows.Media.Streaming.Adaptive;
-using Windows.Storage;
-using Windows.System.Display;
-using Windows.Web.Http;
+using Display.Helper.UI;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Display.Controls;
+namespace Display.Controls.UserController;
 
 public sealed partial class CustomMediaPlayerElement
 {
@@ -181,8 +182,8 @@ public sealed partial class CustomMediaPlayerElement
 
         if (_allMediaPlayItems.Count <= 1) return;
 
-        mediaTransportControls.IsNextTrackButtonVisible = true;
-        mediaTransportControls.IsPreviousTrackButtonVisible = true;
+        MediaTransportControls.IsNextTrackButtonVisible = true;
+        MediaTransportControls.IsPreviousTrackButtonVisible = true;
         _mediaPlaybackList.AutoRepeatEnabled = true;
     }
 
@@ -209,7 +210,7 @@ public sealed partial class CustomMediaPlayerElement
         {
             // 修改标题
             _window.ChangedWindowTitle($"播放- {playItem.Title}");
-            mediaTransportControls.SetTitle(playItem.Title);
+            MediaTransportControls.SetTitle(playItem.Title);
 
             _window.ChangedVideoListViewIndex((int)index);
 
@@ -261,7 +262,7 @@ public sealed partial class CustomMediaPlayerElement
     private async void SetQualityList(MediaPlayItem playItem)
     {
         var list = await playItem.GetQualities();
-        mediaTransportControls.SetQualityListSource(list, _qualityIndex);
+        MediaTransportControls.SetQualityListSource(list, _qualityIndex);
     }
 
     private void SetButton(MediaPlayItem playItem)
@@ -291,9 +292,9 @@ public sealed partial class CustomMediaPlayerElement
                 isLookLater = LookLater != 0;
             }
 
-            mediaTransportControls.SetLike_LookLater(isLike, isLookLater);
+            MediaTransportControls.SetLike_LookLater(isLike, isLookLater);
 
-            mediaTransportControls.TrySetScreenButton();
+            MediaTransportControls.TrySetScreenButton();
 
         }
         else
@@ -304,9 +305,9 @@ public sealed partial class CustomMediaPlayerElement
             isLike = IsLike == 1;
             isLookLater = this.LookLater != 0;
 
-            mediaTransportControls.SetLike_LookLater(isLike, isLookLater);
+            MediaTransportControls.SetLike_LookLater(isLike, isLookLater);
 
-            mediaTransportControls.DisableScreenButton();
+            MediaTransportControls.DisableScreenButton();
         }
     }
 
@@ -623,13 +624,13 @@ public sealed partial class CustomMediaPlayerElement
 
     private void OnOnApplyTemplateCompleted(object sender, EventArgs e)
     {
-        if (!Resources.TryGetValue("QualityDataTemplate", out var qualityDataTemplateValue) || qualityDataTemplateValue is not DataTemplate qualityDataTemplate) return;
-        if (!Resources.TryGetValue("PlayerDataTemplate", out var playerDataTemplateValue) || playerDataTemplateValue is not DataTemplate playerDataTemplate) return;
+        if (!this.TryGetResourceValue<DataTemplate>("QualityDataTemplate", out var qualityDataTemplate)) return;
+        if (!this.TryGetResourceValue<DataTemplate>("PlayerDataTemplate", out var playerDataTemplate)) return;
 
-        mediaTransportControls.InitQuality(qualityDataTemplate);
-        mediaTransportControls.InitPlayer(playerDataTemplate);
+        MediaTransportControls.InitQuality(qualityDataTemplate);
+        MediaTransportControls.InitPlayer(playerDataTemplate);
 
-        if (_allMediaPlayItems.Count > 1) mediaTransportControls.SetRightButton();
+        if (_allMediaPlayItems.Count > 1) MediaTransportControls.SetRightButton();
     }
 
     public event EventHandler<RoutedEventArgs> RightButtonClick;

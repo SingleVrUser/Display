@@ -2956,13 +2956,13 @@
                                                             x:Uid="LikeButton"
                                                             Style="{StaticResource AppBarToggleButtonStyle}"
                                                             Content="&#xE006;"
-                                                            FontFamily="Segoe Fluent Icons"/>
+                                                            FontFamily="{StaticResource SymbolThemeFontFamily}"/>
 
                                         <AppBarToggleButton x:Name="LookAfterButton"
                                                             x:Uid="LookAfterButton"
                                                             Style="{StaticResource AppBarToggleButtonStyle}"
                                                             Content="&#xE13B;"
-                                                            FontFamily="Segoe Fluent Icons" />
+                                                            FontFamily="{StaticResource SymbolThemeFontFamily}" />
                                     </StackPanel>
 
 
@@ -3129,7 +3129,7 @@
                         <Button x:Name="RightButton"
                                 Foreground="White"
                                 Background="{StaticResource RightButtonBackground}"
-                                FontFamily="Segoe Fluent Icons"
+                                FontFamily="{StaticResource SymbolThemeFontFamily}"
                                 Content="&#xF745;"
                                 HorizontalAlignment="Right"
                                 IsTabStop="False"

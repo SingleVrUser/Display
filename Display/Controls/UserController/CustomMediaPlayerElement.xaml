@@ -2,7 +2,7 @@
 <!-- Licensed under the MIT License. -->
 
 <UserControl
-    x:Class="Display.Controls.CustomMediaPlayerElement"
+    x:Class="Display.Controls.UserController.CustomMediaPlayerElement"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -29,7 +29,7 @@
             <MenuFlyout>
                 <MenuFlyoutItem Text="媒体信息" Click="ShowInfoItemClick">
                     <MenuFlyoutItem.Icon>
-                        <FontIcon FontFamily="Segoe Fluent Icons"
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xE946;" />
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
@@ -112,7 +112,7 @@
             </MediaPlayerElement.KeyboardAccelerators>
 
             <MediaPlayerElement.TransportControls>
-                <customController:CustomMediaTransportControls x:Name="mediaTransportControls"
+                <customController:CustomMediaTransportControls x:Name="MediaTransportControls"
                                                     x:FieldModifier="public"
                                                     OnApplyTemplateCompleted="OnOnApplyTemplateCompleted"
                                                     IsCompact="False"
@@ -125,8 +125,7 @@
                                                     ScreenShotButtonClick="ScreenShotButtonClick"
                                                     QualityChanged="QualityChanged"
                                                     PlayerChanged="PlayerChanged"
-                                                    RightButtonClick="MediaTransportControls_OnRightButtonClick"
-                                                    IsHitTestVisible="True" />
+                                                    RightButtonClick="MediaTransportControls_OnRightButtonClick"/>
             </MediaPlayerElement.TransportControls>
         </MediaPlayerElement>
 

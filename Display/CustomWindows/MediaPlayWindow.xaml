@@ -10,6 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:Display.Models.Media"
     xmlns:customController="using:Display.Controls.CustomController"
+    xmlns:userController="using:Display.Controls.UserController"
     mc:Ignorable="d">
     <customController:CursorGrid x:Name="RootGrid">
 
@@ -45,7 +46,7 @@
 
                 </VisualStateManager.VisualStateGroups>
 
-                <customcontrols:CustomMediaPlayerElement x:Name="MediaControl"
+                <userController:CustomMediaPlayerElement x:Name="MediaControl"
                                                          FullWindow="mediaControls_FullWindow"
                                                          MediaDoubleTapped="mediaControl_MediaDoubleTapped"
                                                          RightButtonClick="MediaControl_OnRightButtonClick"

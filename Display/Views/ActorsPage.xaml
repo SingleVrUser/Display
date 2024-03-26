@@ -140,7 +140,7 @@
                                           DecodePixelWidth="140"
                                           DecodePixelHeight="140" />
 
-                        <FontIcon Grid.Row="0" FontFamily="Segoe Fluent Icons"
+                        <FontIcon Grid.Row="0" FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xE00B;"
                                   Foreground="OrangeRed"
                                   Opacity="1"
