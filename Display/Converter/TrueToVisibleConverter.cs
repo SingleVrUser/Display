@@ -4,11 +4,15 @@ using System;
 
 namespace Display.Converter;
 
-public class IsVideoToVisibilityConverter : IValueConverter
+/// <summary>
+/// true => Visible;
+/// false => Collapsed
+/// </summary>
+public class TrueToVisibleConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        return value is 1 ? Visibility.Visible : Visibility.Collapsed;
+        return value is true ? Visibility.Visible : Visibility.Collapsed;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)

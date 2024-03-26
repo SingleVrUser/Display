@@ -19,7 +19,7 @@
                       x:DataType="local:TokenData">
             <StackPanel Orientation="Horizontal">
                 <Border CornerRadius="9999"
-                        Background="{x:Bind Name, Converter={StaticResource NameToColorConverter}}"
+                        Background="{x:Bind Name, Converter={StaticResource ObjectToColorConverter}}"
                         Width="20"
                         Height="20">
                     <TextBlock Text="{x:Bind Initials}"
@@ -38,7 +38,7 @@
                       x:DataType="data:ActorInfo">
             <StackPanel Orientation="Horizontal">
                 <Border CornerRadius="9999"
-                        Background="{x:Bind Name, Converter={StaticResource NameToColorConverter}}"
+                        Background="{x:Bind Name, Converter={StaticResource ObjectToColorConverter}}"
                         Width="20"
                         Height="20">
                     <TextBlock Text="{x:Bind Initials}"

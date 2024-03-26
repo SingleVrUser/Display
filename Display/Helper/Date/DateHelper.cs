@@ -45,24 +45,13 @@ namespace Display.Helper.Date
             if (second is double.NaN)
                 return second.ToString(CultureInfo.InvariantCulture);
 
-            string formatStr;
-
-            if (second < 60)
+            var formatStr = second switch
             {
-                formatStr = "ss'秒'";
-            }
-            else if (second < 3600)
-            {
-                formatStr = "mm'分'ss'秒'";
-            }
-            else if (second < 86400)
-            {
-                formatStr = "hh'小时'mm'分'ss'秒'";
-            }
-            else
-            {
-                formatStr = "dd'天'hh'小时'mm'分'ss'秒'";
-            }
+                < 60 => "ss'秒'",
+                < 3600 => "mm'分'ss'秒'",
+                < 86400 => "hh'小时'mm'分'ss'秒'",
+                _ => "dd'天'hh'小时'mm'分'ss'秒'"
+            };
 
             var ts = TimeSpan.FromSeconds(second);
 

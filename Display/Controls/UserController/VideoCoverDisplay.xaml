@@ -799,14 +799,14 @@
             <local:FileAutoSuggestBox
                 x:Name="FailInfoSuggestBox"
                 TextChanged="FileAutoSuggestBox_TextChanged"
-                Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource BoolToVisibleConverter}}"
+                Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource TrueToVisibleConverter}}"
                 RelativePanel.AlignVerticalCenterWithPanel="True" />
 
             <controls:Segmented x:Name="FailShowChanged_RadioButtons"
                                 HorizontalAlignment="Right"
                                 RelativePanel.AlignRightWithPanel="True"
                                 SelectionChanged="ShowData_RadioButtons_SelectionChanged"
-                                Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource BoolToVisibleConverter}}">
+                                Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource TrueToVisibleConverter}}">
                 <controls:SegmentedItem  x:Name="AllFailRadioButton"
                                          Icon="{winUi:FontIcon Glyph=&#xE0A2;}"
                                          ToolTipService.ToolTip="全部" />
@@ -1089,7 +1089,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Grid ColumnSpacing="8"
-                      Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay,Converter={StaticResource BoolToVisibleConverter}}"
+                      Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay,Converter={StaticResource TrueToVisibleConverter}}"
                       BorderBrush="{ThemeResource ControlElevationBorderBrush}"
                       BorderThickness="1"
                       Padding="8,0,3,0"

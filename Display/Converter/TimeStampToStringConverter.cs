@@ -4,6 +4,9 @@ using System;
 
 namespace Display.Converter;
 
+/// <summary>
+/// 70 => 00:01:10
+/// </summary>
 internal class TimeStampToStringConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)

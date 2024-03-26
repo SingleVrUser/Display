@@ -6,7 +6,10 @@ using System;
 
 namespace Display.Converter;
 
-public class NumberToDateTimeStrConverter : IValueConverter
+/// <summary>
+/// number(string or number format) => "yyyy/MM/dd HH:mm"
+/// </summary>
+internal class NumberToDateTimeStrConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
@@ -14,8 +17,8 @@ public class NumberToDateTimeStrConverter : IValueConverter
         return value switch
         {
             int intValue => DateHelper.ConvertInt32ToDateTime(intValue),
-            string numOrStringValue when !numOrStringValue.IsNumber() => numOrStringValue,
-            string numOrStringValue => DateHelper.ConvertInt32ToDateTime(int.Parse(numOrStringValue)),
+            string stringValue when !stringValue.IsNumber() => stringValue,
+            string numValue => DateHelper.ConvertInt32ToDateTime(int.Parse(numValue)),
             _ => throw new NotImplementedException()
         };
     }

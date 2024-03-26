@@ -43,7 +43,5 @@ internal class PageTypeAndEnum
         { NavigationViewItemEnum.SearchSetting, typeof(SearchPage) },
         { NavigationViewItemEnum.StorageSetting, typeof(StoragePage) },
         { NavigationViewItemEnum.DownSetting, typeof(DownPage) }
-
-
     };
 }

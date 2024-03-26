@@ -4,7 +4,10 @@ using System.Text.RegularExpressions;
 
 namespace Display.Converter;
 
-public class AppUpdateContentConverter : IValueConverter
+/// <summary>
+/// github的release内容格式转换
+/// </summary>
+internal class AppUpdateContentConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {

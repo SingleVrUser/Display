@@ -4,7 +4,10 @@ using System;
 
 namespace Display.Converter;
 
-public class BytesToSizeStrConverter : IValueConverter
+/// <summary>
+/// bytes => xx.x MB/KB
+/// </summary>
+internal class BytesToSizeStrConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
