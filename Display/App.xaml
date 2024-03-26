@@ -105,7 +105,7 @@
             </Style>
 
             <Style TargetType="oldControls:ImageEx">
-                <!--<Setter Property="PlaceholderSource" Value="/Assets/ImageExPlaceholder.jpg"/>-->
+               
                 <Setter Property="PlaceholderStretch"
                         Value="UniformToFill" />
                 <Setter Property="EnableLazyLoading"

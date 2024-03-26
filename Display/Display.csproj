@@ -50,17 +50,6 @@
   </ItemGroup>
 
   <!--<ItemGroup>
-    <Content Remove="Assets\BadgeLogo.scale-100.png" />
-    <Content Remove="Assets\BadgeLogo.scale-125.png" />
-    <Content Remove="Assets\BadgeLogo.scale-150.png" />
-    <Content Remove="Assets\BadgeLogo.scale-200.png" />
-    <Content Remove="Assets\BadgeLogo.scale-400.png" />
-    <Content Remove="Assets\icons8-text-96.png" />
-    <Content Remove="Assets\SplashScreen.png" />
-    <Content Remove="Assets\Win32Resources.res" />
-  </ItemGroup>-->
-
-  <!--<ItemGroup>
     <None Remove="app.manifest" />
     <None Remove="Assets\115favicon.ico" />
     <None Remove="Assets\115\mountain.svg" />
