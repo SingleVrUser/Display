@@ -1,6 +1,6 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
 
-namespace Display.Helper.UI
+namespace Display.Helper.Notifications
 {
     public class Toast
     {

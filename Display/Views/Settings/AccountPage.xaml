@@ -6,8 +6,6 @@
     xmlns:local="using:Display.Views.Settings"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-    xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
     xmlns:customControls="using:Display.Controls"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:data="using:Display.Models.Data"
@@ -32,15 +30,6 @@
                                      Margin="5" />
         </Grid>
 
-        <!--Cookie-->
-        <!--<controls:SettingsExpander Grid.Row="1"
-                                    Header="115"
-                                    MaxWidth="{StaticResource SettingsMaxWidth}">
-            <controls:SettingsExpander.Items>
-
-            </controls:SettingsExpander.Items>
-        </controls:SettingsExpander>-->
-
         <StackPanel Grid.Row="1"
                     Style="{StaticResource SettingStackPanel}">
             <controls:SettingsCard Header="Cookie"
@@ -49,8 +38,7 @@
                 <RelativePanel>
                     <PasswordBox x:Name="CookieBox"
                                  MinWidth="100"
-                                 MaxWidth="600"
-                                 Password="{x:Bind data:AppSettings._115_Cookie}" />
+                                 MaxWidth="600"/>
 
                     <StackPanel Orientation="Horizontal"
                                 RelativePanel.AlignRightWithPanel="True"
@@ -82,8 +70,7 @@
 
             <controls:SettingsCard Header="记录下载请求">
                 <StackPanel Orientation="Horizontal">
-                    <ToggleSwitch x:Name="IsRecordDownRequestToggleSwitch"
-                                  OnContent="开启"
+                    <ToggleSwitch OnContent="开启"
                                   OffContent="关闭"
                                   IsOn="{x:Bind data:AppSettings.IsRecordDownRequest,Mode=TwoWay}" />
 

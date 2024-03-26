@@ -8,6 +8,7 @@
         xmlns:data="using:Display.Models.Data"
         xmlns:winUiEx="using:WinUIEx"
         xmlns:settings="using:Display.Models.Settings"
+        xmlns:userController="using:Display.Controls.UserController"
         mc:Ignorable="d">
 
     <Grid x:Name="RootGrid">
@@ -35,17 +36,17 @@
                                   Foreground="LightGray"
                                   Glyph="&#xE9A6;" />
                     </HyperlinkButton>
-                    <customcontrols:CustomAutoSuggestBox Grid.Column="2"
+                    <userController:CustomAutoSuggestBox Grid.Column="2"
                                                          HorizontalAlignment="Right"
                                                          SuggestionItemTapped="CustomAutoSuggestBox_OnSuggestionItemTapped"
                                                          QuerySubmitted="CustomAutoSuggestBox_QuerySubmitted">
 
-                        <customcontrols:CustomAutoSuggestBox.KeyboardAccelerators>
+                        <userController:CustomAutoSuggestBox.KeyboardAccelerators>
                             <KeyboardAccelerator Key="F"
                                                  Modifiers="Control"
                                                  Invoked="CtrlF_Invoked" />
-                        </customcontrols:CustomAutoSuggestBox.KeyboardAccelerators>
-                    </customcontrols:CustomAutoSuggestBox>
+                        </userController:CustomAutoSuggestBox.KeyboardAccelerators>
+                    </userController:CustomAutoSuggestBox>
                 </Grid>
             </DataTemplate>
 
@@ -85,17 +86,17 @@
                        Style="{ThemeResource BodyStrongTextBlockStyle}"
                        VerticalAlignment="Center"/>
 
-            <customcontrols:CustomAutoSuggestBox x:Name="CustomAutoSuggestBox"
+            <userController:CustomAutoSuggestBox x:Name="CustomAutoSuggestBox"
                                                  Grid.Column="2"
                                                  SuggestionItemTapped="CustomAutoSuggestBox_OnSuggestionItemTapped"
                                                  QuerySubmitted="CustomAutoSuggestBox_QuerySubmitted">
 
-                <customcontrols:CustomAutoSuggestBox.KeyboardAccelerators>
+                <userController:CustomAutoSuggestBox.KeyboardAccelerators>
                     <KeyboardAccelerator Key="F"
                                          Modifiers="Control"
                                          Invoked="CtrlF_Invoked" />
-                </customcontrols:CustomAutoSuggestBox.KeyboardAccelerators>
-            </customcontrols:CustomAutoSuggestBox>
+                </userController:CustomAutoSuggestBox.KeyboardAccelerators>
+            </userController:CustomAutoSuggestBox>
             
         </Grid>
 

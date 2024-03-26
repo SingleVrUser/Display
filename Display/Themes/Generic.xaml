@@ -4,7 +4,8 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="using:Display.Controls"
-                    xmlns:ui="using:Windows.UI">
+                    xmlns:ui="using:Windows.UI"
+                    xmlns:customController="using:Display.Controls.CustomController">
 
     <SolidColorBrush x:Key="MediaTransportControlsPanelBackground"
                      Color="#101c1612" />
@@ -2331,7 +2332,7 @@
         </Setter>
     </Style>
 
-    <Style TargetType="local:CustomMediaTransportControls">
+    <Style TargetType="customController:CustomMediaTransportControls">
         <Setter Property="IsTabStop"
                 Value="False" />
         <Setter Property="FlowDirection"
@@ -3172,21 +3173,6 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-
-    <Style TargetType="local2:CustomControl1" xmlns:local2="using:Display.CustomWindows">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="local2:CustomControl1">
-                    <Border
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}">
                     </Border>
                 </ControlTemplate>
             </Setter.Value>

@@ -8,21 +8,15 @@ using System;
 using Windows.ApplicationModel.DataTransfer;
 using UserInfo = Display.Controls.UserInfo;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
 namespace Display.Views.Settings;
 
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
-public sealed partial class AccountPage : RootPage
+public sealed partial class AccountPage
 {
     private static readonly WebApi WebApi = WebApi.GlobalWebApi;
 
     public AccountPage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
 
         InitializationViewAsync();
     }
@@ -36,6 +30,8 @@ public sealed partial class AccountPage : RootPage
 
         UpdateUserInfo();
         UpdateLoginStatus();
+
+        CookieBox.Password = AppSettings._115_Cookie;
     }
 
     private void UpdateLoginStatus()
@@ -71,20 +67,14 @@ public sealed partial class AccountPage : RootPage
     private void LoginButton_Click(object sender, RoutedEventArgs e)
     {
         //ÏÔÊ¾µÇÂ¼´°¿Ú
-        var loginWindow = new LoginWindow();
-        loginWindow.Activate();
-
         //¹Ø±ÕµÇÂ¼´°¿Ú£¬Ë¢ÐÂÒ³Ãæ
-        loginWindow.Closed += LoginWindow_Closed;
+        LoginWindow.ShowLoginWindow(LoginCompleted);
     }
 
     /// <summary>
-    /// µÇÂ¼´°¿Ú¹Ø±ÕºóË¢ÐÂµÇÂ¼×´Ì¬
+    /// µÇÂ¼³É¹¦ºóË¢ÐÂµÇÂ¼×´Ì¬
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="args"></param>
-
-    private void LoginWindow_Closed(object sender, WindowEventArgs args)
+    private void LoginCompleted()
     {
         InitializationViewAsync();
     }

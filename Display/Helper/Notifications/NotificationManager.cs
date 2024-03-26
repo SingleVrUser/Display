@@ -6,18 +6,12 @@ namespace Display.Helper.Notifications;
 
 internal class NotificationManager
 {
-    private bool m_isRegistered;
+    private bool _mIsRegistered;
 
-    private Dictionary<int, Action<AppNotificationActivatedEventArgs>> c_notificationHandlers;
-
-    public NotificationManager()
+    private readonly Dictionary<int, Action<AppNotificationActivatedEventArgs>> _cNotificationHandlers = new()
     {
-        m_isRegistered = false;
-
-        // When adding new a scenario, be sure to add its notification handler here.
-        c_notificationHandlers = new Dictionary<int, Action<AppNotificationActivatedEventArgs>>();
-        c_notificationHandlers.Add(ToastGetActorInfoWithProgressBar.NotifyId, ToastGetActorInfoWithProgressBar.NotificationReceived);
-    }
+        { ToastGetActorInfoWithProgressBar.NotifyId, ToastGetActorInfoWithProgressBar.NotificationReceived }
+    };
 
     ~NotificationManager()
     {
@@ -34,15 +28,15 @@ internal class NotificationManager
         notificationManager.NotificationInvoked += OnNotificationInvoked;
 
         notificationManager.Register();
-        m_isRegistered = true;
+        _mIsRegistered = true;
     }
 
     public void Unregister()
     {
-        if (m_isRegistered)
+        if (_mIsRegistered)
         {
             AppNotificationManager.Default.Unregister();
-            m_isRegistered = false;
+            _mIsRegistered = false;
         }
     }
 
@@ -69,14 +63,14 @@ internal class NotificationManager
 
     public bool DispatchNotification(AppNotificationActivatedEventArgs notificationActivatedEventArgs)
     {
-        if (!notificationActivatedEventArgs.Arguments.ContainsKey(Common.notificationTag)) return false;
+        if (!notificationActivatedEventArgs.Arguments.ContainsKey(NotifyConstant.NotificationTag)) return false;
 
-        var notificationId = notificationActivatedEventArgs.Arguments[Common.notificationTag];
+        var notificationId = notificationActivatedEventArgs.Arguments[NotifyConstant.NotificationTag];
         if (notificationId.Length != 0)
         {
             try
             {
-                c_notificationHandlers[int.Parse(notificationId)](notificationActivatedEventArgs);
+                _cNotificationHandlers[int.Parse(notificationId)](notificationActivatedEventArgs);
                 return true;
             }
             catch

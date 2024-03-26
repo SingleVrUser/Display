@@ -11,9 +11,9 @@
     <converter:IsVideoToVisibilityConverter x:Key="IsVideoToVisibilityConverter" />
     <converter:NumberToDateTimeStrConverter x:Key="NumberToDateTimeStrConverter" />
     <converter:NumberToLengthStrConverter x:Key="NumberToLengthStrConverter" />
-    <converter:IsVideoToBoolConverter x:Key="IsVideoToBoolConverter" />
+    <converter:OneToTrueConverter x:Key="OneToTrueConverter" />
     <converter:AppUpdateContentConverter x:Key="AppUpdateContentConverter" />
-    <converter:CollapsedWhenNullConverter x:Key="CollapsedWhenNullConverter" />
+    <converter:NullToCollapsedConverter x:Key="NullToCollapsedConverter" />
     <converter:DoubleToInt32Converter x:Key="DoubleToInt32Converter" />
     <converter:NameToColorConverter x:Key="NameToColorConverter" />
     <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter" />
@@ -25,6 +25,5 @@
     <communityConverters:BoolNegationConverter x:Key="BoolNegationConverter" />
     <communityConverters:FileSizeToFriendlyStringConverter x:Key="FileSizeToFriendlyStringConverter" />
     <communityConverters:DoubleToVisibilityConverter x:Key="GreaterThanZeroToVisibilityConverter" GreaterThan="0" />
-
 
 </ResourceDictionary>

@@ -6,6 +6,7 @@ using Display.Views.Settings;
 using Microsoft.UI.Xaml;
 using System;
 using System.Diagnostics;
+using Display.Controls.UserController;
 using Settings18Page = Display.Views.Sort115.Settings18Page;
 
 namespace Display.ViewModels

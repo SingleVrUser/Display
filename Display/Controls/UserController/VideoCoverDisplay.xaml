@@ -893,14 +893,14 @@
                                         Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
                                         Spacing="1"
                                         BorderThickness="1"
-                                        Visibility="{x:Bind ActorInfo.InfoUrl,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
+                                        Visibility="{x:Bind ActorInfo.InfoUrl,Converter={StaticResource NullToCollapsedConverter},Mode=OneWay}">
 
-                                <TextBlock Visibility="{x:Bind ActorInfo.Birthday,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
+                                <TextBlock Visibility="{x:Bind ActorInfo.Birthday,Converter={StaticResource NullToCollapsedConverter},Mode=OneWay}">
                                 <Run Foreground="Gray">出生日期：</Run>
                                 <Run Text="{x:Bind ActorInfo.Birthday,Mode=OneWay}" />
                                 </TextBlock>
 
-                                <TextBlock Visibility="{x:Bind ActorInfo.Bwh,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
+                                <TextBlock Visibility="{x:Bind ActorInfo.Bwh,Converter={StaticResource NullToCollapsedConverter},Mode=OneWay}">
                                 <Run Foreground="Gray">三围：</Run>
                                 <Run Text="{x:Bind ActorInfo.Bust,Mode=OneWay}" />
                                 <Run Text="/" />
@@ -909,12 +909,12 @@
                                 <Run Text="{x:Bind ActorInfo.Hips,Mode=OneWay}" />
                                 </TextBlock>
 
-                                <TextBlock Visibility="{x:Bind ActorInfo.Height,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
+                                <TextBlock Visibility="{x:Bind ActorInfo.Height,Converter={StaticResource NullToCollapsedConverter},Mode=OneWay}">
                                 <Run Foreground="Gray">身高：</Run>
                                 <Run Text="{x:Bind ActorInfo.Height,Mode=OneWay}" />
                                 </TextBlock>
 
-                                <TextBlock Visibility="{x:Bind ActorInfo.WorkTime,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
+                                <TextBlock Visibility="{x:Bind ActorInfo.WorkTime,Converter={StaticResource NullToCollapsedConverter},Mode=OneWay}">
                             <Run Foreground="Gray">出演期间：</Run>
                             <Run Text="{x:Bind ActorInfo.WorkTime,Mode=OneWay}" />
                                 </TextBlock>
@@ -934,10 +934,10 @@
 
                             <HyperlinkButton x:Name="blog_HyperLink"
                                              Content="博客"
-                                             Visibility="{x:Bind ActorInfo.BlogUrl,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}" />
+                                             Visibility="{x:Bind ActorInfo.BlogUrl,Converter={StaticResource NullToCollapsedConverter},Mode=OneWay}" />
                             <HyperlinkButton x:Name="info_HyperLink"
                                              Content="更多信息"
-                                             Visibility="{x:Bind ActorInfo.InfoUrl,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}" />
+                                             Visibility="{x:Bind ActorInfo.InfoUrl,Converter={StaticResource NullToCollapsedConverter},Mode=OneWay}" />
 
                             <ToggleButton Content="喜欢"
                                           HorizontalAlignment="Right"

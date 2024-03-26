@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using WinRT.Interop;
 
@@ -14,32 +15,31 @@ namespace Display.Helper.UI
 
 
         [DllImport("Shcore.dll", SetLastError = true)]
-        internal static extern int GetDpiForMonitor(nint hmonitor, Monitor_DPI_Type dpiType, out uint dpiX, out uint dpiY);
+        private static extern int GetDpiForMonitor(nint hMonitor, MonitorDpiType dpiType, out uint dpiX, out uint dpiY);
 
-        internal enum Monitor_DPI_Type
+        private enum MonitorDpiType
         {
-            MDT_Effective_DPI = 0,
-            MDT_Angular_DPI = 1,
-            MDT_Raw_DPI = 2,
-            MDT_Default = MDT_Effective_DPI
+            MdtEffectiveDpi = 0,
+            MdtAngularDpi = 1,
+            MdtRawDpi = 2,
+            MdtDefault = MdtEffectiveDpi
         }
-
 
         public static double GetScaleAdjustment(object window)
         {
-            nint hWnd = WindowNative.GetWindowHandle(window);
-            WindowId wndId = Win32Interop.GetWindowIdFromWindow(hWnd);
-            DisplayArea displayArea = DisplayArea.GetFromWindowId(wndId, DisplayAreaFallback.Primary);
-            nint hMonitor = Win32Interop.GetMonitorFromDisplayId(displayArea.DisplayId);
+            var hWnd = WindowNative.GetWindowHandle(window);
+            var wndId = Win32Interop.GetWindowIdFromWindow(hWnd);
+            var displayArea = DisplayArea.GetFromWindowId(wndId, DisplayAreaFallback.Primary);
+            var hMonitor = Win32Interop.GetMonitorFromDisplayId(displayArea.DisplayId);
 
             // Get DPI.
-            int result = GetDpiForMonitor(hMonitor, Monitor_DPI_Type.MDT_Default, out uint dpiX, out uint _);
+            var result = GetDpiForMonitor(hMonitor, MonitorDpiType.MdtDefault, out var dpiX, out _);
             if (result != 0)
             {
                 throw new Exception("Could not get DPI for monitor.");
             }
 
-            uint scaleFactorPercent = (uint)(((long)dpiX * 100 + (96 >> 1)) / 96);
+            var scaleFactorPercent = (uint)(((long)dpiX * 100 + (96 >> 1)) / 96);
             return scaleFactorPercent / 100.0;
         }
 
@@ -62,11 +62,7 @@ namespace Display.Helper.UI
             SetForegroundWindow(hwnd);
         }
 
-
-
-        public static List<Window> ActiveWindows => _activeWindows;
-
-        private static List<Window> _activeWindows = new();
+        private static readonly List<Window> ActiveWindows = [];
 
         public static Window CreateWindow()
         {
@@ -80,26 +76,18 @@ namespace Display.Helper.UI
 
         public static void TrackWindow(Window window)
         {
-            window.Closed += (sender, args) =>
+            window.Closed += (_, _) =>
             {
-                _activeWindows.Remove(window);
+                ActiveWindows.Remove(window);
             };
-            _activeWindows.Add(window);
+            ActiveWindows.Add(window);
         }
 
         public static Window GetWindowForElement(UIElement element)
         {
-            if (element.XamlRoot != null)
-            {
-                foreach (Window window in _activeWindows)
-                {
-                    if (element.XamlRoot == window.Content.XamlRoot)
-                    {
-                        return window;
-                    }
-                }
-            }
-            return null;
+            return element.XamlRoot == null ?
+                null :
+                ActiveWindows.FirstOrDefault(window => element.XamlRoot == window.Content.XamlRoot);
         }
     }
 }

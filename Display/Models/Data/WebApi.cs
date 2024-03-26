@@ -1321,13 +1321,11 @@ namespace Display.Models.Data
         /// </summary>
         public async void LogoutAccount()
         {
-            if (UserInfo == null)
-            {
-                return;
-            }
+            if (UserInfo == null) return;
 
             const string url =
                 "https://passportapi.115.com/app/1.0/web/1.0/logout/logout/?goto=https%3A%2F%2F115.com%2F";
+
             //退出账号
             await Client.GetAsync(url);
 

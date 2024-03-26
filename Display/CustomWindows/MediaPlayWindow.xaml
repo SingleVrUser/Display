@@ -9,15 +9,16 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:Display.Models.Media"
+    xmlns:customController="using:Display.Controls.CustomController"
     mc:Ignorable="d">
-    <customcontrols:CursorGrid x:Name="RootGrid">
+    <customController:CursorGrid x:Name="RootGrid">
 
-        <customcontrols:CursorGrid.Resources>
+        <customController:CursorGrid.Resources>
             <Style TargetType="TextBlock">
                 <Setter Property="Foreground"
                         Value="White" />
             </Style>
-        </customcontrols:CursorGrid.Resources>
+        </customController:CursorGrid.Resources>
 
         <Grid.RowDefinitions>
             <RowDefinition x:Name="TitleBarRowDefinition" Height="28" />
@@ -108,5 +109,5 @@
 
         </Grid>
 
-    </customcontrols:CursorGrid>
+    </customController:CursorGrid>
 </Window>
