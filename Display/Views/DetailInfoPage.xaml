@@ -5,21 +5,22 @@
     xmlns:controls="using:Display.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:userController="using:Display.Controls.UserController"
     mc:Ignorable="d"
     Background="{ThemeResource BackButtonBackgroundThemeBrush}">
 
     <Grid>
-        <controls:VideoDetails x:Name="VideoDetailsControl"
+        <userController:VideoDetails x:Name="VideoDetailsControl"
                                ActorClick="{x:Bind Actor_Click}"
                                LabelClick="{x:Bind Label_Click}"
                                VideoPlayClick="{x:Bind VideoPlay_Click}"
                                DeleteClick="{x:Bind Delete_Click}"
                                ResultInfo="{x:Bind DetailInfo, Mode=TwoWay}"
                                CoverTapped="{x:Bind CoverTapped}">
-            <controls:VideoDetails.Transitions>
+            <userController:VideoDetails.Transitions>
                 <EntranceThemeTransition/>
-            </controls:VideoDetails.Transitions>
-        </controls:VideoDetails>
+            </userController:VideoDetails.Transitions>
+        </userController:VideoDetails>
     </Grid>
 
 

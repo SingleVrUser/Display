@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Xml.Serialization;
 using Windows.Storage;
-using Sort115Settings = Display.Models.Disk._115.Sort115Settings;
+using Sort115Settings = Display.Models.Entities._115.Sort115Settings;
 
 namespace Display.Views.Sort115
 {

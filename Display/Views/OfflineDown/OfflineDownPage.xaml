@@ -7,8 +7,8 @@
       xmlns:local="using:Display.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:data="using:Display.Models.Data"
-    mc:Ignorable="d">
+      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
+      mc:Ignorable="d">
 
     <Grid RowDefinitions="*,auto,auto" RowSpacing="10" DragOver="RootGrid_OnDragOver" AllowDrop="True" Drop="RootGrid_OnDrop">
         <TextBox x:Name="LinkTextBox" IsSpellCheckEnabled="False" PlaceholderText="支持HTTP、HTTPS、FTP、磁力链和电驴链接，换行可添加多个" AcceptsReturn="True" Width="538" Height="178" SelectionChanged="TextBox_OnSelectionChanged"/>
@@ -27,7 +27,7 @@
 
                 <ComboBox x:Name="DownPathComboBox">
                     <ComboBox.ItemTemplate>
-                        <DataTemplate x:DataType="data:OfflineDownPathData">
+                        <DataTemplate x:DataType="oneOneFive:OfflineDownPathData">
                             <TextBlock Text="{x:Bind file_name}"></TextBlock>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>

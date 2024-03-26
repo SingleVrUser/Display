@@ -7,8 +7,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
-    xmlns:customControls="using:Display.Controls"
     xmlns:downloader="using:Display.Providers.Downloader"
+    xmlns:userController="using:Display.Controls.UserController"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -28,7 +28,7 @@
                                 <TextBox PlaceholderText="{x:Bind ApiPlaceholder}"
                                          Text="{x:Bind ApiText, Mode=TwoWay}"
                                          Width="540" />
-                                <customControls:StatusShow HorizontalAlignment="Right"
+                                <userController:StatusShow HorizontalAlignment="Right"
                                                            Margin="5,0" />
                             </StackPanel>
 

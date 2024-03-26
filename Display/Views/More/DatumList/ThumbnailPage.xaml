@@ -10,8 +10,8 @@
     xmlns:customcontrols="using:Display.Controls"
     xmlns:data="using:Display.Models.Data"
     xmlns:viewModels="using:Display.ViewModels"
-    xmlns:model="using:Display.Models.Image"
     xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:media="using:Display.Models.Media"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -156,7 +156,7 @@
 
                 <oldControls:AdaptiveGridView.ItemTemplate>
 
-                    <DataTemplate x:DataType="model:LocalThumbnail">
+                    <DataTemplate x:DataType="media:LocalThumbnail">
                         <oldControls:ImageEx Source="{x:Bind Thumbnail}"
                                             Height="60" />
                     </DataTemplate>

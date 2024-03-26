@@ -1,10 +1,12 @@
 ﻿using Display.Models.Data;
-using Display.Models.Version;
 using Newtonsoft.Json;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
+using Display.Models.Dto;
+using Display.Models.Entities;
+using Display.Providers.Downloader;
 
 namespace Display.Helper.Network;
 

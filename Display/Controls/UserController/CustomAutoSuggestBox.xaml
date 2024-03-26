@@ -7,6 +7,7 @@
              xmlns:data="using:Display.Models.Data"
              xmlns:controls="using:CommunityToolkit.WinUI.Controls"
              xmlns:userController="using:Display.Controls.UserController"
+             xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
              mc:Ignorable="d">
 
     <UserControl.Resources>
@@ -20,7 +21,7 @@
             <userController:ItemsContainerStyleSelector x:Key="AutoSuggestionBoxItemsContainerStyleSelector"
                                                NoPointerOverStyle="{StaticResource NoPointerOverListViewItemStyle}"/>
             <DataTemplate x:Key="FoundedSuggestionBox"
-                          x:DataType="data:VideoInfo">
+                          x:DataType="oneOneFive:VideoInfo">
                 <Grid Margin="5"
                       ColumnSpacing="5"
                       Tapped="ItemTapped"
@@ -63,7 +64,7 @@
                         </ItemsRepeater.Layout>
 
                         <ItemsRepeater.ItemTemplate>
-                            <DataTemplate x:DataType="data:SearchHistory">
+                            <DataTemplate x:DataType="oneOneFive:SearchHistory">
                                 <GridViewItem Content="{x:Bind Keyword}"
                                               Tapped="SearchHistoryItem_OnTapped"
                                               Padding="10,0"/>

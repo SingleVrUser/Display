@@ -5,7 +5,6 @@ using Display.CustomWindows;
 using Display.Helper.FileProperties.Name;
 using Display.Managers;
 using Display.Models.Data;
-using Display.Models.Data.Enums;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using Microsoft.UI.Xaml;
@@ -15,6 +14,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Enums;
 using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,

@@ -7,7 +7,10 @@
     xmlns:data="using:Display.Models.Data"
     mc:Ignorable="d"
     xmlns:customcontrols="using:Display.Controls"
-    xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals">
+    xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+    xmlns:providers="using:Display.Providers"
+    xmlns:userController="using:Display.Controls.UserController"
+    xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive">
     <Page.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -34,13 +37,13 @@
                         <ColumnDefinition Width="auto" />
                     </Grid.ColumnDefinitions>
                     <ToggleButton Content="搜刮"
-                                  IsChecked="{x:Bind data:AppSettings.IsSpiderAfterImportDataAccess,Mode=TwoWay}"/>
+                                  IsChecked="{x:Bind providers:AppSettings.IsSpiderAfterImportDataAccess,Mode=TwoWay}"/>
                     <ToggleButton Grid.Column="1"
                                   Content="通知"
-                                  IsChecked="{x:Bind data:AppSettings.IsToastAfterImportDataAccess,Mode=TwoWay}" />
+                                  IsChecked="{x:Bind providers:AppSettings.IsToastAfterImportDataAccess,Mode=TwoWay}" />
                     <ToggleButton Grid.Column="2"
                                   Content="关闭"
-                                  IsChecked="{x:Bind data:AppSettings.IsCloseWindowAfterImportDataAccess,Mode=TwoWay}" />
+                                  IsChecked="{x:Bind providers:AppSettings.IsCloseWindowAfterImportDataAccess,Mode=TwoWay}" />
                 </Grid>
             </StackPanel>
         </RelativePanel>
@@ -68,7 +71,7 @@
             <Expander.Header>
                 <RelativePanel MinWidth="200">
                     <TextBlock Text="获取数量" RelativePanel.AlignVerticalCenterWithPanel="True"/>
-                    <customcontrols:StatusShow x:Name="GetFolderCategory_Progress" status="Doing" RelativePanel.AlignRightWithPanel="True"/>
+                    <userController:StatusShow x:Name="GetFolderCategory_Progress" status="Doing" RelativePanel.AlignRightWithPanel="True"/>
                 </RelativePanel>
             </Expander.Header>
 
@@ -92,7 +95,7 @@
                     </Grid>
                 </ListView.Header>
                 <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="data:FileCategory">
+                    <DataTemplate x:DataType="oneOneFive:FileCategory">
                         <Grid ColumnSpacing="10"
                             MinWidth="200">
                             <Grid.ColumnDefinitions>
@@ -126,7 +129,7 @@
                             <TextBlock>请求速度（次/分钟）</TextBlock>
                         </ToolTipService.ToolTip>
                     </TextBlock>
-                    <customcontrols:StatusShow x:Name="GetInfos_Progress" status="Doing" RelativePanel.AlignRightWithPanel="True"/>
+                    <userController:StatusShow x:Name="GetInfos_Progress" status="Doing" RelativePanel.AlignRightWithPanel="True"/>
                 </RelativePanel>
             </Expander.Header>
 

@@ -1,5 +1,6 @@
-﻿using Display.Managers;
-using Display.Models.Data;
+﻿using Display.Helper.Network;
+using Display.Managers;
+using Display.Providers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Windows.Storage;
 using Windows.System;
+using Display.Models.Dto.OneOneFive;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -98,7 +100,7 @@ namespace Display.Views.SpiderVideoInfo
 
                 if (item.CheckUrl.Contains("http"))
                 {
-                    var isUseful = await GetInfoFromNetwork.CheckUrlUseful(item.CheckUrl);
+                    var isUseful = await NetworkHelper.CheckUrlUseful(item.CheckUrl);
 
                     //网络有用
                     if (isUseful)

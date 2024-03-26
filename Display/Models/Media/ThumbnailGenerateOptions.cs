@@ -1,6 +1,4 @@
-﻿using Display.Models.Image;
-
-namespace Display.Models.Media;
+﻿namespace Display.Models.Media;
 
 public class ThumbnailGenerateOptions
 {

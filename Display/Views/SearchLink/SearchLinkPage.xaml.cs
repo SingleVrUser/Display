@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
-using Display.Models.Data;
 using Display.Models.Spider;
+using Display.Providers;
 using Display.Providers.Searcher;
 using Display.Services.Upload;
 using Display.Views.Settings.Account;
@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Display.Models.Enums;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -135,12 +136,12 @@ namespace Display.Views.SearchLink
 
             if (attmnInfo == null) return new Tuple<bool, string>(false, "获取到附件下载链接时出错");
 
-            switch (attmnInfo.Type)
+            switch (attmnInfo.TypeEnum)
             {
                 // 磁力
-                case AttmnType.Magnet:
+                case AttmnTypeEnum.Magnet:
                     return await RequestOfflineDown(cid, [attmnInfo.Url]);
-                case AttmnType.Rar:
+                case AttmnTypeEnum.Rar:
                     {
                         var rarPath = await X1080X.TryDownAttmn(attmnInfo.Url, attmnInfo.Name);
 
@@ -157,7 +158,7 @@ namespace Display.Views.SearchLink
 
                         return await RequestOfflineDown(cid, down115LinkList, rarInfo.SrtPath);
                     }
-                case AttmnType.Txt:
+                case AttmnTypeEnum.Txt:
                     {
                         var txtPath = await X1080X.TryDownAttmn(attmnInfo.Url, attmnInfo.Name);
                         if (txtPath == null) return new Tuple<bool, string>(false, "下载附件(.txt)时出错");
@@ -171,7 +172,7 @@ namespace Display.Views.SearchLink
 
                         return await RequestOfflineDown(cid, down115LinkList);
                     }
-                case AttmnType.Torrent:
+                case AttmnTypeEnum.Torrent:
                     {
                         var torrentPath = await X1080X.TryDownAttmn(attmnInfo.Url, attmnInfo.Name);
                         if (torrentPath == null) return new Tuple<bool, string>(false, "下载附件(.torrent)时出错");
@@ -185,7 +186,7 @@ namespace Display.Views.SearchLink
             }
         }
 
-        private List<string> Get115DownUrlsFromAttmnInfo(AttmnFileInfo attmnInfo)
+        private List<string> Get115DownUrlsFromAttmnInfo(Forum1080AttmnFileInfo forum1080AttmnInfo)
         {
             var down115LinkList = new List<string>();
 
@@ -193,7 +194,7 @@ namespace Display.Views.SearchLink
             var down115Method = string.Empty;
 
             //其他链接
-            foreach (var linkDict in attmnInfo.Links)
+            foreach (var linkDict in forum1080AttmnInfo.Links)
             {
                 switch (linkDict.Key)
                 {

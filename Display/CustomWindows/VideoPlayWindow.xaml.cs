@@ -1,9 +1,10 @@
-﻿using Display.Models.Data;
+﻿using System;
+using Display.Providers;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using System;
 using Windows.Storage;
+using Display.Helper.Data;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -13,7 +14,7 @@ namespace Display.CustomWindows
     /// <summary>
     /// An empty window that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class VideoPlayWindow : Microsoft.UI.Xaml.Window
+    public sealed partial class VideoPlayWindow
     {
         public string sourceUrl { get; set; }
         private AppWindow appwindow;
@@ -30,7 +31,7 @@ namespace Display.CustomWindows
 
             this.SetTitleBar(AppTitleBar);
 
-            webview.CoreWebView2Initialized += Webview_CoreWebView2Initialized;
+            webview.CoreWebView2Initialized += WebView_CoreWebView2Initialized;
 
             appwindow = App.GetAppWindow(this);
         }
@@ -45,26 +46,20 @@ namespace Display.CustomWindows
             webview.Close();
         }
 
-        private void Webview_CoreWebView2Initialized(WebView2 sender, CoreWebView2InitializedEventArgs args)
+        private void WebView_CoreWebView2Initialized(WebView2 sender, CoreWebView2InitializedEventArgs args)
         {
             this.Closed += VideoPlayWindow_Closed;
-            //var item2 = webview.ExecuteScriptAsync($"window.open('https://baidu.com','_blank');");
             webview.CoreWebView2.ContainsFullScreenElementChanged += CoreWebView2_ContainsFullScreenElementChanged;
 
             var cookie = AppSettings._115_Cookie;
             //cookie不为空且可用
-            if (!string.IsNullOrEmpty(cookie))
-            {
-                webview.CoreWebView2.CookieManager.DeleteAllCookies();
+            if (string.IsNullOrEmpty(cookie)) return;
 
-                var cookiesList = cookie.Split(';');
-                foreach (var cookies in cookiesList)
-                {
-                    var item = cookies.Split('=');
-                    var key = item[0].Trim();
-                    var value = item[1].Trim();
-                    AddCookie(key, value);
-                }
+            webview.CoreWebView2.CookieManager.DeleteAllCookies();
+
+            foreach (var (_, key, value) in CookieHelper.ProductCookieKeyValue(cookie))
+            {
+                AddCookie(key, value);
             }
         }
 
@@ -76,7 +71,7 @@ namespace Display.CustomWindows
                 _markPresenterKindBeforeFullScreen = appwindow.Presenter.Kind;
 
                 this.ExtendsContentIntoTitleBar = false;
-                TitleBarRowDefinition.Height = new(0);
+                TitleBarRowDefinition.Height = new GridLength(0);
 
                 appwindow.SetPresenter(AppWindowPresenterKind.FullScreen);
             }
@@ -85,7 +80,7 @@ namespace Display.CustomWindows
                 appwindow.SetPresenter(_markPresenterKindBeforeFullScreen);
 
                 this.ExtendsContentIntoTitleBar = true;
-                TitleBarRowDefinition.Height = new(28);
+                TitleBarRowDefinition.Height = new GridLength(28);
             }
         }
 
@@ -112,12 +107,12 @@ namespace Display.CustomWindows
             return newWindow;
         }
 
-        private void webview_NavigationStarting(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs args)
+        private void WebView_NavigationStarting(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs args)
         {
             NavigationProgressBar.Visibility = Visibility.Visible;
         }
 
-        private void webview_NavigationCompleted(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs args)
+        private void WebView_NavigationCompleted(WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs args)
         {
             NavigationProgressBar.Visibility = Visibility.Collapsed;
 

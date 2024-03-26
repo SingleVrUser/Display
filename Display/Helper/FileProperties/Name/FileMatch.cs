@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.System;
+using Display.Models.Dto.OneOneFive;
 
 namespace Display.Helper.FileProperties.Name;
 

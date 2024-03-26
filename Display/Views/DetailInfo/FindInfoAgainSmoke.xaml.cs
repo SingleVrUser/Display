@@ -1,8 +1,8 @@
 using Display.Managers;
-using Display.Models.Data;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.ObjectModel;
+using Display.Models.Dto.OneOneFive;
 
 namespace Display.Views.DetailInfo
 {

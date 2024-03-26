@@ -1,12 +1,15 @@
-﻿using Display.Models.Data;
-using Display.Models.Image;
+﻿using Display.Providers;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Media;
+using Display.Providers.Downloader;
 
 namespace Display.Helper.Network
 {
@@ -102,6 +105,62 @@ namespace Display.Helper.Network
 
             memStream.Position = 0;
             return memStream.AsRandomAccessStream();
+        }
+
+        public static string UrlCombine(string uri1, string uri2)
+        {
+            var baseUri = new Uri(uri1);
+            var myUri = new Uri(baseUri, uri2);
+            return myUri.ToString();
+        }
+
+        /// <summary>
+        /// 检查是否能访问该网页
+        /// </summary>
+        /// <param name="checkUrl"></param>
+        /// <returns></returns>
+        public static async Task<bool> CheckUrlUseful(string checkUrl)
+        {
+            var isUseful = true;
+            try
+            {
+                await GetInfoFromNetwork.CommonClient.GetAsync(checkUrl);
+            }
+            catch (HttpRequestException)
+            {
+                isUseful = false;
+            }
+
+            return isUseful;
+        }
+
+        /// <summary>
+        /// 等待startSecond到endSecond秒后继续，文本控件showText提示正在倒计时
+        /// </summary>
+        /// <param name="startSecond"></param>
+        /// <param name="endSecond"></param>
+        public static async Task RandomTimeDelay(int startSecond, int endSecond)
+        {
+            //随机等待1-10s
+            var randomSecond = new Random().Next(startSecond, endSecond);
+
+            //倒计时
+            await Task.Delay(randomSecond * 1000);
+        }
+
+        public static HttpClient CreateClient(Dictionary<string, string> headers)
+        {
+            if (headers == null || headers.Count == 0) return new HttpClient();
+
+            var handler = new HttpClientHandler { UseCookies = false };
+            var client = new HttpClient(handler);
+
+            foreach (var header in headers)
+            {
+                client.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
+            }
+
+            return client;
         }
     }
 }

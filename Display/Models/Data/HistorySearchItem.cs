@@ -1,4 +1,6 @@
-﻿namespace Display.Models.Data;
+﻿using Display.Models.Dto.OneOneFive;
+
+namespace Display.Models.Data;
 
 public class HistorySearchItem
 {

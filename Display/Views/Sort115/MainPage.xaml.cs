@@ -1,5 +1,5 @@
 using Display.CustomWindows;
-using Display.Models.Data;
+using Display.Models.Spider;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -7,8 +7,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
-using Sort115HomeModel = Display.Models.Disk._115.Sort115HomeModel;
-using SpiderInfo = Display.Models.Spider.SpiderInfos;
+using Display.Models.Dto.OneOneFive;
+using Sort115HomeModel = Display.Models.Entities._115.Sort115HomeModel;
 
 
 namespace Display.Views.Sort115;
@@ -102,11 +102,11 @@ public class FetchingSourceOptions
 {
     public string name { get; private set; }
 
-    public SpiderInfo.SpiderSourceName SpiderSourceName;
+    public SpiderNameAndStatus.SpiderSourceName SpiderSourceName;
 
     public bool IsSelected;
 
-    public FetchingSourceOptions(SpiderInfo.SpiderSourceName SpiderSourceName, bool isSelected = false)
+    public FetchingSourceOptions(SpiderNameAndStatus.SpiderSourceName SpiderSourceName, bool isSelected = false)
     {
         this.SpiderSourceName = SpiderSourceName;
         this.name = SpiderSourceName.ToString();

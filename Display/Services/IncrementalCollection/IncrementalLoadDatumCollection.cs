@@ -1,5 +1,5 @@
 ﻿using Display.Extensions;
-using Display.Models.Data;
+using Display.Providers;
 using Microsoft.UI.Xaml.Data;
 using SharpCompress;
 using System;
@@ -9,10 +9,11 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Display.Models.Dto.OneOneFive;
 
 namespace Display.Services.IncrementalCollection;
 
-public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, ISupportIncrementalLoading
+internal class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, ISupportIncrementalLoading
 {
     private WebApi WebApi { get; }
 
@@ -121,7 +122,7 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
         Asc = filesInfo.is_asc;
 
         //汇报事件
-        GetFileInfoCompletedEventArgs args = new() { Orderby = OrderBy, Asc = Asc, TimeReached = DateTime.Now };
+        GetFileInfoCompletedEventArgs args = new() { OrderBy = OrderBy, Asc = Asc, TimeReached = DateTime.Now };
         GetFileInfoCompleted?.Invoke(this, args);
 
         return filesInfo;
@@ -202,9 +203,9 @@ public class IncrementalLoadDatumCollection : ObservableCollection<FilesInfo>, I
     public event Action<WebPath[]> WebPathChanged;
 }
 
-public class GetFileInfoCompletedEventArgs : EventArgs
+internal class GetFileInfoCompletedEventArgs : EventArgs
 {
-    public WebApi.OrderBy Orderby { get; set; }
+    public WebApi.OrderBy OrderBy { get; set; }
 
     public int Asc { get; set; }
 

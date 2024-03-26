@@ -4,7 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Display.Controls
+namespace Display.Controls.UserController
 {
     public sealed partial class TextBlockWithLongText : UserControl
     {

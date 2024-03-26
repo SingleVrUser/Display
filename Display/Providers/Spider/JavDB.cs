@@ -1,5 +1,4 @@
 ﻿using Display.Helper.Network;
-using Display.Models.Data;
 using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
@@ -9,7 +8,9 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using static Display.Models.Spider.SpiderInfos;
+using Display.Models.Dto.OneOneFive;
+using Display.Providers.Downloader;
+using static Display.Models.Spider.SpiderNameAndStatus;
 
 namespace Display.Providers.Spider;
 
@@ -55,7 +56,7 @@ public class JavDb : BaseSpider
 
     private static HttpClient CreateClient(string cookie)
     {
-        return GetInfoFromNetwork.CreateClient(
+        return NetworkHelper.CreateClient(
             new Dictionary<string, string>
             {
                 { "cookie", cookie },
@@ -131,7 +132,7 @@ public class JavDb : BaseSpider
 
         if (!imageUrl.Contains("http"))
         {
-            imageUrl = GetInfoFromNetwork.UrlCombine(javDbUrl, imageUrl);
+            imageUrl = NetworkHelper.UrlCombine(javDbUrl, imageUrl);
         }
 
         var attributeNodes = videoMetaPanelNode.SelectNodes(".//div[contains(@class,'panel-block')]");
@@ -222,7 +223,7 @@ public class JavDb : BaseSpider
             var sampleImageUrl = node.Attributes["href"].Value;
             if (!sampleImageUrl.Contains("http"))
             {
-                sampleImageUrl = GetInfoFromNetwork.UrlCombine(javDbUrl, sampleImageUrl);
+                sampleImageUrl = NetworkHelper.UrlCombine(javDbUrl, sampleImageUrl);
             }
             sampleUrlList.Add(sampleImageUrl);
         }
@@ -233,7 +234,7 @@ public class JavDb : BaseSpider
 
     private async Task<string> GetDetailUrlFromCid(string cid, CancellationToken token)
     {
-        var url = GetInfoFromNetwork.UrlCombine(BaseUrl, $"search?q={cid}&f=all");
+        var url = NetworkHelper.UrlCombine(BaseUrl, $"search?q={cid}&f=all");
 
         // 访问
         var tuple = await RequestHelper.RequestHtml(Common.Client, url, token);
@@ -305,7 +306,7 @@ public class JavDb : BaseSpider
                         || !currentNum.Equals(searchNum)))) continue;
 
             var detailUrl = movieList.SelectSingleNode(".//a").Attributes["href"].Value;
-            detailUrl = GetInfoFromNetwork.UrlCombine(AppSettings.JavDbBaseUrl, detailUrl);
+            detailUrl = NetworkHelper.UrlCombine(AppSettings.JavDbBaseUrl, detailUrl);
             return detailUrl;
         }
 

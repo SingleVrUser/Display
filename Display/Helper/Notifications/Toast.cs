@@ -1,22 +1,21 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
 
-namespace Display.Helper.Notifications
+namespace Display.Helper.Notifications;
+
+public class Toast
 {
-    public class Toast
+    public static void TryToast(string title, string content1, string content2 = "")
     {
-        public static void TryToast(string title, string content1, string content2 = "")
-        {
-            new ToastContentBuilder()
-                .AddArgument("action", "viewConversation")
-                .AddArgument("conversationId", 384928)
+        new ToastContentBuilder()
+            .AddArgument("action", "viewConversation")
+            .AddArgument("conversationId", 384928)
 
-                .AddText(title)
+            .AddText(title)
 
-                .AddText(content1)
+            .AddText(content1)
 
-                .AddText(content2)
+            .AddText(content2)
 
-                .Show();
-        }
+            .Show();
     }
 }

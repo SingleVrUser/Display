@@ -6,7 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:customcontrols="using:Display.Controls"
-    mc:Ignorable="d"
+      xmlns:userController="using:Display.Controls.UserController"
+      mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     HorizontalAlignment="Stretch"
     VerticalAlignment="Stretch">
@@ -53,7 +54,7 @@
 
                         <HyperlinkButton Grid.Column="1" HorizontalAlignment="Center" Content="{x:Bind CheckUrl}" NavigateUri="{x:Bind CheckUrl}" Click="{x:Bind CheckUrlRoutedEventHandler}" ToolTipService.ToolTip="如需修改，请到设置中修改"/>
 
-                        <customcontrols:StatusShow x:Name="LoginCheck" Grid.Column="2" status="{x:Bind Status,Mode=OneWay}"/>
+                        <userController:StatusShow x:Name="LoginCheck" Grid.Column="2" status="{x:Bind Status,Mode=OneWay}"/>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>

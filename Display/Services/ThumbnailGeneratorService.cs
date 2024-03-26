@@ -1,8 +1,7 @@
 ﻿using Display.Helper.Date;
 using Display.Helper.Media;
+using Display.Helper.Network;
 using Display.Interfaces;
-using Display.Models.Data;
-using Display.Models.Image;
 using Display.Models.Media;
 using FFmpeg.AutoGen.Abstractions;
 using System;
@@ -68,7 +67,7 @@ public class ThumbnailGeneratorService : IThumbnailGeneratorService
 
             if (!File.Exists(filePath))
             {
-                if (isWait) await GetInfoFromNetwork.RandomTimeDelay(10, 20);
+                if (isWait) await NetworkHelper.RandomTimeDelay(10, 20);
 
                 if (!vsd.TrySeekPosition(currentTime)) break;
 

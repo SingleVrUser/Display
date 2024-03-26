@@ -1,6 +1,7 @@
 ﻿using Display.Helper.Network;
 using Display.Models.Data;
 using Display.Models.Media;
+using Display.Providers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using Windows.Foundation;
+using Display.Models.Dto.OneOneFive;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

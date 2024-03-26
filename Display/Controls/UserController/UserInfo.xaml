@@ -1,11 +1,12 @@
 ﻿<UserControl
-    x:Class="Display.Controls.UserInfo"
+    x:Class="Display.Controls.UserController.UserInfo"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Display.Controls"
     xmlns:data="using:Display.Models.Data"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
     mc:Ignorable="d">
 
     <!--头像栏-->
@@ -29,7 +30,7 @@
                     <TextBlock FontSize="10" FontFamily="{StaticResource SymbolThemeFontFamily}"
                                Foreground="White"
                                HorizontalAlignment="Center"
-                               Text="{x:Bind data:UserData.getVipName(Userinfo.mark1),Mode=OneWay}"/>
+                               Text="{x:Bind oneOneFive:UserData.getVipName(Userinfo.mark1),Mode=OneWay}"/>
                 </StackPanel>
                 <TextBlock x:Name="UserNameTextBlock" FontWeight="Bold" FontSize="20" HorizontalAlignment="Center" Text="{x:Bind Userinfo.user_name,Mode=OneWay}"/>
                 <!--<TextBlock FontWeight="Bold" FontSize="20" HorizontalAlignment="Center""/>-->

@@ -1,4 +1,3 @@
-using Display.Models.Image;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
@@ -8,6 +7,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using BaseImage = Display.Models.Media.BaseImage;
 using ScrollViewerViewChangedEventArgs = Microsoft.UI.Xaml.Controls.ScrollViewerViewChangedEventArgs;
 using UserControl = Microsoft.UI.Xaml.Controls.UserControl;
 

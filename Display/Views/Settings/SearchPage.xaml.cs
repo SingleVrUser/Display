@@ -1,8 +1,10 @@
 using Display.Models.Data;
+using Display.Providers;
 using Display.Providers.Searcher;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Diagnostics;
+using Display.Providers.Downloader;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

@@ -1,6 +1,4 @@
 ﻿using Display.Helper.Network;
-using Display.Models.Data;
-using Display.Models.Data.Enums;
 using Display.Models.Media;
 using Display.Services.IncrementalCollection;
 using Microsoft.UI.Xaml;
@@ -12,6 +10,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Enums;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

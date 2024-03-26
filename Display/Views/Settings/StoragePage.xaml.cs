@@ -1,7 +1,7 @@
 using Display.Helper.FileProperties.Name;
 using Display.Models.Data;
-using Display.Models.Data.Enums;
 using Display.Models.Settings.Options;
+using Display.Providers;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -11,6 +11,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Windows.Storage.Pickers;
+using Display.Models.Enums;
 
 namespace Display.Views.Settings;
 

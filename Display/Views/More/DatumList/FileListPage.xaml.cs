@@ -5,8 +5,8 @@ using ByteSizeLib;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.Network;
 using Display.Models.Data;
-using Display.Models.Data.Enums;
 using Display.Models.Media;
+using Display.Providers;
 using Display.Services.IncrementalCollection;
 using Display.ViewModels;
 using Display.Views.More.Import115DataToLocalDataAccess;
@@ -32,6 +32,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Enums;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -114,7 +116,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private void FilesInfos_GetFileInfoCompleted(object sender, GetFileInfoCompletedEventArgs e)
     {
-        ChangedOrderIcon(e.Orderby, e.Asc);
+        ChangedOrderIcon(e.OrderBy, e.Asc);
         MyProgressBar.Visibility = Visibility.Collapsed;
         _isLoading = false;
     }
@@ -667,8 +669,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         if (sender is not Button) return;
 
-        List<FilesInfo> files = new();
-        List<string> folderList = new();
+        List<FilesInfo> files = [];
+        List<string> folderList = [];
         foreach (FilesInfo item in BaseExample.SelectedItems)
         {
             files.Add(item);
@@ -852,7 +854,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
                 .Where(x => x.Type == FilesInfo.FileType.Folder || x.IsVideo)
                 .Select(x => new MediaPlayItem(x)).ToList();
 
-            await PlayVideoHelper.PlayVideo(mediaPlayItems, this.XamlRoot, lastPage: this);
+            await PlayVideoHelper.PlayVideo(mediaPlayItems, XamlRoot, lastPage: this);
 
             return;
         }
@@ -863,7 +865,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         if (info.Type == FilesInfo.FileType.Folder || !info.IsVideo) return;
 
         var mediaPlayItem = new MediaPlayItem(info);
-        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, lastPage: this);
+        await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this);
     }
 
     private void Sort115Button_Click(object sender, RoutedEventArgs e)
@@ -1008,7 +1010,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         ContentDialog contentDialog = new()
         {
-            XamlRoot = this.XamlRoot,
+            XamlRoot = XamlRoot,
             Content = stackPanel,
             Title = "重命名",
             PrimaryButtonText = "确定",
@@ -1353,14 +1355,14 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             return;
         }
 
-        if (result.data == null || result.data.Length == 0)
+        if (result.Data is not { Length: > 0 })
         {
             SearchResultListView.ItemsSource = null;
             SearchResultListView.Footer = new TextBlock { Text = "无结果" };
             return;
         }
 
-        SearchResultListView.ItemsSource = result.data.Select(x => new FilesInfo(x)).ToList();
+        SearchResultListView.ItemsSource = result.Data.Select(x => new FilesInfo(x)).ToList();
     }
 
     private void SearchTeachingTip_OnClosed(TeachingTip sender, TeachingTipClosedEventArgs args)

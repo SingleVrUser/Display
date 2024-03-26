@@ -10,6 +10,7 @@
     xmlns:data="using:Display.Models.Data"
     xmlns:settings="using:Display.Models.Settings"
     xmlns:converters="using:CommunityToolkit.WinUI.UI.Converters"
+    xmlns:providers="using:Display.Providers"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -96,7 +97,7 @@
 
                     <ToggleSwitch OnContent="展开"
                                   OffContent="紧凑"
-                                  IsOn="{x:Bind data:AppSettings.IsNavigationViewPaneOpen,Mode=TwoWay}" />
+                                  IsOn="{x:Bind providers:AppSettings.IsNavigationViewPaneOpen,Mode=TwoWay}" />
 
                 </controls:SettingsCard>
 

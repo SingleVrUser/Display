@@ -8,9 +8,10 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:local="using:Display.Views.Sort115"
       xmlns:customcontrols="using:Display.Controls"
-      xmlns:models="using:Display.Models.Disk._115"
       xmlns:viewModels="using:Display.ViewModels"
       xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+      xmlns:model="using:Display.Models.Entities._115"
+      xmlns:userController="using:Display.Controls.UserController"
       mc:Ignorable="d">
 
     <Page.DataContext>
@@ -283,7 +284,7 @@
                         </ListView.HeaderTemplate>
 
                         <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="models:Sort115HomeModel">
+                            <DataTemplate x:DataType="model:Sort115HomeModel">
                                 <Grid Height="48"
                                       ColumnDefinitions="*,150,180,30"
                                       ColumnSpacing="5">
@@ -302,7 +303,7 @@
                                                Style="{ThemeResource BaseTextBlockStyle}"
                                                Text="{x:Bind DestinationPathName,Mode=OneWay}"/>
 
-                                    <customcontrols:StatusShow Grid.Column="3" status="{x:Bind Status,Mode=OneWay}"/>
+                                    <userController:StatusShow Grid.Column="3" status="{x:Bind Status,Mode=OneWay}"/>
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>

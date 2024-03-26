@@ -1,6 +1,7 @@
 ﻿using Display.Helper.Date;
 using Display.Helper.FileProperties.Name;
 using Display.Models.Data;
+using Display.Providers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -12,6 +13,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
+using Display.Models.Dto.OneOneFive;
+using Display.Providers.Downloader;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -23,16 +26,16 @@ namespace Display.Views.More
     /// </summary>
     public sealed partial class GetThumbnail : Page
     {
-        List<ThumbnailInfo> _storeThumbnailInfo;
-        ObservableCollection<ThumbnailInfo> thumbnailInfo = new();
+        private List<ThumbnailInfo> _storeThumbnailInfo;
+        private readonly ObservableCollection<ThumbnailInfo> thumbnailInfo = [];
 
-        CancellationTokenSource s_cts = new();
+        private readonly CancellationTokenSource _cts = new();
 
-        ObservableCollection<string> failList = new();
+        private readonly ObservableCollection<string> _failList = [];
 
         public GetThumbnail()
         {
-            this.InitializeComponent();
+            InitializeComponent();
             LoadedData();
         }
 
@@ -67,7 +70,7 @@ namespace Display.Views.More
         {
             if (BasicGridView.SelectedItems.Count == 0) return;
 
-            updateGridViewShow();
+            UpdateGridViewShow();
 
             switch (OriginMethodSelected_ComboBox.SelectedIndex)
             {
@@ -78,7 +81,7 @@ namespace Display.Views.More
                 //在线视频
                 case 1:
                     //检查在线模型文件是否存在
-                    if (GetImageByOpenCV.IsModelFilesExists)
+                    if (GetImageByOpenCv.IsModelFilesExists)
                     {
                         StartGetThumbnailFromWebVideo();
                     }
@@ -108,43 +111,43 @@ namespace Display.Views.More
             var startTime = DateTimeOffset.Now;
 
             //进度
-            var progress = new Progress<progressClass>(info =>
+            var progress = new Progress<ProgressClass>(info =>
             {
                 if (!progress_TextBlock.IsLoaded)
                 {
-                    s_cts.Cancel();
+                    _cts.Cancel();
                     return;
                 }
 
-                progress_TextBlock.Text = info.text;
+                progress_TextBlock.Text = info.Text;
 
-                if (info.index == -1)
+                if (info.Index == -1)
                 {
                     return;
                 }
 
-                var item = thumbnailInfo[info.index];
+                var item = thumbnailInfo[info.Index];
 
-                item.Status = info.status;
+                item.Status = info.Status;
 
                 if (item.Status == Status.Error)
                 {
-                    failList.Add(item.name);
+                    _failList.Add(item.name);
                 }
 
-                if (!string.IsNullOrEmpty(info.imagePath))
+                if (!string.IsNullOrEmpty(info.ImagePath))
                 {
-                    item.PhotoPath = info.imagePath;
+                    item.PhotoPath = info.ImagePath;
                 }
 
                 //完成
-                if (item.Status != Status.Doing && thumbnailInfo.Count == info.index + 1)
+                if (item.Status != Status.Doing && thumbnailInfo.Count == info.Index + 1)
                 {
                     progress_TextBlock.Text = $"任务已完成，耗时{DateHelper.ConvertDoubleToLengthStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
                 }
             });
 
-            Task.Run(() => GetThumbnailFromUrl(thumbnailInfo.ToList(), progress, s_cts));
+            Task.Run(() => GetThumbnailFromUrl(thumbnailInfo.ToList(), progress, _cts));
         }
 
         private void StartGetThumbnailFromWebVideo()
@@ -152,37 +155,37 @@ namespace Display.Views.More
             var startTime = DateTimeOffset.Now;
 
             // 整体进度
-            var overallProgress = new Progress<progressClass>(info =>
+            var overallProgress = new Progress<ProgressClass>(info =>
             {
                 if (!IsLoaded)
                 {
-                    s_cts.Cancel();
+                    _cts.Cancel();
                     return;
                 }
 
-                progress_TextBlock.Text = info.text;
+                progress_TextBlock.Text = info.Text;
 
-                if (info.index == -1)
+                if (info.Index == -1)
                 {
                     return;
                 }
 
-                var item = thumbnailInfo[info.index];
+                var item = thumbnailInfo[info.Index];
 
-                item.Status = info.status;
+                item.Status = info.Status;
 
                 if (item.Status == Status.Error)
                 {
-                    failList.Add(item.name);
+                    _failList.Add(item.name);
                 }
 
-                if (!string.IsNullOrEmpty(info.imagePath))
+                if (!string.IsNullOrEmpty(info.ImagePath))
                 {
-                    item.PhotoPath = info.imagePath;
+                    item.PhotoPath = info.ImagePath;
                 }
 
                 //完成
-                if (item.Status != Status.Doing && thumbnailInfo.Count == info.index + 1)
+                if (item.Status != Status.Doing && thumbnailInfo.Count == info.Index + 1)
                 {
                     progress_TextBlock.Text = $"任务已完成，耗时{DateHelper.ConvertDoubleToLengthStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
                 }
@@ -190,68 +193,70 @@ namespace Display.Views.More
             });
 
             // 截图进度
-            var getImageProgress = new Progress<progressInfo>();
+            var getImageProgress = new Progress<GetImageByOpenCv.ProgressInfo>();
 
-            GetThumbnailFromWebVideoSetting getThumbnailFromWebVideoSetting = new GetThumbnailFromWebVideoSetting()
+            var getThumbnailFromWebVideoSetting = new GetThumbnailFromWebVideoSetting()
             {
                 IsJumpVrVideo = IsJumpVrVideo_ToggleSwitch.IsOn,
-                isDetectFaces = IsSelectedFaceImage_ToggleSwitch.IsOn,
-                imageCount = (int)ScreenshotsNumber_NumberBox.Value,
-                isShowWindows = IsShowWindows_ToggleSwitch.IsOn
+                IsDetectFaces = IsSelectedFaceImage_ToggleSwitch.IsOn,
+                ImageCount = (int)ScreenshotsNumber_NumberBox.Value,
+                IsShowWindows = IsShowWindows_ToggleSwitch.IsOn
             };
 
 
-            Task.Run(() => GetThumbnailFromWebVideo(thumbnailInfo.ToList(), getThumbnailFromWebVideoSetting, overallProgress, getImageProgress, s_cts));
+            Task.Run(() => GetThumbnailFromWebVideo(thumbnailInfo.ToList(), getThumbnailFromWebVideoSetting, overallProgress, getImageProgress, _cts));
         }
 
-        class GetThumbnailFromWebVideoSetting
+        private record GetThumbnailFromWebVideoSetting
         {
-            public bool IsJumpVrVideo = true;
-            public bool isDetectFaces = false;
-            public bool isShowWindows = false;
-            public int imageCount = 10;
+            public bool IsJumpVrVideo { get; init; } = true;
+            public bool IsDetectFaces;
+            public bool IsShowWindows;
+            public int ImageCount = 10;
         }
 
-        private async void GetThumbnailFromWebVideo(List<ThumbnailInfo> thumbnailinfos, GetThumbnailFromWebVideoSetting getThumbnailFromWebVideoSetting, IProgress<progressClass> overallProgress, IProgress<progressInfo> getImageProgress, CancellationTokenSource s_cts)
+        private async void GetThumbnailFromWebVideo(IReadOnlyList<ThumbnailInfo> thumbnailInfos, GetThumbnailFromWebVideoSetting getThumbnailFromWebVideoSetting, IProgress<ProgressClass> overallProgress, IProgress<GetImageByOpenCv.ProgressInfo> getImageProgress, CancellationTokenSource cts)
         {
             var webApi = WebApi.GlobalWebApi;
-            GetImageByOpenCV openCV = new(true);
+            GetImageByOpenCv openCv = new(true);
 
-            for (int i = 0; i < thumbnailinfos.Count; i++)
+            for (var i = 0; i < thumbnailInfos.Count; i++)
             {
-                progressClass progressinfo = new();
-                progressinfo.index = i;
-                progressinfo.status = Status.Doing;
-
-                overallProgress.Report(progressinfo);
-
-                var name = thumbnailinfos[i].name;
-
-                //最大获取数量
-                int imageCount = getThumbnailFromWebVideoSetting.imageCount;
-
-                string startText = $"【{i + 1}/{thumbnailinfos.Count}】 {name}";
-
-                //保存路径
-                string SavePath = Path.Combine(AppSettings.ImageSavePath, name);
-
-                //缩略图已存在，跳过
-                string existsPath = Path.Combine(SavePath, $"Thumbnail_{imageCount - 1}.jpg");
-                if (File.Exists(existsPath))
+                ProgressClass progressInfo = new()
                 {
-                    progressinfo.text = $"{startText} - 缩略图已存在，跳过该项目";
-                    progressinfo.imagePath = existsPath;
-                    progressinfo.status = Status.BeforeStart;
-                    overallProgress.Report(progressinfo);
-                    continue;
+                    Index = i,
+                    Status = Status.Doing
                 };
 
-                //跳过VR
-                if (getThumbnailFromWebVideoSetting.IsJumpVrVideo && thumbnailinfos[i].isVr)
+                overallProgress.Report(progressInfo);
+
+                var name = thumbnailInfos[i].name;
+
+                //最大获取数量
+                var imageCount = getThumbnailFromWebVideoSetting.ImageCount;
+
+                var startText = $"【{i + 1}/{thumbnailInfos.Count}】 {name}";
+
+                //保存路径
+                var savePath = Path.Combine(AppSettings.ImageSavePath, name);
+
+                //缩略图已存在，跳过
+                var existsPath = Path.Combine(savePath, $"Thumbnail_{imageCount - 1}.jpg");
+                if (File.Exists(existsPath))
                 {
-                    progressinfo.text = $"{startText} - 跳过VR";
-                    progressinfo.status = Status.BeforeStart;
-                    overallProgress.Report(progressinfo);
+                    progressInfo.Text = $"{startText} - 缩略图已存在，跳过该项目";
+                    progressInfo.ImagePath = existsPath;
+                    progressInfo.Status = Status.BeforeStart;
+                    overallProgress.Report(progressInfo);
+                    continue;
+                }
+
+                //跳过VR
+                if (getThumbnailFromWebVideoSetting.IsJumpVrVideo && thumbnailInfos[i].IsVr)
+                {
+                    progressInfo.Text = $"{startText} - 跳过VR";
+                    progressInfo.Status = Status.BeforeStart;
+                    overallProgress.Report(progressInfo);
                     continue;
                 }
 
@@ -259,236 +264,143 @@ namespace Display.Views.More
                 var videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(name);
 
                 //检查视频是否已转码
-                var videofileListAfterDecode = videoInfoList.Where(x => x.Vdi != 0).ToList();
+                var videoFileListAfterDecode = videoInfoList.Where(x => x.Vdi != 0).ToList();
 
-                progressinfo.text = $"{startText} - 获取到视频（总数：{videoInfoList.Count}，转码完成数：{videofileListAfterDecode.Count}）";
-                overallProgress.Report(progressinfo);
+                progressInfo.Text = $"{startText} - 获取到视频（总数：{videoInfoList.Count}，转码完成数：{videoFileListAfterDecode.Count}）";
+                overallProgress.Report(progressInfo);
 
                 //检查能否播放，获取总时长、总帧数
-                Dictionary<int, double> VideoIndexAndFrameCountDict = new();
-
-                VideoToThumbnail videoToThumbnail = new VideoToThumbnail();
-
-                videoToThumbnail.name = name;
-
-                for (int j = 0; j < videofileListAfterDecode.Count; j++)
+                var videoToThumbnail = new VideoToThumbnail
                 {
-                    var videoInfo = videofileListAfterDecode[j];
-                    var m3u8InfoList = await webApi.GetM3U8InfoByPickCode(videoInfo.PickCode);
-                    if (m3u8InfoList.Count > 0)
-                    {
-                        ////总帧数计算
-                        //var frameCount = openCV.getTotalFrameCount(m3u8InfoList[0].Url);
-                        //videoToThumbnail.frame_count += frameCount;
+                    name = name
+                };
 
-                        ////总时长计算，现在已m3u8文件的时长为准，故弃用
-                        //videoToThumbnail.play_long += videoInfo.play_long;
+                foreach (var videoInfo in videoFileListAfterDecode)
+                {
+                    var m3U8InfoList = await webApi.GetM3U8InfoByPickCode(videoInfo.PickCode);
+                    if (m3U8InfoList.Count > 0)
+                    {
 
                         //添加到pickCodeList中
                         videoToThumbnail.pickCodeList.Add(videoInfo.PickCode);
                     }
                 }
 
-                progressinfo.text = $"{startText} - 获取到视频（总数：{videoInfoList.Count}，转码完成数：{videofileListAfterDecode.Count}，可播放数：{videoToThumbnail.pickCodeList.Count}）";
-                overallProgress.Report(progressinfo);
+                progressInfo.Text = $"{startText} - 获取到视频（总数：{videoInfoList.Count}，转码完成数：{videoFileListAfterDecode.Count}，可播放数：{videoToThumbnail.pickCodeList.Count}）";
+                overallProgress.Report(progressInfo);
 
                 foreach (var pickCode in videoToThumbnail.pickCodeList)
                 {
                     //重新获取（时间过长m3u8地址可能失效）
-                    var m3u8InfoList = await webApi.GetM3U8InfoByPickCode(pickCode);
+                    var m3U8InfoList = await webApi.GetM3U8InfoByPickCode(pickCode);
 
-                    if (m3u8InfoList.Count == 0) continue;
+                    if (m3U8InfoList.Count == 0) continue;
 
                     //缩略图画质不需要太好，选择最后一个
-                    var meu8Info = await webApi.GetM3U8Content(m3u8InfoList[^1]);
+                    var meu8Info = await webApi.GetM3U8Content(m3U8InfoList[^1]);
 
                     //总时长
-                    var play_long = meu8Info.TotalSecond;
+                    var playLong = meu8Info.TotalSecond;
 
-                    ////总帧数
-                    //var length = videoToThumbnail.frame_count;
+                    var startJumpSecond = 180;
+                    var endJumpSecond = 10;
 
-
-                    int startJumpSecond = 180;
-                    int endJumpSecond = 10;
-
-                    var averageLength = (play_long - (startJumpSecond + endJumpSecond)) / imageCount;
+                    var averageLength = (playLong - (startJumpSecond + endJumpSecond)) / imageCount;
 
                     double currentTime = startJumpSecond;
 
-                    bool isShowWindow = getThumbnailFromWebVideoSetting.isShowWindows;
+                    var isShowWindow = getThumbnailFromWebVideoSetting.IsShowWindows;
 
-                    int count = 0;
+                    var count = 0;
 
-                    for (int j = 0; j < meu8Info.ts_info_list.Count && count < imageCount; j++)
+                    for (var j = 0; j < meu8Info.TsInfoList.Count && count < imageCount; j++)
                     {
-                        var item = meu8Info.ts_info_list[j];
+                        var item = meu8Info.TsInfoList[j];
 
                         currentTime += item.Second;
 
-                        if (currentTime > averageLength * count)
+                        if (!(currentTime > averageLength * count)) continue;
+
+                        var imagePath = Path.Combine(savePath, $"Thumbnail_{count}.jpg");
+
+
+                        if (!File.Exists(imagePath))
                         {
-                            string imagePath = Path.Combine(SavePath, $"Thumbnail_{count}.jpg");
 
-
-                            if (!File.Exists(imagePath))
+                            var isGetImage = false;
+                            for (var tryCount = 0; tryCount < 20 && !isGetImage; tryCount++)
                             {
-
-                                bool isGetImage = false;
-                                for (int tryCount = 0; tryCount < 20 && !isGetImage; tryCount++)
+                                if (j + tryCount >= meu8Info.TsInfoList.Count)
                                 {
-                                    if (j + tryCount >= meu8Info.ts_info_list.Count)
-                                    {
-                                        break;
-                                    }
-
-                                    var tsUrl = $"{meu8Info.BaseUrl}{meu8Info.ts_info_list[j + tryCount].Url}";
-
-                                    isGetImage = openCV.Task_GetThumbnailByVideoPath(tsUrl, 0, isShowWindow, getImageProgress, SavePath, $"Thumbnail_{count}", getThumbnailFromWebVideoSetting.isDetectFaces);
-
-                                    //Debug.WriteLine("获取链接中的图片");
-                                    Debug.WriteLine($"【{tryCount + 1}/20】url:{tsUrl}\ncurrentTime:{currentTime}");
+                                    break;
                                 }
 
-                                //多次尝试后仍未获取人脸信息，就不检测人脸了，随便截一张
-                                if (!isGetImage)
-                                {
-                                    openCV.Task_GetThumbnailByVideoPath($"{meu8Info.BaseUrl}{item.Url}", 0, isShowWindow, getImageProgress, SavePath, $"Thumbnail_{count}", false);
-                                }
+                                var tsUrl = $"{meu8Info.BaseUrl}{meu8Info.TsInfoList[j + tryCount].Url}";
 
+                                isGetImage = openCv.Task_GetThumbnailByVideoPath(tsUrl, 0, isShowWindow, getImageProgress, savePath, $"Thumbnail_{count}", getThumbnailFromWebVideoSetting.IsDetectFaces);
+
+                                //Debug.WriteLine("获取链接中的图片");
+                                Debug.WriteLine($"【{tryCount + 1}/20】url:{tsUrl}\ncurrentTime:{currentTime}");
                             }
 
-
-                            progressinfo.imagePath = imagePath;
-                            overallProgress.Report(progressinfo);
-
-                            count++;
+                            //多次尝试后仍未获取人脸信息，就不检测人脸了，随便截一张
+                            if (!isGetImage)
+                            {
+                                openCv.Task_GetThumbnailByVideoPath($"{meu8Info.BaseUrl}{item.Url}", 0, isShowWindow, getImageProgress, savePath, $"Thumbnail_{count}", false);
+                            }
                         }
 
+                        progressInfo.ImagePath = imagePath;
+                        overallProgress.Report(progressInfo);
+
+                        count++;
                     }
-
-                    ////平均长度
-                    //double averageLength = (videoToThumbnail.frame_count - (startJumpFrame_num + endJumpFrame_num)) / imageCount;
-
-                    //double next_frame = startJumpFrame_num;
-                    ////-startJumpFrame_num * 1 为消除 double -> int 误差
-                    //for (double current_frame = next_frame; current_frame < length - 1; current_frame += averageLength)
-                    //{
-                    //    string tsUrl = string.Empty;
-                    //    double startFrame = 0;
-                    //    double tsStartFrame = 0;
-
-
-
-                    //    if (string.IsNullOrEmpty(tsUrl))
-                    //    {
-                    //        continue;
-                    //    }
-
-                    //    string imagePath = Path.Combine(SavePath, $"Thumbnail_{count}.jpg");
-
-                    //    if (!File.Exists(imagePath))
-                    //    {
-
-                    //        openCV.Task_GetThumbnailByVideoPath(tsUrl, tsStartFrame, isShowWindow, getImageProgress, SavePath, $"Thumbnail_{count}", getThumbnailFromWebVideoSetting.isDetectFaces, length - current_frame);
-                    //        //Debug.WriteLine("获取链接中的图片");
-                    //        Debug.WriteLine($"url:{tsUrl}\nstartFrame:{tsStartFrame}");
-                    //    }
-
-                    //    progressinfo.imagePath = imagePath;
-
-                    //    overallProgress.Report(progressinfo);
-
-
-                    //    count++;
-                    //    next_frame = averageLength - (length - current_frame);
-
-                    //}
-
                 }
 
-                progressinfo.status = Status.BeforeStart;
-                overallProgress.Report(progressinfo);
+                progressInfo.Status = Status.BeforeStart;
+                overallProgress.Report(progressInfo);
 
             }
         }
 
-        //private async Task<progressInfo> getThumbnialByVideoUrl(string url, int startJumpFrame_num = 100,int endJumpFrame_num = 0, bool isShowWindow = true)
-        //{
-        //    progressInfo progressInfo = new();
-
-        //    GetImageByOpenCV openCV = new GetImageByOpenCV();
-
-        //    var frames_num = openCV.getTotalFrameCount(url);
-        //    if (frames_num == 0) return progressInfo;
-
-        //    ////跳过开头
-        //    //int startJumpFrame_num = 1000;
-
-        //    ////跳过结尾
-        //    //int endJumpFrame_num = 0;
-
-        //    var actualEndFrame = frames_num - endJumpFrame_num;
-
-        //    //平均长度
-        //    var averageLength = (int)(actualEndFrame - startJumpFrame_num) / imageCount;
-
-        //    //进度
-        //    var progress = new Progress<progressInfo>(info =>
-        //    {
-
-        //        progressInfo = info;
-
-        //    });
-
-        //    double length = 100 * 100;
-
-        //    await Task.Run(() => openCV.Task_GenderByVideo(url, startJumpFrame_num, length, isShowWindow, progress, SavePath));
-
-        //    return progressInfo;
-        //}
-
-
-        private async void GetThumbnailFromUrl(List<ThumbnailInfo> thumbnailinfos, IProgress<progressClass> progress, CancellationTokenSource s_cts)
+        private async void GetThumbnailFromUrl(IReadOnlyList<ThumbnailInfo> thumbnailInfos, IProgress<ProgressClass> progress, CancellationTokenSource cts)
         {
-            for (int i = 0; i < thumbnailinfos.Count; i++)
-            //foreach(var thumbnail in thumbnailinfos)
+            for (var i = 0; i < thumbnailInfos.Count; i++)
             {
-                progressClass progressinfo = new();
-                progressinfo.index = i;
-                progressinfo.status = Status.Doing;
-
-                var thumbnail = thumbnailinfos[i];
-                var DownUrlList = thumbnail.thumbnailDownUrlList;
-
-                progressinfo.text = $"【{i + 1}/{thumbnailinfos.Count}】{thumbnail.name}  （{DownUrlList.Count}张）";
-                progress.Report(progressinfo);
-
-                string imagePath = string.Empty;
-                for (int j = 0; j < DownUrlList.Count; j++)
+                ProgressClass progressInfo = new()
                 {
-                    string SavePath = Path.Combine(AppSettings.ImageSavePath, thumbnail.name);
-                    string SaveName = $"Thumbnail_{j}";
-                    string saveImagePath = await GetInfoFromNetwork.DownloadFile(DownUrlList[j], SavePath, SaveName);
+                    Index = i,
+                    Status = Status.Doing
+                };
 
-                    if (j == 1)
-                    {
-                        imagePath = saveImagePath;
-                    }
+                var thumbnail = thumbnailInfos[i];
+                var downUrlList = thumbnail.ThumbnailDownUrlList;
+
+                progressInfo.Text = $"【{i + 1}/{thumbnailInfos.Count}】{thumbnail.name}  （{downUrlList.Count}张）";
+                progress.Report(progressInfo);
+
+                var imagePath = string.Empty;
+                for (var j = 0; j < downUrlList.Count; j++)
+                {
+                    var savePath = Path.Combine(AppSettings.ImageSavePath, thumbnail.name);
+                    var saveName = $"Thumbnail_{j}";
+                    var saveImagePath = await GetInfoFromNetwork.DownloadFile(downUrlList[j], savePath, saveName);
+
+                    if (j == 1) imagePath = saveImagePath;
 
                 }
 
                 if (string.IsNullOrEmpty(imagePath))
                 {
-                    progressinfo.status = Status.Error;
+                    progressInfo.Status = Status.Error;
                 }
                 else
                 {
-                    progressinfo.imagePath = imagePath;
-                    progressinfo.status = Status.BeforeStart;
+                    progressInfo.ImagePath = imagePath;
+                    progressInfo.Status = Status.BeforeStart;
                 }
 
-                progress.Report(progressinfo);
+                progress.Report(progressInfo);
             }
         }
 
@@ -497,21 +409,13 @@ namespace Display.Views.More
         /// 只保留选中项
         /// 退出选择模式
         /// </summary>
-        private void updateGridViewShow()
+        private void UpdateGridViewShow()
         {
-            List<ThumbnailInfo> thumbnailList = new();
-
-            foreach (var item in BasicGridView.SelectedItems)
-            {
-                thumbnailList.Add(item as ThumbnailInfo);
-            }
+            List<ThumbnailInfo> thumbnailList = [];
+            thumbnailList.AddRange(BasicGridView.SelectedItems.Cast<ThumbnailInfo>());
 
             thumbnailInfo.Clear();
-
-            foreach (var actor in thumbnailList)
-            {
-                thumbnailInfo.Add(actor);
-            }
+            thumbnailList.ForEach(thumbnailInfo.Add);
 
             BasicGridView.SelectionMode = ListViewSelectionMode.None;
 
@@ -520,60 +424,53 @@ namespace Display.Views.More
             StartButton.Visibility = Visibility.Collapsed;
         }
 
-        private class progressClass
+        private class ProgressClass
         {
-            public int index { get; set; } = -1;
-            public string imagePath { get; set; }
-            public string text { get; set; }
-            public Status status { get; set; }
+            public int Index { get; init; } = -1;
+            public string ImagePath { get; set; }
+            public string Text { get; set; }
+            public Status Status { get; set; }
         }
 
         private void ShowVideoPart_CheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            if (_storeThumbnailInfo == null)
-            {
-                _storeThumbnailInfo = thumbnailInfo.ToList();
-            }
+            _storeThumbnailInfo ??= [.. thumbnailInfo];
 
-            foreach (var item in _storeThumbnailInfo)
+            foreach (var item in _storeThumbnailInfo
+                         .Where(item => item.ThumbnailDownUrlList.Count > 0))
             {
-                if (item.thumbnailDownUrlList.Count > 0)
-                {
-                    thumbnailInfo.Remove(item);
-                }
+                thumbnailInfo.Remove(item);
             }
-
         }
 
         private void ShowVideoPart_CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (_storeThumbnailInfo != null && _storeThumbnailInfo.Count > 0)
+            if (_storeThumbnailInfo is not { Count: > 0 }) return;
+
+            thumbnailInfo.Clear();
+            foreach (var item in _storeThumbnailInfo)
             {
-                thumbnailInfo.Clear();
-                foreach (var item in _storeThumbnailInfo)
-                {
-                    thumbnailInfo.Add(item);
-                }
+                thumbnailInfo.Add(item);
             }
         }
 
         private void OriginMethodSelected_ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var ComboBox = sender as ComboBox;
-            switch (ComboBox.SelectedIndex)
-            {
-                case 0:
-                    VisualStateManager.GoToState(this, "SelectedUrl", true);
-                    break;
-                case 1:
-                    VisualStateManager.GoToState(this, "SelectedWebVideo", true);
-                    break;
-            }
+            if (sender is not ComboBox comboBox) return;
+
+            var goToState = VisualStateManager.GoToState(this,
+                comboBox.SelectedIndex switch
+                {
+                    0 => "SelectedUrl",
+                    1 => "SelectedWebVideo",
+                    _ => "SelectedUrl"
+                }
+                , true);
         }
 
         private void OpenModelSavePath_HyperLinkClick(Microsoft.UI.Xaml.Documents.Hyperlink sender, Microsoft.UI.Xaml.Documents.HyperlinkClickEventArgs args)
         {
-            string path = Path.Combine(Package.Current.InstalledLocation.Path, @"Assets\Models\caffe");
+            var path = Path.Combine(Package.Current.InstalledLocation.Path, @"Assets\Models\caffe");
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);

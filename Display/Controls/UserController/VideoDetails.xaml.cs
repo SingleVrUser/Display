@@ -1,8 +1,21 @@
-﻿using Display.CustomWindows;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Windows.Foundation;
+using Windows.Foundation.Metadata;
+using Windows.Storage;
+using Windows.Storage.Streams;
+using Display.CustomWindows;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.UI;
 using Display.Models.Data;
-using Display.Models.Data.Enums;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Enums;
+using Display.Providers;
+using Display.Providers.Downloader;
 using Display.Views;
 using Display.Views.DetailInfo;
 using Display.Views.More.DatumList;
@@ -14,17 +27,6 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media.Imaging;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Foundation.Metadata;
-using Windows.Storage;
-using Windows.Storage.Streams;
-using Display.Controls.UserController;
 using DownDialogContent = Display.Views.DetailInfo.DownDialogContent;
 using FileInfoInCidSmoke = Display.Views.DetailInfo.FileInfoInCidSmoke;
 using FindInfoAgainSmoke = Display.Views.DetailInfo.FindInfoAgainSmoke;
@@ -33,7 +35,7 @@ using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Display.Controls
+namespace Display.Controls.UserController
 {
     public sealed partial class VideoDetails : UserControl
     {

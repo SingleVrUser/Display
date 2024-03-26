@@ -1,9 +1,9 @@
-﻿using Display.Models.Data;
-using Display.Models.Data.Enums;
-using Display.Models.Settings;
+﻿using Display.Models.Settings;
+using Display.Providers;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using Display.Models.Enums;
 
 namespace Display.ViewModels.Sub;
 

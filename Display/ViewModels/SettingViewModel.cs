@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Display.Models.Data.Enums;
+using Display.Models.Enums;
 using Display.Models.Settings;
 
 namespace Display.ViewModels;

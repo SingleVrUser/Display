@@ -1,5 +1,4 @@
-﻿using Display.Models.Data;
-using Display.Models.Settings.Options;
+﻿using Display.Models.Settings.Options;
 using System;
 using System.Net;
 using System.Net.Http;

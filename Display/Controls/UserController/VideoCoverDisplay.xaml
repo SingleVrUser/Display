@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Display.Controls.VideoCoverDisplay"
+﻿<UserControl x:Class="Display.Controls.UserController.VideoCoverDisplay"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:Display.Controls"
@@ -12,6 +12,9 @@
              xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
              xmlns:winUi="using:CommunityToolkit.WinUI"
              xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+             xmlns:providers="using:Display.Providers"
+             xmlns:userController="using:Display.Controls.UserController"
+             xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
              mc:Ignorable="d"
              CacheMode="BitmapCache">
 
@@ -205,7 +208,7 @@
 
         <!--预览展示样式-->
         <DataTemplate x:Key="ImageTemplate"
-                      x:DataType="data:VideoCoverDisplayClass">
+                      x:DataType="oneOneFive:VideoCoverDisplayClass">
             <Grid Padding="3,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -450,7 +453,7 @@
                                    Foreground="Gray"
                                    Opacity="0.5" />
                         <AppBarSeparator Grid.Column="7" />
-                        <local:TextBlockWithLongText Grid.Column="8"
+                        <userController:TextBlockWithLongText Grid.Column="8"
                                                      StringValue="{x:Bind Actor}" />
 
                     </Grid>
@@ -474,7 +477,7 @@
 
         <!--匹配失败的仿图片展示样式-->
         <DataTemplate x:Key="FailCoverTemplate"
-                      x:DataType="data:FailVideoInfo">
+                      x:DataType="oneOneFive:FailVideoInfo">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -569,7 +572,7 @@
 
         <!--匹配失败中的喜欢或稍后观看的展示样式-->
         <DataTemplate x:Key="LikeOrLookLaterInFailCoverTemplate"
-                      x:DataType="data:FailInfo">
+                      x:DataType="oneOneFive:FailInfo">
 
             <Grid Padding="3,0"
                   HorizontalAlignment="Center"
@@ -711,7 +714,7 @@
 
         <!--匹配失败的列表展示样式-->
         <DataTemplate x:Key="FailListTemplate"
-                      x:DataType="data:Datum">
+                      x:DataType="oneOneFive:Datum">
             <Grid x:Name="FailGrid"
                   Padding="{StaticResource ButtonPadding}"
                   BorderBrush="{StaticResource ButtonBorderBrush}"
@@ -768,11 +771,11 @@
             </Grid>
         </DataTemplate>
 
-        <local:CoverItemTemplateSelector x:Key="FailItemTemplateSelector"
+        <userController:CoverItemTemplateSelector x:Key="FailItemTemplateSelector"
                                          WithoutImageTemplate="{StaticResource FailListTemplate}"
                                          LikeOrLookLaterInFailCoverTemplate="{StaticResource LikeOrLookLaterInFailCoverTemplate}" />
 
-        <local:CoverItemTemplateSelector x:Key="SuccessOrSearchResultItemTemplateSelector"
+        <userController:CoverItemTemplateSelector x:Key="SuccessOrSearchResultItemTemplateSelector"
                                          ImageTemplate="{StaticResource ImageTemplate}"
                                          FailCoverTemplate="{StaticResource FailCoverTemplate}" />
     </Control.Resources>
@@ -1100,15 +1103,15 @@
                     </Grid.ColumnDefinitions>
                     <Slider x:Name="ImageSizeChangeSlider"
                             Grid.Row="0"
-                            Minimum="{x:Bind local:VideoCoverDisplay.SliderMinValue}"
-                            Maximum="{x:Bind local:VideoCoverDisplay.SliderMaxValue}"
+                            Minimum="{x:Bind userController:VideoCoverDisplay.SliderMinValue}"
+                            Maximum="{x:Bind userController:VideoCoverDisplay.SliderMaxValue}"
                             Width="200" />
 
                     <ToggleButton x:Name="IsAutoAdjustImageSizeToggleButton"
                                   Grid.Column="1"
                                   Content="&#xE167;"
                                   FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                  IsChecked="{x:Bind data:AppSettings.IsAutoAdjustImageSize,Mode=TwoWay}"
+                                  IsChecked="{x:Bind providers:AppSettings.IsAutoAdjustImageSize,Mode=TwoWay}"
                                   Checked="AutoAdjustImageSize_ToggleButton_Checked"
                                   Unchecked="AutoAdjustImageSize_ToggleButton_UnChecked"
                                   ToolTipService.ToolTip="动态调整图片大小"
@@ -1119,20 +1122,20 @@
                       Grid.Column="1"
                       x:FieldModifier="public"
                       x:Name="PageShow_Grid">
-                    <local:ShowCountControl CurrentCount="{x:Bind SuccessInfoCollection.Count,Mode=OneWay}"
+                    <userController:ShowCountControl CurrentCount="{x:Bind SuccessInfoCollection.Count,Mode=OneWay}"
                                             AllCount="{x:Bind SuccessInfoCollection.AllCount,Mode=OneWay}"
                                             Clicked="ToTopButton_Click"
                                             Visibility="{x:Bind IsShowSuccessListView,Mode=OneWay}"
                                             HorizontalAlignment="Right" />
 
                     <Grid Visibility="{x:Bind IsShowFailListView,Mode=OneWay}">
-                        <local:ShowCountControl x:Name="AllFailShowCountControl"
+                        <userController:ShowCountControl x:Name="AllFailShowCountControl"
                                                 CurrentCount="{x:Bind AllFailInfoCollection.Count,Mode=OneWay}"
                                                 AllCount="{x:Bind AllFailInfoCollection.AllCount,Mode=OneWay}"
                                                 Clicked="ToTopButton_Click"
                                                 HorizontalAlignment="Right" />
 
-                        <local:ShowCountControl x:Name="LikeOrLookLaterFailShowCountControl"
+                        <userController:ShowCountControl x:Name="LikeOrLookLaterFailShowCountControl"
                                                 CurrentCount="{x:Bind LikeOrLookLaterFailInfoCollection.Count,Mode=OneWay}"
                                                 AllCount="{x:Bind LikeOrLookLaterFailInfoCollection.AllCount,Mode=OneWay}"
                                                 Clicked="ToTopButton_Click"

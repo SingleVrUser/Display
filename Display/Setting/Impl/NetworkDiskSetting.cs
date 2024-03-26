@@ -3,12 +3,8 @@ using Display.Setting.Models;
 
 namespace Display.Setting.Impl;
 
-internal class NetworkDiskSetting : SettingBase, INetworkDiskSetting
+internal class NetworkDiskSetting(ISettingProvider provider) : SettingBase(provider), INetworkDiskSetting
 {
-    public NetworkDiskSetting(ISettingProvider provider) : base(provider)
-    {
-    }
-
     public NetworkDiskItem[] NetworkDisks
     {
         get => throw new System.NotImplementedException();

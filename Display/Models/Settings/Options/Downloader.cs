@@ -12,11 +12,6 @@ internal class Downloader(string name) : INotifyPropertyChanged
     public string ApiPlaceholder { get; set; }
     public string ApiText { get; set; }
 
-
-
-
-
-
     public Action<string> SavePathAction { get; set; }
     public Func<string> ResetPathFunc { get; set; }
 

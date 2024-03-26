@@ -3,12 +3,8 @@ using static Display.Constants.DefaultSettings;
 
 namespace Display.Setting.Impl;
 
-internal class ImportSetting : SettingBase, IImportSetting
+internal class ImportSetting(ISettingProvider provider) : SettingBase(provider), IImportSetting
 {
-    public ImportSetting(ISettingProvider provider) : base(provider)
-    {
-    }
-
     public bool IsToastAfterImportDataAccess
     {
         get => GetValue(Handle.IsToastAfterImportDataAccess);

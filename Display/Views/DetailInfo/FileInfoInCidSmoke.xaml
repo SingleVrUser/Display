@@ -9,9 +9,8 @@
     xmlns:converter="using:Display.Converter"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:data="using:Display.Models.Data"
-      xmlns:detailInfo="using:Display.Views.DetailInfo"
-    mc:Ignorable="d">
+      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
+      mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
           Width="400"
@@ -21,7 +20,7 @@
         <ListView x:Name="InfosListView"
                   CharacterSpacing="5">
             <ListView.ItemTemplate>
-                <DataTemplate x:DataType="data:Datum">
+                <DataTemplate x:DataType="oneOneFive:Datum">
                     <Grid Padding="5"
                           RowDefinitions="auto,auto,*"
                           RowSpacing="3">

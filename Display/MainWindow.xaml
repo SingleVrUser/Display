@@ -9,6 +9,7 @@
         xmlns:winUiEx="using:WinUIEx"
         xmlns:settings="using:Display.Models.Settings"
         xmlns:userController="using:Display.Controls.UserController"
+        xmlns:providers="using:Display.Providers"
         mc:Ignorable="d">
 
     <Grid x:Name="RootGrid">
@@ -114,7 +115,7 @@
                         PaneDisplayMode="Auto"
                         DisplayModeChanged="NavigationViewControl_DisplayModeChanged"
                         OpenPaneLength="150"
-                        IsPaneOpen="{x:Bind data:AppSettings.IsNavigationViewPaneOpen}"
+                        IsPaneOpen="{x:Bind providers:AppSettings.IsNavigationViewPaneOpen}"
                         SelectionFollowsFocus="Disabled">
 
             <!--调整NavigationView样式-->

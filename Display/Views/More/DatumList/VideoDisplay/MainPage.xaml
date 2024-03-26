@@ -10,6 +10,9 @@
       xmlns:data="using:Display.Models.Data"
       xmlns:videoDisplay="using:Display.Views.More.DatumList.VideoDisplay"
       xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+      xmlns:providers="using:Display.Providers"
+      xmlns:userController="using:Display.Controls.UserController"
+      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
       mc:Ignorable="d">
 
     <Page.Resources>
@@ -86,7 +89,7 @@
                                           Drop="Target_Drop"
                                           DragEnter="Target_DragEnter">
                                     <ListView.ItemTemplate>
-                                        <DataTemplate x:DataType="data:FilesInfo">
+                                    <DataTemplate x:DataType="oneOneFive:FilesInfo">
                                             <Grid ColumnSpacing="5"
                                                   DoubleTapped="OpenFolder_Tapped">
                                                 <Grid.ContextFlyout>
@@ -190,7 +193,7 @@
                                                         <TextBlock Text="{x:Bind VideoInfo.trueName, Mode=OneWay}"
                                                                        IsTextSelectionEnabled="True" />
                                                         <TextBlock Text="{x:Bind VideoInfo.ReleaseTime, Mode=OneWay}" />
-                                                        <customcontrols:TextBlockWithLongText StringValue="{x:Bind VideoInfo.Actor, Mode=OneWay}" />
+                                                        <userController:TextBlockWithLongText StringValue="{x:Bind VideoInfo.Actor, Mode=OneWay}" />
                                                     </StackPanel>
 
                                                     <StackPanel Orientation="Horizontal"
@@ -215,7 +218,7 @@
                                           SelectionMode="Single"
                                           ItemsSource="{x:Bind _playingVideoInfos}">
                                     <ListView.ItemTemplate>
-                                        <DataTemplate x:DataType="data:FilesInfo">
+                                    <DataTemplate x:DataType="oneOneFive:FilesInfo">
                                             <Grid ColumnSpacing="5">
                                                 <Grid.ContextFlyout>
                                                     <MenuFlyout>
@@ -276,27 +279,27 @@
                         <PivotItem Header="设置">
                             <StackPanel Padding="0,10">
                                 <Slider Header="最大播放数"
-                                        Value="{x:Bind data:AppSettings.MaxVideoPlayCount,Mode=TwoWay}"
+                                        Value="{x:Bind providers:AppSettings.MaxVideoPlayCount,Mode=TwoWay}"
                                         Minimum="1"
                                         Maximum="4"
                                         TickFrequency="1"
                                         TickPlacement="Outside"
                                         SnapsTo="Ticks" />
                                 <Slider Header="起始位置"
-                                        Value="{x:Bind data:AppSettings.AutoPlayPositionPercentage,Mode=TwoWay}" />
+                                        Value="{x:Bind providers:AppSettings.AutoPlayPositionPercentage,Mode=TwoWay}" />
 
 
                             <ToggleSwitch Header="从网络中搜刮信息"
-                                          IsOn="{x:Bind data:AppSettings.IsAutoSpiderInVideoDisplay,Mode=TwoWay}" />
+                                          IsOn="{x:Bind providers:AppSettings.IsAutoSpiderInVideoDisplay,Mode=TwoWay}" />
 
 
                             <ToggleSwitch
                                     Header="自动播放"
-                                    IsOn="{x:Bind data:AppSettings.IsAutoPlayInVideoDisplay,Mode=TwoWay}" />
+                                    IsOn="{x:Bind providers:AppSettings.IsAutoPlayInVideoDisplay,Mode=TwoWay}" />
 
 
                             <ToggleSwitch Header="画质选择"
-                                          IsOn="{x:Bind data:AppSettings.IsPlayBestQualityFirst,Mode=TwoWay}"
+                                          IsOn="{x:Bind providers:AppSettings.IsPlayBestQualityFirst,Mode=TwoWay}"
                                           OnContent="最高画质"
                                           OffContent="流畅优先"/>
 

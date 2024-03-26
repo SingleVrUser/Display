@@ -3,14 +3,14 @@
 
 using CommunityToolkit.WinUI.Collections;
 using CommunityToolkit.WinUI.Controls;
-using Display.Models.Data;
 using Display.Services.IncrementalCollection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Windows.Foundation;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.Details;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -135,122 +135,75 @@ public sealed partial class EditInfo : Page
 
     public VideoCoverDisplayClass GetInfoAfterEdit()
     {
-        VideoCoverDisplayClass info = this.videoInfo;
+        var info = videoInfo;
 
         foreach (var option in EditOptions)
         {
-            if (option is CommonEditOption commonEditOption)
+            switch (option)
             {
-                switch (commonEditOption.Header)
-                {
-                    case "标题":
-                        info.Title = commonEditOption.Text;
-                        break;
-                    case "发布时间":
-                        info.ReleaseTime = commonEditOption.Text;
-                        break;
-                    case "视频长度":
-                        info.Lengthtime = commonEditOption.Text;
-                        break;
-                    case "导演":
-                        info.Director = commonEditOption.Text;
-                        break;
-                    case "制作商":
-                        info.Producer = commonEditOption.Text;
-                        break;
-                    case "发行商":
-                        info.Publisher = commonEditOption.Text;
-                        break;
-                    case "系列":
-                        info.Series = commonEditOption.Text;
-                        break;
-                }
-            }
-            else if (option is TokenizingEditOption tokenizingEditOption)
-            {
-                switch (tokenizingEditOption.Header)
-                {
-                    case "类别":
-                        info.Category = string.Join(",", category_items.Select(item => item.Name));
-                        break;
-                    case "演员":
-                        info.Actor = string.Join(",", actor_items.Select(item => item.Name));
-                        break;
-                }
+                case CommonEditOption commonEditOption:
+                    switch (commonEditOption.Header)
+                    {
+                        case "标题":
+                            info.Title = commonEditOption.Text;
+                            break;
+                        case "发布时间":
+                            info.ReleaseTime = commonEditOption.Text;
+                            break;
+                        case "视频长度":
+                            info.Lengthtime = commonEditOption.Text;
+                            break;
+                        case "导演":
+                            info.Director = commonEditOption.Text;
+                            break;
+                        case "制作商":
+                            info.Producer = commonEditOption.Text;
+                            break;
+                        case "发行商":
+                            info.Publisher = commonEditOption.Text;
+                            break;
+                        case "系列":
+                            info.Series = commonEditOption.Text;
+                            break;
+                    }
+
+                    break;
+                case TokenizingEditOption tokenizingEditOption:
+                    switch (tokenizingEditOption.Header)
+                    {
+                        case "类别":
+                            info.Category = string.Join(",", category_items.Select(item => item.Name));
+                            break;
+                        case "演员":
+                            info.Actor = string.Join(",", actor_items.Select(item => item.Name));
+                            break;
+                    }
+
+                    break;
             }
         }
 
         return info;
     }
 
+
+
 }
 
 
 public class CommonOrTokenizingTemplateSelector : DataTemplateSelector
 {
-    // Define the (currently empty) data templates to return
-    // These will be "filled-in" in the XAML code.
     public DataTemplate CommonTemplate { get; set; }
 
     public DataTemplate TokenizingTemplate { get; set; }
 
     protected override DataTemplate SelectTemplateCore(object item)
     {
-        // Return the correct data template based on the item's type.
-        if (item is CommonEditOption)
+        return item switch
         {
-            return CommonTemplate;
-        }
-        else if (item is TokenizingEditOption)
-        {
-            return TokenizingTemplate;
-        }
-        else
-        {
-            return null;
-        }
+            CommonEditOption => CommonTemplate,
+            TokenizingEditOption => TokenizingTemplate,
+            _ => null
+        };
     }
-}
-
-public class CommonEditOption
-{
-    public string Header;
-    public string PlaceholderText => $"请输入{Header}";
-    public double MinWidth { get; set; } = 150;
-
-    public string Text;
-}
-
-public class TokenData
-{
-    public string Initials => string.Empty + Name.FirstOrDefault();
-
-    public string Name { get; set; }
-
-    public TokenData(string name)
-    {
-        this.Name = name;
-    }
-
-}
-
-public class TokenizingEditOption
-{
-    public string Header;
-    public string PlaceholderText => $"添加{Header}";
-
-    public string Text;
-
-    public SymbolIconSource SymbolIconSource;
-
-    public TypedEventHandler<TokenizingTextBox, TokenItemAddingEventArgs> ItemAdding;
-
-    public TypedEventHandler<AutoSuggestBox, AutoSuggestBoxTextChangedEventArgs> TextChanged;
-
-    public object SuggestedItemsSource;
-
-    public object ItemsSource { get; set; }
-
-    public DataTemplate ItemTemplate;
-
 }

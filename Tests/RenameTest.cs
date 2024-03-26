@@ -1,4 +1,4 @@
-﻿using Display.Models.Data;
+﻿using Display.Providers;
 using Display.Services.Upload;
 using Tests.Helper;
 

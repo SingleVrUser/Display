@@ -1,6 +1,6 @@
 ﻿namespace Display.Setting.Interfaces;
 
-public interface IUpdateSetting
+internal interface IUpdateSetting
 {
     /// <summary>
     /// 是否已经升级了数据库

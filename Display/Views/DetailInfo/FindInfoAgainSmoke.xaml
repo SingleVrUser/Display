@@ -12,6 +12,7 @@
       xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:controls="using:CommunityToolkit.WinUI.Controls"
       xmlns:spider="using:Display.Providers.Spider"
+      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
       mc:Ignorable="d">
     <Page.Resources>
         <Style TargetType="Pivot">
@@ -102,7 +103,7 @@
                               x:Name="NewInfo_ListView"
                               SelectionChanged="NewInfo_ListView_SelectionChanged">
                         <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="data:VideoInfo">
+                            <DataTemplate x:DataType="oneOneFive:VideoInfo">
                                 <Grid ColumnSpacing="3"
                                       Padding="0,2">
                                     <Grid.ColumnDefinitions>

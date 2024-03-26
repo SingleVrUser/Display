@@ -8,6 +8,8 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
       xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
+      xmlns:userController="using:Display.Controls.UserController"
+      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
       mc:Ignorable="d">
 
     <ScrollViewer>
@@ -89,7 +91,7 @@
                                       ItemsSource="{x:Bind _items}"
                                       Background="Transparent">
                                 <FlipView.ItemTemplate>
-                                    <DataTemplate x:DataType="data:VideoInfo">
+                                    <DataTemplate x:DataType="oneOneFive:VideoInfo">
                                         <Border x:Name="Image_Grid"
                                                 PointerEntered="Image_PointerEntered"
                                                 PointerExited="Image_PointerExited"
@@ -117,7 +119,7 @@
                                   SelectedIndex="{x:Bind RandomImageFlipView.SelectedIndex, Mode=TwoWay}"
                                   SelectionChanged="videoInfoListView_SelectionChanged">
                             <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="data:VideoInfo">
+                                <DataTemplate x:DataType="oneOneFive:VideoInfo">
                                     <Grid Margin="2">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="auto" />
@@ -135,9 +137,9 @@
                                                     Margin="5">
                                             <TextBlock Text="{x:Bind trueName}"
                                                        FontFamily="JetBrains Mono" />
-                                            <customecontrol:TextBlockWithLongText StringValue="{x:Bind Actor}"
+                                            <userController:TextBlockWithLongText StringValue="{x:Bind Actor}"
                                                                                   IsFirstTextSelectionEnabled="False" />
-                                            <customecontrol:TextBlockWithLongText StringValue="{x:Bind Category}"
+                                            <userController:TextBlockWithLongText StringValue="{x:Bind Category}"
                                                                                   IsFirstTextSelectionEnabled="False" />
                                         </StackPanel>
                                     </Grid>

@@ -1,10 +1,10 @@
-﻿using Display.Models.Data.Enums;
-using Display.Models.Media;
+﻿using Display.Models.Media;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Display.Models.Enums;
 
 namespace Display.Controls.CustomController;
 

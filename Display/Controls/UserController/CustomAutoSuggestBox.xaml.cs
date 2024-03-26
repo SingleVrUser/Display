@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Windows.Foundation;
-using Display.Helper.FileProperties.Name;
+﻿using Display.Helper.FileProperties.Name;
 using Display.Models.Data;
+using Display.Providers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Windows.Foundation;
+using Display.Models.Dto.OneOneFive;
 
 namespace Display.Controls.UserController;
 

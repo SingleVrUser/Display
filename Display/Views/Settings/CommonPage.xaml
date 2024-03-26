@@ -9,7 +9,8 @@
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:data="using:Display.Models.Data"
     xmlns:ui="using:CommunityToolkit.WinUI.UI"
-    xmlns:enums="using:Display.Models.Data.Enums"
+    xmlns:providers="using:Display.Providers"
+    xmlns:enums="using:Display.Models.Enums"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -24,12 +25,12 @@
 
             <ToggleSwitch OnContent="开启"
                           OffContent="关闭"
-                          IsOn="{x:Bind data:AppSettings.IsCheckUpdate,Mode=TwoWay}" />
+                          IsOn="{x:Bind providers:AppSettings.IsCheckUpdate,Mode=TwoWay}" />
         </controls:SettingsCard>
         <controls:SettingsCard Header="缩略图来源">
             <ComboBox RelativePanel.AlignRightWithPanel="True"
                       ItemsSource="{ui:EnumValues Type=enums:ThumbnailOriginType}"
-                      SelectedItem="{x:Bind data:AppSettings.ThumbnailOriginType, Mode=TwoWay}" />
+                      SelectedItem="{x:Bind providers:AppSettings.ThumbnailOriginType, Mode=TwoWay}" />
         </controls:SettingsCard>
 
     </StackPanel>

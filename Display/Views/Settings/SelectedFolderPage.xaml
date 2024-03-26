@@ -7,7 +7,7 @@
       xmlns:local="using:Display.Views.Settings"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:data="using:Display.Models.Data"
+      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
       mc:Ignorable="d"
       Width="600"
       Height="300">
@@ -19,7 +19,7 @@
             <ItemsWrapGrid Orientation="Horizontal" ItemHeight="100" ItemWidth="100"/>
         </ItemsPanelTemplate>
 
-        <DataTemplate x:DataType="data:FilesInfo" x:Name="ListViewDataTemplate">
+        <DataTemplate x:DataType="oneOneFive:FilesInfo" x:Name="ListViewDataTemplate">
             <Grid ColumnDefinitions="32,*"
                   ColumnSpacing="10"
                   ToolTipService.ToolTip="{x:Bind Name}">
@@ -37,7 +37,7 @@
             </Grid>
         </DataTemplate>
 
-        <DataTemplate x:DataType="data:FilesInfo" x:Name="GridViewDataTemplate">
+        <DataTemplate x:DataType="oneOneFive:FilesInfo" x:Name="GridViewDataTemplate">
             <Grid RowDefinitions="*,auto"
                   Padding="5"
                   ToolTipService.ToolTip="{x:Bind Name}">
@@ -78,7 +78,7 @@
                            ItemClicked="FolderBreadcrumbBar_ItemClicked"
                            ItemsSource="{x:Bind explorerItems}">
                 <BreadcrumbBar.ItemTemplate>
-                    <DataTemplate x:DataType="data:ExplorerItem">
+                    <DataTemplate x:DataType="oneOneFive:ExplorerItem">
                         <BreadcrumbBarItem Content="{Binding}">
                             <BreadcrumbBarItem.ContentTemplate>
                                 <DataTemplate>

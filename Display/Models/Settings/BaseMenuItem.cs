@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Display.Models.Data.Enums;
 using Microsoft.UI.Xaml.Controls;
 using System.Text.Json.Serialization;
+using Display.Models.Enums;
 
 namespace Display.Models.Settings;
 

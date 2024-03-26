@@ -1,17 +1,19 @@
 ﻿<UserControl
-    x:Class="Display.Controls.Explorer"
+    x:Class="Display.Controls.UserController.Explorer"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Display.Controls"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:data="using:Display.Models.Data"
-    xmlns:enums="using:Display.Models.Data.Enums"
+    xmlns:enums1="using:Display.Models.Enums"
+    xmlns:userController="using:Display.Controls.UserController"
+    xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
     mc:Ignorable="d">
     <Control.Resources>
         <!--ListView 的 文件 DataTemplate-->
-        <DataTemplate x:Key="FileInSelectFolderTemplate" x:DataType="data:FilesInfo">
+        <DataTemplate x:Key="FileInSelectFolderTemplate"
+                      x:DataType="oneOneFive:FilesInfo">
             <ListViewItem>
                 <Grid ColumnSpacing="10" Background="Transparent">
                     <Grid.ContextFlyout>
@@ -31,23 +33,23 @@
                                 </MenuFlyoutSubItem.Icon>
 
                                 <MenuFlyoutItem Text="WebView"
-                                                Tag="{x:Bind enums:PlayerType.WebView}"
+                                                Tag="{x:Bind enums1:PlayerType.WebView}"
                                                 Click="PlayWithPlayerButtonClick" />
 
                                 <MenuFlyoutItem Text="PotPlayer"
-                                                Tag="{x:Bind enums:PlayerType.PotPlayer}"
+                                                Tag="{x:Bind enums1:PlayerType.PotPlayer}"
                                                 Click="PlayWithPlayerButtonClick" />
 
                                 <MenuFlyoutItem Text="mpv"
-                                                Tag="{x:Bind enums:PlayerType.Mpv}"
+                                                Tag="{x:Bind enums1:PlayerType.Mpv}"
                                                 Click="PlayWithPlayerButtonClick" />
 
                                 <MenuFlyoutItem Text="vlc"
-                                                Tag="{x:Bind enums:PlayerType.Vlc}"
+                                                Tag="{x:Bind enums1:PlayerType.Vlc}"
                                                 Click="PlayWithPlayerButtonClick" />
 
                                 <MenuFlyoutItem Text="MediaElement"
-                                                Tag="{x:Bind enums:PlayerType.MediaElement}"
+                                                Tag="{x:Bind enums1:PlayerType.MediaElement}"
                                                 Click="PlayWithPlayerButtonClick" />
 
                             </MenuFlyoutSubItem>
@@ -75,7 +77,8 @@
         </DataTemplate>
 
         <!--ListView 的 文件夹 DataTemplate-->
-        <DataTemplate x:Key="FolderInSelectFolderTemplate" x:DataType="data:FilesInfo">
+        <DataTemplate x:Key="FolderInSelectFolderTemplate"
+                      x:DataType="oneOneFive:FilesInfo">
             <ListViewItem>
                 <StackPanel Orientation="Horizontal" Spacing="5">
                     <Grid ColumnSpacing="10">
@@ -136,12 +139,6 @@
             </ListViewItem>
         </DataTemplate>
 
-        <!--暂不使用，目前发现 ListView使用 ItemTemplateSelector 会影响ItemClick的点击范围-->
-        <local:FileInfoItemTemplateSelector
-                    x:Key="FileInfoItemTemplateSelector"
-                    FolderTemplate="{StaticResource FolderInSelectFolderTemplate}"
-                    FileTemplate="{StaticResource FileInSelectFolderTemplate}" />
-
         <!--TreeView 的 文件夹 DataTemplate-->
         <DataTemplate x:Key="FolderTemplate" x:DataType="TreeViewNode">
             <TreeViewItem>
@@ -163,7 +160,7 @@
                     </Grid.ContextFlyout>
                     
                     <ToolTipService.ToolTip>
-                        <TextBlock  Text="{x:Bind ((data:ExplorerItem)Content).Name}"/>
+                        <TextBlock  Text="{x:Bind ((oneOneFive:ExplorerItem)Content).Name}"/>
                     </ToolTipService.ToolTip>
 
                     <Image Width="30"
@@ -174,8 +171,9 @@
                                             RasterizePixelHeight="30" />
                         </Image.Source>
                     </Image>
-                    
-                    <TextBlock Grid.Column="1" Text="{x:Bind ((data:ExplorerItem)Content).Name}"
+
+                    <TextBlock Grid.Column="1"
+                               Text="{x:Bind ((oneOneFive:ExplorerItem)Content).Name}"
                                TextTrimming="CharacterEllipsis"
                                VerticalAlignment="Center"
                                HorizontalAlignment="Left" />
@@ -190,17 +188,17 @@
                 <StackPanel Orientation="Horizontal" Spacing="5">
 
                     <ToolTipService.ToolTip>
-                        <TextBlock  Text="{x:Bind ((data:ExplorerItem)Content).Name}"/>
+                        <TextBlock  Text="{x:Bind ((oneOneFive:ExplorerItem)Content).Name}"/>
                     </ToolTipService.ToolTip>
                     <Image Width="20" Source="/Assets/115/file_type/other/unknown.svg"/>
-                    <TextBlock Text="{x:Bind ((data:ExplorerItem)Content).Name}" TextTrimming="WordEllipsis" MaxWidth="400">
+                    <TextBlock Text="{x:Bind ((oneOneFive:ExplorerItem)Content).Name}" TextTrimming="WordEllipsis" MaxWidth="400">
 
                     </TextBlock>
                 </StackPanel>
             </TreeViewItem>
         </DataTemplate>
 
-        <local:ExplorerItemTemplateSelector
+        <userController:ExplorerItemTemplateSelector
                     x:Key="ExplorerItemTemplateSelector"
                     FolderTemplate="{StaticResource FolderTemplate}"
                     FileTemplate="{StaticResource FileTemplate}" />
@@ -284,7 +282,7 @@
                     <BreadcrumbBar ItemClicked="FolderBreadcrumbBar_ItemClicked"
                                    ItemsSource="{x:Bind SelectFolderName}">
                         <BreadcrumbBar.ItemTemplate>
-                            <DataTemplate x:DataType="data:ExplorerItem">
+                            <DataTemplate x:DataType="oneOneFive:ExplorerItem">
                                 <BreadcrumbBarItem Content="{Binding}">
                                     <BreadcrumbBarItem.ContentTemplate>
                                         <DataTemplate>

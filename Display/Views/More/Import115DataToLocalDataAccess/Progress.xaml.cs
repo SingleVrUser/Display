@@ -1,6 +1,6 @@
 ﻿using Display.CustomWindows;
 using Display.Helper.Date;
-using Display.Models.Data;
+using Display.Providers;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.System;
+using Display.Models.Dto.OneOneFive;
 using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,

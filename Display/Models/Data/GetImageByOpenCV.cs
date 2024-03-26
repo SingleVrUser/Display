@@ -6,750 +6,619 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Windows.ApplicationModel;
 
-namespace Display.Models.Data
+namespace Display.Models.Data;
+
+internal class GetImageByOpenCv
 {
-    public class GetImageByOpenCV
+    private static readonly string FaceProto = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/deploy.prototxt");
+    private static readonly string FaceModel = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/res10_300x300_ssd_iter_140000_fp16.caffemodel");
+
+    private static readonly string GenderProto = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/gender_deploy.prototxt");
+    private static readonly string GenderModel = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/gender_net.caffemodel");
+
+    private static readonly string AgeConfigFile = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/age_deploy.prototxt");
+    private static readonly string AgeFaceModel = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/age_net.caffemodel");
+
+    public static bool IsModelFilesExists =>
+        File.Exists(FaceProto) && File.Exists(FaceModel)
+                               && File.Exists(GenderProto) && File.Exists(GenderModel)
+                               && File.Exists(AgeConfigFile) && File.Exists(AgeFaceModel);
+
+    private readonly Net _faceNet = CvDnn.ReadNetFromCaffe(FaceProto, FaceModel);
+    private readonly Net _genderNet = CvDnn.ReadNetFromCaffe(GenderProto, GenderModel);
+    private readonly Net _ageNet = CvDnn.ReadNetFromCaffe(AgeConfigFile, AgeFaceModel);
+
+
+    public GetImageByOpenCv(bool isUseGpu = false)
     {
-        static string faceProto = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/deploy.prototxt");
-        static string faceModel = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/res10_300x300_ssd_iter_140000_fp16.caffemodel");
+        InitializeNet(isUseGpu);
+    }
 
-        static string genderProto = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/gender_deploy.prototxt");
-        static string genderModel = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/gender_net.caffemodel");
-
-        static string AgeconfigFile = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/age_deploy.prototxt");
-        static string AgefaceModel = Path.Combine(Package.Current.InstalledLocation.Path, "Assets/Models/caffe/age_net.caffemodel");
-
-        public static bool IsModelFilesExists
+    private void InitializeNet(bool isUseGpu)
+    {
+        if (isUseGpu)
         {
-            get => File.Exists(faceProto) && File.Exists(faceModel)
-                && File.Exists(genderProto) && File.Exists(genderModel)
-                && File.Exists(AgeconfigFile) && File.Exists(AgefaceModel);
+            _faceNet.SetPreferableBackend(Backend.CUDA);
+            _faceNet.SetPreferableTarget(Target.CUDA);
+
+            _genderNet.SetPreferableBackend(Backend.CUDA);
+            _genderNet.SetPreferableTarget(Target.CUDA);
+
+            _ageNet.SetPreferableBackend(Backend.CUDA);
+            _ageNet.SetPreferableTarget(Target.CUDA);
+        }
+        else
+        {
+            _faceNet.SetPreferableBackend(Backend.DEFAULT);
+            _faceNet.SetPreferableTarget(Target.CPU);
+
+            _genderNet.SetPreferableBackend(Backend.DEFAULT);
+            _genderNet.SetPreferableTarget(Target.CPU);
+
+            _ageNet.SetPreferableBackend(Backend.DEFAULT);
+            _ageNet.SetPreferableTarget(Target.CPU);
+        }
+    }
+
+    public double GetTotalFrameCount(string url)
+    {
+        var cap = new VideoCapture(url);
+        return cap.Get(VideoCaptureProperties.FrameCount);
+    }
+
+    public bool Task_GetThumbnailByVideoPath(string videoPath, double startFrame, bool isShowWindow, IProgress<ProgressInfo> progress, string savePath, string imageName = "", bool isNeedDetectFaces = true, double? length = null)
+    {
+        var isGetImage = false;
+
+        List<string> genderList = ["Male", "Female"];
+        //List<string> ageList = new List<string> { "(0-2)", "(4-6)", "(8-12)", "(15-20)", "(25-32)", "(38-43)", "(48-53)", "(60-100)" };
+
+        var cap = new VideoCapture(videoPath);
+
+        if (startFrame != 0)
+        {
+            cap.Set(VideoCaptureProperties.PosFrames, startFrame);
         }
 
-        Net faceNet = CvDnn.ReadNetFromCaffe(faceProto, faceModel);
-        Net genderNet = CvDnn.ReadNetFromCaffe(genderProto, genderModel);
-        Net ageNet = CvDnn.ReadNetFromCaffe(AgeconfigFile, AgefaceModel);
+        var pause = false;
+        var detectFaces = true;
+        var freq = 100;
 
+        length ??= GetTotalFrameCount(videoPath) - startFrame;
 
-        public GetImageByOpenCV(bool isUseGPU = false)
+        //失败尝试次数
+        var tryAgainCount = 3;
+
+        ////人脸信息尝试获取次数
+        //int GetFaceCount = 30;
+
+        for (int idx = 0, tryCount = 0; idx < length && tryCount < tryAgainCount; idx++)
         {
-            InitializeNet(isUseGPU);
-        }
+            var startTime = DateTime.Now;
 
-        void InitializeNet(bool isUseGPU)
-        {
-            if (isUseGPU)
+            var key = Cv2.WaitKey(1);
+            switch ((char)key)
             {
-                faceNet.SetPreferableBackend(Backend.CUDA);
-                faceNet.SetPreferableTarget(Target.CUDA);
-
-                genderNet.SetPreferableBackend(Backend.CUDA);
-                genderNet.SetPreferableTarget(Target.CUDA);
-
-                ageNet.SetPreferableBackend(Backend.CUDA);
-                ageNet.SetPreferableTarget(Target.CUDA);
+                //case (char)27: // esc
+                //    break;
+                case (char)32: // space
+                    pause = !pause;
+                    break;
+                case 'f':
+                    detectFaces = !detectFaces;
+                    break;
             }
-            else
+
+            //暂停
+            if (pause) continue;
+
+            using Mat image = new();
+            var ret = cap.Grab();
+            if (!ret)
             {
-                faceNet.SetPreferableBackend(Backend.DEFAULT);
-                faceNet.SetPreferableTarget(Target.CPU);
-
-                genderNet.SetPreferableBackend(Backend.DEFAULT);
-                genderNet.SetPreferableTarget(Target.CPU);
-
-                ageNet.SetPreferableBackend(Backend.DEFAULT);
-                ageNet.SetPreferableTarget(Target.CPU);
+                break;
             }
-        }
+            cap.Retrieve(image);
 
-        public double getTotalFrameCount(string url)
-        {
-            var cap = new VideoCapture(url);
-            return cap.Get(VideoCaptureProperties.FrameCount);
-        }
-
-        private async Task MultThread(string url, int Task_Count, int startJumpFrame_num = 1000, int endJumpFrame_num = 0, bool isShowWindow = true)
-        {
-            //string url = @"D:\库\Downloads\115\普通\【楓ふうあ】 SSIS-428\SSIS-428 大嫌いなあなたに懇願ー 生涯最高のイラマチオをください。 楓ふうあ.mp4";
-
-
-            ////文件名
-            //FileName_TextBlock.Text = Path.GetFileName(url);
-
-            ////进度条最大值
-            //AllProgressBar.Maximum = Task_Count;
-
-            //AllProgressBar.Value = 0;
-
-            //int Task_Count = 20;
-
-            var frames_num = getTotalFrameCount(url);
-            if (frames_num == 0) return;
-
-            ////跳过开头
-            //int startJumpFrame_num = 1000;
-
-            ////跳过结尾
-            //int endJumpFrame_num = 0;
-
-            var actualEndFrame = frames_num - endJumpFrame_num;
-
-            //平均长度
-            var averageLength = (int)(actualEndFrame - startJumpFrame_num) / Task_Count;
-
-            //Progress_TextBlock.Text = $"{AllProgressBar.Value}/{Task_Count}";
-            //AllProgressBar.Visibility = Visibility.Visible;
-
-            var startTime = DateTimeOffset.Now;
-            for (double start_frame = startJumpFrame_num; start_frame + averageLength <= actualEndFrame; start_frame += averageLength)
+            if (image.Empty())
             {
+                tryCount++;
+                continue;
+            }
 
-                double taskStartFrame = start_frame;
-                double length = actualEndFrame - startJumpFrame_num < 2 * averageLength ? actualEndFrame - startJumpFrame_num : averageLength;
+            //是否检测
+            if (detectFaces && idx % freq == 1)
+            {
+                var padding = 20;
 
-                //Debug.WriteLine($"进程开始：{start_frame}，长度{length}");
-
-                //进度
-                var progress = new Progress<progressInfo>(info =>
+                //需要检测人脸信息
+                if (isNeedDetectFaces)
                 {
-                    //tryStartShowFaceCanv();
+                    var bBoxes = GetFaceBox(image);
 
-                    //RichTextBlock richTextBlock = new RichTextBlock();
-                    //Paragraph paragraph = new Paragraph();
-
-                    //var faces = info.faceList;
-
-                    //paragraph.Inlines.Add(new Run() { Text = $"捕获人脸({faces.Count})：" });
-                    //paragraph.Inlines.Add(new LineBreak());
-                    //for (int i = 0; i < faces.Count; i++)
-                    //{
-                    //    string index = string.Empty;
-                    //    if (faces.Count > 1)
-                    //    {
-                    //        index = $"{i + 1}. ";
-                    //    }
-
-                    //    paragraph.Inlines.Add(new Run() { Text = $"{index}{faces[i].gender.result}（{faces[i].gender.confidence:0.00}）：{faces[i].age.result}岁（{faces[i].age.confidence:0.00}）" });
-                    //    if (i < faces.Count - 1)
-                    //    {
-                    //        paragraph.Inlines.Add(new LineBreak());
-                    //    }
-                    //}
-
-                    //showImage.Source = new BitmapImage(new Uri(info.imagePath));
-
-                    //updateFaceCanv(info);
-
-                    //if (imageIntroduce_RichTextBlock.Blocks.Count == 0)
-                    //{
-                    //    imageIntroduce_RichTextBlock.Blocks.Add(new Paragraph());
-                    //}
-
-                    //imageIntroduce_RichTextBlock.Blocks[0] = paragraph;
-                });
-
-                await Task.Run(() => Task_GenderByVideo(url, taskStartFrame, length, isShowWindow, progress, @"D:\库\Pictures\Screenshots\"));
-
-                //AllProgressBar.Value++;
-
-                //Progress_TextBlock.Text = $"{AllProgressBar.Value}/{Task_Count}";
-
-                ////计算剩余时间
-                //leftTime_TextBlock.Text = $"预计剩余：{ConvertDoubleToDateStr((Task_Count - AllProgressBar.Value) * ((DateTimeOffset.Now - startTime) / AllProgressBar.Value).TotalSeconds)}";
-
-            }
-
-            ////结束
-            //leftTime_TextBlock.Text = $"总耗时：{FileMatch.ConvertDoubleToDateStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
-        }
-
-        public bool Task_GetThumbnailByVideoPath(string videoPath, double start_frame, bool isShowWindow, IProgress<progressInfo> progress, string SavePath, string imageName = "", bool isNeeddetectFaces = true, double length = -1)
-        {
-            bool isGetImage = false;
-
-            List<string> genderList = new List<string> { "Male", "Female" };
-            //List<string> ageList = new List<string> { "(0-2)", "(4-6)", "(8-12)", "(15-20)", "(25-32)", "(38-43)", "(48-53)", "(60-100)" };
-
-            var cap = new VideoCapture(videoPath);
-
-            if (start_frame != 0)
-            {
-                cap.Set(VideoCaptureProperties.PosFrames, start_frame);
-            }
-
-            var pause = false;
-            var detectFaces = true;
-            int freq = 100;
-
-            if (length == -1)
-            {
-                length = getTotalFrameCount(videoPath) - start_frame;
-            }
-
-            //失败尝试次数
-            int tryAgainCount = 3;
-
-            ////人脸信息尝试获取次数
-            //int GetFaceCount = 30;
-
-            for (int idx = 0, tryCount = 0; idx < length && tryCount < tryAgainCount; idx++)
-            {
-                var starttime = DateTime.Now;
-
-                var key = Cv2.WaitKey(1);
-                switch ((char)key)
-                {
-                    //case (char)27: // esc
-                    //    break;
-                    case (char)32: // space
-                        pause = !pause;
-                        break;
-                    case 'f':
-                        detectFaces = !detectFaces;
-                        break;
-                }
-
-                //暂停
-                if (!pause)
-                {
-                    using Mat image = new();
-                    var ret = cap.Grab();
-                    if (!ret)
+                    //未检测到人脸信息
+                    if (bBoxes.Count == 0)
                     {
-                        break;
-                    }
-                    cap.Retrieve(image);
-
-                    if (image.Empty())
-                    {
-                        tryCount++;
-                        continue;
-                    }
-
-                    //是否检测
-                    if (detectFaces && idx % freq == 1)
-                    {
-                        int padding = 20;
-
-                        //需要检测人脸信息
-                        if (isNeeddetectFaces)
+                        //源
+                        if (isShowWindow)
                         {
-                            var bboxes = getFaceBox(image);
-
-                            //未检测到人脸信息
-                            if (bboxes.Count == 0)
-                            {
-                                //源
-                                if (isShowWindow)
-                                {
-                                    showOriginImage(image, starttime);
-                                }
-                            }
-                            //检测到人脸信息
-                            else
-                            {
-                                progressInfo progressInfo = new();
-                                progressInfo.faceList = new();
-
-                                if (string.IsNullOrEmpty(imageName))
-                                {
-                                    imageName = $"frame{start_frame + idx}";
-                                }
-
-                                string imagePath = Path.Combine(SavePath, $"{imageName}.jpg");
-                                progressInfo.imagePath = imagePath;
-                                progressInfo.PixelWidth = image.Cols;
-                                progressInfo.PixelHeight = image.Rows;
-
-                                bool isGetFemaleImage = false;
-
-                                foreach (var bbox in bboxes)
-                                {
-                                    var newFaceRecognition = new FaceRecognition();
-                                    newFaceRecognition.facebox = bbox;
-
-                                    int x1 = bbox[0];
-                                    int y1 = bbox[1];
-                                    int x2 = bbox[2];
-                                    int y2 = bbox[3];
-
-                                    if (x1 >= x2 || y1 >= y2) continue;
-
-                                    var height = image.Rows;
-                                    var width = image.Cols;
-
-                                    var Range1 = new OpenCvSharp.Range(Math.Max(0, y1 - padding), Math.Min(height, y2 + padding));
-                                    var Range2 = new OpenCvSharp.Range(Math.Max(0, x1 - padding), Math.Min(width, x2 + padding));
-
-                                    Mat face = image[Range1, Range2];
-
-                                    using var blob = CvDnn.BlobFromImage(face, 1.0, new Size(227, 227), new Scalar(78.4263377603, 87.7689143744, 114.895847746), false);
-
-                                    genderNet.SetInput(blob);
-
-                                    using var genderPreds = genderNet.Forward();
-
-                                    double min_index_gender, max_index_gender;
-                                    Point minLoc, maxLoc;
-                                    genderPreds.MinMaxLoc(out min_index_gender, out max_index_gender, out minLoc, out maxLoc);
-                                    var gender = genderList[maxLoc.X];
-                                    newFaceRecognition.gender = new() { result = gender, confidence = max_index_gender };
-
-                                    string label = $"{gender}";
-
-                                    //人脸
-                                    var faceimg = new Mat(image,
-                                        new OpenCvSharp.Range(y1, y2),
-                                        new OpenCvSharp.Range(x1, x2));
-
-                                    var newsize = new Size(faceimg.Cols, faceimg.Rows);
-                                    using var frame = new Mat();
-                                    Cv2.Resize(faceimg, frame, newsize);
-
-                                    ////通过宽高比筛选
-                                    //bool isWHRatioMatch = false;
-
-                                    //float wh_ratio = (float)faceimg.Cols / faceimg.Rows;
-                                    //if (0.7 < wh_ratio && wh_ratio < 0.9)
-                                    //{
-                                    //    isWHRatioMatch = true;
-                                    //}
-
-                                    //hsv，主要筛选出过暗/过亮头像
-                                    bool ishsv_qualified = false;
-
-                                    Mat hsv = new();
-                                    Cv2.CvtColor(frame, hsv, ColorConversionCodes.BGR2HSV);
-                                    Scalar scalar = Cv2.Mean(hsv);
-
-                                    //HSV 中的色相表示颜色，HSV 中的饱和度表示灰色，HSV 中的值表示亮度。
-                                    //HSV 中的色相范围为[0，179]，HSV 中的饱和度范围为[0，255]，HSV 中的值范围为[0，255]
-                                    if (0 < scalar.Val0 && scalar.Val0 < 179 &&
-                                        0 < scalar.Val1 && scalar.Val1 < 255 &&
-                                        50 < scalar.Val2 && scalar.Val2 < 200)
-                                    {
-                                        ishsv_qualified = true;
-                                    }
-
-                                    //只挑选符合条件的
-                                    if (gender == "Female" && newFaceRecognition.gender.confidence > 0.9 && ishsv_qualified)
-                                    {
-                                        isGetFemaleImage = true;
-                                    }
-
-                                    Cv2.PutText(frame, label, new Point(5, 25), HersheyFonts.HersheySimplex, 0.8, new Scalar(0, 255, 255), 2, LineTypes.Link4);
-
-                                    progressInfo.faceList.Add(newFaceRecognition);
-
-                                    if (isShowWindow)
-                                    {
-                                        Cv2.ImShow($"{Thread.CurrentThread.ManagedThreadId} Age Gender Demo", faceimg);
-
-                                    }
-                                }
-
-                                progress.Report(progressInfo);
-
-                                //获取到女生
-                                if (isGetFemaleImage)
-                                {
-                                    SaveOriginOrFaceImage(image, SavePath, imageName);
-                                    //FileMatch.CreateDirectoryIfNotExists(SavePath);
-                                    //image.SaveImage(imagePath);
-                                    isGetImage = true;
-                                    image.Release();
-                                    break;
-                                }
-                            }
+                            ShowOriginImage(image, startTime);
                         }
-                        //不需要检测人脸信息
-                        else
+                    }
+                    //检测到人脸信息
+                    else
+                    {
+                        ProgressInfo progressInfo = new()
                         {
-                            if (string.IsNullOrEmpty(imageName))
-                            {
-                                imageName = $"frame{start_frame + idx}";
-                            }
+                            FaceList = []
+                        };
 
-                            //过暗的不要
+                        if (string.IsNullOrEmpty(imageName))
+                        {
+                            imageName = $"frame{startFrame + idx}";
+                        }
+
+                        var imagePath = Path.Combine(savePath, $"{imageName}.jpg");
+                        progressInfo.ImagePath = imagePath;
+                        progressInfo.PixelWidth = image.Cols;
+                        progressInfo.PixelHeight = image.Rows;
+
+                        var isGetFemaleImage = false;
+
+                        foreach (var bBox in bBoxes)
+                        {
+                            var newFaceRecognition = new FaceRecognition
+                            {
+                                Facebox = bBox
+                            };
+
+                            var x1 = bBox[0];
+                            var y1 = bBox[1];
+                            var x2 = bBox[2];
+                            var y2 = bBox[3];
+
+                            if (x1 >= x2 || y1 >= y2) continue;
+
+                            var height = image.Rows;
+                            var width = image.Cols;
+
+                            var range1 = new OpenCvSharp.Range(Math.Max(0, y1 - padding), Math.Min(height, y2 + padding));
+                            var range2 = new OpenCvSharp.Range(Math.Max(0, x1 - padding), Math.Min(width, x2 + padding));
+
+                            var face = image[range1, range2];
+
+                            using var blob = CvDnn.BlobFromImage(face, 1.0, new Size(227, 227), new Scalar(78.4263377603, 87.7689143744, 114.895847746), false);
+
+                            _genderNet.SetInput(blob);
+
+                            using var genderPres = _genderNet.Forward();
+
+                            genderPres.MinMaxLoc(out _, out var maxIndexGender, out _, out var maxLoc);
+                            var gender = genderList[maxLoc.X];
+                            newFaceRecognition.Gender = new FaceRecognition.PredictLabel { Result = gender, Confidence = maxIndexGender };
+
+                            var label = $"{gender}";
+
+                            //人脸
+                            var faceImg = new Mat(image,
+                                new OpenCvSharp.Range(y1, y2),
+                                new OpenCvSharp.Range(x1, x2));
+
+                            var newSize = new Size(faceImg.Cols, faceImg.Rows);
+                            using var frame = new Mat();
+                            Cv2.Resize(faceImg, frame, newSize);
+
+                            //hsv，主要筛选出过暗/过亮头像
+                            var ishHsvQualified = false;
+
                             Mat hsv = new();
-                            Cv2.CvtColor(image, hsv, ColorConversionCodes.BGR2HSV);
-                            Scalar scalar = Cv2.Mean(hsv);
+                            Cv2.CvtColor(frame, hsv, ColorConversionCodes.BGR2HSV);
+                            var scalar = Cv2.Mean(hsv);
 
                             //HSV 中的色相表示颜色，HSV 中的饱和度表示灰色，HSV 中的值表示亮度。
                             //HSV 中的色相范围为[0，179]，HSV 中的饱和度范围为[0，255]，HSV 中的值范围为[0，255]
-                            if (0 < scalar.Val0 && scalar.Val0 < 179 &&
-                                0 < scalar.Val1 && scalar.Val1 < 255 &&
-                                50 < scalar.Val2 && scalar.Val2 < 200)
+                            if (scalar.Val0 is > 0 and < 179 &&
+                                0 < scalar.Val1 && scalar is { Val1: < 255, Val2: > 50 and < 200 })
                             {
-                                SaveOriginOrFaceImage(image, SavePath, imageName);
-                                isGetImage = true;
-                                break;
+                                ishHsvQualified = true;
                             }
 
-                        }
+                            //只挑选符合条件的
+                            if (gender == "Female" && newFaceRecognition.Gender.Confidence > 0.9 && ishHsvQualified)
+                            {
+                                isGetFemaleImage = true;
+                            }
 
-                    }
-                    else
-                    {
-                        if (isShowWindow)
-                        {
-                            image.PutText("Playing", new Point(10, 300), HersheyFonts.HersheyScriptComplex, 5, Scalar.Blue, 3);
-                            showOriginImage(image, starttime);
-                        }
-                    }
-                }
-            }
-            GC.Collect();
+                            Cv2.PutText(frame, label, new Point(5, 25), HersheyFonts.HersheySimplex, 0.8, new Scalar(0, 255, 255), 2, LineTypes.Link4);
 
-            if (isShowWindow)
-            {
-                Cv2.DestroyAllWindows();
-            }
-            cap.Release();
+                            progressInfo.FaceList.Add(newFaceRecognition);
 
-            return isGetImage;
-        }
-
-        public void Task_GenderByVideo(string videoPath, double start_frame, double length, bool isShowWindow, IProgress<progressInfo> progress, string SavePath, string imageName = "")
-        {
-            bool isOnlySaveFace = imageName == "face" ? true : false;
-
-            List<string> genderList = new List<string> { "Male", "Female" };
-            List<string> ageList = new List<string> { "(0-2)", "(4-6)", "(8-12)", "(15-20)", "(25-32)", "(38-43)", "(48-53)", "(60-100)" };
-
-            var cap = new VideoCapture(videoPath);
-
-            cap.Set(VideoCaptureProperties.PosFrames, start_frame);
-
-            var pause = false;
-            var detectFaces = true;
-            int freq = 100;
-
-            //失败尝试次数
-            int tryAgainCount = 3;
-
-            for (int idx = 0, tryCount = 0; idx < length && tryCount < tryAgainCount; idx++)
-            {
-                var starttime = DateTime.Now;
-
-                var key = Cv2.WaitKey(1);
-                switch ((char)key)
-                {
-                    //case (char)27: // esc
-                    //    break;
-                    case (char)32: // space
-                        pause = !pause;
-                        break;
-                    case 'f':
-                        detectFaces = !detectFaces;
-                        break;
-                }
-
-                //暂停
-                if (!pause)
-                {
-                    using Mat image = new();
-                    var ret = cap.Grab();
-                    if (!ret)
-                    {
-                        break;
-                    }
-                    cap.Retrieve(image);
-
-                    if (image.Empty())
-                    {
-                        tryCount++;
-                        continue;
-                    }
-
-                    //是否检测
-                    if (detectFaces && idx % freq == 1)
-                    {
-                        var bboxes = getFaceBox(image);
-
-                        int padding = 20;
-
-                        //检测到人脸信息
-                        if (bboxes.Count == 0)
-                        {
-                            //源
                             if (isShowWindow)
                             {
-                                showOriginImage(image, starttime);
-                            }
-                            continue;
-                        }
-                        else
-                        {
-                            progressInfo progressInfo = new();
-                            progressInfo.faceList = new();
+                                Cv2.ImShow($"{Thread.CurrentThread.ManagedThreadId} Age Gender Demo", faceImg);
 
-                            if (imageName == string.Empty)
-                            {
-                                imageName = $"frame{start_frame + idx}";
-                            }
-
-                            string imagePath = Path.Combine(SavePath, $"{imageName}.jpg");
-                            progressInfo.imagePath = imagePath;
-                            progressInfo.PixelWidth = image.Cols;
-                            progressInfo.PixelHeight = image.Rows;
-
-                            if (!isOnlySaveFace)
-                            {
-                                FileMatch.CreateDirectoryIfNotExists(SavePath);
-                                image.SaveImage(imagePath);
-                            }
-
-                            bool isGetFemaleImage = false;
-
-                            foreach (var bbox in bboxes)
-                            {
-                                var newFaceRecognition = new FaceRecognition();
-                                newFaceRecognition.facebox = bbox;
-
-                                int x1 = bbox[0];
-                                int y1 = bbox[1];
-                                int x2 = bbox[2];
-                                int y2 = bbox[3];
-
-                                if (x1 >= x2 || y1 >= y2) continue;
-
-                                var height = image.Rows;
-                                var width = image.Cols;
-
-                                var Range1 = new OpenCvSharp.Range(Math.Max(0, y1 - padding), Math.Min(height, y2 + padding));
-                                var Range2 = new OpenCvSharp.Range(Math.Max(0, x1 - padding), Math.Min(width, x2 + padding));
-
-                                Mat face = image[Range1, Range2];
-
-                                using var blob = CvDnn.BlobFromImage(face, 1.0, new Size(227, 227), new Scalar(78.4263377603, 87.7689143744, 114.895847746), false);
-
-                                genderNet.SetInput(blob);
-
-                                using var genderPreds = genderNet.Forward();
-
-                                double min_index_gender, max_index_gender;
-                                Point minLoc, maxLoc;
-                                genderPreds.MinMaxLoc(out min_index_gender, out max_index_gender, out minLoc, out maxLoc);
-                                var gender = genderList[maxLoc.X];
-                                newFaceRecognition.gender = new() { result = gender, confidence = max_index_gender };
-
-                                ageNet.SetInput(blob);
-                                using var agePreds = ageNet.Forward();
-                                agePreds.MinMaxLoc(out min_index_gender, out max_index_gender, out minLoc, out maxLoc);
-                                var age = ageList[maxLoc.X];
-                                newFaceRecognition.age = new() { result = age, confidence = max_index_gender };
-
-                                string label = $"{gender},{age}";
-
-                                //人脸
-                                var faceimg = new Mat(image,
-                                    new OpenCvSharp.Range(y1, y2),
-                                    new OpenCvSharp.Range(x1, x2));
-
-                                var newsize = new Size(faceimg.Cols, faceimg.Rows);
-                                using var frame = new Mat();
-                                Cv2.Resize(faceimg, frame, newsize);
-
-                                //Mat input_imag = new();
-                                //Cv2.CopyTo(frame, input_imag);
-
-                                //通过宽高比筛选
-                                bool isWHRatioMatch = false;
-
-                                float wh_ratio = (float)faceimg.Cols / faceimg.Rows;
-
-                                if (0.7 < wh_ratio && wh_ratio < 0.9)
-                                {
-                                    isWHRatioMatch = true;
-                                }
-
-                                //hsv，主要筛选出过暗/过亮头像
-                                Mat hsv = new();
-                                Cv2.CvtColor(frame, hsv, ColorConversionCodes.BGR2HSV);
-
-                                Scalar scalar = Cv2.Mean(hsv);
-
-                                bool ishsv_qualified = false;
-
-                                //HSV 中的色相表示颜色，HSV 中的饱和度表示灰色，HSV 中的值表示亮度。
-                                //HSV 中的色相范围为[0，179]，HSV 中的饱和度范围为[0，255]，HSV 中的值范围为[0，255]
-                                if (0 < scalar.Val0 && scalar.Val0 < 179 &&
-                                    0 < scalar.Val1 && scalar.Val1 < 255 &&
-                                    85 < scalar.Val2 && scalar.Val2 < 200)
-                                {
-                                    ishsv_qualified = true;
-                                }
-
-                                //只挑选符合条件的
-                                if (gender == "Female" && newFaceRecognition.gender.confidence > 0.9 && ishsv_qualified && isWHRatioMatch)
-                                {
-                                    if (isOnlySaveFace)
-                                    {
-                                        //检查是否有SaveImage无法识别的字符
-                                        //若有，则先Base64编码
-                                        bool needModifyDirctory = false;
-                                        var DirectoryName = Path.GetFileName(SavePath);
-                                        if (DirectoryName.Contains("・"))
-                                        {
-                                            DirectoryName = Convert.ToBase64String(Encoding.UTF8.GetBytes(DirectoryName));
-                                            SavePath = Path.Combine(Path.GetDirectoryName(SavePath), DirectoryName);
-                                            imagePath = Path.Combine(SavePath, $"{imageName}.jpg");
-                                            needModifyDirctory = true;
-                                        }
-
-                                        FileMatch.CreateDirectoryIfNotExists(SavePath);
-
-                                        faceimg.SaveImage(imagePath);
-
-                                        //目录重命名
-                                        if (needModifyDirctory)
-                                        {
-                                            //var srcimagePath = imagePath;
-                                            DirectoryName = Encoding.UTF8.GetString(Convert.FromBase64String(DirectoryName));
-                                            var dstimagePath = Path.Combine(Path.GetDirectoryName(SavePath), DirectoryName);
-
-                                            Directory.Move(Path.GetDirectoryName(imagePath), dstimagePath);
-                                        }
-                                    }
-                                    isGetFemaleImage = true;
-                                }
-
-                                Cv2.PutText(frame, label, new Point(5, 25), HersheyFonts.HersheySimplex, 0.8, new Scalar(0, 255, 255), 2, LineTypes.Link4);
-
-
-                                progressInfo.faceList.Add(newFaceRecognition);
-
-                                if (isShowWindow)
-                                {
-                                    Cv2.ImShow($"{Thread.CurrentThread.ManagedThreadId} Age Gender Demo", faceimg);
-
-                                    //showOriginImage(image, starttime);
-                                }
-                            }
-
-                            progress.Report(progressInfo);
-
-                            //获取到女生
-                            if (isGetFemaleImage)
-                            {
-                                image.Release();
-                                break;
                             }
                         }
+
+                        progress.Report(progressInfo);
+
+                        //获取到女生
+                        if (!isGetFemaleImage) continue;
+
+                        SaveOriginOrFaceImage(image, savePath, imageName);
+                        //FileMatch.CreateDirectoryIfNotExists(SavePath);
+                        //image.SaveImage(imagePath);
+                        isGetImage = true;
+                        image.Release();
+                        break;
                     }
-                    else
+                }
+                //不需要检测人脸信息
+                else
+                {
+                    if (string.IsNullOrEmpty(imageName))
                     {
+                        imageName = $"frame{startFrame + idx}";
+                    }
+
+                    //过暗的不要
+                    Mat hsv = new();
+                    Cv2.CvtColor(image, hsv, ColorConversionCodes.BGR2HSV);
+                    var scalar = Cv2.Mean(hsv);
+
+                    //HSV 中的色相表示颜色，HSV 中的饱和度表示灰色，HSV 中的值表示亮度。
+                    //HSV 中的色相范围为[0，179]，HSV 中的饱和度范围为[0，255]，HSV 中的值范围为[0，255]
+                    if (!(0 < scalar.Val0) || !(scalar.Val0 < 179) ||
+                        !(0 < scalar.Val1) || !(scalar.Val1 < 255) ||
+                        !(50 < scalar.Val2) || !(scalar.Val2 < 200)) continue;
+                    SaveOriginOrFaceImage(image, savePath, imageName);
+                    isGetImage = true;
+                    break;
+
+                }
+
+            }
+            else
+            {
+                if (!isShowWindow) continue;
+
+                image.PutText("Playing", new Point(10, 300), HersheyFonts.HersheyScriptComplex, 5, Scalar.Blue, 3);
+                ShowOriginImage(image, startTime);
+            }
+        }
+        GC.Collect();
+
+        if (isShowWindow)
+        {
+            Cv2.DestroyAllWindows();
+        }
+        cap.Release();
+
+        return isGetImage;
+    }
+
+    public void Task_GenderByVideo(string videoPath, double startFrame, double length, bool isShowWindow, IProgress<ProgressInfo> progress, string savePath, string imageName = "")
+    {
+        var isOnlySaveFace = imageName == "face";
+
+        List<string> genderList = ["Male", "Female"];
+        List<string> ageList = ["(0-2)", "(4-6)", "(8-12)", "(15-20)", "(25-32)", "(38-43)", "(48-53)", "(60-100)"];
+
+        var cap = new VideoCapture(videoPath);
+
+        cap.Set(VideoCaptureProperties.PosFrames, startFrame);
+
+        var pause = false;
+        var detectFaces = true;
+        var freq = 100;
+
+        //失败尝试次数
+        var tryAgainCount = 3;
+
+        for (int idx = 0, tryCount = 0; idx < length && tryCount < tryAgainCount; idx++)
+        {
+            var startTime = DateTime.Now;
+
+            var key = Cv2.WaitKey(1);
+            switch ((char)key)
+            {
+                //case (char)27: // esc
+                //    break;
+                case (char)32: // space
+                    pause = !pause;
+                    break;
+                case 'f':
+                    detectFaces = !detectFaces;
+                    break;
+            }
+
+            //暂停
+            if (pause) continue;
+
+            using Mat image = new();
+            var ret = cap.Grab();
+            if (!ret)
+            {
+                break;
+            }
+            cap.Retrieve(image);
+
+            if (image.Empty())
+            {
+                tryCount++;
+                continue;
+            }
+
+            //是否检测
+            if (detectFaces && idx % freq == 1)
+            {
+                var bBoxes = GetFaceBox(image);
+
+                var padding = 20;
+
+                //检测到人脸信息
+                if (bBoxes.Count == 0)
+                {
+                    //源
+                    if (isShowWindow)
+                    {
+                        ShowOriginImage(image, startTime);
+                    }
+                }
+                else
+                {
+                    ProgressInfo progressInfo = new()
+                    {
+                        FaceList = []
+                    };
+
+                    if (imageName == string.Empty)
+                    {
+                        imageName = $"frame{startFrame + idx}";
+                    }
+
+                    var imagePath = Path.Combine(savePath, $"{imageName}.jpg");
+                    progressInfo.ImagePath = imagePath;
+                    progressInfo.PixelWidth = image.Cols;
+                    progressInfo.PixelHeight = image.Rows;
+
+                    if (!isOnlySaveFace)
+                    {
+                        FileMatch.CreateDirectoryIfNotExists(savePath);
+                        image.SaveImage(imagePath);
+                    }
+
+                    var isGetFemaleImage = false;
+
+                    foreach (var bBox in bBoxes)
+                    {
+                        var newFaceRecognition = new FaceRecognition
+                        {
+                            Facebox = bBox
+                        };
+
+                        var x1 = bBox[0];
+                        var y1 = bBox[1];
+                        var x2 = bBox[2];
+                        var y2 = bBox[3];
+
+                        if (x1 >= x2 || y1 >= y2) continue;
+
+                        var height = image.Rows;
+                        var width = image.Cols;
+
+                        var range1 = new OpenCvSharp.Range(Math.Max(0, y1 - padding), Math.Min(height, y2 + padding));
+                        var range2 = new OpenCvSharp.Range(Math.Max(0, x1 - padding), Math.Min(width, x2 + padding));
+
+                        var face = image[range1, range2];
+
+                        using var blob = CvDnn.BlobFromImage(face, 1.0, new Size(227, 227), new Scalar(78.4263377603, 87.7689143744, 114.895847746), false);
+
+                        _genderNet.SetInput(blob);
+
+                        using var genderPres = _genderNet.Forward();
+
+                        genderPres.MinMaxLoc(out _, out var maxIndexGender, out _, out var maxLoc);
+                        var gender = genderList[maxLoc.X];
+                        newFaceRecognition.Gender = new FaceRecognition.PredictLabel { Result = gender, Confidence = maxIndexGender };
+
+                        _ageNet.SetInput(blob);
+                        using var agePres = _ageNet.Forward();
+                        agePres.MinMaxLoc(out _, out maxIndexGender, out _, out maxLoc);
+                        var age = ageList[maxLoc.X];
+                        newFaceRecognition.Age = new FaceRecognition.PredictLabel { Result = age, Confidence = maxIndexGender };
+
+                        var label = $"{gender},{age}";
+
+                        //人脸
+                        var faceImg = new Mat(image,
+                            new OpenCvSharp.Range(y1, y2),
+                            new OpenCvSharp.Range(x1, x2));
+
+                        var newSize = new Size(faceImg.Cols, faceImg.Rows);
+                        using var frame = new Mat();
+                        Cv2.Resize(faceImg, frame, newSize);
+
+                        //通过宽高比筛选
+                        var isWhRatioMatch = false;
+
+                        var whRatio = (float)faceImg.Cols / faceImg.Rows;
+
+                        if (0.7 < whRatio && whRatio < 0.9)
+                        {
+                            isWhRatioMatch = true;
+                        }
+
+                        //hsv，主要筛选出过暗/过亮头像
+                        Mat hsv = new();
+                        Cv2.CvtColor(frame, hsv, ColorConversionCodes.BGR2HSV);
+
+                        var scalar = Cv2.Mean(hsv);
+
+                        var isHsvQualified = 0 < scalar.Val0 && scalar is { Val0: < 179, Val1: > 0 and < 255, Val2: > 85 and < 200 };
+
+                        //HSV 中的色相表示颜色，HSV 中的饱和度表示灰色，HSV 中的值表示亮度。
+                        //HSV 中的色相范围为[0，179]，HSV 中的饱和度范围为[0，255]，HSV 中的值范围为[0，255]
+
+                        //只挑选符合条件的
+                        if (gender == "Female" && newFaceRecognition.Gender.Confidence > 0.9 && isHsvQualified && isWhRatioMatch)
+                        {
+                            if (isOnlySaveFace)
+                            {
+                                //检查是否有SaveImage无法识别的字符
+                                //若有，则先Base64编码
+                                var needModifyDir = false;
+                                var directoryName = Path.GetFileName(savePath);
+                                if (directoryName.Contains('・'))
+                                {
+                                    directoryName = Convert.ToBase64String(Encoding.UTF8.GetBytes(directoryName));
+                                    savePath = Path.Combine(Path.GetDirectoryName(savePath), directoryName);
+                                    imagePath = Path.Combine(savePath, $"{imageName}.jpg");
+                                    needModifyDir = true;
+                                }
+
+                                FileMatch.CreateDirectoryIfNotExists(savePath);
+
+                                faceImg.SaveImage(imagePath);
+
+                                //目录重命名
+                                if (needModifyDir)
+                                {
+                                    directoryName = Encoding.UTF8.GetString(Convert.FromBase64String(directoryName));
+                                    var dstImagePath = Path.Combine(Path.GetDirectoryName(savePath), directoryName);
+
+                                    Directory.Move(Path.GetDirectoryName(imagePath), dstImagePath);
+                                }
+                            }
+                            isGetFemaleImage = true;
+                        }
+
+                        Cv2.PutText(frame, label, new Point(5, 25), HersheyFonts.HersheySimplex, 0.8, new Scalar(0, 255, 255), 2, LineTypes.Link4);
+
+
+                        progressInfo.FaceList.Add(newFaceRecognition);
+
                         if (isShowWindow)
                         {
-                            image.PutText("Playing", new Point(10, 300), HersheyFonts.HersheyScriptComplex, 5, Scalar.Blue, 3);
-                            showOriginImage(image, starttime);
+                            Cv2.ImShow($"{Thread.CurrentThread.ManagedThreadId} Age Gender Demo", faceImg);
+
                         }
+                    }
+
+                    progress.Report(progressInfo);
+
+                    //获取到女生
+                    if (isGetFemaleImage)
+                    {
+                        image.Release();
+                        break;
                     }
                 }
             }
-            GC.Collect();
-
-            if (isShowWindow)
+            else
             {
-                Cv2.DestroyAllWindows();
-                //Cv2.DestroyWindow($"{Thread.CurrentThread.ManagedThreadId} Origin Video");
-                //Cv2.DestroyWindow($"{Thread.CurrentThread.ManagedThreadId} Age Gender Demo");
-            }
-            cap.Release();
-        }
+                if (!isShowWindow) continue;
 
-        private void SaveOriginOrFaceImage(Mat image, string SavePath, string imageName)
+                image.PutText("Playing", new Point(10, 300), HersheyFonts.HersheyScriptComplex, 5, Scalar.Blue, 3);
+                ShowOriginImage(image, startTime);
+            }
+        }
+        GC.Collect();
+
+        if (isShowWindow)
         {
-            string imagePath = Path.Combine(SavePath, $"{imageName}.jpg");
-            FileMatch.CreateDirectoryIfNotExists(SavePath);
-            image.SaveImage(imagePath);
+            Cv2.DestroyAllWindows();
         }
-
-        void showOriginImage(Mat image, DateTime starttime, List<int> bbox = null)
-        {
-            //源
-            var diff = DateTime.Now - starttime;
-            var fpsinfo = $"fps: nan";
-            if (diff.Milliseconds > 0)
-            {
-                var fpsval = 1.0 / diff.Milliseconds * 1000;
-                fpsinfo = $"fps: {fpsval:00}";
-            }
-
-            Cv2.PutText(image, fpsinfo, new Point(10, 120), HersheyFonts.HersheySimplex, 5, Scalar.White, 2, LineTypes.Link4);
-            //Cv2.PutText(image, fpsinfo, new OpenCvSharp.Point(10, 20), HersheyFonts.HersheyComplexSmall, 1, Scalar.White);
-
-            if (bbox != null)
-            {
-                Cv2.Rectangle(image, new Point(bbox[0], bbox[1]), new Point(bbox[2], bbox[3]), Scalar.Green, image.Rows / 150);
-            }
-
-            var demosize = new Size(image.Cols / 3f, image.Rows / 3f);
-            using var demoframe = new Mat();
-            Cv2.Resize(image, demoframe, demosize);
-            Cv2.ImShow($"{Thread.CurrentThread.ManagedThreadId} Origin Video", demoframe);
-        }
-
-        //人脸框检测
-        List<List<int>> getFaceBox(Mat frameImage)
-        {
-            List<List<int>> bboxes = new();
-
-            using var blob = CvDnn.BlobFromImage(frameImage, 1.0, new Size(300, 300),
-                        new Scalar(104, 117, 123), false, false);
-            faceNet.SetInput(blob, "data");
-
-            using var detection = faceNet.Forward("detection_out");
-            using var detectionmat = new Mat(detection.Size(2), detection.Size(3), MatType.CV_32F, detection.Ptr(0));
-
-            var frameHeight = frameImage.Rows;
-            var frameWidth = frameImage.Cols;
-
-            for (int i = 0; i < detectionmat.Rows; i++)
-            {
-                float confidence = detectionmat.At<float>(i, 2);
-
-                if (confidence > 0.7)
-                {
-                    int x1 = (int)(detectionmat.At<float>(i, 3) * frameWidth);
-                    int y1 = (int)(detectionmat.At<float>(i, 4) * frameHeight);
-                    int x2 = (int)(detectionmat.At<float>(i, 5) * frameWidth);
-                    int y2 = (int)(detectionmat.At<float>(i, 6) * frameHeight);
-
-                    bboxes.Add(new List<int> { x1, y1, x2, y2 });
-
-                }
-            }
-
-            return bboxes;
-        }
-
+        cap.Release();
     }
 
-    public class FaceRecognition
+    private void SaveOriginOrFaceImage(Mat image, string savePath, string imageName)
     {
-        public predictLable gender;
-        public predictLable age;
+        var imagePath = Path.Combine(savePath, $"{imageName}.jpg");
+        FileMatch.CreateDirectoryIfNotExists(savePath);
+        image.SaveImage(imagePath);
+    }
 
-        public List<int> facebox;
-
-        public class predictLable
+    static void ShowOriginImage(Mat image, DateTime startTime, IReadOnlyList<int> bBox = null)
+    {
+        //源
+        var diff = DateTime.Now - startTime;
+        var fpsInfo = "fps: nan";
+        if (diff.Milliseconds > 0)
         {
-            public string result;
-            public double confidence;
+            var fpsVal = 1.0 / diff.Milliseconds * 1000;
+            fpsInfo = $"fps: {fpsVal:00}";
+        }
+
+        Cv2.PutText(image, fpsInfo, new Point(10, 120), HersheyFonts.HersheySimplex, 5, Scalar.White, 2, LineTypes.Link4);
+
+        if (bBox != null)
+        {
+            Cv2.Rectangle(image, new Point(bBox[0], bBox[1]), new Point(bBox[2], bBox[3]), Scalar.Green, image.Rows / 150);
+        }
+
+        var demoSize = new Size(image.Cols / 3f, image.Rows / 3f);
+        using var demoFrame = new Mat();
+        Cv2.Resize(image, demoFrame, demoSize);
+        Cv2.ImShow($"{Thread.CurrentThread.ManagedThreadId} Origin Video", demoFrame);
+    }
+
+    //人脸框检测
+    List<List<int>> GetFaceBox(Mat frameImage)
+    {
+        List<List<int>> bBoxes = [];
+
+        using var blob = CvDnn.BlobFromImage(frameImage, 1.0, new Size(300, 300),
+            new Scalar(104, 117, 123), false, false);
+        _faceNet.SetInput(blob, "data");
+
+        using var detection = _faceNet.Forward("detection_out");
+        using var detectionMat = new Mat(detection.Size(2), detection.Size(3), MatType.CV_32F, detection.Ptr(0));
+
+        var frameHeight = frameImage.Rows;
+        var frameWidth = frameImage.Cols;
+
+        for (var i = 0; i < detectionMat.Rows; i++)
+        {
+            var confidence = detectionMat.At<float>(i, 2);
+
+            if (confidence <= 0.7) continue;
+
+            var x1 = (int)(detectionMat.At<float>(i, 3) * frameWidth);
+            var y1 = (int)(detectionMat.At<float>(i, 4) * frameHeight);
+            var x2 = (int)(detectionMat.At<float>(i, 5) * frameWidth);
+            var y2 = (int)(detectionMat.At<float>(i, 6) * frameHeight);
+
+            bBoxes.Add([x1, y1, x2, y2]);
+        }
+
+        return bBoxes;
+    }
+
+    internal class FaceRecognition
+    {
+        public PredictLabel Gender { get; set; }
+        public PredictLabel Age { get; set; }
+
+        public List<int> Facebox { get; set; }
+
+        public class PredictLabel
+        {
+            public string Result;
+            public double Confidence;
         }
 
     }
 
-    public class progressInfo
+    internal class ProgressInfo
     {
         public int PixelHeight;
         public int PixelWidth;
-        public string imagePath;
-        public List<FaceRecognition> faceList;
+        public string ImagePath;
+        public List<FaceRecognition> FaceList;
     }
+
 }
+

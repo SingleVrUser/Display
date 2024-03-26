@@ -1,11 +1,11 @@
 ﻿using Display.Constants;
 using Display.CustomWindows;
-using Display.Models.Data.Enums;
 using Display.Models.Settings;
 using Display.ViewModels;
 using Display.Views.More;
 using Microsoft.UI.Xaml.Controls;
 using System;
+using Display.Models.Enums;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

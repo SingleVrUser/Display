@@ -9,9 +9,11 @@
     xmlns:customcontrols="using:Display.Controls"
     xmlns:animations="using:CommunityToolkit.WinUI.Animations"
     xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:userController="using:Display.Controls.UserController"
+    xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
     mc:Ignorable="d">
     <Page.Resources>
-        <DataTemplate x:DataType="data:ThumbnailInfo" x:Key="ThumbnailInfoDataTemplate">
+        <DataTemplate x:DataType="oneOneFive:ThumbnailInfo" x:Key="ThumbnailInfoDataTemplate">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -24,7 +26,7 @@
 
                 <TextBlock Grid.Row="1" HorizontalAlignment="Right"/>
 
-                <customcontrols:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
+                <userController:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
             </Grid>
         </DataTemplate>
     </Page.Resources>
