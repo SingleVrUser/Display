@@ -1,4 +1,4 @@
-﻿using Display.Models.Data.Enums;
+﻿using Display.Models.Enums;
 
 namespace Display.Setting.Interfaces;
 

@@ -10,7 +10,8 @@
     xmlns:options="using:Display.Models.Settings.Options"
     xmlns:winUi="using:CommunityToolkit.WinUI"
     xmlns:data="using:Display.Models.Data"
-    xmlns:enums="using:Display.Models.Data.Enums"
+    xmlns:providers="using:Display.Providers"
+    xmlns:enums1="using:Display.Models.Enums"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -68,13 +69,13 @@
         </controls:SettingsCard>
 
         <controls:SettingsCard Header="清晰度">
-            <ComboBox ItemsSource="{winUi:EnumValues Type=enums:PlayQuality}"
-                      SelectedItem="{x:Bind data:AppSettings.DefaultPlayQuality, Mode=TwoWay}" />
+            <ComboBox ItemsSource="{winUi:EnumValues Type=enums1:PlayQuality}"
+                      SelectedItem="{x:Bind providers:AppSettings.DefaultPlayQuality, Mode=TwoWay}" />
         </controls:SettingsCard>
         <controls:SettingsCard Header="加载字幕">
             <ToggleSwitch OnContent="启动"
                           OffContent="关闭"
-                          IsOn="{x:Bind data:AppSettings.IsFindSub, Mode=TwoWay}" />
+                          IsOn="{x:Bind providers:AppSettings.IsFindSub, Mode=TwoWay}" />
         </controls:SettingsCard>
 
         <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}"

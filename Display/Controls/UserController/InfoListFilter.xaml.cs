@@ -15,11 +15,11 @@ namespace Display.Controls
     public sealed partial class InfoListFilter : UserControl
     {
         private static readonly DependencyProperty YearProperty =
-            DependencyProperty.Register("Year", typeof(string), typeof(VideoCoverDisplay), null);
+            DependencyProperty.Register("Year", typeof(string), typeof(UserController.VideoCoverDisplay), null);
         private static readonly DependencyProperty ScoreProperty =
-            DependencyProperty.Register("Score", typeof(int), typeof(VideoCoverDisplay), null);
+            DependencyProperty.Register("Score", typeof(int), typeof(UserController.VideoCoverDisplay), null);
         private static readonly DependencyProperty TypeProperty =
-            DependencyProperty.Register("Type", typeof(string), typeof(VideoCoverDisplay), null);
+            DependencyProperty.Register("Type", typeof(string), typeof(UserController.VideoCoverDisplay), null);
 
         public string Year
         {

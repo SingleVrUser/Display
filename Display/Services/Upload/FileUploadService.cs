@@ -2,8 +2,8 @@
 using Display.Extensions;
 using Display.Helper.Crypto;
 using Display.Helper.Network;
-using Display.Models.Data;
 using Display.Models.Upload;
+using Display.Providers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,6 +13,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Display.Providers.Downloader;
 using static System.String;
 
 namespace Display.Services.Upload
@@ -37,7 +38,7 @@ namespace Display.Services.Upload
                     headers.Add("Cookie", cookie);
                 }
 
-                _client = GetInfoFromNetwork.CreateClient(headers);
+                _client = NetworkHelper.CreateClient(headers);
 
                 return _client;
             }

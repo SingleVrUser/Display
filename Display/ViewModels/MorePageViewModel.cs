@@ -1,5 +1,5 @@
-﻿using Display.Models.Data;
-using Display.Models.Settings;
+﻿using Display.Models.Settings;
+using Display.Providers;
 using System.Linq;
 
 namespace Display.ViewModels;

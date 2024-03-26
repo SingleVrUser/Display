@@ -1,4 +1,4 @@
-﻿using Display.Models.Data;
+﻿using Display.Helper.Network;
 
 namespace Tests.Helper
 {
@@ -19,7 +19,7 @@ namespace Tests.Helper
                     { "Cookie", Cookie }
                 };
 
-                _uploadClient = GetInfoFromNetwork.CreateClient(headers);
+                _uploadClient = NetworkHelper.CreateClient(headers);
 
                 return _uploadClient;
             }
@@ -38,7 +38,7 @@ namespace Tests.Helper
                     { "Cookie", Cookie }
                 };
 
-                _downClient = GetInfoFromNetwork.CreateClient(headers);
+                _downClient = NetworkHelper.CreateClient(headers);
 
                 return _downClient;
             }

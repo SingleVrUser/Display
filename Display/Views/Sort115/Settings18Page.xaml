@@ -4,11 +4,10 @@
 <Page x:Class="Display.Views.Sort115.Settings18Page"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:local="using:Display.Views.Sort115"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:models="using:Display.Models.Disk._115"
       xmlns:viewModels="using:Display.ViewModels"
+      xmlns:models="using:Display.Models.Entities._115"
       mc:Ignorable="d">
 
     <Page.DataContext>

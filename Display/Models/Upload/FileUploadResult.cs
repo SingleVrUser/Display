@@ -1,5 +1,5 @@
-﻿using Display.Models.Data;
-using System;
+﻿using System;
+using Display.Models.Dto.OneOneFive;
 
 namespace Display.Models.Upload;
 

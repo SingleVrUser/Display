@@ -1,9 +1,9 @@
-﻿using Display.Models.Image;
-using FFmpeg.AutoGen.Abstractions;
+﻿using FFmpeg.AutoGen.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using Display.Models.Media;
 using static System.Int64;
 
 namespace Display.Helper.Media;

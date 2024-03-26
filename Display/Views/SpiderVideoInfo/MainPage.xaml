@@ -7,6 +7,8 @@
       xmlns:customControls="using:Display.Controls"
       xmlns:controls="using:CommunityToolkit.WinUI.Controls"
       xmlns:winUi="using:CommunityToolkit.WinUI"
+      xmlns:userController="using:Display.Controls.UserController"
+      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
       mc:Ignorable="d">
 
     <Page.Resources>
@@ -118,7 +120,7 @@
             <!--文件查看-->
             <Grid Grid.Row="1" Grid.Column="0">
                 <!--本地数据库-->
-                <customControls:Explorer x:Name="Explorer"
+                <userController:Explorer x:Name="Explorer"
                                          ItemClick="ExplorerItemClick"
                                          ItemInvoked="TreeView_ItemInvoked"
                                          Visibility="{x:Bind LocalDataItem.IsSelected,Mode=OneWay}"
@@ -132,7 +134,7 @@
                               SelectionChanged="FailListView_SelectionChanged"
                               ItemsSource="{x:Bind FailList,Mode=OneWay}">
                         <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="data:FailDatum">
+                            <DataTemplate x:DataType="oneOneFive:FailDatum">
                                 <Grid>
 
                                     <TextBlock Text="{x:Bind Datum.Name}" />
@@ -186,7 +188,7 @@
                                             Value="Right" />
                                 </Style>
 
-                                <Style TargetType="customControls:TextBlockWithLongText">
+                                <Style TargetType="userController:TextBlockWithLongText">
                                     <Setter Property="VerticalAlignment"
                                             Value="Bottom" />
                                 </Style>
@@ -297,100 +299,100 @@
                             <TextBlock Grid.Row="31" Grid.Column="0"
                                        Style="{StaticResource TitleTextBlock}">视频时长</TextBlock>
 
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                                   Grid.Row="0"
                                                                   StringValue="{x:Bind SelectedDatum.Fid,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="1"
                                                            StringValue="{x:Bind SelectedDatum.Uid,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="2"
                                                            StringValue="{x:Bind SelectedDatum.Aid,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="3"
                                                            StringValue="{x:Bind SelectedDatum.Cid,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="4"
                                                            StringValue="{x:Bind SelectedDatum.Name,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="5"
                                                            StringValue="{x:Bind SelectedDatum.Size,Converter={StaticResource BytesToSizeStrConverter},Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="6"
                                                            StringValue="{x:Bind SelectedDatum.Sta,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="7"
                                                            StringValue="{x:Bind SelectedDatum.Pt,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="8"
                                                            StringValue="{x:Bind SelectedDatum.Pid,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="9"
                                                            StringValue="{x:Bind SelectedDatum.PickCode,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="10"
                                                            StringValue="{x:Bind SelectedDatum.P,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="11"
                                                            StringValue="{x:Bind SelectedDatum.M,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="12"
                                                            StringValue="{x:Bind SelectedDatum.Time,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="13"
                                                            StringValue="{x:Bind SelectedDatum.TimeEdit,Converter={StaticResource NumberToDateTimeStrConverter},Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="14"
                                                            StringValue="{x:Bind SelectedDatum.TimeProduce,Converter={StaticResource NumberToDateTimeStrConverter},Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="15"
                                                            StringValue="{x:Bind SelectedDatum.D,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="16"
                                                            StringValue="{x:Bind SelectedDatum.C,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="17"
                                                            StringValue="{x:Bind SelectedDatum.Sh,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="18"
                                                            StringValue="{x:Bind SelectedDatum.E,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="19"
                                                            StringValue="{x:Bind SelectedDatum.Ico,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="20"
                                                            StringValue="{x:Bind SelectedDatum.Sha,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="21"
                                                            StringValue="{x:Bind SelectedDatum.Fdes,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="22"
                                                            StringValue="{x:Bind SelectedDatum.Q,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="23"
                                                            StringValue="{x:Bind SelectedDatum.Hdf,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="24"
                                                            StringValue="{x:Bind SelectedDatum.Fvs,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="25"
                                                            StringValue="{x:Bind SelectedDatum.U,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="26"
                                                            StringValue="{x:Bind SelectedDatum.Iv,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="27"
                                                                   StringValue="{x:Bind SelectedDatum.CurrentTime,Converter={StaticResource NumberToDateTimeStrConverter},Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="28"
                                                            StringValue="{x:Bind SelectedDatum.PlayedEnd,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="29"
                                                             StringValue="{x:Bind SelectedDatum.LastTime,Converter={StaticResource NumberToDateTimeStrConverter},Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="30"
                                                            StringValue="{x:Bind SelectedDatum.Vdi,Mode=OneWay}" />
-                            <customControls:TextBlockWithLongText Grid.Column="1"
+                            <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="31"
                                                                   StringValue="{x:Bind SelectedDatum.PlayLong,Converter={StaticResource NumberToLengthStrConverter},Mode=OneWay}" />
                         </Grid>
@@ -417,12 +419,12 @@
 
             <Expander.Header>
                 <Grid>
-                    <customControls:TextBlockWithLongText StringValue="检查环境"
+                    <userController:TextBlockWithLongText StringValue="检查环境"
                                                           IsFirstTextSelectionEnabled="False"/>
                     <TextBlock x:FieldModifier="public" x:Name="StatusTextBlock"
                        HorizontalAlignment="Right"
                        Style="{StaticResource CaptionTextBlockStyle}"/>
-                    <customControls:StatusShow x:FieldModifier="public"
+                    <userController:StatusShow x:FieldModifier="public"
                                                HorizontalAlignment="Right"
                                                x:Name="LoginCheck"/>
                 </Grid>

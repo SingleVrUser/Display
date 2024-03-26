@@ -4,7 +4,7 @@
 using Display.Constants;
 using Display.CustomWindows;
 using Display.Helper.UI;
-using Display.Models.Data.Enums;
+using Display.Models.Enums;
 using Display.Models.Settings;
 using Display.ViewModels;
 using Microsoft.UI.Xaml.Controls;

@@ -8,6 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:data="using:Display.Models.Data"
+    xmlns:providers="using:Display.Providers"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -20,8 +21,8 @@
                 <TextBox x:Name="SavePath115CidTextBlock"
                          PlaceholderText="从文件夹中选择。或者输入文件夹的cid，输入后点击保存"
                          Width="200"
-                         Text="{x:Bind data:AppSettings.SavePath115Cid}"
-                         Description="{x:Bind data:AppSettings.SavePath115Name}"/>
+                         Text="{x:Bind providers:AppSettings.SavePath115Cid}"
+                         Description="{x:Bind providers:AppSettings.SavePath115Name}"/>
 
                 <StackPanel RelativePanel.AlignRightWithPanel="True"
                             Orientation="Horizontal"
@@ -37,7 +38,7 @@
         <controls:SettingsExpander Header="x1080x">
             <ToggleSwitch OnContent="启动"
                           OffContent="关闭"
-                          IsOn="{x:Bind data:AppSettings.IsUseX1080X, Mode=TwoWay}" />
+                          IsOn="{x:Bind providers:AppSettings.IsUseX1080X, Mode=TwoWay}" />
 
             <controls:SettingsExpander.Items>
 
@@ -47,7 +48,7 @@
                     <RelativePanel>
                         <TextBox x:Name="X1080UrlTextBox"
                                  Width="600"
-                                 Text="{x:Bind data:AppSettings.X1080XBaseUrl}" />
+                                 Text="{x:Bind providers:AppSettings.X1080XBaseUrl}" />
                         <Button Click="X1080XBaseUrlChange"
                                 Content="修改"
                                 RelativePanel.AlignRightWithPanel="True" />
@@ -61,7 +62,7 @@
                         <TextBox Width="600"
                                  x:Name="X1080XCookieTextBox"
                                  IsSpellCheckEnabled="False"
-                                 Text="{x:Bind data:AppSettings.X1080XCookie}">
+                                 Text="{x:Bind providers:AppSettings.X1080XCookie}">
                             <ToolTipService.ToolTip>
                                 <TextBlock>
                                     搜索资源需要登陆后的Cookie
@@ -81,7 +82,7 @@
                     <RelativePanel>
                         <TextBox x:Name="X1080XuaTextBox"
                                  Width="600"
-                                 Text="{x:Bind data:AppSettings.X1080XUa}"
+                                 Text="{x:Bind providers:AppSettings.X1080XUa}"
                                  IsSpellCheckEnabled="False">
                             <ToolTipService.ToolTip>
                                 <TextBlock>

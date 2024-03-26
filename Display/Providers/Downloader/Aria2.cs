@@ -1,5 +1,4 @@
-﻿using Display.Models.Data;
-using Display.Models.Settings.Options;
+﻿using Display.Models.Settings.Options;
 using Newtonsoft.Json;
 using System;
 using System.Net;
@@ -7,6 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Display.Models.Dto.OneOneFive;
 
 namespace Display.Providers.Downloader;
 

@@ -2,11 +2,11 @@
 // Licensed under the MIT License.
 
 using Display.CustomWindows;
-using Display.Models.Disk._115;
 using Microsoft.UI.Xaml;
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using Display.Models.Dto.OneOneFive;
 
 namespace Display.Views.Settings.Account
 {
@@ -62,7 +62,7 @@ namespace Display.Views.Settings.Account
             var result = JsonConvert.DeserializeObject<VerifyAccountResult>(re);
 
             // TODO 在添加任务的异常中可用，但在播放m3u8视频的异常中无效
-            if (result is not { state: true }) return;
+            if (result is not { State: true }) return;
 
             IsSucceeded = true;
 

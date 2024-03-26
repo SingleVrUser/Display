@@ -1,8 +1,7 @@
-
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-namespace Display.Controls;
+namespace Display.Controls.UserController;
 
 public sealed partial class ShowCountControl : UserControl
 {

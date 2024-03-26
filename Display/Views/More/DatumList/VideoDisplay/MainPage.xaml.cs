@@ -8,6 +8,7 @@ using Display.Helper.FileProperties.Name;
 using Display.Helper.UI;
 using Display.Managers;
 using Display.Models.Data;
+using Display.Providers;
 using Display.Services;
 using Display.Services.IncrementalCollection;
 using Microsoft.UI.Input;
@@ -27,6 +28,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Media.Playback;
+using Display.Models.Dto.OneOneFive;
+using Display.Providers.Downloader;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

@@ -1,4 +1,14 @@
-﻿using Display.Models.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using Display.Models.Data;
+using Display.Models.Dto.OneOneFive;
+using Display.Providers;
 using Display.Services.IncrementalCollection;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -7,16 +17,8 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using SharpCompress;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 
-namespace Display.Controls;
+namespace Display.Controls.UserController;
 
 public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChanged
 {

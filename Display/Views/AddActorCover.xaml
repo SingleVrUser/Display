@@ -6,14 +6,15 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:customcontrols="using:Display.Controls"
-    xmlns:data="using:Display.Models.Data"
     xmlns:helper="using:Display.Helper.FileProperties.Name"
     xmlns:animations1="using:CommunityToolkit.WinUI.Animations"
     xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:userController="using:Display.Controls.UserController"
+    xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
     mc:Ignorable="d">
     <Page.Resources>
 
-        <DataTemplate x:DataType="data:ActorInfo" x:Key="GirdViewTemplate">
+        <DataTemplate x:DataType="oneOneFive:ActorInfo" x:Key="GirdViewTemplate">
             
             <Grid
                 x:Name="connectedElement"
@@ -27,7 +28,7 @@
 
                     <TextBlock Text="{x:Bind Name}" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center" TextWrapping="Wrap" Margin="5"/>
 
-                    <customcontrols:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
+                    <userController:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
                 </Grid>
 
                 <Grid Visibility="{x:Bind helper:FileMatch.ShowIfImageNotNull(ProfilePath),Mode=OneWay}">
@@ -50,7 +51,7 @@
                         <TextBlock Text="{x:Bind AgeInfo,Mode=OneWay}" Visibility="Collapsed"/>
                     </StackPanel>
 
-                    <customcontrols:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
+                    <userController:StatusShow status="{x:Bind Status,Mode=OneWay}"/>
                 </Grid>
 
             </Grid>
@@ -115,7 +116,7 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
-                        <FlipView x:Name="ShowImageFlipView" ItemsSource="{x:Bind ShowImageList}">
+                        <FlipView x:Name="ShowImageFlipView" ItemsSource="{x:Bind _showImageList}">
                             <FlipView.ItemTemplate>
                                 <DataTemplate x:DataType="x:String">
                                     <Grid>
@@ -131,7 +132,7 @@
                             </FlipView.ItemTemplate>
                             <!--<Image x:Name="ShowImage"/>-->
                         </FlipView>
-                        <PipsPager Margin="0" Grid.Row="1" HorizontalAlignment="Center" NumberOfPages="{x:Bind ShowImageList.Count,Mode=OneWay}" SelectedPageIndex="{x:Bind ShowImageFlipView.SelectedIndex,Mode=TwoWay}"/>
+                        <PipsPager Margin="0" Grid.Row="1" HorizontalAlignment="Center" NumberOfPages="{x:Bind _showImageList.Count,Mode=OneWay}" SelectedPageIndex="{x:Bind ShowImageFlipView.SelectedIndex,Mode=TwoWay}"/>
                     </Grid>
                     
                     <Button Click="BackButton_Click" HorizontalAlignment="Right" VerticalAlignment="Top" Height="40" Width="40" Margin="5">
@@ -156,7 +157,7 @@
 
             <ToggleSwitch x:Name="modifyToggleSwitch" Toggled="modifyToggleSwitch_Toggled" OnContent="添加" OffContent="修改" RelativePanel.AlignRightWithPanel="True" MinWidth="0" Margin="10,0,0,0" IsOn="True"/>
 
-            <StackPanel Visibility="{x:Bind local:AddActorCover.IsShowFailList(failList),Mode=OneWay}" Orientation="Horizontal" RelativePanel.LeftOf="modifyToggleSwitch" RelativePanel.AlignVerticalCenterWithPanel="True">
+            <StackPanel Visibility="{x:Bind local:AddActorCover.IsShowFailList(_failList),Mode=OneWay}" Orientation="Horizontal" RelativePanel.LeftOf="modifyToggleSwitch" RelativePanel.AlignVerticalCenterWithPanel="True">
                 <HyperlinkButton Content="失败列表" Click="HyperlinkButton_Click">
                     <FlyoutBase.AttachedFlyout>
                         <Flyout>
@@ -167,7 +168,7 @@
                                 </Grid.RowDefinitions>
                                 <!--<TextBlock Text="{x:Bind failList.Count,Mode=OneWay}" HorizontalAlignment="Right"/>-->
 
-                                <ListView Grid.Row="1" ItemsSource="{x:Bind failList}" SelectionMode="None" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                                <ListView Grid.Row="1" ItemsSource="{x:Bind _failList}" SelectionMode="None" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                                     <TextBlock Text="{x:Bind}"
                                        TextTrimming="CharacterEllipsis"
                                         IsTextSelectionEnabled="True"/>
@@ -177,7 +178,7 @@
                     </FlyoutBase.AttachedFlyout>
                 </HyperlinkButton>
 
-                <TextBlock Text="{x:Bind failList.Count,Mode=OneWay}" VerticalAlignment="Bottom" Foreground="{ThemeResource PivotHeaderForegroundUnselectedBrush}"/>
+                <TextBlock Text="{x:Bind _failList.Count,Mode=OneWay}" VerticalAlignment="Bottom" Foreground="{ThemeResource PivotHeaderForegroundUnselectedBrush}"/>
             </StackPanel>
 
         </RelativePanel>

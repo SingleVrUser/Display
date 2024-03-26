@@ -1,6 +1,23 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
+using ByteSizeLib;
+using Display.Constants;
+using Display.Controls.CustomController;
+using Display.CustomWindows;
+using Display.Helper.UI;
+using Display.Models.Data;
+using Display.Models.Media;
+using Display.Providers;
+using Display.Services;
+using Display.Views;
+using Microsoft.Graphics.Canvas;
+using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,22 +32,8 @@ using Windows.Media.Streaming.Adaptive;
 using Windows.Storage;
 using Windows.System.Display;
 using Windows.Web.Http;
-using ByteSizeLib;
-using Display.Constants;
-using Display.Controls.CustomController;
-using Display.CustomWindows;
-using Display.Models.Data;
-using Display.Models.Media;
-using Display.Services;
-using Display.Views;
-using Microsoft.Graphics.Canvas;
-using Microsoft.UI.Dispatching;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using SharpCompress;
-using Display.Helper.UI;
+using Display.Models.Dto.OneOneFive;
+using Display.Providers.Downloader;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

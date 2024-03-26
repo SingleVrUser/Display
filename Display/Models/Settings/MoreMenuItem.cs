@@ -1,4 +1,4 @@
-﻿using Display.Models.Data.Enums;
+﻿using Display.Models.Enums;
 using Microsoft.UI.Xaml;
 
 namespace Display.Models.Settings;

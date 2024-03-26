@@ -4,6 +4,7 @@ using Display.Helper.UI;
 using Display.Interfaces;
 using Display.Managers;
 using Display.Models.Data;
+using Display.Providers;
 using Display.Services;
 using Display.ViewModels;
 using Display.ViewModels.Sub;

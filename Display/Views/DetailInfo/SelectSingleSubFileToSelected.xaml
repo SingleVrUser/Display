@@ -7,8 +7,8 @@
       xmlns:local="using:Display.Views.DetailInfo"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:data="using:Display.Models.Data"
-    mc:Ignorable="d">
+      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
+      mc:Ignorable="d">
 
     <StackPanel Spacing="5"
                 HorizontalAlignment="Stretch">
@@ -20,7 +20,7 @@
                   ItemsSource="{x:Bind subInfoList}"
                   IsItemClickEnabled="True">
             <ListView.ItemTemplate>
-                <DataTemplate x:DataType="data:SubInfo">
+                <DataTemplate x:DataType="oneOneFive:SubInfo">
                     <TextBlock Text="{x:Bind Name}"
                                TextWrapping="Wrap"/>
                 </DataTemplate>

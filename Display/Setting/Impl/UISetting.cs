@@ -1,4 +1,4 @@
-﻿using Display.Models.Data.Enums;
+﻿using Display.Models.Enums;
 using Display.Setting.Interfaces;
 using DefaultValue = Display.Constants.DefaultSettings;
 

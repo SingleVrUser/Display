@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using Display.Models.Data;
+﻿using Display.Models.Data;
 using SharpCompress;
+using System.Collections.Generic;
 
 namespace Display.Helper.Data;
 

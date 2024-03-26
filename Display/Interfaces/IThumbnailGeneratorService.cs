@@ -1,12 +1,11 @@
-﻿using Display.Models.Image;
-using Display.Models.Media;
+﻿using Display.Models.Media;
 using FFmpeg.AutoGen.Abstractions;
 using System;
 using System.Threading.Tasks;
 
 namespace Display.Interfaces;
 
-public interface IThumbnailGeneratorService
+internal interface IThumbnailGeneratorService
 {
     // Open url contain video
     bool OpenVideo(UrlOptions options);

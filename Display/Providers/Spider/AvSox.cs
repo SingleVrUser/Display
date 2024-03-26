@@ -1,16 +1,16 @@
 ﻿using Display.Helper.Network;
-using Display.Models.Data;
 using Display.Models.Spider;
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Display.Models.Dto.OneOneFive;
 
 namespace Display.Providers.Spider;
 
 public class AvSox : BaseSpider
 {
-    public override SpiderInfos.SpiderSourceName Name => SpiderInfos.SpiderSourceName.Avsox;
+    public override SpiderNameAndStatus.SpiderSourceName Name => SpiderNameAndStatus.SpiderSourceName.Avsox;
 
     public override bool IsOn
     {
@@ -49,7 +49,7 @@ public class AvSox : BaseSpider
 
     private async Task<string> GetDetailUrlFromCid(string cid, CancellationToken token)
     {
-        var url = GetInfoFromNetwork.UrlCombine(BaseUrl, $"cn/search/{cid}");
+        var url = NetworkHelper.UrlCombine(BaseUrl, $"cn/search/{cid}");
 
         // 访问
         var tuple = await RequestHelper.RequestHtml(Common.Client, url, token);

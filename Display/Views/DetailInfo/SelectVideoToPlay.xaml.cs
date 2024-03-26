@@ -1,9 +1,9 @@
 ﻿using Display.Helper.Network;
-using Display.Models.Data;
 using Display.Models.Media;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
 using System.Linq;
+using Display.Models.Dto.OneOneFive;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

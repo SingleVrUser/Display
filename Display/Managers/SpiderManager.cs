@@ -10,18 +10,20 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using static Display.Models.Spider.SpiderInfos;
+using Display.Models.Dto.OneOneFive;
+using Display.Providers.Downloader;
+using static Display.Models.Spider.SpiderNameAndStatus;
 
 namespace Display.Managers;
 
-public partial class SpiderManager
+public class SpiderManager
 {
     private CancellationTokenSource _cancellationTokenSource;
 
     /// <summary>
     /// 待处理的队列
     /// </summary>
-    private readonly ConcurrentQueue<SearchItem> _taskItemQueue = [];
+    private readonly ConcurrentQueue<SpiderItem> _taskItemQueue = [];
 
     /// <summary>
     /// 成功队列（存入数据库的临时空间）
@@ -286,7 +288,7 @@ public partial class SpiderManager
     /// 任务完成后
     /// </summary>
     /// <param name="item"></param>
-    private async void DoWhenNameIsAllSearched(SearchItem item)
+    private async void DoWhenNameIsAllSearched(SpiderItem item)
     {
         // 搜索失败
         if (item.Info is null)
@@ -345,7 +347,7 @@ public partial class SpiderManager
         // 添加进任务队列
         foreach (var name in names)
         {
-            _taskItemQueue.Enqueue(new SearchItem(name));
+            _taskItemQueue.Enqueue(new SpiderItem(name));
         }
 
         //记录当前任务队列的个数

@@ -3,12 +3,8 @@ using Display.Setting.Models;
 
 namespace Display.Setting.Impl;
 
-internal class SearchSetting : SettingBase, ISearchSetting
+internal class SearchSetting(ISettingProvider provider) : SettingBase(provider), ISearchSetting
 {
-    public SearchSetting(ISettingProvider provider) : base(provider)
-    {
-    }
-
     public SearcherItem[] Searchers
     {
         get => throw new System.NotImplementedException();

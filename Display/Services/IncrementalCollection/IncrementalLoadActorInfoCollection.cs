@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Display.Models.Dto.OneOneFive;
 
 namespace Display.Services.IncrementalCollection;
 

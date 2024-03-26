@@ -1,17 +1,18 @@
 ﻿using Display.Helper.Network;
-using Display.Models.Data;
 using Display.Models.Spider;
 using HtmlAgilityPack;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Display.Models.Dto.OneOneFive;
+using Display.Providers.Downloader;
 
 namespace Display.Providers.Spider;
 
 public class LibreDmm : BaseSpider
 {
-    public override SpiderInfos.SpiderSourceName Name => SpiderInfos.SpiderSourceName.Libredmm;
+    public override SpiderNameAndStatus.SpiderSourceName Name => SpiderNameAndStatus.SpiderSourceName.Libredmm;
     public override string Abbreviation => "libre";
     public override string Keywords => "LibreFanza";
 
@@ -29,7 +30,7 @@ public class LibreDmm : BaseSpider
     public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
     {
         cid = cid.ToUpper();
-        var url = GetInfoFromNetwork.UrlCombine(BaseUrl, $"movies/{cid}");
+        var url = NetworkHelper.UrlCombine(BaseUrl, $"movies/{cid}");
 
         var result = await RequestHelper.RequestHtml(Common.Client, url, token);
         if (result == null) return null;

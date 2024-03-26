@@ -1,11 +1,11 @@
-﻿using Display.Models.Data;
-using Display.Models.Spider;
+﻿using Display.Models.Spider;
 using HtmlAgilityPack;
 using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using static Display.Models.Spider.SpiderInfos;
+using Display.Models.Dto.OneOneFive;
+using static Display.Models.Spider.SpiderNameAndStatus;
 
 namespace Display.Providers.Spider;
 
@@ -13,7 +13,7 @@ public abstract class BaseSpider
 {
     public bool IsRunning { get; set; }
 
-    public SearchItem HandleItem { get; set; }
+    public SpiderItem HandleItem { get; set; }
 
     public abstract SpiderSourceName Name { get; }
     public abstract string Abbreviation { get; }

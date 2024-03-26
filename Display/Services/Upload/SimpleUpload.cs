@@ -10,52 +10,51 @@ using System.Threading;
 using System.Threading.Tasks;
 using HttpHeaders = Display.Constants.HttpHeaders;
 
-namespace Display.Services.Upload
+namespace Display.Services.Upload;
+
+internal class SimpleUpload(
+    HttpClient client,
+    FileStream stream,
+    OssToken ossToken,
+    FastUploadResult fastUploadResult,
+    CancellationToken token)
+    : OssUploadBase(client, stream, ossToken, fastUploadResult, token)
 {
-    internal class SimpleUpload(
-        HttpClient client,
-        FileStream stream,
-        OssToken ossToken,
-        FastUploadResult fastUploadResult,
-        CancellationToken token)
-        : OssUploadBase(client, stream, ossToken, fastUploadResult, token)
+    public override async Task<OssUploadResult> Start()
     {
-        public override async Task<OssUploadResult> Start()
+        const string contentType = "application/octet-stream";
+        var headers = new Dictionary<string, string>
         {
-            const string contentType = "application/octet-stream";
-            var headers = new Dictionary<string, string>
-            {
-                [HttpHeaders.Callback] = CallbackBase64,
-                [HttpHeaders.CallbackVar] = CallbackVarBase64,
-                [HttpHeaders.ContentType] = contentType
-            };
+            [HttpHeaders.Callback] = CallbackBase64,
+            [HttpHeaders.CallbackVar] = CallbackVarBase64,
+            [HttpHeaders.ContentType] = contentType
+        };
 
-            Stream.Seek(0, SeekOrigin.Begin);
-            var httpContent = new StreamContent(Stream)
-            {
-                Headers = { ContentType = MediaTypeHeaderValue.Parse(contentType) }
-            };
-            var request = CreateRequest(HttpMethod.Put, BaseUrl, headers, httpContent);
+        Stream.Seek(0, SeekOrigin.Begin);
+        var httpContent = new StreamContent(Stream)
+        {
+            Headers = { ContentType = MediaTypeHeaderValue.Parse(contentType) }
+        };
+        var request = CreateRequest(HttpMethod.Put, BaseUrl, headers, httpContent);
 
-            OssUploadResult result = null;
-            try
-            {
-                result = await Client.SendAsync<OssUploadResult>(request, Token);
+        OssUploadResult result = null;
+        try
+        {
+            result = await Client.SendAsync<OssUploadResult>(request, Token);
 
-                Debug.WriteLine($"上传结果：{result}");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"上传出错：{ex.Message}");
-            }
-
-            Dispose();
-            return result;
+            Debug.WriteLine($"上传结果：{result}");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"上传出错：{ex.Message}");
         }
 
-        public override void Stop()
-        {
-            Dispose();
-        }
+        Dispose();
+        return result;
+    }
+
+    public override void Stop()
+    {
+        Dispose();
     }
 }

@@ -7,11 +7,13 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:local="using:Display.Views.More.DatumList"
-      xmlns:enums="using:Display.Models.Data.Enums"
       xmlns:customizeControls="using:Display.Controls"
       xmlns:data="using:Display.Models.Data"
       xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
       xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
+      xmlns:userController="using:Display.Controls.UserController"
+      xmlns:enums1="using:Display.Models.Enums"
+      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
       mc:Ignorable="d">
     <Page.Resources>
         <Style TargetType="TextBlock"
@@ -45,7 +47,7 @@
 
 
         <DataTemplate x:Key="SearchListTemplate"
-                      x:DataType="data:FilesInfo">
+                      x:DataType="oneOneFive:FilesInfo">
             <Grid Background="Transparent"
                   ColumnDefinitions="*">
                 <Grid.ContextFlyout>
@@ -108,7 +110,7 @@
 
 
         <DataTemplate x:Key="FileListTemplate"
-                      x:DataType="data:FilesInfo">
+                      x:DataType="oneOneFive:FilesInfo">
             <Grid Background="Transparent"
                   ColumnDefinitions="*,140,70">
                 <Grid.ContextFlyout>
@@ -119,23 +121,23 @@
                                 <FontIcon Glyph="&#xEE4A;" />
                             </MenuFlyoutSubItem.Icon>
                             <MenuFlyoutItem Text="WebView"
-                                            Tag="{x:Bind enums:PlayerType.WebView}"
+                                            Tag="{x:Bind enums1:PlayerType.WebView}"
                                             Click="PlayWithPlayerButtonClick" />
 
                             <MenuFlyoutItem Text="PotPlayer"
-                                            Tag="{x:Bind enums:PlayerType.PotPlayer}"
+                                            Tag="{x:Bind enums1:PlayerType.PotPlayer}"
                                             Click="PlayWithPlayerButtonClick" />
 
                             <MenuFlyoutItem Text="mpv"
-                                            Tag="{x:Bind enums:PlayerType.Mpv}"
+                                            Tag="{x:Bind enums1:PlayerType.Mpv}"
                                             Click="PlayWithPlayerButtonClick" />
 
                             <MenuFlyoutItem Text="vlc"
-                                            Tag="{x:Bind enums:PlayerType.Vlc}"
+                                            Tag="{x:Bind enums1:PlayerType.Vlc}"
                                             Click="PlayWithPlayerButtonClick" />
 
                             <MenuFlyoutItem Text="MediaElement"
-                                            Tag="{x:Bind enums:PlayerType.MediaElement}"
+                                            Tag="{x:Bind enums1:PlayerType.MediaElement}"
                                             Click="PlayWithPlayerButtonClick" />
 
                         </MenuFlyoutSubItem>
@@ -403,7 +405,7 @@
                         <AppBarButton.Flyout>
                             <Flyout>
                                 <StackPanel>
-                                    <ToggleSwitch IsOn="{x:Bind data:StaticData.isJumpExistsFolder,Mode=TwoWay}"
+                                    <ToggleSwitch IsOn="{x:Bind data:StaticData.IsJumpExistsFolder,Mode=TwoWay}"
                                                   Header="是否跳过已导入文件夹（修改时间一致）"
                                                   OnContent="跳过"
                                                   OffContent="不跳过" />
@@ -428,7 +430,7 @@
                 </BreadcrumbBar.Transitions>
 
                 <BreadcrumbBar.ItemTemplate>
-                    <DataTemplate x:DataType="data:ExplorerItem">
+                    <DataTemplate x:DataType="oneOneFive:ExplorerItem">
                         <BreadcrumbBarItem Content="{Binding}">
                             <BreadcrumbBarItem.ContentTemplate>
                                 <DataTemplate>
@@ -522,7 +524,7 @@
               BorderBrush="{StaticResource CircleElevationBorderBrush}">
 
             <!--数量指示-->
-            <customizeControls:ShowCountControl Margin="2"
+            <userController:ShowCountControl Margin="2"
                                                 CurrentCount="{x:Bind FilesInfos.Count,Mode=OneWay}"
                                                 AllCount="{x:Bind FilesInfos.AllCount,Mode=OneWay}"
                                                 HorizontalAlignment="Right"

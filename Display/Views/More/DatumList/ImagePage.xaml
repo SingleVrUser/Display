@@ -8,7 +8,8 @@
             xmlns:customcontrols="using:Display.Controls"
             xmlns:data="using:Display.Models.Data"
             xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
-            mc:Ignorable="d">
+      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
+      mc:Ignorable="d">
 
     <Grid RowDefinitions="50,*">
         <Grid.ColumnDefinitions>
@@ -133,7 +134,7 @@
                 </oldControls:AdaptiveGridView.HeaderTemplate>
 
                 <oldControls:AdaptiveGridView.ItemTemplate>
-                    <DataTemplate x:DataType="data:FilesInfo">
+                    <DataTemplate x:DataType="oneOneFive:FilesInfo">
                         <oldControls:ImageEx Source="{x:Bind ThumbnailUrl}"
                                             Height="60" />
                     </DataTemplate>

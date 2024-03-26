@@ -2,14 +2,15 @@
 using CommunityToolkit.Mvvm.Input;
 using Display.Helper.Data;
 using Display.Interfaces;
-using Display.Models.Data;
-using Display.Models.Image;
 using Display.Models.Media;
+using Display.Providers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using Display.Models.Dto.OneOneFive;
+using Display.Providers.Downloader;
 
 namespace Display.ViewModels;
 

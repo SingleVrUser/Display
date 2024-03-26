@@ -1,13 +1,14 @@
-﻿using Display.Helper.Network;
-using Display.Models.Data;
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using static Display.Models.Spider.SpiderInfos;
+using Display.Helper.Network;
+using Display.Models.Dto.OneOneFive;
+using Display.Providers.Downloader;
+using static Display.Models.Spider.SpiderNameAndStatus;
 using HttpClient = System.Net.Http.HttpClient;
 
 namespace Display.Providers.Spider;
@@ -32,7 +33,7 @@ public class JavBus : BaseSpider
 
     private static HttpClient _client;
     public override HttpClient Client =>
-        _client ??= GetInfoFromNetwork.CreateClient(
+        _client ??= NetworkHelper.CreateClient(
             new Dictionary<string, string>
             {
                 { "accept-language", "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2" },
@@ -54,7 +55,7 @@ public class JavBus : BaseSpider
             _ => cid
         };
 
-        var tmpUrl = GetInfoFromNetwork.UrlCombine(BaseUrl, searchCid);
+        var tmpUrl = NetworkHelper.UrlCombine(BaseUrl, searchCid);
 
         var result = await RequestHelper.RequestHtml(Client, tmpUrl, token);
         if (result == null) return null;
@@ -79,7 +80,7 @@ public class JavBus : BaseSpider
         var imageUrl = imageUrlNode.Attributes["src"].Value;
         if (!imageUrl.Contains("http"))
         {
-            imageUrl = GetInfoFromNetwork.UrlCombine(javBusUrl, imageUrl);
+            imageUrl = NetworkHelper.UrlCombine(javBusUrl, imageUrl);
         }
 
         var videoInfo = new VideoInfo
@@ -172,7 +173,7 @@ public class JavBus : BaseSpider
             var sampleImageUrl = node.Attributes["href"].Value;
             if (!sampleImageUrl.Contains("http"))
             {
-                sampleImageUrl = GetInfoFromNetwork.UrlCombine(javBusUrl, sampleImageUrl);
+                sampleImageUrl = NetworkHelper.UrlCombine(javBusUrl, sampleImageUrl);
             }
             sampleUrlList.Add(sampleImageUrl);
         }

@@ -1,15 +1,16 @@
-﻿using Display.Models.Data;
+﻿using Display.Helper.Data;
+using Display.Providers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
+using SharpCompress;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Storage;
-using Display.Helper.Data;
-using SharpCompress;
+using Display.Models.Dto.OneOneFive;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -39,7 +40,7 @@ namespace Display.Controls.UserController
             if (!string.IsNullOrEmpty(cookie))
             {
                 WebView.CoreWebView2.CookieManager.DeleteAllCookies();
-                CookieHelper.ProductCookieKeyValue(cookie).ForEach(item=>AddCookie(item.Key, item.Value));
+                CookieHelper.ProductCookieKeyValue(cookie).ForEach(item => AddCookie(item.Key, item.Value));
             }
 
             WebView.CoreWebView2.WebResourceResponseReceived += CoreWebView2_WebResourceResponseReceived; ;

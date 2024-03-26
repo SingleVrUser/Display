@@ -1,5 +1,5 @@
 ﻿<UserControl
-    x:Class="Display.Controls.StatusShow"
+    x:Class="Display.Controls.UserController.StatusShow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Display.Controls"

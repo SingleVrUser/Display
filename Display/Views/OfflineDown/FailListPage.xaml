@@ -7,8 +7,8 @@
       xmlns:local="using:Display.Views.OfflineDown"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:data="using:Display.Models.Data"
-    mc:Ignorable="d">
+      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
+      mc:Ignorable="d">
 
     <Grid RowDefinitions="auto,*">
 
@@ -20,7 +20,7 @@
 
         <ListView Grid.Row="1" ItemsSource="{x:Bind UrlInfos}" SelectionMode="None">
             <ListView.ItemTemplate>
-                <DataTemplate x:DataType="data:AddTaskUrlInfo">
+                <DataTemplate x:DataType="oneOneFive:AddTaskUrlInfo">
                     <Grid ColumnDefinitions="*,auto" ColumnSpacing="5">
                         <TextBlock Text="{x:Bind url}"/>
 

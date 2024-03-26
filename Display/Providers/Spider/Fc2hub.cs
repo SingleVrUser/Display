@@ -1,6 +1,5 @@
 ﻿using Display.Helper.Date;
 using Display.Helper.Network;
-using Display.Models.Data;
 using Display.Models.Spider;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
@@ -8,12 +7,14 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Display.Models.Dto.OneOneFive;
+using Display.Providers.Downloader;
 
 namespace Display.Providers.Spider;
 
 public class Fc2Hub : BaseSpider
 {
-    public override SpiderInfos.SpiderSourceName Name => SpiderInfos.SpiderSourceName.Fc2club;
+    public override SpiderNameAndStatus.SpiderSourceName Name => SpiderNameAndStatus.SpiderSourceName.Fc2Club;
 
     public override string Abbreviation => "fc";
     public override string Keywords => "Fc2hub.com";
@@ -33,7 +34,7 @@ public class Fc2Hub : BaseSpider
     }
     public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
     {
-        var url = GetInfoFromNetwork.UrlCombine(BaseUrl, $"search?kw={cid.Replace("FC2-", "")}");
+        var url = NetworkHelper.UrlCombine(BaseUrl, $"search?kw={cid.Replace("FC2-", "")}");
 
         var result = await RequestHelper.RequestHtml(Common.Client, url, token);
         if (result == null) return null;

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using Windows.Storage.Streams;
-using Display.Models.Data;
+﻿using Display.Providers;
 using Microsoft.UI;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -10,6 +6,10 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using QRCoder;
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Windows.Storage.Streams;
 
 namespace Display.Views.Settings.Account;
 

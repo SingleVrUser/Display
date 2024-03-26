@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using Display.Models.Data;
+using Display.Providers;
 using Microsoft.UI.Xaml;
 using System.Threading.Tasks;
 

@@ -1,9 +1,9 @@
 ﻿using Display.Helper.Network;
-using Display.Models.Data;
 using HtmlAgilityPack;
 using System.Threading;
 using System.Threading.Tasks;
-using static Display.Models.Spider.SpiderInfos;
+using Display.Models.Dto.OneOneFive;
+using static Display.Models.Spider.SpiderNameAndStatus;
 
 namespace Display.Providers.Spider;
 
@@ -54,7 +54,7 @@ public class AvMoo : BaseSpider
 
     private async Task<string> GetDetailUrlFromCid(string cid, CancellationToken token)
     {
-        var url = GetInfoFromNetwork.UrlCombine(BaseUrl, $"cn/search/{cid}");
+        var url = NetworkHelper.UrlCombine(BaseUrl, $"cn/search/{cid}");
 
         // 访问
         var result = await RequestHelper.RequestHtml(Common.Client, url, token);

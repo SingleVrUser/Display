@@ -1,12 +1,13 @@
 using Display.CustomWindows;
 using Display.Helper.FileProperties.Name;
 using Display.Models.Data;
+using Display.Providers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using System;
 using Windows.ApplicationModel.DataTransfer;
-using UserInfo = Display.Controls.UserInfo;
+using UserInfo = Display.Controls.UserController.UserInfo;
 
 namespace Display.Views.Settings;
 

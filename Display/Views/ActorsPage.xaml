@@ -7,6 +7,7 @@
       xmlns:helper="using:Display.Helper.FileProperties.Name"
       xmlns:animations="using:CommunityToolkit.WinUI.Animations"
       xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
+      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
       mc:Ignorable="d"
       NavigationCacheMode="Enabled">
 
@@ -103,7 +104,7 @@
                             <CubicEase EasingMode="EaseOut" />
                         </oldControls:Carousel.EasingFunction>
                         <oldControls:Carousel.ItemTemplate>
-                            <DataTemplate x:DataType="data:ActorInfo">
+                            <DataTemplate x:DataType="oneOneFive:ActorInfo">
                                 <Image Width="300"
                                        Height="240"
                                        Source="{x:Bind ProfilePath}"
@@ -122,7 +123,7 @@
             </oldControls:AdaptiveGridView.Header>
 
             <oldControls:AdaptiveGridView.ItemTemplate>
-                <DataTemplate x:DataType="data:ActorInfo">
+                <DataTemplate x:DataType="oneOneFive:ActorInfo">
                     <Grid CornerRadius="5"
                           Padding="5,0"
                           PointerEntered="Grid_PointerEntered"
@@ -168,38 +169,5 @@
 
         </oldControls:AdaptiveGridView>
 
-        <!--<GridView Grid.Row="2"
-                x:Name="BasicGridView"
-                IsItemClickEnabled="True"
-                ItemClick="BasicGridView_ItemClick"
-                Margin="10,0,0,0">
-            <GridView.ItemTemplate>
-                <DataTemplate x:DataType="data:ActorsInfo">
-                    <Grid
-                        Width="140"
-                        Height="140"
-                        Padding="10,0"
-                        CornerRadius="5"
-                        PointerEntered="Grid_PointerEntered"
-                        PointerExited="Grid_PointerExited">
-                        
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="auto"/>
-                        </Grid.RowDefinitions>
-
-                        <Grid CornerRadius="5">
-                            <Image Source="{x:Bind prifilePhotoPath}"
-                                   Width="150" />
-                        </Grid>
-
-                        <RelativePanel Margin="5,0" Grid.Row="1">
-                            <TextBlock Text="{x:Bind name}" RelativePanel.AlignVerticalCenterWithPanel="True" IsTextSelectionEnabled="True" TextWrapping="Wrap" FontFamily="霞鹜文楷"/>
-                            <TextBlock Text="{x:Bind count}" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignBottomWithPanel="True" FontFamily="JetBrains Mono" FontSize="10" Opacity="0.4"/>
-                        </RelativePanel>
-                    </Grid>
-                </DataTemplate>
-            </GridView.ItemTemplate>
-        </GridView>-->
     </Grid>
 </Page>

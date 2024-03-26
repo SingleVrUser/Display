@@ -10,6 +10,8 @@
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:data="using:Display.Models.Data"
     xmlns:winUi="using:CommunityToolkit.WinUI"
+    xmlns:providers="using:Display.Providers"
+    xmlns:userController="using:Display.Controls.UserController"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -22,7 +24,7 @@
 
         <!--用户信息-->
         <Grid MaxWidth="{StaticResource SettingsMaxWidth}">
-            <customControls:UserInfo x:Name="UserInfoControl"
+            <userController:UserInfo x:Name="UserInfoControl"
                                      UpdateInfoClick="UpdateInfoButton_Click"
                                      LoginClick="LoginButton_Click"
                                      LogoutClick="LogoutButton_Click"
@@ -72,7 +74,7 @@
                 <StackPanel Orientation="Horizontal">
                     <ToggleSwitch OnContent="开启"
                                   OffContent="关闭"
-                                  IsOn="{x:Bind data:AppSettings.IsRecordDownRequest,Mode=TwoWay}" />
+                                  IsOn="{x:Bind providers:AppSettings.IsRecordDownRequest,Mode=TwoWay}" />
 
                     <HyperlinkButton Content="清空"
                                      Click="ClearDownRecordButton_Click"
@@ -92,7 +94,7 @@
                                SmallChange="60"
                                LargeChange="3600"
                                Minimum="0"
-                               Value="{x:Bind data:AppSettings.DownUrlOverdueTime,Mode=TwoWay}" />
+                               Value="{x:Bind providers:AppSettings.DownUrlOverdueTime,Mode=TwoWay}" />
                 </StackPanel>
             </controls:SettingsCard>
         </StackPanel>

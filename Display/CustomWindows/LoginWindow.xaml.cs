@@ -1,7 +1,6 @@
-﻿using System;
-using Display.Views.Settings;
-using Display.Views.Settings.Account;
+﻿using Display.Views.Settings.Account;
 using Microsoft.UI.Xaml.Controls;
+using System;
 
 namespace Display.CustomWindows;
 

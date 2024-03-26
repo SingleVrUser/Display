@@ -1,10 +1,12 @@
 ﻿using Display.Models.Data;
+using Display.Providers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Display.Providers.Downloader;
 
 namespace Display.Helper.Network;
 

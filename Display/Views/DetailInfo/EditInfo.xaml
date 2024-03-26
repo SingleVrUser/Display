@@ -5,18 +5,17 @@
     x:Class="Display.Views.DetailInfo.EditInfo"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Display.Views.DetailInfo"
-    xmlns:converter="using:Display.Converter"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:data="using:Display.Models.Data"
     xmlns:detailInfo="using:Display.Views.DetailInfo"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:details="using:Display.Models.Entities.Details"
+    xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
     mc:Ignorable="d">
 
     <Page.Resources>
         <DataTemplate x:Key="TokenTemplate"
-                      x:DataType="local:TokenData">
+                      x:DataType="details:TokenData">
             <StackPanel Orientation="Horizontal">
                 <Border CornerRadius="9999"
                         Background="{x:Bind Name, Converter={StaticResource ObjectToColorConverter}}"
@@ -35,7 +34,7 @@
         </DataTemplate>
         
         <DataTemplate x:Key="ActorTemplate"
-                      x:DataType="data:ActorInfo">
+                      x:DataType="oneOneFive:ActorInfo">
             <StackPanel Orientation="Horizontal">
                 <Border CornerRadius="9999"
                         Background="{x:Bind Name, Converter={StaticResource ObjectToColorConverter}}"
@@ -54,7 +53,7 @@
         </DataTemplate>
         
         <DataTemplate x:Key="CommonTemplate"
-                      x:DataType="local:CommonEditOption">
+                      x:DataType="details:CommonEditOption">
             <TextBox Text="{x:Bind Text,Mode=TwoWay}"
                      PlaceholderText="{x:Bind PlaceholderText}"
                      Header="{x:Bind Header}"
@@ -63,7 +62,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="TokenizingTemplate"
-                      x:DataType="local:TokenizingEditOption">
+                      x:DataType="details:TokenizingEditOption">
             <controls:TokenizingTextBox Header="{x:Bind Header}"
                                         PlaceholderText="{x:Bind PlaceholderText}"
                                         QueryIcon="{x:Bind SymbolIconSource}"
