@@ -4,6 +4,7 @@ using Display.Services.Upload;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Display.ViewModels.Sub;
 
 namespace Display.ViewModels;
 
@@ -11,13 +12,13 @@ internal class UploadViewModel : ObservableObject
 {
     private const int MaxUploadCount = 3;
 
-    public ObservableCollection<Services.UploadSubItem> UploadCollection = [];
+    public ObservableCollection<UploadSubItemService> UploadCollection = [];
 
     public void AddUploadTask(string filePath, long cid, Action<FileUploadResult> finishAction = null)
     {
         if (UploadCollection.Any(x => x.UploadFilePath == filePath)) return;
 
-        var uploadUi = new Services.UploadSubItem(filePath, cid);
+        var uploadUi = new UploadSubItemService(filePath, cid);
         UploadCollection.Add(uploadUi);
 
         uploadUi.UploadFinish += result =>

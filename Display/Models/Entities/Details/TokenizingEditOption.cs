@@ -14,14 +14,25 @@ public class TokenizingEditOption
 
     public SymbolIconSource SymbolIconSource;
 
-    public TypedEventHandler<TokenizingTextBox, TokenItemAddingEventArgs> ItemAdding;
-
     public TypedEventHandler<AutoSuggestBox, AutoSuggestBoxTextChangedEventArgs> TextChanged;
+    
+    public TypedEventHandler<TokenizingTextBox, TokenItemAddingEventArgs> ItemAdding;
 
     public object SuggestedItemsSource;
 
-    public object ItemsSource { get; set; }
+    public object ItemsSource { get; init; }
 
     public DataTemplate ItemTemplate;
+    
+    
+    public void OnTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+    {
+        TextChanged?.Invoke(sender,args);
+    }
+    
+    public void OnItemAdding(TokenizingTextBox sender, TokenItemAddingEventArgs args)
+    {
+        ItemAdding?.Invoke(sender,args);
+    }
 
 }

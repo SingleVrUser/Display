@@ -30,6 +30,7 @@ using Windows.Foundation;
 using Windows.System;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
+using Display.Views.Pages;
 using MainPage = Display.Views.Tasks.MainPage;
 
 // To learn more about WinUI, the WinUI project structure,

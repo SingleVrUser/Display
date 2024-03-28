@@ -6,6 +6,7 @@ using Display.Views.Settings;
 using Microsoft.UI.Xaml;
 using System;
 using System.Diagnostics;
+using Display.Views.Pages.Settings;
 using Settings18Page = Display.Views.Sort115.Settings18Page;
 using Sort115Settings = Display.Models.Entities._115.Sort115Settings;
 

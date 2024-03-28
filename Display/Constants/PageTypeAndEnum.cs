@@ -6,6 +6,9 @@ using Display.Views.Tasks;
 using System;
 using System.Collections.Generic;
 using Display.Models.Enums;
+using Display.Views.Pages.More;
+using Display.Views.Pages.Settings;
+using MainPage = Display.Views.Pages.Settings.MainPage;
 
 namespace Display.Constants;
 
@@ -18,7 +21,7 @@ internal class PageTypeAndEnum
         { NavigationViewItemEnum.VideoViewPage, typeof(VideoViewPage) },
         { NavigationViewItemEnum.ActorPage, typeof(ActorsPage) },
         { NavigationViewItemEnum.MorePage, typeof(MorePage) },
-        { NavigationViewItemEnum.SettingPage, typeof(Views.Settings.MainPage) },
+        { NavigationViewItemEnum.SettingPage, typeof(MainPage) },
         { NavigationViewItemEnum.DownPage, typeof(OfflineDownPage) },
         { NavigationViewItemEnum.TaskPage, typeof(Views.Tasks.MainPage) },
 

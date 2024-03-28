@@ -1,4 +1,5 @@
-﻿using Display.Extensions;
+﻿using Display.Constants;
+using Display.Extensions;
 using Display.Helper.Crypto;
 using Display.Services.Upload;
 using Tests.Helper;
@@ -12,7 +13,7 @@ namespace Tests
         private const long RootCid = 0;
         private const int UserId = UserInfo.UserId;
         private const string UserKey = UserInfo.UserKey;
-        private const string AppVer = Constant.DefaultSettings.Network._115.UploadAppVersion;
+        private const string AppVer = DefaultSettings.Network._115.UploadAppVersion;
 
         private readonly HttpClient _client = RequestHelper.UploadClient;
 

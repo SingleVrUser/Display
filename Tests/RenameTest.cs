@@ -1,4 +1,6 @@
-﻿using Display.Providers;
+﻿
+using Display.Constants;
+using Display.Providers;
 using Display.Services.Upload;
 using Tests.Helper;
 
@@ -9,7 +11,7 @@ namespace Tests
     {
         private const int UserId = UserInfo.UserId;
         private const string UserKey = UserInfo.UserKey;
-        private const string AppVer = Constant.DefaultSettings.Network._115.UploadAppVersion;
+        private const string AppVer = DefaultSettings.Network._115.UploadAppVersion;
 
         private readonly HttpClient _uploadClient = RequestHelper.UploadClient;
         private readonly HttpClient _downloadClient = RequestHelper.DownloadClient;

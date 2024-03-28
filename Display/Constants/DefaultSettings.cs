@@ -1,4 +1,5 @@
-﻿using Display.Models.Settings;
+﻿using System.Drawing;
+using Display.Models.Settings;
 using Windows.Storage;
 using Display.Models.Enums;
 
@@ -101,12 +102,13 @@ public static class DefaultSettings
 
         public static class SavePath
         {
-            public static readonly string Image = System.IO.Path.Combine(ApplicationData.Current.LocalFolder.Path, "Image");
-            public static readonly string Sub = System.IO.Path.Combine(ApplicationData.Current.LocalFolder.Path, "Sub");
-            public static readonly string Actor = System.IO.Path.Combine(ApplicationData.Current.LocalFolder.Path, "Actor");
-            public static readonly string Attmn = System.IO.Path.Combine(ApplicationData.Current.LocalFolder.Path, "Attmn");
-            public static readonly string Data = System.IO.Path.Combine(ApplicationData.Current.LocalFolder.Path, "Data");
-            public static readonly string DataAccess = ApplicationData.Current.LocalFolder.Path;
+            private static readonly string BaseSavePath = ApplicationData.Current.LocalFolder.Path;
+            public static readonly string Image = System.IO.Path.Combine(BaseSavePath, "Image");
+            public static readonly string Sub = System.IO.Path.Combine(BaseSavePath, "Sub");
+            public static readonly string Actor = System.IO.Path.Combine(BaseSavePath, "Actor");
+            public static readonly string Attmn = System.IO.Path.Combine(BaseSavePath, "Attmn");
+            public static readonly string Data = System.IO.Path.Combine(BaseSavePath, "Data");
+            public static readonly string DataAccess = BaseSavePath;
 
             public const string BitCometDown = "";
             public const string Aria2 = "";

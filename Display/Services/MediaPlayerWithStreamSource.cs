@@ -12,20 +12,14 @@ using Display.Models.Dto.OneOneFive;
 
 namespace Display.Services;
 
-public class MediaPlayerWithStreamSource
+public class MediaPlayerWithStreamSource(string url, FilesInfo filesInfo)
 {
     private HttpRandomAccessStream _stream;
     private MediaSource _ms;
     public MediaPlayer MediaPlayer = new();
-    public FilesInfo FilesInfo;
+    public FilesInfo FilesInfo = filesInfo;
 
-    public string Url { get; }
-
-    public MediaPlayerWithStreamSource(string url, FilesInfo filesInfo)
-    {
-        Url = url;
-        FilesInfo = filesInfo;
-    }
+    public string Url { get; } = url;
 
     public static async Task<MediaPlayerWithStreamSource> CreateMediaPlayer(string videoUrl, SubInfo subInfo = null, FilesInfo filesInfo = null)
     {
