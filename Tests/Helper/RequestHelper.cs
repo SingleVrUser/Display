@@ -1,4 +1,5 @@
-﻿using Display.Helper.Network;
+﻿using System.Reflection.Metadata;
+using Display.Helper.Network;
 
 namespace Tests.Helper
 {
@@ -15,7 +16,7 @@ namespace Tests.Helper
 
                 var headers = new Dictionary<string, string>
                 {
-                    { "user-agent", Constant.DefaultSettings.Network._115.UploadUserAgent },
+                    { "user-agent", Display.Constants.DefaultSettings.Network._115.UploadUserAgent },
                     { "Cookie", Cookie }
                 };
 
@@ -34,7 +35,7 @@ namespace Tests.Helper
 
                 var headers = new Dictionary<string, string>
                 {
-                    { "user-agent", Constant.DefaultSettings.Network._115.DownUserAgent },
+                    { "user-agent", Display.Constants.DefaultSettings.Network._115.DownUserAgent },
                     { "Cookie", Cookie }
                 };
 

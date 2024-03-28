@@ -22,10 +22,18 @@
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxPackageDir>D:\库\Desktop\打包\</AppxPackageDir>
     <PackageIcon>SmallTile.scale-125.png</PackageIcon>
+    
     <Win32Resource>App.res</Win32Resource>
+    
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    
+<!--    &lt;!&ndash; This bundles the .NET Core libraries &ndash;&gt;-->
+<!--    <SelfContained>true</SelfContained>-->
+
+<!--    &lt;!&ndash; This bundles the WinUI3 components &ndash;&gt;-->
+<!--    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>-->
   </PropertyGroup>
 
   <!-- Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
@@ -122,39 +130,6 @@
     <None Update="Control\FolderControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>
-    <Page Update="Views\Settings\UIShowPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Tasks\SpiderTaskPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Tasks\UploadTaskPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Settings\DownPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Settings\PlayPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Settings\SearchPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Settings\SpiderPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Settings\CommonPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Settings\StoragePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Settings\AccountPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Settings\MainPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Update="Control\RangeSlider.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -192,34 +167,10 @@
     <Page Update="Views\VideoPlay.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Views\DetailInfo\SelectSingleVideoToPlay.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\MorePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Update="Views\BrowserPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Views\VideoCoverPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\ActorsPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\DetailInfoPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\HomePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\VideoViewPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\DetailInfo\DownDialogContent.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\More\DatumList\ThumbnailPage.xaml">
+    <Page Update="Views\Pages\DetailInfo\DownDialogContent.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Views\VerifyAccountPage.xaml">
@@ -229,22 +180,22 @@
 
   <!--CustomWindows-->
   <ItemGroup>
-    <Page Update="CustomWindows\MediaPlayWindow.xaml">
+    <Page Update="Views\Windows\MediaPlayWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="CustomWindows\StartWindow.xaml">
+    <Page Update="Views\Windows\StartWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="CustomWindows\SingleFrameWindow.xaml">
+    <Page Update="Views\Windows\SingleFrameWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="CustomWindows\CommonWindow.xaml">
+    <Page Update="Views\Windows\CommonWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="CustomWindows\LoginWindow.xaml">
+    <Page Update="Views\Windows\LoginWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="CustomWindows\VideoPlayWindow.xaml">
+    <Page Update="Views\Windows\VideoPlayWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -291,6 +242,9 @@
     <None Update="FFmpeg\bin\x86\swscale-7.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Views\Pages\" />
   </ItemGroup>
 
 </Project>

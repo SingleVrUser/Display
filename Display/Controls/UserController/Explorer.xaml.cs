@@ -588,7 +588,6 @@ public sealed partial class Explorer : UserControl
     public event RoutedEventHandler PlayVideoClick;
     private void PlayVideoButton_Click(object sender, RoutedEventArgs e)
     {
-
         PlayVideoClick?.Invoke(sender, e);
     }
 

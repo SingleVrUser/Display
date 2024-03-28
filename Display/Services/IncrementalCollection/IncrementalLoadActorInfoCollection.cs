@@ -50,11 +50,10 @@ public class IncrementalLoadActorInfoCollection : ObservableCollection<ActorInfo
 
         actorInfos.ForEach(Add);
 
-        if (AllCount <= Count)
-        {
-            HasMoreItems = false;
-            System.Diagnostics.Debug.WriteLine("记载完毕");
-        }
+        if (AllCount > Count) return actorInfos.Length;
+
+        HasMoreItems = false;
+        System.Diagnostics.Debug.WriteLine("记载完毕");
 
         return actorInfos.Length;
     }

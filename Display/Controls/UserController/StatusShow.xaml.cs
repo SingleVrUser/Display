@@ -11,7 +11,7 @@ namespace Display.Controls.UserController
     {
         public Status status
         {
-            get { return (Status)GetValue(statusProperty); }
+            get => (Status)GetValue(statusProperty);
             set
             {
                 SetValue(statusProperty, value);
@@ -57,12 +57,5 @@ namespace Display.Controls.UserController
             this.InitializeComponent();
         }
 
-    }
-
-    public class ConditionCheck
-    {
-        public string Condition { get; set; }
-        public string CheckUrl { get; set; }
-        public Status Status { get; set; }
     }
 }
