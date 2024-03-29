@@ -217,8 +217,6 @@
                     Value="10" />
             <Setter Property="BorderThickness"
                     Value="0.5" />
-            <Setter Property="BorderBrush"
-                    Value="{StaticResource ControlElevationBorderBrush}" />
             <Setter Property="Padding"
                     Value="0,10,0,0" />
             <Setter Property="RowSpacing"
@@ -354,13 +352,13 @@
                         </MenuFlyout>
                     </AppBarButton.ContextFlyout>
                 </AppBarButton>
-                <AppBarButton x:Name="ImportButton"
-                              Icon="Import"
+                <AppBarButton
+                    Icon="Import"
                               Label="导入"
                               Visibility="Collapsed"
                               Click="ImportDataButton_Click" />
-                <AppBarButton x:Name="DownloadButton"
-                              Icon="Download"
+                <AppBarButton
+                    Icon="Download"
                               Label="下载"
                               Visibility="Collapsed"
                               Click="DownButton_Click"
@@ -519,8 +517,7 @@
         </ListView>
 
         <Grid Grid.Row="1"
-              BorderThickness="0,1,0,0"
-              BorderBrush="{StaticResource CircleElevationBorderBrush}">
+              BorderThickness="0,1,0,0">
 
             <!--数量指示-->
             <userController:ShowCountControl Margin="2"

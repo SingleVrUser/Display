@@ -25,22 +25,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <SolidColorBrush x:Key="MediaTransportControlsPanelBackground"
-                         Color="#60ffffff" />
         <Style TargetType="MediaPlayerElement">
             <Setter Property="AreTransportControlsEnabled"
-                    Value="True" />
-        </Style>
-        <Style TargetType="MediaTransportControls"
-               BasedOn="{StaticResource DefaultMediaTransportControlsStyle}"
-               x:Key="MediaTransportControls">
-            <Setter Property="IsCompact"
-                    Value="True" />
-            <Setter Property="BackgroundSizing"
-                    Value="InnerBorderEdge" />
-            <Setter Property="IsPlaybackRateButtonVisible"
-                    Value="True" />
-            <Setter Property="IsPlaybackRateEnabled"
                     Value="True" />
         </Style>
     </Page.Resources>
@@ -48,7 +34,7 @@
     <Grid>
         <SplitView x:Name="RootSplitView" PanePlacement="Right" IsPaneOpen="True" DisplayMode="Inline" OpenPaneLength="380">
             <SplitView.Pane>
-                <Pivot x:Name="VideoPlay_Pivot"
+                <Pivot x:Name="VideoPlayPivot"
                        Background="{ThemeResource LayerFillColorDefaultBrush}">
 
                         <PivotItem Header="文件">
@@ -73,12 +59,12 @@
                                             Click="EmptyList_Click" />
                                 </StackPanel>
 
-                                <controls:MetadataControl x:Name="metadataControl"
-                                                            Items="{x:Bind _units}"
+                                <controls:MetadataControl
+                                    Items="{x:Bind _units}"
                                                           Grid.Row="1"
                                                           Separator=" > " />
 
-                                <ListView x:Name="VideoShow_ListView"
+                                <ListView x:Name="VideoShowListView"
                                           Grid.Row="2"
                                           SelectionMode="Multiple"
                                           ItemsSource="{x:Bind _filesInfos}"
@@ -145,7 +131,7 @@
 
                                 <FlipView ItemsSource="{x:Bind _cidInfos}"
                                           Height="300"
-                                          SelectedIndex="{x:Bind VideoPlay_ListView.SelectedIndex,Mode=TwoWay}">
+                                          SelectedIndex="{x:Bind VideoPlayListView.SelectedIndex,Mode=TwoWay}">
                                     <FlipView.ItemTemplate>
                                     <DataTemplate x:DataType="videoDisplay:CidInfo">
                                             <UserControl PointerEntered="CidInfoUserControlPointerEntered"
@@ -208,10 +194,10 @@
                                     </FlipView.ItemTemplate>
                                 </FlipView>
 
-                                <ProgressRing Grid.Row="0" x:Name="FindCidInfo_ProgressRing"
+                                <ProgressRing Grid.Row="0" x:Name="FindCidInfoProgressRing"
                                               Visibility="Collapsed" />
 
-                                <ListView x:Name="VideoPlay_ListView"
+                                <ListView x:Name="VideoPlayListView"
                                           Grid.Row="1"
                                           SelectionMode="Single"
                                           ItemsSource="{x:Bind _playingVideoInfos}">
@@ -309,7 +295,7 @@
 
             <SplitView.Content>
                 <Grid>
-                    <controls:UniformGrid x:Name="Video_UniformGrid"
+                    <controls:UniformGrid x:Name="VideoUniformGrid"
                                           FirstColumn="0"
                                           Orientation="Horizontal"
                                           Rows="2"

@@ -3,8 +3,6 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:data="using:Display.Models.Data"
-      xmlns:customControls="using:Display.Controls"
       xmlns:controls="using:CommunityToolkit.WinUI.Controls"
       xmlns:winUi="using:CommunityToolkit.WinUI"
       xmlns:userController="using:Display.Controls.UserController"
@@ -128,8 +126,8 @@
                                          PlayWithPlayerClick="Explorer_OnPlayWithPlayerClick"/>
 
                 <!--失败列表-->
-                <Grid x:Name="FailListGrid"
-                      Visibility="{x:Bind MatchFailItem.IsSelected,Mode=OneWay}">
+                <Grid
+                    Visibility="{x:Bind MatchFailItem.IsSelected,Mode=OneWay}">
                     <ListView x:Name="FailListView"
                               SelectionChanged="FailListView_SelectionChanged"
                               ItemsSource="{x:Bind FailList,Mode=OneWay}">
@@ -155,7 +153,6 @@
             <Grid Grid.Row="1"
                   Grid.Column="1"
                   BorderThickness="2"
-                  BorderBrush="{StaticResource ControlElevationBorderBrush}"
                   Margin="2"
                   CornerRadius="8">
 
@@ -175,7 +172,7 @@
                     <ScrollViewer Grid.Row="1"
                                   Padding="5">
                         
-                        <Grid x:Name="FileInfoShow_Grid"
+                        <Grid x:Name="FileInfoShowGrid"
                               RowSpacing="5"
                               ColumnSpacing="5"
                               Visibility="Collapsed">
@@ -412,18 +409,13 @@
                   Collapsed="Expander_Collapsed"
                   HorizontalContentAlignment="Stretch">
 
-            <Expander.Resources>
-                <SolidColorBrush x:Key="ExpanderContentBackground"
-                                 Color="{ThemeResource SolidBackgroundFillColorBase}" />
-            </Expander.Resources>
-
             <Expander.Header>
                 <Grid>
                     <userController:TextBlockWithLongText StringValue="检查环境"
                                                           IsFirstTextSelectionEnabled="False"/>
-                    <TextBlock x:FieldModifier="public" x:Name="StatusTextBlock"
-                       HorizontalAlignment="Right"
-                       Style="{StaticResource CaptionTextBlockStyle}"/>
+                    <TextBlock
+                        HorizontalAlignment="Right"
+                               Style="{StaticResource CaptionTextBlockStyle}"/>
                     <userController:StatusShow x:FieldModifier="public"
                                                HorizontalAlignment="Right"
                                                x:Name="LoginCheck"/>

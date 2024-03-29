@@ -716,15 +716,11 @@
         <DataTemplate x:Key="FailListTemplate"
                       x:DataType="oneOneFive:Datum">
             <Grid x:Name="FailGrid"
-                  Padding="{StaticResource ButtonPadding}"
-                  BorderBrush="{StaticResource ButtonBorderBrush}"
-                  CornerRadius="{StaticResource ControlCornerRadius}"
                   BorderThickness="{StaticResource ButtonBorderThemeThickness}"
                   Tapped="FailGrid_Tapped"
                   PointerEntered="FailGrid_PointerEntered"
                   PointerExited="FailGrid_PointerExited"
-                  Margin="5,0"
-                  Background="{StaticResource ControlFillColorDefaultBrush}">
+                  Margin="5,0">
 
                 <Grid.ContextFlyout>
                     <MenuFlyout>
@@ -892,7 +888,6 @@
                                         CornerRadius="5"
                                         Margin="5"
                                         Padding="5"
-                                        BorderBrush="{StaticResource ControlElevationBorderBrush}"
                                         Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
                                         Spacing="1"
                                         BorderThickness="1"
