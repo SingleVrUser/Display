@@ -11,6 +11,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Display.Models.Dto.Media;
+using LocalThumbnail = Display.Models.Dto.Media.LocalThumbnail;
 
 namespace Display.Services;
 

@@ -9,6 +9,8 @@ using Windows.Storage;
 using Windows.System;
 using Display.Helper.Date;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Enums;
+using Display.Models.Enums.OneOneFive;
 using Display.Providers;
 using Display.Views.Windows;
 using Microsoft.Toolkit.Uwp.Notifications;

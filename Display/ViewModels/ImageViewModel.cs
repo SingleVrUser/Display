@@ -11,6 +11,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Media;
 

@@ -9,6 +9,7 @@ using Display.Helper.Network;
 using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
+using Display.Models.Enums.OneOneFive;
 using Display.Models.Media;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;

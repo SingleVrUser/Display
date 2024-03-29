@@ -23,7 +23,7 @@ namespace Display.Views.Pages.SpiderVideoInfo;
 public sealed partial class Progress
 {
     private readonly CancellationTokenSource _sCts = new();
-    private readonly List<string> _selectedFilesNameList;
+    private List<string> SelectedFilesNameList { get; }
     private List<Datum> _fileList = [];
     private readonly List<FailDatum> _failDatumList = [];
 
@@ -37,7 +37,7 @@ public sealed partial class Progress
     public Progress(List<string> selectedFilesNameList, List<Datum> fileList)
     {
         this.InitializeComponent();
-        this._selectedFilesNameList = selectedFilesNameList;
+        this.SelectedFilesNameList = selectedFilesNameList;
         this._fileList = fileList;
         this.Loaded += PageLoaded;
     }
@@ -243,113 +243,6 @@ public sealed partial class Progress
         if (_matchVideoResults == null)
             return Task.CompletedTask;
 
-        //_network ??= new GetInfoFromNetwork();
-        //ShowSpiderInfoList();
-        //ShowSpiderCartesianChart();
-        //CountInfo_Grid.Visibility = Visibility.Visible;
-        //TopProgressRing.IsActive = true;
-        //_failVideoNameList = [];
-
-        //var startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
-        //ProgressMore_TextBlock.Text = "失败数：0";
-        ////视频数量
-        //var videoCount = _matchVideoResults.Count(info => info.statusCode != 0);
-        //AllVideoCount_Run.Text = videoCount.ToString();
-
-        //if (videoCount == 0)
-        //{
-        //    TotalProgress_TextBlock.Text = "视频数为0,停止任务";
-        //    return;
-        //}
-
-        ////匹配成功的视频总数量（1：匹配成功，2：已添加（多集只保留一个番号））
-        //var matchSuccessVideoCount = _matchVideoResults.Where(item => item.statusCode is 1 or 2).ToList().Count;
-
-        ////匹配到的番号总数量
-        //var totalCount = _matchVideoResults.Where(item => !string.IsNullOrEmpty(item.MatchName)).ToList().Count;
-        //MatchCidCount_Run.Text = totalCount.ToString();
-
-        //if (totalCount == 0)
-        //{
-        //    TotalProgress_TextBlock.Text = "匹配到的番号数量为0,停止任务";
-        //    return;
-        //}
-
-        ////正则匹配成功的番号占总视频数的
-        //FileNameSuccessRate_Run.Text = $"{matchSuccessVideoCount * 100 / videoCount}%";
-
-        ////统计成功的名称
-        //var successCount = 0;
-        //List<string> successVideoNameList = [];
-
-        //var failCount = 0;
-
-        //var spiderSourceProgress = new Progress<SpiderInfo>(progressPercent =>
-        //{
-        //    var gridViewItem = _spiderInfos.FirstOrDefault(item => item.SpiderSource == progressPercent.SpiderSource);
-        //    //更新信息
-        //    if (gridViewItem != null)
-        //    {
-        //        gridViewItem.State = progressPercent.State;
-        //        gridViewItem.Message = progressPercent.Message;
-        //    }
-
-        //    //更新柱状图
-        //    //请求成功 (搜刮源或数据库)
-        //    if (progressPercent.RequestStates == RequestStates.success)
-        //    {
-        //        successCount++;
-        //        CidSuccessCount_Run.Text = successCount.ToString();
-
-        //        UpdateSpiderCartesianChart(SpiderInfos.SpiderSourceName.Local);
-        //    }
-        //    //请求失败(搜刮源)
-        //    else if (progressPercent.RequestStates == RequestStates.fail)
-        //    {
-        //        failCount++;
-        //        FailCount_Run.Text = failCount.ToString();
-        //        ProgressMore_TextBlock.Text = $"失败数：{failCount}";
-        //        UpdateSpiderCartesianChart(SpiderInfos.SpiderSourceName.Local);
-
-        //        //番号搜刮成功率
-        //        CidSuccessRate_Run.Text = $"{(totalCount - _failVideoNameList.Count) * 100 / totalCount}%";
-        //    }
-        //    //搜刮源尝试搜刮
-        //    else if (progressPercent.State == SpiderInfos.SpiderStates.Awaiting)
-        //    {
-        //        UpdateSpiderCartesianChart(progressPercent.SpiderSource);
-        //    }
-
-        //    //更新整体进度
-        //    var currentCount = successVideoNameList.Count + _failVideoNameList.Count;
-        //    overallProgress.Value = currentCount;
-        //    percentProgress_TextBlock.Text = $"{currentCount * 100 / totalCount}%";
-        //    countProgress_TextBlock.Text = $"{currentCount}/{totalCount}";
-
-        //});
-
-        //TotalProgress_TextBlock.Text = "正在使用搜刮源搜刮";
-
-        //await SearchAllInfoMultiTask(spiderSourceProgress);
-
-        ////完成
-        //ProgressRing_StackPanel.SetValue(Grid.ColumnSpanProperty, 1);
-        //SearchResult_StackPanel.Visibility = Visibility.Visible;
-        //SearchProgress_TextBlock.Visibility = Visibility.Collapsed;
-
-        //AllCount_Run.Text = _matchVideoResults.Count.ToString();
-        //VideoCount_Run.Text = videoCount.ToString();
-        //FailCount_Run.Text = _failVideoNameList.Count.ToString();
-
-        //if (!GetInfoFromNetwork.IsJavDbCookieVisible)
-        //{
-        //    JavDbCookieVisiable_TeachingTip.IsOpen = true;
-        //}
-
-        ////显示总耗时
-        //SearchMessage_TextBlock.Text = $"⏱总耗时：{DateHelper.ConvertDoubleToLengthStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime)}";
-        //TopProgressRing.IsActive = false;
-
         var list = _matchVideoResults.Where(item => !string.IsNullOrEmpty(item.MatchName))
             .Select(match => match.MatchName).ToList();
         var spiderManager = App.GetService<SpiderManager>();
@@ -362,50 +255,6 @@ public sealed partial class Progress
         return Task.CompletedTask;
     }
 
-    ///// <summary>
-    ///// 每个搜刮源分配一个线程（数据来源与本地数据库）
-    ///// </summary>
-    ///// <returns></returns>
-    //private async Task SearchAllInfoMultiTask(IProgress<SpiderInfo> progress)
-    //{
-    //    // 挑选出启动的
-    //    var tasks = (
-    //        from item
-    //            in _spiderInfos.Where(item => item.IsEnable)
-    //        where item.SpiderSource != SpiderInfos.SpiderSourceName.Local
-    //        select item
-    //    ).ToList();
-
-    //    ////等待任务完成
-    //    //await Task.WhenAll(tasks);
-
-
-    //    var spiderManager = App.GetService<SpiderManager>();
-
-    //    foreach (var matchResult in _matchVideoResults.Where(i=>i.statusCode is 1))
-    //    {
-    //        var name = matchResult.MatchName;
-
-    //        var result = DataAccess.Get.GetOneTrueNameByName(name);
-
-    //        // 数据库没有
-    //        if (!string.IsNullOrEmpty(result)) continue;
-
-    //        foreach (var spiderInfo in tasks)
-    //        {
-    //            var videoInfo = await spiderManager.DispatchSpecificSpiderInfoByCid(name, spiderInfo.SpiderSource, s_cts.Token);
-    //            if (videoInfo is null) continue;
-
-    //            // 添加搜刮信息到数据库（只有从搜刮源查找到的才添加）
-    //            await DataAccess.Add.AddVideoInfo_ActorInfo_IsWmAsync(videoInfo); 
-    //            break;
-    //        }
-    //    }
-
-    //    // 数据库源最后完成
-    //    SpiderInfo currentSpiderInfo = new(SpiderInfos.SpiderSourceName.Local, "完成", SpiderInfos.SpiderStates.Done);
-    //    progress.Report(currentSpiderInfo);
-    //}
 
     /// <summary>
     /// 当前窗口请求关闭，显示关闭提示，如确定关闭则退出当前所有进程
@@ -438,62 +287,6 @@ public sealed partial class Progress
         window.Closed -= CurrentWindow_Closed;
         window.Close();
     }
-
-    //private void ResetMatchCountInfo(List<MatchVideoResult> matchVideoResults)
-    //{
-    //    overallProgress.Maximum = matchVideoResults.Count;
-    //    countProgress_TextBlock.Text = $"{overallProgress.Value}/{matchVideoResults.Count}";
-    //    if (matchVideoResults.Count == 0)
-    //    {
-    //        percentProgress_TextBlock.Text = $"100%";
-    //    }
-    //}
-
-    //#region 鼠标手势变化
-    //private void FailCountTextBlock_PointerEntered(object sender, PointerRoutedEventArgs e)
-    //{
-    //    ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
-    //}
-    //private void FailCountTextBlock_PointerExited(object sender, PointerRoutedEventArgs e)
-    //{
-
-    //    ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
-    //}
-    //#endregion
-
-    ///// <summary>
-    ///// 点击“失败数：xx”显示失败列表
-    ///// </summary>
-    ///// <param Name="sender"></param>
-    ///// <param Name="e"></param>
-    //private async void askLookFailResult_Tapped(object sender, TappedRoutedEventArgs e)
-    //{
-    //    var dialog = new ContentDialog
-    //    {
-    //        // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
-    //        XamlRoot = XamlRoot,
-    //        Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
-    //        Title = "失败列表",
-    //        CloseButtonText = "返回",
-    //        DefaultButton = ContentDialogButton.Close
-    //    };
-
-    //    var contentGrid = new Grid();
-    //    contentGrid.Children.Add(new ListView() { ItemsSource = _failVideoNameList });
-    //    dialog.Content = contentGrid;
-
-    //    await dialog.ShowAsync();
-    //}
-
-    ///// <summary>
-    ///// 点击了进度中的更多
-    ///// </summary>
-    ///// <param Name="sender"></param>
-    ///// <param Name="e"></param>
-    //private void ProgressMore_Click(object sender, RoutedEventArgs e)
-    //{
-    //    FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
-    //}
 
     public void CreateWindow()
     {

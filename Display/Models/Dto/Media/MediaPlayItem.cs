@@ -22,9 +22,9 @@ public class MediaPlayItem
     public readonly long? Size;
     public readonly long Cid;
     public string Description;
-    public List<M3U8Info> M3U8Infos;
+    private List<M3U8Info> M3U8Infos;
 
-    public FilesInfo.FileType Type;
+    private FilesInfo.FileType Type;
 
     private FailInfo _failInfo;
 

@@ -2,6 +2,8 @@
 using FFmpeg.AutoGen.Abstractions;
 using System;
 using System.Threading.Tasks;
+using Display.Models.Dto.Media;
+using LocalThumbnail = Display.Models.Dto.Media.LocalThumbnail;
 
 namespace Display.Interfaces;
 

@@ -28,6 +28,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
+using Display.Models.Enums.OneOneFive;
 using Display.Providers.Downloader;
 using Display.Views.Pages.Settings.Account;
 
@@ -38,10 +39,9 @@ internal class WebApi
     public static UserInfo UserInfo;
     public static QRCodeInfo QrCodeInfo;
     private static UploadInfo _uploadInfo;
-    public static bool IsEnterHiddenMode;
 
     public HttpClient Client;
-    public TokenInfo TokenInfo;
+    private TokenInfo _tokenInfo;
 
     private static long NowDate => DateTimeOffset.Now.ToUnixTimeSeconds();
 
@@ -139,11 +139,9 @@ internal class WebApi
         if (driveSetting?.data.show == "1")
         {
             result = true;
-            IsEnterHiddenMode = true;
         }
         else
         {
-            IsEnterHiddenMode = false;
         }
 
         return result;
@@ -601,8 +599,8 @@ internal class WebApi
     /// <summary>
     /// 重命名文件
     /// </summary>
-    /// <param Name="pid"></param>
-    /// <param Name="fids"></param>
+    /// <param name="id"></param>
+    /// <param name="newName"></param>
     /// <returns></returns>
     public async Task<RenameRequest> RenameFile(long? id, string newName)
     {
@@ -736,7 +734,7 @@ internal class WebApi
     /// 检查二维码登录验证状态，若登录成功则存储cookie;
     /// </summary>
     /// <returns></returns>
-    public async Task<TokenInfo> NetworkVerifyTokenAsync()
+    public async Task GetNetworkVerifyTokenAsync()
     {
         const string url = "https://passportapi.115.com/app/1.0/web/1.0/login/qrcode";
 
@@ -746,19 +744,17 @@ internal class WebApi
         };
         var content = new FormUrlEncodedContent(values);
 
-        TokenInfo = await Client.SendAsync<TokenInfo>(HttpMethod.Post, url, content);
+        _tokenInfo = await Client.SendAsync<TokenInfo>(HttpMethod.Post, url, content);
 
-        if (TokenInfo.state != 1) return TokenInfo;
+        if (_tokenInfo.state != 1) return;
 
         //存储cookie至本地
-        var cookieList = TokenInfo.data.cookie.GetType().GetProperties().Select(item => $"{item.Name}={item.GetValue(TokenInfo.data.cookie)}").ToList();
+        var cookieList = _tokenInfo.data.cookie.GetType().GetProperties().Select(item => $"{item.Name}={item.GetValue(_tokenInfo.data.cookie)}").ToList();
 
         var cookie = string.Join(";", cookieList);
         AppSettings._115_Cookie = cookie;
         Client.DefaultRequestHeaders.Remove("Cookie");
         Client.DefaultRequestHeaders.Add("Cookie", cookie);
-
-        return TokenInfo;
     }
 
     /// <summary>
@@ -1223,21 +1219,16 @@ internal class WebApi
     /// <returns></returns>
     private async Task<string> GetBitCometDefaultSavePath(HttpClient client, string baseUrl)
     {
-        string savePath = null;
-
         var response = await client.GetAsync(baseUrl + "/panel/task_add_httpftp");
 
-        if (!response.IsSuccessStatusCode || response.StatusCode != HttpStatusCode.OK) return savePath;
+        if (!response.IsSuccessStatusCode || response.StatusCode != HttpStatusCode.OK) return null;
 
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(await response.Content.ReadAsStringAsync());
 
         var savePathNode = htmlDoc.DocumentNode.SelectSingleNode("//input[@id='save_path']");
 
-        if (savePathNode != null)
-            savePath = savePathNode.GetAttributeValue("value", null);
-
-        return savePath;
+        return savePathNode?.GetAttributeValue("value", null);
     }
 
     private static async Task<string> GetAria2DefaultSavePath(string apiUrl, string password)
@@ -1331,7 +1322,6 @@ internal class WebApi
         await Client.GetAsync(url);
 
         //清空账号信息
-        IsEnterHiddenMode = false;
         QrCodeInfo = null;
         UserInfo = null;
         DeleteCookie();
@@ -1627,7 +1617,7 @@ internal class WebApi
         switch (playerType)
         {
             case PlayerType.PotPlayer:
-                PlayVideoHelper.Play115SourceVideoWithPotPlayer(playItems, userAgent: ua, savePath, quality, true);
+                PlayVideoHelper.Play115SourceVideoWithPotPlayer(playItems, userAgent: ua, savePath, quality);
                 break;
             case PlayerType.Mpv:
                 PlayVideoHelper.Play115SourceVideoWithMpv(playItems, userAgent: ua, savePath, quality, false);
