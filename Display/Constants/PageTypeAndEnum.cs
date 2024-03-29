@@ -6,6 +6,7 @@ using Display.Views.Tasks;
 using System;
 using System.Collections.Generic;
 using Display.Models.Enums;
+using Display.Views.Pages;
 using Display.Views.Pages.More;
 using Display.Views.Pages.Settings;
 using MainPage = Display.Views.Pages.Settings.MainPage;
@@ -30,7 +31,7 @@ internal class PageTypeAndEnum
         { NavigationViewItemEnum.SpiderTask, typeof(SpiderTaskPage) },
 
         //更多页
-        { NavigationViewItemEnum.SpiderPage,typeof(Views.SpiderVideoInfo.MainPage) },
+        { NavigationViewItemEnum.SpiderPage,typeof(Views.Pages.SpiderVideoInfo.MainPage) },
         { NavigationViewItemEnum.CalculateSha1Page,typeof(CalculateLocalFileSha1) },
         { NavigationViewItemEnum.BrowserPage,typeof(BrowserPage) },
         { NavigationViewItemEnum.FilePage,typeof(Views.More.DatumList.MainPage) },

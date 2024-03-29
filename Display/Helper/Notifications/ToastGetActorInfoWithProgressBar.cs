@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
+using Display.Views.Pages;
 
 namespace Display.Helper.Notifications;
 
