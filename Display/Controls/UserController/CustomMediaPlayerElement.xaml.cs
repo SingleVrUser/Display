@@ -34,6 +34,7 @@ using Windows.System.Display;
 using Windows.Web.Http;
 using Display.Models.Dto.OneOneFive;
 using Display.Providers.Downloader;
+using Display.Views.Pages;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
