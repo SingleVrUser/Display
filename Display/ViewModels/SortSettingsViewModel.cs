@@ -2,12 +2,11 @@
 using CommunityToolkit.Mvvm.Input;
 using Display.Controls.UserController;
 using Display.Models.Enums;
-using Display.Views.Settings;
 using Microsoft.UI.Xaml;
 using System;
 using System.Diagnostics;
 using Display.Views.Pages.Settings;
-using Settings18Page = Display.Views.Sort115.Settings18Page;
+using Settings18Page = Display.Views.Pages.Sort115.Settings18Page;
 using Sort115Settings = Display.Models.Entities._115.Sort115Settings;
 
 namespace Display.ViewModels;

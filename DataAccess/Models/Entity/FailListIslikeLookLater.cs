@@ -8,6 +8,7 @@ public class FailListIslikeLookLater
 {
     [Key]
     [Column("pc")]
+    [StringLength(20)]
     public string Pc { get; set; } = null!;
 
     [Column("is_like")]
@@ -20,5 +21,6 @@ public class FailListIslikeLookLater
     public int? LookLater { get; set; }
 
     [Column("image_path")]
+    [StringLength(500)]
     public string? ImagePath { get; set; }
 }

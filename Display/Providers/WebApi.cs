@@ -6,7 +6,6 @@ using Display.Models.Data;
 using Display.Models.Entities._115;
 using Display.Models.Media;
 using Display.Services.Upload;
-using Display.Views.Settings.Account;
 using HtmlAgilityPack;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -30,6 +29,7 @@ using System.Web;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
 using Display.Providers.Downloader;
+using Display.Views.Pages.Settings.Account;
 
 namespace Display.Providers;
 
@@ -813,10 +813,10 @@ internal class WebApi
     /// <returns></returns>
     async Task<bool> RequestDownBy115Browser(List<Datum> videoInfoList)
     {
-        var downRequest = new Browser_115_Request
+        var downRequest = new Browser115Request
         {
             //UID
-            uid = videoInfoList[0].Uid
+            Uid = videoInfoList[0].Uid
         };
 
         //KEY
@@ -824,10 +824,10 @@ internal class WebApi
         {
             await GetQrCodeInfo();
         }
-        downRequest.key = QrCodeInfo?.data.uid;
+        downRequest.Key = QrCodeInfo?.data.uid;
 
         //PARAM
-        downRequest.param = new Param_Request
+        downRequest.Param = new ParamRequest
         {
             count = videoInfoList.Count,
             list = [],
@@ -837,7 +837,7 @@ internal class WebApi
         foreach (var videoInfo in videoInfoList)
         {
             var isDir = videoInfo.Uid == 0;
-            downRequest.param.list.Add(new Down_Request()
+            downRequest.Param.list.Add(new Down_Request()
             { n = videoInfo.Name, pc = videoInfo.PickCode, is_dir = isDir });
         }
 

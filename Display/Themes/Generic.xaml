@@ -5,7 +5,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="using:Display.Controls"
                     xmlns:ui="using:Windows.UI"
-                    xmlns:customController="using:Display.Controls.CustomController">
+                    xmlns:customController="using:Display.Controls.CustomController"
+                    xmlns:userController="using:Display.Controls.UserController">
 
     <SolidColorBrush x:Key="MediaTransportControlsPanelBackground"
                      Color="#101c1612" />
@@ -3166,10 +3167,10 @@
         </Setter>
     </Style>
 
-    <Style TargetType="local:RangeSlider">
+    <Style TargetType="userController:RangeSlider">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="local:RangeSlider">
+                <ControlTemplate TargetType="userController:RangeSlider">
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">

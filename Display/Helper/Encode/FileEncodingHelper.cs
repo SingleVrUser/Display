@@ -11,7 +11,7 @@ public class FileEncodingHelper
         var buffer = new byte[3];
         using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
         {
-            fs.Read(buffer, 0, 3);
+            _ = fs.Read(buffer, 0, 3);
         }
 
         return buffer[0] switch

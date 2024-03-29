@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using Windows.Foundation;
 using Display.Helper.Network;
-using Display.Models.Data;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Media;
 using Display.Providers;

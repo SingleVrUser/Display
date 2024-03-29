@@ -1,27 +1,19 @@
-using Display.Views.Pages.More.DatumList;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+namespace Display.Views.Pages.More.DatumList;
 
-namespace Display.Views.More.DatumList
+public sealed partial class MainPage
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
-    public sealed partial class MainPage : Page
+    public MainPage()
     {
-        public MainPage()
-        {
-            this.InitializeComponent();
-        }
+        InitializeComponent();
+    }
 
-        private void RootFrame_OnLoaded(object sender, RoutedEventArgs e)
-        {
-            if (sender is not Frame frame) return;
+    private void RootFrame_OnLoaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Frame frame) return;
 
-            frame.Navigate(typeof(FileListPage));
-        }
+        frame.Navigate(typeof(FileListPage));
     }
 }

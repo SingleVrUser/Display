@@ -1,10 +1,4 @@
-﻿using Display.Extensions;
-using Display.Helper.Data;
-using Display.Helper.FileProperties.Name;
-using Display.Providers;
-using Display.Providers.Spider;
-using Microsoft.Data.Sqlite;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -13,10 +7,15 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Display.Extensions;
+using Display.Helper.Data;
+using Display.Helper.FileProperties.Name;
 using Display.Models.Dto.OneOneFive;
+using Display.Providers.Spider;
+using Microsoft.Data.Sqlite;
 using static System.Int32;
 
-namespace Display.Models.Data;
+namespace Display.Providers;
 
 public static class DataAccess
 {

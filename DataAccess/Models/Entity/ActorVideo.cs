@@ -14,5 +14,6 @@ public class ActorVideo
 
     [Key]
     [Column("video_name")]
+    [StringLength(20)]
     public string VideoName { get; set; } = null!;
 }

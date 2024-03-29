@@ -1,14 +1,14 @@
-﻿using Display.Models.Data;
-using Microsoft.UI.Xaml.Data;
-using SharpCompress;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Display.Models.Dto.OneOneFive;
+using Display.Providers;
+using Microsoft.UI.Xaml.Data;
+using SharpCompress;
 
-namespace Display.Services.IncrementalCollection;
+namespace Display.Models.Data.IncrementalCollection;
 
 public class IncrementalLoadActorInfoCollection : ObservableCollection<ActorInfo>, ISupportIncrementalLoading
 {
@@ -16,11 +16,9 @@ public class IncrementalLoadActorInfoCollection : ObservableCollection<ActorInfo
 
     public int AllCount { get; private set; }
 
-    public Dictionary<string, bool> OrderByList { get; private set; }
+    private Dictionary<string, bool> OrderByList { get; set; }
 
-    public List<string> FilterList { get; private set; }
-
-    public bool IsDsc { get; private set; }
+    private List<string> FilterList { get; set; }
 
     public IncrementalLoadActorInfoCollection(Dictionary<string, bool> orderByList, int defaultAddCount = 40)
     {
@@ -65,18 +63,18 @@ public class IncrementalLoadActorInfoCollection : ObservableCollection<ActorInfo
         if (!HasMoreItems) HasMoreItems = true;
     }
 
-    public void SetOrder(Dictionary<string, bool> orderBy)
+    private void SetOrder(Dictionary<string, bool> orderBy)
     {
         OrderByList = orderBy;
     }
 
     public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
     {
-        return InnerLoadMoreItemsAsync(count).AsAsyncOperation();
+        return InnerLoadMoreItemsAsync().AsAsyncOperation();
     }
 
     private readonly int _defaultAddCount;
-    private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
+    private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync()
     {
         var getCount = await LoadData(_defaultAddCount, Count);
 

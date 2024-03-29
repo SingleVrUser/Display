@@ -9,12 +9,12 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Windows.Foundation.Metadata;
 using Display.Helper.Date;
-using Display.Models.Data;
+using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
 using Display.Providers;
 using Display.Providers.Downloader;
-using Display.Services.IncrementalCollection;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -484,7 +484,7 @@ public sealed partial class AddActorCover
         BasicGridView.UpdateLayout();
 
         // Use the Direct configuration to go back (if the API is available). 
-        if (Windows.Foundation.Metadata.ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 7))
+        if (ApiInformation.IsApiContractPresent($"{nameof(Windows)}.Foundation.UniversalApiContract", 7))
         {
             animation.Configuration = new DirectConnectedAnimationConfiguration();
         }

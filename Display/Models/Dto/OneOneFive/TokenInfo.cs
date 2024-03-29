@@ -55,15 +55,22 @@ public class Face
 }
 
 //调用115下载请求
-public class Browser_115_Request
+public class Browser115Request
 {
-    public long uid { get; set; }
-    public string key { get; set; }
-    public Param_Request param { get; set; }
-    public int type { get; set; } = 1;
+    [JsonProperty("uid")]
+    public long Uid { get; set; }
+    
+    [JsonProperty("key")]
+    public string Key { get; set; }
+    
+    [JsonProperty("param")]
+    public ParamRequest Param { get; set; }
+    
+    [JsonProperty("type")]
+    public int Type { get; set; } = 1;
 }
 
-public class Param_Request
+public class ParamRequest
 {
     public List<Down_Request> list { get; set; }
     public int count { get; set; }
@@ -604,10 +611,7 @@ public class ActorInfo : INotifyPropertyChanged
 
     public string GenderInfo
     {
-        get
-        {
-            return _genderInfo;
-        }
+        get => _genderInfo;
         set
         {
             _genderInfo = value;

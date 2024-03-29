@@ -67,19 +67,18 @@ public sealed unsafe class VideoStreamDecoder : IDisposable
         ffmpeg.avcodec_open2(_pCodecContext, codec, null).ThrowExceptionIfError();
 
         Duration = _pFormatContext->duration;
-        CodecName = ffmpeg.avcodec_get_name(codec->id);
+        ffmpeg.avcodec_get_name(codec->id);
         FrameSize = new Size(_pCodecContext->width, _pCodecContext->height);
         PixelFormat = _pCodecContext->pix_fmt;
     }
 
-    public long Duration { get; set; }
-    public string CodecName { get; set; }
-    public Size FrameSize { get; set; }
-    public AVPixelFormat PixelFormat { get; set; }
+    public long Duration { get; private set; }
+    public Size FrameSize { get; private set; }
+    public AVPixelFormat PixelFormat { get; private set; }
 
     public void Dispose()
     {
-        var pFrame = _pFrame; ;
+        var pFrame = _pFrame;
         ffmpeg.av_frame_free(&pFrame);
 
         var pPacket = _pPacket;

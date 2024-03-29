@@ -8,19 +8,17 @@ using Windows.Foundation;
 using Windows.Foundation.Metadata;
 using Windows.Storage;
 using Windows.Storage.Streams;
-using Display.CustomWindows;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.UI;
-using Display.Models.Data;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
 using Display.Providers;
 using Display.Providers.Downloader;
-using Display.Views;
 using Display.Views.Pages;
 using Display.Views.Pages.DetailInfo;
 using Display.Views.Pages.More.DatumList;
-using Display.Views.SearchLink;
+using Display.Views.Pages.SearchLink;
+using Display.Views.Windows;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -28,8 +26,8 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media.Imaging;
-using FileInfoInCidSmoke = Display.Views.DetailInfo.FileInfoInCidSmoke;
-using FindInfoAgainSmoke = Display.Views.DetailInfo.FindInfoAgainSmoke;
+using FileInfoInCidSmoke = Display.Views.Pages.DetailInfo.FileInfoInCidSmoke;
+using FindInfoAgainSmoke = Display.Views.Pages.DetailInfo.FindInfoAgainSmoke;
 using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -240,31 +238,23 @@ namespace Display.Controls.UserController
                 string topFolderName = null;
                 if (videoinfoList.Count > 1)
                     topFolderName = name;
-                bool isOk = await webApi.RequestDown(videoinfoList, downType, savePath, topFolderName);
+                var isOk = await webApi.RequestDown(videoinfoList, downType, savePath, topFolderName);
 
-                if (isOk)
-                    ShowTeachingTip("发送下载请求成功");
-                else
-                    ShowTeachingTip("发送下载请求失败");
+                ShowTeachingTip(isOk ? "发送下载请求成功" : "发送下载请求失败");
             }
 
             //下载选中
             else if (result == ContentDialogResult.Secondary)
             {
-                var stackPanel = downDialogContent.Content as StackPanel;
+                if (downDialogContent.Content is not StackPanel stackPanel) return;
                 foreach (var item in stackPanel.Children)
                 {
-                    if (item is CheckBox)
+                    if(item is not CheckBox fileBox || fileBox.IsChecked == false) continue;
+                    
+                    var selectVideoInfo = videoinfoList.FirstOrDefault(x => x.PickCode == fileBox.Name);
+                    if (selectVideoInfo != null)
                     {
-                        CheckBox fileBox = item as CheckBox;
-                        if (fileBox.IsChecked == true)
-                        {
-                            var selectVideoInfo = videoinfoList.FirstOrDefault(x => x.PickCode == fileBox.Name);
-                            if (selectVideoInfo != null)
-                            {
-                                downVideoInfoList.Add(selectVideoInfo);
-                            }
-                        }
+                        downVideoInfoList.Add(selectVideoInfo);
                     }
                 }
 
@@ -273,14 +263,12 @@ namespace Display.Controls.UserController
                 if (downVideoInfoList.Count > 1)
                     topFolderName = name;
 
-                bool isOk = await webApi.RequestDown(downVideoInfoList, downType, savePath, topFolderName);
+                var isOk = await webApi.RequestDown(downVideoInfoList, downType, savePath, topFolderName);
 
                 ShowTeachingTip(isOk ? "发送下载请求成功" : "发送下载请求失败");
             }
-            else
-            {
-                //DialogResult.Text = "User cancelled the dialog";
-            }
+            
+            //DialogResult.Text = "User cancelled the dialog";
         }
 
         private void UpdateLookLater(bool? val)
@@ -574,6 +562,8 @@ namespace Display.Controls.UserController
 
                     //原先的旧值
                     var oldItem = ResultInfo.GetType().GetProperty(name);
+                    if (oldItem == null) continue;
+                    
                     var oldValue = oldItem.GetValue(ResultInfo);
 
                     //与新值比较，判断是否需要更新正在显示的ResultInfo数据
@@ -605,9 +595,9 @@ namespace Display.Controls.UserController
 
         private void RatingControl_ValueChanged(RatingControl sender, object args)
         {
-            string score_str = sender.Value == 0 ? "-1" : sender.Value.ToString();
+            var scoreStr = sender.Value == 0 ? "-1" : ""+sender.Value;
 
-            DataAccess.Update.UpdateSingleDataFromVideoInfo(ResultInfo.trueName, "score", score_str);
+            DataAccess.Update.UpdateSingleDataFromVideoInfo(ResultInfo.trueName, "score", scoreStr);
         }
 
         private void ShowTeachingTip(string subtitle, string content = null)
@@ -643,7 +633,6 @@ namespace Display.Controls.UserController
             }
 
             SmokeCancelGrid.Tapped -= FileInfoInCidSmokeCancelGrid_Tapped;
-            ;
 
         }
 

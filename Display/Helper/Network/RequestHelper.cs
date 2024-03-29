@@ -1,5 +1,4 @@
-﻿using Display.Models.Data;
-using Display.Providers;
+﻿using Display.Providers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

@@ -6,11 +6,10 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Display.Helper.Network;
+using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
 using Display.Models.Media;
-using Display.Services.IncrementalCollection;
-using Display.Views.SpiderVideoInfo;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 

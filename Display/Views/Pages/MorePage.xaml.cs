@@ -1,20 +1,15 @@
-﻿using Display.Constants;
-using Display.CustomWindows;
+﻿using System;
+using Display.Constants;
+using Display.Models.Enums;
 using Display.Models.Settings;
 using Display.ViewModels;
-using Display.Views.More;
+using Display.Views.Pages.More;
+using Display.Views.Windows;
 using Microsoft.UI.Xaml.Controls;
-using System;
-using Display.Models.Enums;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+namespace Display.Views.Pages;
 
-namespace Display.Views;
-
-
-
-public sealed partial class MorePage : Page
+public sealed partial class MorePage
 {
     private readonly MorePageViewModel _viewModel = App.GetService<MorePageViewModel>();
 

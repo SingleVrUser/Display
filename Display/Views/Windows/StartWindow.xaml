@@ -2,7 +2,7 @@
 <!-- Licensed under the MIT License. -->
 
 <winex:WindowEx
-    x:Class="Display.CustomWindows.StartWindow"
+    x:Class="Display.Views.Windows.StartWindow"
     xmlns:winex="using:WinUIEx"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"

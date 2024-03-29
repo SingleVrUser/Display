@@ -1,7 +1,7 @@
 <!-- Copyright (c) Microsoft Corporation and Contributors. -->
 <!-- Licensed under the MIT License. -->
 
-<UserControl x:Class="Display.Controls.FileControl"
+<UserControl x:Class="Display.Controls.UserController.FileControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Display.Controls"

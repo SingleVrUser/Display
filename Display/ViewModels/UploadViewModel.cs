@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Display.Models.Upload;
-using Display.Services.Upload;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Display.ViewModels.Sub;
+using Display.Models.Enums;
+using UploadSubItemService = Display.Services.Upload.UploadSubItemService;
 
 namespace Display.ViewModels;
 

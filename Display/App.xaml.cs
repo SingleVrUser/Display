@@ -1,9 +1,7 @@
-﻿using Display.CustomWindows;
-using Display.Helper.Notifications;
+﻿using Display.Helper.Notifications;
 using Display.Helper.UI;
 using Display.Interfaces;
 using Display.Managers;
-using Display.Models.Data;
 using Display.Providers;
 using Display.Services;
 using Display.ViewModels;
@@ -20,6 +18,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.IO;
+using Display.Views.Windows;
 using WinRT.Interop;
 using ImageViewModel = Display.ViewModels.ImageViewModel;
 

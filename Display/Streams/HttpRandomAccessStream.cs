@@ -7,7 +7,7 @@ using Windows.Foundation;
 using Windows.Storage.Streams;
 using Windows.Web.Http;
 
-namespace Display.Services;
+namespace Display.Streams;
 
 internal class HttpRandomAccessStream(HttpClient client, Uri requestedUri) : IRandomAccessStreamWithContentType
 {

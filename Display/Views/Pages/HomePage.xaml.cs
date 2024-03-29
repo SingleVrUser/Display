@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Display.Models.Data;
+using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
-using Display.Services.IncrementalCollection;
+using Display.Providers;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;

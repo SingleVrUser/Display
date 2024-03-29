@@ -13,5 +13,6 @@ public class ActorName
     public int Id { get; set; }
 
     [Key]
+    [StringLength(20)]
     public string Name { get; set; } = null!;
 }

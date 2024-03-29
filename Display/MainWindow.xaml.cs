@@ -1,6 +1,5 @@
 ﻿using Display.Constants;
 using Display.Controls.UserController;
-using Display.CustomWindows;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.Network;
 using Display.Helper.UI;
@@ -8,11 +7,6 @@ using Display.Models.Media;
 using Display.Models.Settings;
 using Display.Providers;
 using Display.ViewModels;
-using Display.Views;
-using Display.Views.OfflineDown;
-using Display.Views.SearchLink;
-using Display.Views.Settings;
-using Display.Views.Settings.Account;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -31,7 +25,12 @@ using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
 using Display.Views.Pages;
 using Display.Views.Pages.More.DatumList;
-using MainPage = Display.Views.Tasks.MainPage;
+using Display.Views.Pages.OfflineDown;
+using Display.Views.Pages.SearchLink;
+using Display.Views.Pages.Settings;
+using Display.Views.Pages.Settings.Account;
+using Display.Views.Windows;
+using MainPage = Display.Views.Pages.Tasks.MainPage;
 
 
 namespace Display;
@@ -484,7 +483,7 @@ public sealed partial class MainWindow
             }
         };
 
-        downPage.FailLoaded += DownPage_FailLoaded; ;
+        downPage.FailLoaded += DownPage_FailLoaded;
 
         downPage.RequestCompleted += DownPage_RequestCompleted;
 

@@ -1,5 +1,4 @@
-﻿using System.Reflection.Metadata;
-using Display.Helper.Network;
+﻿using Display.Helper.Network;
 
 namespace Tests.Helper
 {

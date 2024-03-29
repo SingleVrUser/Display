@@ -12,16 +12,15 @@ using Windows.ApplicationModel.DataTransfer;
 using Windows.Media.Playback;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.Controls;
-using Display.CustomWindows;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.UI;
 using Display.Managers;
-using Display.Models.Data;
+using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
 using Display.Providers;
 using Display.Providers.Downloader;
 using Display.Services;
-using Display.Services.IncrementalCollection;
+using Display.Views.Windows;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -31,20 +30,14 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SharpCompress;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
 namespace Display.Views.Pages.More.DatumList.VideoDisplay;
 
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
-public sealed partial class MainPage : Page, IDisposable
+public sealed partial class MainPage : IDisposable
 {
 
-    private readonly ObservableCollection<FilesInfo> _playingVideoInfos = new();
+    private readonly ObservableCollection<FilesInfo> _playingVideoInfos = [];
 
-    private readonly ObservableCollection<CidInfo> _cidInfos = new();
+    private readonly ObservableCollection<CidInfo> _cidInfos = [];
 
     private readonly ObservableCollection<FilesInfo> _filesInfos;
 
@@ -69,17 +62,17 @@ public sealed partial class MainPage : Page, IDisposable
 
         _lastFilesListView = lastFilesListView;
 
-        _filesInfos = new ObservableCollection<FilesInfo>();
+        _filesInfos = [];
         filesInfos.ForEach(_filesInfos.Add);
 
-        _units = new ObservableCollection<MetadataItem> { new() { Label = "播放列表", Command = OpenFolderCommand, CommandParameter = (long)0 } };
+        _units = [new MetadataItem { Label = "播放列表", Command = OpenFolderCommand, CommandParameter = (long)0 }];
 
         _webApi = WebApi.GlobalWebApi;
 
         TryPlayVideoFromSelectedFiles(_filesInfos.ToList());
     }
 
-    private async void TryPlayVideoFromSelectedFiles(List<FilesInfo> filesInfos)
+    private async void TryPlayVideoFromSelectedFiles(IReadOnlyCollection<FilesInfo> filesInfos)
     {
         var maxPlayCount = MaxCanPlayCount;
 
@@ -295,7 +288,7 @@ public sealed partial class MainPage : Page, IDisposable
     {
         MenuFlyout menuFlyout = new();
 
-        var menuFlyoutItemDeletedFromList = new MenuFlyoutItem()
+        var menuFlyoutItemDeletedFromList = new MenuFlyoutItem
         {
             Text = "从播放列表中移除",
             Icon = new FontIcon { FontFamily = new FontFamily("Segoe Fluent Icons"), Glyph = "\uE108" }
@@ -303,7 +296,7 @@ public sealed partial class MainPage : Page, IDisposable
         menuFlyoutItemDeletedFromList.Click += RemoveFileFromListButton_Click;
         menuFlyoutItemDeletedFromList.DataContext = file;
 
-        var menuFlyoutItemDeletedFrom115 = new MenuFlyoutItem()
+        var menuFlyoutItemDeletedFrom115 = new MenuFlyoutItem
         {
             Text = "从115中删除",
             Icon = new FontIcon { FontFamily = new FontFamily("Segoe Fluent Icons"), Glyph = "\uE107" }
@@ -311,7 +304,7 @@ public sealed partial class MainPage : Page, IDisposable
         menuFlyoutItemDeletedFrom115.Click += RemoveFileFrom115Button_Click;
         menuFlyoutItemDeletedFrom115.DataContext = file;
 
-        var menuFlyoutItemLoadVideoAgain = new MenuFlyoutItem()
+        var menuFlyoutItemLoadVideoAgain = new MenuFlyoutItem
         {
             Text = "重新加载",
             Icon = new FontIcon { FontFamily = new FontFamily("Segoe Fluent Icons"), Glyph = "\uF83E" }
@@ -557,7 +550,7 @@ public sealed partial class MainPage : Page, IDisposable
         await TryRemoveCurrentVideoAndPlayNextVideo(fileInfo);
 
         // 然后，删除115文件
-        var result = await _webApi.DeleteFiles(fileInfo.Cid, new[] { (long)fid });
+        var result = await _webApi.DeleteFiles(fileInfo.Cid, [(long)fid]);
         if (!result)
         {
             ShowTeachingTip("删除115文件失败");
@@ -587,13 +580,13 @@ public sealed partial class MainPage : Page, IDisposable
         var fid = fileInfo.Id;
 
         //移除播放列表
-        if (_filesInfos.Contains(fileInfo)) _filesInfos.Remove(fileInfo);
+        _filesInfos.Remove(fileInfo);
 
         // 文件
         if (isFile)
         {
             //移除正在播放的视频列表
-            if (_playingVideoInfos.Contains(fileInfo)) _playingVideoInfos.Remove(fileInfo);
+            _playingVideoInfos.Remove(fileInfo);
 
         }
         // 文件夹
@@ -618,7 +611,7 @@ public sealed partial class MainPage : Page, IDisposable
     {
         //移除cid信息（预览图/信息）
         var removeCid = _cidInfos.FirstOrDefault(item =>
-            item.VideoInfo.trueName == fileInfo.Name || item.VideoInfo.trueName.ToUpper() == FileMatch.MatchName(fileInfo.Name)?.ToUpper());
+            item.VideoInfo.trueName == fileInfo.Name || item.VideoInfo.trueName.Equals(FileMatch.MatchName(fileInfo.Name)?.ToUpper(), StringComparison.CurrentCultureIgnoreCase));
 
         if (removeCid == null) return;
 
@@ -842,7 +835,7 @@ public sealed partial class MainPage : Page, IDisposable
     /// <param name="mediaPlayerElement"></param>
     /// <param name="videoInfo"></param>
     /// <returns></returns>
-    private async Task RemoveVideoAndPlayNextVideo(MediaPlayerElement mediaPlayerElement, FilesInfo videoInfo)
+    private async Task RemoveVideoAndPlayNextVideo(FrameworkElement mediaPlayerElement, FilesInfo videoInfo)
     {
         RemovePlayingVideo(mediaPlayerElement);
 
@@ -912,7 +905,7 @@ public sealed partial class MainPage : Page, IDisposable
     }
 
     //鼠标状态计数器
-    private int _iCount = 0;
+    private int _iCount;
 
     private void timer_Tick(object sender, System.Timers.ElapsedEventArgs e)
     {

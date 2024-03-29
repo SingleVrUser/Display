@@ -1,10 +1,10 @@
-﻿using CommunityToolkit.WinUI.Behaviors;
+﻿using System;
+using CommunityToolkit.WinUI.Behaviors;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using System;
 
-namespace Display.Views.Settings;
+namespace Display.Views.Pages.Settings;
 
 public abstract class RootPage : Page
 {

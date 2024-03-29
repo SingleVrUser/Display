@@ -4,8 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Display.Models.Data;
 using Display.Models.Dto.OneOneFive;
+using Display.Providers;
 using Microsoft.Data.Sqlite;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -130,7 +130,8 @@ public sealed partial class Explorer : UserControl
     public event TypedEventHandler<TreeView, TreeViewItemInvokedEventArgs> ItemInvoked;
     private void TreeView_ItemInvoked(TreeView sender, TreeViewItemInvokedEventArgs args)
     {
-        var content = ((args.InvokedItem as TreeViewNode).Content as ExplorerItem);
+        if (args.InvokedItem is not TreeViewNode { Content: ExplorerItem content }) return;
+        
         var cid = content.Id;
 
         //避免重复点击
@@ -193,45 +194,6 @@ public sealed partial class Explorer : UserControl
     }
 
     /// <summary>
-    /// 通过文件Cid获取根目录的Node
-    /// </summary>
-    /// <param Name="rootNodes"></param>
-    /// <param Name="folderCid"></param>
-    /// <returns></returns>
-    private TreeViewNode getNodeByRootNodeWithCid(List<TreeViewNode> rootNodes, long folderCid)
-    {
-        //不存在Cid未零的Node
-        if (folderCid == 0) return null;
-
-        TreeViewNode targertNode = null;
-
-        var childrenNode = rootNodes;
-
-        while (targertNode == null && childrenNode.Count != 0)
-        {
-            List<TreeViewNode> tmpChildrenNode = new();
-            foreach (var node in childrenNode)
-            {
-                //Content
-                if (((ExplorerItem)node.Content).Id == folderCid)
-                {
-                    targertNode = node;
-                    break;
-                }
-                //Children
-
-                foreach (var cnode in node.Children)
-                {
-                    tmpChildrenNode.Add(cnode);
-                }
-            }
-            childrenNode = tmpChildrenNode;
-        }
-
-        return targertNode;
-    }
-
-    /// <summary>
     /// 更新所选文件夹的文件列表
     /// </summary>
     /// <param name="items"></param>
@@ -258,32 +220,30 @@ public sealed partial class Explorer : UserControl
     private void TreeView_Expanding(TreeView sender, TreeViewExpandingEventArgs args)
     {
         //标记为 内含未加载项
-        if (args.Node.HasUnrealizedChildren)
-        {
-            bool isNeedLoad = true;
+        if (!args.Node.HasUnrealizedChildren) return;
+        var isNeedLoad = true;
 
-            if (_markShowPartFolderItemList.Count > 0)
+        if (_markShowPartFolderItemList.Count > 0)
+        {
+            var currentCid = (args.Node.Content as ExplorerItem).Id;
+            foreach (var item in _markShowPartFolderItemList)
             {
-                var currentCid = (args.Node.Content as ExplorerItem).Id;
-                foreach (var item in _markShowPartFolderItemList)
+                //找到之前未加载完成的记录，
+                //即之前加载过了，无需重复加载
+                if ((item.InsertNode.Content as ExplorerItem).Id == currentCid)
                 {
-                    //找到之前未加载完成的记录，
-                    //即之前加载过了，无需重复加载
-                    if ((item.InsertNode.Content as ExplorerItem).Id == currentCid)
-                    {
-                        ShowNumTextBlock.Visibility = Visibility.Visible;
-                        ShowNumTip.Text = $"{item.ShowNum}/{item.LastFolderItem.Count}";
-                        _lastFolderItemList = item;
-                        isNeedLoad = false;
-                        break;
-                    }
+                    ShowNumTextBlock.Visibility = Visibility.Visible;
+                    ShowNumTip.Text = $"{item.ShowNum}/{item.LastFolderItem.Count}";
+                    _lastFolderItemList = item;
+                    isNeedLoad = false;
+                    break;
                 }
             }
+        }
 
-            if (isNeedLoad)
-            {
-                FillTreeNode(args.Node);
-            }
+        if (isNeedLoad)
+        {
+            FillTreeNode(args.Node);
         }
     }
 
@@ -335,7 +295,6 @@ public sealed partial class Explorer : UserControl
             {
                 InsertNode = node,
                 LastFolderItem = itemsList,
-                Count = itemsList.Count,
                 ShowNum = MaxNum
             };
             _markShowPartFolderItemList.Add(_lastFolderItemList);
@@ -601,10 +560,9 @@ public sealed partial class Explorer : UserControl
 
 public class LastUnAllShowFolderItem
 {
-    public TreeViewNode InsertNode { get; set; }
-    public List<Datum> LastFolderItem { get; set; }
-    public int Count { get; set; }
-    public int ShowNum { get; set; }
+    public TreeViewNode InsertNode { get; init; }
+    public List<Datum> LastFolderItem { get; init; }
+    public int ShowNum { get; init; }
 }
 
 /// <summary>

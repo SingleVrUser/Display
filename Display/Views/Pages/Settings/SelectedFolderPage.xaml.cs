@@ -6,9 +6,9 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
 using Display.Providers;
-using Display.Services.IncrementalCollection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 

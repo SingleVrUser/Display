@@ -9,40 +9,49 @@ public class ActorInfo
     [Key]
     [Column("id")]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    public int Id { get; set; }
+    public int Id { get; init; }
 
-    public string Name { get; set; } = null!;
+    [Column("name")]
+    [StringLength(20)]
+    public string Name { get; init; } = null!;
 
     [Column("is_woman")]
-    public int? IsWoman { get; set; }
+    public int? IsWoman { get; init; }
 
     [Column("birthday")]
-    public string? Birthday { get; set; }
+    [StringLength(20)]
+    public string? Birthday { get; init; }
 
     [Column("bwh")]
-    public string? Bwh { get; set; }
+    [StringLength(10)]
+    public string? Bwh { get; init; }
 
     [Column("height")]
-    public int? Height { get; set; }
+    public int? Height { get; init; }
 
     [Column("works_count")]
-    public int? WorksCount { get; set; }
+    public int? WorksCount { get; init; }
 
     [Column("work_time")]
-    public string? WorkTime { get; set; }
+    [StringLength(5)]
+    public string? WorkTime { get; init; }
 
     [Column("prifile_path")]
-    public string? PrifilePath { get; set; }
+    [StringLength(500)]
+    public string? PrifilePath { get; init; }
 
     [Column("blog_url")]
-    public string? BlogUrl { get; set; }
+    [StringLength(500)]
+    public string? BlogUrl { get; init; }
 
     [Column("is_like")]
-    public int? IsLike { get; set; }
+    public int? IsLike { get; init; }
 
     [Column("addtime")]
-    public int? Addtime { get; set; }
+    [StringLength(20)]
+    public int? Addtime { get; init; }
 
     [Column("info_url")]
-    public string? InfoUrl { get; set; }
+    [StringLength(100)]
+    public string? InfoUrl { get; init; }
 }

@@ -1,29 +1,20 @@
-// Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
 
-using Display.Helper.UI;
-using Display.Models.Media;
-using Display.Views.More.DatumList;
-using Microsoft.UI.Windowing;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
+using Display.Helper.UI;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Media;
 using Display.Views.Pages.More.DatumList;
+using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using static Display.Controls.UserController.CustomMediaPlayerElement;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+namespace Display.Views.Windows;
 
-namespace Display.CustomWindows;
-
-/// <summary>
-/// An empty window that can be used on its own or navigated to within a Frame.
-/// </summary>
 public sealed partial class MediaPlayWindow
 {
     private readonly AppWindow _appWindow;
@@ -160,7 +151,7 @@ public sealed partial class MediaPlayWindow
 
     private void RootGrid_KeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == Windows.System.VirtualKey.Escape)
+        if (e.Key == global::Windows.System.VirtualKey.Escape)
         {
             CancelFullScreen();
         }
@@ -192,7 +183,7 @@ public sealed partial class MediaPlayWindow
         // Create a timer with a one second interval.
         _aTimer = new System.Timers.Timer(500);
         _aTimer.Enabled = true;
-        _aTimer.Elapsed += timer_Tick; ;
+        _aTimer.Elapsed += timer_Tick;
     }
 
     private void MediaControl_OnPointerExited(object sender, PointerRoutedEventArgs e)

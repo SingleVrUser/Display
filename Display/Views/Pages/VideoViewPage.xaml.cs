@@ -1,35 +1,24 @@
-﻿using Display.Controls.UserController;
+﻿using System.Collections.Generic;
+using Display.Controls.UserController;
 using Display.Helper.Network;
-using Display.Models.Data;
+using Display.Models.Dto.OneOneFive;
 using Display.Models.Media;
+using Display.Providers;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
-using System.Collections.Generic;
-using Display.Models.Dto.OneOneFive;
-using Display.Views.Pages;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+namespace Display.Views.Pages;
 
-namespace Display.Views;
-
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary> 
 public sealed partial class VideoViewPage
 {
-    public static VideoViewPage Current;
-
     //为返回动画做准备（需启动缓存）
-    public VideoCoverDisplayClass _storeditem;
+    private VideoCoverDisplayClass _storeditem;
     public VideoViewPage()
     {
         InitializeComponent();
-
-        Current = this;
 
         //启动缓存（为了返回无需过长等待，也为了返回动画）
         NavigationCacheMode = NavigationCacheMode.Enabled;

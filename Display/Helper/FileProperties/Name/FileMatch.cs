@@ -1,5 +1,4 @@
-﻿using Display.Models.Data;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using SharpCompress;
 using System;
 using System.Collections.Generic;
@@ -11,6 +10,7 @@ using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.System;
 using Display.Models.Dto.OneOneFive;
+using Display.Providers;
 
 namespace Display.Helper.FileProperties.Name;
 
@@ -25,21 +25,10 @@ public static class FileMatch
     {
         var regReplaceList =
             new List<string> { "uur76", @"({\d}K)?\d{2,3}fps\d{0,}", @"part\d", "@18P2P", @"[^\d]\d{3,6}P", @"\[?[0-9a-z]+?[\._](com|cn|xyz|la|me|net|app|cc)\]?@?",
-                                @"SE\d{2}",@"EP\d{2}", @"S\d{1,2}E\d{1,2}", @"\D[hx]26[54]", "[-_][468]k", @"h_[0-9]{3,4}",@"[a-z0-9]{15,}",
+                                @"SE\d{2}",@"EP\d{2}", @"S\d{1,2}E\d{1,2}", @"\D[hx]26[54]", "[-_][468]k", "h_[0-9]{3,4}",@"[a-z0-9]{15,}",
                                 @"\d+bit",@"\d{3,6}x\d{3,6}", @"whole[-_\w]+$"};
 
-        foreach (var t in regReplaceList)
-        {
-            Regex rgx = new Regex(t, RegexOptions.IgnoreCase);
-            name = rgx.Replace(name, "");
-        }
-
-        return name;
-    }
-
-    public static bool IsFc2(string cid)
-    {
-        return cid.Contains("FC2");
+        return regReplaceList.Select(t => new Regex(t, RegexOptions.IgnoreCase)).Aggregate(name, (current, rgx) => rgx.Replace(current, ""));
     }
 
     /// <summary>
@@ -91,6 +80,8 @@ public static class FileMatch
             }
         }
 
+        if (noDomain == null) return string.Empty;
+
         //匹配缩写成hey的heydouga影片。由于番号分三部分，要先于后面分两部分的进行匹配
         match = Regex.Match(noDomain, @"(?:hey)[-_]*(\d{4})[-_]+0?(\d{3,5})", RegexOptions.IgnoreCase);
         if (match.Success)
@@ -101,7 +92,7 @@ public static class FileMatch
         match = Regex.Match(noDomain, @"([a-z]{2,10})[-_]+0*(\d{2,5})", RegexOptions.IgnoreCase);
         if (match.Success)
         {
-            string number = match.Groups[2].Value;
+            var number = match.Groups[2].Value;
             //不满三位数，填充0
             number = number.PadLeft(3, '0');
 
@@ -127,12 +118,7 @@ public static class FileMatch
         {
             var matchName = match.Groups[1].Value;
             match = Regex.Match(matchName, @"([a-z]+)(\d+)", RegexOptions.IgnoreCase);
-            if (match.Success)
-            {
-                return $"{match.Groups[1].Value}-{match.Groups[2].Value}";
-            }
-
-            return matchName;
+            return match.Success ? $"{match.Groups[1].Value}-{match.Groups[2].Value}" : matchName;
         }
 
         //尝试匹配TMA制作的影片（如'T28-557'，他家的番号很乱）
@@ -162,40 +148,10 @@ public static class FileMatch
         }
 
         //如果最后仍然匹配不了番号，则尝试使用文件所在文件夹的名字去匹配
-        if (fileCid != null)
-        {
-            var folderDatum = DataAccess.Get.GetUpperLevelFolderCid((long)fileCid);
+        if (fileCid == null) return null;
+        var folderDatum = DataAccess.Get.GetUpperLevelFolderCid((long)fileCid);
 
-            if (!string.IsNullOrEmpty(folderDatum?.Name))
-            {
-                return MatchName(folderDatum.Name);
-            }
-        }
-
-        return null;
-
-    }
-
-    /// <summary>
-    /// List(class)转换,VideoInfo ==> VideoCoverDisplayClass
-    /// </summary>
-    /// <param name="videoInfoList"></param>
-    /// <param name="imgWidth"></param>
-    /// <param name="imgHeight"></param>
-    /// <returns></returns>
-    public static List<VideoCoverDisplayClass> GetFileGrid(List<VideoInfo> videoInfoList, double imgWidth, double imgHeight)
-    {
-        List<VideoCoverDisplayClass> fileGrid = new();
-
-        // VR 和 4K 类别在右上角显示标签
-        // 初始化为图片大小
-        foreach (var t in videoInfoList)
-        {
-            VideoCoverDisplayClass info = new(t, imgWidth, imgHeight);
-            fileGrid.Add(info);
-        }
-
-        return fileGrid;
+        return !string.IsNullOrEmpty(folderDatum?.Name) ? MatchName(folderDatum.Name) : null;
     }
 
     public static bool IsLike(int isLike)
@@ -282,7 +238,7 @@ public static class FileMatch
     public static List<MatchVideoResult> GetVideoAndMatchFile(List<Datum> data)
     {
         //根据视频信息匹配视频文件
-        List<MatchVideoResult> resultList = new();
+        List<MatchVideoResult> resultList = [];
 
         foreach (var fileInfo in data)
         {
@@ -300,27 +256,24 @@ public static class FileMatch
                 //未匹配
                 if (videoName == null)
                 {
-                    resultList.Add(new MatchVideoResult() { status = false, OriginalName = fileInfo.Name, statusCode = -1, message = "匹配失败" });
+                    resultList.Add(new MatchVideoResult { status = false, OriginalName = fileInfo.Name, statusCode = -1, message = "匹配失败" });
                     continue;
                 }
 
                 //匹配后，查询是否重复匹配
                 var existsResult = resultList.FirstOrDefault(x => x.MatchName == videoName);
 
-                if (existsResult == null)
-                {
-                    resultList.Add(new MatchVideoResult() { status = true, OriginalName = fileInfo.Name, message = "匹配成功", statusCode = 1, MatchName = videoName });
-                }
-                else
-                {
-                    resultList.Add(new MatchVideoResult() { status = true, OriginalName = fileInfo.Name, statusCode = 2, message = "已添加" });
-                }
-
-
+                resultList.Add(existsResult == null
+                    ? new MatchVideoResult
+                    {
+                        status = true, OriginalName = fileInfo.Name, message = "匹配成功", statusCode = 1,
+                        MatchName = videoName
+                    }
+                    : new MatchVideoResult { status = true, OriginalName = fileInfo.Name, statusCode = 2, message = "已添加" });
             }
             else
             {
-                resultList.Add(new MatchVideoResult() { status = true, OriginalName = fileInfo.Name, statusCode = 0, message = "跳过非视频" });
+                resultList.Add(new MatchVideoResult { status = true, OriginalName = fileInfo.Name, statusCode = 0, message = "跳过非视频" });
             }
         }
 
@@ -329,7 +282,7 @@ public static class FileMatch
 
     public static List<CookieFormat> ExportCookies(string cookie)
     {
-        List<CookieFormat> cookieList = new();
+        List<CookieFormat> cookieList = [];
 
         var cookiesList = cookie.Split(';');
         foreach (var cookies in cookiesList)
@@ -344,13 +297,13 @@ public static class FileMatch
             switch (key)
             {
                 case "acw_tc":
-                    cookieList.Add(new CookieFormat() { name = key, value = value, domain = "115.com", hostOnly = true });
+                    cookieList.Add(new CookieFormat { name = key, value = value, domain = "115.com", hostOnly = true });
                     break;
                 case "115_lang":
-                    cookieList.Add(new CookieFormat() { name = key, value = value, httpOnly = false });
+                    cookieList.Add(new CookieFormat { name = key, value = value, httpOnly = false });
                     break;
                 case "CID" or "SEID" or "UID" or "USERSESSIONID":
-                    cookieList.Add(new CookieFormat() { name = key, value = value });
+                    cookieList.Add(new CookieFormat { name = key, value = value });
                     break;
                 //mini_act……_dialog_show
                 default:
@@ -428,7 +381,7 @@ public static class FileMatch
 
         var enumerable = items.ToList();
         var maxDigits = enumerable
-                      .SelectMany(i => regex.Matches(selector(i)).Cast<Match>().Select(digitChunk => (int?)digitChunk.Value.Length))
+                      .SelectMany(i => regex.Matches(selector(i)).Select(digitChunk => (int?)digitChunk.Value.Length))
                       .Max() ?? 0;
 
         return enumerable.OrderBy(i => regex.Replace(selector(i), match => match.Value.PadLeft(maxDigits, '0')), stringComparer ?? StringComparer.CurrentCulture);

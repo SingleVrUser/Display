@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using Display.Models.Settings;
+﻿using Display.Models.Settings;
 using Windows.Storage;
 using Display.Models.Enums;
 
