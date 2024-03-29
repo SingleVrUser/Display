@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Enums.OneOneFive;
 using Display.Providers;
 using Microsoft.UI.Xaml.Data;
 using SharpCompress;

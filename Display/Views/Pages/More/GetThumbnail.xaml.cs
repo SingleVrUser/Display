@@ -10,6 +10,8 @@ using Windows.ApplicationModel;
 using Display.Helper.Date;
 using Display.Helper.FileProperties.Name;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Enums;
+using Display.Models.Enums.OneOneFive;
 using Display.Providers;
 using Display.Providers.Downloader;
 using Display.Services;
@@ -132,7 +134,7 @@ public sealed partial class GetThumbnail : Page
 
             if (item.Status == Status.Error)
             {
-                _failList.Add(item.name);
+                _failList.Add(item.Name);
             }
 
             if (!string.IsNullOrEmpty(info.ImagePath))
@@ -176,7 +178,7 @@ public sealed partial class GetThumbnail : Page
 
             if (item.Status == Status.Error)
             {
-                _failList.Add(item.name);
+                _failList.Add(item.Name);
             }
 
             if (!string.IsNullOrEmpty(info.ImagePath))
@@ -230,7 +232,7 @@ public sealed partial class GetThumbnail : Page
 
             overallProgress.Report(progressInfo);
 
-            var name = thumbnailInfos[i].name;
+            var name = thumbnailInfos[i].Name;
 
             //最大获取数量
             var imageCount = getThumbnailFromWebVideoSetting.ImageCount;
@@ -376,13 +378,13 @@ public sealed partial class GetThumbnail : Page
             var thumbnail = thumbnailInfos[i];
             var downUrlList = thumbnail.ThumbnailDownUrlList;
 
-            progressInfo.Text = $"【{i + 1}/{thumbnailInfos.Count}】{thumbnail.name}  （{downUrlList.Count}张）";
+            progressInfo.Text = $"【{i + 1}/{thumbnailInfos.Count}】{thumbnail.Name}  （{downUrlList.Count}张）";
             progress.Report(progressInfo);
 
             var imagePath = string.Empty;
             for (var j = 0; j < downUrlList.Count; j++)
             {
-                var savePath = Path.Combine(AppSettings.ImageSavePath, thumbnail.name);
+                var savePath = Path.Combine(AppSettings.ImageSavePath, thumbnail.Name);
                 var saveName = $"Thumbnail_{j}";
                 var saveImagePath = await GetInfoFromNetwork.DownloadFile(downUrlList[j], savePath, saveName);
 

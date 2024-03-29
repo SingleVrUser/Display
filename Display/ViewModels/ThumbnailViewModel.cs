@@ -10,8 +10,10 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
 using Display.Providers.Downloader;
+using LocalThumbnail = Display.Models.Dto.Media.LocalThumbnail;
 
 namespace Display.ViewModels;
 

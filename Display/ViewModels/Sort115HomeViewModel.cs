@@ -11,6 +11,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Enums;
+using Display.Models.Enums.OneOneFive;
 using Settings18Page = Display.Views.Pages.Sort115.Settings18Page;
 using Sort115Settings = Display.Models.Entities._115.Sort115Settings;
 

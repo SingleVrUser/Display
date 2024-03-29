@@ -13,6 +13,8 @@ using Windows.Foundation.Metadata;
 using Display.Helper.Date;
 using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Enums;
+using Display.Models.Enums.OneOneFive;
 using Display.Providers;
 using Display.Providers.Downloader;
 using Microsoft.UI.Input;

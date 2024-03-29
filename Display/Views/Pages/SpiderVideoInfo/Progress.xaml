@@ -52,10 +52,10 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="{x:Bind sys:String.Format('选中的文件数量：{0}',_selectedFilesNameList.Count)}" />
+                <TextBlock Text="{x:Bind sys:String.Format('选中的文件数量：{0}',SelectedFilesNameList.Count)}" />
 
                 <ListView Grid.Row="1"
-                          ItemsSource="{x:Bind _selectedFilesNameList}"
+                          ItemsSource="{x:Bind SelectedFilesNameList}"
                           SelectionMode="None">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="x:String">

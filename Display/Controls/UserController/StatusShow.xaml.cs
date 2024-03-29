@@ -1,4 +1,6 @@
 ﻿using Display.Models.Dto.OneOneFive;
+using Display.Models.Enums;
+using Display.Models.Enums.OneOneFive;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 

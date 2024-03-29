@@ -5,9 +5,9 @@ using Display.Helper.Data;
 using Display.Helper.Network;
 using Display.Models.Dto.OneOneFive;
 
-namespace Display.Models.Media;
+namespace Display.Models.Dto.Media;
 
-internal class SubImageModel(FilesInfo fileInfo) : Media.BaseImage
+internal class SubImageModel(FilesInfo fileInfo) : Dto.Media.BaseImage
 {
     public readonly FilesInfo FileInfo = fileInfo;
     private ImageInfo? _imageInfo;

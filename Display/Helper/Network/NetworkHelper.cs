@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
+using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Media;
 using Display.Providers.Downloader;

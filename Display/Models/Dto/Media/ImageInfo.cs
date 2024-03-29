@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Display.Models.Media;
+namespace Display.Models.Dto.Media;
 
 internal class ImageInfo
 {

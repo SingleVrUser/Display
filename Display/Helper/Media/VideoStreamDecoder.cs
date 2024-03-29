@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using Display.Models.Dto.Media;
 using Display.Models.Media;
 using static System.Int64;
 

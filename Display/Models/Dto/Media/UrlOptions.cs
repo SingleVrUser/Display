@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Display.Models.Media;
+namespace Display.Models.Dto.Media;
 
 public class UrlOptions
 {

@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Enums.OneOneFive;
 using Display.Providers;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;

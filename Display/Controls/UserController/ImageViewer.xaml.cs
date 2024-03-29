@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
-using BaseImage = Display.Models.Media.BaseImage;
+using BaseImage = Display.Models.Dto.Media.BaseImage;
 using ScrollViewerViewChangedEventArgs = Microsoft.UI.Xaml.Controls.ScrollViewerViewChangedEventArgs;
 
 // To learn more about WinUI, the WinUI project structure,

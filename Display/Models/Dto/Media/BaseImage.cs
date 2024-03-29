@@ -5,7 +5,7 @@ using Windows.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml.Media.Imaging;
 
-namespace Display.Models.Media;
+namespace Display.Models.Dto.Media;
 
 public abstract partial class BaseImage : ObservableObject
 {

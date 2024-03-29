@@ -49,7 +49,7 @@ public sealed partial class LoginPage
             return;
 
         //成功登录后，检查网络状态（内含存储Cookie），关闭窗口
-        await _webapi.NetworkVerifyTokenAsync();
+        await _webapi.GetNetworkVerifyTokenAsync();
         await ShowSuccessAndExit();
     }
 

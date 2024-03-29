@@ -11,6 +11,7 @@ using Display.Extensions;
 using Display.Helper.Data;
 using Display.Helper.FileProperties.Name;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Enums.OneOneFive;
 using Display.Providers.Spider;
 using Microsoft.Data.Sqlite;
 using static System.Int32;

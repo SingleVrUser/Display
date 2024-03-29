@@ -1,0 +1,66 @@
+﻿namespace Display.Models.Dto.OneOneFive;
+
+public class SettingData
+{
+    public string asc_file { get; set; }
+    public string order_file { get; set; }
+    public string view_file { get; set; }
+    public string language { get; set; }
+    public string page_num { get; set; }
+    public string isp_download { get; set; }
+    public string isp_upload { get; set; }
+    public string play_count { get; set; }
+    public string show_ad { get; set; }
+    public string ssl_download { get; set; }
+    public string ssl_upload { get; set; }
+    public string kc_open { get; set; }
+    public string user_edit_info { get; set; }
+    public string mobile { get; set; }
+    public string mobile_set { get; set; }
+    public string valid_type { get; set; }
+    public string show { get; set; }
+    public int movies { get; set; }
+    public string movies_subtype { get; set; }
+    public string theme { get; set; }
+    public string theme_wl { get; set; }
+    public int tutorial { get; set; }
+    public string first_login { get; set; }
+    public string show_hit { get; set; }
+    public string forever { get; set; }
+    public int natsort { get; set; }
+    public int prav_tv_channels { get; set; }
+    public string prav_tv_channels_1 { get; set; }
+    public string root_folder { get; set; }
+    public int video_progress_bar { get; set; }
+    public int video_play_mode { get; set; }
+    public string lang_pack { get; set; }
+    public string play_speed { get; set; }
+    public int album_cover { get; set; }
+    public int allow_radar_protocol { get; set; }
+    public string allow_link_protocol { get; set; }
+    public string allow_pubshare_protocol { get; set; }
+    public int allow_similarphoto_protocol { get; set; }
+    public int is_popup_showed { get; set; }
+    public int display_week { get; set; }
+    public string allow_global_protocol { get; set; }
+    public int fc_mix { get; set; }
+    public string is_into_transfer { get; set; }
+    public int skip_silence { get; set; }
+    public string is_silent_hint { get; set; }
+    public int first_photo_backup { get; set; }
+    public string first_play_video { get; set; }
+    public int first_upload { get; set; }
+    public string first_download { get; set; }
+    public string insert_default_file_label { get; set; }
+    public string subtitle_color { get; set; }
+    public int subtitle_position { get; set; }
+    public int subtitle_size_type { get; set; }
+    public int subtitle_web_size { get; set; }
+    public string last_file_type { get; set; }
+    public string last_file_id { get; set; }
+    public int default_search_path { get; set; }
+    public string range_options_guide { get; set; }
+    public string include_music_order { get; set; }
+    public int star_music_asc { get; set; }
+    public int music_list_asc { get; set; }
+}

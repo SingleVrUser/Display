@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using Display.Models.Entities.Upload;
+using Newtonsoft.Json;
 
 namespace Display.Models.Upload;
 
@@ -19,19 +19,4 @@ public class FastUploadResult
     [JsonProperty(propertyName: "object")]
     public string Object { get; set; }
     public Callback callback { get; set; }
-}
-
-public class Callback
-{
-    public string callback { get; set; }
-    public string callback_var { get; set; }
-}
-
-public class OssToken
-{
-    public string StatusCode { get; set; }
-    public string AccessKeySecret { get; set; }
-    public string SecurityToken { get; set; }
-    public DateTime Expiration { get; set; }
-    public string AccessKeyId { get; set; }
 }

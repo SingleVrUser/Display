@@ -1,4 +1,6 @@
-﻿namespace Display.Models.Media;
+﻿using Display.Models.Media;
+
+namespace Display.Models.Dto.Media;
 
 public class ThumbnailGenerateOptions
 {
