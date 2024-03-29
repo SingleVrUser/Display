@@ -30,7 +30,7 @@
             <StackPanel RelativePanel.AlignRightWithPanel="True" Orientation="Horizontal" Spacing="10">
                 <TextBlock Text="任务完成后"/>
                 
-                <Grid BorderBrush="{StaticResource CardStrokeColorDefaultSolidBrush}" BorderThickness="2" ColumnSpacing="2" Padding="2" CornerRadius="5">
+                <Grid BorderThickness="2" ColumnSpacing="2" Padding="2" CornerRadius="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition Width="auto" />

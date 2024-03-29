@@ -77,7 +77,7 @@ namespace Display.Views.DetailInfo
         /// <param Name="e"></param>
         private void Confirm_Button_Click(object sender, RoutedEventArgs e)
         {
-            if (NewInfo_ListView.SelectedItem is not VideoInfo videoInfo) return;
+            if (NewInfoListView.SelectedItem is not VideoInfo videoInfo) return;
             if (sender is not Button button) return;
 
             //修改一下

@@ -103,7 +103,7 @@ namespace Display.Views.SpiderVideoInfo
             CurrentWindow.Closed -= CurrentWindow_Closed;
 
             TopProgressRing.IsActive = false;
-            TotalProgress_TextBlock.Text = "完成";
+            TotalProgressTextBlock.Text = "完成";
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace Display.Views.SpiderVideoInfo
             ShowFilesPieCharts(_fileList);
             if (s_cts.IsCancellationRequested) return;
 
-            TotalProgress_TextBlock.Text = "正则匹配番号名中……";
+            TotalProgressTextBlock.Text = "正则匹配番号名中……";
 
             //挑选符合条件的视频文件
             _matchVideoResults = await Task.Run(() => FileMatch.GetVideoAndMatchFile(_fileList));

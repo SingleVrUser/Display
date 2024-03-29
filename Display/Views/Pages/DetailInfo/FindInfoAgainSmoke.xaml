@@ -68,8 +68,7 @@
 
                         <ItemsRepeater x:Name="SpiderCheckBoxGrid">
                             <ItemsRepeater.Resources>
-                                <Style TargetType="CheckBox"
-                                       BasedOn="{StaticResource DefaultCheckBoxStyle}">
+                                <Style TargetType="CheckBox">
                                     <Setter Property="MinWidth"
                                             Value="80" />
                                 </Style>
@@ -98,7 +97,7 @@
 
                     <ListView Grid.Row="2"
                               ItemsSource="{x:Bind _searchResultList}"
-                              x:Name="NewInfo_ListView"
+                              x:Name="NewInfoListView"
                               SelectionChanged="NewInfo_ListView_SelectionChanged">
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="oneOneFive:VideoInfo">
@@ -142,13 +141,13 @@
                                         <TextBlock Grid.Row="0"
                                                    Text="番号"
                                                    Style="{StaticResource TitleTextBlock}" />
-                                        <TextBlock Grid.Row="1"
+                                        <TextBlock Grid.Row="1" Grid.Column="0"
                                                    Text="演员"
                                                    Style="{StaticResource TitleTextBlock}" />
-                                        <TextBlock Grid.Row="2"
+                                        <TextBlock Grid.Row="2" Grid.Column="0"
                                                    Text="类别"
                                                    Style="{StaticResource TitleTextBlock}" />
-                                        <TextBlock Grid.Row="3"
+                                        <TextBlock Grid.Row="3" Grid.Column="0"
                                                    Text="时间"
                                                    Style="{StaticResource TitleTextBlock}" />
 

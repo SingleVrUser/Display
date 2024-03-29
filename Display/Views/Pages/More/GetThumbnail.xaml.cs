@@ -64,7 +64,7 @@ public sealed partial class GetThumbnail : Page
     {
         var selectedItemCount = BasicGridView.SelectedItems.Count;
 
-        selectedCheckBox.Content = $"共选 {selectedItemCount} 项";
+        SelectedCheckBox.Content = $"共选 {selectedItemCount} 项";
     }
 
     private async void StartButton_Click(object sender, RoutedEventArgs e)
@@ -73,7 +73,7 @@ public sealed partial class GetThumbnail : Page
 
         UpdateGridViewShow();
 
-        switch (OriginMethodSelected_ComboBox.SelectedIndex)
+        switch (OriginMethodSelectedComboBox.SelectedIndex)
         {
             //搜刮源网站
             case 0:
@@ -114,13 +114,13 @@ public sealed partial class GetThumbnail : Page
         //进度
         var progress = new Progress<ProgressClass>(info =>
         {
-            if (!progress_TextBlock.IsLoaded)
+            if (!ProgressTextBlock.IsLoaded)
             {
                 _cts.Cancel();
                 return;
             }
 
-            progress_TextBlock.Text = info.Text;
+            ProgressTextBlock.Text = info.Text;
 
             if (info.Index == -1)
             {
@@ -144,7 +144,7 @@ public sealed partial class GetThumbnail : Page
             //完成
             if (item.Status != Status.Doing && _thumbnailInfo.Count == info.Index + 1)
             {
-                progress_TextBlock.Text = $"任务已完成，耗时{DateHelper.ConvertDoubleToLengthStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
+                ProgressTextBlock.Text = $"任务已完成，耗时{DateHelper.ConvertDoubleToLengthStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
             }
         });
 
@@ -164,7 +164,7 @@ public sealed partial class GetThumbnail : Page
                 return;
             }
 
-            progress_TextBlock.Text = info.Text;
+            ProgressTextBlock.Text = info.Text;
 
             if (info.Index == -1)
             {
@@ -188,7 +188,7 @@ public sealed partial class GetThumbnail : Page
             //完成
             if (item.Status != Status.Doing && _thumbnailInfo.Count == info.Index + 1)
             {
-                progress_TextBlock.Text = $"任务已完成，耗时{DateHelper.ConvertDoubleToLengthStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
+                ProgressTextBlock.Text = $"任务已完成，耗时{DateHelper.ConvertDoubleToLengthStr((DateTimeOffset.Now - startTime).TotalSeconds)}";
             }
 
         });
@@ -198,10 +198,10 @@ public sealed partial class GetThumbnail : Page
 
         var getThumbnailFromWebVideoSetting = new GetThumbnailFromWebVideoSetting()
         {
-            IsJumpVrVideo = IsJumpVrVideo_ToggleSwitch.IsOn,
-            IsDetectFaces = IsSelectedFaceImage_ToggleSwitch.IsOn,
-            ImageCount = (int)ScreenshotsNumber_NumberBox.Value,
-            IsShowWindows = IsShowWindows_ToggleSwitch.IsOn
+            IsJumpVrVideo = IsJumpVrVideoToggleSwitch.IsOn,
+            IsDetectFaces = IsSelectedFaceImageToggleSwitch.IsOn,
+            ImageCount = (int)ScreenshotsNumberNumberBox.Value,
+            IsShowWindows = IsShowWindowsToggleSwitch.IsOn
         };
 
 
@@ -420,7 +420,7 @@ public sealed partial class GetThumbnail : Page
 
         BasicGridView.SelectionMode = ListViewSelectionMode.None;
 
-        selectedCheckBox.Visibility = Visibility.Collapsed;
+        SelectedCheckBox.Visibility = Visibility.Collapsed;
 
         StartButton.Visibility = Visibility.Collapsed;
     }

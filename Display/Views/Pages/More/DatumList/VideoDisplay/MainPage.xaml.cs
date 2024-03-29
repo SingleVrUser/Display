@@ -153,12 +153,12 @@ public sealed partial class MainPage : Page, IDisposable
         //选中的是第一项
         if (index == 0)
         {
-            VideoShow_ListView.ItemsSource = _filesInfos;
+            VideoShowListView.ItemsSource = _filesInfos;
             return;
         }
 
         await _filesInfosCollection.SetCid(cid);
-        VideoShow_ListView.ItemsSource = _filesInfosCollection;
+        VideoShowListView.ItemsSource = _filesInfosCollection;
 
     }
 
@@ -179,14 +179,14 @@ public sealed partial class MainPage : Page, IDisposable
 
     private void RemoveAllMediaControl()
     {
-        foreach (var child in Video_UniformGrid.Children)
+        foreach (var child in VideoUniformGrid.Children)
         {
             if (child is not MediaPlayerElement { Tag: MediaPlayerWithStreamSource oldMediaPlayerWithStreamSource }) continue;
 
             oldMediaPlayerWithStreamSource.Dispose();
         }
 
-        Video_UniformGrid.Children.Clear();
+        VideoUniformGrid.Children.Clear();
     }
 
     private void OpenFolder_Tapped(object sender, DoubleTappedRoutedEventArgs e)
@@ -213,9 +213,9 @@ public sealed partial class MainPage : Page, IDisposable
             await _filesInfosCollection.SetCid(folderId);
         }
 
-        if (VideoShow_ListView.ItemsSource != _filesInfosCollection)
+        if (VideoShowListView.ItemsSource != _filesInfosCollection)
         {
-            VideoShow_ListView.ItemsSource = _filesInfosCollection;
+            VideoShowListView.ItemsSource = _filesInfosCollection;
         }
 
         _units.Add(new MetadataItem
@@ -229,9 +229,9 @@ public sealed partial class MainPage : Page, IDisposable
     private void PlayVideoButton_Click(object sender, RoutedEventArgs e)
     {
         //检查选中的文件或文件夹
-        if (VideoShow_ListView.SelectedItems.FirstOrDefault() is not FilesInfo) return;
+        if (VideoShowListView.SelectedItems.FirstOrDefault() is not FilesInfo) return;
 
-        var filesInfo = VideoShow_ListView.SelectedItems.Cast<FilesInfo>().ToList();
+        var filesInfo = VideoShowListView.SelectedItems.Cast<FilesInfo>().ToList();
 
         TryPlayVideoFromSelectedFiles(filesInfo);
     }
@@ -243,16 +243,16 @@ public sealed partial class MainPage : Page, IDisposable
             case 0:
                 return;
             case 1:
-                Video_UniformGrid.Rows = 1;
-                Video_UniformGrid.Columns = 1;
+                VideoUniformGrid.Rows = 1;
+                VideoUniformGrid.Columns = 1;
                 break;
             case 2:
-                Video_UniformGrid.Rows = 2;
-                Video_UniformGrid.Columns = 1;
+                VideoUniformGrid.Rows = 2;
+                VideoUniformGrid.Columns = 1;
                 break;
             case > 2:
-                Video_UniformGrid.Rows = 2;
-                Video_UniformGrid.Columns = 2;
+                VideoUniformGrid.Rows = 2;
+                VideoUniformGrid.Columns = 2;
                 break;
         }
     }
@@ -373,11 +373,11 @@ public sealed partial class MainPage : Page, IDisposable
 
         if (addIndex == -1)
         {
-            Video_UniformGrid.Children.Add(mediaPlayerElement);
+            VideoUniformGrid.Children.Add(mediaPlayerElement);
         }
         else
         {
-            Video_UniformGrid.Children.Insert(addIndex, mediaPlayerElement);
+            VideoUniformGrid.Children.Insert(addIndex, mediaPlayerElement);
         }
 
     }
@@ -386,10 +386,10 @@ public sealed partial class MainPage : Page, IDisposable
     {
         if (sender is not MediaPlayerElement focusMedia) return;
 
-        var index = Video_UniformGrid.Children.IndexOf(focusMedia);
+        var index = VideoUniformGrid.Children.IndexOf(focusMedia);
 
-        if (VideoPlay_ListView.SelectedIndex != index && VideoPlay_ListView.Items.Count > index)
-            VideoPlay_ListView.SelectedIndex = index;
+        if (VideoPlayListView.SelectedIndex != index && VideoPlayListView.Items.Count > index)
+            VideoPlayListView.SelectedIndex = index;
     }
 
 
@@ -420,7 +420,7 @@ public sealed partial class MainPage : Page, IDisposable
 
         }
 
-        VideoPlay_Pivot.SelectedIndex = 1;
+        VideoPlayPivot.SelectedIndex = 1;
 
         // 搜索影片信息
         _cidInfos.Clear();
@@ -430,7 +430,7 @@ public sealed partial class MainPage : Page, IDisposable
 
     private async Task FindAndShowInfosFromInternet(IEnumerable<FilesInfo> filesInfos)
     {
-        VideoPlay_ListView.IsEnabled = false;
+        VideoPlayListView.IsEnabled = false;
 
         const string noPicturePath = Constants.FileType.NoPicturePath;
 
@@ -476,13 +476,13 @@ public sealed partial class MainPage : Page, IDisposable
 
                 _cidInfos.Add(info);
 
-                FindCidInfo_ProgressRing.Visibility = Visibility.Visible;
+                FindCidInfoProgressRing.Visibility = Visibility.Visible;
 
                 // 直接使用await spiderManager.DispatchSpiderInfoByCidInOrder会阻塞UI线程
                 var videoInfo = await Task.Run(async () =>
                     await spiderManager.DispatchSpiderInfoByCidInOrder(trueName, info.CancellationTokenSource.Token));
 
-                FindCidInfo_ProgressRing.Visibility = Visibility.Collapsed;
+                FindCidInfoProgressRing.Visibility = Visibility.Collapsed;
 
                 if (videoInfo == null || info.CancellationTokenSource.Token.IsCancellationRequested) continue;
 
@@ -491,12 +491,12 @@ public sealed partial class MainPage : Page, IDisposable
         }
 
 
-        VideoPlay_ListView.IsEnabled = true;
+        VideoPlayListView.IsEnabled = true;
     }
 
     private void DoubleVideoPlayButton_Click(object sender, RoutedEventArgs e)
     {
-        foreach (var item in Video_UniformGrid.Children)
+        foreach (var item in VideoUniformGrid.Children)
         {
             if (item is not MediaPlayerElement videoControl) continue;
             videoControl.MediaPlayer.Play();
@@ -505,7 +505,7 @@ public sealed partial class MainPage : Page, IDisposable
 
     private void DoubleVideoPauseButton_Click(object sender, RoutedEventArgs e)
     {
-        foreach (var item in Video_UniformGrid.Children)
+        foreach (var item in VideoUniformGrid.Children)
         {
             if (item is not MediaPlayerElement videoControl) continue;
             videoControl.MediaPlayer.Pause();
@@ -514,7 +514,7 @@ public sealed partial class MainPage : Page, IDisposable
 
     private void IsMuteButton_Checked(object sender, RoutedEventArgs e)
     {
-        foreach (var item in Video_UniformGrid.Children)
+        foreach (var item in VideoUniformGrid.Children)
         {
             if (item is not MediaPlayerElement videoControl) continue;
             videoControl.MediaPlayer.IsMuted = true;
@@ -524,7 +524,7 @@ public sealed partial class MainPage : Page, IDisposable
 
     private void IsMuteButton_Unchecked(object sender, RoutedEventArgs e)
     {
-        foreach (var item in Video_UniformGrid.Children)
+        foreach (var item in VideoUniformGrid.Children)
         {
             if (item is not MediaPlayerElement videoControl) continue;
 
@@ -534,7 +534,7 @@ public sealed partial class MainPage : Page, IDisposable
 
     private void Slider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
-        foreach (var item in Video_UniformGrid.Children)
+        foreach (var item in VideoUniformGrid.Children)
         {
             if (item is not MediaPlayerElement videoControl) continue;
 
@@ -636,9 +636,9 @@ public sealed partial class MainPage : Page, IDisposable
 
         try
         {
-            if (Video_UniformGrid.Children.Contains(mediaPlayerElement))
+            if (VideoUniformGrid.Children.Contains(mediaPlayerElement))
             {
-                Video_UniformGrid.Children.Remove(mediaPlayerElement);
+                VideoUniformGrid.Children.Remove(mediaPlayerElement);
             }
 
             oldMediaPlayerWithStreamSource.Dispose();
@@ -789,7 +789,7 @@ public sealed partial class MainPage : Page, IDisposable
 
     private MediaPlayerElement GetFirstElementPlayPickCode(string pc)
     {
-        var media = Video_UniformGrid.Children.FirstOrDefault(item =>
+        var media = VideoUniformGrid.Children.FirstOrDefault(item =>
             ((item as MediaPlayerElement)?.Tag as MediaPlayerWithStreamSource)?.FilesInfo.PickCode == pc);
         if (media == null || media is not MediaPlayerElement mediaPlayerElement) return null;
 
@@ -831,7 +831,7 @@ public sealed partial class MainPage : Page, IDisposable
             RemovePlayingVideo(mediaPlayerElement);
 
             // 修改布局
-            ChangedVideo_UniformGrid(Video_UniformGrid.Children.Count);
+            ChangedVideo_UniformGrid(VideoUniformGrid.Children.Count);
         }
 
     }
@@ -885,8 +885,8 @@ public sealed partial class MainPage : Page, IDisposable
         var videoUrl = oldMediaPlayerWithStreamSource.Url;
 
         // 删除旧的
-        var index = Video_UniformGrid.Children.IndexOf(oldMediaElement);
-        Video_UniformGrid.Children.RemoveAt(index);
+        var index = VideoUniformGrid.Children.IndexOf(oldMediaElement);
+        VideoUniformGrid.Children.RemoveAt(index);
         oldMediaPlayerWithStreamSource.Dispose();
 
         // 添加新的
@@ -984,7 +984,7 @@ public sealed partial class MainPage : Page, IDisposable
 
     public void Dispose()
     {
-        Video_UniformGrid.PointerExited -= Video_UniformGrid_OnPointerExited;
+        VideoUniformGrid.PointerExited -= Video_UniformGrid_OnPointerExited;
         _aTimer?.Stop();
         _aTimer?.Dispose();
         RemoveAllMediaControl();
@@ -1000,9 +1000,9 @@ public sealed partial class MainPage : Page, IDisposable
     private void DeleteFiles_Click(object sender, RoutedEventArgs e)
     {
         // 移除选中的文件
-        if (VideoShow_ListView.SelectedItems.FirstOrDefault() is not FilesInfo) return;
+        if (VideoShowListView.SelectedItems.FirstOrDefault() is not FilesInfo) return;
 
-        VideoShow_ListView.SelectedItems.Cast<FilesInfo>().ForEach(info =>
+        VideoShowListView.SelectedItems.Cast<FilesInfo>().ForEach(info =>
         {
             _filesInfos.Remove(info);
         });

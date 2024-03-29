@@ -24,35 +24,6 @@
                            Command="{x:Bind ViewModel.DeleteCommand}"
                            Description="移除该项" />
 
-        <Style TargetType="Grid"
-               x:Key="BaseGrid">
-            <Setter Property="BorderBrush"
-                    Value="{StaticResource CircleElevationBorderBrush}" />
-            <Setter Property="BorderThickness"
-                    Value="1" />
-            <Setter Property="CornerRadius"
-                    Value="5" />
-            <Setter Property="Padding"
-                    Value="5" />
-        </Style>
-
-        <Style TargetType="StackPanel"
-               x:Key="BaseStackPanel">
-
-            <Setter Property="BorderBrush"
-                    Value="{StaticResource CircleElevationBorderBrush}" />
-            <Setter Property="BorderThickness"
-                    Value="1" />
-            <Setter Property="CornerRadius"
-                    Value="5" />
-            <Setter Property="Padding"
-                    Value="5" />
-            <Setter Property="Spacing"
-                    Value="20" />
-
-
-        </Style>
-
         <DataTemplate x:Key="FolderDataTemplate"
                       x:DataType="x:String">
             <Grid ColumnSpacing="5">
@@ -104,14 +75,6 @@
                        HorizontalAlignment="Right"
                        Foreground="Gray" />
         </DataTemplate>
-
-        <Style TargetType="TextBlock"
-               x:Key="TitleTextBlockStyle">
-            <Setter Property="HorizontalAlignment"
-                    Value="Right" />
-            <Setter Property="Foreground"
-                    Value="Gray" />
-        </Style>
 
         <Style TargetType="controls:HeaderedContentControl">
             <Setter Property="HorizontalContentAlignment"

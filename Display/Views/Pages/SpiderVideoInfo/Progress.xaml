@@ -5,18 +5,14 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:sys="using:System"
-      xmlns:data="using:Display.Models.Data"
       xmlns:lvc="using:LiveChartsCore.SkiaSharpView.WinUI"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:spiderInfo="using:Display.Models.Spider"
       mc:Ignorable="d">
 
     <Page.Resources>
         <Style TargetType="Grid"
                x:Key="GridWithBrush">
-            <Setter Property="BorderBrush"
-                    Value="{StaticResource ControlElevationBorderBrush}" />
             <Setter Property="BorderThickness"
                     Value="1" />
             <Setter Property="Margin"
@@ -39,7 +35,7 @@
             <!--进度条-->
             <ProgressRing x:Name="TopProgressRing" Width="10" Height="10"/>
             
-            <TextBlock x:Name="TotalProgress_TextBlock"
+            <TextBlock x:Name="TotalProgressTextBlock"
                        Text="正在统计文件夹中的视频数量……"
                        VerticalAlignment="Center"
                        FontSize="15"/>

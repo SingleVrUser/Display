@@ -64,7 +64,6 @@
 
             <Grid  Grid.Row="3"
                   Grid.ColumnSpan="2" Grid.Column="0"
-                  BorderBrush="{StaticResource ControlElevationBorderBrush}"
                   BorderThickness="1"
                   CornerRadius="5">
                 <ScrollViewer Padding="10">

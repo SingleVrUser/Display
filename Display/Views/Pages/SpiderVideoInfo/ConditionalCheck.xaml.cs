@@ -137,7 +137,7 @@ public class ConditionCheck : INotifyPropertyChanged
         }
     }
 
-    public RoutedEventHandler CheckUrlRoutedEventHandler;
+    public readonly RoutedEventHandler CheckUrlRoutedEventHandler;
 
     public ConditionCheck()
     {

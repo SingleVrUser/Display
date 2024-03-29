@@ -191,7 +191,7 @@ public sealed partial class MainPage : INotifyPropertyChanged
     {
         if (e.ClickedItem is not FilesInfo itemInfo) return;
 
-        if (FileInfoShow_Grid.Visibility == Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
+        if (FileInfoShowGrid.Visibility == Visibility.Collapsed) FileInfoShowGrid.Visibility = Visibility.Visible;
         SelectedDatum = itemInfo.Datum;
     }
 
@@ -204,7 +204,7 @@ public sealed partial class MainPage : INotifyPropertyChanged
     {
         if (args.InvokedItem is not TreeViewNode { Content: ExplorerItem content }) return;
 
-        if (FileInfoShow_Grid.Visibility == Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
+        if (FileInfoShowGrid.Visibility == Visibility.Collapsed) FileInfoShowGrid.Visibility = Visibility.Visible;
         SelectedDatum = content.datum;
     }
 

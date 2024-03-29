@@ -9,7 +9,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid x:Name="RootGrid" BorderBrush="{StaticResource ControlElevationBorderBrush}"
+    <Grid x:Name="RootGrid"
           Background="{ThemeResource LayerFillColorDefaultBrush}"
           BorderThickness="1"
           CornerRadius="5"
