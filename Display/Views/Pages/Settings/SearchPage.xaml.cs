@@ -2,7 +2,6 @@ using System.Diagnostics;
 using Display.Providers;
 using Display.Providers.Downloader;
 using Display.Providers.Searcher;
-using Display.Views.Settings;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 

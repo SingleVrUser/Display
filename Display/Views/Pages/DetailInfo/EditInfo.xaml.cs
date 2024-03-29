@@ -7,9 +7,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.WinUI.Collections;
 using CommunityToolkit.WinUI.Controls;
+using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Entities.Details;
-using Display.Services.IncrementalCollection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 

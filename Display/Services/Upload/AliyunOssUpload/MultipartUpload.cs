@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Display.Extensions;
 using Display.Helper.Encode;
+using Display.Models.Enums;
 using Display.Models.Upload;
 using Display.Streams;
 using HttpHeaders = Display.Constants.HttpHeaders;
@@ -141,9 +142,10 @@ internal class MultipartUpload(
             }
 
             var url = $"{BaseUrl}?partNumber={i}&uploadId={_uploadId}";
+            var currentProgress = position;
             var progress1 = new Progress<long>(p =>
             {
-                var currentPosition = position + p;
+                var currentPosition = currentProgress + p;
                 progress?.Report(currentPosition);
                 //Debug.WriteLine($"本地文件大小：{FileSize} 上传大小：{currentPosition}  当前进度为:{(double)currentPosition / FileSize:P}");
             });

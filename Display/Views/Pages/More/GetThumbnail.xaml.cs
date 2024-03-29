@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Display.Helper.Date;
 using Display.Helper.FileProperties.Name;
-using Display.Models.Data;
 using Display.Models.Dto.OneOneFive;
 using Display.Providers;
 using Display.Providers.Downloader;

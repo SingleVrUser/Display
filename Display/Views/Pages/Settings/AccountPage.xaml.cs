@@ -1,9 +1,8 @@
 using System;
 using Windows.ApplicationModel.DataTransfer;
-using Display.CustomWindows;
 using Display.Helper.FileProperties.Name;
-using Display.Models.Data;
 using Display.Providers;
+using Display.Views.Windows;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;

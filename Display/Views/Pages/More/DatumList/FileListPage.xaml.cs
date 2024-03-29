@@ -15,15 +15,13 @@ using Windows.Storage;
 using ByteSizeLib;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.Network;
-using Display.Models.Data;
+using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
 using Display.Models.Media;
 using Display.Providers;
-using Display.Services.IncrementalCollection;
 using Display.ViewModels;
-using Display.Views.More.DatumList;
-using Display.Views.More.Import115DataToLocalDataAccess;
+using Display.Views.Pages.More.Import115DataToLocalDataAccess;
 using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Text;
@@ -35,19 +33,15 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using SharpCompress;
-using MainPage = Display.Views.Pages.More.DatumList.VideoDisplay.MainPage;
 
 namespace Display.Views.Pages.More.DatumList;
 
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
 public sealed partial class FileListPage : INotifyPropertyChanged
 {
     private const string UpSortIconRun = "\uE014";
     private const string DownSortIconRun = "\uE015";
     private WebApi _webApi;
-    private readonly ObservableCollection<ExplorerItem> _units = new();
+    private readonly ObservableCollection<ExplorerItem> _units;
     private static readonly ExplorerItem RootExplorerItem = new()
     {
         Name = "根目录",
@@ -80,6 +74,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     public FileListPage()
     {
+        _units = new ObservableCollection<ExplorerItem>();
         InitializeComponent();
 
         InitData(0);
@@ -87,6 +82,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     public FileListPage(long cid)
     {
+        _units = new ObservableCollection<ExplorerItem>();
         InitializeComponent();
 
         InitData(cid);
@@ -170,7 +166,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         var filesInfo = BaseExample.SelectedItems.Cast<FilesInfo>().ToList();
 
-        var page = new MainPage(filesInfo, BaseExample);
+        var page = new DatumList.VideoDisplay.MainPage(filesInfo, BaseExample);
         page.CreateWindow();
     }
 
@@ -206,23 +202,13 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         Run[] orderIconRunList = [TimeRun, NameRun, SizeRun];
 
-        Run run;
-
-        switch (orderBy)
+        Run run = orderBy switch
         {
-            case WebApi.OrderBy.FileName:
-                run = NameRun;
-                break;
-            case WebApi.OrderBy.UserProduceTime:
-                run = TimeRun;
-                break;
-            case WebApi.OrderBy.FileSize:
-                run = SizeRun;
-                break;
-            default:
-                run = TimeRun;
-                break;
-        }
+            WebApi.OrderBy.FileName => NameRun,
+            WebApi.OrderBy.UserProduceTime => TimeRun,
+            WebApi.OrderBy.FileSize => SizeRun,
+            _ => TimeRun
+        };
 
         foreach (var itemRun in orderIconRunList)
         {
@@ -314,7 +300,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     }
 
-    private void HandleCaption(DragEventArgs e, ListView target, List<FilesInfo> sourceFilesInfos)
+    private void HandleCaption(DragEventArgs e, ListView target, ICollection<FilesInfo> sourceFilesInfos)
     {
         var index = GetInsertIndexInListView(target, e);
         // 范围之外
@@ -376,13 +362,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             // 如果移动的文件已经在中转站了，没必要再移动了
             var sameFile = _transferStationFiles.Where(item =>
             {
-                foreach (var file in item.TransferFiles)
-                {
-                    if (!sourceFilesInfos.Contains(file)) return false;
-                }
-
-                return true;
-
+                return item.TransferFiles.All(file => sourceFilesInfos.Contains(file));
             }).FirstOrDefault();
 
             if (sameFile == null)
@@ -445,8 +425,10 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     /// </summary>
     /// <param name="sourceFilesInfos"></param>
     /// <returns></returns>
-    private async Task Delete115Files(List<FilesInfo> sourceFilesInfos)
+    private async Task Delete115Files(IList<FilesInfo> sourceFilesInfos)
     {
+        if (sourceFilesInfos == null) return;
+        
         // 删除文件列表中的文件
         TryRemoveFilesInExplorer(sourceFilesInfos);
 
@@ -589,7 +571,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     /// 移动115文件
     /// </summary>
     /// <returns></returns>
-    private async Task Move115Files(long cid, List<FilesInfo> files)
+    private async Task Move115Files(long cid, IList<FilesInfo> files)
     {
         await WebApi.MoveFiles(cid, files.Select(item => item.Id).ToArray());
 
@@ -709,12 +691,12 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         var readyStackPanel = new StackPanel();
 
-        readyStackPanel.Children.Add(new TextBlock() { Text = "选中文件夹：" });
+        readyStackPanel.Children.Add(new TextBlock { Text = "选中文件夹：" });
         var index = 0;
         foreach (var name in nameList)
         {
             index++;
-            var textBlock = new TextBlock()
+            var textBlock = new TextBlock
             {
                 Text = $"  {index}.{name}",
                 IsTextSelectionEnabled = true,
@@ -725,7 +707,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
 
         readyStackPanel.Children.Add(
-            new TextBlock()
+            new TextBlock
             {
                 Text = "未进入隐藏系统的情况下，隐藏的文件将被跳过，请知晓",
                 TextWrapping = TextWrapping.Wrap,
@@ -807,7 +789,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (BaseExample.SelectedItems.FirstOrDefault() is not FilesInfo) return;
 
-        List<Datum> videoInfos = new();
+        List<Datum> videoInfos = [];
 
         foreach (var item in BaseExample.SelectedItems)
         {
@@ -899,7 +881,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
             if (info.Type == FilesInfo.FileType.Folder || !info.IsVideo) return;
 
-            mediaPlayItems = new List<MediaPlayItem> { new(info) };
+            mediaPlayItems = [new(info)];
         }
 
 
@@ -914,10 +896,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         {
             if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
 
-            fileInfos = new List<FilesInfo>
-            {
-                info
-            };
+            fileInfos = [info];
 
         }
         else
@@ -1000,7 +979,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             checkBox = new CheckBox
             {
                 Content = "强制重命名（包括后缀名）",
-                HorizontalAlignment = HorizontalAlignment.Right,
+                HorizontalAlignment = HorizontalAlignment.Right
             };
             ToolTipService.SetToolTip(checkBox, "按新名称重新上传文件，完成后删除旧文件");
             stackPanel.Children.Add(checkBox);
@@ -1086,7 +1065,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
     }
 
-    private static List<FilesInfo> GetFilesInfosExceptInCid(long cid, List<FilesInfo> infos)
+    private static List<FilesInfo> GetFilesInfosExceptInCid(long cid, IList<FilesInfo> infos)
     {
         return infos.Where(x => x.Cid != cid).ToList();
     }
@@ -1198,7 +1177,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         var infos = new Dictionary<string, string>
         {
             {"名称",info.Name },
-            {"cid",info.Id.ToString() },
+            {"cid",info.Id.ToString() }
         };
 
         await InfoPage.ShowInContentDialog(XamlRoot, infos, "属性");
@@ -1323,7 +1302,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     public void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
         // Raise the PropertyChanged event, passing the Name of the property whose value has changed.
-        this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     private async void SearchButton_Click(object sender, RoutedEventArgs e)

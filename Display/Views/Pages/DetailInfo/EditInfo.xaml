@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:detailInfo="using:Display.Views.DetailInfo"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:details="using:Display.Models.Entities.Details"
     xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"

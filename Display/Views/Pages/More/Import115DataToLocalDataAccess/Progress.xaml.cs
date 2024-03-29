@@ -1,10 +1,4 @@
-﻿using Display.CustomWindows;
-using Display.Helper.Date;
-using Display.Providers;
-using Microsoft.Toolkit.Uwp.Notifications;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -13,323 +7,323 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.System;
+using Display.Helper.Date;
 using Display.Models.Dto.OneOneFive;
+using Display.Providers;
+using Display.Views.Windows;
+using Microsoft.Toolkit.Uwp.Notifications;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using WinUIEx;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+namespace Display.Views.Pages.More.Import115DataToLocalDataAccess;
 
-namespace Display.Views.More.Import115DataToLocalDataAccess
+public sealed partial class Progress
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
-    public sealed partial class Progress : Page
+    private readonly List<FilesInfo> _fileInfos;
+    private readonly WebApi _webapi = WebApi.GlobalWebApi;
+    private readonly ObservableCollection<FileCategory> _fileCategoryCollection = [];
+    public Status Status { get; set; }
+
+    private readonly CancellationTokenSource _sCts = new();
+    private Window _currentWindow;
+
+    public Progress()
     {
-        private List<FilesInfo> _fileInfos;
-        private WebApi webapi = WebApi.GlobalWebApi;
-        public ObservableCollection<FileCategory> FileCategoryCollection = new();
-        public Status _status;
+        InitializeComponent();
+    }
 
-        private CancellationTokenSource s_cts = new();
-        private Window currentWindow;
+    public Progress(List<FilesInfo> fileInfos)
+    {
+        InitializeComponent();
 
-        public Progress()
+        _fileInfos = fileInfos;
+    }
+
+    public void CreateWindow()
+    {
+        var window = new CommonWindow("导入数据");
+
+        _currentWindow = window;
+
+        window.SetWindowSize(500, 666);
+        window.Content = this;
+        window.Activate();
+    }
+
+    private async void CurrentWindow_Closed(object sender, WindowEventArgs args)
+    {
+        args.Handled = true;
+
+        if (sender is not Window window) return;
+
+        var dialog = new ContentDialog
         {
-            InitializeComponent();
-        }
+            // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
+            XamlRoot = XamlRoot,
+            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+            Title = "确认",
+            PrimaryButtonText = "关闭",
+            CloseButtonText = "返回",
+            DefaultButton = ContentDialogButton.Primary,
+            Content = "关闭窗口后将取消当前任务，是否继续关闭"
+        };
 
-        public Progress(List<FilesInfo> fileInfos)
+        var result = await dialog.ShowAsync();
+        if (result != ContentDialogResult.Primary) return;
+
+        await _sCts.CancelAsync();
+
+        window.Closed -= CurrentWindow_Closed;
+        window.Close();
+    }
+
+    private async void LoadData()
+    {
+        _currentWindow.Closed += CurrentWindow_Closed;
+
+        GetFolderCategoryProgress.status = Status.Doing;
+
+        // 1.预准备，获取所有文件的全部信息（大小和数量）
+        //1-1.获取数据
+        List<FilesInfo> filesWithoutRootList = [];
+
+        // 剔除根目录 并 获取进度
+        foreach (var info in _fileInfos)
         {
-            InitializeComponent();
-
-            _fileInfos = fileInfos;
-        }
-
-        public void CreateWindow()
-        {
-            var window = new CommonWindow("导入数据");
-
-            currentWindow = window;
-
-            window.SetWindowSize(500, 666);
-            window.Content = this;
-            window.Activate();
-        }
-
-        private async void CurrentWindow_Closed(object sender, WindowEventArgs args)
-        {
-            args.Handled = true;
-
-            if (sender is not Window window) return;
-
-            var dialog = new ContentDialog
+            // 文件
+            if (info.Type == FilesInfo.FileType.File)
             {
-                // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
-                XamlRoot = XamlRoot,
-                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
-                Title = "确认",
-                PrimaryButtonText = "关闭",
-                CloseButtonText = "返回",
-                DefaultButton = ContentDialogButton.Primary,
-                Content = "关闭窗口后将取消当前任务，是否继续关闭"
-            };
+                filesWithoutRootList.Add(info);
+                _overallCount++;
 
-            var result = await dialog.ShowAsync();
-            if (result != ContentDialogResult.Primary) return;
-
-            await s_cts.CancelAsync();
-
-            window.Closed -= CurrentWindow_Closed;
-            window.Close();
-        }
-
-        private async void LoadData()
-        {
-            currentWindow.Closed += CurrentWindow_Closed;
-
-            GetFolderCategory_Progress.status = Status.Doing;
-
-            // 1.预准备，获取所有文件的全部信息（大小和数量）
-            //1-1.获取数据
-            List<FilesInfo> filesWithoutRootList = new();
-
-            // 剔除根目录 并 获取进度
-            foreach (var info in _fileInfos)
+                _fileCategoryCollection.Add(new FileCategory(info.Datum));
+            }
+            // 文件夹
+            else
             {
-                // 文件
-                if (info.Type == FilesInfo.FileType.File)
+                if (info.Id == null) continue;
+
+                var cid = (long)info.Id;
+
+                //cid为0（根目录）无法使用GetFolderCategory接口获取文件信息，故将0目录变为0目录下的目录
+                if (cid == 0)
                 {
-                    filesWithoutRootList.Add(info);
-                    _overallCount++;
+                    var rootFileInfo = await _webapi.GetFileAsync(cid, loadAll: true);
 
-                    FileCategoryCollection.Add(new FileCategory(info.Datum));
+                    var foldersInfoInRoot = rootFileInfo.data;
+
+                    filesWithoutRootList.AddRange(foldersInfoInRoot.Select(datum => new FilesInfo(datum)));
                 }
-                // 文件夹
                 else
                 {
-                    if (info.Id == null) continue;
+                    filesWithoutRootList.Add(info);
+                }
+            }
+        }
 
-                    var cid = (long)info.Id;
+        foreach (var folderInfo in filesWithoutRootList.Where(i => i.Type == FilesInfo.FileType.Folder && i.Id != null))
+        {
+            var item = await _webapi.GetFolderCategory((long)folderInfo.Id!);
 
-                    //cid为0（根目录）无法使用GetFolderCategory接口获取文件信息，故将0目录变为0目录下的目录
-                    if (cid == 0)
+            //添加文件和文件夹数量
+            _overallCount += item.folder_count;
+            _overallCount += item.count;
+
+            //当前文件夹下更新文件夹数量
+            _folderCount += item.folder_count;
+
+            //自身为文件夹，也添加进去
+            _folderCount++;
+
+            _fileCategoryCollection.Add(item);
+        }
+
+        //1-2.显示进度
+        OverallProgress.Maximum = _overallCount;
+        UpdateProgress();
+        GetFolderCategoryProgress.status = Status.Success;
+
+        // 2-1.显示进度
+        GetInfosExpander.Visibility = Visibility.Visible;
+        GetInfosProgress.status = Status.Doing;
+        LeftTimeTipTextBlock.Visibility = Visibility.Visible;
+        UpdateLayout();
+
+        var startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+
+        //进度条
+        var progress = new Progress<GetFileProgressIProgress>(progressPercent =>
+        {
+            switch (progressPercent.status)
+            {
+                //正常
+                case ProgressStatus.normal:
+                    _successCount = progressPercent.getFilesProgressInfo.AllCount;
+                    UpdateProgress();
+                    CpsTextBlock.Text = $"{progressPercent.sendCountPerMinutes} 次/分钟";
+                    LeftTimeRun.Text = DateHelper.ConvertDoubleToLengthStr(1.5 * (_folderCount - progressPercent.getFilesProgressInfo.FolderCount));
+                    //updateSendSpeed(progressPercent.sendCountPerSecond);
+                    break;
+                case ProgressStatus.done:
+                {
+                    //全部完成
+                    if (_successCount == _overallCount)
                     {
-                        var rootFileInfo = await webapi.GetFileAsync(cid, loadAll: true);
+                        GetInfosProgress.status = Status.Success;
 
-                        var foldersInfoInRoot = rootFileInfo.data;
-
-                        filesWithoutRootList.AddRange(foldersInfoInRoot.Select(datum => new FilesInfo(datum)));
+                        //通知
+                        TryToast("任务已完成", $"{_overallCount}条数据添加进数据库 👏");
                     }
                     else
                     {
-                        filesWithoutRootList.Add(info);
+                        FailExpander.Visibility = Visibility.Visible;
+                        GetInfosProgress.status = Status.Pause;
+
+                        FailExpander.IsExpanded = true;
+
+                        FailListView.ItemsSource = progressPercent.getFilesProgressInfo?.FailCid;
+                        FailCountTextBlock.Text = progressPercent.getFilesProgressInfo?.FailCid.Count.ToString();
+
+                        //通知
+                        TryToast("任务已结束", $"完成情况：{_successCount}/{_overallCount}，问题不大 😋");
                     }
+
+                    //剩余时间改总耗时
+                    LeftTimeTitleRun.Text = "总耗时：";
+                    LeftTimeRun.Text = DateHelper.ConvertDoubleToLengthStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime);
+
+                    CpsTextBlock.Visibility = Visibility.Collapsed;
+                    GetFolderCategoryExpander.IsExpanded = true;
+                    GetInfosProgress.Visibility = Visibility.Collapsed;
+                    break;
                 }
+                case ProgressStatus.cancel:
+                    Debug.WriteLine("退出进程");
+                    break;
+                //出错
+                case ProgressStatus.error:
+                default:
+                    ErrorTeachingTip.IsOpen = true;
+                    GetInfosProgress.status = Status.Error;
+                    break;
             }
 
-            foreach (var folderInfo in filesWithoutRootList.Where(i => i.Type == FilesInfo.FileType.Folder && i.Id != null))
-            {
-                var item = await webapi.GetFolderCategory((long)folderInfo.Id!);
+            Status = GetInfosProgress.status;
+        });
 
-                //添加文件和文件夹数量
-                _overallCount += item.folder_count;
-                _overallCount += item.count;
+        // 2.获取数据，获取所有文件的全部信息（大小和数量）
+        await _webapi.GetAllFileInfoToDataAccess(filesWithoutRootList, _sCts.Token, progress);
 
-                //当前文件夹下更新文件夹数量
-                _folderCount += item.folder_count;
+        _currentWindow.Closed -= CurrentWindow_Closed;
 
-                //自身为文件夹，也添加进去
-                _folderCount++;
+        //搜刮完成,是否自动搜刮
+        if (AppSettings.IsSpiderAfterImportDataAccess && _overallCount != 0)
+        {
+            //提示将会开始搜刮
+            WillStartSpiderTaskTip.IsOpen = true;
 
-                FileCategoryCollection.Add(item);
-            }
+            await Task.Delay(1000, _sCts.Token);
 
-            //1-2.显示进度
-            overallProgress.Maximum = _overallCount;
-            UpdateProgress();
-            GetFolderCategory_Progress.status = Status.Success;
+            if (_sCts.Token.IsCancellationRequested) return;
 
-            // 2-1.显示进度
-            GetInfos_Expander.Visibility = Visibility.Visible;
-            GetInfos_Progress.status = Status.Doing;
-            LeftTimeTip_TextBlock.Visibility = Visibility.Visible;
-            UpdateLayout();
+            WillStartSpiderTaskTip.IsOpen = false;
 
-            var startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
-
-            //进度条
-            var progress = new Progress<GetFileProgressIProgress>(progressPercent =>
-            {
-                switch (progressPercent.status)
-                {
-                    //正常
-                    case ProgressStatus.normal:
-                        _successCount = progressPercent.getFilesProgressInfo.AllCount;
-                        UpdateProgress();
-                        cps_TextBlock.Text = $"{progressPercent.sendCountPerMinutes} 次/分钟";
-                        leftTime_Run.Text = DateHelper.ConvertDoubleToLengthStr(1.5 * (_folderCount - progressPercent.getFilesProgressInfo.FolderCount));
-                        //updateSendSpeed(progressPercent.sendCountPerSecond);
-                        break;
-                    case ProgressStatus.done:
-                        {
-                            //全部完成
-                            if (_successCount == _overallCount)
-                            {
-                                GetInfos_Progress.status = Status.Success;
-
-                                //通知
-                                TryToast("任务已完成", $"{_overallCount}条数据添加进数据库 👏");
-                            }
-                            else
-                            {
-                                Fail_Expander.Visibility = Visibility.Visible;
-                                GetInfos_Progress.status = Status.Pause;
-
-                                Fail_Expander.IsExpanded = true;
-
-                                Fail_ListView.ItemsSource = progressPercent.getFilesProgressInfo?.FailCid;
-                                FailCount_TextBlock.Text = progressPercent.getFilesProgressInfo?.FailCid.Count.ToString();
-
-                                //通知
-                                TryToast("任务已结束", $"完成情况：{_successCount}/{_overallCount}，问题不大 😋");
-                            }
-
-                            //剩余时间改总耗时
-                            leftTimeTitle_Run.Text = "总耗时：";
-                            leftTime_Run.Text = DateHelper.ConvertDoubleToLengthStr(DateTimeOffset.Now.ToUnixTimeSeconds() - startTime);
-
-                            cps_TextBlock.Visibility = Visibility.Collapsed;
-                            GetFolderCategory_Expander.IsExpanded = true;
-                            GetInfos_Progress.Visibility = Visibility.Collapsed;
-                            break;
-                        }
-                    case ProgressStatus.cancel:
-                        Debug.WriteLine("退出进程");
-                        break;
-                    //出错
-                    default:
-                        ErrorTeachingTip.IsOpen = true;
-                        GetInfos_Progress.status = Status.Error;
-                        break;
-                }
-
-                _status = GetInfos_Progress.status;
-            });
-
-            // 2.获取数据，获取所有文件的全部信息（大小和数量）
-            await webapi.GetAllFileInfoToDataAccess(filesWithoutRootList, s_cts.Token, progress);
-
-            currentWindow.Closed -= CurrentWindow_Closed;
-
-            //搜刮完成,是否自动搜刮
-            if (AppSettings.IsSpiderAfterImportDataAccess && _overallCount != 0)
-            {
-                //提示将会开始搜刮
-                WillStartSpiderTaskTip.IsOpen = true;
-
-                await Task.Delay(1000, s_cts.Token);
-
-                if (s_cts.Token.IsCancellationRequested) return;
-
-                WillStartSpiderTaskTip.IsOpen = false;
-
-                var fileNameList = FileCategoryCollection.Select(item => item.file_name).ToList();
-                var page = new SpiderVideoInfo.Progress(fileNameList, filesWithoutRootList.Select(x => x.Datum).ToList());
-                //创建搜刮进度窗口
-                page.CreateWindow();
-            }
-
-            if (AppSettings.IsCloseWindowAfterImportDataAccess)
-            {
-                currentWindow.Close();
-            }
+            var fileNameList = _fileCategoryCollection.Select(item => item.file_name).ToList();
+            var page = new SpiderVideoInfo.Progress(fileNameList, filesWithoutRootList.Select(x => x.Datum).ToList());
+            //创建搜刮进度窗口
+            page.CreateWindow();
         }
 
-        //文件总数（包括文件夹）
-        private int _successCount;
-        private int _overallCount;
-        private int _folderCount;
-
-        private static void TryToast(string title, string content)
+        if (AppSettings.IsCloseWindowAfterImportDataAccess)
         {
-            if (!AppSettings.IsToastAfterImportDataAccess) return;
-
-            new ToastContentBuilder()
-                .AddArgument("action", "viewConversation")
-                .AddArgument("conversationId", 384928)
-
-                .AddText(title)
-
-                .AddText(content)
-
-                .Show();
+            _currentWindow.Close();
         }
+    }
 
-        //更新进度环信息
-        private void UpdateProgress()
+    //文件总数（包括文件夹）
+    private int _successCount;
+    private int _overallCount;
+    private int _folderCount;
+
+    private static void TryToast(string title, string content)
+    {
+        if (!AppSettings.IsToastAfterImportDataAccess) return;
+
+        new ToastContentBuilder()
+            .AddArgument("action", "viewConversation")
+            .AddArgument("conversationId", 384928)
+
+            .AddText(title)
+
+            .AddText(content)
+
+            .Show();
+    }
+
+    //更新进度环信息
+    private void UpdateProgress()
+    {
+        int percentProgress;
+        if (_overallCount == 0)
         {
-            int percentProgress;
-            if (_overallCount == 0)
-            {
-                percentProgress = 100;
-            }
-            else
-                percentProgress = (_successCount * 100) / _overallCount;
-
-            percent_TextBlock.Text = $"{percentProgress}%";
-            countProgress_TextBlock.Text = $"{_successCount}/{_overallCount}";
-            overallProgress.Value = _successCount;
+            percentProgress = 100;
         }
+        else
+            percentProgress = _successCount * 100 / _overallCount;
 
-        private async void OpenSavePathButton_Click(object sender, RoutedEventArgs e)
+        PercentTextBlock.Text = $"{percentProgress}%";
+        CountProgressTextBlock.Text = $"{_successCount}/{_overallCount}";
+        OverallProgress.Value = _successCount;
+    }
+
+    private async void OpenSavePathButton_Click(object sender, RoutedEventArgs e)
+    {
+        var folder = await StorageFolder.GetFolderFromPathAsync(AppSettings.DataAccessSavePath);
+
+        await Launcher.LaunchFolderAsync(folder);
+    }
+
+    private async void BackButton_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new ContentDialog
         {
-            var folder = await StorageFolder.GetFolderFromPathAsync(AppSettings.DataAccessSavePath);
+            // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
+            XamlRoot = XamlRoot,
+            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+            Title = "确认",
+            PrimaryButtonText = "确认返回",
+            CloseButtonText = "退出",
+            DefaultButton = ContentDialogButton.Close,
+            Content = "当前任务正在运行，确认返回上一页面？"
+        };
 
-            await Launcher.LaunchFolderAsync(folder);
-        }
-
-        private async void BackButton_Click(object sender, RoutedEventArgs e)
+        if (Status == Status.Doing)
         {
-            var dialog = new ContentDialog
-            {
-                // XamlRoot must be set in the case of a ContentDialog running in a Desktop app
-                XamlRoot = XamlRoot,
-                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
-                Title = "确认",
-                PrimaryButtonText = "确认返回",
-                CloseButtonText = "退出",
-                DefaultButton = ContentDialogButton.Close,
-                Content = "当前任务正在运行，确认返回上一页面？"
-            };
-
-            if (_status == Status.Doing)
-            {
-                var result = await dialog.ShowAsync();
-                if (result == ContentDialogResult.Primary)
-                {
-                    TryFrameGoBack();
-                }
-            }
-            else
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
             {
                 TryFrameGoBack();
             }
         }
-
-        private void TryFrameGoBack()
+        else
         {
-            if (!Frame.CanGoBack) return;
-            Frame.GoBack();
-            s_cts.Cancel();
+            TryFrameGoBack();
         }
+    }
 
-        private void GetFolderCategory_Expander_Loaded(object sender, RoutedEventArgs e)
+    private void TryFrameGoBack()
+    {
+        if (!Frame.CanGoBack) return;
+        Frame.GoBack();
+        _sCts.Cancel();
+    }
+
+    private void GetFolderCategory_Expander_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (_fileInfos != null)
         {
-            if (_fileInfos != null)
-            {
-                LoadData();
-            }
+            LoadData();
         }
     }
 }

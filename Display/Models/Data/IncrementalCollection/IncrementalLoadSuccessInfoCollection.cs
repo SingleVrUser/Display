@@ -1,14 +1,14 @@
-﻿using Display.Models.Data;
-using Microsoft.UI.Xaml.Data;
-using SharpCompress;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Display.Models.Dto.OneOneFive;
+using Display.Providers;
+using Microsoft.UI.Xaml.Data;
+using SharpCompress;
 
-namespace Display.Services.IncrementalCollection;
+namespace Display.Models.Data.IncrementalCollection;
 
 public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCoverDisplayClass>, ISupportIncrementalLoading
 {

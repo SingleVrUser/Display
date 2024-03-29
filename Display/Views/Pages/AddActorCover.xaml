@@ -146,7 +146,7 @@
             </Grid>
         </Grid>
 
-        <RelativePanel Margin="10,2,10,10">
+        <RelativePanel Grid.Row="0" Margin="10,2,10,10">
             <CheckBox x:Name="selectedCheckBox" RelativePanel.AlignVerticalCenterWithPanel="True" Content="共选 0 项" CornerRadius="10" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
             <TextBlock x:Name="progress_TextBlock" RelativePanel.AlignVerticalCenterWithPanel="True"/>
 

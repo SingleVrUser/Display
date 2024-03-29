@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Page x:Class="Display.Views.Tasks.UploadTaskPage"
+<Page x:Class="Display.Views.Pages.Tasks.UploadTaskPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:local="using:Display.Views.Tasks"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:services="using:Display.Services"
       xmlns:sub="using:Display.ViewModels.Sub"
+      xmlns:upload="using:Display.Services.Upload"
       mc:Ignorable="d">
 
     <Page.Resources>
@@ -20,7 +20,7 @@
     <Grid Padding="10">
         <ItemsRepeater ItemsSource="{x:Bind _uploadVm.UploadCollection}">
             <ItemsRepeater.ItemTemplate>
-                <DataTemplate  x:DataType="sub:UploadSubItemService">
+                <DataTemplate  x:DataType="upload:UploadSubItemService">
                     <Grid RowDefinitions="auto,*,6"
                           Height="70"
                           ColumnDefinitions="*,auto,auto"
@@ -64,7 +64,7 @@
                                      ShowPaused="{x:Bind ProgressShowPaused,Mode=OneWay}"
                                      Visibility="{x:Bind ProgressVisibility, Mode=OneWay}"
                                      Value="{x:Bind Position, Mode=OneWay}"
-                                     Maximum="{x:Bind sub:UploadSubItemService.Maximum}" />
+                                     Maximum="{x:Bind upload:UploadSubItemService.Maximum}" />
 
                         <StackPanel Grid.Column="2"
                                     Grid.RowSpan="3">

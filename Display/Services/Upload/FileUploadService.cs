@@ -13,6 +13,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Display.Models.Enums;
 using Display.Providers.Downloader;
 using Display.Services.Upload.AliyunOssUpload;
 using static System.String;

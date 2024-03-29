@@ -795,7 +795,7 @@
 
         <RelativePanel Grid.Row="0" Margin="10,2">
             <!--搜索框（匹配失败列表显示时显示）-->
-            <local:FileAutoSuggestBox
+            <userController:FileAutoSuggestBox
                 x:Name="FailInfoSuggestBox"
                 TextChanged="FileAutoSuggestBox_TextChanged"
                 Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource TrueToVisibleConverter}}"
@@ -1010,12 +1010,12 @@
                                    Padding="10,5" />
 
         <!--筛选栏，默认隐藏-->
-        <customcontrols:InfoListFilter x:Name="InfosFilter"
+        <userController:InfoListFilter x:Name="InfosFilter"
                                        Grid.Row="3"
                                        Visibility="{x:Bind FilterToggleButton.IsChecked,Mode=OneWay}"
                                        Height="35"
                                        Margin="5,2,0,0"
-                                       SplitButton_Click="InfoListFilter_SplitButton_Click"
+                                       SplitButtonClick="InfoListFilter_SplitButton_Click"
                                        SelectionChanged="InfoListFilter_SelectionChanged"
                                        TextChanged="InfoListFilter_TextChanged" />
 

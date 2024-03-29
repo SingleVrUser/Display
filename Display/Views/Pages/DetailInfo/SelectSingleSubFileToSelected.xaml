@@ -1,10 +1,9 @@
 ﻿<!-- Copyright (c) Microsoft Corporation and Contributors. -->
 <!-- Licensed under the MIT License. -->
 
-<Page x:Class="Display.Views.DetailInfo.SelectSingleSubFileToSelected"
+<Page x:Class="Display.Views.Pages.DetailInfo.SelectSingleSubFileToSelected"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:local="using:Display.Views.DetailInfo"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
@@ -16,8 +15,8 @@
         <ListView x:FieldModifier="public"
                   x:Name="ContentListView"
                   SelectionMode="None"
-                  DataContext="{x:Bind trueName}"
-                  ItemsSource="{x:Bind subInfoList}"
+                  DataContext="{x:Bind TrueName}"
+                  ItemsSource="{x:Bind SubInfoList}"
                   IsItemClickEnabled="True">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="oneOneFive:SubInfo">

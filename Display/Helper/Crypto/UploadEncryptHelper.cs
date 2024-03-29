@@ -61,7 +61,7 @@ namespace Display.Helper.Crypto
 
             using var decryption = aes.CreateDecryptor(aes.Key, aes.IV);
 
-            return decryption.TransformFinalBlock(cipherText, 0, cipherText.Length); ;
+            return decryption.TransformFinalBlock(cipherText, 0, cipherText.Length);
         }
 
         public static byte[] GetData(Dictionary<string, string> dataForm, byte[] aesKey, byte[] aesIv)

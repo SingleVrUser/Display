@@ -1,14 +1,14 @@
-﻿using Display.Providers;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Display.Models.Dto.OneOneFive;
+using Display.Providers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.Web.WebView2.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Display.Models.Dto.OneOneFive;
 
-namespace Display.Views.More;
+namespace Display.Views.Pages.More;
 
 public sealed partial class BrowserPage
 {
@@ -68,7 +68,7 @@ public sealed partial class BrowserPage
             _webApi ??= WebApi.GlobalWebApi;
 
             List<Datum> videoInfoList = [];
-            videoInfoList.AddRange(selectedItemList.Select(item => new Datum() { Cid = item.id, Name = item.name, PickCode = item.pick_code, Fid = item.file_id }));
+            videoInfoList.AddRange(selectedItemList.Select(item => new Datum { Cid = item.id, Name = item.name, PickCode = item.pick_code, Fid = item.file_id }));
 
             //BitComet只需要cid,n,pc三个值
             var isSuccess = await _webApi.RequestDown(videoInfoList, downtype);

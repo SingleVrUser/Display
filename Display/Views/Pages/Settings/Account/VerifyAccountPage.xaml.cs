@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
-using Display.CustomWindows;
-using Microsoft.UI.Xaml;
-using Newtonsoft.Json;
 using System;
 using System.IO;
 using Display.Models.Dto.OneOneFive;
+using Display.Views.Windows;
+using Microsoft.UI.Xaml;
+using Newtonsoft.Json;
 
-namespace Display.Views.Settings.Account
+namespace Display.Views.Pages.Settings.Account
 {
     public sealed partial class VerifyAccountPage
     {

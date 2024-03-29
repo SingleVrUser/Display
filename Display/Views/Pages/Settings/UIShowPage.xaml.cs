@@ -22,7 +22,7 @@ public sealed partial class UIShowPage
         new PageEnumAndName(NavigationViewItemEnum.VideoViewPage, "展示"),
         new PageEnumAndName(NavigationViewItemEnum.ActorPage, "演员"),
         new PageEnumAndName(NavigationViewItemEnum.MorePage, "其他"),
-        new PageEnumAndName(NavigationViewItemEnum.SettingPage, "设置"),
+        new PageEnumAndName(NavigationViewItemEnum.SettingPage, "设置")
     ];
 
     private PageEnumAndName DefaultStartPageItem { get; }

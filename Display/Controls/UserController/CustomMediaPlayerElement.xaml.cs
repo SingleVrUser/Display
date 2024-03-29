@@ -1,16 +1,10 @@
-// Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
 
 using ByteSizeLib;
 using Display.Constants;
 using Display.Controls.CustomController;
-using Display.CustomWindows;
 using Display.Helper.UI;
-using Display.Models.Data;
 using Display.Models.Media;
 using Display.Providers;
-using Display.Services;
-using Display.Views;
 using Microsoft.Graphics.Canvas;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -34,10 +28,10 @@ using Windows.System.Display;
 using Windows.Web.Http;
 using Display.Models.Dto.OneOneFive;
 using Display.Providers.Downloader;
+using Display.Streams;
 using Display.Views.Pages;
+using Display.Views.Windows;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace Display.Controls.UserController;
 

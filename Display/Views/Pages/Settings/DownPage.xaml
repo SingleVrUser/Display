@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<local:RootPage
+<settings:RootPage
     x:Class="Display.Views.Pages.Settings.DownPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Display.Views.Settings"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:downloader="using:Display.Providers.Downloader"
     xmlns:userController="using:Display.Controls.UserController"
+    xmlns:settings="using:Display.Views.Pages.Settings"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <local:RootPage.Resources>
+    <settings:RootPage.Resources>
 
         <StackLayout x:Key="DownloaderStackLayout" Spacing="{StaticResource SettingsCardPadding}"/>
 
@@ -68,7 +68,7 @@
                 </controls:SettingsExpander.Items>
             </controls:SettingsExpander>
         </DataTemplate>
-    </local:RootPage.Resources>
+    </settings:RootPage.Resources>
 
     <StackPanel Style="{StaticResource SettingStackPanel}">
 
@@ -81,4 +81,4 @@
                        ItemsSource="{x:Bind _downloaders}"/>
 
     </StackPanel>
-</local:RootPage>
+</settings:RootPage>

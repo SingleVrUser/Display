@@ -43,7 +43,7 @@ namespace Display.Controls.UserController
                 CookieHelper.ProductCookieKeyValue(cookie).ForEach(item => AddCookie(item.Key, item.Value));
             }
 
-            WebView.CoreWebView2.WebResourceResponseReceived += CoreWebView2_WebResourceResponseReceived; ;
+            WebView.CoreWebView2.WebResourceResponseReceived += CoreWebView2_WebResourceResponseReceived;
         }
 
         public event TypedEventHandler<CoreWebView2, CoreWebView2WebResourceResponseReceivedEventArgs> WebMessageReceived;

@@ -1,5 +1,4 @@
 ﻿using Display.Helper.Network;
-using Display.Models.Data;
 using Display.Models.Spider;
 using Display.Providers.Spider;
 using HtmlAgilityPack;
@@ -11,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Display.Models.Dto.OneOneFive;
+using Display.Providers;
 using Display.Providers.Downloader;
 using static Display.Models.Spider.SpiderNameAndStatus;
 

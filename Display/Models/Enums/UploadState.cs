@@ -1,4 +1,4 @@
-﻿namespace Display.Services.Upload;
+﻿namespace Display.Models.Enums;
 
 internal enum UploadState
 {

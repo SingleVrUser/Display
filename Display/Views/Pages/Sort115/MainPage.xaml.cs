@@ -1,19 +1,18 @@
-using Display.CustomWindows;
-using Display.Models.Spider;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Spider;
+using Display.Views.Windows;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Sort115HomeModel = Display.Models.Entities._115.Sort115HomeModel;
 
+namespace Display.Views.Pages.Sort115;
 
-namespace Display.Views.Sort115;
-
-public sealed partial class MainPage : Page
+public sealed partial class MainPage
 {
     //private List<FetchingSourceOptions> fetchingCommonSourceList;
 
@@ -82,7 +81,7 @@ public sealed partial class MainPage : Page
             PrimaryButtonText = "保存",
             CloseButtonText = "返回",
             DefaultButton = ContentDialogButton.Primary,
-            Content = new Views.Sort115.Settings18Page(),
+            Content = new Settings18Page(),
             Resources =
             {
                 // 使用更大的 MaxWidth
@@ -109,7 +108,7 @@ public class FetchingSourceOptions
     public FetchingSourceOptions(SpiderNameAndStatus.SpiderSourceName SpiderSourceName, bool isSelected = false)
     {
         this.SpiderSourceName = SpiderSourceName;
-        this.name = SpiderSourceName.ToString();
+        name = SpiderSourceName.ToString();
         IsSelected = isSelected;
     }
 }

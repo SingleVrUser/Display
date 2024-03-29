@@ -58,7 +58,7 @@ internal class NotificationManager
     public static async void RemoveGetActorInfoProgessToast()
     {
         //删除获取演员信息的进度通知
-        await AppNotificationManager.Default.RemoveByGroupAsync(ToastGetActorInfoWithProgressBar.c_group);
+        await AppNotificationManager.Default.RemoveByGroupAsync(ToastGetActorInfoWithProgressBar.CGroup);
     }
 
     public bool DispatchNotification(AppNotificationActivatedEventArgs notificationActivatedEventArgs)

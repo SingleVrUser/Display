@@ -1,16 +1,16 @@
 ﻿using Display.Helper.Data;
 using Display.Models.Data;
 
-namespace Display.Views.Settings.Account;
+namespace Display.Views.Pages.Settings.Account;
 
 public sealed partial class CheckCookie
 {
-    private readonly CookieKeyValue[] _cookieKeyValueArray;
+    private CookieKeyValue[] CookieKeyValueArray { get; }
 
     public CheckCookie(string cookies)
     {
         InitializeComponent();
 
-        _cookieKeyValueArray = CookieHelper.FormatCookieArray(cookies);
+        CookieKeyValueArray = CookieHelper.FormatCookieArray(cookies);
     }
 }

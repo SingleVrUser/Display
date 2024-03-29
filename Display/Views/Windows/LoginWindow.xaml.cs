@@ -1,8 +1,8 @@
-﻿using Display.Views.Settings.Account;
+﻿using System;
+using Display.Views.Pages.Settings.Account;
 using Microsoft.UI.Xaml.Controls;
-using System;
 
-namespace Display.CustomWindows;
+namespace Display.Views.Windows;
 
 public sealed partial class LoginWindow
 {

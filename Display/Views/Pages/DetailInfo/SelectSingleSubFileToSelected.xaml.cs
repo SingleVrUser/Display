@@ -1,36 +1,25 @@
-// Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
-
-using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
 using Display.Models.Dto.OneOneFive;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+namespace Display.Views.Pages.DetailInfo;
 
-namespace Display.Views.DetailInfo;
-
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
-public sealed partial class SelectSingleSubFileToSelected : Page
+public sealed partial class SelectSingleSubFileToSelected
 {
-    private string trueName;
+    private string TrueName { get; }
 
-
-    private List<SubInfo> subInfoList { get; set; }
+    private List<SubInfo> SubInfoList { get; }
 
     public SelectSingleSubFileToSelected()
     {
-        this.InitializeComponent();
+        InitializeComponent();
     }
 
     public SelectSingleSubFileToSelected(List<SubInfo> subList, string trueName)
     {
-        this.InitializeComponent();
+        InitializeComponent();
 
-        subInfoList = subList;
-        this.trueName = trueName;
+        SubInfoList = subList;
+        this.TrueName = trueName;
     }
 
 }

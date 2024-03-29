@@ -1,17 +1,13 @@
-using Display.Helper.Data;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Display.Helper.Data;
 using Display.Models.Dto.OneOneFive;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Navigation;
 using ImageViewModel = Display.ViewModels.ImageViewModel;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
-namespace Display.Views.More.DatumList;
+namespace Display.Views.Pages.More.DatumList;
 
 internal sealed partial class ImagePage
 {

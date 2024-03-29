@@ -1,5 +1,4 @@
 ﻿using Display.Helper.FileProperties.Name;
-using Display.Models.Data;
 using Display.Providers;
 using System.Collections.Generic;
 using System.IO;

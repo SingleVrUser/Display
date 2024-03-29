@@ -112,7 +112,7 @@ public sealed partial class ThumbnailPage : Page
 
         if (result == ContentDialogResult.Primary)
         {
-            _viewModel.DeleteAsyncCommand.Execute(null);
+            _viewModel.DeleteCommand.Execute(null);
         }
     }
 }

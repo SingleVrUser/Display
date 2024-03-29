@@ -3,11 +3,12 @@ using System.Diagnostics;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Display.Models.Enums;
 using Display.Models.Upload;
-using Display.Services.Upload;
+using Display.ViewModels;
 using Microsoft.UI.Xaml;
 
-namespace Display.ViewModels.Sub;
+namespace Display.Services.Upload;
 
 internal partial class UploadSubItemService(string path, long cid) : ObservableObject
 {

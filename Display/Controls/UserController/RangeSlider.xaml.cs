@@ -1,17 +1,11 @@
-// Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
-
+using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
-using System;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+namespace Display.Controls.UserController;
 
-namespace Display.Controls;
-
-public sealed partial class RangeSlider : UserControl
+public sealed partial class RangeSlider
 {
     public double Minimum
     {
@@ -37,19 +31,18 @@ public sealed partial class RangeSlider : UserControl
         set => SetValue(RangeMaxProperty, value);
     }
 
-    public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register(nameof(Minimum), typeof(double), typeof(RangeSlider), new PropertyMetadata(0.0));
+    private static readonly DependencyProperty MinimumProperty = DependencyProperty.Register(nameof(Minimum), typeof(double), typeof(RangeSlider), new PropertyMetadata(0.0));
 
-    public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register(nameof(Maximum), typeof(double), typeof(RangeSlider), new PropertyMetadata(1.0));
+    private static readonly DependencyProperty MaximumProperty = DependencyProperty.Register(nameof(Maximum), typeof(double), typeof(RangeSlider), new PropertyMetadata(1.0));
 
-    public static readonly DependencyProperty RangeMinProperty = DependencyProperty.Register(nameof(RangeMin), typeof(double), typeof(RangeSlider), new PropertyMetadata(0.0, OnRangeMinPropertyChanged));
+    private static readonly DependencyProperty RangeMinProperty = DependencyProperty.Register(nameof(RangeMin), typeof(double), typeof(RangeSlider), new PropertyMetadata(0.0, OnRangeMinPropertyChanged));
 
-    public static readonly DependencyProperty RangeMaxProperty = DependencyProperty.Register(nameof(RangeMax), typeof(double), typeof(RangeSlider), new PropertyMetadata(1.0, OnRangeMaxPropertyChanged));
+    private static readonly DependencyProperty RangeMaxProperty = DependencyProperty.Register(nameof(RangeMax), typeof(double), typeof(RangeSlider), new PropertyMetadata(1.0, OnRangeMaxPropertyChanged));
 
 
-
-    public RangeSlider()
+    private RangeSlider()
     {
-        this.InitializeComponent();
+        InitializeComponent();
     }
 
 

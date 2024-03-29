@@ -122,7 +122,7 @@ internal partial class ImageViewModel : ObservableObject
     [RelayCommand]
     private async Task OpenWithOtherApplicationAsync()
     {
-        var filePath = LocalCacheHelper.GetCacheFilePath(_currentPhotoModel.FileInfo.Name);
+        var filePath = LocalCacheHelper.GetCacheFilePath(CurrentPhotoModel.FileInfo.Name);
         if (filePath == null) return;
         await Windows.System.Launcher.LaunchUriAsync(new Uri(filePath));
     }

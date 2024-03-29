@@ -8,6 +8,7 @@ public class Bwh
 {
     [Key]
     [Column("bwh")]
+    [StringLength(100)]
     public string Bwh1 { get; set; } = null!;
 
     [Column("bust")]

@@ -1,7 +1,7 @@
 ﻿<!-- Copyright (c) Microsoft Corporation and Contributors. -->
 <!-- Licensed under the MIT License. -->
 
-<Page x:Class="Display.Views.SpiderVideoInfo.Progress"
+<Page x:Class="Display.Views.Pages.SpiderVideoInfo.Progress"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:sys="using:System"

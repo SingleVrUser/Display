@@ -32,3 +32,5 @@ exclude:
     paths:
       - Display\Themes\Generic.xaml
       - Display\Views\Pages\SpiderVideoInfo\Progress.xaml
+      - DataAccess\Models\Entity
+  - name: UnusedAutoPropertyAccessor.Global

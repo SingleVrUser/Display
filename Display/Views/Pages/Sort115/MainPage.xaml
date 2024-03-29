@@ -1,17 +1,17 @@
 ﻿<!-- Copyright (c) Microsoft Corporation and Contributors. -->
 <!-- Licensed under the MIT License. -->
 
-<Page x:Class="Display.Views.Sort115.MainPage"
+<Page x:Class="Display.Views.Pages.Sort115.MainPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:local="using:Display.Views.Sort115"
-      xmlns:customcontrols="using:Display.Controls"
+
       xmlns:viewModels="using:Display.ViewModels"
       xmlns:controls="using:CommunityToolkit.WinUI.Controls"
       xmlns:model="using:Display.Models.Entities._115"
       xmlns:userController="using:Display.Controls.UserController"
+      xmlns:sort115="using:Display.Views.Pages.Sort115"
       mc:Ignorable="d">
 
     <Page.DataContext>
@@ -64,7 +64,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="FetchingSourceTemplate"
-                      x:DataType="local:FetchingSourceOptions">
+                      x:DataType="sort115:FetchingSourceOptions">
             <ToggleButton Content="{x:Bind name}" />
         </DataTemplate>
 
@@ -208,8 +208,8 @@
                                    RelativePanel.AlignLeftWithPanel="True"
                                    RelativePanel.AlignVerticalCenterWithPanel="True"
                                    Margin="2" />
-                        <FontIcon x:Name="VideoInfoIcon"
-                                  FontFamily="{StaticResource SymbolThemeFontFamily}"
+                        <FontIcon
+                            FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xE946;"
                                   FontSize="15"
                                   Foreground="Gray"
@@ -252,7 +252,7 @@
                                       ColumnDefinitions="*,150,180,30"
                                       ColumnSpacing="5">
 
-                                    <customcontrols:FileControl FolderName="{x:Bind Info.Name}"
+                                    <userController:FileControl FolderName="{x:Bind Info.Name}"
                                                                 Type="{x:Bind Info.Type}"
                                                                 DeleteCommand="{StaticResource DeleteCommand}" />
 

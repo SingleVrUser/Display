@@ -49,8 +49,8 @@
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
                     <RelativePanel Margin="10,0,10,0">
-                        <TextBlock Grid.Row="0"
-                                   Text="随机视频"
+                        <TextBlock
+                            Text="随机视频"
                                    FontSize="20"
                                    FontWeight="Bold"
                                    RelativePanel.AlignVerticalCenterWithPanel="True" />
@@ -153,14 +153,14 @@
             </Grid>
 
 
-            <customecontrol:MultipleCoverShow Grid.Row="1"
+            <userController:MultipleCoverShow Grid.Row="1"
                                               ShowName="最新视频"
                                               CoverList="{x:Bind _recentCoverList}"
                                               ItemClick="MultipleCoverShow_ItemClick"
                                               RefreshButtonVisibility="Visible"
                                               RefreshClick="RefreshNewestVideoButtonClick"/>
 
-            <customecontrol:MultipleCoverShow Grid.Row="2"
+            <userController:MultipleCoverShow Grid.Row="2"
                                               ShowName="喜欢视频"
                                               CoverList="{x:Bind _loveCoverList}"
                                               ItemClick="MultipleCoverShow_ItemClick"
@@ -169,7 +169,7 @@
                                               RefreshButtonVisibility="Visible"
                                               RefreshClick="RefreshLikeVideoButtonClick" />
 
-            <customecontrol:MultipleCoverShow Grid.Row="3"
+            <userController:MultipleCoverShow Grid.Row="3"
                                               ShowName="稍后观看"
                                               CoverList="{x:Bind _lookLaterList}"
                                               ItemClick="MultipleCoverShow_ItemClick"

@@ -1,15 +1,13 @@
 using Display.ViewModels;
-using Microsoft.UI.Xaml.Controls;
 
+namespace Display.Views.Pages.Tasks;
 
-namespace Display.Views.Tasks;
-
-public sealed partial class SpiderTaskPage : Page
+public sealed partial class SpiderTaskPage
 {
     private readonly SpiderTaskViewModel _viewModel = App.GetService<SpiderTaskViewModel>();
 
     public SpiderTaskPage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
     }
 }

@@ -1,10 +1,10 @@
 ﻿using Display.Extensions;
-using Display.Models.Data;
 using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using Display.Providers;
 
 namespace Display.Helper.Data
 {

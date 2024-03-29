@@ -1,14 +1,11 @@
-﻿using Display.Views;
-using Display.Views.More;
-using Display.Views.OfflineDown;
-using Display.Views.Settings;
-using Display.Views.Tasks;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Display.Models.Enums;
 using Display.Views.Pages;
 using Display.Views.Pages.More;
+using Display.Views.Pages.OfflineDown;
 using Display.Views.Pages.Settings;
+using Display.Views.Pages.Tasks;
 using MainPage = Display.Views.Pages.Settings.MainPage;
 
 namespace Display.Constants;
@@ -24,7 +21,7 @@ internal class PageTypeAndEnum
         { NavigationViewItemEnum.MorePage, typeof(MorePage) },
         { NavigationViewItemEnum.SettingPage, typeof(MainPage) },
         { NavigationViewItemEnum.DownPage, typeof(OfflineDownPage) },
-        { NavigationViewItemEnum.TaskPage, typeof(Views.Tasks.MainPage) },
+        { NavigationViewItemEnum.TaskPage, typeof(Views.Pages.Tasks.MainPage) },
 
         //后台任务
         { NavigationViewItemEnum.UploadTask, typeof(UploadTaskPage) },
@@ -34,7 +31,7 @@ internal class PageTypeAndEnum
         { NavigationViewItemEnum.SpiderPage,typeof(Views.Pages.SpiderVideoInfo.MainPage) },
         { NavigationViewItemEnum.CalculateSha1Page,typeof(CalculateLocalFileSha1) },
         { NavigationViewItemEnum.BrowserPage,typeof(BrowserPage) },
-        { NavigationViewItemEnum.FilePage,typeof(Views.More.DatumList.MainPage) },
+        { NavigationViewItemEnum.FilePage,typeof(Views.Pages.More.DatumList.MainPage) },
         { NavigationViewItemEnum.ActorCoverPage,typeof(AddActorCover) },
         { NavigationViewItemEnum.ThumbnailPage,typeof(GetThumbnail) },
         

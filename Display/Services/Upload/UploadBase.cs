@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Display.Models.Enums;
 
 namespace Display.Services.Upload;
 

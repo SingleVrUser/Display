@@ -9,12 +9,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Display.Models.Dto.OneOneFive;
 using Display.Providers.Downloader;
 
 namespace Display.ViewModels;
 
-partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGeneratorService) : ObservableObject
+internal partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGeneratorService) : ObservableObject
 {
     private string _videoUrl;
     private List<FilesInfo> _fileInfos;
@@ -22,7 +23,7 @@ partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGeneratorSe
     [ObservableProperty]
     private bool _loading;
 
-    public ObservableCollection<GroupThumbnailCollection> ThumbnailList = [];
+    internal readonly ObservableCollection<GroupThumbnailCollection> ThumbnailList = [];
 
     [ObservableProperty]
     private FilesInfo _currentFileItem;
@@ -136,7 +137,7 @@ partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGeneratorSe
     }
 
     [RelayCommand]
-    private async void DeleteAsync()
+    private async Task DeleteAsync()
     {
         var dst = CurrentThumbnailItem;
 
@@ -150,7 +151,7 @@ partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGeneratorSe
             // 从115中删除 
             Debug.WriteLine($"删除{CurrentFileItem.Cid}下的{CurrentFileItem.Id}");
             var deleteResult = CurrentFileItem.Id != null && await WebApi.GlobalWebApi.DeleteFiles(CurrentFileItem.Cid,
-                new[] { (long)CurrentFileItem.Id });
+                [(long)CurrentFileItem.Id]);
 
             if (!deleteResult) return;
             _fileInfos.RemoveAt(i); // 要在ThumbnailList的Remove之前执行
@@ -163,18 +164,12 @@ partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGeneratorSe
     }
 }
 
-public class GroupThumbnailCollection : ObservableCollection<object>
+public class GroupThumbnailCollection(FilesInfo info)
+    : ObservableCollection<object>(new ObservableCollection<LocalThumbnail>())
 {
-    public readonly string PickCode;
-    public readonly string Title;
-    public readonly bool HasM3U8;
-
-    public GroupThumbnailCollection(FilesInfo info) : base(new ObservableCollection<LocalThumbnail>())
-    {
-        Title = info.NameWithoutExtension;
-        PickCode = info.PickCode;
-        HasM3U8 = info.Datum.Vdi != 0;
-    }
+    public readonly string PickCode = info.PickCode;
+    public readonly string Title = info.NameWithoutExtension;
+    public readonly bool HasM3U8 = info.Datum.Vdi != 0;
 }
 
 
