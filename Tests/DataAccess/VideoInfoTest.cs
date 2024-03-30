@@ -65,7 +65,7 @@ public class VideoInfoTest
             // 内容断言
             Assert.AreEqual(VideoInfos[i], checkInfos[i]);
         }
-        
+
         // Key查询
         var databaseVideoInfo = videoInfoDao.Find(info.TrueName);
         Assert.AreEqual(info, databaseVideoInfo);
@@ -82,7 +82,7 @@ public class VideoInfoTest
         Assert.AreEqual(info, databaseVideoInfo);
 
         // 删
-        for (var i = VideoInfos.Count - 1; i >=0 ; i--)
+        for (var i = VideoInfos.Count - 1; i >= 0; i--)
         {
             var removeInfo = VideoInfos[i];
             videoInfoDao.Remove(removeInfo);

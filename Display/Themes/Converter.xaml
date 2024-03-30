@@ -8,16 +8,15 @@
     xmlns:communityConverters="using:CommunityToolkit.WinUI.UI.Converters">
 
     <converter:BytesToSizeStrConverter x:Key="BytesToSizeStrConverter" />
-    <converter:IsVideoToVisibilityConverter x:Key="IsVideoToVisibilityConverter" />
     <converter:NumberToDateTimeStrConverter x:Key="NumberToDateTimeStrConverter" />
     <converter:NumberToLengthStrConverter x:Key="NumberToLengthStrConverter" />
-    <converter:IsVideoToBoolConverter x:Key="IsVideoToBoolConverter" />
+    <converter:OneToTrueConverter x:Key="OneToTrueConverter" />
     <converter:AppUpdateContentConverter x:Key="AppUpdateContentConverter" />
-    <converter:CollapsedWhenNullConverter x:Key="CollapsedWhenNullConverter" />
+    <converter:NullToCollapsedConverter x:Key="NullToCollapsedConverter" />
     <converter:DoubleToInt32Converter x:Key="DoubleToInt32Converter" />
-    <converter:NameToColorConverter x:Key="NameToColorConverter" />
+    <converter:ObjectToColorConverter x:Key="ObjectToColorConverter" />
     <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter" />
-    <converter:BoolToVisibleConverter x:Key="BoolToVisibleConverter" />
+    <converter:TrueToVisibleConverter x:Key="TrueToVisibleConverter" />
     <converter:ZeroToVisibleConverter x:Key="ZeroToVisibleConverter" />
     <converter:FloatToPercentageConverter x:Key="FloatToPercentageConverter" />
     <converter:TimeStampToStringConverter x:Key="TimeStampToStringConverter" />
@@ -25,6 +24,5 @@
     <communityConverters:BoolNegationConverter x:Key="BoolNegationConverter" />
     <communityConverters:FileSizeToFriendlyStringConverter x:Key="FileSizeToFriendlyStringConverter" />
     <communityConverters:DoubleToVisibilityConverter x:Key="GreaterThanZeroToVisibilityConverter" GreaterThan="0" />
-
 
 </ResourceDictionary>

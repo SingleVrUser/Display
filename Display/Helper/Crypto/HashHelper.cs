@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Display.Extensions;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
-using Display.Extensions;
+using System.Threading.Tasks;
 
 namespace Display.Helper.Crypto
 {
@@ -59,7 +59,7 @@ namespace Display.Helper.Crypto
             if (ranges.Length != 2) return string.Empty;
 
             if (!long.TryParse(ranges[0], out var startIndex) || !long.TryParse(ranges[1], out var endIndex)) return string.Empty;
-                
+
             var bufferSize = (int)(endIndex - startIndex + 1);
             var buffer = new byte[bufferSize];
 

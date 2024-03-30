@@ -4,7 +4,10 @@ using System.Text.RegularExpressions;
 
 namespace Display.Converter;
 
-public class AppUpdateContentConverter : IValueConverter
+/// <summary>
+/// github的release内容格式转换
+/// </summary>
+internal class AppUpdateContentConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
@@ -12,11 +15,9 @@ public class AppUpdateContentConverter : IValueConverter
 
         if (string.IsNullOrEmpty(content)) return null;
 
-        string finallyContent;
-
         //删除 by @xxx 
-        Regex rgx = new Regex("by @.*? ", RegexOptions.IgnoreCase);
-        finallyContent = rgx.Replace(content, "");
+        var rgx = new Regex("by @.*? ", RegexOptions.IgnoreCase);
+        var finallyContent = rgx.Replace(content, "");
 
         //http://……/pull/xx 替换为 #xx Markdown格式
         rgx = new Regex(@"https://.*?/pull/(\d+)", RegexOptions.IgnoreCase);

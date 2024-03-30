@@ -1,6 +1,5 @@
-﻿using System.Diagnostics;
-using Microsoft.Extensions.Configuration;
-using Display.Helper.Data;
+﻿using Microsoft.Extensions.Configuration;
+using System.Diagnostics;
 using Tests.Models;
 
 namespace Tests.DataAccess;

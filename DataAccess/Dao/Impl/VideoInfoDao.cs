@@ -20,4 +20,4 @@ public class VideoInfoDao : DaoImpl<VideoInfo>, IVideoInfoDao
     }
 
 
-}   
+}

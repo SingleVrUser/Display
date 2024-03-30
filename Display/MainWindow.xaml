@@ -7,7 +7,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:data="using:Display.Models.Data"
         xmlns:winUiEx="using:WinUIEx"
-        xmlns:settings="using:Display.Models.Settings"
+        xmlns:userController="using:Display.Controls.UserController"
+        xmlns:providers="using:Display.Providers"
+        xmlns:settings1="using:Display.Models.Dto.Settings"
         mc:Ignorable="d">
 
     <Grid x:Name="RootGrid">
@@ -31,21 +33,21 @@
                                      Opacity="0.2"
                                      PointerEntered="FullScreenButton_PointerEntered"
                                      PointerExited="FullScreenButton_PointerExited">
-                        <FontIcon FontFamily="Segoe Fluent Icons"
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Foreground="LightGray"
                                   Glyph="&#xE9A6;" />
                     </HyperlinkButton>
-                    <customcontrols:CustomAutoSuggestBox Grid.Column="2"
+                    <userController:CustomAutoSuggestBox Grid.Column="2"
                                                          HorizontalAlignment="Right"
                                                          SuggestionItemTapped="CustomAutoSuggestBox_OnSuggestionItemTapped"
                                                          QuerySubmitted="CustomAutoSuggestBox_QuerySubmitted">
 
-                        <customcontrols:CustomAutoSuggestBox.KeyboardAccelerators>
+                        <userController:CustomAutoSuggestBox.KeyboardAccelerators>
                             <KeyboardAccelerator Key="F"
                                                  Modifiers="Control"
                                                  Invoked="CtrlF_Invoked" />
-                        </customcontrols:CustomAutoSuggestBox.KeyboardAccelerators>
-                    </customcontrols:CustomAutoSuggestBox>
+                        </userController:CustomAutoSuggestBox.KeyboardAccelerators>
+                    </userController:CustomAutoSuggestBox>
                 </Grid>
             </DataTemplate>
 
@@ -85,17 +87,17 @@
                        Style="{ThemeResource BodyStrongTextBlockStyle}"
                        VerticalAlignment="Center"/>
 
-            <customcontrols:CustomAutoSuggestBox x:Name="CustomAutoSuggestBox"
+            <userController:CustomAutoSuggestBox x:Name="CustomAutoSuggestBox"
                                                  Grid.Column="2"
                                                  SuggestionItemTapped="CustomAutoSuggestBox_OnSuggestionItemTapped"
                                                  QuerySubmitted="CustomAutoSuggestBox_QuerySubmitted">
 
-                <customcontrols:CustomAutoSuggestBox.KeyboardAccelerators>
+                <userController:CustomAutoSuggestBox.KeyboardAccelerators>
                     <KeyboardAccelerator Key="F"
                                          Modifiers="Control"
                                          Invoked="CtrlF_Invoked" />
-                </customcontrols:CustomAutoSuggestBox.KeyboardAccelerators>
-            </customcontrols:CustomAutoSuggestBox>
+                </userController:CustomAutoSuggestBox.KeyboardAccelerators>
+            </userController:CustomAutoSuggestBox>
             
         </Grid>
 
@@ -113,7 +115,7 @@
                         PaneDisplayMode="Auto"
                         DisplayModeChanged="NavigationViewControl_DisplayModeChanged"
                         OpenPaneLength="150"
-                        IsPaneOpen="{x:Bind data:AppSettings.IsNavigationViewPaneOpen}"
+                        IsPaneOpen="{x:Bind providers:AppSettings.IsNavigationViewPaneOpen}"
                         SelectionFollowsFocus="Disabled">
 
             <!--调整NavigationView样式-->
@@ -124,7 +126,7 @@
 
             <!--菜单-->
             <NavigationView.MenuItemTemplate>
-                <DataTemplate x:DataType="settings:MenuItem">
+                <DataTemplate x:DataType="settings1:MenuItem">
                     <NavigationViewItem Content="{x:Bind Content}"
                                         Icon="{x:Bind Icon}"
                                         Tag="{x:Bind PageEnum}"
@@ -160,7 +162,7 @@
             <HyperlinkButton FontSize="20"
                              HorizontalAlignment="Center"
                              VerticalAlignment="Center"
-                             Content="{x:Bind data:DataAccess.DbPath}"
+                             Content="{x:Bind providers:DataAccess.DbPath}"
                              Click="HyperlinkButton_Click" />
         </StackPanel>
 

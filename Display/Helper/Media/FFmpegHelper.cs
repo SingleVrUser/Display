@@ -1,10 +1,10 @@
-﻿using System;
+﻿using FFmpeg.AutoGen.Abstractions;
+using FFmpeg.AutoGen.Bindings.DynamicallyLoaded;
+using SkiaSharp;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using FFmpeg.AutoGen.Abstractions;
-using FFmpeg.AutoGen.Bindings.DynamicallyLoaded;
-using SkiaSharp;
 
 namespace Display.Helper.Media;
 

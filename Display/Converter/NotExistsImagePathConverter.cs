@@ -1,5 +1,4 @@
-﻿using Display.Constants;
-using Microsoft.UI.Xaml.Data;
+﻿using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
@@ -7,7 +6,10 @@ using System.IO;
 
 namespace Display.Converter;
 
-public class NotExistsImagePathConverter : IValueConverter
+/// <summary>
+/// imagePath is empty or not exists => $"{NoPicturePath}"
+/// </summary>
+internal class NotExistsImagePathConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {

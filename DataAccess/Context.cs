@@ -42,7 +42,7 @@ public class Context : DbContext
     public static string SetSavePath(string? savePath = null)
     {
         savePath ??= Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        
+
         var path = Path.Combine(savePath, DbName);
         if (DbPath == path) return path;
 

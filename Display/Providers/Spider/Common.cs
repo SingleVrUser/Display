@@ -6,13 +6,17 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Display.Models.Data;
+using Display.Helper.Network;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
+using Display.Providers.Downloader;
 
 namespace Display.Providers.Spider;
 
 public class Common
 {
-    public static readonly HttpClient Client = GetInfoFromNetwork.CommonClient;
+    public static readonly HttpClient Client = NetworkHelper.CommonClient;
 
     public static Tuple<string, string> SplitCid(string cid, bool needSingleKeyword = false)
     {
@@ -39,7 +43,7 @@ public class Common
                     rightCid = matchResult.Groups[2].Value;
                 }
                 // 纯字母或纯数字
-                else if(needSingleKeyword)
+                else if (needSingleKeyword)
                 {
                     return new Tuple<string, string>(cid, null);
                 }
@@ -93,34 +97,33 @@ public class Common
         return true;
     }
 
-    public static async Task<VideoInfo> AnalysisHtmlDocInfoFromAvSoxOrAvMoo(string CID, string detail_url, HtmlDocument htmlDoc)
+    public static async Task<VideoInfo> AnalysisHtmlDocInfoFromAvSoxOrAvMoo(string cid, string detailUrl, HtmlDocument htmlDoc)
     {
         VideoInfo videoInfo = new()
         {
-            trueName = CID,
-            busUrl = detail_url
+            TrueName = cid,
+            busUrl = detailUrl
         };
 
         //封面图
-        string CoverUrl = null;
-        var ImageNode = htmlDoc.DocumentNode.SelectSingleNode("//a[@class='bigImage']");
-        if (ImageNode == null) return null;
-        CoverUrl = ImageNode.Attributes["href"].Value;
-        videoInfo.ImageUrl = CoverUrl;
+        var imageNode = htmlDoc.DocumentNode.SelectSingleNode("//a[@class='bigImage']");
+        if (imageNode == null) return null;
+        var coverUrl = imageNode.Attributes["href"].Value;
+        videoInfo.ImageUrl = coverUrl;
 
-        //标题（AvMoox在a标签上，AvSox在img标签上）
-        var result = ImageNode.GetAttributeValue("title", string.Empty);
+        //标题（AvMoo在a标签上，AvSox在img标签上）
+        var result = imageNode.GetAttributeValue("title", string.Empty);
         if (!string.IsNullOrEmpty(result))
         {
             videoInfo.Title = result;
         }
         else
         {
-            var ImgNode = ImageNode.SelectSingleNode(".//img");
+            var imgNode = imageNode.SelectSingleNode(".//img");
 
-            if (ImgNode == null) return null;
+            if (imgNode == null) return null;
 
-            result = ImgNode.GetAttributeValue("title", string.Empty);
+            result = imgNode.GetAttributeValue("title", string.Empty);
 
             if (string.IsNullOrEmpty(result))
                 return null;
@@ -129,15 +132,15 @@ public class Common
         }
 
         //其他信息
-        var InfoNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='row movie']/div[@class='col-md-3 info']");
+        var infoNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='row movie']/div[@class='col-md-3 info']");
 
         //解析
-        Dictionary<string, string> infos = new Dictionary<string, string>();
-        string key = null;
-        List<string> values = new List<string>();
-        foreach (var info in InfoNode.ChildNodes)
+        var infos = new Dictionary<string, string>();
+        var key = string.Empty;
+        var values = new List<string>();
+        foreach (var info in infoNode.ChildNodes)
         {
-            string name = info.Name;
+            var name = info.Name;
 
             if (name != "p") continue;
 
@@ -145,7 +148,7 @@ public class Common
             {
                 var className = info.GetAttributeValue("class", string.Empty);
 
-                string InnerText = info.InnerText.Replace(":", string.Empty).Trim();
+                var innerText = info.InnerText.Replace(":", string.Empty).Trim();
 
                 if (className == "header")
                 {
@@ -157,11 +160,11 @@ public class Common
                         values.Clear();
                     }
 
-                    key = InnerText;
+                    key = innerText;
                 }
-                else if (!string.IsNullOrEmpty(InnerText))
+                else if (!string.IsNullOrEmpty(innerText))
                 {
-                    values.Add(InnerText);
+                    values.Add(innerText);
                 }
             }
             else
@@ -226,28 +229,25 @@ public class Common
         }
 
         //演员
-        var ActorNodes = htmlDoc.DocumentNode.SelectNodes("//div[@id='avatar-waterfall']/a[@class='avatar-box']/span");
-        if (ActorNodes != null)
-            videoInfo.Actor = string.Join(",", ActorNodes.Select(item => item.InnerText.Trim()).ToList());
+        var actorNodes = htmlDoc.DocumentNode.SelectNodes("//div[@id='avatar-waterfall']/a[@class='avatar-box']/span");
+        if (actorNodes != null)
+            videoInfo.Actor = string.Join(",", actorNodes.Select(item => item.InnerText.Trim()).ToList());
 
         //样品图片
-        List<string> sampleUrlList = new List<string>();
+        var sampleUrlList = new List<string>();
         var sampleNodes = htmlDoc.DocumentNode.SelectNodes("//div[@id='sample-waterfall']/a[@class='sample-box']");
 
         if (sampleNodes != null)
         {
-            foreach (var sampleNode in sampleNodes)
-            {
-                sampleUrlList.Add(sampleNode.GetAttributeValue("href", string.Empty));
-            }
+            sampleUrlList.AddRange(sampleNodes.Select(sampleNode => sampleNode.GetAttributeValue("href", string.Empty)));
 
             videoInfo.SampleImageList = string.Join(",", sampleUrlList);
         }
 
         //下载图片
-        string filePath = Path.Combine(AppSettings.ImageSavePath, CID);
-        videoInfo.ImageUrl = CoverUrl;
-        videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(CoverUrl, filePath, CID);
+        var filePath = Path.Combine(AppSettings.ImageSavePath, cid);
+        videoInfo.ImageUrl = coverUrl;
+        videoInfo.ImagePath = await DbNetworkHelper.DownloadFile(coverUrl, filePath, cid);
 
         return videoInfo;
     }

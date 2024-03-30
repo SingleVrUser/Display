@@ -1,11 +1,9 @@
-﻿using Display.Models.Data;
+﻿using Display.Providers;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using Display.Models.Data.Enums;
-using Display.Models.Settings;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
+using Display.Models.Dto.Settings;
+using Display.Models.Enums;
 
 namespace Display.ViewModels.Sub;
 
