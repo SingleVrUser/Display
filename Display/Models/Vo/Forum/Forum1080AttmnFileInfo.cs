@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Display.Models.Spider;
+namespace Display.Models.Vo.Forum;
 
 public class Forum1080AttmnFileInfo
 {

@@ -8,6 +8,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="using:Display.Models.Spider"
+    xmlns:forum="using:Display.Models.Vo.Forum"
     mc:Ignorable="d">
 
     <Grid RowDefinitions="auto,*">
@@ -16,7 +17,7 @@
         <ListView x:Name="LinksListView" Grid.Row="1" SelectionMode="Single" CharacterSpacing="12">
 
             <ListView.ItemTemplate>
-                <DataTemplate x:DataType="model:Forum1080SearchResult">
+                <DataTemplate x:DataType="forum:Forum1080SearchResult">
                     <Grid RowDefinitions="*,auto" Row="5" Padding="10">
                         <Grid.ContextFlyout>
                             <MenuFlyout>

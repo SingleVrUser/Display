@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Display.Models.Enums;
 
-namespace Display.Models.Spider;
+namespace Display.Models.Vo.Forum;
 
 public class Forum1080AttachmentInfo(string url, AttmnTypeEnum typeEnum)
 {
