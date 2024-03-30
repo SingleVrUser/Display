@@ -1,12 +1,11 @@
 using System;
 using Windows.ApplicationModel.DataTransfer;
 using Display.Helper.FileProperties.Name;
+using Display.Models.Enums;
 using Display.Providers;
 using Display.Views.Windows;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using UserInfo = Display.Controls.UserController.UserInfo;
 
 namespace Display.Views.Pages.Settings;
 
@@ -23,11 +22,11 @@ public sealed partial class AccountPage
 
     private async void InitializationViewAsync()
     {
-        if (!string.IsNullOrEmpty(AppSettings._115_Cookie) && WebApi.UserInfoResult == null)
+        if (!string.IsNullOrEmpty(AppSettings._115_Cookie) && (WebApi.UserInfoResult == null || WebApi.UserInfoResult.Data == null))
         {
             await WebApi.UpdateLoginInfoAsync();
         }
-
+        
         UpdateUserInfo();
         UpdateLoginStatus();
 
@@ -36,7 +35,7 @@ public sealed partial class AccountPage
 
     private void UpdateLoginStatus()
     {
-        UserInfoControl.Status = WebApi.UserInfoResult?.State == true ? UserInfo.LoginStatus.Login : UserInfo.LoginStatus.NoLogin;
+        UserInfoControl.Status = WebApi.UserInfoResult?.State == true ? LoginStatus.Login : LoginStatus.NoLogin;
     }
 
     private void UpdateUserInfo()
@@ -51,7 +50,7 @@ public sealed partial class AccountPage
     /// <param name="e"></param>
     private async void UpdateInfoButton_Click(object sender, RoutedEventArgs e)
     {
-        UserInfoControl.Status = UserInfo.LoginStatus.Update;
+        UserInfoControl.Status = LoginStatus.Update;
         if (await WebApi.UpdateLoginInfoAsync())
         {
             UpdateUserInfo();
@@ -62,13 +61,6 @@ public sealed partial class AccountPage
         }
         UpdateLoginStatus();
 
-    }
-
-    private void LoginButton_Click(object sender, RoutedEventArgs e)
-    {
-        //显示登录窗口
-        //关闭登录窗口，刷新页面
-        LoginWindow.ShowLoginWindow(LoginCompleted);
     }
 
     /// <summary>
@@ -82,7 +74,7 @@ public sealed partial class AccountPage
     private void LogoutButton_Click(object sender, RoutedEventArgs e)
     {
         WebApi.LogoutAccount();
-        UserInfoControl.Status = UserInfo.LoginStatus.NoLogin;
+        UserInfoControl.Status = LoginStatus.NoLogin;
     }
 
     #region cookie
@@ -165,19 +157,6 @@ public sealed partial class AccountPage
         ShowTeachingTip("已添加到剪贴板");
     }
 
-    /// <summary>
-    /// 显示或隐藏Cookie
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Show115CookieButtonClick(object sender, RoutedEventArgs e)
-    {
-        if (sender is not ToggleButton button) return;
-
-        CookieBox.PasswordRevealMode = button.IsChecked == true ? PasswordRevealMode.Visible : PasswordRevealMode.Hidden;
-    }
-
-
     private void ClearDownRecordButton_Click(object sender, RoutedEventArgs e)
     {
         DataAccess.Delete.DeleteTable(DataAccess.TableName.DownHistory);
@@ -185,7 +164,26 @@ public sealed partial class AccountPage
         ShowTeachingTip("已清空");
     }
 
-
     #endregion
 
+    private async void SaveCookieClick(object sender, RoutedEventArgs e)
+    {
+        var newCookie = CookieBox.Password;
+        if (string.IsNullOrEmpty(newCookie))
+        {
+            ShowTeachingTip("输入为空，请重新输入");
+        }
+        else
+        {
+            var result = await WebApi.TryRefreshCookie(newCookie);
+
+            //Cookie有用
+            ShowTeachingTip(result ? "Cookie有效，已保存" : "Cookie无效，请重新输入");
+        }
+    }
+
+    private void ShowLoginWindow(object sender, RoutedEventArgs e)
+    {
+        LoginWindow.ShowLoginWindow(LoginCompleted);
+    }
 }

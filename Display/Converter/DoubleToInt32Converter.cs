@@ -12,7 +12,7 @@ internal class DoubleToInt32Converter : IValueConverter
     {
         return value switch
         {
-            double doubleValue => doubleValue,
+            double doubleValue => (int)doubleValue,
             int intValue => intValue,
             _ => 0
         };

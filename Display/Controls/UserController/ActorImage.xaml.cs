@@ -13,7 +13,7 @@ namespace Display.Controls.UserController;
 
 public sealed partial class ActorImage
 {
-    public ActorInfo ActorInfo;
+    public readonly ActorInfo ActorInfo;
 
     private readonly string _releaseTime;
 

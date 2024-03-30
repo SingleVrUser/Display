@@ -434,7 +434,7 @@
                             <BreadcrumbBarItem.ContentTemplate>
                                 <DataTemplate x:DataType="vo:ExplorerItem">
                                     <TextBlock
-                                        TextAlignment="{x:Bind Name}"
+                                        Text="{x:Bind Name}"
                                         AllowDrop="True"
                                        DragOver="MetadataItem_OnDragOver"
                                        Drop="MetadataItem_OnDrop">

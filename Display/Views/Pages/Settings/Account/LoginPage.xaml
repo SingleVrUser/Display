@@ -8,56 +8,26 @@
 
     <!--内容-->
     <Grid Loaded="Grid_Loaded"
+          RowDefinitions="*, auto, *"
           RowSpacing="10"
           Margin="40,0"
           CornerRadius="15"
           MaxHeight="350"
           MaxWidth="800"
           MinHeight="200"
-          Opacity="1">
-
-        <Grid.Background>
-            <!--<SolidColorBrush Color="{ThemeResource CardBackgroundFillColorDefault}" Opacity="1"/>-->
-            <SolidColorBrush Color="White" />
-        </Grid.Background>
-
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*" />
-            <ColumnDefinition Width="5*" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+          Background="{ThemeResource SystemChromeWhiteColor}">
 
         <!--标题-->
         <TextBlock Grid.Row="0"
-                   Grid.Column="0"
                    Text="扫描二维码登录"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Bottom"
                    FontSize="18" />
-        <TextBlock Grid.Row="0"
-                   Grid.Column="1"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Bottom"
-                   FontSize="18">
-                <Run Foreground="#e74c3c">Cookie</Run>
-                <Run>登录</Run>
-        </TextBlock>
 
         <!--二维码登录-->
         <Grid Grid.Row="1"
-              Grid.Column="0"
-              BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-              BorderThickness="0,0,1,0">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="200" />
-                    <RowDefinition Height="30" />
-                </Grid.RowDefinitions>
-
+              BorderBrush="{ThemeResource ControlElevationBorderBrush}">
+            <Grid RowDefinitions="200,30">
                 <Grid Height="200"
                       Width="200">
                     <Image x:Name="QrCodeImage"
@@ -121,42 +91,9 @@
             </Grid>
         </Grid>
 
-        <!--Cookie登录-->
-        <Grid Grid.Row="1"
-              Grid.Column="1"
-              Padding="20,0,0,0">
-            <StackPanel HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Spacing="20">
-                <StackPanel>
-                    <TextBox x:Name="CookieInputTextBox"
-                             Header="Cookie:"
-                             PlaceholderText="输入Cookie后提交"
-                             MinWidth="380"
-                             IsSpellCheckEnabled="False" />
-                    <HyperlinkButton x:Name="CheckCookieButton"
-                                     Content="检查"
-                                     HorizontalAlignment="Right"
-                                     Click="CheckCookieButton_Click"
-                                     Visibility="{x:Bind CookieInputTextBox.Text, Converter={StaticResource NullToCollapsedConverter}, Mode=OneWay}" />
-
-                    <TeachingTip x:Name="CheckCookieTip"
-                                 Target="{x:Bind CheckCookieButton}"
-                                 IsLightDismissEnabled="True" />
-                </StackPanel>
-                <Button x:Name="CookieInputButton"
-                        Content="提交"
-                        HorizontalAlignment="Center"
-                        Click="CookieInputButton_Click" />
-                <TeachingTip x:Name="CookieInputTip"
-                             Target="{x:Bind CookieInputButton}"
-                             IsLightDismissEnabled="True" />
-                <TeachingTip x:Name="SuccessTip"
-                             IsLightDismissEnabled="True"
-                             Subtitle="成功登录，2秒自动后关闭窗口" />
-            </StackPanel>
-        </Grid>
-
         <!--提示-->
+        <TeachingTip Grid.Row="1" x:Name="SuccessTip"
+                     IsLightDismissEnabled="True"
+                     Subtitle="成功登录，2秒自动后关闭窗口" />
     </Grid>
 </settings:RootPage>

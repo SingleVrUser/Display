@@ -6,19 +6,20 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
-      xmlns:file="using:Display.Models.Api.OneOneFive.File"
-      xmlns:oneOneFive1="using:Display.Models.Vo.OneOneFive"
       xmlns:vo="using:Display.Models.Vo"
+      xmlns:oneOneFive="using:Display.Models.Vo.OneOneFive"
       mc:Ignorable="d"
       Width="600"
-      Height="300">
-    <Page.Resources>
+      Height="300"> 
+    <Page.Resources> 
         <ItemsPanelTemplate x:Name="ListViewPanelTemplate">
             <ItemsStackPanel/>
         </ItemsPanelTemplate>
+        <ItemsPanelTemplate x:Name="GridViewPanelTemplate">
+            <ItemsWrapGrid Orientation="Horizontal" ItemHeight="100" ItemWidth="100"/>
+        </ItemsPanelTemplate>
 
-        <DataTemplate x:DataType="oneOneFive1:FilesInfo" x:Name="ListViewDataTemplate">
+        <DataTemplate x:DataType="oneOneFive:FilesInfo" x:Name="ListViewDataTemplate">
             <Grid ColumnDefinitions="32,*"
                   ColumnSpacing="10"
                   ToolTipService.ToolTip="{x:Bind Name}">
@@ -33,6 +34,25 @@
                            VerticalAlignment="Center"
                            HorizontalAlignment="Left"
                            TextTrimming="CharacterEllipsis" />
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:DataType="oneOneFive:FilesInfo" x:Name="GridViewDataTemplate">
+            <Grid RowDefinitions="*,auto"
+                  Padding="5"
+                  ToolTipService.ToolTip="{x:Bind Name}">
+                <Image>
+                    <Image.Source>
+                        <SvgImageSource UriSource="{x:Bind IconPath}"
+                                        RasterizePixelWidth="34"
+                                        RasterizePixelHeight="34"/>
+                    </Image.Source>
+                </Image>
+                <TextBlock Grid.Row="1"
+                           Text="{x:Bind Name}"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           TextTrimming="CharacterEllipsis"/>
             </Grid>
         </DataTemplate>
 

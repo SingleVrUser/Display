@@ -64,7 +64,6 @@
                 Visibility="{x:Bind WorkYearDiffTextBlock.Visibility}">
             <TextBlock x:Name="WorkYearDiffTextBlock"
                 FontSize="20"
-                FontFamily="{StaticResource SymbolThemeFontFamily}"
                 Foreground="White"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"

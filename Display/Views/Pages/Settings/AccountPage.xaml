@@ -5,9 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:customControls="using:Display.Controls"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
-    xmlns:data="using:Display.Models.Data"
     xmlns:winUi="using:CommunityToolkit.WinUI"
     xmlns:providers="using:Display.Providers"
     xmlns:userController="using:Display.Controls.UserController"
@@ -21,12 +19,10 @@
     </settings:RootPage.Resources>
 
     <Grid RowDefinitions="auto, auto, *">
-
         <!--用户信息-->
         <Grid MaxWidth="{StaticResource SettingsMaxWidth}">
-            <userController:UserInfo x:Name="UserInfoControl"
+            <userController:UserInfoControl x:Name="UserInfoControl"
                                      UpdateInfoClick="UpdateInfoButton_Click"
-                                     LoginClick="LoginButton_Click"
                                      LogoutClick="LogoutButton_Click"
                                      HorizontalAlignment="Left"
                                      Margin="5" />
@@ -34,12 +30,18 @@
 
         <StackPanel Grid.Row="1"
                     Style="{StaticResource SettingStackPanel}">
+
+            <controls:SettingsCard Header="二维码登录"
+                                   HeaderIcon="{winUi:FontIcon Glyph=&#xED14;}"
+                                   IsClickEnabled="True"
+                                   Click="ShowLoginWindow"/>
+
             <controls:SettingsCard Header="Cookie"
                                    HorizontalContentAlignment="Stretch"
                                    ContentAlignment="Vertical">
                 <RelativePanel>
                     <PasswordBox x:Name="CookieBox"
-                                 MinWidth="100"
+                                 MinWidth="300"
                                  MaxWidth="600"/>
 
                     <StackPanel Orientation="Horizontal"
@@ -53,20 +55,15 @@
                                 Click="ExportCookieButton">
                             <ToolTipService.ToolTip>
                                 <TextBlock>
-                                     配合浏览器插件(Cookie Edit)使用
+                                    配合浏览器插件(Cookie Edit)使用
                                 </TextBlock>
                             </ToolTipService.ToolTip>
                         </Button>
-                        <ToggleButton Content="显示"
-                                      Click="Show115CookieButtonClick" />
+                        <Button Content="保存"
+                                      Click="SaveCookieClick" />
                     </StackPanel>
                 </RelativePanel>
             </controls:SettingsCard>
-
-            <controls:SettingsCard Header="二维码登录"
-                                   HeaderIcon="{winUi:FontIcon Glyph=&#xED14;}"
-                                   IsClickEnabled="True"/>
-
             <controls:SettingsCard Header="请求间隔"
                                    Content="1s" />
 
