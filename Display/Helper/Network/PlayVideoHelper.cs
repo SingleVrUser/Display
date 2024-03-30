@@ -1,27 +1,28 @@
-﻿
-using Display.Controls;
+﻿using Display.Controls.UserController;
+using Display.Helper.FileProperties.Name;
+using Display.Helper.Notifications;
+using Display.Providers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web;
-using static Display.Models.Data.WebApi;
-using Display.CustomWindows;
-using Display.Helper.FileProperties.Name;
-using Display.Models.Media;
-using Display.Helper.UI;
-using Display.Models.Data;
-using Display.Models.Data.Enums;
-using SelectVideoToPlay = Display.Views.DetailInfo.SelectVideoToPlay;
+using Display.Models.Api.OneOneFive.File;
+using Display.Models.Dto.Media;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Enums;
+using Display.Views.Windows;
+using static Display.Providers.WebApi;
+using SelectVideoToPlay = Display.Views.Pages.DetailInfo.SelectVideoToPlay;
 
 namespace Display.Helper.Network;
 
-public class PlayVideoHelper
+internal class PlayVideoHelper
 {
     /// <summary>
     /// 指定播放器播放

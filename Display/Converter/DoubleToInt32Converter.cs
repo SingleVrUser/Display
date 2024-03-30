@@ -3,21 +3,19 @@ using System;
 
 namespace Display.Converter;
 
-public class DoubleToInt32Converter : IValueConverter
+/// <summary>
+/// Double => Int
+/// </summary>
+internal class DoubleToInt32Converter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        if (value is double doubleValue)
+        return value switch
         {
-            return (int)doubleValue;
-        }
-
-        if (value is int intValue)
-        {
-            return intValue;
-        }
-
-        return 0;
+            double doubleValue => doubleValue,
+            int intValue => intValue,
+            _ => 0
+        };
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)

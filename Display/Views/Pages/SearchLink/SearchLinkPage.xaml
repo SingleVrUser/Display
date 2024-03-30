@@ -1,0 +1,66 @@
+<!-- Copyright (c) Microsoft Corporation and Contributors. -->
+<!-- Licensed under the MIT License. -->
+
+<Page
+    x:Class="Display.Views.Pages.SearchLink.SearchLinkPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="using:Display.Models.Spider"
+    xmlns:forum="using:Display.Models.Vo.Forum"
+    mc:Ignorable="d">
+
+    <Grid RowDefinitions="auto,*">
+        <ProgressBar x:Name="MyProgressBar" IsIndeterminate="True"/>
+
+        <ListView x:Name="LinksListView" Grid.Row="1" SelectionMode="Single" CharacterSpacing="12">
+
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="forum:Forum1080SearchResult">
+                    <Grid RowDefinitions="*,auto" Row="5" Padding="10">
+                        <Grid.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="在浏览器中打开" Click="OpenInBrowserClick"/>
+                            </MenuFlyout>
+                        </Grid.ContextFlyout>
+
+                        <!--标题-->
+                        <TextBlock Text="{x:Bind Title}"
+                                   TextWrapping="Wrap"
+                                   FontWeight="Bold"/>
+
+                        <!--<TextBlock Grid.Row="1" Text="{x:Bind Description}" TextWrapping="Wrap"/>-->
+
+                        <Grid Grid.Row="1" ColumnDefinitions="*,auto" ColumnSpacing="5">
+                            <TextBlock Text="{x:Bind Time}"/>
+
+                            <TextBlock Grid.Column="1" Text="{x:Bind Type}"/>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <TextBlock x:Name="WithoutResultTextBlock"
+                   Grid.Row="2"
+                   HorizontalAlignment="Center" Text="无结果" FontWeight="Bold" Visibility="Collapsed"/>
+
+        <StackPanel Grid.Row="1"
+                    Visibility="{x:Bind IsShowTimeCountdown(LeftTime),Mode=OneWay}"
+                    Spacing="3">
+
+            <StackPanel.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                </Style>
+            </StackPanel.Resources>
+
+            <TextBlock>根据论坛的限制，距离下次请求还需要</TextBlock>
+            <TextBlock>
+                <Run Text="{x:Bind LeftTime,Mode=OneWay}" Foreground="OrangeRed" FontSize="20"/>
+                <Run> 秒</Run>
+            </TextBlock>
+        </StackPanel>
+    </Grid>
+</Page>

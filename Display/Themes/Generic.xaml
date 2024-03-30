@@ -4,7 +4,9 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="using:Display.Controls"
-                    xmlns:ui="using:Windows.UI">
+                    xmlns:ui="using:Windows.UI"
+                    xmlns:customController="using:Display.Controls.CustomController"
+                    xmlns:userController="using:Display.Controls.UserController">
 
     <SolidColorBrush x:Key="MediaTransportControlsPanelBackground"
                      Color="#101c1612" />
@@ -2331,7 +2333,7 @@
         </Setter>
     </Style>
 
-    <Style TargetType="local:CustomMediaTransportControls">
+    <Style TargetType="customController:CustomMediaTransportControls">
         <Setter Property="IsTabStop"
                 Value="False" />
         <Setter Property="FlowDirection"
@@ -2955,13 +2957,13 @@
                                                             x:Uid="LikeButton"
                                                             Style="{StaticResource AppBarToggleButtonStyle}"
                                                             Content="&#xE006;"
-                                                            FontFamily="Segoe Fluent Icons"/>
+                                                            FontFamily="{StaticResource SymbolThemeFontFamily}"/>
 
                                         <AppBarToggleButton x:Name="LookAfterButton"
                                                             x:Uid="LookAfterButton"
                                                             Style="{StaticResource AppBarToggleButtonStyle}"
                                                             Content="&#xE13B;"
-                                                            FontFamily="Segoe Fluent Icons" />
+                                                            FontFamily="{StaticResource SymbolThemeFontFamily}" />
                                     </StackPanel>
 
 
@@ -3128,7 +3130,7 @@
                         <Button x:Name="RightButton"
                                 Foreground="White"
                                 Background="{StaticResource RightButtonBackground}"
-                                FontFamily="Segoe Fluent Icons"
+                                FontFamily="{StaticResource SymbolThemeFontFamily}"
                                 Content="&#xF745;"
                                 HorizontalAlignment="Right"
                                 IsTabStop="False"
@@ -3165,10 +3167,10 @@
         </Setter>
     </Style>
 
-    <Style TargetType="local:RangeSlider">
+    <Style TargetType="userController:RangeSlider">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="local:RangeSlider">
+                <ControlTemplate TargetType="userController:RangeSlider">
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
@@ -3177,5 +3179,4 @@
             </Setter.Value>
         </Setter>
     </Style>
-
 </ResourceDictionary>

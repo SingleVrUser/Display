@@ -6,31 +6,21 @@ using System;
 
 namespace Display.Converter;
 
-public class NumberToLengthStrConverter : IValueConverter
+/// <summary>
+/// 59 => 59秒
+/// </summary>
+internal class NumberToLengthStrConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-
-        if (value is int intValue)
+        return value switch
         {
-            return DateHelper.ConvertDoubleToLengthStr(intValue);
-        }
-
-        if (value is double doubleValue)
-        {
-            return DateHelper.ConvertDoubleToLengthStr(doubleValue);
-        }
-
-        if (value is string numOrStringValue)
-        {
-            if (!numOrStringValue.IsNumber())
-                return numOrStringValue;
-
-            return DateHelper.ConvertDoubleToLengthStr(int.Parse(numOrStringValue));
-        }
-
-
-        throw new NotImplementedException();
+            int intValue => DateHelper.ConvertDoubleToLengthStr(intValue),
+            double doubleValue => DateHelper.ConvertDoubleToLengthStr(doubleValue),
+            string stringValue when !stringValue.IsNumber() => stringValue,
+            string numValue => DateHelper.ConvertDoubleToLengthStr(int.Parse(numValue)),
+            _ => throw new NotImplementedException()
+        };
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)

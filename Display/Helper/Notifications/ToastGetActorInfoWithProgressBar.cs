@@ -1,39 +1,39 @@
-﻿using Display.Views;
-using Microsoft.Windows.AppNotifications;
+﻿using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
+using Display.Views.Pages;
 
 namespace Display.Helper.Notifications;
 
-class ToastGetActorInfoWithProgressBar
+internal class ToastGetActorInfoWithProgressBar
 {
     public const int NotifyId = 1;
 
-    public const string c_tag = "进度";
-    public const string c_group = "GetActorInfoProgress";
+    private const string CTag = "进度";
+    public const string CGroup = "GetActorInfoProgress";
 
-    public static int currentValue = 1;
+    private static int _curValue = 1;
 
-    public static int allCount = 1;
+    private static int _allCount = 1;
 
     public static bool SendToast(int currentValue = 0, int allCount = 0)
     {
         if (currentValue != 0)
-            ToastGetActorInfoWithProgressBar.currentValue = currentValue;
+            _curValue = currentValue;
         else
-            currentValue = ToastGetActorInfoWithProgressBar.currentValue;
+            currentValue = _curValue;
 
         if (allCount != 0)
-            ToastGetActorInfoWithProgressBar.allCount = allCount;
+            _allCount = allCount;
         else
-            allCount = ToastGetActorInfoWithProgressBar.allCount;
+            allCount = _allCount;
 
         var appNotification = new AppNotificationBuilder()
             .AddArgument("action", "ToastClick")
-            .AddArgument(Common.notificationTag, NotifyId.ToString())
+            .AddArgument(NotifyConstant.NotificationTag, NotifyId.ToString())
 
             .SetAppLogoOverride(new Uri("file://" + Path.Combine(Package.Current.InstalledLocation.Path, "Assets/NoPicture.jpg")), AppNotificationImageCrop.Circle)
             .AddText("获取演员信息")
@@ -46,12 +46,12 @@ class ToastGetActorInfoWithProgressBar
                 .BindStatus())
             .BuildNotification();
 
-        appNotification.Tag = c_tag;
-        appNotification.Group = c_group;
+        appNotification.Tag = CTag;
+        appNotification.Group = CGroup;
 
         AppNotificationProgressData data = new(1)
         {
-            Title = c_tag,
+            Title = CTag,
             Value = (double)currentValue / allCount,
             ValueStringOverride = $"{currentValue}/{allCount} 演员",
             Status = "正在获取演员信息..."
@@ -63,33 +63,31 @@ class ToastGetActorInfoWithProgressBar
         return appNotification.Id != 0; // return true (indicating success) if the toast was sent (if it has an Id)
     }
 
-    public static async Task<bool> AddValue(int i, int allCount)
+    public static async Task AddValue(int i, int allCount)
     {
-        ToastGetActorInfoWithProgressBar.allCount = allCount;
+        _allCount = allCount;
 
         AppNotificationProgressData data = new(2)
         {
-            Title = c_tag,
+            Title = CTag,
             Value = (double)i / allCount,
             ValueStringOverride = $"{i}/{allCount} 演员"
         };
 
         if (i == allCount)
         {
-            currentValue = 1;
+            _curValue = 1;
             data.Status = "完成";
             await Task.Delay(100);
         }
         else
         {
-            currentValue = i;
+            _curValue = i;
             data.Status = "正在获取演员信息...";
         }
 
         System.Diagnostics.Debug.WriteLine("更新通知信息");
-        var result = await AppNotificationManager.Default.UpdateAsync(data, c_tag, c_group);
-
-        return result == AppNotificationProgressResult.Succeeded;
+        await AppNotificationManager.Default.UpdateAsync(data, CTag, CGroup);
     }
 
     public static void NotificationReceived(AppNotificationActivatedEventArgs _)

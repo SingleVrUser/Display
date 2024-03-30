@@ -1,5 +1,10 @@
-﻿using System;
+﻿using Display.Helper.Network;
+using Display.Helper.Notifications;
+using Display.Models.Spider;
+using Display.Providers.Spider;
 using HtmlAgilityPack;
+using SharpCompress.Readers;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -7,14 +12,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using SharpCompress.Readers;
-using static System.Int32;
 using System.Web;
-using Display.Models.Spider;
-using Display.Helper.UI;
-using Display.Helper.Network;
-using Display.Models.Data;
-using Display.Providers.Spider;
+using Display.Models.Enums;
+using Display.Models.Vo.Forum;
+using Display.Models.Vo.Spider;
 
 namespace Display.Providers.Searcher
 {
@@ -31,7 +32,7 @@ namespace Display.Providers.Searcher
         {
             get
             {
-                if(_client != null) return _client;
+                if (_client != null) return _client;
 
                 var headers = new Dictionary<string, string>
                 {
@@ -39,7 +40,7 @@ namespace Display.Providers.Searcher
                     {"cookie",AppSettings.X1080XCookie},
                     {"referer",$"{BaseUrl}forum.php"}
                 };
-                _client = GetInfoFromNetwork.CreateClient(headers);
+                _client = NetworkHelper.CreateClient(headers);
                 return _client;
             }
         }
@@ -81,14 +82,14 @@ namespace Display.Providers.Searcher
                     var codeContent = node.InnerText;
                     foreach (var line in codeContent.Split('\n'))
                     {
-                        links.Add(new Forum1080AttachmentInfo(line, AttmnType.Magnet));
+                        links.Add(new Forum1080AttachmentInfo(line, AttmnTypeEnum.Magnet));
                     }
                 }
             }
 
             if (links.Count > 0)
             {
-                return links.ToArray();
+                return [.. links];
             }
 
             //附件
@@ -100,7 +101,7 @@ namespace Display.Providers.Searcher
                 var attmnSpanNode = htmlDoc.DocumentNode.SelectNodes(".//span[contains(@id,'attach_')]");
                 if (attmnSpanNode == null)
                 {
-                    return links.ToArray();
+                    return [.. links];
                 }
 
                 foreach (var spanNode in attmnSpanNode)
@@ -109,50 +110,49 @@ namespace Display.Providers.Searcher
 
                     var description = spanNode.SelectSingleNode("em")?.InnerText;
 
-                    if (nameNode != null && description != null)
+                    if (nameNode == null || description == null) continue;
+
+                    var name = nameNode.InnerText.Trim();
+
+                    if (name.Contains("protected"))
                     {
-                        var name = nameNode.InnerText.Trim();
-
-                        if (name.Contains("protected"))
+                        var emailNode = nameNode.SelectSingleNode("span");
+                        if (emailNode != null)
                         {
-                            var emailNode = nameNode.SelectSingleNode("span");
-                            if (emailNode != null)
-                            {
-                                var data = emailNode.GetAttributeValue("data-cfemail", string.Empty);
+                            var data = emailNode.GetAttributeValue("data-cfemail", string.Empty);
 
-                                if (!string.IsNullOrEmpty(data))
-                                {
-                                    name = RequestHelper.DecodeCfEmail(data);
-                                }
+                            if (!string.IsNullOrEmpty(data))
+                            {
+                                name = RequestHelper.DecodeCfEmail(data);
                             }
                         }
-
-                        var downLink = nameNode.GetAttributeValue("href", string.Empty);
-                        var attmnType = GetAttmnTypeFromName(name);
-                        Forum1080AttachmentInfo attmnInfo = new(downLink, attmnType)
-                        {
-                            Name = name
-                        };
-
-                        var result = Regex.Match(description, "([. \\w]+)  , 下载次数: (\\d+)(.*, 售价: 点数 (\\d+))?");
-                        if (result.Success)
-                        {
-                            attmnInfo.Size = result.Groups[1].Value;
-
-                            if (TryParse(result.Groups[2].Value, out var count))
-                            {
-                                attmnInfo.DownCount = count;
-                            }
-
-                            if (TryParse(result.Groups[4].Value, out var countResult))
-                            {
-                                attmnInfo.Expense = countResult;
-                            }
-                        }
-
-
-                        links.Add(attmnInfo);
                     }
+
+                    var downLink = nameNode.GetAttributeValue("href", string.Empty);
+                    var attmnType = GetAttmnTypeFromName(name);
+                    Forum1080AttachmentInfo attmnInfo = new(downLink, attmnType)
+                    {
+                        Name = name
+                    };
+
+                    var result = Regex.Match(description, "([. \\w]+)  , 下载次数: (\\d+)(.*, 售价: 点数 (\\d+))?");
+                    if (result.Success)
+                    {
+                        attmnInfo.Size = result.Groups[1].Value;
+
+                        if (int.TryParse(result.Groups[2].Value, out var count))
+                        {
+                            attmnInfo.DownCount = count;
+                        }
+
+                        if (int.TryParse(result.Groups[4].Value, out var countResult))
+                        {
+                            attmnInfo.Expense = countResult;
+                        }
+                    }
+
+
+                    links.Add(attmnInfo);
 
                 }
 
@@ -187,12 +187,12 @@ namespace Display.Providers.Searcher
                     {
                         attmnInfo.Size = result.Groups[1].Value;
 
-                        if (TryParse(result.Groups[2].Value, out int count))
+                        if (int.TryParse(result.Groups[2].Value, out int count))
                         {
                             attmnInfo.DownCount = count;
                         }
 
-                        if (TryParse(result.Groups[4].Value, out int countResult))
+                        if (int.TryParse(result.Groups[4].Value, out int countResult))
                         {
                             attmnInfo.Expense = countResult;
                         }
@@ -206,27 +206,27 @@ namespace Display.Providers.Searcher
             return links.ToArray();
         }
 
-        private static AttmnType GetAttmnTypeFromName(string name)
+        private static AttmnTypeEnum GetAttmnTypeFromName(string name)
         {
-            AttmnType attmnType;
+            AttmnTypeEnum attmnTypeEnum;
             if (name.Contains(".rar"))
             {
-                attmnType = AttmnType.Rar;
+                attmnTypeEnum = AttmnTypeEnum.Rar;
             }
             else if (name.Contains(".txt"))
             {
-                attmnType = AttmnType.Txt;
+                attmnTypeEnum = AttmnTypeEnum.Txt;
             }
             else if (name.Contains(".torrent"))
             {
-                attmnType = AttmnType.Torrent;
+                attmnTypeEnum = AttmnTypeEnum.Torrent;
             }
             else
             {
-                attmnType = AttmnType.Unknown;
+                attmnTypeEnum = AttmnTypeEnum.Unknown;
             }
 
-            return attmnType;
+            return attmnTypeEnum;
         }
 
 
@@ -270,7 +270,7 @@ namespace Display.Providers.Searcher
                 if (!string.IsNullOrEmpty(nextPageUrl))
                 {
                     // 等待1~3秒
-                    await GetInfoFromNetwork.RandomTimeDelay(1, 3);
+                    await NetworkHelper.RandomTimeDelay(1, 3);
                 }
             }
 
@@ -312,7 +312,7 @@ namespace Display.Providers.Searcher
                 var title = titleNode.InnerText;
                 var upperText = title.ToUpper();
 
-                if(!Common.IsSearchResultMatch(leftCid, rightCid, upperText)) continue;
+                if (!Common.IsSearchResultMatch(leftCid, rightCid, upperText)) continue;
 
                 var detailUrl = titleNode.GetAttributeValue("href", null);
                 if (detailUrl == null) continue;
@@ -491,27 +491,27 @@ namespace Display.Providers.Searcher
             return forum1080SearchResult;
         }
 
-        public static async Task<AttmnFileInfo> GetRarInfoFromTxtPath(string txtPath)
+        public static async Task<Forum1080AttmnFileInfo> GetRarInfoFromTxtPath(string txtPath)
         {
             var txtFile = new FileInfo(txtPath);
 
             var matchTxt = Regex.Match(txtFile.Name, @"(.*[a-z0-9])\.txt", RegexOptions.IgnoreCase);
             if (!matchTxt.Success) return null;
 
-            AttmnFileInfo attmnFileInfo = new(txtPath);
+            Forum1080AttmnFileInfo forum1080AttmnFileInfo = new(txtPath);
 
             //读取文件
             using var sr = new StreamReader(txtFile.FullName);
             var originalContent = await sr.ReadToEndAsync();
 
-            ParsingRarDetailContent(attmnFileInfo, originalContent);
+            ParsingRarDetailContent(forum1080AttmnFileInfo, originalContent);
 
-            return attmnFileInfo;
+            return forum1080AttmnFileInfo;
         }
 
-        public static async Task<AttmnFileInfo> GetRarInfoFromRarPath(string rarPath)
+        public static async Task<Forum1080AttmnFileInfo> GetRarInfoFromRarPath(string rarPath)
         {
-            AttmnFileInfo attmnFileInfo = new(rarPath);
+            Forum1080AttmnFileInfo forum1080AttmnFileInfo = new(rarPath);
 
             await using var stream = File.OpenRead(rarPath);
             using var reader = ReaderFactory.Open(stream, new ReaderOptions()
@@ -535,7 +535,7 @@ namespace Display.Providers.Searcher
                     using var sr = new StreamReader(entryStream);
                     var originalContent = await sr.ReadToEndAsync();
 
-                    ParsingRarDetailContent(attmnFileInfo, originalContent);
+                    ParsingRarDetailContent(forum1080AttmnFileInfo, originalContent);
                 }
                 else if (key.Contains("png"))
                 {
@@ -556,7 +556,7 @@ namespace Display.Providers.Searcher
                     {
                         string savePath = Path.Combine(AppSettings.X1080XAttmnSavePath, reader.Entry.Key);
                         reader.WriteEntryToFile(savePath);
-                        attmnFileInfo.SrtPath = savePath;
+                        forum1080AttmnFileInfo.SrtPath = savePath;
                     }
                     catch (Exception ex)
                     {
@@ -607,16 +607,16 @@ namespace Display.Providers.Searcher
                 }
             }
 
-            return attmnFileInfo;
+            return forum1080AttmnFileInfo;
         }
 
-        private static void ParsingRarDetailContent(AttmnFileInfo attmnFile, string originalContent)
+        private static void ParsingRarDetailContent(Forum1080AttmnFileInfo forum1080AttmnFile, string originalContent)
         {
-            attmnFile.DetailFileContent = originalContent;
+            forum1080AttmnFile.DetailFileContent = originalContent;
 
             //获取下载链接
             var contentLine = originalContent.Split('\n');
-            for (int i = 0; i < contentLine.Count(); i++)
+            for (var i = 0; i < contentLine.Length; i++)
             {
                 var line = contentLine[i].Trim();
                 if (line.Contains("解壓密碼："))
@@ -624,43 +624,43 @@ namespace Display.Providers.Searcher
                     var passwordResult = Regex.Match(line, @"解壓密碼：(.*)");
                     if (passwordResult.Success)
                     {
-                        attmnFile.CompressedPassword = passwordResult.Groups[1].Value;
+                        forum1080AttmnFile.CompressedPassword = passwordResult.Groups[1].Value;
                     }
                 }
                 else if (line.Contains("magnet"))
                 {
                     string link = line;
-                    if (attmnFile.Links.TryGetValue("magnet", out var fileLink))
+                    if (forum1080AttmnFile.Links.TryGetValue("magnet", out var fileLink))
                     {
                         fileLink.Add(link);
                     }
                     else
                     {
-                        attmnFile.Links.Add("magnet", new List<string> { link });
+                        forum1080AttmnFile.Links.Add("magnet", [link]);
                     }
                 }
                 else if (line.Contains("ed2k://"))
                 {
-                    string link = line;
-                    if (attmnFile.Links.TryGetValue("ed2k", out var fileLink))
+                    var link = line;
+                    if (forum1080AttmnFile.Links.TryGetValue("ed2k", out var fileLink))
                     {
                         fileLink.Add(link);
                     }
                     else
                     {
-                        attmnFile.Links.Add("ed2k", new List<string> { link });
+                        forum1080AttmnFile.Links.Add("ed2k", [link]);
                     }
                 }
                 else if (line.Contains('|') && Regex.Match(line, @"\w.*\|\d.*?\|\w{40}\|\w{40}").Success)
                 {
-                    string link = line;
-                    if (attmnFile.Links.TryGetValue("115转存链接", out var fileLink))
+                    var link = line;
+                    if (forum1080AttmnFile.Links.TryGetValue("115转存链接", out var fileLink))
                     {
                         fileLink.Add(link);
                     }
                     else
                     {
-                        attmnFile.Links.Add("115转存链接", new List<string> { link });
+                        forum1080AttmnFile.Links.Add("115转存链接", [link]);
                     }
                 }
                 else if (line.Contains("http"))
@@ -668,50 +668,47 @@ namespace Display.Providers.Searcher
                     if (line.Contains("1fichier"))
                     {
                         var linkResult = Regex.Match(line, @"[:： ]+(https?:.*)");
-                        if (linkResult.Success)
+                        if (!linkResult.Success) continue;
+
+                        var link = linkResult.Groups[1].Value;
+                        if (forum1080AttmnFile.Links.TryGetValue("1fichier", out var fileLink))
                         {
-                            string link = linkResult.Groups[1].Value;
-                            if (attmnFile.Links.TryGetValue("1fichier", out var fileLink))
-                            {
-                                fileLink.Add(link);
-                            }
-                            else
-                            {
-                                attmnFile.Links.Add("1fichier", new List<string> { link });
-                            }
+                            fileLink.Add(link);
+                        }
+                        else
+                        {
+                            forum1080AttmnFile.Links.Add("1fichier", [link]);
                         }
                     }
                     else
                     {
                         var linkResult = Regex.Match(line, @"^http.*");
-                        if (linkResult.Success)
+                        if (!linkResult.Success) continue;
+
+                        var link = linkResult.Value;
+                        if (forum1080AttmnFile.Links.TryGetValue("直链", out var fileLink))
                         {
-                            string link = linkResult.Value;
-                            if (attmnFile.Links.TryGetValue("直链", out var fileLink))
-                            {
-                                fileLink.Add(link);
-                            }
-                            else
-                            {
-                                attmnFile.Links.Add("直链", new List<string> { link });
-                            }
+                            fileLink.Add(link);
+                        }
+                        else
+                        {
+                            forum1080AttmnFile.Links.Add("直链", [link]);
                         }
                     }
                 }
                 else if (line.Contains("http"))
                 {
                     var linkResult = Regex.Match(line, @"^http.*");
-                    if (linkResult.Success)
+                    if (!linkResult.Success) continue;
+
+                    var link = linkResult.Groups[1].Value;
+                    if (forum1080AttmnFile.Links.TryGetValue("直链", out var fileLink))
                     {
-                        string link = linkResult.Groups[1].Value;
-                        if (attmnFile.Links.TryGetValue("直链", out var fileLink))
-                        {
-                            fileLink.Add(link);
-                        }
-                        else
-                        {
-                            attmnFile.Links.Add("直链", new List<string> { link });
-                        }
+                        fileLink.Add(link);
+                    }
+                    else
+                    {
+                        forum1080AttmnFile.Links.Add("直链", [link]);
                     }
                 }
             }

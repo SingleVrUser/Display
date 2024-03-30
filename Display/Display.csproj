@@ -22,10 +22,18 @@
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxPackageDir>D:\库\Desktop\打包\</AppxPackageDir>
     <PackageIcon>SmallTile.scale-125.png</PackageIcon>
+    
     <Win32Resource>App.res</Win32Resource>
+    
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    
+<!--    &lt;!&ndash; This bundles the .NET Core libraries &ndash;&gt;-->
+<!--    <SelfContained>true</SelfContained>-->
+
+<!--    &lt;!&ndash; This bundles the WinUI3 components &ndash;&gt;-->
+<!--    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>-->
   </PropertyGroup>
 
   <!-- Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
@@ -33,129 +41,6 @@
        package has not yet been restored -->
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnablePreviewMsixTooling)'=='true'">
     <ProjectCapability Include="Msix" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="Views\Task\**" />
-    <EmbeddedResource Remove="Views\Task\**" />
-    <None Remove="Views\Task\**" />
-    <Page Remove="Views\Task\**" />
-  </ItemGroup>
-
-
-  <ItemGroup>
-    <None Update="Assets\SmallTile.scale-125.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
-
-  <!--<ItemGroup>
-    <Content Remove="Assets\BadgeLogo.scale-100.png" />
-    <Content Remove="Assets\BadgeLogo.scale-125.png" />
-    <Content Remove="Assets\BadgeLogo.scale-150.png" />
-    <Content Remove="Assets\BadgeLogo.scale-200.png" />
-    <Content Remove="Assets\BadgeLogo.scale-400.png" />
-    <Content Remove="Assets\icons8-text-96.png" />
-    <Content Remove="Assets\SplashScreen.png" />
-    <Content Remove="Assets\Win32Resources.res" />
-  </ItemGroup>-->
-
-  <!--<ItemGroup>
-    <None Remove="app.manifest" />
-    <None Remove="Assets\115favicon.ico" />
-    <None Remove="Assets\115\mountain.svg" />
-    <None Remove="Assets\115\pic_left_det.svg" />
-    <None Remove="Assets\115\QRCode.png" />
-    <None Remove="Assets\Fail.jpg" />
-    <None Remove="Assets\FileType\file.png" />
-    <None Remove="Assets\FileType\folder.png" />
-    <None Remove="Assets\icons8-archive-folder-96.png" />
-    <None Remove="Assets\icons8-circled-play-96.png" />
-    <None Remove="Assets\icons8-image-96.png" />
-    <None Remove="Assets\icons8-page-96.png" />
-    <None Remove="Assets\ImageExPlaceholder.jpg" />
-    <None Remove="Assets\NoPicture.jpg" />
-    <None Remove="Assets\Logo\mpv-logo.png" />
-    <None Remove="Assets\Logo\potplayer-logo.png" />
-    <None Remove="Assets\Logo\vlc-logo.png" />
-    <None Remove="Assets\SmallTile.scale-100.png" />
-    <None Remove="Assets\StoreLogo.png" />
-    <None Remove="Assets\Svg\accounting_banking_business_calculate_calculator_icon.svg" />
-    <None Remove="Assets\Svg\face_male_man_portrait_icon.svg" />
-    <None Remove="Assets\Svg\file_document_paper_page_icon.svg" />
-    <None Remove="Assets\Tip\FindFolderCid.png" />
-    <None Remove="Controls\ImageViewer.xaml" />
-    <None Remove="Views\More\DatumList\FileListPage.xaml" />
-    <None Remove="Views\More\DatumList\MainPage.xaml" />
-    <None Remove="Views\More\DatumList\ThumbnailPage.xaml" />
-    <None Remove="Views\More\DatumList\VideoDisplay\MainPage.xaml" />
-    <None Remove="Views\DetailInfo\EditInfo.xaml" />
-    <None Remove="Views\OfflineDown\FailListPage.xaml" />
-    <None Remove="Views\SearchLink\SearchLinkPage.xaml" />
-    <None Remove="Views\Settings\AccountPage.xaml" />
-    <None Remove="Views\Settings\CommonPage.xaml" />
-    <None Remove="Views\Settings\DownPage.xaml" />
-    <None Remove="Views\Settings\MainPage.xaml" />
-    <None Remove="Views\Settings\PathPage.xaml" />
-    <None Remove="Views\Settings\PlayPage.xaml" />
-    <None Remove="Views\Settings\SearchPage.xaml" />
-    <None Remove="Views\Settings\SpiderPage.xaml" />
-    <None Remove="Views\Sort115\MainPage.xaml" />
-    <None Remove="Views\Sort115\Settings18Page.xaml" />
-    <None Remove="Views\SpiderVideoInfo\Progress.xaml" />
-    <None Remove="Controls\ActorImage.xaml" />
-    <None Remove="Controls\Browser.xaml" />
-    <None Remove="Controls\CustomAutoSuggestBox.xaml" />
-    <None Remove="Controls\CustomContentDialog.xaml" />
-    <None Remove="Controls\CustomMediaPlayerElement.xaml" />
-    <None Remove="Controls\Explorer.xaml" />
-    <None Remove="Controls\FileAutoSuggestBox.xaml" />
-    <None Remove="Controls\FileControl.xaml" />
-    <None Remove="Controls\ImageInfoControl.xaml" />
-    <None Remove="Controls\InfoListFilter.xaml" />
-    <None Remove="Controls\MultipleCoverShow.xaml" />
-    <None Remove="Controls\RangeSlider.xaml" />
-    <None Remove="Controls\ShowCountControl.xaml" />
-    <None Remove="Controls\StatusShow.xaml" />
-    <None Remove="Controls\TextBlockWithLongText.xaml" />
-    <None Remove="Controls\TextBlockWithStressText.xaml" />
-    <None Remove="Controls\UserInfo.xaml" />
-    <None Remove="Controls\VideoCoverDisplay.xaml" />
-    <None Remove="Controls\VideoDetails.xaml" />
-    <None Remove="Themes\Converter.xaml" />
-    <None Remove="VideoPlayWindow.xaml" />
-    <None Remove="Views\BrowserPage.xaml" />
-    <None Remove="Views\MorePage.xaml" />
-    <None Remove="Views\Tasks\SpiderTaskPage.xaml" />
-    <None Remove="Views\Tasks\UploadTaskPage.xaml" />
-    <None Remove="Views\VerifyAccountPage.xaml" />
-    <None Remove="CustomWindows\CommonWindow.xaml" />
-    <None Remove="CustomWindows\LoginWindow.xaml" />
-    <None Remove="CustomWindows\MediaPlayWindow.xaml" />
-    <None Remove="CustomWindows\SingleFrameWindow.xaml" />
-    <None Remove="CustomWindows\StartWindow.xaml" />
-  </ItemGroup>-->
-
-  <ItemGroup>
-    <Content Include="Assets\SplashScreen.scale-200.png" />
-    <Content Include="Assets\LockScreenLogo.scale-200.png" />
-    <Content Include="Assets\Square150x150Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
-    <Content Include="Assets\StoreLogo.png" />
-    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
-    <Content Include="Views\ActorInfoPage.xaml" />
-    <Content Include="Views\ActorInfoPage.xaml.cs" />
-    <Content Include="Views\ActorsPage.xaml" />
-    <Content Include="Views\ActorsPage.xaml.cs" />
-    <Content Include="Views\DetailInfoPage.xaml" />
-    <Content Include="Views\DetailInfoPage.xaml.cs" />
-    <Content Include="Views\HomePage.xaml" />
-    <Content Include="Views\HomePage.xaml.cs" />
-    <Content Include="Views\SettingsPage.xaml" />
-    <Content Include="Views\SettingsPage.xaml.cs" />
-    <Content Include="Views\VideoViewPage.xaml" />
-    <Content Include="Views\VideoViewPage.xaml.cs" />
   </ItemGroup>
 
   <!--PackageReference-->
@@ -245,39 +130,6 @@
     <None Update="Control\FolderControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>
-    <Page Update="Views\Settings\UIShowPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Tasks\SpiderTaskPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Tasks\UploadTaskPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Settings\DownPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Settings\PlayPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Settings\SearchPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Settings\SpiderPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Settings\CommonPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Settings\StoragePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Settings\AccountPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Settings\MainPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Update="Control\RangeSlider.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -315,37 +167,10 @@
     <Page Update="Views\VideoPlay.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Views\DetailInfo\SelectSingleVideoToPlay.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\MorePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Update="Views\BrowserPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Views\ActorInfoPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\ActorsPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\DetailInfoPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\HomePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\SettingsPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\VideoViewPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\DetailInfo\DownDialogContent.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\More\DatumList\ThumbnailPage.xaml">
+    <Page Update="Views\Pages\DetailInfo\DownDialogContent.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Views\VerifyAccountPage.xaml">
@@ -355,22 +180,22 @@
 
   <!--CustomWindows-->
   <ItemGroup>
-    <Page Update="CustomWindows\MediaPlayWindow.xaml">
+    <Page Update="Views\Windows\MediaPlayWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="CustomWindows\StartWindow.xaml">
+    <Page Update="Views\Windows\StartWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="CustomWindows\SingleFrameWindow.xaml">
+    <Page Update="Views\Windows\SingleFrameWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="CustomWindows\CommonWindow.xaml">
+    <Page Update="Views\Windows\CommonWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="CustomWindows\LoginWindow.xaml">
+    <Page Update="Views\Windows\LoginWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="CustomWindows\VideoPlayWindow.xaml">
+    <Page Update="Views\Windows\VideoPlayWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -418,17 +243,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Views\Pages\" />
+  </ItemGroup>
 
-  <ItemGroup>
-    <CustomAdditionalCompileInputs Remove="Views\DetailInfo\EditInfo.xaml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Remove="Views\DetailInfo\EditInfo.xaml" />
-  </ItemGroup>
-  <ItemGroup>
-    <PRIResource Remove="Views\Task\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Views\Settings\UIShowPage.xaml" />
-  </ItemGroup>
 </Project>

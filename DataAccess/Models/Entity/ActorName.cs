@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Models.Entity;
 
@@ -13,5 +13,6 @@ public class ActorName
     public int Id { get; set; }
 
     [Key]
+    [StringLength(20)]
     public string Name { get; set; } = null!;
 }

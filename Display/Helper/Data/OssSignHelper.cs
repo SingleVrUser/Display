@@ -11,7 +11,7 @@ namespace Display.Helper.Data
     {
         private const string NewLineMarker = "\n";
         private const string OssPrefix = "x-oss-";
-        private static readonly IList<string> ParametersToSign = new List<string> {
+        private static readonly IList<string> ParametersToSign = [
             "acl", "uploadId", "partNumber", "uploads", "cors", "logging",
             "website", "delete", "referer", "lifecycle", "security-token","append",
             "position", "x-oss-process", "restore", "bucketInfo", "stat", "symlink",
@@ -23,8 +23,7 @@ namespace Display.Helper.Data
             "worm","wormId","wormExtend","response-content-type",
             "response-content-language","response-expires","response-cache-control",
             "response-content-disposition","response-content-encoding"
-
-        };
+        ];
 
         private class KeyComparer : IComparer<string>
         {
@@ -105,7 +104,7 @@ namespace Display.Helper.Data
                 canonicalizedResource.Append(paramName);
                 var paramValue = parameters[paramName];
                 if (!string.IsNullOrEmpty(paramValue))
-                    canonicalizedResource.Append("=").Append(paramValue);
+                    canonicalizedResource.Append('=').Append(paramValue);
 
                 separator = '&';
             }

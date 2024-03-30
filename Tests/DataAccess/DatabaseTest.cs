@@ -1,5 +1,4 @@
 ﻿using DataAccess;
-using DataAccess.Dao.Impl;
 using DataAccess.Models.Entity;
 
 namespace Tests.DataAccess;

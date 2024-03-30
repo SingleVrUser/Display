@@ -1,27 +1,30 @@
-﻿using HtmlAgilityPack;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Threading;
-using Display.Models.Data;
-using static Display.Models.Spider.SpiderInfos;
-using Display.Helper.Network;
-using Display.Providers.Spider;
-using System.Collections.Concurrent;
-using System;
-using System.Diagnostics;
+﻿using Display.Helper.Network;
 using Display.Models.Spider;
+using Display.Providers.Spider;
+using HtmlAgilityPack;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
+using Display.Models.Vo.Spider;
+using Display.Providers;
 
 namespace Display.Managers;
 
-public partial class SpiderManager
+public class SpiderManager
 {
     private CancellationTokenSource _cancellationTokenSource;
 
     /// <summary>
     /// 待处理的队列
     /// </summary>
-    private readonly ConcurrentQueue<SearchItem> _taskItemQueue = [];
+    private readonly ConcurrentQueue<SpiderItem> _taskItemQueue = [];
 
     /// <summary>
     /// 成功队列（存入数据库的临时空间）
@@ -107,7 +110,7 @@ public partial class SpiderManager
     {
         //先访问detail_url，获取到标题
         //当访问JavDB且内容为FC2时，由于使用的是CommonClient，所以会提示需要登入
-        var tuple = await RequestHelper.RequestHtml(GetInfoFromNetwork.CommonClient, detailUrl, token);
+        var tuple = await RequestHelper.RequestHtml(NetworkHelper.CommonClient, detailUrl, token);
         if (tuple == null) return null;
 
         var strResult = tuple.Item2;
@@ -128,7 +131,7 @@ public partial class SpiderManager
             // 当遇到需要登入才能访问的内容时，使用特定的client
             if (title.Contains("登入") && spider is JavDb)
             {
-                tuple = await RequestHelper.RequestHtml(GetInfoFromNetwork.ClientWithJavDbCookie, detailUrl, token);
+                tuple = await RequestHelper.RequestHtml(DbNetworkHelper.ClientWithJavDbCookie, detailUrl, token);
                 if (tuple == null) return null;
 
                 strResult = tuple.Item2;
@@ -239,7 +242,7 @@ public partial class SpiderManager
 
             // 向Item项添加当前id
             item.DoneSpiderNameArray.Enqueue(spider.Name);
-            
+
             // 所有字段搜索完成
             var isThisNameDone = item.IsCompleted;
 
@@ -277,7 +280,7 @@ public partial class SpiderManager
         var queueArray = _taskItemQueue.ToArray();
 
         return queueArray.All(item => item.DoneSpiderNameArray.Contains(curSpider.Name)) &&
-               spiders.All(spider => spider.HandleItem ==null ||
+               spiders.All(spider => spider.HandleItem == null ||
                                      (spider.HandleItem != null && spider.HandleItem.DoneSpiderNameArray.Contains(curSpider.Name))
                                      );
     }
@@ -286,7 +289,7 @@ public partial class SpiderManager
     /// 任务完成后
     /// </summary>
     /// <param name="item"></param>
-    private async void DoWhenNameIsAllSearched(SearchItem item)
+    private async void DoWhenNameIsAllSearched(SpiderItem item)
     {
         // 搜索失败
         if (item.Info is null)
@@ -345,7 +348,7 @@ public partial class SpiderManager
         // 添加进任务队列
         foreach (var name in names)
         {
-            _taskItemQueue.Enqueue(new SearchItem(name));
+            _taskItemQueue.Enqueue(new SpiderItem(name));
         }
 
         //记录当前任务队列的个数
