@@ -7,6 +7,7 @@
       xmlns:winUi="using:CommunityToolkit.WinUI"
       xmlns:userController="using:Display.Controls.UserController"
       xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
+      xmlns:vo="using:Display.Models.Vo"
       mc:Ignorable="d">
 
     <Page.Resources>
@@ -132,7 +133,7 @@
                               SelectionChanged="FailListView_SelectionChanged"
                               ItemsSource="{x:Bind FailList,Mode=OneWay}">
                         <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="oneOneFive:FailDatum">
+                            <DataTemplate x:DataType="vo:FailDatum">
                                 <Grid>
 
                                     <TextBlock Text="{x:Bind Datum.Name}" />
@@ -358,7 +359,7 @@
                                                            StringValue="{x:Bind SelectedDatum.Ico,Mode=OneWay}" />
                             <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="20"
-                                                           StringValue="{x:Bind SelectedDatum.Sha,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Sha1,Mode=OneWay}" />
                             <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="21"
                                                            StringValue="{x:Bind SelectedDatum.Fdes,Mode=OneWay}" />

@@ -5,12 +5,14 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
 
 namespace Display.Providers.Spider;
 
 public class AvSox : BaseSpider
 {
-    public override SpiderNameAndStatus.SpiderSourceName Name => SpiderNameAndStatus.SpiderSourceName.Avsox;
+    public override SpiderSourceName Name => SpiderSourceName.Avsox;
 
     public override bool IsOn
     {

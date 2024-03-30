@@ -7,11 +7,11 @@ using System;
 using System.Diagnostics;
 using Display.Views.Pages.Settings;
 using Settings18Page = Display.Views.Pages.Sort115.Settings18Page;
-using Sort115Settings = Display.Models.Entities._115.Sort115Settings;
+using Sort115Settings = Display.Models.Vo.OneOneFive.Sort115Settings;
 
 namespace Display.ViewModels;
 
-public partial class SortSettingsViewModel : ObservableObject
+internal partial class SortSettingsViewModel : ObservableObject
 {
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NumNameSample))]

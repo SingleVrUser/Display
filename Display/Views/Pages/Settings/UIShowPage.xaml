@@ -6,10 +6,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
-    xmlns:settings="using:Display.Models.Settings"
     xmlns:converters="using:CommunityToolkit.WinUI.UI.Converters"
     xmlns:providers="using:Display.Providers"
     xmlns:settings1="using:Display.Views.Pages.Settings"
+    xmlns:settings2="using:Display.Models.Dto.Settings"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -41,7 +41,7 @@
 
 
         <DataTemplate x:Key="MenuItemsTemplate"
-                      x:DataType="settings:BaseMenuItem">
+                      x:DataType="settings2:BaseMenuItem">
             <Grid ColumnDefinitions="auto, *, auto"
                   ColumnSpacing="10">
                 <FontIcon Glyph="{x:Bind Glyph}" />
@@ -59,7 +59,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="MoreMenuItemsTemplate"
-                      x:DataType="settings:BaseMenuItem">
+                      x:DataType="settings2:BaseMenuItem">
             <Grid ColumnDefinitions="auto, *, auto"
                   ColumnSpacing="10">
                 <Image Height="20" Source="{x:Bind Glyph}"/>

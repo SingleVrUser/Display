@@ -1,3 +1,4 @@
+using Display.Models.Vo.Down;
 using Display.Providers.Downloader;
 using Microsoft.UI.Xaml.Controls;
 using SharpCompress;

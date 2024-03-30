@@ -6,8 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
-    xmlns:options="using:Display.Models.Settings.Options"
     xmlns:settings="using:Display.Views.Pages.Settings"
+    xmlns:options1="using:Display.Models.Dto.Settings.Options"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -18,7 +18,7 @@
         <StackLayout x:Key="SettingStackLayout"
                      Spacing="{StaticResource SettingsCardPadding}"/>
 
-        <DataTemplate x:Key="SettingDataTemplate" x:DataType="options:SavePath">
+        <DataTemplate x:Key="SettingDataTemplate" x:DataType="options1:SavePath">
             <controls:SettingsCard Header="{x:Bind Name}"
                                    ContentAlignment="Vertical"
                                    HorizontalContentAlignment="Stretch">

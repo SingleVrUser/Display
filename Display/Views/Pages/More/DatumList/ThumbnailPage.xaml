@@ -8,7 +8,6 @@
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:viewModels="using:Display.ViewModels"
     xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
-    xmlns:media="using:Display.Models.Media"
     xmlns:userController="using:Display.Controls.UserController"
     xmlns:media1="using:Display.Models.Dto.Media"
     mc:Ignorable="d">

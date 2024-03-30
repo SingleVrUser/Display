@@ -1,8 +1,8 @@
-﻿using Display.Models.Settings;
-using Display.Providers;
+﻿using Display.Providers;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using Display.Models.Dto.Settings;
 using Display.Models.Enums;
 
 namespace Display.ViewModels.Sub;

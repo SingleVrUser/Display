@@ -3,11 +3,10 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:data="using:Display.Models.Data"
       xmlns:helper="using:Display.Helper.FileProperties.Name"
       xmlns:animations="using:CommunityToolkit.WinUI.Animations"
       xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
-      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
+      xmlns:oneOneFive="using:Display.Models.Entities.OneOneFive"
       mc:Ignorable="d"
       NavigationCacheMode="Enabled">
 

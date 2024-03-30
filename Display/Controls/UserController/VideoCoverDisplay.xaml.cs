@@ -6,9 +6,14 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Display.Models.Api.OneOneFive.File;
 using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities;
+using Display.Models.Entities.OneOneFive;
 using Display.Models.Enums.OneOneFive;
+using Display.Models.Vo;
+using Display.Models.Vo.OneOneFive;
 using Display.Providers;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -454,7 +459,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         videoInfo.IsLike = button.IsChecked == true ? 1 : 0;
 
-        DataAccess.Update.UpdateSingleDataFromVideoInfo(videoInfo.trueName, "is_like", videoInfo.IsLike.ToString());
+        DataAccess.Update.UpdateSingleDataFromVideoInfo(videoInfo.TrueName, "is_like", videoInfo.IsLike.ToString());
     }
 
     private void FailLikeToggleButton_Click(object sender, RoutedEventArgs e)
@@ -477,7 +482,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         videoInfo.LookLater = button.IsChecked == true ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
 
-        DataAccess.Update.UpdateSingleDataFromVideoInfo(videoInfo.trueName, "look_later", videoInfo.LookLater.ToString());
+        DataAccess.Update.UpdateSingleDataFromVideoInfo(videoInfo.TrueName, "look_later", videoInfo.LookLater.ToString());
     }
 
     private void FailLookLaterToggleButton_Click(object sender, RoutedEventArgs e)
@@ -500,7 +505,7 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
 
         var scoreStr = videoInfo.Score == 0 ? "-1" : sender.Value.ToString(CultureInfo.InvariantCulture);
 
-        DataAccess.Update.UpdateSingleDataFromVideoInfo(videoInfo.trueName, "score", scoreStr);
+        DataAccess.Update.UpdateSingleDataFromVideoInfo(videoInfo.TrueName, "score", scoreStr);
 
     }
 
@@ -710,10 +715,10 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
         if (sender is not AppBarButton { DataContext: VideoCoverDisplayClass item }) return;
 
         //从数据库中删除
-        DataAccess.Delete.DeleteDataInVideoInfoTable(item.trueName);
+        DataAccess.Delete.DeleteDataInVideoInfoTable(item.TrueName);
 
         //删除存储的文件夹
-        var savePath = Path.Combine(AppSettings.ImageSavePath, item.trueName);
+        var savePath = Path.Combine(AppSettings.ImageSavePath, item.TrueName);
         if (Directory.Exists(savePath))
         {
             Directory.Delete(savePath, true);

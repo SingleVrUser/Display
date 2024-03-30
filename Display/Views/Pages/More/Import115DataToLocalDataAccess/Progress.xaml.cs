@@ -8,9 +8,13 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.System;
 using Display.Helper.Date;
+using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
 using Display.Models.Enums.OneOneFive;
+using Display.Models.Vo;
+using Display.Models.Vo.OneOneFive;
+using Display.Models.Vo.Progress;
 using Display.Providers;
 using Display.Views.Windows;
 using Microsoft.Toolkit.Uwp.Notifications;
@@ -113,7 +117,7 @@ public sealed partial class Progress
                 {
                     var rootFileInfo = await _webapi.GetFileAsync(cid, loadAll: true);
 
-                    var foldersInfoInRoot = rootFileInfo.data;
+                    var foldersInfoInRoot = rootFileInfo.Data;
 
                     filesWithoutRootList.AddRange(foldersInfoInRoot.Select(datum => new FilesInfo(datum)));
                 }

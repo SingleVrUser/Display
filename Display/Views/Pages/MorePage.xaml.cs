@@ -1,7 +1,7 @@
 ﻿using System;
 using Display.Constants;
+using Display.Models.Dto.Settings;
 using Display.Models.Enums;
-using Display.Models.Settings;
 using Display.ViewModels;
 using Display.Views.Pages.More;
 using Display.Views.Windows;

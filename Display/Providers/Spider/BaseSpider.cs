@@ -5,7 +5,8 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Display.Models.Dto.OneOneFive;
-using static Display.Models.Spider.SpiderNameAndStatus;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
 
 namespace Display.Providers.Spider;
 

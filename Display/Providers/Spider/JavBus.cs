@@ -7,8 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Display.Helper.Network;
 using Display.Models.Dto.OneOneFive;
-using Display.Providers.Downloader;
-using static Display.Models.Spider.SpiderNameAndStatus;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Spider;
+using Display.Models.Vo;
 using HttpClient = System.Net.Http.HttpClient;
 
 namespace Display.Providers.Spider;
@@ -37,7 +38,7 @@ public class JavBus : BaseSpider
             new Dictionary<string, string>
             {
                 { "accept-language", "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2" },
-                { "user-agent", GetInfoFromNetwork.DownUserAgent }
+                { "user-agent", DbNetworkHelper.DownUserAgent }
             });
 
     public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
@@ -86,7 +87,7 @@ public class JavBus : BaseSpider
         var videoInfo = new VideoInfo
         {
             busUrl = detailUrl,
-            trueName = cid
+            TrueName = cid
         };
 
         //标题
@@ -161,7 +162,7 @@ public class JavBus : BaseSpider
 
             var filePath = Path.Combine(savePath, cid);
             videoInfo.ImageUrl = imageUrl;
-            videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(imageUrl, filePath, cid);
+            videoInfo.ImagePath = await DbNetworkHelper.DownloadFile(imageUrl, filePath, cid);
         }
 
         var sampleBoxNodes = htmlDoc.DocumentNode.SelectNodes("//a[@class='sample-box']");

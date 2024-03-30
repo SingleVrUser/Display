@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Display.Controls.UserController;
 using Display.Helper.Network;
+using Display.Models.Api.OneOneFive.File;
+using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
-using Display.Models.Media;
 using Display.Providers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -139,7 +140,7 @@ public sealed partial class VideoCoverPage
             return;
         }
 
-        var videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(videoInfo.trueName);
+        var videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(videoInfo.TrueName);
 
         _storedItem = videoInfo;
 

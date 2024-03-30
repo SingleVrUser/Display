@@ -6,8 +6,9 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Display.Helper.Data;
+using Display.Models.Api.OneOneFive.Upload;
 using Display.Models.Enums;
-using Display.Models.Upload;
+using Display.Models.Vo;
 using HttpHeaders = Display.Constants.HttpHeaders;
 
 namespace Display.Services.Upload.AliyunOssUpload;
@@ -51,9 +52,9 @@ internal abstract class BaseOssUpload : IDisposable
         AccessKeySecret = ossToken.AccessKeySecret;
         SecurityToken = ossToken.SecurityToken;
 
-        CallbackBase64 = fastUploadResult.callback.callback;
-        CallbackVarBase64 = fastUploadResult.callback.callback_var;
-        BucketName = fastUploadResult.bucket;
+        CallbackBase64 = fastUploadResult.OssCallback.Callback;
+        CallbackVarBase64 = fastUploadResult.OssCallback.CallbackVar;
+        BucketName = fastUploadResult.Bucket;
         ObjectName = fastUploadResult.Object;
 
         BaseUrl = $"http://{BucketName}.{EndpointUri.Authority}/{ObjectName}";

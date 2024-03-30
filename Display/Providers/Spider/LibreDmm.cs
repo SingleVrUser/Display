@@ -6,13 +6,15 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
 using Display.Providers.Downloader;
 
 namespace Display.Providers.Spider;
 
 public class LibreDmm : BaseSpider
 {
-    public override SpiderNameAndStatus.SpiderSourceName Name => SpiderNameAndStatus.SpiderSourceName.Libredmm;
+    public override SpiderSourceName Name => SpiderSourceName.Libredmm;
     public override string Abbreviation => "libre";
     public override string Keywords => "LibreFanza";
 
@@ -57,7 +59,7 @@ public class LibreDmm : BaseSpider
         var videoInfo = new VideoInfo
         {
             busUrl = detailUrl,
-            trueName = cid,
+            TrueName = cid,
             //dmm肯定没有步兵
             IsWm = 0
         };
@@ -111,7 +113,7 @@ public class LibreDmm : BaseSpider
         var savePath = AppSettings.ImageSavePath;
         var filePath = Path.Combine(savePath, cid);
         videoInfo.ImageUrl = imageUrl;
-        videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(imageUrl, filePath, cid);
+        videoInfo.ImagePath = await DbNetworkHelper.DownloadFile(imageUrl, filePath, cid);
 
         return videoInfo;
     }

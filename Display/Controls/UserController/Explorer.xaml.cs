@@ -4,7 +4,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Records;
+using Display.Models.Vo;
+using Display.Models.Vo.OneOneFive;
 using Display.Providers;
 using Microsoft.Data.Sqlite;
 using Microsoft.UI.Xaml;
@@ -75,11 +79,7 @@ public sealed partial class Explorer : UserControl
             //排序
             items = items.OrderByDescending(x => x.TimeEdit).ToArray();
 
-            StoreDataList.Add(new StoreDatum()
-            {
-                Cid = folderCid,
-                DatumList = items
-            });
+            StoreDataList.Add(new StoreDatum(folderCid, items));
         }
         else
         {
@@ -113,7 +113,7 @@ public sealed partial class Explorer : UserControl
                 Type = FilesInfo.FileType.Folder,
                 Id = item.Cid,
                 HasUnrealizedChildren = hasUnrealizedChildren,
-                datum = item
+                Datum = item
             };
 
             list.Add(folders);
@@ -337,7 +337,7 @@ public sealed partial class Explorer : UserControl
                     Name = videoInfo.Name,
                     Type = FilesInfo.FileType.Folder,
                     Id = videoInfo.Cid,
-                    datum = videoInfo
+                    Datum = videoInfo
                 },
                 HasUnrealizedChildren = newNodeDict.Value,
             };

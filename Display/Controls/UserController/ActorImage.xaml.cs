@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using System;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
 using Display.Providers;
 using Display.Views.Pages;
 

@@ -9,11 +9,14 @@
     xmlns:enums1="using:Display.Models.Enums"
     xmlns:userController="using:Display.Controls.UserController"
     xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
+    xmlns:file="using:Display.Models.Api.OneOneFive.File"
+    xmlns:oneOneFive1="using:Display.Models.Vo.OneOneFive"
+    xmlns:vo="using:Display.Models.Vo"
     mc:Ignorable="d">
     <Control.Resources>
         <!--ListView 的 文件 DataTemplate-->
         <DataTemplate x:Key="FileInSelectFolderTemplate"
-                      x:DataType="oneOneFive:FilesInfo">
+                      x:DataType="oneOneFive1:FilesInfo">
             <ListViewItem>
                 <Grid ColumnSpacing="10" Background="Transparent">
                     <Grid.ContextFlyout>
@@ -78,7 +81,7 @@
 
         <!--ListView 的 文件夹 DataTemplate-->
         <DataTemplate x:Key="FolderInSelectFolderTemplate"
-                      x:DataType="oneOneFive:FilesInfo">
+                      x:DataType="oneOneFive1:FilesInfo">
             <ListViewItem>
                 <StackPanel Orientation="Horizontal" Spacing="5">
                     <Grid ColumnSpacing="10">
@@ -160,7 +163,7 @@
                     </Grid.ContextFlyout>
                     
                     <ToolTipService.ToolTip>
-                        <TextBlock  Text="{x:Bind ((oneOneFive:ExplorerItem)Content).Name}"/>
+                        <TextBlock  Text="{x:Bind ((vo:ExplorerItem)Content).Name}"/>
                     </ToolTipService.ToolTip>
 
                     <Image Width="30"
@@ -173,7 +176,7 @@
                     </Image>
 
                     <TextBlock Grid.Column="1"
-                               Text="{x:Bind ((oneOneFive:ExplorerItem)Content).Name}"
+                               Text="{x:Bind ((vo:ExplorerItem)Content).Name}"
                                TextTrimming="CharacterEllipsis"
                                VerticalAlignment="Center"
                                HorizontalAlignment="Left" />
@@ -188,10 +191,10 @@
                 <StackPanel Orientation="Horizontal" Spacing="5">
 
                     <ToolTipService.ToolTip>
-                        <TextBlock  Text="{x:Bind ((oneOneFive:ExplorerItem)Content).Name}"/>
+                        <TextBlock  Text="{x:Bind ((vo:ExplorerItem)Content).Name}"/>
                     </ToolTipService.ToolTip>
                     <Image Width="20" Source="/Assets/115/file_type/other/unknown.svg"/>
-                    <TextBlock Text="{x:Bind ((oneOneFive:ExplorerItem)Content).Name}" TextTrimming="WordEllipsis" MaxWidth="400">
+                    <TextBlock Text="{x:Bind ((vo:ExplorerItem)Content).Name}" TextTrimming="WordEllipsis" MaxWidth="400">
 
                     </TextBlock>
                 </StackPanel>
@@ -282,7 +285,7 @@
                     <BreadcrumbBar ItemClicked="FolderBreadcrumbBar_ItemClicked"
                                    ItemsSource="{x:Bind SelectFolderName}">
                         <BreadcrumbBar.ItemTemplate>
-                            <DataTemplate x:DataType="oneOneFive:ExplorerItem">
+                            <DataTemplate x:DataType="vo:ExplorerItem">
                                 <BreadcrumbBarItem Content="{Binding}">
                                     <BreadcrumbBarItem.ContentTemplate>
                                         <DataTemplate>

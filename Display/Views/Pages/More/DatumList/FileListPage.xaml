@@ -13,6 +13,9 @@
       xmlns:enums1="using:Display.Models.Enums"
       xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
       xmlns:datumList="using:Display.Views.Pages.More.DatumList"
+      xmlns:file="using:Display.Models.Api.OneOneFive.File"
+      xmlns:oneOneFive1="using:Display.Models.Vo.OneOneFive"
+      xmlns:vo="using:Display.Models.Vo"
       mc:Ignorable="d">
     <Page.Resources>
         <Style TargetType="TextBlock"
@@ -46,7 +49,7 @@
 
 
         <DataTemplate x:Key="SearchListTemplate"
-                      x:DataType="oneOneFive:FilesInfo">
+                      x:DataType="oneOneFive1:FilesInfo">
             <Grid Background="Transparent"
                   ColumnDefinitions="*">
                 <Grid.ContextFlyout>
@@ -109,7 +112,7 @@
 
 
         <DataTemplate x:Key="FileListTemplate"
-                      x:DataType="oneOneFive:FilesInfo">
+                      x:DataType="oneOneFive1:FilesInfo">
             <Grid Background="Transparent"
                   ColumnDefinitions="*,140,70">
                 <Grid.ContextFlyout>
@@ -426,10 +429,10 @@
                 </BreadcrumbBar.Transitions>
 
                 <BreadcrumbBar.ItemTemplate>
-                    <DataTemplate x:DataType="oneOneFive:ExplorerItem">
+                    <DataTemplate x:DataType="vo:ExplorerItem">
                         <BreadcrumbBarItem>
                             <BreadcrumbBarItem.ContentTemplate>
-                                <DataTemplate x:DataType="oneOneFive:ExplorerItem">
+                                <DataTemplate x:DataType="vo:ExplorerItem">
                                     <TextBlock
                                         TextAlignment="{x:Bind Name}"
                                         AllowDrop="True"

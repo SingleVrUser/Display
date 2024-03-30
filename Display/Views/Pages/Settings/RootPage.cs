@@ -10,7 +10,7 @@ public abstract class RootPage : Page
 {
     private StackedNotificationsBehavior _notificationQueue;
 
-    protected void SetNotificationQueue(StackedNotificationsBehavior notificationQueue)
+    private void SetNotificationQueue(StackedNotificationsBehavior notificationQueue)
         => _notificationQueue = notificationQueue;
 
     protected override void OnNavigatedTo(NavigationEventArgs e)

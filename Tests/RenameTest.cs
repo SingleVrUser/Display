@@ -27,7 +27,7 @@ namespace Tests
             var result = await FileUploadService.UploadAgainByFastUpload(_downloadClient, pickCode, cid, totalSha1, newName, length, UserId, UserKey, token: Token);
             Assert.IsNotNull(result);
 
-            var newPickCode = result.pickcode;
+            var newPickCode = result.PickCode;
             Assert.IsNotNull(newPickCode);
 
             // 删除原文件

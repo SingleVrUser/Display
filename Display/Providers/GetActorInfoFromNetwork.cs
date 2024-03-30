@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Display.Helper.Network;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
 using Display.Providers.Downloader;
 using HtmlAgilityPack;
 
@@ -19,7 +20,7 @@ public class GetActorInfoFromNetwork
 
         var url = NetworkHelper.UrlCombine(baseUrl, $"search_result.php?search_scope=actress&search_word={name}&search=+Go+");
 
-        var client = GetInfoFromNetwork.CommonClient;
+        var client = NetworkHelper.CommonClient;
 
         ActorInfo actorInfo = new() { Name = name };
 

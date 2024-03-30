@@ -7,7 +7,8 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Display.Extensions;
-using Display.Models.Upload;
+using Display.Models.Api.OneOneFive.Upload;
+using Display.Models.Vo;
 using HttpHeaders = Display.Constants.HttpHeaders;
 
 namespace Display.Services.Upload.AliyunOssUpload;

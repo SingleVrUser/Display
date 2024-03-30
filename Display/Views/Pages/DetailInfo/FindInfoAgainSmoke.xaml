@@ -11,6 +11,8 @@
       xmlns:controls="using:CommunityToolkit.WinUI.Controls"
       xmlns:spider="using:Display.Providers.Spider"
       xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
+      xmlns:vo="using:Display.Models.Vo"
+      xmlns:oneOneFive1="using:Display.Models.Entities.OneOneFive"
       mc:Ignorable="d">
     <Page.Resources>
         <Style TargetType="Pivot">
@@ -100,7 +102,7 @@
                               x:Name="NewInfoListView"
                               SelectionChanged="NewInfo_ListView_SelectionChanged">
                         <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="oneOneFive:VideoInfo">
+                            <DataTemplate x:DataType="oneOneFive1:VideoInfo">
                                 <Grid ColumnSpacing="3"
                                       Padding="0,2">
                                     <Grid.ColumnDefinitions>
@@ -153,7 +155,7 @@
 
                                         <TextBlock Grid.Column="1"
                                                    Grid.Row="0"
-                                                   Text="{x:Bind trueName}"
+                                                   Text="{x:Bind TrueName}"
                                                    FontWeight="Bold" />
 
                                         <TextBlock Grid.Column="1"
@@ -235,7 +237,7 @@
                             <TextBlock>
                                     <Run>番号</Run>
                                     <Run FontWeight="Bold"
-                                         Text="{x:Bind _videoInfo.trueName,Mode=OneWay}" />
+                                         Text="{x:Bind _videoInfo.TrueName,Mode=OneWay}" />
                             </TextBlock>
 
                             <TextBlock>

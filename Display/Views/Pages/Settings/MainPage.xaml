@@ -5,15 +5,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:settings="using:Display.Models.Settings"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
+    xmlns:settings1="using:Display.Models.Dto.Settings"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Page.Resources>
         <DataTemplate x:Key="NavLinkItemTemplate"
-                      x:DataType="settings:MenuItem">
+                      x:DataType="settings1:MenuItem">
             <StackPanel Orientation="Horizontal"
                         Spacing="10">
                 <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"

@@ -23,7 +23,7 @@ public sealed partial class AccountPage
 
     private async void InitializationViewAsync()
     {
-        if (!string.IsNullOrEmpty(AppSettings._115_Cookie) && WebApi.UserInfo == null)
+        if (!string.IsNullOrEmpty(AppSettings._115_Cookie) && WebApi.UserInfoResult == null)
         {
             await WebApi.UpdateLoginInfoAsync();
         }
@@ -36,12 +36,12 @@ public sealed partial class AccountPage
 
     private void UpdateLoginStatus()
     {
-        UserInfoControl.Status = WebApi.UserInfo?.state == true ? UserInfo.LoginStatus.Login : UserInfo.LoginStatus.NoLogin;
+        UserInfoControl.Status = WebApi.UserInfoResult?.State == true ? UserInfo.LoginStatus.Login : UserInfo.LoginStatus.NoLogin;
     }
 
     private void UpdateUserInfo()
     {
-        UserInfoControl.Userinfo = WebApi.UserInfo?.data;
+        UserInfoControl.Userinfo = WebApi.UserInfoResult?.Data;
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public sealed partial class AccountPage
         }
         else
         {
-            WebApi.UserInfo = null;
+            WebApi.UserInfoResult = null;
         }
         UpdateLoginStatus();
 

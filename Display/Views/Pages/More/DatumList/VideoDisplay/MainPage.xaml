@@ -11,6 +11,8 @@
       xmlns:userController="using:Display.Controls.UserController"
       xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
       xmlns:videoDisplay="using:Display.Views.Pages.More.DatumList.VideoDisplay"
+      xmlns:file="using:Display.Models.Api.OneOneFive.File"
+      xmlns:oneOneFive1="using:Display.Models.Vo.OneOneFive"
       mc:Ignorable="d">
 
     <Page.Resources>
@@ -73,7 +75,7 @@
                                           Drop="Target_Drop"
                                           DragEnter="Target_DragEnter">
                                     <ListView.ItemTemplate>
-                                    <DataTemplate x:DataType="oneOneFive:FilesInfo">
+                                    <DataTemplate x:DataType="oneOneFive1:FilesInfo">
                                             <Grid ColumnSpacing="5"
                                                   DoubleTapped="OpenFolder_Tapped">
                                                 <Grid.ContextFlyout>
@@ -174,7 +176,7 @@
 
                                                     <StackPanel Grid.Row="1"
                                                                 HorizontalAlignment="Center">
-                                                        <TextBlock Text="{x:Bind VideoInfo.trueName, Mode=OneWay}"
+                                                        <TextBlock Text="{x:Bind VideoInfo.TrueName, Mode=OneWay}"
                                                                        IsTextSelectionEnabled="True" />
                                                         <TextBlock Text="{x:Bind VideoInfo.ReleaseTime, Mode=OneWay}" />
                                                         <userController:TextBlockWithLongText StringValue="{x:Bind VideoInfo.Actor, Mode=OneWay}" />
@@ -202,7 +204,7 @@
                                           SelectionMode="Single"
                                           ItemsSource="{x:Bind _playingVideoInfos}">
                                     <ListView.ItemTemplate>
-                                    <DataTemplate x:DataType="oneOneFive:FilesInfo">
+                                    <DataTemplate x:DataType="oneOneFive1:FilesInfo">
                                             <Grid ColumnSpacing="5">
                                                 <Grid.ContextFlyout>
                                                     <MenuFlyout>

@@ -1,5 +1,4 @@
 ﻿using Display.Helper.Crypto;
-using Display.Models.Upload;
 using Display.Services.Upload;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -8,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Display.Models.Api.OneOneFive.Upload;
 
 namespace Display.Helper.Network;
 

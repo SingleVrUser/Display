@@ -5,7 +5,7 @@ namespace Display.Extensions;
 
 internal static class EnumExtension
 {
-    public static string GetCustomDescription(object objEnum)
+    private static string GetCustomDescription(object objEnum)
     {
         var content = objEnum.ToString();
         if (string.IsNullOrEmpty(content)) return content;

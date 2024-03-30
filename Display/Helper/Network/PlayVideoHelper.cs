@@ -1,7 +1,6 @@
 ﻿using Display.Controls.UserController;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.Notifications;
-using Display.Models.Media;
 using Display.Providers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -13,6 +12,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
+using Display.Models.Api.OneOneFive.File;
+using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
 using Display.Views.Windows;
@@ -21,7 +22,7 @@ using SelectVideoToPlay = Display.Views.Pages.DetailInfo.SelectVideoToPlay;
 
 namespace Display.Helper.Network;
 
-public class PlayVideoHelper
+internal class PlayVideoHelper
 {
     /// <summary>
     /// 指定播放器播放

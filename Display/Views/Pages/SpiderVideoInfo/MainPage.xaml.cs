@@ -6,11 +6,15 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Display.Helper.Network;
+using Display.Models.Api.OneOneFive.File;
 using Display.Models.Data.IncrementalCollection;
+using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
 using Display.Models.Enums;
 using Display.Models.Enums.OneOneFive;
-using Display.Models.Media;
+using Display.Models.Vo;
+using Display.Models.Vo.OneOneFive;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -205,7 +209,7 @@ public sealed partial class MainPage : INotifyPropertyChanged
         if (args.InvokedItem is not TreeViewNode { Content: ExplorerItem content }) return;
 
         if (FileInfoShowGrid.Visibility == Visibility.Collapsed) FileInfoShowGrid.Visibility = Visibility.Visible;
-        SelectedDatum = content.datum;
+        SelectedDatum = content.Datum;
     }
 
     /// <summary>

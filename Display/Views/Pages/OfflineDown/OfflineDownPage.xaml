@@ -8,6 +8,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
+      xmlns:offlineDown="using:Display.Models.Api.OneOneFive.OfflineDown"
       mc:Ignorable="d">
 
     <Grid RowDefinitions="*,auto,auto" RowSpacing="10" DragOver="RootGrid_OnDragOver" AllowDrop="True" Drop="RootGrid_OnDrop">
@@ -27,8 +28,8 @@
 
                 <ComboBox x:Name="DownPathComboBox">
                     <ComboBox.ItemTemplate>
-                        <DataTemplate x:DataType="oneOneFive:OfflineDownPathData">
-                            <TextBlock Text="{x:Bind file_name}"></TextBlock>
+                        <DataTemplate x:DataType="offlineDown:OfflineDownPathData">
+                            <TextBlock Text="{x:Bind FileName}"></TextBlock>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>

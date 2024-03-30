@@ -6,8 +6,11 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Display.Models.Api.OneOneFive.File;
 using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Vo;
+using Display.Models.Vo.OneOneFive;
 using Display.Providers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -70,7 +73,7 @@ public sealed partial class SelectedFolderPage
 
         foreach (var path in _folderInfos.WebPaths)
         {
-            _explorerItems.Add(new ExplorerItem { Name = path.name, Id = path.cid });
+            _explorerItems.Add(new ExplorerItem { Name = path.Name, Id = path.Cid });
         }
     }
 
@@ -129,7 +132,7 @@ public sealed partial class SelectedFolderPage
             var makeDirResult = await WebApi.GlobalWebApi.RequestMakeDir(currentFolder.Id, NewCreateFolderTextBox.Text);
             if (makeDirResult == null) return;
 
-            _folderInfos.Insert(0, new FilesInfo(new Datum { Cid = makeDirResult.cid, Name = makeDirResult.cname }));
+            _folderInfos.Insert(0, new FilesInfo(new Datum { Cid = makeDirResult.Cid, Name = makeDirResult.Cname }));
         }
 
         CreateNewFolderGrid.Visibility = Visibility.Collapsed;

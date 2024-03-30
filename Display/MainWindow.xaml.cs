@@ -3,8 +3,6 @@ using Display.Controls.UserController;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.Network;
 using Display.Helper.UI;
-using Display.Models.Media;
-using Display.Models.Settings;
 using Display.Providers;
 using Display.ViewModels;
 using Microsoft.UI;
@@ -21,8 +19,12 @@ using System.IO;
 using System.Linq;
 using Windows.Foundation;
 using Windows.System;
+using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Dto.Settings;
+using Display.Models.Entities.OneOneFive;
 using Display.Models.Enums;
+using Display.Models.Vo;
 using Display.Views.Pages;
 using Display.Views.Pages.More.DatumList;
 using Display.Views.Pages.OfflineDown;
@@ -212,7 +214,7 @@ public sealed partial class MainWindow
         {
             //下载
             case ContentDialogResult.Primary:
-                var installUrl = AppUpdateHelper.IsWindows11() ? $"ms-appinstaller:?source={releaseCheck.AppAsset.browser_download_url}" : $"{releaseCheck.AppAsset.browser_download_url}";
+                var installUrl = AppUpdateHelper.IsWindows11() ? $"ms-appinstaller:?source={releaseCheck.AppAsset.BrowserDownloadUrl}" : $"{releaseCheck.AppAsset.BrowserDownloadUrl}";
 
                 await Launcher.LaunchUriAsync(new Uri(installUrl));
                 break;
@@ -507,14 +509,14 @@ public sealed partial class MainWindow
         }
 
         // 成功
-        if (info.state)
+        if (info.State)
         {
             ShowTeachingTip("添加任务成功");
             return;
         }
 
         // 需要验证账户
-        if (info.errcode == Account.AccountAnomalyCode)
+        if (info.ErrCode == Account.AccountAnomalyCode)
         {
             var window = WebApi.CreateWindowToVerifyAccount();
 
@@ -531,9 +533,9 @@ public sealed partial class MainWindow
             return;
         }
 
-        var failList = !string.IsNullOrEmpty(info.error_msg)
+        var failList = !string.IsNullOrEmpty(info.ErrorMsg)
             ? [info] // 单链接
-            : info.result?.Where(x => !string.IsNullOrEmpty(x.error_msg)).ToList();  // 多链接
+            : info.Result?.Where(x => !string.IsNullOrEmpty(x.ErrorMsg)).ToList();  // 多链接
 
         if (failList == null || failList.Count == 0)
         {
@@ -562,7 +564,7 @@ public sealed partial class MainWindow
         if (result != ContentDialogResult.Primary) return;
 
         // 跳转失败的重试
-        var defaultLink = string.Join("\n", failList.Select(x => x.url));
+        var defaultLink = string.Join("\n", failList.Select(x => x.Url));
         CreateCloudDownContentDialog(defaultLink);
     }
 

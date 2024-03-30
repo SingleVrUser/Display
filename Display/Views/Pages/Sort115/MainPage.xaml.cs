@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
+using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Spider;
+using Display.Models.Vo.OneOneFive;
 using Display.Views.Windows;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Sort115HomeModel = Display.Models.Entities._115.Sort115HomeModel;
+using Sort115HomeModel = Display.Models.Vo.OneOneFive.Sort115HomeModel;
 
 namespace Display.Views.Pages.Sort115;
 
@@ -101,11 +103,11 @@ public class FetchingSourceOptions
 {
     public string name { get; private set; }
 
-    public SpiderNameAndStatus.SpiderSourceName SpiderSourceName;
+    public SpiderSourceName SpiderSourceName;
 
     public bool IsSelected;
 
-    public FetchingSourceOptions(SpiderNameAndStatus.SpiderSourceName SpiderSourceName, bool isSelected = false)
+    public FetchingSourceOptions(SpiderSourceName SpiderSourceName, bool isSelected = false)
     {
         this.SpiderSourceName = SpiderSourceName;
         name = SpiderSourceName.ToString();

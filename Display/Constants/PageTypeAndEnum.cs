@@ -10,7 +10,7 @@ using MainPage = Display.Views.Pages.Settings.MainPage;
 
 namespace Display.Constants;
 
-internal class PageTypeAndEnum
+internal static class PageTypeAndEnum
 {
     public static Dictionary<NavigationViewItemEnum, Type> PageTypeAndEnumDict = new()
     {

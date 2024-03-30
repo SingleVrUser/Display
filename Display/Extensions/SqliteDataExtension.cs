@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Reflection;
+using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.OneOneFive;
 
 namespace Display.Extensions;

@@ -9,7 +9,7 @@ using Display.Providers.Downloader;
 
 namespace Display.Helper.Network;
 
-public class RequestHelper
+internal static class RequestHelper
 {
     public static async Task<Tuple<string, string>> RequestHtml(HttpClient client, string url, CancellationToken token, int maxRequestCount = 3)
     {
@@ -48,8 +48,8 @@ public class RequestHelper
                 //JavDb访问Fc2需要登录，如果cookie失效，就无法访问
                 if (response.StatusCode != System.Net.HttpStatusCode.BadGateway) continue;
 
-                if (url.Contains(AppSettings.JavDbBaseUrl))
-                    GetInfoFromNetwork.IsJavDbCookieVisible = false;
+                // if (url.Contains(AppSettings.JavDbBaseUrl))
+                //     GetInfoFromNetwork.IsJavDbCookieVisible = false;
 
                 break;
             }
@@ -119,17 +119,16 @@ public class RequestHelper
 
     public static string DecodeCfEmail(string data)
     {
-        string email = string.Empty;
+        var email = string.Empty;
 
         var r = Convert.ToInt32(data[..2], 16);
 
-        for (int i = 2; i < data.Length; i += 2)
+        for (var i = 2; i < data.Length; i += 2)
         {
             email += (char)(Convert.ToInt32(data.Substring(i, 2), 16) ^ r);
         }
 
         return email;
     }
-
 
 }

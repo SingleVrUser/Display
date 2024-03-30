@@ -10,9 +10,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
 using Display.Providers;
-using Display.Providers.Downloader;
-using static Display.Models.Spider.SpiderNameAndStatus;
 
 namespace Display.Managers;
 
@@ -109,7 +109,7 @@ public class SpiderManager
     {
         //先访问detail_url，获取到标题
         //当访问JavDB且内容为FC2时，由于使用的是CommonClient，所以会提示需要登入
-        var tuple = await RequestHelper.RequestHtml(GetInfoFromNetwork.CommonClient, detailUrl, token);
+        var tuple = await RequestHelper.RequestHtml(NetworkHelper.CommonClient, detailUrl, token);
         if (tuple == null) return null;
 
         var strResult = tuple.Item2;
@@ -130,7 +130,7 @@ public class SpiderManager
             // 当遇到需要登入才能访问的内容时，使用特定的client
             if (title.Contains("登入") && spider is JavDb)
             {
-                tuple = await RequestHelper.RequestHtml(GetInfoFromNetwork.ClientWithJavDbCookie, detailUrl, token);
+                tuple = await RequestHelper.RequestHtml(DbNetworkHelper.ClientWithJavDbCookie, detailUrl, token);
                 if (tuple == null) return null;
 
                 strResult = tuple.Item2;

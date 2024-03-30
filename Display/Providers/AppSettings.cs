@@ -1,12 +1,12 @@
 ﻿using Display.Constants;
-using Display.Models.Settings;
-using Display.Models.Settings.Options;
 using System.IO;
 using System.Runtime.CompilerServices;
+using Display.Models.Dto.Settings;
+using Display.Models.Dto.Settings.Options;
 using Display.Models.Enums;
 using static Display.Constants.DefaultSettings;
 using DefaultValue = Display.Constants.DefaultSettings;
-using MenuItem = Display.Models.Settings.MenuItem;
+using MenuItem = Display.Models.Dto.Settings.MenuItem;
 
 namespace Display.Providers;
 

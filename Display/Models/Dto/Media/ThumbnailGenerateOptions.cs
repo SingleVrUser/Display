@@ -1,10 +1,8 @@
-﻿using Display.Models.Media;
-
-namespace Display.Models.Dto.Media;
+﻿namespace Display.Models.Dto.Media;
 
 public class ThumbnailGenerateOptions
 {
-    public int FrameCount = 10;
+    public readonly int FrameCount = 10;
 
     public string SavePath;
 

@@ -4,6 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:data="using:Display.Models.Data"
+    xmlns:records="using:Display.Models.Records"
     mc:Ignorable="d"
     Width="300"
     Height="300">
@@ -35,7 +36,7 @@
                     </Style>
                 </ListView.ItemContainerStyle>
                 <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="data:CookieKeyValue">
+                    <DataTemplate x:DataType="records:CookieKeyValue">
                         <Grid RowSpacing="10">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="40"/>

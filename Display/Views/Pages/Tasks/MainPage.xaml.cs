@@ -3,8 +3,8 @@
 
 using Display.Constants;
 using Display.Helper.UI;
+using Display.Models.Dto.Settings;
 using Display.Models.Enums;
-using Display.Models.Settings;
 using Display.ViewModels;
 using Display.Views.Windows;
 using Microsoft.UI.Xaml.Controls;

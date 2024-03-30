@@ -216,14 +216,14 @@ public sealed partial class SearchLinkPage : INotifyPropertyChanged
         var uploadInfo = await webApi.GetUploadInfo();
         if (uploadInfo == null) return new Tuple<bool, string>(false, "获取115上传信息时出错");
 
-        var offlineSpaceInfo = await webApi.GetOfflineSpaceInfo(uploadInfo.userkey, uploadInfo.user_id);
+        var offlineSpaceInfo = await webApi.GetOfflineSpaceInfo(uploadInfo.UserKey, uploadInfo.UserId);
 
-        var addTaskUrlInfo = await webApi.AddTaskUrl(links, cid, uploadInfo.user_id, offlineSpaceInfo.sign, offlineSpaceInfo.time);
+        var addTaskUrlInfo = await webApi.AddTaskUrl(links, cid, uploadInfo.UserId, offlineSpaceInfo.Sign, offlineSpaceInfo.Time);
 
         var isDone = false;
         string result = null;
         // 需要验证账号
-        if (addTaskUrlInfo is { errcode: Constants.Account.AccountAnomalyCode })
+        if (addTaskUrlInfo is { ErrCode: Constants.Account.AccountAnomalyCode })
         {
             var window = WebApi.CreateWindowToVerifyAccount();
 
@@ -257,11 +257,11 @@ public sealed partial class SearchLinkPage : INotifyPropertyChanged
         // 上传字幕，如果需要
         if (!string.IsNullOrEmpty(srtPath))
         {
-            await FileUploadService.SimpleUpload(srtPath, cid, uploadInfo.user_id, uploadInfo.userkey);
+            await FileUploadService.SimpleUpload(srtPath, cid, uploadInfo.UserId, uploadInfo.UserKey);
         }
 
-        isDone = addTaskUrlInfo is { state: true };
-        result = isDone ? "任务添加成功" : !string.IsNullOrEmpty(addTaskUrlInfo.error_msg) ? addTaskUrlInfo.error_msg : "任务添加失败";
+        isDone = addTaskUrlInfo is { State: true };
+        result = isDone ? "任务添加成功" : !string.IsNullOrEmpty(addTaskUrlInfo.ErrorMsg) ? addTaskUrlInfo.ErrorMsg : "任务添加失败";
         return new Tuple<bool, string>(isDone, result);
     }
 

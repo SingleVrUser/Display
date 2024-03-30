@@ -4,8 +4,10 @@ using System.Collections.ObjectModel;
 using System.IO;
 using Windows.Foundation;
 using Display.Helper.Network;
+using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
-using Display.Models.Media;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
 using Display.Providers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -144,7 +146,7 @@ public sealed partial class DetailInfoPage : Page
         if (sender is not Button videoPlayButton)
             return;
 
-        string trueName = DetailInfo.trueName;
+        string trueName = DetailInfo.TrueName;
         var videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(trueName);
 
         //没有该数据
@@ -194,10 +196,10 @@ public sealed partial class DetailInfoPage : Page
             if (sender is AppBarButton)
             {
                 //从数据库中删除
-                DataAccess.Delete.DeleteDataInVideoInfoTable(DetailInfo.trueName);
+                DataAccess.Delete.DeleteDataInVideoInfoTable(DetailInfo.TrueName);
 
                 //删除存储的文件夹
-                string savePath = Path.Combine(AppSettings.ImageSavePath, DetailInfo.trueName);
+                string savePath = Path.Combine(AppSettings.ImageSavePath, DetailInfo.TrueName);
                 if (Directory.Exists(savePath))
                 {
                     Directory.Delete(savePath, true);
@@ -220,7 +222,7 @@ public sealed partial class DetailInfoPage : Page
         if (!(sender is Grid grid))
             return;
 
-        string name = DetailInfo.trueName;
+        string name = DetailInfo.TrueName;
         var videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(name);
 
         //没有该数据

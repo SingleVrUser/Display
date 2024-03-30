@@ -6,7 +6,7 @@ using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using static Display.Models.Dto.OneOneFive.FilesInfo;
+using static Display.Models.Vo.OneOneFive.FilesInfo;
 
 
 namespace Display.Controls.UserController;

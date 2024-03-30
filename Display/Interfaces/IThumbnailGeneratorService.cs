@@ -1,5 +1,4 @@
-﻿using Display.Models.Media;
-using FFmpeg.AutoGen.Abstractions;
+﻿using FFmpeg.AutoGen.Abstractions;
 using System;
 using System.Threading.Tasks;
 using Display.Models.Dto.Media;

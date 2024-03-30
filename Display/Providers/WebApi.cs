@@ -3,8 +3,6 @@ using Display.Helper.Crypto;
 using Display.Helper.Date;
 using Display.Helper.Network;
 using Display.Models.Data;
-using Display.Models.Entities._115;
-using Display.Models.Media;
 using Display.Services.Upload;
 using HtmlAgilityPack;
 using Microsoft.UI.Xaml;
@@ -26,22 +24,36 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Display.Models.Api.Aria2;
+using Display.Models.Api.OneOneFive;
+using Display.Models.Api.OneOneFive.Browser;
+using Display.Models.Api.OneOneFive.Down;
+using Display.Models.Api.OneOneFive.File;
+using Display.Models.Api.OneOneFive.OfflineDown;
+using Display.Models.Api.OneOneFive.Search;
+using Display.Models.Api.OneOneFive.Setting;
+using Display.Models.Api.OneOneFive.Upload;
+using Display.Models.Api.OneOneFive.User;
+using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
 using Display.Models.Enums.OneOneFive;
-using Display.Providers.Downloader;
+using Display.Models.Vo;
+using Display.Models.Vo.OneOneFive;
+using Display.Models.Vo.Progress;
 using Display.Views.Pages.Settings.Account;
+using FileInfo = System.IO.FileInfo;
 
 namespace Display.Providers;
 
 internal class WebApi
 {
-    public static UserInfo UserInfo;
-    public static QRCodeInfo QrCodeInfo;
-    private static UploadInfo _uploadInfo;
+    public static UserInfoResult UserInfoResult;
+    public static QRCodeInfoResult QrCodeInfoResult;
+    private static UploadInfoResult _uploadInfoResult;
 
     public HttpClient Client;
-    private TokenInfo _tokenInfo;
+    private Result _result;
 
     private static long NowDate => DateTimeOffset.Now.ToUnixTimeSeconds();
 
@@ -62,7 +74,7 @@ internal class WebApi
     /// </summary>
     public void InitializeInternet()
     {
-        var headers = new Dictionary<string, string> { { "user-agent", GetInfoFromNetwork.DownUserAgent } };
+        var headers = new Dictionary<string, string> { { "user-agent", DbNetworkHelper.DownUserAgent } };
 
         var cookie = AppSettings._115_Cookie;
         //cookie不为空且可用
@@ -102,7 +114,7 @@ internal class WebApi
         const string referer = "https://115.com/?cid=0&offset=0&tab=&mode=wangpan";
         var windowWebHttpClient = new Windows.Web.Http.HttpClient();
         windowWebHttpClient.DefaultRequestHeaders.Add("Referer", referer);
-        windowWebHttpClient.DefaultRequestHeaders.Add("User-Agent", GetInfoFromNetwork.DownUserAgent);
+        windowWebHttpClient.DefaultRequestHeaders.Add("User-Agent", DbNetworkHelper.DownUserAgent);
 
         return windowWebHttpClient;
     }
@@ -113,10 +125,10 @@ internal class WebApi
     /// <returns>true - 登录，false - 未登录</returns>
     public async Task<bool> UpdateLoginInfoAsync()
     {
-        UserInfo = await Client.SendAsync<UserInfo>(HttpMethod.Get,
+        UserInfoResult = await Client.SendAsync<UserInfoResult>(HttpMethod.Get,
             $"https://my.115.com/?ct=ajax&ac=nav&_={NowDate}");
 
-        return UserInfo?.state == true;
+        return UserInfoResult?.State == true;
     }
 
     /// <summary>
@@ -136,7 +148,7 @@ internal class WebApi
         var driveSetting = await Client.SendAsync<_115Setting>(HttpMethod.Post, url, content);
 
         var result = false;
-        if (driveSetting?.data.show == "1")
+        if (driveSetting?.Info.Show == "1")
         {
             result = true;
         }
@@ -215,7 +227,7 @@ internal class WebApi
         if (pid >= 0 && StaticData.IsJumpExistsFolder)
         {
             //如果修改时间未变，但移动了位置
-            if (pid == cidCategory.paths.Last().file_id)
+            if (pid == cidCategory.paths.Last().FileId)
             {
                 await DataAccess.Add.AddFilesInfoAsync(FileCategory.ConvertFolderToDatum(cidCategory, cid));
             }
@@ -282,15 +294,15 @@ internal class WebApi
         //查询下一级文件信息
         var webFileInfo = await GetFileAsync(cid, loadAll: true);
 
-        if (webFileInfo.state)
+        if (webFileInfo.State)
         {
             //  下级目录为空
-            if (webFileInfo.data is null)
+            if (webFileInfo.Data is null)
             {
                 return getFilesProgressInfo;
             }
 
-            foreach (var item in webFileInfo.data)
+            foreach (var item in webFileInfo.Data)
             {
                 if (token.IsCancellationRequested)
                 {
@@ -405,7 +417,7 @@ internal class WebApi
 
         var result = await client.SendAsync<DeleteFilesResult>(HttpMethod.Post, url, content);
 
-        return result.state;
+        return result.State;
 
     }
 
@@ -449,14 +461,14 @@ internal class WebApi
         var uploadInfo = await GetUploadInfo();
 
         // 无该信息
-        if (info is not { state: true })
+        if (info is not { State: true })
         {
             // 获取种子文件应该存放的目录cid
             var torrentCidInfo = await GetTorrentCid();
 
             if (torrentCidInfo != null && uploadInfo != null)
             {
-                await FileUploadService.SimpleUpload(torrentPath, torrentCidInfo.cid, uploadInfo.user_id, uploadInfo.userkey);
+                await FileUploadService.SimpleUpload(torrentPath, torrentCidInfo.Cid, uploadInfo.UserId, uploadInfo.UserKey);
             }
 
             // 再次检查网盘中是否有该torrent
@@ -464,33 +476,33 @@ internal class WebApi
         }
 
         // 上传后仍然为空
-        if (info is not { state: true } || uploadInfo == null) return new Tuple<bool, string>(false, "上传torrent失败");
+        if (info is not { State: true } || uploadInfo == null) return new Tuple<bool, string>(false, "上传torrent失败");
 
-        var offlineSpaceInfo = await GetOfflineSpaceInfo(uploadInfo.userkey, uploadInfo.user_id);
+        var offlineSpaceInfo = await GetOfflineSpaceInfo(uploadInfo.UserKey, uploadInfo.UserId);
 
         // 获取种子信息
-        var torrentInfo = await GetTorrentInfo(info.data.pick_code, info.sha1, info.user_id.ToString(), offlineSpaceInfo.sign,
-            offlineSpaceInfo.time.ToString());
+        var torrentInfo = await GetTorrentInfo(info.Data.PickCode, info.Sha1, info.UserId.ToString(), offlineSpaceInfo.Sign,
+            offlineSpaceInfo.Time.ToString());
 
         if (torrentInfo == null) return new Tuple<bool, string>(false, "获取torrent信息失败");
 
         // 最小大小,10 MB
         const long minSize = 10485760;
         List<int> selectedIndexList = new();
-        for (var i = 0; i < torrentInfo.torrent_filelist_web.Length; i++)
+        for (var i = 0; i < torrentInfo.TorrentFileListWeb.Length; i++)
         {
-            var fileInfo = torrentInfo.torrent_filelist_web[i];
+            var fileInfo = torrentInfo.TorrentFileListWeb[i];
 
-            if (fileInfo.size > minSize)
+            if (fileInfo.Size > minSize)
             {
                 selectedIndexList.Add(i);
             }
         }
 
         // 添加任务
-        var taskInfo = await AddTaskBt(torrentInfo.info_hash, string.Join(",", selectedIndexList), cid, uploadInfo.user_id.ToString(), offlineSpaceInfo.sign, offlineSpaceInfo.time.ToString());
+        var taskInfo = await AddTaskBt(torrentInfo.InfoHash, string.Join(",", selectedIndexList), cid, uploadInfo.UserId.ToString(), offlineSpaceInfo.Sign, offlineSpaceInfo.Time.ToString());
 
-        if (taskInfo is not { state: true }) return new Tuple<bool, string>(false, "添加torrent任务失败");
+        if (taskInfo is not { State: true }) return new Tuple<bool, string>(false, "添加torrent任务失败");
 
         Debug.WriteLine("添加任务成功");
         return new Tuple<bool, string>(true, "torrent任务添加成功");
@@ -623,12 +635,12 @@ internal class WebApi
         if (data is not { NoId: false }) return false;
 
         var uploadInfo = await GetUploadInfo();
-        var userId = uploadInfo.user_id;
-        var userKey = uploadInfo.userkey;
+        var userId = uploadInfo.UserId;
+        var userKey = uploadInfo.UserKey;
 
         // 通过秒传上传一份
         var result = await FileUploadService.UploadAgainByFastUpload(FileUploadService.Client, data.PickCode, data.Cid, data.Sha1, newName, data.Size, userId, userKey);
-        if (result == null || string.IsNullOrEmpty(result.pickcode)) return false;
+        if (result == null || string.IsNullOrEmpty(result.PickCode)) return false;
 
         // 删除原文件
         return await DeleteFiles(FileUploadService.Client, data.Cid, new[] { (long)data.Id! });
@@ -675,7 +687,7 @@ internal class WebApi
 
         //te，tp简单用t替换，接口2没有te,tp
 
-        webFileInfoResult.data?.ForEach(item =>
+        webFileInfoResult.Data?.ForEach(item =>
         {
             int dateInt;
             //item.t 可能是 "1658999027" 也可能是 "2022-07-28 17:03"
@@ -702,14 +714,14 @@ internal class WebApi
 
 
         //接口1出错，使用接口2
-        if (webFileInfoResult.errNo == 20130827 && useApi2 == false)
+        if (webFileInfoResult.ErrNo == 20130827 && useApi2 == false)
         {
-            webFileInfoResult = await GetFileAsync(cid, limit, offset, true, loadAll, webFileInfoResult.order, webFileInfoResult.is_asc, isOnlyFolder: isOnlyFolder);
+            webFileInfoResult = await GetFileAsync(cid, limit, offset, true, loadAll, webFileInfoResult.Order, webFileInfoResult.IsAsc, isOnlyFolder: isOnlyFolder);
         }
         //需要加载全部，但未加载全部
-        else if (loadAll && webFileInfoResult.count > limit)
+        else if (loadAll && webFileInfoResult.Count > limit)
         {
-            webFileInfoResult = await GetFileAsync(cid, webFileInfoResult.count, offset, useApi2, true, orderBy, asc);
+            webFileInfoResult = await GetFileAsync(cid, webFileInfoResult.Count, offset, useApi2, true, orderBy, asc);
         }
 
         return webFileInfoResult;
@@ -740,16 +752,16 @@ internal class WebApi
 
         var values = new Dictionary<string, string>
         {
-            { "account", QrCodeInfo.data.uid }
+            { "account", QrCodeInfoResult.data.Uid }
         };
         var content = new FormUrlEncodedContent(values);
 
-        _tokenInfo = await Client.SendAsync<TokenInfo>(HttpMethod.Post, url, content);
+        _result = await Client.SendAsync<Result>(HttpMethod.Post, url, content);
 
-        if (_tokenInfo.state != 1) return;
+        if (_result.State != 1) return;
 
         //存储cookie至本地
-        var cookieList = _tokenInfo.data.cookie.GetType().GetProperties().Select(item => $"{item.Name}={item.GetValue(_tokenInfo.data.cookie)}").ToList();
+        var cookieList = _result.Data.Cookie.GetType().GetProperties().Select(item => $"{item.Name}={item.GetValue(_result.Data.Cookie)}").ToList();
 
         var cookie = string.Join(";", cookieList);
         AppSettings._115_Cookie = cookie;
@@ -761,24 +773,24 @@ internal class WebApi
     /// 检查二维码扫描状态
     /// </summary>
     /// <returns></returns>
-    public async Task<QRCodeStatus> GetQrCodeStatusAsync()
+    public async Task<QRCodeStatusResult> GetQrCodeStatusAsync()
     {
-        var url = $"https://qrcodeapi.115.com/get/status/?uid={QrCodeInfo.data.uid}&time={QrCodeInfo.data.time}&sign={QrCodeInfo.data.sign}&_={NowDate}";
+        var url = $"https://qrcodeapi.115.com/get/status/?uid={QrCodeInfoResult.data.Uid}&time={QrCodeInfoResult.data.Time}&sign={QrCodeInfoResult.data.Sign}&_={NowDate}";
 
 
-        return await Client.SendAsync<QRCodeStatus>(HttpMethod.Get, url);
+        return await Client.SendAsync<QRCodeStatusResult>(HttpMethod.Get, url);
     }
 
     /// <summary>
     /// 获取登录二维码信息
     /// </summary>
     /// <returns></returns>
-    public async Task<QRCodeInfo> GetQrCodeInfo()
+    public async Task<QRCodeInfoResult> GetQrCodeInfo()
     {
         const string url = "https://qrcodeapi.115.com/api/1.0/web/1.0/token";
 
-        QrCodeInfo = await Client.SendAsync<QRCodeInfo>(HttpMethod.Get, url);
-        return QrCodeInfo;
+        QrCodeInfoResult = await Client.SendAsync<QRCodeInfoResult>(HttpMethod.Get, url);
+        return QrCodeInfoResult;
     }
 
     public enum DownType { _115, Bc, Aria2 };
@@ -790,11 +802,11 @@ internal class WebApi
             DownType._115 => await RequestDownBy115Browser(videoInfoList),
 
             //BitComet支持文件和文件夹
-            DownType.Bc => await RequestDownByBitComet(videoInfoList, GetInfoFromNetwork.DownUserAgent,
+            DownType.Bc => await RequestDownByBitComet(videoInfoList, DbNetworkHelper.DownUserAgent,
                 savePath: savePath, topFolderName: topFolderName),
 
             //Aria2也支持文件和文件夹
-            DownType.Aria2 => await RequestDownByAria2(videoInfoList, GetInfoFromNetwork.DownUserAgent,
+            DownType.Aria2 => await RequestDownByAria2(videoInfoList, DbNetworkHelper.DownUserAgent,
                 savePath: savePath, topFolderName: topFolderName),
             _ => false
         };
@@ -816,25 +828,25 @@ internal class WebApi
         };
 
         //KEY
-        if (QrCodeInfo == null)
+        if (QrCodeInfoResult == null)
         {
             await GetQrCodeInfo();
         }
-        downRequest.Key = QrCodeInfo?.data.uid;
+        downRequest.Key = QrCodeInfoResult?.data.Uid;
 
         //PARAM
         downRequest.Param = new ParamRequest
         {
-            count = videoInfoList.Count,
-            list = [],
-            ref_url = $"https://115.com/?cid={videoInfoList[0].Cid}&offset=0&mode=wangpan"
+            Count = videoInfoList.Count,
+            List = [],
+            RefUrl = $"https://115.com/?cid={videoInfoList[0].Cid}&offset=0&mode=wangpan"
         };
 
         foreach (var videoInfo in videoInfoList)
         {
             var isDir = videoInfo.Uid == 0;
-            downRequest.Param.list.Add(new Down_Request()
-            { n = videoInfo.Name, pc = videoInfo.PickCode, is_dir = isDir });
+            downRequest.Param.List.Add(new DownRequest()
+            { Name = videoInfo.Name, PickCode = videoInfo.PickCode, IsDir = isDir });
         }
 
         var url = string.Empty;
@@ -933,20 +945,20 @@ internal class WebApi
         return await Client.SendAsync<OfflineDownPathRequest>(HttpMethod.Get, url);
     }
 
-    public async Task<SearchResult> GetSearchResult(long cid, string value)
+    public async Task<SearchInfo> GetSearchResult(long cid, string value)
     {
         var url = $"https://webapi.115.com/files/search?offset=0&limit=30&search_value={value}&date=&aid=1&cid={cid}&pick_code=&type=&count_folders=1&source=&format=json";
 
-        return await Client.SendAsync<SearchResult>(HttpMethod.Get, url);
+        return await Client.SendAsync<SearchInfo>(HttpMethod.Get, url);
     }
 
-    public async Task<UploadInfo> GetUploadInfo(bool isUpdate = false)
+    public async Task<UploadInfoResult> GetUploadInfo(bool isUpdate = false)
     {
-        if (!isUpdate && _uploadInfo != null) return _uploadInfo;
+        if (!isUpdate && _uploadInfoResult != null) return _uploadInfoResult;
 
         const string url = "https://proapi.115.com/app/uploadinfo";
-        _uploadInfo = await Client.SendAsync<UploadInfo>(HttpMethod.Get, url);
-        return _uploadInfo;
+        _uploadInfoResult = await Client.SendAsync<UploadInfoResult>(HttpMethod.Get, url);
+        return _uploadInfoResult;
     }
 
     public async Task<OfflineSpaceInfo> GetOfflineSpaceInfo(string userKey, int userId)
@@ -1030,14 +1042,14 @@ internal class WebApi
             {
                 //获取该文件夹下的文件和文件夹
                 var webFileInfo = await GetFileAsync(datum.Cid, loadAll: true);
-                if (webFileInfo.count == 0)
+                if (webFileInfo.Count == 0)
                 {
                     success = false;
                     continue;
                 }
 
                 var newSavePath = Path.Combine(savePath, datum.Name);
-                var isOk = await GetAllFilesTraverseAndDownByAria2(webFileInfo.data.ToList(), apiUrl, password, newSavePath, ua);
+                var isOk = await GetAllFilesTraverseAndDownByAria2(webFileInfo.Data.ToList(), apiUrl, password, newSavePath, ua);
 
 
                 if (!isOk)
@@ -1158,7 +1170,7 @@ internal class WebApi
         //获取该文件夹下的文件和文件夹
         var webFileInfo = await GetFileAsync(datum.Cid, loadAll: true);
 
-        foreach (var data in webFileInfo.data)
+        foreach (var data in webFileInfo.Data)
         {
             //文件夹
             if (data.Fid == null)
@@ -1257,7 +1269,7 @@ internal class WebApi
                 var aria2GlobalOptionRequest =
                     JsonConvert.DeserializeObject<Aria2GlobalOptionRequest>(strResult);
 
-                savePath = aria2GlobalOptionRequest?.result?.dir;
+                savePath = aria2GlobalOptionRequest?.Result?.Dir;
             }
         }
         catch
@@ -1313,7 +1325,7 @@ internal class WebApi
     /// </summary>
     public async void LogoutAccount()
     {
-        if (UserInfo == null) return;
+        if (UserInfoResult == null) return;
 
         const string url =
             "https://passportapi.115.com/app/1.0/web/1.0/logout/logout/?goto=https%3A%2F%2F115.com%2F";
@@ -1322,8 +1334,8 @@ internal class WebApi
         await Client.GetAsync(url);
 
         //清空账号信息
-        QrCodeInfo = null;
-        UserInfo = null;
+        QrCodeInfoResult = null;
+        UserInfoResult = null;
         DeleteCookie();
     }
 
@@ -1369,7 +1381,7 @@ internal class WebApi
         }
 
         var src = $"{{\"pickcode\":\"{pickCode}\"}}";
-        var (data, keyBytes) = M115.Encode(src, tm);
+        var (data, keyBytes) = M115Helper.Encode(src, tm);
 
         var dataString = Encoding.ASCII.GetString(data);
         var dataUrlEncode = HttpUtility.UrlEncode(dataString);
@@ -1384,13 +1396,13 @@ internal class WebApi
 
         var downUrlBase64EncryptInfo = await client.SendAsync<DownUrlBase64EncryptInfo>(HttpMethod.Post, url, content);
 
-        if (downUrlBase64EncryptInfo is { state: true })
+        if (downUrlBase64EncryptInfo is { State: true })
         {
-            var base64Text = downUrlBase64EncryptInfo.data;
+            var base64Text = downUrlBase64EncryptInfo.Data;
 
             var srcBase64 = Convert.FromBase64String(base64Text);
 
-            var rep = M115.Decode(srcBase64, keyBytes);
+            var rep = M115Helper.Decode(srcBase64, keyBytes);
 
             //JObject json = JsonConvert.DeserializeObject<JObject>(rep);
             var json = JObject.Parse(rep);
@@ -1554,15 +1566,15 @@ internal class WebApi
         {
             case PlayerType.PotPlayer:
                 savePath = AppSettings.PotPlayerExePath;
-                ua = GetInfoFromNetwork.DownUserAgent;
+                ua = DbNetworkHelper.DownUserAgent;
                 break;
             case PlayerType.Mpv:
                 savePath = AppSettings.MpvExePath;
-                ua = GetInfoFromNetwork.DownUserAgent;
+                ua = DbNetworkHelper.DownUserAgent;
                 break;
             case PlayerType.Vlc:
                 savePath = AppSettings.VlcExePath;
-                ua = GetInfoFromNetwork.DownUserAgent;
+                ua = DbNetworkHelper.DownUserAgent;
                 break;
             case PlayerType.WebView:
             case PlayerType.MediaElement:
@@ -1644,7 +1656,7 @@ internal class WebApi
         if (File.Exists(subFile))
             return subFile;
 
-        var ua = GetInfoFromNetwork.DownUserAgent;
+        var ua = DbNetworkHelper.DownUserAgent;
 
         //不存在则获取下载链接并下载
         var subUrlList = await GetDownUrl(pickCode, ua);
@@ -1655,7 +1667,7 @@ internal class WebApi
 
         var subUrl = subUrlList.First().Value;
 
-        subFile = await GetInfoFromNetwork.DownloadFile(subUrl, subSavePath, fileName, false, new Dictionary<string, string>
+        subFile = await DbNetworkHelper.DownloadFile(subUrl, subSavePath, fileName, false, new Dictionary<string, string>
         {
             {"User-Agent", ua }
         });

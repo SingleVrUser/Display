@@ -1,15 +1,21 @@
-﻿using Display.Helper.FileProperties.Name;
-using Display.Providers;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media.Playback;
+using Display.Helper.FileProperties.Name;
+using Display.Helper.Network;
+using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities;
+using Display.Models.Entities.OneOneFive;
 using Display.Models.Enums;
+using Display.Models.Vo;
+using Display.Models.Vo.OneOneFive;
+using Display.Providers;
 using Display.Providers.Downloader;
 
-namespace Display.Models.Media;
+namespace Display.Models.Dto.Media;
 
 public class MediaPlayItem
 {
@@ -21,10 +27,9 @@ public class MediaPlayItem
     public readonly long? Fid;
     public readonly long? Size;
     public readonly long Cid;
-    public string Description;
-    private List<M3U8Info> M3U8Infos;
-
-    private FilesInfo.FileType Type;
+    public string Description { get; set; }
+    private List<M3U8Info> _m3U8Infos;
+    private readonly FilesInfo.FileType _type;
 
     private FailInfo _failInfo;
 
@@ -74,7 +79,7 @@ public class MediaPlayItem
         FileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
         TrueName = FileMatch.MatchName(FileNameWithoutExtension)?.ToUpper();
         Title = FileNameWithoutExtension;
-        Type = type;
+        _type = type;
 
         Size = size;
         Cid = cid;
@@ -92,14 +97,14 @@ public class MediaPlayItem
 
     public async Task<List<M3U8Info>> GetM3U8Infos()
     {
-        if (IsRequestM3U8) return M3U8Infos;
+        if (IsRequestM3U8) return _m3U8Infos;
 
         // 没获取过
-        M3U8Infos = await _webApi.GetM3U8InfoByPickCode(PickCode);
+        _m3U8Infos = await _webApi.GetM3U8InfoByPickCode(PickCode);
 
         IsRequestM3U8 = true;
 
-        return M3U8Infos;
+        return _m3U8Infos;
     }
 
     public MediaPlaybackItem MediaPlaybackItem { get; set; }
@@ -125,7 +130,7 @@ public class MediaPlayItem
             return OriginalUrl;
         }
 
-        var downUrlList = await _webApi.GetDownUrl(PickCode, GetInfoFromNetwork.DownUserAgent);
+        var downUrlList = await _webApi.GetDownUrl(PickCode, DbNetworkHelper.DownUserAgent);
         IsRequestOriginal = true;
 
         OriginalUrl = downUrlList.FirstOrDefault().Value;
@@ -137,7 +142,7 @@ public class MediaPlayItem
         if (QualityInfos != null) return QualityInfos;
 
         //先原画
-        QualityInfos = new List<Quality> { new("原画", isOriginal: true) };
+        QualityInfos = [new Quality("原画", isOriginal: true)];
 
         var m3U8Infos = await GetM3U8Infos();
         //有m3u8
@@ -208,12 +213,12 @@ public class MediaPlayItem
 
         foreach (var playItem in oldMediaPlayItems)
         {
-            if (playItem.Type == FilesInfo.FileType.Folder)
+            if (playItem._type == FilesInfo.FileType.Folder)
             {
                 var fileInfos = await webApi.GetFileAsync(playItem.Cid, loadAll: true);
 
                 newMediaPlayItems.AddRange(
-                    fileInfos.data
+                    fileInfos.Data
                         .Where(x => x.Fid != null && x.Iv == 1)
                         .Select(x => new MediaPlayItem(x)));
             }
