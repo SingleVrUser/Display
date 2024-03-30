@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using Display.Helper.Data;
 using Display.Interfaces;
-using Display.Models.Media;
 using Display.Providers;
 using System;
 using System.Collections.Generic;
@@ -10,8 +9,11 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Display.Helper.Network;
+using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Vo.OneOneFive;
 using Display.Providers.Downloader;
 using LocalThumbnail = Display.Models.Dto.Media.LocalThumbnail;
 
@@ -81,7 +83,7 @@ internal partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGe
             if (string.IsNullOrEmpty(_videoUrl))
             {
                 // 视频未转码，m3u8链接为0，尝试获取直链
-                var downUrlList = await _webApi.GetDownUrl(item.PickCode, GetInfoFromNetwork.DownUserAgent);
+                var downUrlList = await _webApi.GetDownUrl(item.PickCode, DbNetworkHelper.DownUserAgent);
 
                 if (downUrlList.Count > 0)
                 {
@@ -101,7 +103,7 @@ internal partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGe
                     Headers = new Dictionary<string, string>
                     {
                         { "referer", "https://115.com" },
-                        { "user_agent",GetInfoFromNetwork.DownUserAgent }
+                        { "user_agent",DbNetworkHelper.DownUserAgent }
                     }
                 }
             };

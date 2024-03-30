@@ -10,7 +10,9 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Storage;
+using Display.Models.Api.OneOneFive.Browser;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Vo;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -95,17 +97,17 @@ namespace Display.Controls.UserController
         /// file_count,folder_count,hasHiddenFile,size可能获取不到（选中数超过两个），所以只使用name和id
         /// </summary>
         /// <returns></returns>
-        public async Task<List<SelectedItem>> GetSelectedItems()
+        public async Task<List<SelectedItemInBrowser>> GetSelectedItems()
         {
             if (WebView == null)
             {
                 return null;
             }
 
-            List<SelectedItem> selectedItemList = new();
+            List<SelectedItemInBrowser> selectedItemList = [];
 
             //选择文件夹和文件
-            string inputElementsIdAndValueAsJsonString = await WebView.ExecuteScriptAsync(
+            var inputElementsIdAndValueAsJsonString = await WebView.ExecuteScriptAsync(
                 "Array.from(" +
                         "document.getElementById('js_center_main_box').getElementsByTagName('iframe')[0].contentDocument.getElementsByClassName('list-contents')[0].getElementsByTagName('li')" +
                     ").filter(" +
@@ -126,7 +128,7 @@ namespace Display.Controls.UserController
 
             if (inputElementsIdAndValueAsJsonString != "[]" && inputElementsIdAndValueAsJsonString != "0")
             {
-                selectedItemList = JsonSerializer.Deserialize<List<SelectedItem>>(inputElementsIdAndValueAsJsonString);
+                selectedItemList = JsonSerializer.Deserialize<List<SelectedItemInBrowser>>(inputElementsIdAndValueAsJsonString);
             }
 
             return selectedItemList;

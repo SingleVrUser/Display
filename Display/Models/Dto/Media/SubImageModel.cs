@@ -3,11 +3,14 @@ using System;
 using System.Threading.Tasks;
 using Display.Helper.Data;
 using Display.Helper.Network;
+using Display.Models.Api.OneOneFive;
+using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Vo.OneOneFive;
 
 namespace Display.Models.Dto.Media;
 
-internal class SubImageModel(FilesInfo fileInfo) : Dto.Media.BaseImage
+internal class SubImageModel(FilesInfo fileInfo) : BaseImage
 {
     public readonly FilesInfo FileInfo = fileInfo;
     private ImageInfo? _imageInfo;

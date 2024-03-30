@@ -7,9 +7,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:data="using:Display.Models.Data"
         xmlns:winUiEx="using:WinUIEx"
-        xmlns:settings="using:Display.Models.Settings"
         xmlns:userController="using:Display.Controls.UserController"
         xmlns:providers="using:Display.Providers"
+        xmlns:settings1="using:Display.Models.Dto.Settings"
         mc:Ignorable="d">
 
     <Grid x:Name="RootGrid">
@@ -126,7 +126,7 @@
 
             <!--菜单-->
             <NavigationView.MenuItemTemplate>
-                <DataTemplate x:DataType="settings:MenuItem">
+                <DataTemplate x:DataType="settings1:MenuItem">
                     <NavigationViewItem Content="{x:Bind Content}"
                                         Icon="{x:Bind Icon}"
                                         Tag="{x:Bind PageEnum}"

@@ -8,6 +8,8 @@
             xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
       xmlns:userController="using:Display.Controls.UserController"
+      xmlns:file="using:Display.Models.Api.OneOneFive.File"
+      xmlns:oneOneFive1="using:Display.Models.Vo.OneOneFive"
       mc:Ignorable="d">
 
     <Grid RowDefinitions="50,*">
@@ -133,7 +135,7 @@
                 </oldControls:AdaptiveGridView.HeaderTemplate>
 
                 <oldControls:AdaptiveGridView.ItemTemplate>
-                    <DataTemplate x:DataType="oneOneFive:FilesInfo">
+                    <DataTemplate x:DataType="oneOneFive1:FilesInfo">
                         <oldControls:ImageEx Source="{x:Bind ThumbnailUrl}"
                                             Height="60" />
                     </DataTemplate>

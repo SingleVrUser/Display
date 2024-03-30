@@ -7,9 +7,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:models="using:Display.Models.Media"
     xmlns:customController="using:Display.Controls.CustomController"
     xmlns:userController="using:Display.Controls.UserController"
+    xmlns:media="using:Display.Models.Dto.Media"
     mc:Ignorable="d">
     <customController:CursorGrid x:Name="RootGrid">
 
@@ -63,7 +63,7 @@
                       Visibility="Collapsed">
                     <ListView x:Name="VideoListView" IsEnabled="False" >
                         <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="models:MediaPlayItem">
+                            <DataTemplate x:DataType="media:MediaPlayItem">
                                 <Grid>
                                     <Grid.Resources>
                                         <Style TargetType="TextBlock">

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System.Collections.Generic;
+using Display.Models.Api.OneOneFive.OfflineDown;
 using Display.Models.Dto.OneOneFive;
 
 namespace Display.Views.Pages.OfflineDown;

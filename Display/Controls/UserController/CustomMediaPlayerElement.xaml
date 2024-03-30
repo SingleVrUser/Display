@@ -7,13 +7,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:models="using:Display.Models.Media"
     xmlns:customController="using:Display.Controls.CustomController"
+    xmlns:media="using:Display.Models.Dto.Media"
     mc:Ignorable="d">
 
     <UserControl.Resources>
         <DataTemplate x:Key="QualityDataTemplate"
-                      x:DataType="models:Quality">
+                      x:DataType="media:Quality">
             <TextBlock Text="{x:Bind ShowName}" />
         </DataTemplate>
         

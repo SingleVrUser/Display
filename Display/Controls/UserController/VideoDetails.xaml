@@ -252,7 +252,7 @@
                         <StackPanel Grid.Row="1"
                                     Orientation="Horizontal"
                                     Spacing="10">
-                            <TextBlock Text="{x:Bind ResultInfo.trueName,Mode=OneWay}"
+                            <TextBlock Text="{x:Bind ResultInfo.TrueName,Mode=OneWay}"
                                        IsTextSelectionEnabled="True"
                                        FontFamily="JetBrains Mono"
                                        FontSize="26"

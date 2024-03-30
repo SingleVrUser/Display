@@ -7,6 +7,9 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
+      xmlns:file="using:Display.Models.Api.OneOneFive.File"
+      xmlns:oneOneFive1="using:Display.Models.Vo.OneOneFive"
+      xmlns:vo="using:Display.Models.Vo"
       mc:Ignorable="d"
       Width="600"
       Height="300">
@@ -15,7 +18,7 @@
             <ItemsStackPanel/>
         </ItemsPanelTemplate>
 
-        <DataTemplate x:DataType="oneOneFive:FilesInfo" x:Name="ListViewDataTemplate">
+        <DataTemplate x:DataType="oneOneFive1:FilesInfo" x:Name="ListViewDataTemplate">
             <Grid ColumnDefinitions="32,*"
                   ColumnSpacing="10"
                   ToolTipService.ToolTip="{x:Bind Name}">
@@ -56,10 +59,10 @@
                            ItemClicked="FolderBreadcrumbBar_ItemClicked"
                            ItemsSource="{x:Bind _explorerItems}">
                 <BreadcrumbBar.ItemTemplate>
-                    <DataTemplate x:DataType="oneOneFive:ExplorerItem">
+                    <DataTemplate x:DataType="vo:ExplorerItem">
                         <BreadcrumbBarItem>
                             <BreadcrumbBarItem.ContentTemplate>
-                                <DataTemplate x:DataType="oneOneFive:ExplorerItem">
+                                <DataTemplate x:DataType="vo:ExplorerItem">
                                     <TextBlock Text="{x:Bind Name}" />
                                 </DataTemplate>
                             </BreadcrumbBarItem.ContentTemplate>

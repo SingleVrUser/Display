@@ -3,7 +3,6 @@ using ByteSizeLib;
 using Display.Constants;
 using Display.Controls.CustomController;
 using Display.Helper.UI;
-using Display.Models.Media;
 using Display.Providers;
 using Microsoft.Graphics.Canvas;
 using Microsoft.UI.Dispatching;
@@ -26,7 +25,13 @@ using Windows.Media.Streaming.Adaptive;
 using Windows.Storage;
 using Windows.System.Display;
 using Windows.Web.Http;
+using Display.Helper.Network;
+using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
+using Display.Models.Vo.OneOneFive;
 using Display.Providers.Downloader;
 using Display.Streams;
 using Display.Views.Pages;
@@ -37,8 +42,8 @@ namespace Display.Controls.UserController;
 
 public sealed partial class CustomMediaPlayerElement
 {
-    public int IsLike;
-    public int LookLater;
+    private int _isLike;
+    private int _lookLater;
 
     public enum PlayType { Success, Fail }
     public event EventHandler<RoutedEventArgs> FullWindow;
@@ -52,14 +57,14 @@ public sealed partial class CustomMediaPlayerElement
     private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     private HttpClient _httpClient;
     private int _qualityIndex = 1;
-    private uint _playIndex = 0;
+    private uint _playIndex;
 
-    private List<AdaptiveMediaSourceCreationResult> _adaptiveMediaSourceList;
-    private List<HttpRandomAccessStream> _httpRandomAccessStreamList;
+    private readonly List<AdaptiveMediaSourceCreationResult> _adaptiveMediaSourceList =[];
+    private readonly List<HttpRandomAccessStream> _httpRandomAccessStreamList = [];
 
     public CustomMediaPlayerElement()
     {
-        this.InitializeComponent();
+        InitializeComponent();
     }
 
     public void InitLoad(IList<MediaPlayItem> playItems, MediaPlayWindow window)
@@ -71,8 +76,6 @@ public sealed partial class CustomMediaPlayerElement
         _webApi ??= WebApi.GlobalWebApi;
         _httpClient = WebApi.SingleVideoWindowWebHttpClient;
 
-        _adaptiveMediaSourceList = new List<AdaptiveMediaSourceCreationResult>();
-        _httpRandomAccessStreamList = new List<HttpRandomAccessStream>();
         _mediaPlaybackList = new MediaPlaybackList();
         SetMediaPlayer();
     }
@@ -244,7 +247,7 @@ public sealed partial class CustomMediaPlayerElement
         Debug.WriteLine("添加字幕");
         mediaPlaybackItem.Source.ExternalTimedTextSources.Add(timedTextSource);
 
-        mediaPlaybackItem.TimedMetadataTracksChanged += (sender, args) =>
+        mediaPlaybackItem.TimedMetadataTracksChanged += (sender, _) =>
         {
             Debug.WriteLine($"当前字幕数量为: {mediaPlaybackItem.TimedMetadataTracks.Count}");
 
@@ -283,11 +286,11 @@ public sealed partial class CustomMediaPlayerElement
             }
             else
             {
-                IsLike = failInfo.IsLike;
-                LookLater = Convert.ToInt32(failInfo.LookLater);
+                _isLike = failInfo.IsLike;
+                _lookLater = Convert.ToInt32(failInfo.LookLater);
 
-                isLike = IsLike == 1;
-                isLookLater = LookLater != 0;
+                isLike = _isLike == 1;
+                isLookLater = _lookLater != 0;
             }
 
             MediaTransportControls.SetLike_LookLater(isLike, isLookLater);
@@ -297,11 +300,11 @@ public sealed partial class CustomMediaPlayerElement
         }
         else
         {
-            IsLike = videoInfo.IsLike;
-            LookLater = Convert.ToInt32(videoInfo.LookLater);
+            _isLike = videoInfo.IsLike;
+            _lookLater = Convert.ToInt32(videoInfo.LookLater);
 
-            isLike = IsLike == 1;
-            isLookLater = this.LookLater != 0;
+            isLike = _isLike == 1;
+            isLookLater = this._lookLater != 0;
 
             MediaTransportControls.SetLike_LookLater(isLike, isLookLater);
 
@@ -456,15 +459,15 @@ public sealed partial class CustomMediaPlayerElement
 
         if (string.IsNullOrEmpty(pickCode)) return;
 
-        IsLike = button.IsChecked == true ? 1 : 0;
+        _isLike = button.IsChecked == true ? 1 : 0;
 
         var videoInfo = playItem.GetVideoInfo();
 
         if (videoInfo != null)
         {
-            DataAccess.Update.UpdateSingleDataFromVideoInfo(trueName, "is_like", IsLike.ToString());
+            DataAccess.Update.UpdateSingleDataFromVideoInfo(trueName, "is_like", _isLike.ToString());
 
-            if (IsLike == 1) ShowTeachingTip("已添加进喜欢");
+            if (_isLike == 1) ShowTeachingTip("已添加进喜欢");
         }
         else
         {
@@ -478,27 +481,27 @@ public sealed partial class CustomMediaPlayerElement
                 DataAccess.Add.AddOrReplaceFailList_IsLike_LookLater(new()
                 {
                     PickCode = pickCode,
-                    IsLike = IsLike,
+                    IsLike = _isLike,
                     ImagePath = capPath
                 });
 
-                if (IsLike == 1) ShowTeachingTip("已添加进喜欢");
+                if (_isLike == 1) ShowTeachingTip("已添加进喜欢");
             }
             else
             {
-                DataAccess.Update.UpdateSingleFailInfo(pickCode, "is_like", IsLike.ToString());
+                DataAccess.Update.UpdateSingleFailInfo(pickCode, "is_like", _isLike.ToString());
 
                 //需要截图
-                if (failInfo.ImagePath == Constants.FileType.NoPicturePath || !File.Exists(failInfo.ImagePath))
+                if (failInfo.ImagePath == FileType.NoPicturePath || !File.Exists(failInfo.ImagePath))
                 {
                     var capPath = await ScreenShotAsync(pickCode);
                     DataAccess.Update.UpdateSingleFailInfo(pickCode, "image_path", capPath);
 
-                    if (IsLike == 1) ShowTeachingTip("已添加进喜欢，并截取当前画面作为封面");
+                    if (_isLike == 1) ShowTeachingTip("已添加进喜欢，并截取当前画面作为封面");
                 }
                 else
                 {
-                    if (IsLike == 1) ShowTeachingTip("已添加进喜欢");
+                    if (_isLike == 1) ShowTeachingTip("已添加进喜欢");
                 }
             }
         }
@@ -515,15 +518,15 @@ public sealed partial class CustomMediaPlayerElement
         if (string.IsNullOrEmpty(pickCode)) return;
 
 
-        LookLater = button.IsChecked == true ? Convert.ToInt32(DateTimeOffset.Now.ToUnixTimeSeconds()) : 0;
+        _lookLater = button.IsChecked == true ? Convert.ToInt32(DateTimeOffset.Now.ToUnixTimeSeconds()) : 0;
 
         var videoInfo = playItem.GetVideoInfo();
 
         if (videoInfo != null)
         {
-            DataAccess.Update.UpdateSingleDataFromVideoInfo(trueName, "look_later", LookLater.ToString());
+            DataAccess.Update.UpdateSingleDataFromVideoInfo(trueName, "look_later", _lookLater.ToString());
 
-            if (LookLater != 0) ShowTeachingTip("已添加进稍后观看");
+            if (_lookLater != 0) ShowTeachingTip("已添加进稍后观看");
         }
         else
         {
@@ -535,15 +538,15 @@ public sealed partial class CustomMediaPlayerElement
                 DataAccess.Add.AddOrReplaceFailList_IsLike_LookLater(new()
                 {
                     PickCode = pickCode,
-                    LookLater = LookLater,
+                    LookLater = _lookLater,
                     ImagePath = capPath
                 });
 
-                if (LookLater != 0) ShowTeachingTip("已添加进稍后观看");
+                if (_lookLater != 0) ShowTeachingTip("已添加进稍后观看");
             }
             else
             {
-                DataAccess.Update.UpdateSingleFailInfo(pickCode, "look_later", LookLater.ToString());
+                DataAccess.Update.UpdateSingleFailInfo(pickCode, "look_later", _lookLater.ToString());
 
                 //需要添加截图
                 if (failInfo.ImagePath == FileType.NoPicturePath || !File.Exists(failInfo.ImagePath))
@@ -551,11 +554,11 @@ public sealed partial class CustomMediaPlayerElement
                     var capPath = await ScreenShotAsync(pickCode);
                     DataAccess.Update.UpdateSingleFailInfo(pickCode, "image_path", capPath);
 
-                    if (LookLater != 0) ShowTeachingTip("已添加进稍后观看，并截取当前画面作为封面");
+                    if (_lookLater != 0) ShowTeachingTip("已添加进稍后观看，并截取当前画面作为封面");
                 }
                 else
                 {
-                    if (LookLater != 0) ShowTeachingTip("已添加进稍后观看");
+                    if (_lookLater != 0) ShowTeachingTip("已添加进稍后观看");
                 }
             }
         }
@@ -856,7 +859,7 @@ public sealed partial class CustomMediaPlayerElement
             infos.Add("下载链接", await playItem.GetOriginalUrl());
         }
 
-        infos.Add("userAgent", GetInfoFromNetwork.DownUserAgent);
+        infos.Add("userAgent", DbNetworkHelper.DownUserAgent);
 
         await InfoPage.ShowInContentDialog(XamlRoot, infos, "媒体信息");
     }

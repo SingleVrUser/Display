@@ -6,14 +6,17 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Display.Helper.Network;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
 using Display.Providers.Downloader;
 
 namespace Display.Providers.Spider;
 
 public class Common
 {
-    public static readonly HttpClient Client = GetInfoFromNetwork.CommonClient;
+    public static readonly HttpClient Client = NetworkHelper.CommonClient;
 
     public static Tuple<string, string> SplitCid(string cid, bool needSingleKeyword = false)
     {
@@ -98,7 +101,7 @@ public class Common
     {
         VideoInfo videoInfo = new()
         {
-            trueName = cid,
+            TrueName = cid,
             busUrl = detailUrl
         };
 
@@ -244,7 +247,7 @@ public class Common
         //下载图片
         var filePath = Path.Combine(AppSettings.ImageSavePath, cid);
         videoInfo.ImageUrl = coverUrl;
-        videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(coverUrl, filePath, cid);
+        videoInfo.ImagePath = await DbNetworkHelper.DownloadFile(coverUrl, filePath, cid);
 
         return videoInfo;
     }

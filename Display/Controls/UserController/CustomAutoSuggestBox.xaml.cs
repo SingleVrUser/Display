@@ -9,7 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.Foundation;
+using Display.Models.Api.OneOneFive.Search;
+using Display.Models.Dto;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
 
 namespace Display.Controls.UserController;
 
@@ -127,10 +131,7 @@ public sealed partial class CustomAutoSuggestBox
 
         NavViewSearchBox.ItemsSource = new List<HistorySearchItem>
         {
-            new()
-            {
-                KeywordArray = result
-            }
+            new(result)
         };
     }
 

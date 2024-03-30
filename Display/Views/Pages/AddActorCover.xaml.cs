@@ -11,12 +11,11 @@ using System.Threading.Tasks;
 using System.Web;
 using Windows.Foundation.Metadata;
 using Display.Helper.Date;
+using Display.Helper.Network;
 using Display.Models.Data.IncrementalCollection;
-using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
 using Display.Models.Enums;
-using Display.Models.Enums.OneOneFive;
 using Display.Providers;
-using Display.Providers.Downloader;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -58,7 +57,7 @@ public sealed partial class AddActorCover
 
     }
 
-    ActorInfo _storedItem;
+    private ActorInfo _storedItem;
     private async void BasicGridView_ItemClick(object sender, ItemClickEventArgs e)
     {
         ConnectedAnimation animation = null;
@@ -385,7 +384,7 @@ public sealed partial class AddActorCover
     /// <returns></returns>
     private async Task<string> GetGitUpdateDateStr()
     {
-        var client = GetInfoFromNetwork.CommonClient;
+        var client = NetworkHelper.CommonClient;
 
         const string gitInfoUrl = @"https://api.github.com/repos/gfriends/gfriends";
 
@@ -415,7 +414,7 @@ public sealed partial class AddActorCover
     {
         if (IsNullOrEmpty(filePath)) return false;
 
-        _client ??= GetInfoFromNetwork.CommonClient;
+        _client ??= NetworkHelper.CommonClient;
 
         var directoryName = Path.GetDirectoryName(filePath);
         if (!IsNullOrEmpty(directoryName) && !File.Exists(directoryName))
@@ -559,7 +558,7 @@ public sealed partial class AddActorCover
         var actorName = ShoeActorName.Text;
 
         var savePath = Path.Combine(AppSettings.ActorInfoSavePath, actorName);
-        await GetInfoFromNetwork.DownloadFile(imageUrl, savePath, "face", true);
+        await DbNetworkHelper.DownloadFile(imageUrl, savePath, "face", true);
 
         foreach (var item in _actorInfo)
         {

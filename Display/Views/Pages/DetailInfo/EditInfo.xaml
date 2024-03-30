@@ -6,13 +6,14 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:details="using:Display.Models.Entities.Details"
-    xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
     xmlns:detailInfo1="using:Display.Views.Pages.DetailInfo"
+    xmlns:records="using:Display.Models.Records"
+    xmlns:oneOneFive="using:Display.Models.Entities.OneOneFive"
     mc:Ignorable="d">
 
     <Page.Resources>
         <DataTemplate x:Key="TokenTemplate"
-                      x:DataType="details:TokenData">
+                      x:DataType="records:TokenData">
             <StackPanel Orientation="Horizontal">
                 <Border CornerRadius="9999"
                         Background="{x:Bind Name, Converter={StaticResource ObjectToColorConverter}}"

@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using Display.Managers;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 

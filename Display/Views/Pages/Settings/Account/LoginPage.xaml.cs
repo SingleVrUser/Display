@@ -39,13 +39,13 @@ public sealed partial class LoginPage
         QrCodeMessageStackPanel.Visibility = Visibility.Collapsed;
 
         //显示二维码
-        QrCodeShow(qrcodeInfo.data.qrcode);
+        QrCodeShow(qrcodeInfo.data.Qrcode);
 
         //状态：登录中
         UpdateStateUI(QrCodeStatus.WaitScan);
 
         //监听二维码状态
-        if (!await WaitLoginByQrCode(qrcodeInfo.data.uid))
+        if (!await WaitLoginByQrCode(qrcodeInfo.data.Uid))
             return;
 
         //成功登录后，检查网络状态（内含存储Cookie），关闭窗口
@@ -69,34 +69,34 @@ public sealed partial class LoginPage
             if (breakFlag) break;
 
             //二维码已更新
-            if (uid != WebApi.QrCodeInfo.data.uid) return false;
+            if (uid != WebApi.QrCodeInfoResult.data.Uid) return false;
 
             //发送查询请求，可能为超长时长（服务器单次最大通讯时长30s）
             var qRCodeStatus = await _webapi.GetQrCodeStatusAsync();
 
-            if (qRCodeStatus.state == 1)
+            if (qRCodeStatus.State == 1)
             {
-                var statusInfo = qRCodeStatus.data;
-                Debug.WriteLine($"当前状态码：{statusInfo.status}，信息：{statusInfo.msg}");
+                var statusInfo = qRCodeStatus.Data;
+                Debug.WriteLine($"当前状态码：{statusInfo.Status}，信息：{statusInfo.Msg}");
 
-                switch (statusInfo.status)
+                switch (statusInfo.Status)
                 {
                     case 0:
-                        UpdateStateUI(QrCodeStatus.WaitScan, statusInfo.msg);
+                        UpdateStateUI(QrCodeStatus.WaitScan, statusInfo.Msg);
                         break;
                     case 1:
-                        UpdateStateUI(QrCodeStatus.WaitConfirm, statusInfo.msg);
+                        UpdateStateUI(QrCodeStatus.WaitConfirm, statusInfo.Msg);
                         break;
                     case 2:
                         UpdateStateUI(QrCodeStatus.Success, "登录成功");
                         return true;
                     case -2:
-                        UpdateStateUI(QrCodeStatus.NeedFresh, statusInfo.msg);
+                        UpdateStateUI(QrCodeStatus.NeedFresh, statusInfo.Msg);
                         breakFlag = true;
                         _waitingFresh = true;
                         break;
                     case -1:
-                        UpdateStateUI(QrCodeStatus.Error, statusInfo.msg);
+                        UpdateStateUI(QrCodeStatus.Error, statusInfo.Msg);
                         breakFlag = true;
                         break;
                 }
@@ -104,7 +104,7 @@ public sealed partial class LoginPage
             //二维码过期，超过5min
             else
             {
-                UpdateStateUI(QrCodeStatus.Error, qRCodeStatus.message);
+                UpdateStateUI(QrCodeStatus.Error, qRCodeStatus.Message);
                 break;
             }
         }

@@ -1,4 +1,6 @@
-﻿namespace Display.Extensions;
+﻿using System.Linq;
+
+namespace Display.Extensions;
 
 internal static class String
 {
@@ -22,14 +24,7 @@ internal static class String
     /// <returns></returns>
     public static bool IsNumber(this string @string)
     {
-        if (string.IsNullOrEmpty(@string))
-            return false;
-
-        foreach (char c in @string)
-        {
-            if (!char.IsDigit(c))
-                return false;
-        }
-        return true;
+        return !string.IsNullOrEmpty(@string)
+               && @string.All(char.IsDigit);
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Display.Helper.Crypto
 {
@@ -19,15 +21,15 @@ namespace Display.Helper.Crypto
             }
         }
 
-        public static uint Compute(byte[] bytes)
+        public static uint Compute(IEnumerable<byte> bytes)
         {
-            var crc = uint.MaxValue;
-            foreach (var t in bytes)
-                crc = CrcTable[(crc ^ t) & 0xff] ^ crc >> 8;
+            var crc = bytes.Aggregate(uint.MaxValue, (current, t) => CrcTable[(current ^ t) & 0xff] ^ current >> 8);
             return ~crc;
         }
         public static byte[] CalcCrc32(byte[] bytes)
         {
+            ArgumentNullException.ThrowIfNull(bytes);
+            
             var newCrc32 = Compute(bytes);
             var newResult = BitConverter.GetBytes(newCrc32);
 

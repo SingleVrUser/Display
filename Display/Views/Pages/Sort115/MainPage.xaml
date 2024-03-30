@@ -9,9 +9,10 @@
 
       xmlns:viewModels="using:Display.ViewModels"
       xmlns:controls="using:CommunityToolkit.WinUI.Controls"
-      xmlns:model="using:Display.Models.Entities._115"
       xmlns:userController="using:Display.Controls.UserController"
       xmlns:sort115="using:Display.Views.Pages.Sort115"
+      xmlns:oneOneFive="using:Display.Models.Api.OneOneFive"
+      xmlns:oneOneFive1="using:Display.Models.Vo.OneOneFive"
       mc:Ignorable="d">
 
     <Page.DataContext>
@@ -247,7 +248,7 @@
                         </ListView.HeaderTemplate>
 
                         <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="model:Sort115HomeModel">
+                            <DataTemplate x:DataType="oneOneFive1:Sort115HomeModel">
                                 <Grid Height="48"
                                       ColumnDefinitions="*,150,180,30"
                                       ColumnSpacing="5">

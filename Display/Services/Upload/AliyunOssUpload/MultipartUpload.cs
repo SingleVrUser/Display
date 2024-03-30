@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 using System.Xml;
 using Display.Extensions;
 using Display.Helper.Encode;
+using Display.Models.Api.OneOneFive.Upload;
 using Display.Models.Enums;
-using Display.Models.Upload;
+using Display.Models.Vo;
 using Display.Streams;
 using HttpHeaders = Display.Constants.HttpHeaders;
 

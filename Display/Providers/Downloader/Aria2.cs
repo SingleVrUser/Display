@@ -1,12 +1,14 @@
-﻿using Display.Models.Settings.Options;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Display.Models.Api.Aria2;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Dto.Settings.Options;
+using Display.Models.Vo.Down;
 
 namespace Display.Providers.Downloader;
 
@@ -31,10 +33,10 @@ internal class Aria2 : BaseDownloader
 
         Aria2Request request = new()
         {
-            jsonrpc = "2.0",
-            method = "aria2.getVersion",
-            id = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString(),
-            _params = [curSetting.Password]
+            Jsonrpc = "2.0",
+            Method = "aria2.getVersion",
+            Id = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString(),
+            Params = [curSetting.Password]
         };
 
         var myContent = JsonConvert.SerializeObject(request);

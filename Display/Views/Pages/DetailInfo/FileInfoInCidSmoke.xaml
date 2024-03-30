@@ -9,6 +9,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
       xmlns:detailInfo="using:Display.Views.Pages.DetailInfo"
+      xmlns:file="using:Display.Models.Api.OneOneFive.File"
       mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
@@ -19,7 +20,7 @@
         <ListView x:Name="InfosListView"
                   CharacterSpacing="5">
             <ListView.ItemTemplate>
-                <DataTemplate x:DataType="oneOneFive:Datum">
+                <DataTemplate x:DataType="file:Datum">
                     <Grid Padding="5"
                           RowDefinitions="auto,auto,*"
                           RowSpacing="3">

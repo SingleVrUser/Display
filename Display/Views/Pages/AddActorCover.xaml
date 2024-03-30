@@ -8,8 +8,8 @@
     xmlns:animations1="using:CommunityToolkit.WinUI.Animations"
     xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:userController="using:Display.Controls.UserController"
-    xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
     xmlns:pages="using:Display.Views.Pages"
+    xmlns:oneOneFive="using:Display.Models.Entities.OneOneFive"
     mc:Ignorable="d">
     <Page.Resources>
 

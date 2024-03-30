@@ -9,8 +9,9 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Display.Models.Dto.OneOneFive;
-using Display.Providers.Downloader;
-using static Display.Models.Spider.SpiderNameAndStatus;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Spider;
+using Display.Models.Vo;
 
 namespace Display.Providers.Spider;
 
@@ -60,7 +61,7 @@ public class JavDb : BaseSpider
             new Dictionary<string, string>
             {
                 { "cookie", cookie },
-                { "user-agent", GetInfoFromNetwork.DownUserAgent }
+                { "user-agent", DbNetworkHelper.DownUserAgent }
             });
     }
 
@@ -137,7 +138,7 @@ public class JavDb : BaseSpider
 
         var attributeNodes = videoMetaPanelNode.SelectNodes(".//div[contains(@class,'panel-block')]");
 
-        videoInfo.trueName = cid;
+        videoInfo.TrueName = cid;
         //信息
         foreach (var currentNode in attributeNodes)
         {
@@ -202,13 +203,13 @@ public class JavDb : BaseSpider
         //标题
         var titleNode = htmlDoc.DocumentNode.SelectSingleNode(".//strong[@class='current-title']");
         var title = titleNode.InnerText;
-        videoInfo.Title = title.Replace(videoInfo.trueName, "").Trim();
+        videoInfo.Title = title.Replace(videoInfo.TrueName, "").Trim();
 
         //下载封面
         var savePath = AppSettings.ImageSavePath;
         var filePath = Path.Combine(savePath, cid);
         videoInfo.ImageUrl = imageUrl;
-        videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(imageUrl, filePath, cid);
+        videoInfo.ImagePath = await DbNetworkHelper.DownloadFile(imageUrl, filePath, cid);
 
         //样品图片
         var previewImagesSingesNode = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class,'preview-images')]");

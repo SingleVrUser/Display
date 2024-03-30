@@ -1,5 +1,3 @@
-// Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
 
 using System;
 using System.Collections.Generic;
@@ -10,17 +8,13 @@ using CommunityToolkit.WinUI.Controls;
 using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Entities.Details;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Records;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
 namespace Display.Views.Pages.DetailInfo;
 
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
 public sealed partial class EditInfo
 {
     private readonly List<object> _editOptions;

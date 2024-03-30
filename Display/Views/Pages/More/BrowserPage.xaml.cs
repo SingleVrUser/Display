@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.OneOneFive;
 using Display.Providers;
 using Microsoft.UI.Xaml;
@@ -68,7 +69,7 @@ public sealed partial class BrowserPage
             _webApi ??= WebApi.GlobalWebApi;
 
             List<Datum> videoInfoList = [];
-            videoInfoList.AddRange(selectedItemList.Select(item => new Datum { Cid = item.id, Name = item.name, PickCode = item.pick_code, Fid = item.file_id }));
+            videoInfoList.AddRange(selectedItemList.Select(item => new Datum { Cid = item.Id, Name = item.Name, PickCode = item.PickCode, Fid = item.FileId }));
 
             //BitComet只需要cid,n,pc三个值
             var isSuccess = await _webApi.RequestDown(videoInfoList, downtype);

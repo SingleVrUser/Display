@@ -5,8 +5,10 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Display.Extensions;
+using Display.Helper.Network;
+using Display.Models.Api.OneOneFive.Upload;
 using Display.Models.Enums;
-using Display.Models.Upload;
+using Display.Models.Vo;
 using Display.Providers.Downloader;
 
 namespace Display.Services.Upload.AliyunOssUpload;
@@ -60,7 +62,7 @@ internal class AliyunOssService : IDisposable
 
     public event Action<UploadState> StateChanged;
 
-    private static HttpClient SingleOssClient => GetInfoFromNetwork.CommonClient;
+    private static HttpClient SingleOssClient => NetworkHelper.CommonClient;
 
     /// <summary>
     /// 初始化AliyunOss
@@ -86,7 +88,7 @@ internal class AliyunOssService : IDisposable
         var simpleUpload = new SimpleUpload(SingleOssClient, _stream, _ossToken, _fastUploadResult, token);
         var uploadResult = await simpleUpload.Start();
 
-        State = uploadResult is { state: true } ? UploadState.Succeed : UploadState.Faulted;
+        State = uploadResult is { State: true } ? UploadState.Succeed : UploadState.Faulted;
 
         return uploadResult;
     }
@@ -117,7 +119,7 @@ internal class AliyunOssService : IDisposable
 
         if (State != UploadState.Paused)
         {
-            State = uploadResult is { state: true } ? UploadState.Succeed : UploadState.Faulted;
+            State = uploadResult is { State: true } ? UploadState.Succeed : UploadState.Faulted;
         }
 
         return uploadResult;

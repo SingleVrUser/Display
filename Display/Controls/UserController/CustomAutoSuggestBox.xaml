@@ -8,6 +8,10 @@
              xmlns:controls="using:CommunityToolkit.WinUI.Controls"
              xmlns:userController="using:Display.Controls.UserController"
              xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
+             xmlns:search="using:Display.Models.Api.OneOneFive.Search"
+             xmlns:dto="using:Display.Models.Dto"
+             xmlns:vo="using:Display.Models.Vo"
+             xmlns:oneOneFive1="using:Display.Models.Entities.OneOneFive"
              mc:Ignorable="d">
 
     <UserControl.Resources>
@@ -21,7 +25,7 @@
             <userController:ItemsContainerStyleSelector x:Key="AutoSuggestionBoxItemsContainerStyleSelector"
                                                NoPointerOverStyle="{StaticResource NoPointerOverListViewItemStyle}"/>
             <DataTemplate x:Key="FoundedSuggestionBox"
-                          x:DataType="oneOneFive:VideoInfo">
+                          x:DataType="oneOneFive1:VideoInfo">
                 <Grid Margin="5"
                       ColumnSpacing="5"
                       Tapped="ItemTapped"
@@ -38,7 +42,7 @@
                                x:Name="Cover_image" />
                     </Grid>
                     <StackPanel Grid.Column="1">
-                        <TextBlock Text="{x:Bind trueName}"
+                        <TextBlock Text="{x:Bind TrueName}"
                                    TextTrimming="CharacterEllipsis" />
                         <TextBlock Text="{x:Bind Actor}"
                                    TextTrimming="WordEllipsis"
@@ -52,7 +56,7 @@
             </DataTemplate>
 
             <DataTemplate x:Key="HistorySearchBox"
-                          x:DataType="data:HistorySearchItem">
+                          x:DataType="dto:HistorySearchItem">
 
                 <Grid RowDefinitions="*,auto">
                     <ItemsRepeater x:Name="WrapRepeater"
@@ -64,7 +68,7 @@
                         </ItemsRepeater.Layout>
 
                         <ItemsRepeater.ItemTemplate>
-                            <DataTemplate x:DataType="oneOneFive:SearchHistory">
+                            <DataTemplate x:DataType="search:SearchHistory">
                                 <GridViewItem Content="{x:Bind Keyword}"
                                               Tapped="SearchHistoryItem_OnTapped"
                                               Padding="10,0"/>

@@ -9,7 +9,11 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.System;
+using Display.Models.Api.EditorCookie;
+using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
 using Display.Providers;
 
 namespace Display.Helper.FileProperties.Name;
@@ -219,7 +223,7 @@ public static class FileMatch
 
             var newItems = DataAccess.Get.GetVideoInfoBySomeType(trueType, keywords, leftCount);
 
-            newItems?.ForEach(item => dictionary.TryAdd(item.trueName, item));
+            newItems?.ForEach(item => dictionary.TryAdd(item.TrueName, item));
         }
 
         return dictionary.Values.ToList();
@@ -256,7 +260,7 @@ public static class FileMatch
                 //未匹配
                 if (videoName == null)
                 {
-                    resultList.Add(new MatchVideoResult { status = false, OriginalName = fileInfo.Name, statusCode = -1, message = "匹配失败" });
+                    resultList.Add(new MatchVideoResult { Status = false, OriginalName = fileInfo.Name, StatusCode = -1, Message = "匹配失败" });
                     continue;
                 }
 
@@ -266,14 +270,14 @@ public static class FileMatch
                 resultList.Add(existsResult == null
                     ? new MatchVideoResult
                     {
-                        status = true, OriginalName = fileInfo.Name, message = "匹配成功", statusCode = 1,
+                        Status = true, OriginalName = fileInfo.Name, Message = "匹配成功", StatusCode = 1,
                         MatchName = videoName
                     }
-                    : new MatchVideoResult { status = true, OriginalName = fileInfo.Name, statusCode = 2, message = "已添加" });
+                    : new MatchVideoResult { Status = true, OriginalName = fileInfo.Name, StatusCode = 2, Message = "已添加" });
             }
             else
             {
-                resultList.Add(new MatchVideoResult { status = true, OriginalName = fileInfo.Name, statusCode = 0, message = "跳过非视频" });
+                resultList.Add(new MatchVideoResult { Status = true, OriginalName = fileInfo.Name, StatusCode = 0, Message = "跳过非视频" });
             }
         }
 
@@ -297,17 +301,17 @@ public static class FileMatch
             switch (key)
             {
                 case "acw_tc":
-                    cookieList.Add(new CookieFormat { name = key, value = value, domain = "115.com", hostOnly = true });
+                    cookieList.Add(new CookieFormat { Name = key, Value = value, Domain = "115.com", HostOnly = true });
                     break;
                 case "115_lang":
-                    cookieList.Add(new CookieFormat { name = key, value = value, httpOnly = false });
+                    cookieList.Add(new CookieFormat { Name = key, Value = value, HttpOnly = false });
                     break;
                 case "CID" or "SEID" or "UID" or "USERSESSIONID":
-                    cookieList.Add(new CookieFormat { name = key, value = value });
+                    cookieList.Add(new CookieFormat { Name = key, Value = value });
                     break;
                 //mini_act……_dialog_show
                 default:
-                    cookieList.Add(new CookieFormat { name = key, value = value, session = true });
+                    cookieList.Add(new CookieFormat { Name = key, Value = value, Session = true });
                     break;
             }
         }

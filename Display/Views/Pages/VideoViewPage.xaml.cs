@@ -1,8 +1,13 @@
 ﻿using System.Collections.Generic;
 using Display.Controls.UserController;
 using Display.Helper.Network;
+using Display.Models.Api.OneOneFive.File;
+using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
-using Display.Models.Media;
+using Display.Models.Entities;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
+using Display.Models.Vo.OneOneFive;
 using Display.Providers;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -70,7 +75,7 @@ public sealed partial class VideoViewPage
 
         if (VideoPlayButton.DataContext is not VideoCoverDisplayClass videoInfo) return;
 
-        List<Datum> videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(videoInfo.trueName);
+        List<Datum> videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(videoInfo.TrueName);
 
         //没有
         if (videoInfoList.Count == 0)

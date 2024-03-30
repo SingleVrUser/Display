@@ -10,6 +10,8 @@
       xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:userController="using:Display.Controls.UserController"
       xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
+      xmlns:vo="using:Display.Models.Vo"
+      xmlns:oneOneFive1="using:Display.Models.Entities.OneOneFive"
       mc:Ignorable="d">
 
     <ScrollViewer>
@@ -91,7 +93,7 @@
                                       ItemsSource="{x:Bind _items}"
                                       Background="Transparent">
                                 <FlipView.ItemTemplate>
-                                    <DataTemplate x:DataType="oneOneFive:VideoInfo">
+                                    <DataTemplate x:DataType="oneOneFive1:VideoInfo">
                                         <Border x:Name="Image_Grid"
                                                 PointerEntered="Image_PointerEntered"
                                                 PointerExited="Image_PointerExited"
@@ -119,7 +121,7 @@
                                   SelectedIndex="{x:Bind RandomImageFlipView.SelectedIndex, Mode=TwoWay}"
                                   SelectionChanged="videoInfoListView_SelectionChanged">
                             <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="oneOneFive:VideoInfo">
+                                <DataTemplate x:DataType="oneOneFive1:VideoInfo">
                                     <Grid Margin="2">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="auto" />
@@ -135,7 +137,7 @@
                                         <StackPanel Grid.Column="1"
                                                     VerticalAlignment="Center"
                                                     Margin="5">
-                                            <TextBlock Text="{x:Bind trueName}"
+                                            <TextBlock Text="{x:Bind TrueName}"
                                                        FontFamily="JetBrains Mono" />
                                             <userController:TextBlockWithLongText StringValue="{x:Bind Actor}"
                                                                                   IsFirstTextSelectionEnabled="False" />

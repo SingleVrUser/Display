@@ -10,8 +10,15 @@ using Windows.Storage;
 using Display.Extensions;
 using Display.Helper.Data;
 using Display.Helper.FileProperties.Name;
+using Display.Models.Api.OneOneFive.Down;
+using Display.Models.Api.OneOneFive.File;
+using Display.Models.Api.OneOneFive.Search;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities;
+using Display.Models.Entities.OneOneFive;
 using Display.Models.Enums.OneOneFive;
+using Display.Models.Vo;
+using Display.Models.Vo.OneOneFive;
 using Display.Providers.Spider;
 using Microsoft.Data.Sqlite;
 using static System.Int32;
@@ -288,7 +295,7 @@ public static class DataAccess
 
         createTable.ExecuteNonQuery();
 
-        var wmProducer = Constants.WmInfo.WmProducer;
+        var wmProducer = Constants.DefaultWmInfo.WmProducer;
 
         //插入常见的
         foreach (var name in wmProducer)
@@ -480,7 +487,7 @@ public static class DataAccess
                     {
                         actorsInfoDict.Add(actor, new List<string>());
                     }
-                    actorsInfoDict[actor].Add(videoInfo.trueName);
+                    actorsInfoDict[actor].Add(videoInfo.TrueName);
                 }
             }
 
@@ -676,13 +683,13 @@ public static class DataAccess
             Update.UpdateVideoInfo(videoInfo, connection);
 
             //更新是否步兵
-            Add.AddOrReplaceIs_Wm(videoInfo.trueName, videoInfo.Producer, videoInfo.IsWm, connection);
+            Add.AddOrReplaceIs_Wm(videoInfo.TrueName, videoInfo.Producer, videoInfo.IsWm, connection);
 
             //更新演员信息
             //先删除Actor_Videos中所有Video_name的数据
-            Delete.DeleteVideoInfoByName(videoInfo.trueName, connection);
+            Delete.DeleteVideoInfoByName(videoInfo.TrueName, connection);
 
-            Add.AddActorInfoByActorInfo(videoInfo, new List<string> { videoInfo.trueName }, connection);
+            Add.AddActorInfoByActorInfo(videoInfo, new List<string> { videoInfo.TrueName }, connection);
 
             connection.Close();
         }
@@ -945,10 +952,10 @@ public static class DataAccess
             AddVideoInfo(data, connection);
 
             //添加演员信息
-            AddActorInfoByActorInfo(data, [data.trueName], connection);
+            AddActorInfoByActorInfo(data, [data.TrueName], connection);
 
             //添加是否步兵
-            AddOrReplaceIs_Wm(data.trueName, data.Producer, data.IsWm, connection);
+            AddOrReplaceIs_Wm(data.TrueName, data.Producer, data.IsWm, connection);
 
             connection.Close();
         }
@@ -973,7 +980,7 @@ public static class DataAccess
                     //添加信息，如果已经存在则忽略
                     command.CommandText = $"INSERT OR IGNORE INTO Actor_Video VALUES (@actor_id,@video_name)";
                     command.Parameters.AddWithValue("@actor_id", actorId);
-                    command.Parameters.AddWithValue("@video_name", videoInfo.trueName);
+                    command.Parameters.AddWithValue("@video_name", videoInfo.TrueName);
                     command.ExecuteNonQuery();
                 }
                 // 没有该演员信息的话

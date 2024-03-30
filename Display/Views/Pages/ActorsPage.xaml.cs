@@ -11,6 +11,7 @@ using Display.Helper.Network;
 using Display.Helper.Notifications;
 using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
 using Display.Providers;
 using Display.Providers.Downloader;
 using Microsoft.UI.Input;
@@ -344,7 +345,7 @@ public sealed partial class ActorsPage
 
                     Uri infoUri = new(actorInfo.InfoUrl);
 
-                    var profilePath = await GetInfoFromNetwork.DownloadFile(actorInfo.ImageUrl, filePath, "face", headers: new()
+                    var profilePath = await DbNetworkHelper.DownloadFile(actorInfo.ImageUrl, filePath, "face", headers: new()
                     {
                         {"Host",infoUri.Host },
                         {"Referer", actorInfo.InfoUrl }

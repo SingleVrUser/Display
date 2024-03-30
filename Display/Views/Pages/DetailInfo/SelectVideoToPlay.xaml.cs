@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Display.Helper.Network;
+using Display.Models.Api.OneOneFive.File;
+using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
-using Display.Models.Media;
 
 namespace Display.Views.Pages.DetailInfo;
 

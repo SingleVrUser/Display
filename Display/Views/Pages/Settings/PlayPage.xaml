@@ -6,11 +6,11 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
-    xmlns:options="using:Display.Models.Settings.Options"
     xmlns:winUi="using:CommunityToolkit.WinUI"
     xmlns:data="using:Display.Models.Data"
     xmlns:providers="using:Display.Providers"
     xmlns:enums1="using:Display.Models.Enums"
+    xmlns:options1="using:Display.Models.Dto.Settings.Options"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -21,7 +21,7 @@
         <StackLayout x:Key="PlayerStackLayout" Spacing="{StaticResource SettingsCardPadding}"/>
 
         <DataTemplate x:Key="PlayerDataTemplate"
-                      x:DataType="options:Player">
+                      x:DataType="options1:Player">
             <controls:SettingsExpander Header="{x:Bind Name}"
                                        HeaderIcon="{x:Bind Icon}"
                                        Visibility="{x:Bind IsNeedPath}">
@@ -60,7 +60,7 @@
                       ItemsSource="{x:Bind _players}"
                       SelectedItem="{x:Bind CurrentPlayer,Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
-                    <DataTemplate x:DataType="options:Player">
+                    <DataTemplate x:DataType="options1:Player">
                         <TextBlock Text="{x:Bind Name}" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>

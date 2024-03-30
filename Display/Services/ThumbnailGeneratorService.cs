@@ -2,7 +2,6 @@
 using Display.Helper.Media;
 using Display.Helper.Network;
 using Display.Interfaces;
-using Display.Models.Media;
 using FFmpeg.AutoGen.Abstractions;
 using System;
 using System.Collections.Generic;

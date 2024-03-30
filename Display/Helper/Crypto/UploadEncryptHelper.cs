@@ -13,7 +13,8 @@ namespace Display.Helper.Crypto
     {
         private const string Md5Salt = "Qclm8MGWUv59TnrR0XPg";
         private static readonly byte[] CrcSaltBytes = "^j>WD3Kr?J2gLFjD4W2y@"u8.ToArray();
-        public static readonly byte[] ServerPubKey = {
+        public static readonly byte[] ServerPubKey =
+        [
             0x04, 0x57, 0xa2, 0x92, 0x57, 0xcd, 0x23, 0x20,
             0xe5, 0xd6, 0xd1, 0x43, 0x32, 0x2f, 0xa4, 0xbb,
             0x8a, 0x3c, 0xf9, 0xd3, 0xcc, 0x62, 0x3e, 0xf5,
@@ -22,7 +23,7 @@ namespace Display.Helper.Crypto
             0x22, 0xd0, 0x34, 0xc8, 0x95, 0xdd, 0x24, 0x65,
             0x24, 0x3a, 0xdd, 0xc2, 0x50, 0x95, 0x3b, 0xee,
             0xba
-        };
+        ];
 
         public static string GetSign(int userid, string fileId, string target, string userKey)
         {

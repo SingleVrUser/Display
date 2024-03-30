@@ -1,8 +1,9 @@
-﻿using Display.Models.Settings.Options;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using Display.Models.Dto.Settings.Options;
+using Display.Models.Vo.Down;
 
 namespace Display.Providers.Downloader;
 

@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
 using Display.Providers;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -179,7 +181,7 @@ public sealed partial class HomePage
             bool isAdd = true;
             foreach (var showItem in videoList)
             {
-                if (showItem.trueName == item.trueName)
+                if (showItem.TrueName == item.TrueName)
                 {
                     isAdd = false;
                 }
@@ -198,7 +200,7 @@ public sealed partial class HomePage
             bool isDel = true;
             foreach (var item in videoInfos)
             {
-                if (showItem.trueName == item.trueName)
+                if (showItem.TrueName == item.TrueName)
                 {
                     isDel = false;
                 }
@@ -206,13 +208,13 @@ public sealed partial class HomePage
 
             if (isDel)
             {
-                delList.Add(showItem.trueName);
+                delList.Add(showItem.TrueName);
             }
         }
 
         foreach (var trueName in delList)
         {
-            var delItem = videoList.FirstOrDefault(x => x.trueName == trueName);
+            var delItem = videoList.FirstOrDefault(x => x.TrueName == trueName);
             videoList.Remove(delItem);
         }
         foreach (var item in addList)

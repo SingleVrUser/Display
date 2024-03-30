@@ -9,6 +9,7 @@
     xmlns:downloader="using:Display.Providers.Downloader"
     xmlns:userController="using:Display.Controls.UserController"
     xmlns:settings="using:Display.Views.Pages.Settings"
+    xmlns:down="using:Display.Models.Vo.Down"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -16,7 +17,7 @@
 
         <StackLayout x:Key="DownloaderStackLayout" Spacing="{StaticResource SettingsCardPadding}"/>
 
-        <DataTemplate x:Key="DownloadDataTemplate"  x:DataType="downloader:BaseDownloader">
+        <DataTemplate x:Key="DownloadDataTemplate"  x:DataType="down:BaseDownloader">
             <controls:SettingsExpander Header="{x:Bind Name}"
                                        Description="{x:Bind Description}">
                 <controls:SettingsExpander.Items>

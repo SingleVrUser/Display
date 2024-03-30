@@ -9,6 +9,8 @@ using System.Text.RegularExpressions;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Storage;
+using Display.Models.Api.OneOneFive.OfflineDown;
+using Display.Models.Api.OneOneFive.Upload;
 using Display.Models.Dto.OneOneFive;
 using Display.Providers;
 using Display.Views.Pages.More.DatumList;
@@ -24,7 +26,7 @@ public sealed partial class OfflineDownPage
 
     private MatchCollection _matchLinkCollection;
 
-    private UploadInfo _uploadInfo;
+    private UploadInfoResult _uploadInfoResult;
 
     private OfflineSpaceInfo _offlineSpaceInfo;
 
@@ -42,9 +44,9 @@ public sealed partial class OfflineDownPage
     {
         var downPathRequest = await _webApi.GetOfflineDownPath();
 
-        if (!(downPathRequest?.data?.Length > 0)) return;
+        if (!(downPathRequest?.Data?.Length > 0)) return;
 
-        foreach (var datum in downPathRequest.data)
+        foreach (var datum in downPathRequest.Data)
         {
             DownPathComboBox.Items.Add(datum);
         }
@@ -70,16 +72,16 @@ public sealed partial class OfflineDownPage
 
     public async void CreateOfflineDownRequest()
     {
-        _uploadInfo ??= await _webApi.GetUploadInfo();
+        _uploadInfoResult ??= await _webApi.GetUploadInfo();
 
-        if (_uploadInfo == null)
+        if (_uploadInfoResult == null)
         {
             // 无法获取上传信息
             FailLoaded?.Invoke(this, new FailLoadedEventArgs("无法获取UploadInfo"));
             return;
         }
 
-        _offlineSpaceInfo ??= await _webApi.GetOfflineSpaceInfo(_uploadInfo.userkey, _uploadInfo.user_id);
+        _offlineSpaceInfo ??= await _webApi.GetOfflineSpaceInfo(_uploadInfoResult.UserKey, _uploadInfoResult.UserId);
 
         if (_offlineSpaceInfo == null)
         {
@@ -104,8 +106,8 @@ public sealed partial class OfflineDownPage
 
         Debug.WriteLine("正在添加磁力任务");
 
-        var result = await _webApi.AddTaskUrl(links, downPath.file_id, downPath.user_id, _offlineSpaceInfo.sign,
-            _offlineSpaceInfo.time);
+        var result = await _webApi.AddTaskUrl(links, downPath.FileId, downPath.UserId, _offlineSpaceInfo.Sign,
+            _offlineSpaceInfo.Time);
 
         Debug.WriteLine("添加磁力任务完毕");
 
@@ -150,7 +152,7 @@ public sealed partial class OfflineDownPage
                 break;
             // 单个torrent
             case 1:
-                (isSucceed, content) = await WebApi.GlobalWebApi.CreateTorrentOfflineDown(downPath.file_id, rarItems.First().Path);
+                (isSucceed, content) = await WebApi.GlobalWebApi.CreateTorrentOfflineDown(downPath.FileId, rarItems.First().Path);
                 break;
             // 多个
             default:
@@ -165,7 +167,7 @@ public sealed partial class OfflineDownPage
                     ShowTeachingTip($"添加torrent任务中：{i}/{length}" + (failCount > 0 ? "，失败数:{failCount}" : string.Empty));
 
                     var (isCurrentSucceed, _) = await WebApi.GlobalWebApi.CreateTorrentOfflineDown(
-                        downPath.file_id, file.Path);
+                        downPath.FileId, file.Path);
 
                     if (!isCurrentSucceed) failCount++;
                 }
@@ -184,7 +186,7 @@ public sealed partial class OfflineDownPage
                 Debug.WriteLine("请求打开所在目录");
 
                 // 打开所在目录
-                CommonWindow.CreateAndShowWindow(new FileListPage(downPath.file_id));
+                CommonWindow.CreateAndShowWindow(new FileListPage(downPath.FileId));
             });
         }
         else

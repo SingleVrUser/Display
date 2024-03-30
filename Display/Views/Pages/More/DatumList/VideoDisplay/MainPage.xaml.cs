@@ -13,10 +13,15 @@ using Windows.Media.Playback;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.Controls;
 using Display.Helper.FileProperties.Name;
+using Display.Helper.Network;
 using Display.Helper.UI;
 using Display.Managers;
+using Display.Models.Api.OneOneFive.File;
 using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
+using Display.Models.Vo.OneOneFive;
 using Display.Providers;
 using Display.Providers.Downloader;
 using Display.Services;
@@ -100,7 +105,7 @@ public sealed partial class MainPage : IDisposable
                         var filesInfo = await _webApi.GetFileAsync(folder.Cid);
 
                         // 挑选视频数量
-                        var videoInFolder = filesInfo.data
+                        var videoInFolder = filesInfo.Data
                             .Where(item => item.Fid != null && item.Iv == 1).Take(leftCount).ToList();
                         var videoInFolderCount = videoInFolder.Count;
 
@@ -273,7 +278,7 @@ public sealed partial class MainPage : IDisposable
         if (!string.IsNullOrEmpty(videoUrl)) return videoUrl;
 
         // 视频未转码，m3u8链接为0，尝试获取直链
-        var downUrlList = await _webApi.GetDownUrl(pickCode, GetInfoFromNetwork.DownUserAgent);
+        var downUrlList = await _webApi.GetDownUrl(pickCode, DbNetworkHelper.DownUserAgent);
 
         if (downUrlList.Count > 0)
         {
@@ -445,7 +450,7 @@ public sealed partial class MainPage : IDisposable
             Debug.WriteLine("正在添加信息：" + trueName);
 
             // cidInfo已经存在
-            var cidInfo = _cidInfos.FirstOrDefault(item => item.VideoInfo.trueName.ToUpper().Equals(trueName.ToUpper()));
+            var cidInfo = _cidInfos.FirstOrDefault(item => item.VideoInfo.TrueName.ToUpper().Equals(trueName.ToUpper()));
             if (cidInfo is not null)
             {
                 _cidInfos.Add(cidInfo);
@@ -611,7 +616,7 @@ public sealed partial class MainPage : IDisposable
     {
         //移除cid信息（预览图/信息）
         var removeCid = _cidInfos.FirstOrDefault(item =>
-            item.VideoInfo.trueName == fileInfo.Name || item.VideoInfo.trueName.Equals(FileMatch.MatchName(fileInfo.Name)?.ToUpper(), StringComparison.CurrentCultureIgnoreCase));
+            item.VideoInfo.TrueName == fileInfo.Name || item.VideoInfo.TrueName.Equals(FileMatch.MatchName(fileInfo.Name)?.ToUpper(), StringComparison.CurrentCultureIgnoreCase));
 
         if (removeCid == null) return;
 
@@ -1009,7 +1014,7 @@ public class CidInfo
 
     public CidInfo(string name, string imagePath)
     {
-        VideoInfo = new VideoInfo { trueName = name, ImagePath = imagePath };
+        VideoInfo = new VideoInfo { TrueName = name, ImagePath = imagePath };
     }
 
     public CidInfo(VideoInfo info)
@@ -1019,7 +1024,7 @@ public class CidInfo
 
     public void UpdateInfo(VideoInfo info)
     {
-        VideoInfo.trueName = info.trueName;
+        VideoInfo.TrueName = info.TrueName;
         VideoInfo.ImagePath = info.ImagePath;
         VideoInfo.ReleaseTime = info.ReleaseTime;
         VideoInfo.Actor = info.Actor;

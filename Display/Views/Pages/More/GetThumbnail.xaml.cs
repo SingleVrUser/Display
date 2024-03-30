@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Display.Helper.Date;
 using Display.Helper.FileProperties.Name;
+using Display.Helper.Network;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
 using Display.Models.Enums.OneOneFive;
@@ -386,7 +387,7 @@ public sealed partial class GetThumbnail : Page
             {
                 var savePath = Path.Combine(AppSettings.ImageSavePath, thumbnail.Name);
                 var saveName = $"Thumbnail_{j}";
-                var saveImagePath = await GetInfoFromNetwork.DownloadFile(downUrlList[j], savePath, saveName);
+                var saveImagePath = await DbNetworkHelper.DownloadFile(downUrlList[j], savePath, saveName);
 
                 if (j == 1) imagePath = saveImagePath;
 

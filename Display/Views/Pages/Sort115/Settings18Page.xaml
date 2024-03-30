@@ -7,7 +7,10 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:viewModels="using:Display.ViewModels"
-      xmlns:models="using:Display.Models.Entities._115"
+      xmlns:oneOneFive="using:Display.Models.Api.OneOneFive"
+      xmlns:vo="using:Display.Models.Vo"
+      xmlns:oneOneFive1="using:Display.Models.Vo.OneOneFive"
+      xmlns:records="using:Display.Models.Records"
       mc:Ignorable="d">
 
     <Page.DataContext>
@@ -169,10 +172,10 @@
                               DisplayMemberPath="Item1"
                               SelectedValuePath="Item2"
                               SelectedIndex="{x:Bind ViewModel.SeparatorNumSelectedIndex,Mode=TwoWay}"
-                              ItemsSource="{x:Bind models:Sort115Settings.PartNumCombos}" />
+                              ItemsSource="{x:Bind oneOneFive1:Sort115Settings.PartNumCombos}" />
                     <TextBlock Grid.Row="12"
                                Grid.Column="1"
-                               Text="{x:Bind (models:PartNumCombo)PartNumComboBox.SelectedValue,Mode=OneWay}"
+                               Text="{x:Bind (records:PartNumCombo)PartNumComboBox.SelectedValue,Mode=OneWay}"
                                Style="{StaticResource ExampleTextBlockStyle}" />
 
                     <TextBlock Grid.Row="13"
@@ -183,7 +186,7 @@
                               DisplayMemberPath="Item1"
                               SelectedValuePath="Item2"
                               SelectedIndex="{x:Bind ViewModel.NumNameFormatSelectedIndex,Mode=TwoWay}"
-                              ItemsSource="{x:Bind models:Sort115Settings.NumNameFormatCombos}" />
+                              ItemsSource="{x:Bind oneOneFive1:Sort115Settings.NumNameFormatCombos}" />
                     <TextBlock Grid.Row="14"
                                Grid.Column="1"
                                Text="{x:Bind NumNameSampleTextBlock.Text,Mode=OneWay}"

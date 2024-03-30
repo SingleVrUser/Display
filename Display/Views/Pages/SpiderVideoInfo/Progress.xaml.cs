@@ -8,8 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Display.Helper.FileProperties.Name;
 using Display.Managers;
+using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
+using Display.Models.Vo;
+using Display.Models.Vo.OneOneFive;
 using Display.Providers;
 using Display.Views.Windows;
 using LiveChartsCore;
@@ -60,7 +63,7 @@ public sealed partial class Progress
 
         foreach (var item in _failDatumList)
         {
-            _matchVideoResults.Add(new MatchVideoResult { status = true, OriginalName = item.Datum.Name, message = "匹配成功", statusCode = 1, MatchName = item.MatchName });
+            _matchVideoResults.Add(new MatchVideoResult { Status = true, OriginalName = item.Datum.Name, Message = "匹配成功", StatusCode = 1, MatchName = item.MatchName });
 
             //替换数据库的数据
             DataAccess.Add.AddFileToInfo(item.Datum.PickCode, item.MatchName, isReplace: true);

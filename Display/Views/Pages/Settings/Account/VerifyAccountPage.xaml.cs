@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using Display.Models.Api.OneOneFive.Browser;
 using Display.Models.Dto.OneOneFive;
 using Display.Views.Windows;
 using Microsoft.UI.Xaml;

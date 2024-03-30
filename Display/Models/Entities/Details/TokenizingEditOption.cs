@@ -10,8 +10,6 @@ public class TokenizingEditOption
     public string Header;
     public string PlaceholderText => $"添加{Header}";
 
-    public string Text;
-
     public SymbolIconSource SymbolIconSource;
 
     public TypedEventHandler<AutoSuggestBox, AutoSuggestBoxTextChangedEventArgs> TextChanged;

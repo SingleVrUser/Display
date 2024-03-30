@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Display.Models.Dto.Settings.Options;
 using Display.Models.Enums;
-using Display.Models.Settings.Options;
 using Display.Providers;
 using Microsoft.UI.Xaml.Controls;
 

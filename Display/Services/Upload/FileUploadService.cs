@@ -2,7 +2,6 @@
 using Display.Extensions;
 using Display.Helper.Crypto;
 using Display.Helper.Network;
-using Display.Models.Upload;
 using Display.Providers;
 using System;
 using System.Collections.Generic;
@@ -13,7 +12,10 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Display.Models.Api.OneOneFive.Upload;
 using Display.Models.Enums;
+using Display.Models.Vo;
+using Display.Models.Vo.OneOneFive;
 using Display.Providers.Downloader;
 using Display.Services.Upload.AliyunOssUpload;
 using static System.String;
@@ -74,7 +76,7 @@ internal class FileUploadService : UploadBase
     private static async Task<string> GetRangSha1FromInternet(HttpClient client, string pickCode, string signCheck, CancellationToken token)
     {
         // 获取下载链接
-        var downUrls = await WebApi.GetDownUrl(client, pickCode, GetInfoFromNetwork.DownUserAgent, false);
+        var downUrls = await WebApi.GetDownUrl(client, pickCode, DbNetworkHelper.DownUserAgent, false);
 
         if (downUrls is not { Count: > 0 })
         {
@@ -160,7 +162,7 @@ internal class FileUploadService : UploadBase
                 continue;
             }
 
-            if (IsNullOrEmpty(fastUploadResult.sign_key) || IsNullOrEmpty(fastUploadResult.sign_check))
+            if (IsNullOrEmpty(fastUploadResult.SignKey) || IsNullOrEmpty(fastUploadResult.SignCheck))
             {
                 // 不能秒传，需要上传
                 if (!IsNullOrEmpty(fastUploadResult.Object))
@@ -170,21 +172,21 @@ internal class FileUploadService : UploadBase
                 }
 
                 // 秒传成功
-                if (fastUploadResult.status == 2)
+                if (fastUploadResult.Status == 2)
                 {
                     Position = _fileInfo.Length;
                     State = UploadState.Succeed;
                     return fastUploadResult;
                 }
 
-                Debug.WriteLine($"上传时发生错误：{fastUploadResult.statusmsg}");
+                Debug.WriteLine($"上传时发生错误：{fastUploadResult.StatusMsg}");
                 State = UploadState.Faulted;
 
                 return null;
             }
 
-            signKey = fastUploadResult.sign_key;
-            signVal = HashHelper.ComputeSha1RangeByStream(_stream, fastUploadResult.sign_check);
+            signKey = fastUploadResult.SignKey;
+            signVal = HashHelper.ComputeSha1RangeByStream(_stream, fastUploadResult.SignCheck);
         }
 
         State = UploadState.Faulted;
@@ -240,7 +242,7 @@ internal class FileUploadService : UploadBase
         var uploadResult = State == UploadState.Succeed;
         if (uploadResult)
         {
-            FileUploadResult.PickCode = upload115Result.pickcode;
+            FileUploadResult.PickCode = upload115Result.PickCode;
             FileUploadResult.Sha1 = _totalSha1;
             FileUploadResult.Success = true;
 
@@ -251,10 +253,10 @@ internal class FileUploadService : UploadBase
         // 秒传未完成但获取到了需要的参数
 
         //转换callback、callbackVar为base64格式
-        upload115Result.callback.callback =
-            Convert.ToBase64String(Encoding.Default.GetBytes(upload115Result.callback.callback));
-        upload115Result.callback.callback_var =
-            Convert.ToBase64String(Encoding.Default.GetBytes(upload115Result.callback.callback_var));
+        upload115Result.OssCallback.Callback =
+            Convert.ToBase64String(Encoding.Default.GetBytes(upload115Result.OssCallback.Callback));
+        upload115Result.OssCallback.CallbackVar =
+            Convert.ToBase64String(Encoding.Default.GetBytes(upload115Result.OssCallback.CallbackVar));
 
         var ossUploadResult = await UploadByAliyunOss(upload115Result);
         uploadResult = State == UploadState.Succeed;
@@ -387,7 +389,7 @@ internal class FileUploadService : UploadBase
                 continue;
             }
 
-            if (string.IsNullOrEmpty(fastUploadResult.sign_key) || string.IsNullOrEmpty(fastUploadResult.sign_check))
+            if (string.IsNullOrEmpty(fastUploadResult.SignKey) || string.IsNullOrEmpty(fastUploadResult.SignCheck))
             {
                 // 不能秒传，需要上传
                 if (!string.IsNullOrEmpty(fastUploadResult.Object))
@@ -396,18 +398,18 @@ internal class FileUploadService : UploadBase
                 }
 
                 // 秒传成功
-                if (fastUploadResult.status == 2)
+                if (fastUploadResult.Status == 2)
                 {
                     return fastUploadResult;
                 }
 
-                Debug.WriteLine($"上传时发生错误：{fastUploadResult.statusmsg}");
+                Debug.WriteLine($"上传时发生错误：{fastUploadResult.StatusMsg}");
 
                 return null;
             }
 
-            signKey = fastUploadResult.sign_key;
-            signVal = await GetRangSha1FromInternet(client, pickCode, fastUploadResult.sign_check, token);
+            signKey = fastUploadResult.SignKey;
+            signVal = await GetRangSha1FromInternet(client, pickCode, fastUploadResult.SignCheck, token);
         }
 
         return null;
@@ -425,8 +427,8 @@ internal class FileUploadService : UploadBase
         if (!IsGetUploadInfo)
         {
             var uploadInfo = await WebApi.GlobalWebApi.GetUploadInfo();
-            _userId = uploadInfo.user_id;
-            _userKey = uploadInfo.userkey;
+            _userId = uploadInfo.UserId;
+            _userKey = uploadInfo.UserKey;
         }
 
         // 计算本地Sha1

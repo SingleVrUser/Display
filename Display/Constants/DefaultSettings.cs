@@ -1,5 +1,5 @@
-﻿using Display.Models.Settings;
-using Windows.Storage;
+﻿using Windows.Storage;
+using Display.Models.Dto.Settings;
 using Display.Models.Enums;
 
 namespace Display.Constants;

@@ -15,10 +15,13 @@ using Windows.Storage;
 using ByteSizeLib;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.Network;
+using Display.Models.Api.OneOneFive.File;
 using Display.Models.Data.IncrementalCollection;
+using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
-using Display.Models.Media;
+using Display.Models.Vo;
+using Display.Models.Vo.OneOneFive;
 using Display.Providers;
 using Display.ViewModels;
 using Display.Views.Pages.More.Import115DataToLocalDataAccess;
@@ -105,7 +108,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     private void FilesInfos_WebPathChanged(WebPath[] obj)
     {
         _units.Clear();
-        FilesInfos.WebPaths?.ForEach(path => _units.Add(new ExplorerItem { Name = path.name, Id = path.cid }));
+        FilesInfos.WebPaths?.ForEach(path => _units.Add(new ExplorerItem { Name = path.Name, Id = path.Cid }));
 
     }
 
@@ -946,11 +949,11 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         // 移动文件到新文件夹
         Debug.WriteLine($"移动文件数量：{fileInfos.Count}");
-        await Move115Files(makeDirResult.cid, fileInfos);
+        await Move115Files(makeDirResult.Cid, fileInfos);
 
         // 更新UI
         // 新建文件夹
-        FilesInfos.Insert(0, new FilesInfo(new Datum { Cid = makeDirResult.cid, Name = makeDirResult.cname, Pid = LastExplorerItem.Id, TimeEdit = (int)DateTimeOffset.Now.ToUnixTimeSeconds() }));
+        FilesInfos.Insert(0, new FilesInfo(new Datum { Cid = makeDirResult.Cid, Name = makeDirResult.Cname, Pid = LastExplorerItem.Id, TimeEdit = (int)DateTimeOffset.Now.ToUnixTimeSeconds() }));
 
         // 删除文件
         TryRemoveFilesInExplorer(fileInfos);
@@ -1021,7 +1024,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         else
         {
             var renameRequest = await WebApi.RenameFile(info.Id, newName);
-            isSucceed = renameRequest.state;
+            isSucceed = renameRequest.State;
         }
 
         if (!isSucceed)

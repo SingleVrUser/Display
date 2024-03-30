@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Display.Helper.Network;
 using Display.Providers;
 using Display.Providers.Downloader;
 using Display.Providers.Searcher;
@@ -44,8 +45,6 @@ public sealed partial class SearchPage
     private void X1080XCookieChange(object sender, RoutedEventArgs e)
     {
         AppSettings.X1080XCookie = X1080XCookieTextBox.Text;
-
-        GetInfoFromNetwork.IsX1080XCookieVisible = true;
 
         X1080X.TryChangedClientHeader("cookie", AppSettings.X1080XCookie);
 

@@ -6,12 +6,12 @@ public static class FileType
 {
     public const string MsUri = "ms-appx:///";
 
-    public const string AssetsBasePath = "Assets/";
+    private const string AssetsBasePath = "Assets/";
 
     /// <summary>
     /// ms-appx:///Assets/
     /// </summary>
-    public const string AssetsFullBasePath = MsUri + AssetsBasePath;
+    private const string AssetsFullBasePath = MsUri + AssetsBasePath;
 
     /// <summary>
     /// Assets/115/file_type/

@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
+    xmlns:user="using:Display.Models.Api.OneOneFive.User"
     mc:Ignorable="d">
 
     <!--头像栏-->
@@ -17,7 +18,7 @@
             Padding="20,0"
             Visibility="{x:Bind IsShowUserInfo(Status),Mode=OneWay}">
             <!--头像-->
-            <PersonPicture ProfilePicture="{x:Bind Userinfo.face,Mode=OneWay}" x:Name="FacePicture"/>
+            <PersonPicture ProfilePicture="{x:Bind Userinfo.Face,Mode=OneWay}" x:Name="FacePicture"/>
 
             <!--信息-->
             <StackPanel x:Name="UserInfoStackPanel" Padding="5,5" HorizontalAlignment="Center">
@@ -30,9 +31,9 @@
                     <TextBlock FontSize="10" FontFamily="{StaticResource SymbolThemeFontFamily}"
                                Foreground="White"
                                HorizontalAlignment="Center"
-                               Text="{x:Bind oneOneFive:UserData.getVipName(Userinfo.mark1),Mode=OneWay}"/>
+                               Text="{x:Bind Userinfo.VipName, Mode=OneWay}"/>
                 </StackPanel>
-                <TextBlock x:Name="UserNameTextBlock" FontWeight="Bold" FontSize="20" HorizontalAlignment="Center" Text="{x:Bind Userinfo.user_name,Mode=OneWay}"/>
+                <TextBlock x:Name="UserNameTextBlock" FontWeight="Bold" FontSize="20" HorizontalAlignment="Center" Text="{x:Bind Userinfo.UserName,Mode=OneWay}"/>
                 <!--<TextBlock FontWeight="Bold" FontSize="20" HorizontalAlignment="Center""/>-->
                 <HyperlinkButton HorizontalAlignment="Right" Content="更新信息" Click="UpdateInfoButton_Click"/>
                 <HyperlinkButton HorizontalAlignment="Right" Content="退出登录" Click="Logout_Click"/>

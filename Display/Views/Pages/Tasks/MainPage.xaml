@@ -8,7 +8,7 @@
     xmlns:local="using:Display.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:settings="using:Display.Models.Settings"
+    xmlns:settings1="using:Display.Models.Dto.Settings"
     mc:Ignorable="d">
 
     <Grid>
@@ -21,7 +21,7 @@
                         SelectionChanged="ContentNavigationView_OnSelectionChanged">
 
             <NavigationView.MenuItemTemplate>
-                <DataTemplate x:DataType="settings:MenuItem">
+                <DataTemplate x:DataType="settings1:MenuItem">
                     <TextBlock Text="{x:Bind Content}" />
                 </DataTemplate>
             </NavigationView.MenuItemTemplate>

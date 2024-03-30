@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.Network;
-using Display.Models.Entities._115;
 using Display.Providers;
 using Microsoft.UI.Xaml;
 using System.Collections.Generic;
@@ -10,17 +9,19 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
-using Display.Models.Enums.OneOneFive;
+using Display.Models.Vo.OneOneFive;
 using Settings18Page = Display.Views.Pages.Sort115.Settings18Page;
-using Sort115Settings = Display.Models.Entities._115.Sort115Settings;
+using Sort115HomeModel = Display.Models.Vo.OneOneFive.Sort115HomeModel;
+using Sort115Settings = Display.Models.Vo.OneOneFive.Sort115Settings;
 
 namespace Display.ViewModels;
 
 public partial class Sort115HomeViewModel : ObservableObject
 {
-    public ObservableCollection<Sort115HomeModel> SelectedFiles = new();
+    public readonly ObservableCollection<Sort115HomeModel> SelectedFiles = [];
     private readonly Sort115Settings _settings = Settings18Page.Settings;
     private readonly WebApi _webApi = WebApi.GlobalWebApi;
 
@@ -138,14 +139,14 @@ public partial class Sort115HomeViewModel : ObservableObject
                 }
                 else
                 {
-                    multipleList[destinationPath] = new List<Sort115HomeModel> { info };
+                    multipleList[destinationPath] = [info];
                 }
             }
         }
 
         // 单集文件最后移动到一个指定目录
         var moveResult = await _webApi.MoveFiles(_settings.SingleVideoSaveExplorerItem.Id, singleInfoList.Select(x => x.Info.Id).ToArray());
-        var moveState = moveResult.state ? Status.Success : Status.Error;
+        var moveState = moveResult.State ? Status.Success : Status.Error;
         singleInfoList.ForEach(i => { i.Status = moveState; });
 
         // 多集移动到对应目录
@@ -170,9 +171,9 @@ public partial class Sort115HomeViewModel : ObservableObject
             await NetworkHelper.RandomTimeDelay(1, 2);
 
             // 移动到
-            moveResult = await _webApi.MoveFiles(makeDirResult.cid, infoList.Select(x => x.Info.Id).ToArray());
+            moveResult = await _webApi.MoveFiles(makeDirResult.Cid, infoList.Select(x => x.Info.Id).ToArray());
 
-            moveState = moveResult.state ? Status.Success : Status.Error;
+            moveState = moveResult.State ? Status.Success : Status.Error;
             foreach (var info in infoList.Where(info => info.Status != Status.Error))
             {
                 info.Status = moveState;
@@ -207,7 +208,7 @@ public partial class Sort115HomeViewModel : ObservableObject
             }
             else
             {
-                tmpTaskList[matchName] = new List<Sort115HomeModel> { info };
+                tmpTaskList[matchName] = [info];
             }
         }
 
