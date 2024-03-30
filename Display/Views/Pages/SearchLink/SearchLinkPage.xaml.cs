@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using Windows.System;
 using Display.Models.Enums;
 using Display.Models.Spider;
+using Display.Models.Vo.Forum;
+using Display.Models.Vo.Spider;
 using Display.Providers;
 using Display.Providers.Searcher;
 using Display.Services.Upload;

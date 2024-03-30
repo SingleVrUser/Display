@@ -1,4 +1,4 @@
-﻿namespace Display.Models.Spider;
+﻿namespace Display.Models.Vo.Forum;
 
 public class BaiduShareInfo
 {

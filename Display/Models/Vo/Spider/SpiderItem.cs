@@ -1,10 +1,9 @@
-﻿using Display.Helper.Data;
-using System.Collections.Concurrent;
-using Display.Models.Dto.OneOneFive;
+﻿using System.Collections.Concurrent;
+using Display.Helper.Data;
 using Display.Models.Entities.OneOneFive;
-using Display.Models.Vo;
+using Display.Models.Spider;
 
-namespace Display.Models.Spider;
+namespace Display.Models.Vo.Spider;
 
 public record SpiderItem(string Name)
 {

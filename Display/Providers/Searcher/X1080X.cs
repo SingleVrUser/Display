@@ -14,6 +14,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using Display.Models.Enums;
+using Display.Models.Vo.Forum;
+using Display.Models.Vo.Spider;
 
 namespace Display.Providers.Searcher
 {

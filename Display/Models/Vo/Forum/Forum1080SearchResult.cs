@@ -1,10 +1,10 @@
-﻿namespace Display.Models.Spider;
+﻿namespace Display.Models.Vo.Forum;
 
 public class Forum1080SearchResult
 {
-    public string Url { get; set; }
+    public string Url { get; init; }
 
-    public string Title { get; set; }
+    public string Title { get; init; }
 
     public string Description { get; set; }
 
