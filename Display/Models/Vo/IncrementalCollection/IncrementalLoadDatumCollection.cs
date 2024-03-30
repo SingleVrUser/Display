@@ -2,18 +2,16 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Display.Extensions;
 using Display.Models.Api.OneOneFive.File;
-using Display.Models.Dto.OneOneFive;
 using Display.Models.Vo.OneOneFive;
 using Display.Providers;
 using Microsoft.UI.Xaml.Data;
 using SharpCompress;
 
-namespace Display.Models.Data.IncrementalCollection;
+namespace Display.Models.Vo.IncrementalCollection;
 
 internal class IncrementalLoadDatumCollection(long cid, bool isOnlyFolder = false)
     : ObservableCollection<FilesInfo>, ISupportIncrementalLoading
@@ -81,9 +79,9 @@ internal class IncrementalLoadDatumCollection(long cid, bool isOnlyFolder = fals
 
     private int Asc { get; set; }
 
-    public long Cid { get; set; } = cid;
+    public long Cid { get; private set; } = cid;
 
-    private bool IsOnlyFolder { get; set; } = isOnlyFolder;
+    private bool IsOnlyFolder { get; } = isOnlyFolder;
 
 
     private WebPath[] _webPaths;

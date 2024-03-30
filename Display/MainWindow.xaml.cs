@@ -24,7 +24,6 @@ using Display.Models.Dto.OneOneFive;
 using Display.Models.Dto.Settings;
 using Display.Models.Entities.OneOneFive;
 using Display.Models.Enums;
-using Display.Models.Vo;
 using Display.Views.Pages;
 using Display.Views.Pages.More.DatumList;
 using Display.Views.Pages.OfflineDown;
@@ -32,7 +31,6 @@ using Display.Views.Pages.SearchLink;
 using Display.Views.Pages.Settings;
 using Display.Views.Pages.Settings.Account;
 using Display.Views.Windows;
-using MainPage = Display.Views.Pages.Tasks.MainPage;
 
 
 namespace Display;
@@ -381,8 +379,8 @@ public sealed partial class MainWindow
     /// <summary>
     /// 提交搜索选项
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="args"></param>
+    /// <param name="sender"></param>
+    /// <param name="args"></param>
     private void CustomAutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
     {
         var types = sender.DataContext as List<string>;
@@ -393,8 +391,8 @@ public sealed partial class MainWindow
     /// <summary>
     /// 点击了全屏或退出全屏按键
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void fullScreenWindowButton_Click(object sender, RoutedEventArgs e)
     {
         if (_appWindow.Presenter.Kind != AppWindowPresenterKind.FullScreen)
@@ -410,8 +408,8 @@ public sealed partial class MainWindow
     /// <summary>
     /// 监听ESC按键（退出全屏）
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void RootGrid_KeyDown(object sender, KeyRoutedEventArgs e)
     {
         if (e.Key == VirtualKey.Escape)
@@ -604,7 +602,7 @@ public sealed partial class MainWindow
                 break;
             case NavigationViewItemEnum.TaskPage:
                 DispatcherQueue.TryEnqueue(() =>
-                    MainPage.ShowSingleWindow());
+                    TaskPage.ShowSingleWindow());
                 break;
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Display.Models.Api.OneOneFive.User;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Enums;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -8,12 +9,11 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Display.Controls.UserController;
 
-public sealed partial class UserInfo : UserControl
+public sealed partial class UserInfoControl
 {
-
     //status需要实时更新
     private static readonly DependencyProperty StatusProperty =
-        DependencyProperty.Register(nameof(Status), typeof(LoginStatus), typeof(UserInfo),
+        DependencyProperty.Register(nameof(Status), typeof(LoginStatus), typeof(UserInfoControl),
             new PropertyMetadata(LoginStatus.Update));
 
     public LoginStatus Status
@@ -24,7 +24,7 @@ public sealed partial class UserInfo : UserControl
 
     //userinfo需要实时更新
     private static readonly DependencyProperty UserinfoProperty =
-        DependencyProperty.Register(nameof(Userinfo), typeof(UserData), typeof(UserInfo), null);
+        DependencyProperty.Register(nameof(Userinfo), typeof(UserData), typeof(UserInfoControl), null);
 
     public UserData Userinfo
     {
@@ -33,9 +33,9 @@ public sealed partial class UserInfo : UserControl
     }
 
 
-    public UserInfo()
+    public UserInfoControl()
     {
-        this.InitializeComponent();
+        InitializeComponent();
     }
 
     private Visibility IsShowVip(LoginStatus status)
@@ -70,11 +70,11 @@ public sealed partial class UserInfo : UserControl
     }
 
 
-    public event RoutedEventHandler LoginClick;
-    private void LoginButton_Click(object sender, RoutedEventArgs e)
-    {
-        LoginClick?.Invoke(sender, e);
-    }
+    // public event RoutedEventHandler LoginClick;
+    // private void LoginButton_Click(object sender, RoutedEventArgs e)
+    // {
+    //     LoginClick?.Invoke(sender, e);
+    // }
 
 
     public event RoutedEventHandler LogoutClick;
@@ -82,14 +82,4 @@ public sealed partial class UserInfo : UserControl
     {
         LogoutClick?.Invoke(sender, e);
     }
-
-
-    public enum LoginStatus
-    {
-        None,
-        Update,
-        NoLogin,
-        Login
-    }
-
 }

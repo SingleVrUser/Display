@@ -6,14 +6,17 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Display.Helper.UI;
 using Display.Models.Api.OneOneFive.File;
 using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Vo;
+using Display.Models.Vo.IncrementalCollection;
 using Display.Models.Vo.OneOneFive;
 using Display.Providers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using SharpCompress;
 
 namespace Display.Views.Pages.Settings;
 
@@ -39,11 +42,11 @@ public sealed partial class SelectedFolderPage
         _folderInfos = new IncrementalLoadDatumCollection(0, isOnlyFolder: true);
         _folderInfos.GetFileInfoCompleted += FolderInfos_GetFileInfoCompleted;
 
-        _myListViewPanelTemplate = Resources["ListViewPanelTemplate"] as ItemsPanelTemplate;
-        _myGridViewPanelTemplate = Resources["GridViewPanelTemplate"] as ItemsPanelTemplate;
-
-        _myListViewDataTemplate = Resources["ListViewDataTemplate"] as DataTemplate;
-        _myGridViewDataTemplate = Resources["GridViewDataTemplate"] as DataTemplate;
+        this.TryGetResourceValue("ListViewPanelTemplate", out _myListViewPanelTemplate);
+        this.TryGetResourceValue("GridViewPanelTemplate", out _myGridViewPanelTemplate);
+        
+        this.TryGetResourceValue("ListViewDataTemplate", out _myListViewDataTemplate);
+        this.TryGetResourceValue("GridViewDataTemplate", out _myGridViewDataTemplate);
     }
 
 
@@ -71,10 +74,7 @@ public sealed partial class SelectedFolderPage
         Debug.WriteLine("加载完成");
         _explorerItems.Clear();
 
-        foreach (var path in _folderInfos.WebPaths)
-        {
-            _explorerItems.Add(new ExplorerItem { Name = path.Name, Id = path.Cid });
-        }
+        _folderInfos.WebPaths?.ForEach(path => _explorerItems.Add(new ExplorerItem { Name = path.Name, Id = path.Cid }));
     }
 
     private void FolderBreadcrumbBar_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)

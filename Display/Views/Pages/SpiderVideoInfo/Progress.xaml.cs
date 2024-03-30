@@ -252,7 +252,7 @@ public sealed partial class Progress
         spiderManager.AddTask(list);
 
         // 展示页面
-        Tasks.MainPage.ShowSingleWindow(NavigationViewItemEnum.SpiderTask);
+        TaskPage.ShowSingleWindow(NavigationViewItemEnum.SpiderTask);
 
         TopProgressRing.IsActive = false;
         return Task.CompletedTask;

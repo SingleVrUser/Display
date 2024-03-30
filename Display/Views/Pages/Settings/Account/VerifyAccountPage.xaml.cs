@@ -15,7 +15,7 @@ namespace Display.Views.Pages.Settings.Account
     {
         private static string RequestUrl => $"https://captchaapi.115.com/?ac=security_code&type=web&cb=Close911_{DateTimeOffset.Now.ToUnixTimeMilliseconds()}";
 
-        public bool IsSucceeded;
+        private bool _isSucceeded;
 
         private readonly Window _currentWindow;
 
@@ -41,7 +41,7 @@ namespace Display.Views.Pages.Settings.Account
 
         private void Window_Closed(object sender, WindowEventArgs args)
         {
-            VerifyAccountCompleted?.Invoke(this, IsSucceeded);
+            VerifyAccountCompleted?.Invoke(this, _isSucceeded);
         }
 
         public event EventHandler<bool> VerifyAccountCompleted;
@@ -65,7 +65,7 @@ namespace Display.Views.Pages.Settings.Account
             // TODO 在添加任务的异常中可用，但在播放m3u8视频的异常中无效
             if (result is not { State: true }) return;
 
-            IsSucceeded = true;
+            _isSucceeded = true;
 
             _currentWindow.Close();
         }

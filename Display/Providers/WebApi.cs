@@ -24,6 +24,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Display.Helper.Notifications;
 using Display.Models.Api.Aria2;
 using Display.Models.Api.OneOneFive;
 using Display.Models.Api.OneOneFive.Browser;
@@ -61,7 +62,7 @@ internal class WebApi
 
     public static WebApi GlobalWebApi => _webApi ??= new WebApi();
 
-    public WebApi(bool useCookie = true)
+    private WebApi(bool useCookie = true)
     {
         if (useCookie)
         {
@@ -686,6 +687,11 @@ internal class WebApi
         if (webFileInfoResult == null) return null;
 
         //te，tp简单用t替换，接口2没有te,tp
+        if (!string.IsNullOrEmpty(webFileInfoResult.Error))
+        {
+            Toast.TryToast("115",webFileInfoResult.Error);
+            return null;
+        }
 
         webFileInfoResult.Data?.ForEach(item =>
         {
@@ -761,7 +767,8 @@ internal class WebApi
         if (_result.State != 1) return;
 
         //存储cookie至本地
-        var cookieList = _result.Data.Cookie.GetType().GetProperties().Select(item => $"{item.Name}={item.GetValue(_result.Data.Cookie)}").ToList();
+        var cookieList = _result.Data.Cookie.GetType().GetProperties().Select(item
+            => $"{item.Name}={item.GetValue(_result.Data.Cookie)}").ToList();
 
         var cookie = string.Join(";", cookieList);
         AppSettings._115_Cookie = cookie;

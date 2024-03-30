@@ -1,15 +1,16 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Display.Models.Api.OneOneFive.User;
 
 public class Cookie
 {
     [JsonProperty("UID")]
-    public string Uid { get; set; }
+    public string UID { get; set; }
     
     [JsonProperty("CID")]
-    public string Cid { get; set; }
+    public string CID { get; set; }
     
     [JsonProperty("SEID")]
-    public string Seid { get; set; }
+    public string SEID { get; set; }
 }

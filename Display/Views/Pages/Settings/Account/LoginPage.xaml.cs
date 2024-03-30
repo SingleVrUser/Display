@@ -148,12 +148,6 @@ public sealed partial class LoginPage
         QrCodeImage.Source = image;
     }
 
-    private void CheckCookieButton_Click(object sender, RoutedEventArgs e)
-    {
-        CheckCookieTip.Content = new CheckCookie(CookieInputTextBox.Text);
-        CheckCookieTip.IsOpen = true;
-    }
-
     private void UpdateStateUI(QrCodeStatus state, string message = null)
     {
         if (state == QrCodeStatus.WaitScan)
@@ -213,30 +207,6 @@ public sealed partial class LoginPage
     {
         _waitingFresh = false;
         TryLogin();
-    }
-
-    private async void CookieInputButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (string.IsNullOrEmpty(CookieInputTextBox.Text))
-        {
-            CookieInputTip.Subtitle = "输入为空，请重新输入";
-            CookieInputTip.IsOpen = true;
-        }
-        else
-        {
-            var result = await _webapi.TryRefreshCookie(CookieInputTextBox.Text);
-
-            //Cookie有用
-            if (result)
-            {
-                await ShowSuccessAndExit();
-            }
-            else
-            {
-                CookieInputTip.Subtitle = "Cookie无效，请重新输入";
-                CookieInputTip.IsOpen = true;
-            }
-        }
     }
 
     private enum QrCodeStatus

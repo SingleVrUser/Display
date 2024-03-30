@@ -5,13 +5,13 @@ using Microsoft.UI.Xaml.Controls;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Display.Views.Pages.Settings;
+namespace Display.Views.Pages;
 
-public sealed partial class MainPage : Page
+public sealed partial class SettingPage
 {
     private SettingViewModel _viewModel;
 
-    public MainPage()
+    public SettingPage()
     {
         _viewModel = App.GetService<SettingViewModel>();
 
@@ -22,7 +22,7 @@ public sealed partial class MainPage : Page
     {
         if (PageTypeAndEnum.PageTypeAndEnumDict.TryGetValue(_viewModel.CurrentLink.PageEnum, out var pageType))
         {
-            SettingFrame.Navigate(pageType);
+            SettingFrame.Navigate(pageType, NotificationQueue);
         }
     }
 }

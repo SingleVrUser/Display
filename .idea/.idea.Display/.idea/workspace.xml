@@ -8,7 +8,40 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7e630695-b381-4f87-ba1b-fc0a833f8434" name="Changes" comment="" />
+    <list default="true" id="7e630695-b381-4f87-ba1b-fc0a833f8434" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Display/Models/Enums/UserInfo.LoginStatus.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Display/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Display/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Constants/PageTypeAndEnum.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Constants/PageTypeAndEnum.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/ActorImage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/ActorImage.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/UserInfo.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/UserInfoControl.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/UserInfo.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/UserInfoControl.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Converter/DoubleToInt32Converter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Converter/DoubleToInt32Converter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Display.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Display.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/MainWindow.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/MainWindow.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Models/Api/OneOneFive/User/Cookie.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Api/OneOneFive/User/Cookie.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadDatumCollection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadDatumCollection.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Providers/WebApi.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Providers/WebApi.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/AddActorCover.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/AddActorCover.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/AddActorCover.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/AddActorCover.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/FileListPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/FileListPage.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/FileListPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/FileListPage.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/VideoDisplay/MainPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/VideoDisplay/MainPage.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/Account/LoginPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/Settings/Account/LoginPage.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/Account/LoginPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/Settings/Account/LoginPage.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/Account/VerifyAccountPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/Settings/Account/VerifyAccountPage.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/Account/VerifyAccountPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/Settings/Account/VerifyAccountPage.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/AccountPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/Settings/AccountPage.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/AccountPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/Settings/AccountPage.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/DownPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/Settings/DownPage.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/MainPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/SettingPage.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/MainPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/SettingPage.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/SelectedFolderPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/Settings/SelectedFolderPage.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/SelectedFolderPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/Settings/SelectedFolderPage.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/Progress.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/Progress.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Tasks/MainPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/TaskPage.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Tasks/MainPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/TaskPage.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Windows/LoginWindow.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Windows/LoginWindow.xaml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -32,7 +65,10 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Private.CoreLib/src/System/Collections/Generic/List.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3fa134a4f7024c6a9faff12697fb4fb9c8e8a0/23/43374af3/Int64.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3fa134a4f7024c6a9faff12697fb4fb9c8e8a0/49/a30af049/ExecutionContext.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3fa134a4f7024c6a9faff12697fb4fb9c8e8a0/4d/aabe2050/DefaultInterpolatedStringHandler.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9bbdf87048bd43de89b63f272a61b8876dfc20/1a/c5fa3866/RelativeSourceMode.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9bbdf87048bd43de89b63f272a61b8876dfc20/2a/e10c6eb3/FrameworkElement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9bbdf87048bd43de89b63f272a61b8876dfc20/3a/5d1eb66d/AppBarToggleButton.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9bbdf87048bd43de89b63f272a61b8876dfc20/85/9e972f61/RoutedEventHandler.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9bbdf87048bd43de89b63f272a61b8876dfc20/e4/600b272f/ButtonBase.cs" root0="SKIP_HIGHLIGHTING" />
@@ -42,10 +78,23 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/dbe46b48f4854a1e87fb478d9089a8a58d400/4e/18405c8a/Utility.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/15f9da733c88dd854d1e5488f1fd410fef95b8c1cd76ec6784d25e82d2d1d12/JsonPropertyAttribute.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/94a622829d23a99e6859dc73690c2f724f2d4373af0699883e3f70ac955577/TokenizingTextBox.Events.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Controls/UserController/ActorImage.xaml" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Controls/UserController/ActorImage.xaml" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Converter/DoubleToInt32Converter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Converter/DoubleToInt32Converter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Converter/DoubleToInt32Converter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Views/Pages/ActorsPage.xaml.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/App.g.i.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Controls/UserController/MultipleCoverShow.g.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Controls/UserController/VideoCoverDisplay.g.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Views/Pages/DetailInfo/SelectSingleSubFileToSelected.g.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Views/Pages/HomePage.g.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Views/Pages/More/DatumList/FileListPage.g.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Views/Pages/SearchLink/SearchLinkPage.g.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Views/Pages/SpiderVideoInfo/ConditionalCheck.g.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Views/Pages/Tasks/SpiderTaskPage.g.i.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Views/Pages/Tasks/UploadTaskPage.g.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Views/Pages/VideoViewPage.g.i.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Views/Windows/VideoPlayWindow.g.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Views/Windows/VideoPlayWindow.g.i.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/XamlTypeInfo.g.cs" root0="SKIP_HIGHLIGHTING" />
@@ -78,7 +127,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "UWP.Display.executor": "Debug",
-    "XThreadsFramesViewSplitterKey": "0.18962076",
+    "XThreadsFramesViewSplitterKey": "0.1904762",
     "git-widget-placeholder": "main",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -138,6 +187,7 @@
       <workItem from="1711775365788" duration="12105000" />
       <workItem from="1711797831033" duration="323000" />
       <workItem from="1711798166709" duration="146000" />
+      <workItem from="1711798482386" duration="9505000" />
     </task>
     <task id="LOCAL-00001" summary="clean views">
       <option name="closed" value="true" />

@@ -6,22 +6,21 @@ using Display.Views.Pages.More;
 using Display.Views.Pages.OfflineDown;
 using Display.Views.Pages.Settings;
 using Display.Views.Pages.Tasks;
-using MainPage = Display.Views.Pages.Settings.MainPage;
 
 namespace Display.Constants;
 
 internal static class PageTypeAndEnum
 {
-    public static Dictionary<NavigationViewItemEnum, Type> PageTypeAndEnumDict = new()
+    public static readonly Dictionary<NavigationViewItemEnum, Type> PageTypeAndEnumDict = new()
     {
         //菜单栏
         { NavigationViewItemEnum.HomePage, typeof(HomePage) },
         { NavigationViewItemEnum.VideoViewPage, typeof(VideoViewPage) },
         { NavigationViewItemEnum.ActorPage, typeof(ActorsPage) },
         { NavigationViewItemEnum.MorePage, typeof(MorePage) },
-        { NavigationViewItemEnum.SettingPage, typeof(MainPage) },
+        { NavigationViewItemEnum.SettingPage, typeof(SettingPage) },
         { NavigationViewItemEnum.DownPage, typeof(OfflineDownPage) },
-        { NavigationViewItemEnum.TaskPage, typeof(Views.Pages.Tasks.MainPage) },
+        { NavigationViewItemEnum.TaskPage, typeof(TaskPage) },
 
         //后台任务
         { NavigationViewItemEnum.UploadTask, typeof(UploadTaskPage) },

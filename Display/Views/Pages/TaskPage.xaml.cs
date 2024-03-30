@@ -12,9 +12,9 @@ using WinUIEx;
 using Window = Microsoft.UI.Xaml.Window;
 
 
-namespace Display.Views.Pages.Tasks;
+namespace Display.Views.Pages;
 
-public sealed partial class MainPage
+public sealed partial class TaskPage
 {
     private readonly TaskViewModel _viewModel = App.GetService<TaskViewModel>();
 
@@ -22,7 +22,7 @@ public sealed partial class MainPage
     private static Window? _window;
 #nullable disable
 
-    public MainPage()
+    public TaskPage()
     {
         InitializeComponent();
 
@@ -36,7 +36,7 @@ public sealed partial class MainPage
     {
         if (_window == null)
         {
-            var page = new MainPage();
+            var page = new TaskPage();
             page.SetPage(pageEnum);
 
             _window = new CommonWindow("传输任务", 842, 537)
@@ -51,7 +51,7 @@ public sealed partial class MainPage
         }
         else
         {
-            if (_window.Content is MainPage page)
+            if (_window.Content is TaskPage page)
             {
                 page.SetPage(pageEnum);
             }

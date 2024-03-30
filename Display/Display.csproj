@@ -243,8 +243,5 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Views\Pages\" />
-  </ItemGroup>
 
 </Project>

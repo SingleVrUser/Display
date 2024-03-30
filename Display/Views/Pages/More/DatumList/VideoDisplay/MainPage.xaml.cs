@@ -21,6 +21,7 @@ using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Entities.OneOneFive;
 using Display.Models.Vo;
+using Display.Models.Vo.IncrementalCollection;
 using Display.Models.Vo.OneOneFive;
 using Display.Providers;
 using Display.Providers.Downloader;

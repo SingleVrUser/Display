@@ -21,6 +21,7 @@ using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
 using Display.Models.Vo;
+using Display.Models.Vo.IncrementalCollection;
 using Display.Models.Vo.OneOneFive;
 using Display.Providers;
 using Display.ViewModels;
@@ -497,7 +498,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             }
 
             //添加任务后显示传输任务窗口
-            Tasks.MainPage.ShowSingleWindow();
+            TaskPage.ShowSingleWindow();
         }
     }
 
