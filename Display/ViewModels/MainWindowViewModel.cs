@@ -1,5 +1,4 @@
-﻿using Display.Models.Settings;
-using Display.ViewModels.Sub;
+﻿using Display.ViewModels.Sub;
 
 namespace Display.ViewModels;
 

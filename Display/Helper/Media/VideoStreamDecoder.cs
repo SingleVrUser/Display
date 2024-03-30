@@ -1,9 +1,9 @@
-﻿using System;
+﻿using FFmpeg.AutoGen.Abstractions;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using Display.Models.Image;
-using FFmpeg.AutoGen.Abstractions;
+using Display.Models.Dto.Media;
 using static System.Int64;
 
 namespace Display.Helper.Media;
@@ -67,19 +67,18 @@ public sealed unsafe class VideoStreamDecoder : IDisposable
         ffmpeg.avcodec_open2(_pCodecContext, codec, null).ThrowExceptionIfError();
 
         Duration = _pFormatContext->duration;
-        CodecName = ffmpeg.avcodec_get_name(codec->id);
+        ffmpeg.avcodec_get_name(codec->id);
         FrameSize = new Size(_pCodecContext->width, _pCodecContext->height);
         PixelFormat = _pCodecContext->pix_fmt;
     }
 
-    public long Duration { get; set; }
-    public string CodecName { get; set; }
-    public Size FrameSize { get; set; }
-    public AVPixelFormat PixelFormat { get; set; }
+    public long Duration { get; private set; }
+    public Size FrameSize { get; private set; }
+    public AVPixelFormat PixelFormat { get; private set; }
 
     public void Dispose()
     {
-        var pFrame = _pFrame;;
+        var pFrame = _pFrame;
         ffmpeg.av_frame_free(&pFrame);
 
         var pPacket = _pPacket;
@@ -90,7 +89,7 @@ public sealed unsafe class VideoStreamDecoder : IDisposable
 
         ffmpeg.avcodec_close(_pCodecContext);
 
-        if(_pFormatContext->video_codec_id != AVCodecID.AV_CODEC_ID_NONE)
+        if (_pFormatContext->video_codec_id != AVCodecID.AV_CODEC_ID_NONE)
         {
             var pFormatContext = _pFormatContext;
             ffmpeg.avformat_close_input(&pFormatContext);

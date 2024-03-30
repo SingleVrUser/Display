@@ -1,17 +1,17 @@
-﻿using System;
+﻿using Display.Helper.Date;
+using Display.Helper.Media;
+using Display.Helper.Network;
+using Display.Interfaces;
+using FFmpeg.AutoGen.Abstractions;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
-using Display.Helper.Media;
-using Display.Interfaces;
-using Display.Models.Image;
-using FFmpeg.AutoGen.Abstractions;
-using Display.Models.Media;
-using Display.Helper.Date;
-using Display.Models.Data;
+using Display.Models.Dto.Media;
+using LocalThumbnail = Display.Models.Dto.Media.LocalThumbnail;
 
 namespace Display.Services;
 
@@ -59,21 +59,21 @@ public class ThumbnailGeneratorService : IThumbnailGeneratorService
         var currentTime = increaseTime;
 
         // 非m3u8都要等待
-        var isWait = ! thumbnailGenerateOptions.UrlOptions.IsM3U8;
+        var isWait = !thumbnailGenerateOptions.UrlOptions.IsM3U8;
 
         for (var i = 0; i < frameCount; i++, currentTime += increaseTime)
         {
             var filePath = GetFilePath(thumbnailGenerateOptions, currentTime);
-            if(filePath == null) continue;
+            if (filePath == null) continue;
 
             if (!File.Exists(filePath))
             {
-                if (isWait) await GetInfoFromNetwork.RandomTimeDelay(10,20);
+                if (isWait) await NetworkHelper.RandomTimeDelay(10, 20);
 
                 if (!vsd.TrySeekPosition(currentTime)) break;
 
                 AVFrame frame = default;
-                if (!await Task.Run(()=> vsd.TryDecodeNextFrame(frame:out frame))) break;
+                if (!await Task.Run(() => vsd.TryDecodeNextFrame(frame: out frame))) break;
 
                 var convertedFrame = vfc.Convert(frame);
 
@@ -89,7 +89,7 @@ public class ThumbnailGeneratorService : IThumbnailGeneratorService
 
     private static string GetFilePath(ThumbnailGenerateOptions thumbnailGenerateOptions, long currentTime)
     {
-        DateHelper.GetTimeFromTimeStamp(currentTime, out var hh,out var mm, out var ss);
+        DateHelper.GetTimeFromTimeStamp(currentTime, out var hh, out var mm, out var ss);
 
         var filePath = Path.Combine(thumbnailGenerateOptions.SavePath,
             string.Format(thumbnailGenerateOptions.StringFormat, $"{hh:D2}_{mm:D2}_{ss:D2}") + ".jpg");

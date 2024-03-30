@@ -4,7 +4,10 @@ using System;
 
 namespace Display.Converter;
 
-public class BytesToSizeStrConverter : IValueConverter
+/// <summary>
+/// bytes => xx.x MB/KB
+/// </summary>
+internal class BytesToSizeStrConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
@@ -18,7 +21,7 @@ public class BytesToSizeStrConverter : IValueConverter
             return string.Empty;
         }
 
-        ByteSize size = value switch
+        var size = value switch
         {
             double doubleValue => ByteSize.FromBytes(doubleValue),
             long longValue => ByteSize.FromBytes(longValue),

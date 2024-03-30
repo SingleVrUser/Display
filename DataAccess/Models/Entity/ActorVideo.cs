@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Models.Entity;
 
@@ -14,5 +14,6 @@ public class ActorVideo
 
     [Key]
     [Column("video_name")]
+    [StringLength(20)]
     public string VideoName { get; set; } = null!;
 }

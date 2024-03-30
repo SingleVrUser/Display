@@ -1,0 +1,27 @@
+﻿<Page
+    x:Class="Display.Views.Pages.DetailInfoPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Display.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:userController="using:Display.Controls.UserController"
+    mc:Ignorable="d"
+    Background="{ThemeResource BackButtonBackgroundThemeBrush}">
+
+    <Grid>
+        <userController:VideoDetails x:Name="VideoDetailsControl"
+                               ActorClick="{x:Bind Actor_Click}"
+                               LabelClick="{x:Bind Label_Click}"
+                               VideoPlayClick="{x:Bind VideoPlay_Click}"
+                               DeleteClick="{x:Bind Delete_Click}"
+                               ResultInfo="{x:Bind DetailInfo, Mode=TwoWay}"
+                               CoverTapped="{x:Bind CoverTapped}">
+            <userController:VideoDetails.Transitions>
+                <EntranceThemeTransition/>
+            </userController:VideoDetails.Transitions>
+        </userController:VideoDetails>
+    </Grid>
+
+
+</Page>

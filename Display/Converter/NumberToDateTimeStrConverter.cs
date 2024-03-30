@@ -6,27 +6,21 @@ using System;
 
 namespace Display.Converter;
 
-public class NumberToDateTimeStrConverter : IValueConverter
+/// <summary>
+/// number(string or number format) => "yyyy/MM/dd HH:mm"
+/// </summary>
+internal class NumberToDateTimeStrConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
         //2022-09-18 17:24 或者 1663493094
-
-        if (value is int intValue)
+        return value switch
         {
-            return DateHelper.ConvertInt32ToDateTime(intValue);
-        }
-
-        if (value is string numOrStringValue)
-        {
-            if (!numOrStringValue.IsNumber())
-                return numOrStringValue;
-
-            return DateHelper.ConvertInt32ToDateTime(int.Parse(numOrStringValue));
-        }
-
-
-        throw new NotImplementedException();
+            int intValue => DateHelper.ConvertInt32ToDateTime(intValue),
+            string stringValue when !stringValue.IsNumber() => stringValue,
+            string numValue => DateHelper.ConvertInt32ToDateTime(int.Parse(numValue)),
+            _ => throw new NotImplementedException()
+        };
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)

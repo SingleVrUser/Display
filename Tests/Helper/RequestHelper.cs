@@ -1,5 +1,4 @@
-﻿using Display.Constants;
-using Display.Models.Data;
+﻿using Display.Helper.Network;
 
 namespace Tests.Helper
 {
@@ -16,11 +15,11 @@ namespace Tests.Helper
 
                 var headers = new Dictionary<string, string>
                 {
-                    { "user-agent", Constant.DefaultSettings.Network._115.UploadUserAgent },
+                    { "user-agent", Display.Constants.DefaultSettings.Network._115.UploadUserAgent },
                     { "Cookie", Cookie }
                 };
 
-                _uploadClient = GetInfoFromNetwork.CreateClient(headers);
+                _uploadClient = NetworkHelper.CreateClient(headers);
 
                 return _uploadClient;
             }
@@ -35,11 +34,11 @@ namespace Tests.Helper
 
                 var headers = new Dictionary<string, string>
                 {
-                    { "user-agent", Constant.DefaultSettings.Network._115.DownUserAgent },
+                    { "user-agent", Display.Constants.DefaultSettings.Network._115.DownUserAgent },
                     { "Cookie", Cookie }
                 };
 
-                _downClient = GetInfoFromNetwork.CreateClient(headers);
+                _downClient = NetworkHelper.CreateClient(headers);
 
                 return _downClient;
             }

@@ -1,17 +1,18 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Net;
-using Display.Models.Data;
-using Newtonsoft.Json;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Windows.Devices.Geolocation;
-using Display.Models.Settings.Options;
+using Display.Models.Api.Aria2;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Dto.Settings.Options;
+using Display.Models.Vo.Down;
 
 namespace Display.Providers.Downloader;
 
-internal class Aria2: BaseDownloader
+internal class Aria2 : BaseDownloader
 {
     public override string Name => "Aria2";
 
@@ -32,10 +33,10 @@ internal class Aria2: BaseDownloader
 
         Aria2Request request = new()
         {
-            jsonrpc = "2.0",
-            method = "aria2.getVersion",
-            id = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString(),
-            _params = [curSetting.Password]
+            Jsonrpc = "2.0",
+            Method = "aria2.getVersion",
+            Id = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString(),
+            Params = [curSetting.Password]
         };
 
         var myContent = JsonConvert.SerializeObject(request);

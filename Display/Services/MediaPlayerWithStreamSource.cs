@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Display.Helper.Encode;
+using Display.Providers;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -6,126 +8,121 @@ using System.Threading.Tasks;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Media.Streaming.Adaptive;
-using Display.Helper.Encode;
-using Display.Models.Data;
+using Display.Models.Api.OneOneFive.File;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Vo.OneOneFive;
+using Display.Streams;
 
-namespace Display.Services
+namespace Display.Services;
+
+public class MediaPlayerWithStreamSource(string url, FilesInfo filesInfo)
 {
-    public class MediaPlayerWithStreamSource
+    private HttpRandomAccessStream _stream;
+    private MediaSource _ms;
+    public MediaPlayer MediaPlayer = new();
+    public FilesInfo FilesInfo = filesInfo;
+
+    public string Url { get; } = url;
+
+    public static async Task<MediaPlayerWithStreamSource> CreateMediaPlayer(string videoUrl, SubInfo subInfo = null, FilesInfo filesInfo = null)
     {
-        private HttpRandomAccessStream _stream;
-        private MediaSource _ms;
-        public MediaPlayer MediaPlayer = new();
-        public FilesInfo FilesInfo;
+        var mediaPlayerWithStreamSource = new MediaPlayerWithStreamSource(videoUrl, filesInfo);
 
-        public string Url { get; }
+        var mediaPlayer = mediaPlayerWithStreamSource.MediaPlayer;
 
-        public MediaPlayerWithStreamSource(string url, FilesInfo filesInfo)
+        MediaSource ms = null;
+
+        var videoHttpClient = WebApi.SingleVideoWindowWebHttpClient;
+        if (videoUrl.Contains(".m3u8"))
         {
-            Url = url;
-            FilesInfo = filesInfo;
+            var result = await AdaptiveMediaSource.CreateFromUriAsync(new Uri(videoUrl), videoHttpClient);
+
+            if (result.Status == AdaptiveMediaSourceCreationStatus.Success)
+            {
+                ms = MediaSource.CreateFromAdaptiveMediaSource(result.MediaSource);
+            }
         }
-        
-        public static async Task<MediaPlayerWithStreamSource> CreateMediaPlayer(string videoUrl,SubInfo subInfo = null ,FilesInfo filesInfo=null)
+
+        if (ms == null)
         {
-            var mediaPlayerWithStreamSource = new MediaPlayerWithStreamSource(videoUrl,filesInfo);
+            mediaPlayerWithStreamSource._stream = await HttpRandomAccessStream.CreateAsync(videoHttpClient, new Uri(videoUrl));
 
-            var mediaPlayer = mediaPlayerWithStreamSource.MediaPlayer;
-
-            MediaSource ms = null;
-
-            var videoHttpClient = WebApi.SingleVideoWindowWebHttpClient;
-            if (videoUrl.Contains(".m3u8"))
+            if (!mediaPlayerWithStreamSource._stream.CanRead)
             {
-                var result = await AdaptiveMediaSource.CreateFromUriAsync(new Uri(videoUrl), videoHttpClient);
-
-                if (result.Status == AdaptiveMediaSourceCreationStatus.Success)
-                {
-                    ms = MediaSource.CreateFromAdaptiveMediaSource(result.MediaSource);
-                }
+                return mediaPlayerWithStreamSource;
             }
 
-            if (ms == null)
-            {
-                mediaPlayerWithStreamSource._stream = await HttpRandomAccessStream.CreateAsync(videoHttpClient, new Uri(videoUrl));
+            ms = MediaSource.CreateFromStream(mediaPlayerWithStreamSource._stream, "video/mp4");
+        }
 
-                if (!mediaPlayerWithStreamSource._stream.CanRead)
+        mediaPlayerWithStreamSource._ms = ms;
+
+        //添加字幕文件
+        if (subInfo != null)
+        {
+            //下载字幕
+            var subPath = await WebApi.GlobalWebApi.TryDownSubFile(subInfo.Name, subInfo.PickCode);
+
+            if (!string.IsNullOrEmpty(subPath))
+            {
+                //var timedTextSource = TimedTextSource.CreateFromUri(new Uri(subPath), SubInfo.name);
+                //ms.ExternalTimedTextSources.Add(timedTextSource);
+
+                var textEncoding = FileEncodingHelper.GetEncoding(subPath);
+
+                //如果文本格式不是UTF-8，就将文本转换为该格式
+                if (!Equals(textEncoding, Encoding.UTF8))
                 {
-                    return mediaPlayerWithStreamSource;
+                    Debug.WriteLine("字幕不是UTF-8，转为该格式并覆盖");
+                    await File.WriteAllTextAsync(subPath,
+                        await File.ReadAllTextAsync(subPath, textEncoding),
+                        Encoding.UTF8);
                 }
 
-                ms = MediaSource.CreateFromStream(mediaPlayerWithStreamSource._stream, "video/mp4");
+                ms.ExternalTimedTextSources.Add(TimedTextSource.CreateFromUri(new Uri(subPath)));
+
             }
 
-            mediaPlayerWithStreamSource._ms = ms;
+            var playbackItem = new MediaPlaybackItem(ms);
 
-            //添加字幕文件
-            if (subInfo != null)
+
+            if (ms.ExternalTimedTextSources.Count > 0)
             {
-                //下载字幕
-                var subPath = await WebApi.GlobalWebApi.TryDownSubFile(subInfo.Name, subInfo.PickCode);
+                Debug.WriteLine("发现字幕文件");
 
-                if (!string.IsNullOrEmpty(subPath))
+                playbackItem.TimedMetadataTracksChanged += (_, _) =>
                 {
-                    //var timedTextSource = TimedTextSource.CreateFromUri(new Uri(subPath), SubInfo.name);
-                    //ms.ExternalTimedTextSources.Add(timedTextSource);
+                    playbackItem.TimedMetadataTracks.SetPresentationMode(0, TimedMetadataTrackPresentationMode.PlatformPresented);
 
-                    var textEncoding = FileEncodingHelper.GetEncoding(subPath);
+                    Debug.WriteLine("默认选中第一个字幕");
 
-                    //如果文本格式不是UTF-8，就将文本转换为该格式
-                    if (!Equals(textEncoding, Encoding.UTF8))
-                    {
-                        Debug.WriteLine("字幕不是UTF-8，转为该格式并覆盖");
-                        await File.WriteAllTextAsync(subPath,
-                            await File.ReadAllTextAsync(subPath, textEncoding),
-                            Encoding.UTF8);
-                    }
-
-                    ms.ExternalTimedTextSources.Add(TimedTextSource.CreateFromUri(new Uri(subPath)));
-
-                }
-
-                var playbackItem = new MediaPlaybackItem(ms);
-
-
-                if (ms.ExternalTimedTextSources.Count > 0)
-                {
-                    Debug.WriteLine("发现字幕文件");
-
-                    playbackItem.TimedMetadataTracksChanged += (_, _) =>
-                    {
-                        playbackItem.TimedMetadataTracks.SetPresentationMode(0, TimedMetadataTrackPresentationMode.PlatformPresented);
-
-                        Debug.WriteLine("默认选中第一个字幕");
-
-                    };
-                }
-                else
-                {
-                    Debug.WriteLine("没有字幕文件");
-                }
-
-                mediaPlayer.Source = playbackItem;
-
+                };
             }
             else
             {
-                mediaPlayer.Source = ms;
+                Debug.WriteLine("没有字幕文件");
             }
 
-            return mediaPlayerWithStreamSource;
-        }
+            mediaPlayer.Source = playbackItem;
 
-        public void Dispose()
+        }
+        else
         {
-            if (MediaPlayer.CanPause) MediaPlayer.Pause();
-
-            MediaPlayer?.Dispose();
-            MediaPlayer = null;
-
-            _ms?.Dispose();
-            _ms = null;
+            mediaPlayer.Source = ms;
         }
 
+        return mediaPlayerWithStreamSource;
     }
+
+    public void Dispose()
+    {
+        if (MediaPlayer.CanPause) MediaPlayer.Pause();
+
+        MediaPlayer?.Dispose();
+        MediaPlayer = null;
+
+        _ms?.Dispose();
+        _ms = null;
+    }
+
 }

@@ -1,12 +1,13 @@
-﻿using Display.Models.Data;
+﻿using Display.Models.Spider;
 using HtmlAgilityPack;
 using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Display.Models.Spider;
-using Display.Setting.Models;
-using static Display.Models.Spider.SpiderInfos;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
+using Display.Models.Vo.Spider;
 
 namespace Display.Providers.Spider;
 
@@ -14,7 +15,7 @@ public abstract class BaseSpider
 {
     public bool IsRunning { get; set; }
 
-    public SearchItem HandleItem { get; set; }
+    public SpiderItem HandleItem { get; set; }
 
     public abstract SpiderSourceName Name { get; }
     public abstract string Abbreviation { get; }
