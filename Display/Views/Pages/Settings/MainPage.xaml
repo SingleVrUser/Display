@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Display.Views.Pages.Settings.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
+    xmlns:settings1="using:Display.Models.Dto.Settings"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <DataTemplate x:Key="NavLinkItemTemplate"
+                      x:DataType="settings1:MenuItem">
+            <StackPanel Orientation="Horizontal"
+                        Spacing="10">
+                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                          Glyph="{x:Bind Glyph}" />
+                <TextBlock Text="{x:Bind Content}" />
+            </StackPanel>
+        </DataTemplate>
+
+        <x:Double x:Key="OpenPaneLength">120</x:Double>
+    </Page.Resources>
+
+    <Grid>
+        <SplitView IsPaneOpen="True"
+                   OpenPaneLength="{StaticResource OpenPaneLength}"
+                   DisplayMode="Inline">
+            <SplitView.Pane>
+                <ListView Margin="0,12,0,0"
+                          SelectionMode="Single"
+                          ItemTemplate="{StaticResource NavLinkItemTemplate}"
+                          ItemsSource="{x:Bind  _viewModel.NavLinks}"
+                          SelectedItem="{x:Bind _viewModel.CurrentLink,Mode=TwoWay}"
+                          SelectionChanged="Selector_OnSelectionChanged"/>
+            </SplitView.Pane>
+
+            <Frame x:Name="SettingFrame">
+                <Frame.ContentTransitions>
+                    <TransitionCollection>
+                        <EntranceThemeTransition />
+                    </TransitionCollection>
+                </Frame.ContentTransitions>
+            </Frame>
+        </SplitView>
+
+        <InfoBar Style="{StaticResource MessageInfoBar}">
+            <interactivity:Interaction.Behaviors>
+                <behaviors:StackedNotificationsBehavior x:Name="NotificationQueue" />
+            </interactivity:Interaction.Behaviors>
+        </InfoBar>
+    </Grid>
+
+</Page>

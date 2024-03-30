@@ -1,6 +1,6 @@
-﻿using System.Linq;
-using Display.Models.Data;
-using Display.Models.Settings;
+﻿using Display.Providers;
+using System.Linq;
+using Display.Models.Dto.Settings;
 
 namespace Display.ViewModels;
 

@@ -1,8 +1,9 @@
-﻿using Display.Providers.Downloader;
+﻿using Display.Models.Vo.Down;
+using Display.Providers.Downloader;
 
 namespace Display.Managers;
 
-internal class DownloadManager
+internal static class DownloadManager
 {
     private static BaseDownloader[] _downloader;
     public static BaseDownloader[] Downloads

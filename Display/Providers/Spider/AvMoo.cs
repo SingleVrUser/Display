@@ -1,16 +1,15 @@
-﻿using HtmlAgilityPack;
-using System;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using SpiderInfo = Display.Models.Spider.SpiderInfos;
+﻿using Display.Helper.Network;
+using HtmlAgilityPack;
 using System.Threading;
-using Display.Models.Data;
-using Display.Helper.Network;
-using static Display.Models.Spider.SpiderInfos;
+using System.Threading.Tasks;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Spider;
+using Display.Models.Vo;
 
 namespace Display.Providers.Spider;
 
-public class AvMoo: BaseSpider
+public class AvMoo : BaseSpider
 {
     public override SpiderSourceName Name => SpiderSourceName.Avmoo;
 
@@ -57,7 +56,7 @@ public class AvMoo: BaseSpider
 
     private async Task<string> GetDetailUrlFromCid(string cid, CancellationToken token)
     {
-        var url = GetInfoFromNetwork.UrlCombine(BaseUrl, $"cn/search/{cid}");
+        var url = NetworkHelper.UrlCombine(BaseUrl, $"cn/search/{cid}");
 
         // 访问
         var result = await RequestHelper.RequestHtml(Common.Client, url, token);
@@ -93,7 +92,7 @@ public class AvMoo: BaseSpider
         {
             var upperTitle = movieList.SelectSingleNode(".//div[@class='photo-info']/span/date").InnerText.ToUpper();
 
-            if(!Common.IsSearchResultMatch(leftCid,rightCid, upperTitle)) continue;
+            if (!Common.IsSearchResultMatch(leftCid, rightCid, upperTitle)) continue;
 
             var detailUrl = movieList.SelectSingleNode(".//a[@class='movie-box']").Attributes["href"].Value;
 

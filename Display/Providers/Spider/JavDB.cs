@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using Display.Helper.Network;
+using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,9 +8,10 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Display.Models.Data;
-using static Display.Models.Spider.SpiderInfos;
-using Display.Helper.Network;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Spider;
+using Display.Models.Vo;
 
 namespace Display.Providers.Spider;
 
@@ -55,11 +57,11 @@ public class JavDb : BaseSpider
 
     private static HttpClient CreateClient(string cookie)
     {
-        return GetInfoFromNetwork.CreateClient(
+        return NetworkHelper.CreateClient(
             new Dictionary<string, string>
             {
                 { "cookie", cookie },
-                { "user-agent", GetInfoFromNetwork.DownUserAgent }
+                { "user-agent", DbNetworkHelper.DownUserAgent }
             });
     }
 
@@ -131,12 +133,12 @@ public class JavDb : BaseSpider
 
         if (!imageUrl.Contains("http"))
         {
-            imageUrl = GetInfoFromNetwork.UrlCombine(javDbUrl, imageUrl);
+            imageUrl = NetworkHelper.UrlCombine(javDbUrl, imageUrl);
         }
 
         var attributeNodes = videoMetaPanelNode.SelectNodes(".//div[contains(@class,'panel-block')]");
 
-        videoInfo.trueName = cid;
+        videoInfo.TrueName = cid;
         //信息
         foreach (var currentNode in attributeNodes)
         {
@@ -201,13 +203,13 @@ public class JavDb : BaseSpider
         //标题
         var titleNode = htmlDoc.DocumentNode.SelectSingleNode(".//strong[@class='current-title']");
         var title = titleNode.InnerText;
-        videoInfo.Title = title.Replace(videoInfo.trueName, "").Trim();
+        videoInfo.Title = title.Replace(videoInfo.TrueName, "").Trim();
 
         //下载封面
         var savePath = AppSettings.ImageSavePath;
         var filePath = Path.Combine(savePath, cid);
         videoInfo.ImageUrl = imageUrl;
-        videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(imageUrl, filePath, cid);
+        videoInfo.ImagePath = await DbNetworkHelper.DownloadFile(imageUrl, filePath, cid);
 
         //样品图片
         var previewImagesSingesNode = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class,'preview-images')]");
@@ -222,7 +224,7 @@ public class JavDb : BaseSpider
             var sampleImageUrl = node.Attributes["href"].Value;
             if (!sampleImageUrl.Contains("http"))
             {
-                sampleImageUrl = GetInfoFromNetwork.UrlCombine(javDbUrl, sampleImageUrl);
+                sampleImageUrl = NetworkHelper.UrlCombine(javDbUrl, sampleImageUrl);
             }
             sampleUrlList.Add(sampleImageUrl);
         }
@@ -233,7 +235,7 @@ public class JavDb : BaseSpider
 
     private async Task<string> GetDetailUrlFromCid(string cid, CancellationToken token)
     {
-        var url = GetInfoFromNetwork.UrlCombine(BaseUrl, $"search?q={cid}&f=all");
+        var url = NetworkHelper.UrlCombine(BaseUrl, $"search?q={cid}&f=all");
 
         // 访问
         var tuple = await RequestHelper.RequestHtml(Common.Client, url, token);
@@ -274,16 +276,16 @@ public class JavDb : BaseSpider
             switch (split.Length)
             {
                 case 1:
-                {
-                    var matchResult = Regex.Match(title, @"([A-Z]+)(\d+)");
-                    if (matchResult.Success)
                     {
-                        searchLeftCid = matchResult.Groups[1].Value;
-                        searchRightCid = matchResult.Groups[2].Value;
-                    }
+                        var matchResult = Regex.Match(title, @"([A-Z]+)(\d+)");
+                        if (matchResult.Success)
+                        {
+                            searchLeftCid = matchResult.Groups[1].Value;
+                            searchRightCid = matchResult.Groups[2].Value;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
                 case 2:
                     searchLeftCid = split[0];
                     searchRightCid = split[1];
@@ -305,7 +307,7 @@ public class JavDb : BaseSpider
                         || !currentNum.Equals(searchNum)))) continue;
 
             var detailUrl = movieList.SelectSingleNode(".//a").Attributes["href"].Value;
-            detailUrl = GetInfoFromNetwork.UrlCombine(AppSettings.JavDbBaseUrl, detailUrl);
+            detailUrl = NetworkHelper.UrlCombine(AppSettings.JavDbBaseUrl, detailUrl);
             return detailUrl;
         }
 

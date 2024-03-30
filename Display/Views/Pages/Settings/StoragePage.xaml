@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<settings:RootPage
+    x:Class="Display.Views.Pages.Settings.StoragePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:settings="using:Display.Views.Pages.Settings"
+    xmlns:options1="using:Display.Models.Dto.Settings.Options"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <settings:RootPage.Resources>
+        <Style TargetType="controls:SettingsCard"
+               BasedOn="{StaticResource BaseSettingsCardStyle}" />
+
+        <StackLayout x:Key="SettingStackLayout"
+                     Spacing="{StaticResource SettingsCardPadding}"/>
+
+        <DataTemplate x:Key="SettingDataTemplate" x:DataType="options1:SavePath">
+            <controls:SettingsCard Header="{x:Bind Name}"
+                                   ContentAlignment="Vertical"
+                                   HorizontalContentAlignment="Stretch">
+                <RelativePanel>
+                    <TextBox Width="600"
+                             Text="{x:Bind Path, Mode=TwoWay}" />
+                    <Button Content="修改"
+                            RelativePanel.LeftOf="OpenPathButton"
+                            Click="{x:Bind UpdatePathButtonClick}" />
+                    <Button x:Name="OpenPathButton"
+                            Click="{x:Bind OpenPathButtonClick}"
+                            Content="打开路径"
+                            RelativePanel.AlignRightWithPanel="True"
+                            Margin="3,0,0,0" />
+                </RelativePanel>
+            </controls:SettingsCard>
+        </DataTemplate>
+    </settings:RootPage.Resources>
+
+
+    <StackPanel Style="{StaticResource SettingStackPanel}">
+        
+        <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}"
+                   Text="保存路径" />
+        <ItemsRepeater Layout="{StaticResource SettingStackLayout}"
+                       ItemTemplate="{StaticResource SettingDataTemplate}"
+                       ItemsSource="{x:Bind _savePaths}">
+            
+        </ItemsRepeater>
+    </StackPanel>
+</settings:RootPage>

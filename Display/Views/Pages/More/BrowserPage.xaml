@@ -1,0 +1,36 @@
+﻿<Page x:Class="Display.Views.Pages.More.BrowserPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:customcontrols="using:Display.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:userController="using:Display.Controls.UserController"
+    mc:Ignorable="d">
+
+    <Grid>
+        <userController:Browser x:Name="Browser"/>
+
+        <!--下载按钮-->
+        <HyperlinkButton
+            x:Name="DownButton"
+            Visibility="Collapsed"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Margin="10,80,10,0"
+            ToolTipService.ToolTip="点击使用比特彗星下载，右键选择更多下载方式"
+            CornerRadius="15"
+            Opacity="0.2">
+
+            <HyperlinkButton.ContextFlyout>
+                <MenuFlyout>
+                    <MenuFlyoutItem x:Name="Aria2DownItem" Text="Aria2下载"/>
+                </MenuFlyout>
+            </HyperlinkButton.ContextFlyout>
+            
+            <SymbolIcon Symbol="Download" />
+
+        </HyperlinkButton>
+        
+        <TeachingTip x:Name="LightDismissTeachingTip" IsLightDismissEnabled="True"/>
+    </Grid>
+</Page>

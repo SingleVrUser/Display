@@ -13,7 +13,7 @@ namespace Tests
         private const long RootCid = 0;
         private const int UserId = UserInfo.UserId;
         private const string UserKey = UserInfo.UserKey;
-        private const string AppVer = Constant.DefaultSettings.Network._115.UploadAppVersion;
+        private const string AppVer = DefaultSettings.Network._115.UploadAppVersion;
 
         private readonly HttpClient _client = RequestHelper.UploadClient;
 
@@ -26,7 +26,7 @@ namespace Tests
         /// <returns></returns>
         [TestMethod]
         public async Task GetFilesByDesktopTest()
-        {   
+        {
             var aesKey = UploadKey.Instance.AesKey;
             var aesIv = UploadKey.Instance.AesIv;
             var clientPublicKey = UploadKey.Instance.ClientPublicKey;
@@ -58,7 +58,7 @@ namespace Tests
             var contentBytes = await response.Content.ReadAsByteArrayAsync(Token);
 
             var result = UploadEncryptHelper.DecryptReceiveData<FileInfo.Desktop.Info>(contentBytes, aesKey: aesKey, aesIv: aesIv);
-            
+
             Assert.AreEqual(result.state, true);
             Assert.AreEqual(result.cid, RootCid);
             Assert.AreEqual(result.offset, 0);

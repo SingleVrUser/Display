@@ -1,19 +1,23 @@
-﻿using HtmlAgilityPack;
+﻿using Display.Helper.Date;
+using Display.Helper.Network;
+using Display.Models.Spider;
+using HtmlAgilityPack;
+using Newtonsoft.Json;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Display.Models.Data;
-using Display.Models.Spider;
-using Display.Helper.Network;
-using Display.Helper.Date;
-using Newtonsoft.Json;
-using System.Linq;
+using Display.Models.Api.Fc2Club;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
+using Display.Providers.Downloader;
 
 namespace Display.Providers.Spider;
 
 public class Fc2Hub : BaseSpider
 {
-    public override SpiderInfos.SpiderSourceName Name => SpiderInfos.SpiderSourceName.Fc2club;
+    public override SpiderSourceName Name => SpiderSourceName.Fc2Club;
 
     public override string Abbreviation => "fc";
     public override string Keywords => "Fc2hub.com";
@@ -33,7 +37,7 @@ public class Fc2Hub : BaseSpider
     }
     public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
     {
-        var url = GetInfoFromNetwork.UrlCombine(BaseUrl, $"search?kw={cid.Replace("FC2-", "")}");
+        var url = NetworkHelper.UrlCombine(BaseUrl, $"search?kw={cid.Replace("FC2-", "")}");
 
         var result = await RequestHelper.RequestHtml(Common.Client, url, token);
         if (result == null) return null;
@@ -63,27 +67,27 @@ public class Fc2Hub : BaseSpider
 
         var json = JsonConvert.DeserializeObject<FcJson>(jsonString);
 
-        if (json.name == null || json.image == null) return null;
+        if (json.Name == null || json.Image == null) return null;
 
-        videoInfo.Title = json.name;
-        videoInfo.trueName = cid;
-        videoInfo.ReleaseTime = json.datePublished.Replace("/", "-");
+        videoInfo.Title = json.Name;
+        videoInfo.TrueName = cid;
+        videoInfo.ReleaseTime = json.DatePublished.Replace("/", "-");
         //PTxHxMxS转x分钟
-        videoInfo.Lengthtime = DateHelper.ConvertPtTimeToTotalMinute(json.duration);
-        videoInfo.Director = json.director;
+        videoInfo.Lengthtime = DateHelper.ConvertPtTimeToTotalMinute(json.Duration);
+        videoInfo.Director = json.Director;
         videoInfo.Producer = "fc2";
 
-        if (json.genre != null)
-            videoInfo.Category = string.Join(",", json.genre);
+        if (json.Genre != null)
+            videoInfo.Category = string.Join(",", json.Genre);
 
-        if (json.actor != null)
-            videoInfo.Actor = string.Join(",", json.actor);
+        if (json.Actor != null)
+            videoInfo.Actor = string.Join(",", json.Actor);
 
 
         var imageUrl = string.Empty;
-        if (json.image != null)
+        if (json.Image != null)
         {
-            imageUrl = json.image;
+            imageUrl = json.Image;
         }
         else
         {
@@ -101,7 +105,7 @@ public class Fc2Hub : BaseSpider
         var savePath = AppSettings.ImageSavePath;
         var filePath = Path.Combine(savePath, cid);
         videoInfo.ImageUrl = imageUrl;
-        videoInfo.ImagePath = await GetInfoFromNetwork.DownloadFile(imageUrl, filePath, cid);
+        videoInfo.ImagePath = await DbNetworkHelper.DownloadFile(imageUrl, filePath, cid);
 
         return videoInfo;
     }

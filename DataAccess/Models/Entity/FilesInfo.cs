@@ -7,99 +7,101 @@ namespace DataAccess.Models.Entity;
 public class FilesInfo
 {
     [Column("fid")]
-    public string? Fid { get; set; }
+    [StringLength(20)]
+    public string? Fid { get; init; }
 
     [Column("uid")]
-    public int? Uid { get; set; }
+    public int? Uid { get; init; }
 
     [Column("aid")]
-    public int? Aid { get; set; }
+    public int? Aid { get; init; }
 
     [Column("cid")]
-    public string? Cid { get; set; }
+    [StringLength(20)]
+    public string? Cid { get; init; }
 
     [Column("n")]
-    public string? N { get; set; }
+    public string? N { get; init; }
 
     [Column("s")]
-    public int? S { get; set; }
+    public int? S { get; init; }
 
     [Column("sta")]
-    public int? Sta { get; set; }
+    public int? Sta { get; init; }
 
     [Column("pt")]
-    public string? Pt { get; set; }
+    public string? Pt { get; init; }
 
     [Column("pid")]
-    public string? Pid { get; set; }
+    public string? Pid { get; init; }
 
     [Key]
     [Column("pc")]
-    public string Pc { get; set; } = null!;
+    public string Pc { get; init; } = null!;
 
     [Column("p")]
-    public int? P { get; set; }
+    public int? P { get; init; }
 
     [Column("m")]
-    public int? M { get; set; }
+    public int? M { get; init; }
 
     [Column("t")]
-    public string? T { get; set; }
+    public string? T { get; init; }
 
     [Column("te")]
-    public int? Te { get; set; }
+    public int? Te { get; init; }
 
     [Column("tp")]
-    public int? Tp { get; set; }
+    public int? Tp { get; init; }
 
     [Column("d")]
-    public int? D { get; set; }
+    public int? D { get; init; }
 
     [Column("c")]
-    public int? C { get; set; }
+    public int? C { get; init; }
 
     [Column("sh")]
-    public int? Sh { get; set; }
+    public int? Sh { get; init; }
 
     [Column("e")]
-    public string? E { get; set; }
+    public string? E { get; init; }
 
     [Column("ico")]
-    public string? Ico { get; set; }
+    public string? Ico { get; init; }
 
     [Column("sha")]
-    public string? Sha { get; set; }
+    public string? Sha { get; init; }
 
     [Column("fdes")]
-    public string? Fdes { get; set; }
+    public string? Fdes { get; init; }
 
     [Column("q")]
-    public int? Q { get; set; }
+    public int? Q { get; init; }
 
     [Column("hdf")]
-    public int? Hdf { get; set; }
+    public int? Hdf { get; init; }
 
     [Column("fvs")]
-    public int? Fvs { get; set; }
+    public int? Fvs { get; init; }
 
     [Column("u")]
-    public string? U { get; set; }
+    public string? U { get; init; }
 
     [Column("iv")]
-    public int? Iv { get; set; }
+    public int? Iv { get; init; }
 
     [Column("current_time")]
-    public int? CurrentTime { get; set; }
+    public int? CurrentTime { get; init; }
 
     [Column("played_end")]
-    public int? PlayedEnd { get; set; }
+    public int? PlayedEnd { get; init; }
 
     [Column("last_time")]
-    public string? LastTime { get; set; }
+    public string? LastTime { get; init; }
 
     [Column("vdi")]
-    public int? Vdi { get; set; }
+    public int? Vdi { get; init; }
 
     [Column("play_long")]
-    public double? PlayLong { get; set; }
+    public double? PlayLong { get; init; }
 }

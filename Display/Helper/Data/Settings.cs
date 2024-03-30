@@ -15,6 +15,7 @@ internal static class Settings
 
         if (value is null)
         {
+            LocalSettings.Values[key] = null;
             LocalSettings.Values.Remove(key);
         }
         else if (value is string or int or double)
@@ -32,8 +33,8 @@ internal static class Settings
 
     public static T GetValue<T>(string key, T defaultValue = default)
     {
-        if(string.IsNullOrEmpty(key)) return defaultValue;
-            
+        if (string.IsNullOrEmpty(key)) return defaultValue;
+
         var value = LocalSettings.Values[key];
 
         switch (value)

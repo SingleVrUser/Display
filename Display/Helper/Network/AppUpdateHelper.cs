@@ -1,14 +1,14 @@
-﻿using Display.Models.Data;
-using Display.Models.Version;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
+using Display.Models.Api.Github;
+using Display.Models.Vo.Github;
 
 namespace Display.Helper.Network;
 
-public static class AppUpdateHelper
+internal static class AppUpdateHelper
 {
     private const string LatestReleaseUrl = "https://api.github.com/repos/SingleVrUser/Display/releases/latest";
 
@@ -35,11 +35,11 @@ public static class AppUpdateHelper
     /// 获取github上最新的release信息
     /// </summary>
     /// <returns></returns>
-    public static async Task<GitHubInfo.ReleaseInfo> GetGithubLatestReleaseAsync()
+    private static async Task<GitHubInfo.ReleaseInfo> GetGithubLatestReleaseAsync()
     {
         GitHubInfo.ReleaseInfo result = null;
 
-        var client = GetInfoFromNetwork.CommonClient;
+        var client = NetworkHelper.CommonClient;
 
         //设置超时时间（5s）
         var option = new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token;
@@ -70,10 +70,7 @@ public static class AppUpdateHelper
     {
         //从Github中获取最新信息
         var latestReleaseInfo = await GetGithubLatestReleaseAsync();
-        if (latestReleaseInfo == null)
-            return null;
-
-        return new LatestReleaseCheck(latestReleaseInfo);
+        return latestReleaseInfo == null ? null : new LatestReleaseCheck(latestReleaseInfo);
     }
 
     public static bool IsWindows11()

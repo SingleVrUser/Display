@@ -1,10 +1,7 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Linq;
-using CommunityToolkit.Mvvm.ComponentModel;
-using Display.Constants;
-using Display.Models.Data.Enums;
-using Display.Models.Settings;
-using Display.Views.Tasks;
+using Display.Models.Dto.Settings;
+using Display.Models.Enums;
 
 namespace Display.ViewModels;
 
@@ -13,7 +10,7 @@ internal partial class TaskViewModel : ObservableObject
     public MenuItem[] NavLinks =
     [
         new MenuItem("上传", "\uF6FA", NavigationViewItemEnum.UploadTask),
-        new MenuItem("搜刮", "\uF6FA", NavigationViewItemEnum.SpiderTask), 
+        new MenuItem("搜刮", "\uF6FA", NavigationViewItemEnum.SpiderTask),
     ];
 
     [ObservableProperty]
