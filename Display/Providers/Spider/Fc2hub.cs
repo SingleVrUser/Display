@@ -5,13 +5,11 @@ using HtmlAgilityPack;
 using Newtonsoft.Json;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Display.Models.Api.Fc2Club;
-using Display.Models.Dto.OneOneFive;
 using Display.Models.Entities.OneOneFive;
-using Display.Models.Vo;
-using Display.Providers.Downloader;
 
 namespace Display.Providers.Spider;
 
@@ -44,6 +42,19 @@ public class Fc2Hub : BaseSpider
 
         var detailUrl = result.Item1;
         var htmlString = result.Item2;
+
+        if (htmlString.Contains("Redirecting to"))
+        {
+            var match = Regex.Match(htmlString, "<a href=\"(.*?)\"");
+            if(match.Success)
+            {
+                var newUrl = match.Groups[1].Value;
+                result = await RequestHelper.RequestHtml(Common.Client, newUrl, token);
+                if (result == null) return null;
+                detailUrl = result.Item1;
+                htmlString = result.Item2;
+            }
+        }
 
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlString);

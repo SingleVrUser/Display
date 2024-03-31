@@ -8,10 +8,9 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Display.Models.Dto.OneOneFive;
+using Display.Helper.Notifications;
 using Display.Models.Entities.OneOneFive;
 using Display.Models.Spider;
-using Display.Models.Vo;
 
 namespace Display.Providers.Spider;
 
@@ -54,6 +53,7 @@ public class JavDb : BaseSpider
     public override HttpClient Client =>
         _client ??= CreateClient(Cookie);
 
+    private string _disableCookie = string.Empty;
 
     private static HttpClient CreateClient(string cookie)
     {
@@ -67,10 +67,10 @@ public class JavDb : BaseSpider
 
     public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
     {
-        cid = cid.ToUpper();
         var isUseCookie = cid.Contains("FC");
 
-        if (isUseCookie && string.IsNullOrEmpty(AppSettings.JavDbCookie)) return null;
+        var cookie = AppSettings.JavDbCookie;
+        if (isUseCookie && (string.IsNullOrEmpty(cookie) || cookie == _disableCookie)) return null;
 
         var detailUrl = await GetDetailUrlFromCid(cid, token);
 
@@ -85,6 +85,16 @@ public class JavDb : BaseSpider
             tuple = await RequestHelper.RequestHtml(Common.Client, detailUrl, token);
 
         if (tuple == null) return null;
+
+        //JavDb访问Fc2需要登录，如果cookie失效，就无法访问
+        if (tuple.Item1.Contains("login"))
+        {
+            _disableCookie = cookie;
+            _client = null;
+
+            Toast.TryToast("javDB", "Cookie失效");
+            return null;
+        };
 
         var htmlString = tuple.Item2;
         if (string.IsNullOrEmpty(htmlString)) return null;

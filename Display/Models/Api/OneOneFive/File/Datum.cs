@@ -5,118 +5,118 @@ namespace Display.Models.Api.OneOneFive.File;
 
 public class Datum
 {
-    [JsonProperty(propertyName: "fid")]
+    [JsonProperty("fid")]
     public long? Fid { get; set; }
 
-    [JsonProperty(propertyName: "uid")]
+    [JsonProperty("uid")]
     public long Uid { get; set; }
 
-    [JsonProperty(propertyName: "aid")]
+    [JsonProperty("aid")]
     public int Aid { get; set; }
 
-    [JsonProperty(propertyName: "cid")]
+    [JsonProperty("cid")]
     public long Cid { get; set; }
 
-    [JsonProperty(propertyName: "n")]
+    [JsonProperty("n")]
     public string Name { get; set; }
 
-    [JsonProperty(propertyName: "s")]
+    [JsonProperty("s")]
     public long Size { get; set; }
 
-    [JsonProperty(propertyName: "sta")]
+    [JsonProperty("sta")]
     public int Sta { get; set; }
 
-    [JsonProperty(propertyName: "pt")]
+    [JsonProperty("pt")]
     public string Pt { get; set; }
     
-    [JsonProperty(propertyName: "pid")]
+    [JsonProperty("pid")]
     public long? Pid { get; set; }
 
-    [JsonProperty(propertyName: "pc")]
+    [JsonProperty("pc")]
     public string PickCode { get; set; }
 
-    [JsonProperty(propertyName: "p")]
+    [JsonProperty("p")]
     public int P { get; set; }
 
 
-    [JsonProperty(propertyName: "m")]
+    [JsonProperty("m")]
     public int M { get; set; }
 
-    [JsonProperty(propertyName: "t")]
+    [JsonProperty("t")]
     public string Time { get; set; }
 
 
-    [JsonProperty(propertyName: "te")]
+    [JsonProperty("te")]
     public int TimeEdit { get; set; }
 
-    [JsonProperty(propertyName: "tp")]
+    [JsonProperty("tp")]
     public int TimeProduce { get; set; }
 
-    [JsonProperty(propertyName: "d")]
+    [JsonProperty("d")]
     public int D { get; set; }
 
-    [JsonProperty(propertyName: "c")]
+    [JsonProperty("c")]
     public int C { get; set; }
 
 
-    [JsonProperty(propertyName: "sh")]
+    [JsonProperty("sh")]
     public int Sh { get; set; }
 
-    [JsonProperty(propertyName: "e")]
+    [JsonProperty("e")]
     public string E { get; set; }
 
 
-    [JsonProperty(propertyName: "ico")]
+    [JsonProperty("ico")]
     public string Ico { get; set; }
 
 
-    [JsonProperty(propertyName: "sha")]
+    [JsonProperty("sha")]
     public string Sha1 { get; set; }
 
 
-    [JsonProperty(propertyName: "fdes")]
+    [JsonProperty("fdes")]
     public string Fdes { get; set; }
 
 
-    [JsonProperty(propertyName: "q")]
+    [JsonProperty("q")]
     public int Q { get; set; }
 
 
-    [JsonProperty(propertyName: "hdf")]
+    [JsonProperty("hdf")]
     public int Hdf { get; set; }
 
 
-    [JsonProperty(propertyName: "fvs")]
+    [JsonProperty("fvs")]
     public int Fvs { get; set; }
 
-    [JsonProperty(propertyName: "fl")]
+    [JsonProperty("fl")]
     public Flag[] Fl { get; set; }
 
-    [JsonProperty(propertyName: "u")]
+    [JsonProperty("u")]
     public string U { get; set; }
 
 
-    [JsonProperty(propertyName: "iv")]
+    [JsonProperty("iv")]
     public int Iv { get; set; }
 
 
-    [JsonProperty(propertyName: "current_time")]
+    [JsonProperty("current_time")]
     public int CurrentTime { get; set; }
 
 
-    [JsonProperty(propertyName: "played_end")]
+    [JsonProperty("played_end")]
     public int PlayedEnd { get; set; }
 
 
-    [JsonProperty(propertyName: "last_time")]
+    [JsonProperty("last_time")]
     public string LastTime { get; set; }
 
 
-    [JsonProperty(propertyName: "vdi")]
+    [JsonProperty("vdi")]
     public int Vdi { get; set; }
 
 
-    [JsonProperty(propertyName: "play_long")]
+    [JsonProperty("play_long")]
     public double PlayLong { get; set; }
 
     public override string ToString() => Name;

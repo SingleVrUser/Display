@@ -4,9 +4,7 @@ using HtmlAgilityPack;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Display.Models.Dto.OneOneFive;
 using Display.Models.Entities.OneOneFive;
-using Display.Models.Vo;
 
 namespace Display.Providers.Spider;
 
@@ -22,6 +20,8 @@ public class AvSox : BaseSpider
     public override string Abbreviation => "Avsox";
     public override string Keywords => "AVSOX";
 
+    public override bool IgnoreFc2 => false;
+
     public override string BaseUrl
     {
         get => AppSettings.AvSoxBaseUrl;
@@ -29,8 +29,6 @@ public class AvSox : BaseSpider
     }
     public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
     {
-        cid = cid.ToUpper();
-
         var detailUrl = await GetDetailUrlFromCid(cid, token);
 
         //搜索无果，退出
@@ -51,7 +49,8 @@ public class AvSox : BaseSpider
 
     private async Task<string> GetDetailUrlFromCid(string cid, CancellationToken token)
     {
-        var url = NetworkHelper.UrlCombine(BaseUrl, $"cn/search/{cid}");
+        var searchKeyword = cid.Replace("FC2-", "");
+        var url = NetworkHelper.UrlCombine(BaseUrl, $"cn/search/{searchKeyword}");
 
         // 访问
         var tuple = await RequestHelper.RequestHtml(Common.Client, url, token);
@@ -65,7 +64,7 @@ public class AvSox : BaseSpider
         return GetDetailUrlFromSearchResult(htmlDoc, cid);
     }
 
-    private static string GetDetailUrlFromSearchResult(HtmlDocument htmlDoc, string CID)
+    private static string GetDetailUrlFromSearchResult(HtmlDocument htmlDoc, string cid)
     {
         //是否提示搜索失败
         var alertNode = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class,'alert-danger')]");
@@ -76,7 +75,7 @@ public class AvSox : BaseSpider
         if (searchResultNodes == null) return null;
 
         //分割通过正则匹配得到的CID
-        var splitResult = Common.SplitCid(CID);
+        var splitResult = Common.SplitCid(cid, cid.Contains("FC2"));
         if (splitResult == null) return null;
 
         var leftCid = splitResult.Item1;
@@ -110,7 +109,7 @@ public class AvSox : BaseSpider
                     searchRightCid = splitSearchResult[1];
                     break;
                 //有且有三个分隔符（FC2-PPV-3143749）
-                case 3 when CID.Contains("FC2"):
+                case 3 when cid.Contains("FC2"):
                     searchLeftCid = "FC2";
                     searchRightCid = splitSearchResult[2];
                     break;

@@ -710,8 +710,8 @@ public static class DataAccess
             var keyList = new List<string>();
             foreach (var item in data.GetType().GetProperties())
             {
-                ////fl为数组，应添加进新表中，一对多。目前暂不考虑，故跳过
-                //if (item.Name == "Fl") continue;
+                //fl为数组，应添加进新表中，一对多。目前暂不考虑，故跳过
+                if (item.Name == "Fl") continue;
 
                 if (!item.TryGetJsonName(out var fieldName)) continue;
 
@@ -724,8 +724,8 @@ public static class DataAccess
             var parameters = new List<SqliteParameter>();
             foreach (var item in data.GetType().GetProperties())
             {
-                ////fl为数组，应添加进新表中，一对多。目前暂不考虑，故跳过
-                //if (item.Name == "Fl") continue;
+                //fl为数组，应添加进新表中，一对多。目前暂不考虑，故跳过
+                if (item.Name == "Fl") continue;
 
                 if (!item.TryGetJsonName(out var fieldName)) continue;
 
