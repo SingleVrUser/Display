@@ -1293,7 +1293,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     public void NavigationToImagePage(List<FilesInfo> files, FilesInfo currentInfo)
     {
         var images = files.Where(i => i.IsImage).ToList();
-        var currentIndex = files.IndexOf(currentInfo);
+        var currentIndex = images.IndexOf(currentInfo);
 
         Frame.Navigate(typeof(ImagePage), Tuple.Create(images, currentIndex), new EntranceNavigationTransitionInfo());
     }
