@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Display.Models.Api.OneOneFive.Browser;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json;
 using Windows.Storage;
@@ -24,10 +27,10 @@ internal static class Settings
         }
         else
         {
-            LocalSettings.Values[key] = JsonSerializer.Serialize(value);
+            LocalSettings.Values[key] = JsonConvert.SerializeObject(value);
 
             // LocalSettings 最大设置 8KB (8 * 1024 bytes)
-            //Debug.WriteLine($"占用字节数：{System.Text.Encoding.Default.GetByteCount(JsonSerializer.Serialize(value))}");
+            //Debug.WriteLine($"占用字节数：{System.Text.Encoding.Default.GetByteCount(JsonConvert.SerializeObject(value))}");
         }
     }
 
@@ -45,7 +48,7 @@ internal static class Settings
                 T result;
                 try
                 {
-                    result = JsonSerializer.Deserialize<T>(s);
+                    result = JsonConvert.DeserializeObject<T>(s);
                 }
                 catch (Exception ex)
                 {

@@ -21,6 +21,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using SharpCompress;
+using Newtonsoft.Json;
 
 namespace Display.Views.Pages;
 
@@ -232,7 +233,7 @@ public sealed partial class ActorsPage
         if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
         var storageFolder = await StorageFolder.GetFolderFromPathAsync(savePath);
         var sampleFile = await storageFolder.CreateFileAsync("getting.json", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(sampleFile, JsonSerializer.Serialize(infos));
+        await FileIO.WriteTextAsync(sampleFile, JsonConvert.SerializeObject(infos));
 
         await GetActorsInfo(infos);
 
@@ -248,7 +249,8 @@ public sealed partial class ActorsPage
         if (File.Exists(filePath))
         {
             var jsonString = await File.ReadAllTextAsync(filePath);
-            var infos = JsonSerializer.Deserialize<ActorInfo[]>(jsonString);
+
+            var infos = JsonConvert.DeserializeObject<ActorInfo[]>(jsonString);
 
             await GetActorsInfo(infos, AppSettings.GetActorInfoLastIndex);
 

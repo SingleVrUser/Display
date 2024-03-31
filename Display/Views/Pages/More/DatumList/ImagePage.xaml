@@ -6,18 +6,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
             xmlns:controls="using:CommunityToolkit.WinUI.Controls"
             xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
-      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
-      xmlns:userController="using:Display.Controls.UserController"
-      xmlns:file="using:Display.Models.Api.OneOneFive.File"
-      xmlns:oneOneFive1="using:Display.Models.Vo.OneOneFive"
+             xmlns:userController="using:Display.Controls.UserController"
+             xmlns:oneOneFive1="using:Display.Models.Vo.OneOneFive"
       mc:Ignorable="d">
 
     <Grid RowDefinitions="50,*">
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
 
-            <ColumnDefinition
-                MinWidth="0"
+            <ColumnDefinition x:Name="InfoColumnDefinition"
+                              MinWidth="0"
                               MaxWidth="700"
                               Width="0" />
         </Grid.ColumnDefinitions>
@@ -162,8 +160,8 @@
               PointerEntered="TopGrid_PointerEntered"
               PointerExited="TopGrid_PointerExited">
 
-            <RelativePanel
-                Background="{ThemeResource LayerOnMicaBaseAltFillColorDefaultBrush}"
+            <RelativePanel x:Name="TopPanel"
+                           Background="{ThemeResource LayerOnMicaBaseAltFillColorDefaultBrush}"
                            Visibility="Collapsed">
                 <HyperlinkButton x:Name="BackButton"
                                  Margin="8"
@@ -184,8 +182,8 @@
             </RelativePanel>
 
             <RelativePanel>
-                <StackPanel
-                    RelativePanel.LeftOf="MoreButton"
+                <StackPanel x:Name="MoreButtonStackPanel"
+                            RelativePanel.LeftOf="MoreButton"
                             RelativePanel.AlignVerticalCenterWithPanel="True"
                             Spacing="5"
                             Orientation="Horizontal"
@@ -202,7 +200,7 @@
                                  Click="OpenInfoButtonClick"
                                  Margin="10,0"
                                  Visibility="Collapsed">
-                    <SymbolIcon Symbol="ClosePane" />
+                    <SymbolIcon x:Name="MoreSymbolIcon" Symbol="ClosePane" />
                 </HyperlinkButton>
             </RelativePanel>
 

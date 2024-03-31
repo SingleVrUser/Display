@@ -673,6 +673,8 @@ internal class WebApi
     public async Task<WebFileInfo> GetFileAsync(long? cid, int limit = 40, int offset = 0, bool useApi2 = false,
         bool loadAll = false, string orderBy = "user_ptime", int asc = 0, bool isOnlyFolder = false)
     {
+        if (cid == 0) useApi2 = true;
+
         var url = !useApi2
             ? $"https://webapi.115.com/files?aid=1&cid={cid}&o={orderBy}&asc={asc}&offset={offset}&show_dir=1&limit={limit}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json"
             :
