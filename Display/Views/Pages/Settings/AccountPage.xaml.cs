@@ -6,6 +6,7 @@ using Display.Providers;
 using Display.Views.Windows;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Newtonsoft.Json;
 
 namespace Display.Views.Pages.Settings;
 
@@ -141,7 +142,7 @@ public sealed partial class AccountPage
         var exportCookieList = FileMatch.ExportCookies(cookies);
 
         //设置创建包里的文本内容
-        var clipboardText = System.Text.Json.JsonSerializer.Serialize(exportCookieList);
+        var clipboardText = JsonConvert.SerializeObject(exportCookieList);
 
         //创建一个数据包
         var dataPackage = new DataPackage();

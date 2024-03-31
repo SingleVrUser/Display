@@ -7,9 +7,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
-using Display.Models.Api.OneOneFive;
 using Display.Models.Api.OneOneFive.File;
-using Display.Models.Dto.OneOneFive;
 
 namespace Display.Helper.Network;
 

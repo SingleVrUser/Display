@@ -13,6 +13,7 @@ using Windows.Storage;
 using Display.Models.Api.OneOneFive.Browser;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Vo;
+using Newtonsoft.Json;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -128,7 +129,8 @@ namespace Display.Controls.UserController
 
             if (inputElementsIdAndValueAsJsonString != "[]" && inputElementsIdAndValueAsJsonString != "0")
             {
-                selectedItemList = JsonSerializer.Deserialize<List<SelectedItemInBrowser>>(inputElementsIdAndValueAsJsonString);
+                
+                selectedItemList = JsonConvert.DeserializeObject<List<SelectedItemInBrowser>>(inputElementsIdAndValueAsJsonString);
             }
 
             return selectedItemList;
