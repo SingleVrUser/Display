@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Display.Helper.UI;
 using Display.Models.Api.OneOneFive.File;
 using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
@@ -13,6 +14,7 @@ using Display.Models.Entities;
 using Display.Models.Entities.OneOneFive;
 using Display.Models.Enums.OneOneFive;
 using Display.Models.Vo;
+using Display.Models.Vo.IncrementalCollection;
 using Display.Models.Vo.OneOneFive;
 using Display.Providers;
 using Microsoft.UI.Input;
@@ -118,16 +120,11 @@ public sealed partial class VideoCoverDisplay : UserControl, INotifyPropertyChan
     /// <param name="isShowSuccessFlyout"></param>
     private void ChangedOrderButtonFlyout(bool isShowSuccessFlyout)
     {
-        //显示成功的排序
-        if (isShowSuccessFlyout)
-        {
-            OrderButton.Flyout = Resources["SuccessOrderFlyout"] as Flyout;
-        }
-        //显示失败的排序
-        else
-        {
-            OrderButton.Flyout = Resources["FailOrderFlyout"] as Flyout;
-        }
+        if (this.TryGetResourceValue<Flyout>(
+                isShowSuccessFlyout
+                ? "SuccessOrderFlyout"
+                : "FailOrderFlyout", out var flout))
+            OrderButton.Flyout = flout;
     }
 
     /// <summary>

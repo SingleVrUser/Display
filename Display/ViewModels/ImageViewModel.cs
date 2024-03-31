@@ -50,7 +50,6 @@ internal partial class ImageViewModel : ObservableObject
             subImageViewModels.Add(photoViewModel);
         }
 
-        //Photos = new ObservableCollection<Models.Image.SubImageModel>(subImageViewModels);
         Photos = subImageViewModels;
 
         await LoadImage();

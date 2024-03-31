@@ -3,13 +3,12 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Display.Models.Api.OneOneFive.File;
-using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums.OneOneFive;
 using Display.Providers;
 using Microsoft.UI.Xaml.Data;
 using SharpCompress;
 
-namespace Display.Models.Data.IncrementalCollection;
+namespace Display.Models.Vo.IncrementalCollection;
 
 public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum>, ISupportIncrementalLoading
 {
@@ -47,17 +46,15 @@ public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum
     public async Task LoadData(int startShowCount = 20)
     {
         var newItems = await DataAccess.Get.GetFailFileInfoWithDatum(0, startShowCount, FilterName, OrderBy, IsDesc, ShowType);
-
         if (Count == 0)
         {
-            HasMoreItems = true;
             AllCount = DataAccess.Get.GetCountOfFailDatumFiles(FilterName, ShowType);
         }
         else
             Clear();
 
-
         newItems?.ForEach(Add);
+        HasMoreItems = true;
     }
 
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
