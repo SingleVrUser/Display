@@ -7,14 +7,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:model="using:Display.Models.Spider"
     xmlns:forum="using:Display.Models.Vo.Forum"
     mc:Ignorable="d">
 
     <Grid RowDefinitions="auto,*">
         <ProgressBar x:Name="MyProgressBar" IsIndeterminate="True"/>
 
-        <ListView x:Name="LinksListView" Grid.Row="1" SelectionMode="Single" CharacterSpacing="12">
+        <ListView x:Name="LinksListView" Grid.Row="1" SelectionMode="Multiple" CharacterSpacing="12">
 
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="forum:Forum1080SearchResult">
@@ -29,8 +28,6 @@
                         <TextBlock Text="{x:Bind Title}"
                                    TextWrapping="Wrap"
                                    FontWeight="Bold"/>
-
-                        <!--<TextBlock Grid.Row="1" Text="{x:Bind Description}" TextWrapping="Wrap"/>-->
 
                         <Grid Grid.Row="1" ColumnDefinitions="*,auto" ColumnSpacing="5">
                             <TextBlock Text="{x:Bind Time}"/>

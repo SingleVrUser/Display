@@ -9,16 +9,17 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.System;
+using Display.Helper.Notifications;
 using Display.Models.Enums;
-using Display.Models.Spider;
 using Display.Models.Vo.Forum;
-using Display.Models.Vo.Spider;
 using Display.Providers;
 using Display.Providers.Searcher;
 using Display.Services.Upload;
 using Display.Views.Pages.Settings.Account;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using NetworkHelper = Display.Helper.Network.NetworkHelper;
+using Display.Models.Api.OneOneFive.Upload;
 
 namespace Display.Views.Pages.SearchLink;
 
@@ -28,6 +29,8 @@ public sealed partial class SearchLinkPage : INotifyPropertyChanged
 
     private static long _lastRequestTime;
     private const int SpacingSecond = 15;
+
+    private WebApi _webApi = WebApi.GlobalWebApi;
 
     private static long NowDate => DateTimeOffset.Now.ToUnixTimeSeconds();
 
@@ -122,65 +125,107 @@ public sealed partial class SearchLinkPage : INotifyPropertyChanged
 
     public async Task<Tuple<bool, string>> OfflineDownSelectedLink(long cid)
     {
-        if (LinksListView.SelectedItem is not Forum1080SearchResult info) return null;
+        var infos = LinksListView.SelectedItems.Cast<Forum1080SearchResult>().ToArray();
+        if (!infos.Any()) return null;
 
-        var url = info.Url;
-        var attachmentInfos = await X1080X.GetDownLinkFromUrl(url);
-        Debug.WriteLine($"获取到下载链接({attachmentInfos.Length})");
+        List<string> offlineDownList = [];
+        List<string> torrentDownList = [];
+        List<string> srtUploadList = [];
 
-        //选择第一个不需要点数的
-        var attmnInfo = attachmentInfos.FirstOrDefault(x => x.Expense == 0);
-
-        if (attmnInfo == null) return new Tuple<bool, string>(false, "获取到附件下载链接时出错");
-
-        switch (attmnInfo.TypeEnum)
+        for (var i = 0; i < infos.Length; i++)
         {
-            // 磁力
-            case AttmnTypeEnum.Magnet:
-                return await RequestOfflineDown(cid, [attmnInfo.Url]);
-            case AttmnTypeEnum.Rar:
+            var url = infos[i].Url;
+            var attachmentInfos = await X1080X.GetDownLinkFromUrl(url);
+
+            Debug.WriteLine($"获取到下载链接({attachmentInfos.Length})");
+
+            // 最后一个不需要等待（当数量为1时，第一个就是最后一个）
+            if(infos.Length != i + 1) await NetworkHelper.RandomTimeDelay(1,5);
+
+            //选择第一个不需要点数的
+            var attmnInfo = attachmentInfos.FirstOrDefault(x => x.Expense == 0);
+
+            if (attmnInfo == null)
             {
-                var rarPath = await X1080X.TryDownAttmn(attmnInfo.Url, attmnInfo.Name);
-
-                if (rarPath == null) return new Tuple<bool, string>(false, "下载附件(.rar)时出错");
-
-                Debug.WriteLine($"附件已保存到：{rarPath}");
-
-                // 解析Rar
-                var rarInfo = await X1080X.GetRarInfoFromRarPath(rarPath);
-                if (rarInfo == null) return new Tuple<bool, string>(false, "解析附件时出错");
-
-                var down115LinkList = Get115DownUrlsFromAttmnInfo(rarInfo);
-                if (down115LinkList.Count == 0) return new Tuple<bool, string>(false, "附件中未找到115下载链接");
-
-                return await RequestOfflineDown(cid, down115LinkList, rarInfo.SrtPath);
+                Toast.TryToast("1080", "获取到附件下载链接时出错");
+                continue;
             }
-            case AttmnTypeEnum.Txt:
+
+            switch (attmnInfo.TypeEnum)
             {
-                var txtPath = await X1080X.TryDownAttmn(attmnInfo.Url, attmnInfo.Name);
-                if (txtPath == null) return new Tuple<bool, string>(false, "下载附件(.txt)时出错");
+                // 磁力
+                case AttmnTypeEnum.Magnet:
+                {
+                    offlineDownList.Add(attmnInfo.Url);
+                    break;
+                }
+                case AttmnTypeEnum.Rar:
+                {
+                    var rarPath = await X1080X.TryDownAttmn(attmnInfo.Url, attmnInfo.Name);
 
-                Debug.WriteLine($"附件已保存到：{txtPath}");
+                    if (rarPath == null) return new Tuple<bool, string>(false, "下载附件(.rar)时出错");
 
-                var txtInfo = await X1080X.GetRarInfoFromTxtPath(txtPath);
+                    Debug.WriteLine($"附件已保存到：{rarPath}");
 
-                var down115LinkList = Get115DownUrlsFromAttmnInfo(txtInfo);
-                if (down115LinkList.Count == 0) return new Tuple<bool, string>(false, "附件中未找到115下载链接");
+                    // 解析Rar
+                    var rarInfo = await X1080X.GetRarInfoFromRarPath(rarPath);
+                    if (rarInfo == null) return new Tuple<bool, string>(false, "解析附件时出错");
 
-                return await RequestOfflineDown(cid, down115LinkList);
+                    var down115LinkList = Get115DownUrlsFromAttmnInfo(rarInfo);
+                    if (down115LinkList.Count == 0)
+                    {
+                        Toast.TryToast("1080", "附件中未找到115下载链接");
+                        continue;
+                    }
+
+                    srtUploadList.Add(rarInfo.SrtPath);
+                    offlineDownList.AddRange(down115LinkList);
+                    break;
+                }
+                case AttmnTypeEnum.Txt:
+                {
+                    var txtPath = await X1080X.TryDownAttmn(attmnInfo.Url, attmnInfo.Name);
+                    if (txtPath == null) return new Tuple<bool, string>(false, "下载附件(.txt)时出错");
+
+                    Debug.WriteLine($"附件已保存到：{txtPath}");
+
+                    var txtInfo = await X1080X.GetRarInfoFromTxtPath(txtPath);
+
+                    var down115LinkList = Get115DownUrlsFromAttmnInfo(txtInfo);
+                    if (down115LinkList.Count == 0)
+                    {
+                        Toast.TryToast("1080", "附件中未找到115下载链接");
+                        continue;
+                    }
+
+                    offlineDownList.AddRange(down115LinkList);
+                    break;
+                }
+                case AttmnTypeEnum.Torrent:
+                {
+                    var torrentPath = await X1080X.TryDownAttmn(attmnInfo.Url, attmnInfo.Name);
+                    if (torrentPath == null)
+                    {
+                        Toast.TryToast("1080", "下载附件(.torrent)时出错");
+                        continue;
+                    }
+
+                    Debug.WriteLine($"附件已保存到：{torrentPath}");
+
+                    torrentDownList.Add(torrentPath);
+                    break;
+                }
             }
-            case AttmnTypeEnum.Torrent:
-            {
-                var torrentPath = await X1080X.TryDownAttmn(attmnInfo.Url, attmnInfo.Name);
-                if (torrentPath == null) return new Tuple<bool, string>(false, "下载附件(.torrent)时出错");
-
-                Debug.WriteLine($"附件已保存到：{torrentPath}");
-
-                return await WebApi.GlobalWebApi.CreateTorrentOfflineDown(cid, torrentPath);
-            }
-            default:
-                return new Tuple<bool, string>(false, "当前附件格式不受支持");
         }
+
+        var uploadInfo = await _webApi.GetUploadInfo();
+        if (uploadInfo == null) return new Tuple<bool, string>(false, "获取115上传信息时出错");
+
+        await RequestUploadSrtPath(cid, uploadInfo, srtUploadList);
+        await RequestTorrentDown(cid, torrentDownList);
+        var isAllDone = await RequestOfflineDown(cid, uploadInfo, offlineDownList);
+
+        return isAllDone ? new Tuple<bool, string>(true, "已添加") : new Tuple<bool, string>(false, "添加失败");
     }
 
     private List<string> Get115DownUrlsFromAttmnInfo(Forum1080AttmnFileInfo forum1080AttmnInfo)
@@ -211,60 +256,61 @@ public sealed partial class SearchLinkPage : INotifyPropertyChanged
         return noRarList.Count > 0 ? noRarList : down115LinkList;
     }
 
-    private async Task<Tuple<bool, string>> RequestOfflineDown(long cid, List<string> links, string srtPath = null)
+    private async Task RequestTorrentDown(long cid, IList<string> torrentPathList)
     {
-        var webApi = WebApi.GlobalWebApi;
-
-        var uploadInfo = await webApi.GetUploadInfo();
-        if (uploadInfo == null) return new Tuple<bool, string>(false, "获取115上传信息时出错");
-
-        var offlineSpaceInfo = await webApi.GetOfflineSpaceInfo(uploadInfo.UserKey, uploadInfo.UserId);
-
-        var addTaskUrlInfo = await webApi.AddTaskUrl(links, cid, uploadInfo.UserId, offlineSpaceInfo.Sign, offlineSpaceInfo.Time);
-
-        var isDone = false;
-        string result = null;
-        // 需要验证账号
-        if (addTaskUrlInfo is { ErrCode: Constants.Account.AccountAnomalyCode })
+        foreach (var torrentPath in torrentPathList)
         {
-            var window = WebApi.CreateWindowToVerifyAccount();
-
-            if (window.Content is not VerifyAccountPage page) return null;
-
-            var isClosed = false;
-            page.VerifyAccountCompleted += async (_, iSucceeded) =>
-            {
-                if (!iSucceeded)
-                {
-                    result = "验证账号未成功";
-                    isClosed = true;
-                    return;
-                }
-
-                (isDone, result) = await RequestOfflineDown(cid, links);
-                isClosed = true;
-            };
-
-            window.Activate();
-
-            //堵塞，直到关闭输入验证码的window
-            while (!isClosed)
-            {
-                await Task.Delay(2000);
-            }
-
-            return new Tuple<bool, string>(isDone, result);
+            await WebApi.GlobalWebApi.CreateTorrentOfflineDown(cid, torrentPath);
         }
+    }
 
-        // 上传字幕，如果需要
-        if (!string.IsNullOrEmpty(srtPath))
+    private async Task RequestUploadSrtPath(long cid, UploadInfoResult uploadInfo, IEnumerable<string> srtPathList)
+    {
+        foreach (var srtPath in srtPathList.Where(srtPath => !string.IsNullOrEmpty(srtPath)))
         {
             await FileUploadService.SimpleUpload(srtPath, cid, uploadInfo.UserId, uploadInfo.UserKey);
         }
+    }
 
-        isDone = addTaskUrlInfo is { State: true };
-        result = isDone ? "任务添加成功" : !string.IsNullOrEmpty(addTaskUrlInfo.ErrorMsg) ? addTaskUrlInfo.ErrorMsg : "任务添加失败";
-        return new Tuple<bool, string>(isDone, result);
+    private async Task<bool> RequestOfflineDown(long cid, UploadInfoResult uploadInfo, List<string> links)
+    {
+        var offlineSpaceInfo = await _webApi.GetOfflineSpaceInfo(uploadInfo.UserKey, uploadInfo.UserId);
+
+        var addTaskUrlInfo = await _webApi.AddTaskUrl(links, cid, uploadInfo.UserId, offlineSpaceInfo.Sign, offlineSpaceInfo.Time);
+
+        var isDone = false;
+
+        // 需要验证账号
+        if (addTaskUrlInfo is not { ErrCode: Constants.Account.AccountAnomalyCode })
+            return addTaskUrlInfo is { State: true };
+
+        var window = WebApi.CreateWindowToVerifyAccount();
+
+        if (window.Content is not VerifyAccountPage page) return false;
+
+        var isClosed = false;
+        page.VerifyAccountCompleted += async (_, iSucceeded) =>
+        {
+            if (!iSucceeded)
+            {
+                isClosed = true;
+                return;
+            }
+
+            isDone = await RequestOfflineDown(cid, uploadInfo, links);
+            isClosed = true;
+        };
+
+        window.Activate();
+
+        //堵塞，直到关闭输入验证码的window
+        while (!isClosed)
+        {
+            await Task.Delay(2000);
+        }
+
+        return isDone;
+
     }
 
     private void OpenInBrowserClick(object sender, RoutedEventArgs e)
@@ -286,4 +332,6 @@ public sealed partial class SearchLinkPage : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
+
+    private record UrlsAndSrtPath(List<string> Urls, string SrtPath);
 }

@@ -34,7 +34,6 @@ using Display.Models.Api.OneOneFive.OfflineDown;
 using Display.Models.Api.OneOneFive.Search;
 using Display.Models.Api.OneOneFive.Setting;
 using Display.Models.Api.OneOneFive.Upload;
-using Display.Models.Api.OneOneFive.User;
 using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
@@ -430,9 +429,9 @@ internal class WebApi
     public async Task RevertFiles(List<string> rids)
     {
         const string url = "https://webapi.115.com/rb/revert";
-        Dictionary<string, string> values = new();
+        Dictionary<string, string> values = [];
 
-        for (int i = 0; i < rids.Count; i++)
+        for (var i = 0; i < rids.Count; i++)
         {
             values.Add($"rid[{i}]", rids[i]);
         }
@@ -489,7 +488,7 @@ internal class WebApi
 
         // 最小大小,10 MB
         const long minSize = 10485760;
-        List<int> selectedIndexList = new();
+        List<int> selectedIndexList = [];
         for (var i = 0; i < torrentInfo.TorrentFileListWeb.Length; i++)
         {
             var fileInfo = torrentInfo.TorrentFileListWeb[i];
