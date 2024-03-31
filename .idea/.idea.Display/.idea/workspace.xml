@@ -9,38 +9,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7e630695-b381-4f87-ba1b-fc0a833f8434" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Display/Models/Enums/UserInfo.LoginStatus.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Display/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Display/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Constants/PageTypeAndEnum.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Constants/PageTypeAndEnum.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/ActorImage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/ActorImage.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/UserInfo.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/UserInfoControl.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/UserInfo.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/UserInfoControl.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Converter/DoubleToInt32Converter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Converter/DoubleToInt32Converter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Display.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Display.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/MainWindow.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/MainWindow.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Api/OneOneFive/User/Cookie.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Api/OneOneFive/User/Cookie.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadDatumCollection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadDatumCollection.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Providers/WebApi.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Providers/WebApi.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/AddActorCover.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/AddActorCover.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/AddActorCover.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/AddActorCover.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/FileListPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/FileListPage.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/FileListPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/FileListPage.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/VideoDisplay/MainPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/VideoDisplay/MainPage.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/Account/LoginPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/Settings/Account/LoginPage.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/Account/LoginPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/Settings/Account/LoginPage.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/Account/VerifyAccountPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/Settings/Account/VerifyAccountPage.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/Account/VerifyAccountPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/Settings/Account/VerifyAccountPage.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/AccountPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/Settings/AccountPage.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/AccountPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/Settings/AccountPage.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/DownPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/Settings/DownPage.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/MainPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/SettingPage.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/MainPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/SettingPage.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/SelectedFolderPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/Settings/SelectedFolderPage.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Settings/SelectedFolderPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/Settings/SelectedFolderPage.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/Progress.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/Progress.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Tasks/MainPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/TaskPage.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/Tasks/MainPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/TaskPage.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Windows/LoginWindow.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Windows/LoginWindow.xaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,6 +52,7 @@
     <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Converter/DoubleToInt32Converter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Converter/DoubleToInt32Converter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Converter/DoubleToInt32Converter.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Converter/DoubleToInt32Converter.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Views/Pages/ActorsPage.xaml.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/App.g.i.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Controls/UserController/MultipleCoverShow.g.cs" root0="SKIP_HIGHLIGHTING" />
@@ -121,30 +91,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET Launch Settings Profile.Display: Display (Unpackaged).executor": "Debug",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "UWP.Display.executor": "Debug",
-    "XThreadsFramesViewSplitterKey": "0.1904762",
-    "git-widget-placeholder": "main",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "CodeLensConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET Launch Settings Profile.Display: Display (Unpackaged).executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;UWP.Display.executor&quot;: &quot;Debug&quot;,
+    &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.1904762&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;CodeLensConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "rider.external.source.directories": [
-      "C:\\Users\\liuzu\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\DecompilerCache",
-      "C:\\Users\\liuzu\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\SourcesCache",
-      "C:\\Users\\liuzu\\AppData\\Local\\Symbols\\src"
+  &quot;keyToStringList&quot;: {
+    &quot;rider.external.source.directories&quot;: [
+      &quot;C:\\Users\\liuzu\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\DecompilerCache&quot;,
+      &quot;C:\\Users\\liuzu\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\SourcesCache&quot;,
+      &quot;C:\\Users\\liuzu\\AppData\\Local\\Symbols\\src&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="UWP.Display">
     <configuration name="Display: Display (Unpackaged)" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/Display/Display.csproj" />
@@ -187,7 +157,8 @@
       <workItem from="1711775365788" duration="12105000" />
       <workItem from="1711797831033" duration="323000" />
       <workItem from="1711798166709" duration="146000" />
-      <workItem from="1711798482386" duration="9505000" />
+      <workItem from="1711798482386" duration="9731000" />
+      <workItem from="1711876264874" duration="68000" />
     </task>
     <task id="LOCAL-00001" summary="clean views">
       <option name="closed" value="true" />
@@ -253,7 +224,15 @@
       <option name="project" value="LOCAL" />
       <updated>1711798021558</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Modifying the login Page">
+      <option name="closed" value="true" />
+      <created>1711808179658</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1711808179658</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -268,6 +247,7 @@
     <MESSAGE value="clean up xml" />
     <MESSAGE value="clean up model" />
     <MESSAGE value="clean up" />
-    <option name="LAST_COMMIT_MESSAGE" value="clean up" />
+    <MESSAGE value="Modifying the login Page" />
+    <option name="LAST_COMMIT_MESSAGE" value="Modifying the login Page" />
   </component>
 </project>

@@ -313,7 +313,7 @@
                     <EdgeUIThemeTransition Edge="Right" />
                 </CommandBar.Transitions>
 
-                <AppBarButton Icon="Play"
+                <AppBarButton x:Name="PlayButton" Icon="Play"
                               Label="播放"
                               Visibility="Collapsed"
                               Click="PlayButton_Click">
@@ -355,12 +355,12 @@
                         </MenuFlyout>
                     </AppBarButton.ContextFlyout>
                 </AppBarButton>
-                <AppBarButton
-                    Icon="Import"
-                              Label="导入"
-                              Visibility="Collapsed"
-                              Click="ImportDataButton_Click" />
-                <AppBarButton
+                <AppBarButton x:Name="ImportButton"
+                        Icon="Import"
+                      Label="导入"
+                      Visibility="Collapsed"
+                      Click="ImportDataButton_Click" />
+                <AppBarButton x:Name="DownloadButton"
                     Icon="Download"
                               Label="下载"
                               Visibility="Collapsed"
