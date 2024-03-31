@@ -43,8 +43,6 @@ public class JavBus : BaseSpider
 
     public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
     {
-        cid = cid.ToUpper();
-
         var splitCid = cid.Split("-");
         if (splitCid.Length != 2) return null;
 

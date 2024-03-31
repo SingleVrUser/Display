@@ -1,11 +1,9 @@
-﻿using Display.Providers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Display.Providers.Downloader;
 
 namespace Display.Helper.Network;
 
@@ -45,11 +43,7 @@ internal static class RequestHelper
                     break;
                 }
 
-                //JavDb访问Fc2需要登录，如果cookie失效，就无法访问
                 if (response.StatusCode != System.Net.HttpStatusCode.BadGateway) continue;
-
-                // if (url.Contains(AppSettings.JavDbBaseUrl))
-                //     GetInfoFromNetwork.IsJavDbCookieVisible = false;
 
                 break;
             }

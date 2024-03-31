@@ -31,7 +31,6 @@ public class LibreDmm : BaseSpider
     }
     public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
     {
-        cid = cid.ToUpper();
         var url = NetworkHelper.UrlCombine(BaseUrl, $"movies/{cid}");
 
         var result = await RequestHelper.RequestHtml(Common.Client, url, token);

@@ -4,9 +4,7 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Display.Models.Dto.OneOneFive;
 using Display.Models.Entities.OneOneFive;
-using Display.Models.Vo;
 using Display.Models.Vo.Spider;
 
 namespace Display.Providers.Spider;

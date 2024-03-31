@@ -348,7 +348,12 @@ public class SpiderManager
         // 添加进任务队列
         foreach (var name in names)
         {
-            _taskItemQueue.Enqueue(new SpiderItem(name));
+            var upperName = name.ToUpper();
+            // 先从数据库中搜索
+            var singleVideoInfoByTrueName = DataAccess.Get.GetSingleVideoInfoByTrueName(upperName);
+            if(singleVideoInfoByTrueName != null) continue;
+
+            _taskItemQueue.Enqueue(new SpiderItem(upperName));
         }
 
         //记录当前任务队列的个数

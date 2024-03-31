@@ -33,8 +33,6 @@ public class AvMoo : BaseSpider
 
     public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
     {
-        cid = cid.ToUpper();
-
         var detailUrl = await GetDetailUrlFromCid(cid, token);
 
         //搜索无果，退出
