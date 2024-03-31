@@ -112,11 +112,11 @@ public sealed partial class VideoViewPage
             if (_storeditem != null)
             {
                 //开始动画
-                videoControl.StartAnimation(animation, _storeditem);
+                VideoControl.StartAnimation(animation, _storeditem);
             }
             else
             {
-                animation.TryStart(videoControl.PageShow_Grid);
+                animation.TryStart(VideoControl.PageShow_Grid);
             }
         }
     }

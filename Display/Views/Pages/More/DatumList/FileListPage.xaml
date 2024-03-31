@@ -11,9 +11,7 @@
       xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
       xmlns:userController="using:Display.Controls.UserController"
       xmlns:enums1="using:Display.Models.Enums"
-      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
       xmlns:datumList="using:Display.Views.Pages.More.DatumList"
-      xmlns:file="using:Display.Models.Api.OneOneFive.File"
       xmlns:oneOneFive1="using:Display.Models.Vo.OneOneFive"
       xmlns:vo="using:Display.Models.Vo"
       mc:Ignorable="d">
@@ -222,6 +220,8 @@
                     Value="0.5" />
             <Setter Property="Padding"
                     Value="0,10,0,0" />
+            <Setter Property="BorderBrush"
+                    Value="{ThemeResource ControlElevationBorderBrush}" />
             <Setter Property="RowSpacing"
                     Value="5" />
             <Setter Property="HorizontalAlignment"
