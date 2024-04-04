@@ -7,11 +7,10 @@ using Display.Models.Enums;
 using Display.Models.Records;
 using static Display.Constants.DefaultSettings;
 using DefaultValue = Display.Constants.DefaultSettings;
-using MenuItem = Display.Models.Dto.Settings.MenuItem;
 
 namespace Display.Providers;
 
-public class AppSettings
+public abstract class AppSettings
 {
     private static T GetValue<T>(T defaultValue = default, [CallerMemberName] string propertyName = null)
     {

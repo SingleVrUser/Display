@@ -395,6 +395,12 @@ public static class DataAccessLocal
             {
                 commandText = $"SELECT * FROM VideoInfo LEFT JOIN Is_Wm ON VideoInfo.truename = Is_Wm.truename LEFT JOIN ProducerInfo ON VideoInfo.producer = ProducerInfo.Name{filterStr}";
             }
+            //通过名字对演员进行精确查询
+            else if (rangesDicts == null && filterConditionList?.Count == 1 &&
+                     filterConditionList.FirstOrDefault() == "actor")
+            {
+                commandText = $"SELECT VideoInfo.* FROM VideoInfo LEFT JOIN Actor_Video ON VideoInfo.truename = Actor_Video.video_name LEFT JOIN Actor_Names ON Actor_Video.actor_id = Actor_Names.id WHERE Actor_Names.name == '{filterKeywords}'";
+            }
             //普通查询
             else
             {

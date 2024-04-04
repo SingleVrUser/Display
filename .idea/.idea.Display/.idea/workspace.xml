@@ -8,16 +8,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7e630695-b381-4f87-ba1b-fc0a833f8434" name="Changes" comment="Add entity framework">
+    <list default="true" id="7e630695-b381-4f87-ba1b-fc0a833f8434" name="Changes" comment="fix some bug in search">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Display/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Display/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/DaoImpl.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/DaoImpl.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/ActorInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/ActorInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/SearchHistory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/SearchHistory.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/SpiderLog.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/SpiderLog.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/CustomAutoSuggestBox.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/CustomAutoSuggestBox.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/CustomAutoSuggestBox.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/CustomAutoSuggestBox.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Api/OneOneFive/Search/SearchHistory.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Dto/HistorySearchItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Dto/HistorySearchItem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/VideoCoverDisplay.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/VideoCoverDisplay.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadSuccessInfoCollection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadSuccessInfoCollection.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Providers/AppSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Providers/AppSettings.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Providers/DataAccessLocal.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Providers/DataAccessLocal.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,7 +72,9 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/15f9da733c88dd854d1e5488f1fd410fef95b8c1cd76ec6784d25e82d2d1d12/JsonPropertyAttribute.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/4b21fc3f8a3abb5d25f06c622276fbec0fd3932f169cc6af520bf5abc6a46b4/DbSet.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/94a622829d23a99e6859dc73690c2f724f2d4373af0699883e3f70ac955577/TokenizingTextBox.Events.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/97b37ca73f6f8bd6e576f661f8650c6a1f5107d827c14ff82eb2689e5964bc/Utility.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/98c377d82be4c36912d3e59d6d7e2a55a14898ee9757311a192711c5f4115e7/TestMethodInfo.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://D:/Work/WinUi/GitHub/Display/DataAccess/Models/Entity/ActorInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Constants/Account.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Constants/Account.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Controls/UserController/CustomMediaPlayerElement.xaml" root0="SKIP_HIGHLIGHTING" />
@@ -85,6 +83,7 @@
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/App.g.i.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Controls/UserController/ActorImage.g.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Controls/UserController/CustomAutoSuggestBox.g.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Controls/UserController/VideoCoverDisplay.g.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/XamlTypeInfo.g.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -189,7 +188,7 @@
       <workItem from="1712109459015" duration="16231000" />
       <workItem from="1712150320346" duration="5574000" />
       <workItem from="1712156685420" duration="6467000" />
-      <workItem from="1712198315779" duration="23633000" />
+      <workItem from="1712198315779" duration="28004000" />
     </task>
     <task id="LOCAL-00001" summary="clean views">
       <option name="closed" value="true" />
@@ -271,7 +270,15 @@
       <option name="project" value="LOCAL" />
       <updated>1712219054738</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="fix some bug in search">
+      <option name="closed" value="true" />
+      <created>1712223918720</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1712223918720</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -299,7 +306,8 @@
     <MESSAGE value="clean up" />
     <MESSAGE value="Modifying the login Page" />
     <MESSAGE value="Add entity framework" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add entity framework" />
+    <MESSAGE value="fix some bug in search" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix some bug in search" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -719,6 +727,19 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="38" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Display/Providers/DataAccessLocal.cs</url>
+          <line>265</line>
+          <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Providers\DataAccessLocal.cs" initialLine="265" containingFunctionPresentation="Method 'GetFailFileInfoWithFailInfo'">
+            <startOffsets>
+              <option value="8925" />
+            </startOffsets>
+            <endOffsets>
+              <option value="9027" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="93" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
