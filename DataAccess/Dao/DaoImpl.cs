@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -12,7 +13,14 @@ public class DaoImpl<T> : IDao<T> where T : class
     public void Add(T entity)
     {
         DbSet.Add(entity);
-        Context.SaveChanges();
+        try
+        {
+            Context.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(typeof(T).Name + "添加数据时错误:" + ex.Message);
+        }
     }
 
     public List<T> List() => DbSet.ToList();

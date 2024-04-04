@@ -6,12 +6,12 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Windows.Foundation;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using Display.Models.Dto;
-using SearchHistory = Display.Models.Api.OneOneFive.Search.SearchHistory;
 
 namespace Display.Controls.UserController;
 
@@ -24,6 +24,11 @@ public sealed partial class CustomAutoSuggestBox
 
     private readonly ISearchHistoryDao _searchHistoryDao = App.GetService<ISearchHistoryDao>();
 
+    public CustomAutoSuggestBox()
+    {
+        InitializeComponent();
+    }
+    
     //输入的Text改变
     private async void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
@@ -89,8 +94,13 @@ public sealed partial class CustomAutoSuggestBox
                 QuerySubmitted?.Invoke(sender, args);
             }
 
-            //保存到数据库
-            _searchHistoryDao.Add(new DataAccess.Models.Entity.SearchHistory {Keyword = args.QueryText});
+            var keyword = args.QueryText;
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                //保存到数据库
+                _searchHistoryDao.Add(new SearchHistory {Keyword = keyword});
+            }
+            
         }
 
         //初始化搜索框
@@ -119,7 +129,11 @@ public sealed partial class CustomAutoSuggestBox
 
     private void ShowHistorySearch()
     {
-        NavViewSearchBox.ItemsSource = _searchHistoryDao.List();
+        var searchHistories = _searchHistoryDao.List().ToArray();
+        NavViewSearchBox.ItemsSource = new List<HistorySearchItem>
+        {
+            new(searchHistories)
+        };
     }
 
     private void NavViewSearchBox_LostFocus(object sender, RoutedEventArgs e)
@@ -275,7 +289,7 @@ public sealed partial class CustomAutoSuggestBox
         var keyword = NavViewSearchBox.Text;
         SuggestionItemTapped?.Invoke(sender, keyword);
 
-        _searchHistoryDao.Add(new DataAccess.Models.Entity.SearchHistory {Keyword = keyword});
+        _searchHistoryDao.Add(new SearchHistory {Keyword = keyword});
     }
 
     private bool _isBusy;

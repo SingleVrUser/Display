@@ -10,7 +10,7 @@ public class SearchHistory
 {
     [Key]
     [Column("id")]
-    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; init; }
 
     [Column("keyword", TypeName = "TEXT NO")]
