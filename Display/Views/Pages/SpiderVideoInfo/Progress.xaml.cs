@@ -234,7 +234,7 @@ public sealed partial class Progress
 
             if (tmpData == null)
             {
-                typeInfo.data.Add(new FileStatistics.Data() { Name = name, Count = 1, Size = dataInfo.Size });
+                typeInfo.data.Add(new FileStatistics.Data { Name = name, Count = 1, Size = dataInfo.Size });
             }
             else
             {
@@ -244,7 +244,7 @@ public sealed partial class Progress
         }
         else
         {
-            typeInfo.data.Add(new FileStatistics.Data() { Name = name, Count = 1, Size = dataInfo.Size });
+            typeInfo.data.Add(new FileStatistics.Data { Name = name, Count = 1, Size = dataInfo.Size });
         }
     }
 

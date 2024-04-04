@@ -32,7 +32,6 @@ public class SpiderManager
 
     private readonly ConcurrentQueue<string> _failureNameInfos = [];
 
-    private readonly IFilesInfoDao _filesInfoDao = App.GetService<IFilesInfoDao>();
     private readonly IFileToInfoDao _fileToInfoDao = App.GetService<IFileToInfoDao>();
     private readonly IVideoInfoDao _videoInfoDao = App.GetService<IVideoInfoDao>();
     
@@ -310,13 +309,8 @@ public class SpiderManager
 
         // TODO 当_nameInfos达到指定数量时才添加进数据库
         await DataAccessLocal.Add.AddVideoInfo_ActorInfo_IsWmAsync(item.Info);
-        
-        _fileToInfoDao.UpdateSingle(new FileToInfo
-        {
-            Truename = item.Name,
-            Issuccess = 1
-            
-        });
+
+        _fileToInfoDao.UpdateIsSuccessByTrueName(item.Name, 1);
     }
 
 

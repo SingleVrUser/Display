@@ -24,6 +24,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using DataAccess;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using Display.Helper.Notifications;
@@ -44,6 +45,7 @@ using Display.Models.Vo;
 using Display.Models.Vo.OneOneFive;
 using Display.Models.Vo.Progress;
 using Display.Views.Pages.Settings.Account;
+using Microsoft.EntityFrameworkCore;
 using FileInfo = System.IO.FileInfo;
 
 namespace Display.Providers;
@@ -194,7 +196,9 @@ internal class WebApi
                 return;
             }
 
-            _filesInfoDao.Add(info.Datum);
+            var existsInfo = _filesInfoDao.GetOneByPickCode(info.Datum.PickCode);
+            if (existsInfo == null) _filesInfoDao.Add(info.Datum);
+            else _filesInfoDao.UpdateSingle(info.Datum);
 
             getFilesProgressInfo!.FilesCount++;
 
@@ -228,54 +232,79 @@ internal class WebApi
         // 获取上一次已添加文件夹的pid（如果存在，且修改时间不变；不存在的默认值为string.empty）
         var folderInfo = _filesInfoDao.GetOneByPickCode(cidCategory.pick_code);
 
-        // 该文件已存在数据库里，且修改时间不变
-        if (StaticData.IsJumpExistsFolder && folderInfo != null && folderInfo.TimeEdit == cidCategory.utime)
+        // 该文件已存在数据库里
+        if (folderInfo != null)
         {
-            //如果修改时间未变，但移动了位置
-            if (folderInfo.ParentId == cidCategory.Paths.Last().FileId)
+            //修改时间不变
+            if (StaticData.IsJumpExistsFolder && folderInfo.TimeEdit == cidCategory.utime)
             {
-                _filesInfoDao.Add(FileCategory.ConvertFolderToDatum(cidCategory, cid));
-            }
-
-            //统计上下级文件夹所含文件的数量
-
-            //文件数量
-            getFilesProgressInfo!.FilesCount += cidCategory.count;
-
-            //文件夹数量
-            getFilesProgressInfo!.FolderCount += cidCategory.folder_count;
-
-            var cpm = 60 / (NowDate - lastDate);
-
-            progress?.Report(new GetFileProgressIProgress
-            { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
-        }
-        //之前未添加或修改时间已改变
-        else
-        {
-            //获取当前文件夹下所有文件信息和文件夹信息（从数据库或者网络）
-            getFilesProgressInfo = await TraverseAllFileInfo(cid, getFilesProgressInfo, token, progress);
-
-            var addToDataAccessList = getFilesProgressInfo.AddToDataAccessList;
-
-            //删除后重新添加
-            _filesInfoDao.RemoveAllByFolderId(cid);
-
-            if (addToDataAccessList.Count > 0)
-            {
-                //需要添加进数据库的Datum
-                foreach (var item in addToDataAccessList)
+                //如果修改时间未变，也没有移动位置
+                if (folderInfo.ParentId == cidCategory.Paths.Last().FileId)
                 {
-                    _filesInfoDao.Add(item);
                 }
-            }
+                // 移动了位置
+                else
+                {
+                    //修改位置信息
+                    folderInfo.ParentId = cidCategory.Paths.Last().FileId;
+                }
+                
+                //统计上下级文件夹所含文件的数量
 
-            //不添加有错误的目录进数据库（添加数据库时会跳过已经添加过的目录，对于出现错误的目录不添加方便后续重新添加）
-            if (getFilesProgressInfo.FailCid.Count == 0)
+                //文件数量
+                getFilesProgressInfo!.FilesCount += cidCategory.count;
+
+                //文件夹数量
+                getFilesProgressInfo!.FolderCount += cidCategory.folder_count;
+
+                var cpm = 60 / (NowDate - lastDate);
+
+                progress?.Report(new GetFileProgressIProgress
+                    { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
+            }
+            else
             {
-                _filesInfoDao.Add(FileCategory.ConvertFolderToDatum(cidCategory, cid));
+                //删除后重新添加
+                _filesInfoDao.RemoveAllByFolderId(cid);
+                folderInfo = null;
             }
         }
+
+        if (folderInfo == null)
+        {
+            //获取当前文件夹下所有文件信息和文件夹信息（从网络）
+            getFilesProgressInfo = await TraverseAllFileInfo(cid, getFilesProgressInfo, token, progress);
+        }
+        
+        var addToDataAccessList = getFilesProgressInfo.AddToDataAccessList;
+
+        if (addToDataAccessList.Count > 0)
+        {
+            //需要添加进数据库的Datum
+            foreach (var item in addToDataAccessList)
+            {
+                var existFileInfo = _filesInfoDao.GetOneByPickCode(item.PickCode);
+                if (existFileInfo == null)
+                    Context.Instance.FilesInfos.Add(item);
+                else
+                {
+                    Context.Instance.Entry(existFileInfo).State = EntityState.Detached;
+                    Context.Instance.FilesInfos.Update(item);
+                }
+                
+            }
+            
+            
+            addToDataAccessList.Clear();
+        }
+
+        //不添加有错误的目录进数据库（添加数据库时会跳过已经添加过的目录，对于出现错误的目录不添加方便后续重新添加）
+        if (getFilesProgressInfo.FailCid.Count == 0 && folderInfo == null)
+        {
+            _filesInfoDao.Add(FileCategory.ConvertFolderToDatum(cidCategory, cid));
+        }
+
+        await Context.Instance.SaveChangesAsync(token);
 
         return getFilesProgressInfo;
     }

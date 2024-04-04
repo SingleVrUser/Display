@@ -58,12 +58,6 @@ public class FilesInfoDao : DaoImpl<FilesInfo>, IFilesInfoDao
         return queryable.ToList();
     }   
     
-    public List<FilesInfo> GetPartFileListById(long id)
-    {
-        // 文件 或者 文件夹
-        return DbSet.Where(i => i.CurrentId == id || i.ParentId == id).ToList();
-    }
-
     public void RemoveAllByFolderId(long folderId)
     {
         var allFiles = GetAllFilesListByFolderId(folderId);
@@ -94,6 +88,7 @@ public class FilesInfoDao : DaoImpl<FilesInfo>, IFilesInfoDao
         
         SaveChanges();
     }
+
 
     public FilesInfo? GetOneByPickCode(string pickCode)
     {
@@ -142,16 +137,17 @@ public class FilesInfoDao : DaoImpl<FilesInfo>, IFilesInfoDao
 
     private List<FilesInfo> GetAllFileListTraverse(long id, List<FilesInfo> allFileList)
     {
-        var list = GetPartFileListById(id);
+        var list = DbSet.Where(i => (i.FileId != default && i.CurrentId == id) || i.ParentId == id).ToList();
         
         list.ForEach(item =>
         {
             // 文件夹，再向下查询
             if (item.FileId == default)
             {
-                allFileList = GetAllFileListTraverse(id, allFileList);
+                allFileList = GetAllFileListTraverse(item.CurrentId, allFileList);
             }
         });
+        
         allFileList.AddRange(list);
         return allFileList;
     }

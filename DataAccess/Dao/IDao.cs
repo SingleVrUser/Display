@@ -3,7 +3,7 @@
 public interface IDao<T>
 {
     void Add(T entity);
-
+    
     List<T> List();
 
     void SaveChanges();

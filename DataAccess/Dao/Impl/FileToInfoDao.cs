@@ -6,7 +6,13 @@ namespace DataAccess.Dao.Impl;
 
 public class FileToInfoDao : DaoImpl<FileToInfo>, IFileToInfoDao
 {
-    void test()
+    public void UpdateIsSuccessByTrueName(string trueName, int isSuccess)
     {
+        var fileToInfos = DbSet.Where(i => i.Truename == trueName).ToList();
+        foreach (var fileToInfo in fileToInfos)
+        {
+            fileToInfo.Issuccess = isSuccess;
+        }
+        SaveChanges();
     }
 }
