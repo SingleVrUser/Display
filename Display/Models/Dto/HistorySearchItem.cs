@@ -1,4 +1,4 @@
-﻿using Display.Models.Api.OneOneFive.Search;
+﻿using DataAccess.Models.Entity;
 
 namespace Display.Models.Dto;
 

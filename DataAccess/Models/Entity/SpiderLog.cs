@@ -8,7 +8,7 @@ public class SpiderLog
 {
     [Key]
     [Column("task_id")]
-    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int TaskId { get; set; }
 
     [Column("time")]

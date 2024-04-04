@@ -5,10 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="using:CommunityToolkit.WinUI.Controls"
              xmlns:userController="using:Display.Controls.UserController"
-             xmlns:search="using:Display.Models.Api.OneOneFive.Search"
              xmlns:dto="using:Display.Models.Dto"
-             xmlns:vo="using:Display.Models.Vo"
-             xmlns:oneOneFive1="using:Display.Models.Entities.OneOneFive"
              xmlns:entity="using:DataAccess.Models.Entity"
              mc:Ignorable="d">
 
@@ -35,7 +32,7 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid CornerRadius="2">
-                        <Image Source="{x:Bind ImagePath}"
+                        <Image Source="{x:Bind ImagePath, Converter={StaticResource NotExistsImagePathConverter}}"
                                Width="150"
                                x:Name="Cover_image" />
                     </Grid>
@@ -66,7 +63,7 @@
                         </ItemsRepeater.Layout>
 
                         <ItemsRepeater.ItemTemplate>
-                            <DataTemplate x:DataType="search:SearchHistory">
+                            <DataTemplate x:DataType="entity:SearchHistory">
                                 <GridViewItem Content="{x:Bind Keyword}"
                                               Tapped="SearchHistoryItem_OnTapped"
                                               Padding="10,0"/>
