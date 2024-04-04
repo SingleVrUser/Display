@@ -13,14 +13,7 @@ public class DaoImpl<T> : IDao<T> where T : class
     public void Add(T entity)
     {
         DbSet.Add(entity);
-        try
-        {
-            Context.SaveChanges();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine(typeof(T).Name + "添加数据时错误:" + ex.Message);
-        }
+        Context.SaveChanges();
     }
 
     public List<T> List() => DbSet.ToList();
@@ -37,6 +30,7 @@ public class DaoImpl<T> : IDao<T> where T : class
     public void UpdateSingle(T entity)
     {
         DbSet.Update(entity);
+
         Context.SaveChanges();
     }
 

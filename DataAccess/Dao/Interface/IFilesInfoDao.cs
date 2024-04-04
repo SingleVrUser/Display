@@ -30,13 +30,6 @@ public interface IFilesInfoDao : IDao<FilesInfo>
     List<FilesInfo> GetPartFolderListByPid(long pid, int? limit = null);
     
     /// <summary>
-    /// 通过id获取文件和文件夹列表，深度只有一级
-    /// </summary>
-    /// <param name="id">文件id或者文件夹id</param>
-    /// <returns></returns>
-    List<FilesInfo> GetPartFileListById(long id);
-    
-    /// <summary>
     /// 通过文件夹的id删除该文件夹以及文件夹下的所有文件和文件夹
     /// </summary>
     /// <param name="folderId">文件id或者文件夹id</param>
@@ -53,7 +46,7 @@ public interface IFilesInfoDao : IDao<FilesInfo>
     /// </summary>
     /// <param name="trueName"></param>
     void ExecuteRemoveByTrueName(string trueName);
-
+    
     /// <summary>
     /// 通过pickCode查询
     /// </summary>

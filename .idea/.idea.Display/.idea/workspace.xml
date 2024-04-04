@@ -8,12 +8,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7e630695-b381-4f87-ba1b-fc0a833f8434" name="Changes" comment="fix some bug in search">
+    <list default="true" id="7e630695-b381-4f87-ba1b-fc0a833f8434" name="Changes" comment="Fix bug in null image">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Display/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Display/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/VideoCoverDisplay.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/VideoCoverDisplay.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadSuccessInfoCollection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadSuccessInfoCollection.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Providers/AppSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Providers/AppSettings.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/DaoImpl.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/DaoImpl.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/IDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/IDao.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/FileToInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Impl/FileToInfoDao.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/FilesInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Impl/FilesInfoDao.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFileToInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFileToInfoDao.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFilesInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFilesInfoDao.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Helper/FileProperties/Name/FileMatch.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Helper/FileProperties/Name/FileMatch.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Managers/SpiderManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Managers/SpiderManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Display/Providers/DataAccessLocal.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Providers/DataAccessLocal.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Providers/WebApi.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Providers/WebApi.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/ViewModels/SpiderTaskViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/ViewModels/SpiderTaskViewModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/ActorsPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/ActorsPage.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/More/Import115DataToLocalDataAccess/Progress.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/Import115DataToLocalDataAccess/Progress.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/Progress.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/Progress.xaml.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,6 +55,7 @@
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Private.CoreLib/src/System/Collections/ObjectModel/Collection.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Private.CoreLib/src/System/IO/FileInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Private.CoreLib/src/System/Int32.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Private.CoreLib/src/System/Nullable.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/1d16877762624e96864c872a2991fc241e4fb0/22/b4af14b1/RelationalQueryableExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3fa134a4f7024c6a9faff12697fb4fb9c8e8a0/23/43374af3/Int64.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3fa134a4f7024c6a9faff12697fb4fb9c8e8a0/49/a30af049/ExecutionContext.cs" root0="SKIP_HIGHLIGHTING" />
@@ -63,6 +74,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9bbdf87048bd43de89b63f272a61b8876dfc20/a0/15b15e62/ItemsControl.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9bbdf87048bd43de89b63f272a61b8876dfc20/b9/da8978b4/IApplicationStaticsMethods.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9bbdf87048bd43de89b63f272a61b8876dfc20/e4/600b272f/ButtonBase.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9bbdf87048bd43de89b63f272a61b8876dfc20/f6/5033c525/_EventSource_global__Microsoft_UI_Xaml_UnhandledEx.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a6ca83fd68634bcf88b36fa07a3599b426a020/f0/fe8b6706/DbContext.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b25c6c7bed3c4257968cca26f3724ce384908/e8/bebe01fc/Enumerable.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d2ef6d96d3bf411eb028281c690d074a14aca28/ce/69de0544/SpeechRecognitionQualityDegradingEventArgs.cs" root0="SKIP_HIGHLIGHTING" />
@@ -79,6 +91,7 @@
     <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Constants/Account.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Controls/UserController/CustomMediaPlayerElement.xaml" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Controls/UserController/CustomMediaPlayerElement.xaml.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Providers/AppSettings.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Views/Windows/MediaPlayWindow.xaml" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/App.g.i.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Controls/UserController/ActorImage.g.cs" root0="SKIP_HIGHLIGHTING" />
@@ -115,7 +128,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "UWP.Display.executor": "Debug",
-    "XThreadsFramesViewSplitterKey": "0.50088185",
+    "XThreadsFramesViewSplitterKey": "0.37213403",
     "b6d00020-21dd-433e-828c-9ee31090f2eb.executor": "Debug",
     "f8910c43-d913-4048-823e-f4c9916b2f46.executor": "Debug",
     "git-widget-placeholder": "main",
@@ -188,7 +201,7 @@
       <workItem from="1712109459015" duration="16231000" />
       <workItem from="1712150320346" duration="5574000" />
       <workItem from="1712156685420" duration="6467000" />
-      <workItem from="1712198315779" duration="28004000" />
+      <workItem from="1712198315779" duration="39873000" />
     </task>
     <task id="LOCAL-00001" summary="clean views">
       <option name="closed" value="true" />
@@ -278,7 +291,15 @@
       <option name="project" value="LOCAL" />
       <updated>1712223918720</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Fix bug in null image">
+      <option name="closed" value="true" />
+      <created>1712229050956</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1712229050956</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -307,7 +328,8 @@
     <MESSAGE value="Modifying the login Page" />
     <MESSAGE value="Add entity framework" />
     <MESSAGE value="fix some bug in search" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix some bug in search" />
+    <MESSAGE value="Fix bug in null image" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix bug in null image" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -730,16 +752,94 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Display/Providers/DataAccessLocal.cs</url>
-          <line>265</line>
+          <line>270</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Providers\DataAccessLocal.cs" initialLine="265" containingFunctionPresentation="Method 'GetFailFileInfoWithFailInfo'">
             <startOffsets>
-              <option value="8925" />
+              <option value="9058" />
             </startOffsets>
             <endOffsets>
-              <option value="9027" />
+              <option value="9160" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="93" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Display/Providers/DataAccessLocal.cs</url>
+          <line>113</line>
+          <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Providers\DataAccessLocal.cs" initialLine="113" containingFunctionPresentation="Method 'AddActorInfoAndReturnId'">
+            <startOffsets>
+              <option value="3435" />
+            </startOffsets>
+            <endOffsets>
+              <option value="3466" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="151" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/DataAccess/Dao/Impl/FilesInfoDao.cs</url>
+          <line>139</line>
+          <properties documentPath="D:\Work\WinUi\GitHub\Display\DataAccess\Dao\Impl\FilesInfoDao.cs" initialLine="139" containingFunctionPresentation="Method 'GetAllFileListTraverse'">
+            <startOffsets>
+              <option value="4144" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4245" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="173" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Display/Providers/WebApi.cs</url>
+          <line>238</line>
+          <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Providers\WebApi.cs" initialLine="238" containingFunctionPresentation="Method 'TryAddFolderToDataAccess'">
+            <startOffsets>
+              <option value="7330" />
+            </startOffsets>
+            <endOffsets>
+              <option value="7408" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="174" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Display/Providers/WebApi.cs</url>
+          <line>186</line>
+          <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Providers\WebApi.cs" initialLine="186" containingFunctionPresentation="Method 'GetAllFileInfoToDataAccess'">
+            <startOffsets>
+              <option value="5495" />
+            </startOffsets>
+            <endOffsets>
+              <option value="5604" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="175" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/DataAccess/Dao/Impl/FilesInfoDao.cs</url>
+          <line>150</line>
+          <properties documentPath="D:\Work\WinUi\GitHub\Display\DataAccess\Dao\Impl\FilesInfoDao.cs" initialLine="150" containingFunctionPresentation="Method 'GetAllFileListTraverse'">
+            <startOffsets>
+              <option value="4499" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4526" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="177" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/DataAccess/Dao/Impl/FilesInfoDao.cs</url>
+          <line>146</line>
+          <properties documentPath="D:\Work\WinUi\GitHub\Display\DataAccess\Dao\Impl\FilesInfoDao.cs" initialLine="146" containingFunctionPresentation="Lambda expression inside Method 'GetAllFileListTraverse'">
+            <startOffsets>
+              <option value="4389" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4455" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="178" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

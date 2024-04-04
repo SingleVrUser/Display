@@ -236,6 +236,7 @@ public sealed partial class Progress
             WillStartSpiderTaskTip.IsOpen = false;
 
             var fileNameList = _fileCategoryCollection.Select(item => item.file_name).ToList();
+            
             var page = new SpiderVideoInfo.Progress(fileNameList, filesWithoutRootList.Select(x => x.Datum).ToList());
             //创建搜刮进度窗口
             page.CreateWindow();

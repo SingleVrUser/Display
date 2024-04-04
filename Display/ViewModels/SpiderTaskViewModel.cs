@@ -49,7 +49,7 @@ internal partial class SpiderTaskViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public void Start()
+    private void Start()
     {
         InitView();
 
@@ -65,7 +65,7 @@ internal partial class SpiderTaskViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public void Cancel()
+    private void Cancel()
     {
         ShowPause = true;
         _manager.CancelTask();

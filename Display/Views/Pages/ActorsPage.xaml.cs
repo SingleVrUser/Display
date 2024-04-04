@@ -323,9 +323,9 @@ public sealed partial class ActorsPage
         var actorInfo = await GetActorInfoFromNetwork.SearchInfoFromMinnanoAv(actorName, default);
         if (actorInfo == null) return null;
 
-        var actorId = DataAccessLocal.Get.GetIdInActor_Names(actorName);
-        if (actorId == -1) return null;
-
+        var actorInfoFromDb = ActorInfoDao.GetPartInfoByActorName(actorName);
+        if (actorInfoFromDb == null) return null;
+        var actorId = actorInfoFromDb.Id;
         actorInfo.Id = actorId;
         
         ActorInfoDao.UpdateSingle(actorInfo);

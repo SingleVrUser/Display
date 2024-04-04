@@ -7,18 +7,14 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DataAccess;
-using DataAccess.Dao.Impl;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
-using Display.Helper.Data;
+using Display.Extensions;
 using Display.Helper.FileProperties.Name;
-using Display.Models.Entities.OneOneFive;
 using Display.Models.Enums.OneOneFive;
 using Display.Providers.Spider;
-using Display.Views.Pages.SpiderVideoInfo;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using SharpCompress;
 using static System.Int32;
 
 namespace Display.Providers;
@@ -32,6 +28,8 @@ public static class DataAccessLocal
         return Path.Combine(newPath, Context.DbName);
     }
 
+    private static readonly IActorInfoDao ActorInfoDao = App.GetService<IActorInfoDao>();
+
     public class Add
     {
         /// <summary>
@@ -41,12 +39,12 @@ public static class DataAccessLocal
         public static async Task AddVideoInfo_ActorInfo_IsWmAsync(VideoInfo data)
         {
             Context.Instance.VideoInfos.Add(data);
-
+            
             //添加演员信息
             AddActorInfoByActorInfo(data, [data.TrueName]);
 
             //添加是否步兵
-            Context.Instance.IsWms.Add(new IsWm()
+            Context.Instance.IsWms.Add(new IsWm
             {
                 Truename = data.TrueName,
                 IsWm1 = data.IsWm
@@ -55,13 +53,19 @@ public static class DataAccessLocal
             if (data.Producer != null)
             {
                 //添加厂商信息
-                Context.Instance.ProducerInfos.Add(new ProducerInfo()
-                {
-                    Name = data.Producer,
-                    IsWm = data.IsWm
-                });
-            }
+                var producerInfo = Context.Instance.ProducerInfos.FirstOrDefault(i=>i.Name == data.Producer);
 
+                if (producerInfo == null)
+                {
+                    Context.Instance.ProducerInfos.Add(new ProducerInfo
+                    {
+                        Name = data.Producer,
+                        IsWm = data.IsWm
+                    });
+                }
+            }
+            
+            await Context.Instance.SaveChangesAsync();
         }
 
         /// <summary>
@@ -69,7 +73,6 @@ public static class DataAccessLocal
         /// </summary>
         /// <param name="videoInfo"></param>
         /// <param name="videoNameList"></param>
-        /// <param name="connection"></param>
         private static void AddActorInfoByActorInfo(VideoInfo videoInfo, List<string> videoNameList)
         {
             var actorStr = videoInfo.Actor;
@@ -79,15 +82,16 @@ public static class DataAccessLocal
             foreach (var actorName in actorList)
             {
                 //查询Actor_ID
-                SqliteCommand command = new($"SELECT id FROM ActorInfo WHERE Name == '{JavDb.TrimGenderFromActorName(actorName)}'");
-
-                if (command.ExecuteScalar() is long actorId)
+                var actorInfo = ActorInfoDao.GetPartInfoByActorName(JavDb.TrimGenderFromActorName(actorName));
+                
+                if(actorInfo != null)
                 {
                     //添加信息，如果已经存在则忽略
-                    command.CommandText = $"INSERT OR IGNORE INTO Actor_Video VALUES (@actor_id,@video_name)";
-                    command.Parameters.AddWithValue("@actor_id", actorId);
-                    command.Parameters.AddWithValue("@video_name", videoInfo.TrueName);
-                    command.ExecuteNonQuery();
+                    Context.Instance.ActorVideos.Add(new ActorVideo
+                    {
+                        ActorId = actorInfo.Id,
+                        VideoName = videoInfo.TrueName
+                    });
                 }
                 // 没有该演员信息的话
                 // 新添加演员信息
@@ -96,17 +100,19 @@ public static class DataAccessLocal
                     AddActorInfo(actorName, videoNameList);
                 }
             }
+
         }
 
         /// <summary>
         /// 插入演员信息并返回actor_id
         /// </summary>
         /// <param name="info"></param>
-        /// <param name="connection"></param>
         /// <returns></returns>
         private static long AddActorInfoAndReturnId(ActorInfo info)
         {
             Context.Instance.ActorInfos.Add(info);
+            Context.Instance.SaveChanges();
+            
             // TODO 插入后可直接返回
             Debug.WriteLine(info.Id);
 
@@ -119,7 +125,6 @@ public static class DataAccessLocal
         /// </summary>
         /// <param name="actorName"></param>
         /// <param name="videoNameList"></param>
-        /// <param name="connection"></param>
         private static void AddActorInfo(string actorName, List<string> videoNameList)
         {
             string singleActorName;
@@ -151,9 +156,11 @@ public static class DataAccessLocal
             }
 
             //插入演员信息（不存在时才插入）
-            var actorId = Get.GetIdInActor_Names(singleActorName);
+            
+            var actorInfoFromDb = ActorInfoDao.GetPartInfoByActorName(singleActorName);
+            long actorId;
             //数据库中不存在该名称
-            if (actorId == -1)
+            if (actorInfoFromDb == null)
             {
                 ActorInfo actorInfo = new() { Name = singleActorName, IsWoman = isWoman , BwhInfo = new Bwh()};
 
@@ -166,10 +173,15 @@ public static class DataAccessLocal
 
                 actorId = AddActorInfoAndReturnId(actorInfo);
             }
-            //为了弥补，之前所有的is_woman都默认为1
-            else if (isWoman == 0)
+            else
             {
-                Context.Instance.ActorInfos.Update(new ActorInfo { Id = actorId, IsWoman = isWoman });
+                actorId = actorInfoFromDb.Id;
+                
+                //为了弥补，之前所有的is_woman都默认为1
+                if (isWoman == 0)
+                {
+                    Context.Instance.ActorInfos.Update(new ActorInfo { Id = actorId, IsWoman = isWoman });
+                }
             }
 
             //添加Actor_Names
@@ -185,7 +197,6 @@ public static class DataAccessLocal
             {
                 foreach (var name in otherNames)
                 {
-
                     Context.Instance.ActorNames.Add(new ActorName
                     {
                         Id = actorId,
@@ -204,12 +215,7 @@ public static class DataAccessLocal
                     VideoName = videoName
                 });
             }
-
-
         }
-
-
-
     }
 
     public class Get
@@ -230,9 +236,8 @@ public static class DataAccessLocal
         /// 查找truename
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="connection"></param>
         /// <returns></returns>
-        public static string GetOneTrueNameByName(string name, SqliteConnection connection = null)
+        public static string GetOneTrueNameByName(string name)
         {
             if (name.Contains('_'))
             {
@@ -408,19 +413,6 @@ public static class DataAccessLocal
             }
 
             return Context.Instance.VideoInfos.FromSqlRaw(commandText).Count();
-        }
-
-        /// <summary>
-        /// 查询表Actor_Names中对应Names的id
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="connection"></param>
-        /// <returns>对应Name的id，不存在则返回 -1</returns>
-        public static long GetIdInActor_Names(string name, SqliteConnection connection = null)
-        {
-            var commandText = $"SELECT id FROM Actor_Names WHERE Name == '{name}'";
-
-            return Context.Instance.Database.SqlQueryRaw<long>(commandText).FirstOrDefault();
         }
 
         private static string GetVideoInfoFilterStr(List<string> filterConditionList = null, string filterKeywords = null, Dictionary<string, string> rangesDicts = null)

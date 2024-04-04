@@ -256,9 +256,6 @@ public static class FileMatch
                 //根据视频名称匹配番号
                 var videoName = MatchName(fileName, fileInfo.CurrentId);
 
-                //无论匹配与否，都存入数据库
-                FilesInfoDao.Add(fileInfo);
-
                 //未匹配
                 if (videoName == null)
                 {
