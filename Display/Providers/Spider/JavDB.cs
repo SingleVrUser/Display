@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using DataAccess.Models.Entity;
 using Display.Helper.Notifications;
 using Display.Models.Entities.OneOneFive;
 using Display.Models.Spider;
@@ -133,7 +134,7 @@ public class JavDb : BaseSpider
 
         var videoInfo = new VideoInfo
         {
-            busUrl = detailUrl
+            Url = detailUrl
         };
 
         Uri uri = new(detailUrl);
@@ -164,7 +165,7 @@ public class JavDb : BaseSpider
             }
             else if (key.Contains("時長"))
             {
-                videoInfo.Lengthtime = valueNode.InnerText.Trim().Replace(" 分鍾", "分钟");
+                videoInfo.LengthTime = valueNode.InnerText.Trim().Replace(" 分鍾", "分钟");
             }
             else if (key.Contains("導演"))
             {

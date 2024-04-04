@@ -5,11 +5,13 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.WinUI.Collections;
 using CommunityToolkit.WinUI.Controls;
-using Display.Models.Data.IncrementalCollection;
+using DataAccess.Models.Entity;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Entities.Details;
 using Display.Models.Entities.OneOneFive;
 using Display.Models.Records;
+using Display.Models.Vo;
+using Display.Models.Vo.IncrementalCollection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -26,9 +28,9 @@ public sealed partial class EditInfo
     private readonly IncrementalLoadActorInfoCollection _actorsSuggestion;
     private readonly ObservableCollection<ActorInfo> _actorItems;
 
-    private readonly VideoCoverDisplayClass _videoInfo;
+    private readonly VideoInfoVo _videoInfo;
 
-    public EditInfo(VideoCoverDisplayClass videoInfo)
+    public EditInfo(VideoInfoVo videoInfo)
     {
         InitializeComponent();
 
@@ -75,7 +77,7 @@ public sealed partial class EditInfo
 
             new CommonEditOption { Header = "标题", MinWidth = 480, Text = videoInfo.Title },
             new CommonEditOption { Header = "发布时间", Text = videoInfo.ReleaseTime },
-            new CommonEditOption { Header = "视频长度", Text = videoInfo.Lengthtime },
+            new CommonEditOption { Header = "视频长度", Text = videoInfo.LengthTime },
             new CommonEditOption { Header = "导演", Text = videoInfo.Director },
             new CommonEditOption { Header = "制作商", Text = videoInfo.Producer },
             new CommonEditOption { Header = "发行商", Text = videoInfo.Publisher },
@@ -102,7 +104,7 @@ public sealed partial class EditInfo
     }
 
 
-    private async void Actor_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+    private void Actor_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
         if (!args.CheckCurrent() || args.Reason != AutoSuggestionBoxTextChangeReason.UserInput) return;
         
@@ -119,7 +121,7 @@ public sealed partial class EditInfo
             _actorsSuggestion.SetFilter([$"name LIKE '%{sender.Text}%'"]);
         }
 
-        if (_actorsSuggestion.Count == 0) await _actorsSuggestion.LoadData(20);
+        if (_actorsSuggestion.Count == 0) _actorsSuggestion.LoadData(20);
         //_acv.RefreshFilter();
     }
 
@@ -131,7 +133,7 @@ public sealed partial class EditInfo
                     new ActorInfo { Name = args.TokenText };
     }
 
-    public VideoCoverDisplayClass GetInfoAfterEdit()
+    public VideoInfoVo GetInfoAfterEdit()
     {
         foreach (var option in _editOptions)
         {
@@ -147,7 +149,7 @@ public sealed partial class EditInfo
                             _videoInfo.ReleaseTime = commonEditOption.Text;
                             break;
                         case "视频长度":
-                            _videoInfo.Lengthtime = commonEditOption.Text;
+                            _videoInfo.LengthTime = commonEditOption.Text;
                             break;
                         case "导演":
                             _videoInfo.Director = commonEditOption.Text;

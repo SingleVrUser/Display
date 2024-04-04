@@ -258,11 +258,11 @@
                                        FontSize="26"
                                        FontWeight="Bold" />
 
-                            <HyperlinkButton NavigateUri="{x:Bind ResultInfo.busUrl,Mode=OneWay}"
+                            <HyperlinkButton NavigateUri="{x:Bind ResultInfo.Url,Mode=OneWay}"
                                              Opacity="1"
                                              CornerRadius="10"
                                              Padding="5"
-                                             ToolTipService.ToolTip="{x:Bind ResultInfo.busUrl,Mode=OneWay}">
+                                             ToolTipService.ToolTip="{x:Bind ResultInfo.Url,Mode=OneWay}">
                                 <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                                           Glyph="&#xF6FA;"
                                           Foreground="LightGray"
@@ -277,7 +277,7 @@
                                        IsTextSelectionEnabled="True"
                                        FontFamily="霞鹜文楷"
                                        FontWeight="Bold" />
-                            <TextBlock Text="{x:Bind ResultInfo.Lengthtime,Mode=OneWay}"
+                            <TextBlock Text="{x:Bind ResultInfo.LengthTime,Mode=OneWay}"
                                        IsTextSelectionEnabled="True" />
                         </StackPanel>
 

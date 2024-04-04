@@ -1,8 +1,6 @@
 using System.Collections.ObjectModel;
+using DataAccess.Models.Entity;
 using Display.Managers;
-using Display.Models.Dto.OneOneFive;
-using Display.Models.Entities.OneOneFive;
-using Display.Models.Vo;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -66,7 +64,7 @@ public sealed partial class FindInfoAgainSmoke
         if (sender is not ListView listView)
             return;
 
-        Confirm_Button.IsEnabled = listView.SelectedIndex != -1;
+        ConfirmButton.IsEnabled = listView.SelectedIndex != -1;
     }
 
     public event RoutedEventHandler ConfirmClick;
@@ -97,7 +95,7 @@ public sealed partial class FindInfoAgainSmoke
 
     private async void SearchInfoBySpecificUrlButton_Click(object sender, RoutedEventArgs e)
     {
-        var url = SpecificUrl_TextBlock.Text;
+        var url = SpecificUrlTextBlock.Text;
 
         ReCheckProgressRing.Visibility = Visibility.Visible;
         ConfirmSpecificUrlButton.IsEnabled = false;

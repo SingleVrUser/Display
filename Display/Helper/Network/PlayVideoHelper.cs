@@ -12,9 +12,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
-using Display.Models.Api.OneOneFive.File;
+using DataAccess.Models.Entity;
 using Display.Models.Dto.Media;
-using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
 using Display.Views.Windows;
 using static Display.Providers.WebApi;
@@ -228,7 +227,7 @@ internal class PlayVideoHelper
     /// </summary>
     /// <param name="multisetList"></param>
     /// <param name="xamlRoot"></param>
-    public static async void ShowSelectedVideoToPlayPage(List<Datum> multisetList, XamlRoot xamlRoot)
+    public static async void ShowSelectedVideoToPlayPage(List<FilesInfo> multisetList, XamlRoot xamlRoot)
     {
         multisetList = multisetList.OrderBy(item => item.Name).ToList();
 

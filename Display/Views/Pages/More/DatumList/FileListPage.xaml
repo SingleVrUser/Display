@@ -47,7 +47,7 @@
 
 
         <DataTemplate x:Key="SearchListTemplate"
-                      x:DataType="oneOneFive1:FilesInfo">
+                      x:DataType="oneOneFive1:DetailFileInfo">
             <Grid Background="Transparent"
                   ColumnDefinitions="*">
                 <Grid.ContextFlyout>
@@ -110,7 +110,7 @@
 
 
         <DataTemplate x:Key="FileListTemplate"
-                      x:DataType="oneOneFive1:FilesInfo">
+                      x:DataType="oneOneFive1:DetailFileInfo">
             <Grid Background="Transparent"
                   ColumnDefinitions="*,140,70">
                 <Grid.ContextFlyout>

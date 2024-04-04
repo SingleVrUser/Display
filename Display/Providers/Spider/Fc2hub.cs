@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using DataAccess.Models.Entity;
 using Display.Models.Api.Fc2Club;
 using Display.Models.Entities.OneOneFive;
 
@@ -66,7 +67,7 @@ public class Fc2Hub : BaseSpider
     {
         var videoInfo = new VideoInfo
         {
-            busUrl = detailUrl,
+            Url = detailUrl,
             IsWm = 1
         };
 
@@ -84,7 +85,7 @@ public class Fc2Hub : BaseSpider
         videoInfo.TrueName = cid;
         videoInfo.ReleaseTime = json.DatePublished.Replace("/", "-");
         //PTxHxMxS转x分钟
-        videoInfo.Lengthtime = DateHelper.ConvertPtTimeToTotalMinute(json.Duration);
+        videoInfo.LengthTime = DateHelper.ConvertPtTimeToTotalMinute(json.Duration);
         videoInfo.Director = json.Director;
         videoInfo.Producer = "fc2";
 

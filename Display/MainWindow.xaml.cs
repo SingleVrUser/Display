@@ -19,11 +19,13 @@ using System.IO;
 using System.Linq;
 using Windows.Foundation;
 using Windows.System;
+using DataAccess.Models.Entity;
 using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Dto.Settings;
 using Display.Models.Entities.OneOneFive;
 using Display.Models.Enums;
+using Display.Models.Vo;
 using Display.Views.Pages;
 using Display.Views.Pages.More.DatumList;
 using Display.Views.Pages.OfflineDown;
@@ -239,23 +241,21 @@ public sealed partial class MainWindow
 
         if (args.IsSettingsSelected)
         {
-            NavView_Navigate(NavigationViewItemEnum.SettingPage, args.RecommendedNavigationTransitionInfo);
+            NavView_Navigate(typeof(SettingPage), args.RecommendedNavigationTransitionInfo);
         }
         else if (args.SelectedItem is MenuItem item)
         {
-            NavView_Navigate(item.PageEnum, args.RecommendedNavigationTransitionInfo);
+            NavView_Navigate(item.PageType, args.RecommendedNavigationTransitionInfo);
         }
     }
 
     /// <summary>
     /// 页面跳转
     /// </summary>
-    /// <param name="pageEnum"></param>
+    /// <param name="pageType"></param>
     /// <param name="transitionInfo"></param>
-    private void NavView_Navigate(NavigationViewItemEnum pageEnum, NavigationTransitionInfo transitionInfo)
+    private void NavView_Navigate(Type pageType, NavigationTransitionInfo transitionInfo)
     {
-        if (!PageTypeAndEnum.PageTypeAndEnumDict.TryGetValue(pageEnum, out var pageType)) return;
-
         ContentFrame.Navigate(pageType, null, transitionInfo);
 
     }
@@ -370,7 +370,7 @@ public sealed partial class MainWindow
         else
         {
             //加载应用记录的图片默认大小
-            var newItem = new VideoCoverDisplayClass(nowItem, AppSettings.ImageWidth, AppSettings.ImageHeight);
+            var newItem = new VideoInfoVo(nowItem, AppSettings.ImageWidth, AppSettings.ImageHeight);
             ContentFrame.Navigate(typeof(DetailInfoPage), newItem, new SuppressNavigationTransitionInfo());
         }
 

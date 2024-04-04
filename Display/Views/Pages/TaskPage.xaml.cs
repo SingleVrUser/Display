@@ -60,7 +60,7 @@ public sealed partial class TaskPage
         }
     }
 
-    public void SetPage(NavigationViewItemEnum pageEnum)
+    private void SetPage(NavigationViewItemEnum pageEnum)
     {
         _viewModel.SetCurrentLink(pageEnum);
     }
@@ -74,10 +74,7 @@ public sealed partial class TaskPage
     {
         if (args.SelectedItem is not MenuItem currentLink) return;
 
-        if (PageTypeAndEnum.PageTypeAndEnumDict.TryGetValue(currentLink.PageEnum, out var pageType))
-        {
-            ContentFrame.Navigate(pageType);
-        }
+        ContentFrame.Navigate(currentLink.PageType);
 
     }
 

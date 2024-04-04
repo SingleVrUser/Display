@@ -1,8 +1,8 @@
-﻿using DataAccess.Models.Entity;
+﻿using DataAccess.Dao.Interface;
+using DataAccess.Models.Entity;
 
 namespace DataAccess.Dao.Impl;
 
-public class BwhDao : DaoImpl<Bwh>
+public class BwhDao : DaoImpl<Bwh>, IBwhDao
 {
-
 }

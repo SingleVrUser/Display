@@ -1,14 +1,16 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Display.Models.Enums;
 using Microsoft.UI.Xaml.Controls;
 
 namespace Display.Models.Dto.Settings;
 
-public abstract partial class BaseMenuItem(string content, string glyph, NavigationViewItemEnum pageEnum) : ObservableObject
+public abstract partial class BaseMenuItem(NavigationViewItemEnum pageEnum, string content, string glyph, Type pageType) : ObservableObject
 {
-    public string Content { get; } = content;
     public NavigationViewItemEnum PageEnum { get; } = pageEnum;
+    public string Content { get; } = content;
+    public Type PageType { get; } = pageType;
     public string Glyph { get; } = glyph;
 
     public bool CanSelected { get; init; } = true;

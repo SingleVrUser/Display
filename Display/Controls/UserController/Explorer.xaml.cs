@@ -4,8 +4,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Display.Models.Api.OneOneFive.File;
-using Display.Models.Dto.OneOneFive;
+using DataAccess.Dao.Interface;
+using DataAccess.Models.Entity;
+using Display.Models.Enums;
 using Display.Models.Records;
 using Display.Models.Vo;
 using Display.Models.Vo.OneOneFive;
@@ -16,10 +17,9 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Display.Controls.UserController;
 
-public sealed partial class Explorer : UserControl
+public sealed partial class Explorer
 {
-
-    public static readonly DependencyProperty FileMenuFlyoutProperty =
+    private static readonly DependencyProperty FileMenuFlyoutProperty =
         DependencyProperty.Register(nameof(FileMenuFlyout), typeof(MenuFlyout), typeof(Explorer), null);
 
     public MenuFlyout FileMenuFlyout
@@ -28,13 +28,15 @@ public sealed partial class Explorer : UserControl
         set => SetValue(FileMenuFlyoutProperty, value);
     }
 
-    ObservableCollection<ExplorerItem> TreeViewDataSource;
-    ObservableCollection<ExplorerItem> SelectFolderName;
-    ObservableCollection<FilesInfo> FileInSelectFolder;
+    private ObservableCollection<ExplorerItem> TreeViewDataSource { get; }
+    private ObservableCollection<ExplorerItem> SelectFolderName { get; }
+    private ObservableCollection<DetailFileInfo> FileInSelectFolder { get; }
 
     //存储获取过的Datum，避免重复获取
-    List<StoreDatum> StoreDataList = new();
+    private readonly List<StoreDatum> _storeDataList = [];
 
+    private readonly IFilesInfoDao _filesInfoDao = App.GetService<IFilesInfoDao>();
+    
     public Explorer()
     {
         InitializeComponent();
@@ -42,7 +44,7 @@ public sealed partial class Explorer : UserControl
         TreeViewDataSource = GetRootFolder();
         foreach (var item in TreeViewDataSource)
         {
-            var node = new TreeViewNode()
+            var node = new TreeViewNode
             {
                 Content = item,
                 HasUnrealizedChildren = item.HasUnrealizedChildren,
@@ -51,8 +53,8 @@ public sealed partial class Explorer : UserControl
             FolderTreeView.RootNodes.Add(node);
         }
 
-        FileInSelectFolder = new ObservableCollection<FilesInfo>();
-        SelectFolderName = new ObservableCollection<ExplorerItem>();
+        FileInSelectFolder = [];
+        SelectFolderName = [];
 
         TryUpdateFolderInfo(0);
     }
@@ -64,54 +66,52 @@ public sealed partial class Explorer : UserControl
     /// <param name="folderCid"></param>
     /// <param name="outType"></param>
     /// <returns></returns>
-    public Datum[] GetFilesFromItems(long folderCid, FilesInfo.FileType outType)
+    public List<FilesInfo> GetFilesFromItems(long folderCid, FileType outType)
     {
-        Datum[] items;
-
+        List<FilesInfo> items;
+    
         //先从存储的List中获取
-        var item = StoreDataList.FirstOrDefault(x => x.Cid == folderCid);
+        var item = _storeDataList.FirstOrDefault(x => x.Cid == folderCid);
         if (item == null)
         {
-            items = DataAccess.Get.GetListByCid(folderCid);
-
-            if (items == null) return null;
+            items = _filesInfoDao.GetPartFolderListByPid(folderCid);
 
             //排序
-            items = items.OrderByDescending(x => x.TimeEdit).ToArray();
+            items = items.OrderByDescending(x => x.TimeEdit).ToList();
 
-            StoreDataList.Add(new StoreDatum(folderCid, items));
+            _storeDataList.Add(new StoreDatum(folderCid, items));
         }
         else
         {
             items = item.DatumList;
         }
 
-        if (outType == FilesInfo.FileType.Folder)
+        if (outType == FileType.Folder)
         {
-            items = items.Where(x => x.Fid == null).ToArray();
+            items = items.Where(x => x.FileId == null).ToList();
         }
 
         return items;
     }
 
     //获取根目录下的文件夹
-    public ObservableCollection<ExplorerItem> GetRootFolder()
+    private ObservableCollection<ExplorerItem> GetRootFolder()
     {
         var list = new ObservableCollection<ExplorerItem>();
 
         //位于根目录下的文件夹
-        var data = GetFilesFromItems(0, FilesInfo.FileType.Folder);
+        var data = GetFilesFromItems(0, FileType.Folder);
         if (data == null) return list;
 
         foreach (var item in data)
         {
-            var hasUnrealizedChildren = DataAccess.Get.GetFolderListByPid(item.Cid, 1).Length != 0;
+            var hasUnrealizedChildren = _filesInfoDao.GetPartFolderListByPid(item.CurrentId, 1).Count != 0;
 
-            var folders = new ExplorerItem()
+            var folders = new ExplorerItem
             {
                 Name = item.Name,
-                Type = FilesInfo.FileType.Folder,
-                Id = item.Cid,
+                Type = FileType.Folder,
+                Id = item.CurrentId,
                 HasUnrealizedChildren = hasUnrealizedChildren,
                 Datum = item
             };
@@ -150,7 +150,7 @@ public sealed partial class Explorer : UserControl
     /// <param name="folderCid"></param>
     private void TryUpdateFolderInfo(long folderCid)
     {
-        var items = GetFilesFromItems(folderCid, FilesInfo.FileType.File);
+        var items = GetFilesFromItems(folderCid, FileType.File);
 
         //更新右侧文件夹目录
         SelectFolderName.Clear();
@@ -180,13 +180,13 @@ public sealed partial class Explorer : UserControl
         else
         {
             //从数据库中获取根目录信息
-            List<Datum> folderToRootList = DataAccess.Get.GetRootByCid(folderCid);
+            var folderToRootList = _filesInfoDao.GetFolderListToRootByFolderId(folderCid);
             foreach (var info in folderToRootList)
             {
-                SelectFolderName.Add(new ExplorerItem()
+                SelectFolderName.Add(new ExplorerItem
                 {
                     Name = info.Name,
-                    Id = info.Cid
+                    Id = info.CurrentId
                 });
             }
         }
@@ -197,18 +197,18 @@ public sealed partial class Explorer : UserControl
     /// 更新所选文件夹的文件列表
     /// </summary>
     /// <param name="items"></param>
-    private void TryUpdateFileInSelectFolder(Datum[] items)
+    private void TryUpdateFileInSelectFolder(List<FilesInfo> items)
     {
         FileInSelectFolder.Clear();
 
         if (items == null) return;
 
         //排序
-        items = items.OrderByDescending(x => x.Pid).ToArray();
+        items = items.OrderByDescending(x => x.ParentId).ToList();
 
         foreach (var file in items)
         {
-            FileInSelectFolder.Add(new FilesInfo(file));
+            FileInSelectFolder.Add(new DetailFileInfo(file));
         }
     }
 
@@ -250,6 +250,11 @@ public sealed partial class Explorer : UserControl
     private List<LastUnAllShowFolderItem> _markShowPartFolderItemList = new();
     private LastUnAllShowFolderItem _lastFolderItemList;
 
+    public Explorer(ObservableCollection<ExplorerItem> selectFolderName)
+    {
+        SelectFolderName = selectFolderName;
+    }
+
 
     /// <summary>
     /// 填充之前TreeView未加载的子节点
@@ -260,7 +265,7 @@ public sealed partial class Explorer : UserControl
     {
         if (node.Content is not ExplorerItem folder) return;
 
-        List<Datum> itemsList;
+        List<FilesInfo> itemsList;
 
         if (isInsertLeft && _lastFolderItemList != null)
         {
@@ -271,8 +276,8 @@ public sealed partial class Explorer : UserControl
         }
         else
         {
-            itemsList = GetFilesFromItems(folder.Id, FilesInfo.FileType.Folder)?.ToList();
-            //itemsList = DataAccess.GetFolderListByPid(folder.Cid);
+            itemsList = GetFilesFromItems(folder.Id, FileType.Folder)?.ToList();
+            //itemsList = DataAccessLocal.GetFolderListByPid(folder.Cid);
         }
 
         if (itemsList is not { Count: > 0 })
@@ -282,15 +287,15 @@ public sealed partial class Explorer : UserControl
             return;
         }
 
-        List<Datum> itemspartList;
-        bool hasUnrealizedChildren = false;
+        List<FilesInfo> itemsPartList;
+        var hasUnrealizedChildren = false;
 
         // 显示部分
         if (itemsList.Count > MaxNum)
         {
             ShowNumTextBlock.Visibility = Visibility.Visible;
             ShowNumTip.Text = $"{MaxNum}/{itemsList.Count}";
-            itemspartList = itemsList.GetRange(0, MaxNum);
+            itemsPartList = itemsList.GetRange(0, MaxNum);
             _lastFolderItemList = new LastUnAllShowFolderItem()
             {
                 InsertNode = node,
@@ -303,17 +308,17 @@ public sealed partial class Explorer : UserControl
         // 数量较小，直接显示全部
         else
         {
-            itemspartList = itemsList;
+            itemsPartList = itemsList;
             ShowNumTextBlock.Visibility = Visibility.Collapsed;
         }
 
-        startUpdateTreeView(node, itemspartList);
+        startUpdateTreeView(node, itemsPartList);
 
         //标记 下一级是否有未加载的
         node.HasUnrealizedChildren = hasUnrealizedChildren;
     }
 
-    private async void startUpdateTreeView(TreeViewNode node, List<Datum> itemsList)
+    private async void startUpdateTreeView(TreeViewNode node, List<FilesInfo> itemsList)
     {
         readFileProgressBar.Maximum = itemsList.Count;
         readFileProgressBar.Value = 0;
@@ -325,18 +330,18 @@ public sealed partial class Explorer : UserControl
         //itemsList = itemsList.OrderBy(x => x.pid).ToList();
 
         //效率低
-        Dictionary<Datum, bool> newNode_Children_Dict = await Task.Run(() => getNewNode(itemsList, progress));
+        var newNodeChildrenDict = await Task.Run(() => GetNewNode(itemsList, progress));
 
-        foreach (var newNodeDict in newNode_Children_Dict)
+        foreach (var newNodeDict in newNodeChildrenDict)
         {
             var videoInfo = newNodeDict.Key;
-            var newNode = new TreeViewNode()
+            var newNode = new TreeViewNode
             {
-                Content = new ExplorerItem()
+                Content = new ExplorerItem
                 {
                     Name = videoInfo.Name,
-                    Type = FilesInfo.FileType.Folder,
-                    Id = videoInfo.Cid,
+                    Type = FileType.Folder,
+                    Id = videoInfo.CurrentId,
                     Datum = videoInfo
                 },
                 HasUnrealizedChildren = newNodeDict.Value,
@@ -344,64 +349,33 @@ public sealed partial class Explorer : UserControl
             node.Children.Add(newNode);
         }
 
-        //await Task.Run(() => {
-        //    var newdfNode = new TreeViewNode();
-        //});
-
-
         readFileProgressBar.Value = 0;
         readFileProgressBar.Visibility = Visibility.Collapsed;
     }
 
-    //private List<TreeViewNode> createTreeViewNode()
-    //{
-    //    var result = new List<TreeViewNode>();
-    //    for (int i = 0; i < 10; i++)
-    //    {
-    //        var node = new TreeViewNode();
-    //        result.Add(node);
-    //    }
-
-    //    return result;
-    //}
-
     /// <summary>
     /// 放入 花时 较长的 查询目录是否有下级目录的操作
     /// </summary>
-    /// <param Name="itemsList"></param>
-    /// <param Name="progress"></param>
+    /// <param name="itemsList"></param>
+    /// <param name="progress"></param>
     /// <returns></returns>
-    private Dictionary<Datum, bool> getNewNode(List<Datum> itemsList, IProgress<int> progress)
+    private Dictionary<FilesInfo, bool> GetNewNode(List<FilesInfo> itemsList, IProgress<int> progress)
     {
-        var Node_HasUnrealizedChildren_Dict = new Dictionary<Datum, bool>();
-        //var NodeList = new List<TreeViewNode>();
-        int i = 0;
+        var nodeHasUnrealizedChildrenDict = new Dictionary<FilesInfo, bool>();
+        
+        var i = 0;
         foreach (var folderInfo in itemsList)
         {
             i++;
             progress.Report(i);
             //检查下级是否还有文件夹
-            bool hasUnrealizedChildren = DataAccess.Get.GetFolderListByPid(folderInfo.Cid, 1)?.Length != 0;
+            var hasUnrealizedChildren = _filesInfoDao.GetPartFolderListByPid(folderInfo.CurrentId, 1).Count != 0;
 
-            Node_HasUnrealizedChildren_Dict.Add(folderInfo, hasUnrealizedChildren);
+            nodeHasUnrealizedChildrenDict.Add(folderInfo, hasUnrealizedChildren);
 
-            //var newNode = new TreeViewNode()
-            //{
-            //    Content = new ExplorerItem()
-            //    {
-            //        Name = folderInfo.n,
-            //        Type = ExplorerItem.ExplorerItemType.Folder,
-            //        Cid = folderInfo.cid,
-            //    },
-            //    HasUnrealizedChildren = hasUnrealizedChildren,
-            //};
-
-            //newNode.HasUnrealizedChildren = hasUnrealizedChildren;
-
-            //NodeList.Add(newNode);
         }
 
-        return Node_HasUnrealizedChildren_Dict;
+        return nodeHasUnrealizedChildrenDict;
     }
 
     /// <summary>
@@ -445,7 +419,7 @@ public sealed partial class Explorer : UserControl
             {
                 var item = (ExplorerItem)args.Item;
 
-                //var data = DataAccess.GetListByCid(item.Cid);
+                //var data = DataAccessLocal.GetListByCid(item.Cid);
                 //FileInSelectFolder.Clear();
                 //foreach (var file_info in data)
                 //{
@@ -477,10 +451,10 @@ public sealed partial class Explorer : UserControl
     //点击了详情页的列表
     private void FilesInfoListView_ItemClick(object sender, ItemClickEventArgs e)
     {
-        if (e.ClickedItem is not FilesInfo itemInfo) return;
+        if (e.ClickedItem is not DetailFileInfo itemInfo) return;
 
         //文件夹
-        if (itemInfo.Type == FilesInfo.FileType.Folder)
+        if (itemInfo.Type == FileType.Folder)
         {
             if (itemInfo.Id == null) return;
 
@@ -514,34 +488,24 @@ public sealed partial class Explorer : UserControl
         }
     }
 
-    private static void DeletedNodeAndDataAccessByCid(IList<TreeViewNode> nodeChildren, long cid, SqliteConnection connection = null)
+    private void DeletedNodeAndDataAccessByCid(IList<TreeViewNode> nodeChildren, long cid)
     {
-        var isNeedCloseConnection = connection == null;
-        if (connection == null)
-        {
-            connection = new SqliteConnection(DataAccess.ConnectionString);
-            connection.Open();
-        }
-
         foreach (var node in nodeChildren)
         {
             if (((ExplorerItem)node.Content).Id == cid)
             {
                 nodeChildren.Remove(node);
-                DataAccess.Delete.DeleteAllDirectoryAndFiles_InFilesInfoTable(cid, connection);
+                
+                _filesInfoDao.RemoveAllByFolderId(cid);
                 return;
             }
             var treeViewNodes = node.Children;
             if (treeViewNodes.Count != 0)
             {
-                DeletedNodeAndDataAccessByCid(treeViewNodes, cid, connection);
+                DeletedNodeAndDataAccessByCid(treeViewNodes, cid);
             }
         }
 
-        if (!isNeedCloseConnection) return;
-
-        connection.Close();
-        connection.Dispose();
     }
 
     public event RoutedEventHandler PlayVideoClick;
@@ -561,7 +525,7 @@ public sealed partial class Explorer : UserControl
 public class LastUnAllShowFolderItem
 {
     public TreeViewNode InsertNode { get; init; }
-    public List<Datum> LastFolderItem { get; init; }
+    public List<FilesInfo> LastFolderItem { get; init; }
     public int ShowNum { get; init; }
 }
 
@@ -577,6 +541,6 @@ public class ExplorerItemTemplateSelector : DataTemplateSelector
     protected override DataTemplate SelectTemplateCore(object item)
     {
         var explorerItem = (ExplorerItem)(item as TreeViewNode).Content;
-        return explorerItem.Type == FilesInfo.FileType.Folder ? FolderTemplate : FileTemplate;
+        return explorerItem.Type == FileType.Folder ? FolderTemplate : FileTemplate;
     }
 }

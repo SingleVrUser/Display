@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using Windows.Foundation;
+using DataAccess.Dao.Interface;
+using DataAccess.Models.Entity;
 using Display.Helper.Network;
 using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
-using Display.Models.Entities.OneOneFive;
 using Display.Models.Vo;
 using Display.Providers;
 using Microsoft.UI.Xaml;
@@ -17,29 +18,20 @@ using Microsoft.UI.Xaml.Navigation;
 
 namespace Display.Views.Pages;
 
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
-public sealed partial class DetailInfoPage : Page
+public sealed partial class DetailInfoPage
 {
-    public VideoCoverDisplayClass DetailInfo;
+    public VideoInfoVo DetailInfo;
 
-    public static DetailInfoPage Current;
-
-    //public VideoInfo VideoInfo = new();
+    private readonly IFilesInfoDao _filesInfoDao = App.GetService<IFilesInfoDao>();
 
     public DetailInfoPage()
     {
-        this.InitializeComponent();
-
-        Current = this;
+        InitializeComponent();
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-
-
 
         var anim = ConnectedAnimationService.GetForCurrentView().GetAnimation("ForwardConnectedAnimation");
         if (anim != null)
@@ -62,8 +54,8 @@ public sealed partial class DetailInfoPage : Page
 
         DetailInfo = e.Parameter switch
         {
-            VideoCoverDisplayClass detailinfo => detailinfo,
-            VideoInfo videoinfo => new VideoCoverDisplayClass(videoinfo, 500, 300),
+            VideoInfoVo detailInfo => detailInfo,
+            VideoInfo videoInfo => new VideoInfoVo(videoInfo, 500, 300),
             _ => DetailInfo
         };
     }
@@ -94,8 +86,8 @@ public sealed partial class DetailInfoPage : Page
     /// <summary>
     /// 演员更多页跳转
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void Actor_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not Grid clickButton) return;
@@ -112,42 +104,42 @@ public sealed partial class DetailInfoPage : Page
 
         if (string.IsNullOrEmpty(actorName)) return;
 
-        Tuple<List<string>, string, bool> TypesAndName = new(new() { "actor" }, actorName, false);
+        Tuple<List<string>, string, bool> typesAndName = new(["actor"], actorName, false);
 
         //准备动画
         ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", clickButton);
         animation.Configuration = new BasicConnectedAnimationConfiguration();
-        Frame.Navigate(typeof(VideoCoverPage), TypesAndName);
+        Frame.Navigate(typeof(VideoCoverPage), typesAndName);
     }
 
     /// <summary>
     /// 标签更多页跳转
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void Label_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not Button clickButton) return;
 
-        string LabelName = clickButton.Content as string;
-        Tuple<List<string>, string, bool> TypesAndName = new(new() { "category" }, LabelName, false);
+        var labelName = clickButton.Content as string;
+        Tuple<List<string>, string, bool> typesAndName = new(["category"], labelName, false);
 
-        ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", clickButton);
-        Frame.Navigate(typeof(VideoCoverPage), TypesAndName);
+        var animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", clickButton);
+        Frame.Navigate(typeof(VideoCoverPage), typesAndName);
     }
 
     /// <summary>
     /// 视频播放页面跳转
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void VideoPlay_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not Button videoPlayButton)
             return;
 
-        string trueName = DetailInfo.TrueName;
-        var videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(trueName);
+        var trueName = DetailInfo.TrueName;
+        var videoInfoList = DataAccessLocal.Get.GetSingleFileInfoByTrueName(trueName);
 
         //没有该数据
         if (videoInfoList == null || videoInfoList.Count == 0)
@@ -174,8 +166,8 @@ public sealed partial class DetailInfoPage : Page
     /// <summary>
     /// 点击了删除键
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void Delete_Click(object sender, RoutedEventArgs e)
     {
         ContentDialog dialog = new ContentDialog()
@@ -191,27 +183,25 @@ public sealed partial class DetailInfoPage : Page
 
         var result = await dialog.ShowAsync();
 
-        if (result == ContentDialogResult.Primary)
+        if (result != ContentDialogResult.Primary) return;
+
+        if (sender is not AppBarButton) return;
+        
+        //从数据库中删除
+        _filesInfoDao.ExecuteRemoveByTrueName(DetailInfo.TrueName);
+
+        //删除存储的文件夹
+        var savePath = Path.Combine(AppSettings.ImageSavePath, DetailInfo.TrueName);
+        if (Directory.Exists(savePath))
         {
-            if (sender is AppBarButton)
-            {
-                //从数据库中删除
-                DataAccess.Delete.DeleteDataInVideoInfoTable(DetailInfo.TrueName);
+            Directory.Delete(savePath, true);
+        }
 
-                //删除存储的文件夹
-                string savePath = Path.Combine(AppSettings.ImageSavePath, DetailInfo.TrueName);
-                if (Directory.Exists(savePath))
-                {
-                    Directory.Delete(savePath, true);
-                }
+        DetailInfo.IsDeleted = Visibility.Visible;
 
-                DetailInfo.IsDeleted = Visibility.Visible;
-
-                if (Frame.CanGoBack)
-                {
-                    Frame.GoBack();
-                }
-            }
+        if (Frame.CanGoBack)
+        {
+            Frame.GoBack();
         }
     }
 
@@ -219,22 +209,23 @@ public sealed partial class DetailInfoPage : Page
 
     private async void CoverTapped(object sender, TappedRoutedEventArgs e)
     {
-        if (!(sender is Grid grid))
-            return;
+        if (sender is not Grid) return;
 
-        string name = DetailInfo.TrueName;
-        var videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(name);
+        var name = DetailInfo.TrueName;
+        var videoInfoList = DataAccessLocal.Get.GetSingleFileInfoByTrueName(name);
 
         //没有该数据
         if (videoInfoList.Count == 0)
         {
-            ContentDialog dialog = new();
-            dialog.XamlRoot = this.XamlRoot;
-            dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
-            dialog.Title = "播放";
-            dialog.CloseButtonText = "返回";
-            dialog.Content = "经查询，本地数据库无该文件，请导入后继续";
-            dialog.DefaultButton = ContentDialogButton.Close;
+            ContentDialog dialog = new()
+            {
+                XamlRoot = XamlRoot,
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+                Title = "播放",
+                CloseButtonText = "返回",
+                Content = "经查询，本地数据库无该文件，请导入后继续",
+                DefaultButton = ContentDialogButton.Close
+            };
             await dialog.ShowAsync();
         }
         //一集

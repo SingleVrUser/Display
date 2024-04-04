@@ -4,15 +4,13 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using DataAccess.Models.Entity;
 using Display.Helper.Network;
-using Display.Models.Dto.OneOneFive;
-using Display.Models.Entities.OneOneFive;
-using Display.Providers.Downloader;
 using HtmlAgilityPack;
 
 namespace Display.Providers;
 
-public class GetActorInfoFromNetwork
+public static class GetActorInfoFromNetwork
 {
     public static async Task<ActorInfo> SearchInfoFromMinnanoAv(string name, CancellationToken token)
     {
@@ -71,11 +69,17 @@ public class GetActorInfoFromNetwork
                     if (match.Success)
                     {
                         actorInfo.Height = string.IsNullOrEmpty(match.Groups[1].Value) ? 0 : Convert.ToInt32(match.Groups[1].Value);
-                        actorInfo.Bust = string.IsNullOrEmpty(match.Groups[2].Value) ? 0 : Convert.ToInt32(match.Groups[2].Value);
-                        actorInfo.Waist = string.IsNullOrEmpty(match.Groups[3].Value) ? 0 : Convert.ToInt32(match.Groups[3].Value);
-                        actorInfo.Hips = string.IsNullOrEmpty(match.Groups[4].Value) ? 0 : Convert.ToInt32(match.Groups[4].Value);
+                        var bust = string.IsNullOrEmpty(match.Groups[2].Value) ? 0 : Convert.ToInt32(match.Groups[2].Value);
+                        var waist = string.IsNullOrEmpty(match.Groups[3].Value) ? 0 : Convert.ToInt32(match.Groups[3].Value);
+                        var hips = string.IsNullOrEmpty(match.Groups[4].Value) ? 0 : Convert.ToInt32(match.Groups[4].Value);
 
-                        actorInfo.Bwh = $"{actorInfo.Bust}_{actorInfo.Waist}_{actorInfo.Hips}";
+                        actorInfo.BwhInfo = new Bwh
+                        {
+                            Bust = bust,
+                            Waist = waist,
+                            Hips = hips
+                        };
+                        actorInfo.Bwh = $"{bust}_{waist}_{hips}";
                     }
                     break;
                 case "AV出演期間":
@@ -90,7 +94,7 @@ public class GetActorInfoFromNetwork
         }
 
         Debug.WriteLine($"別名：{string.Join(",", otherNames)}");
-        actorInfo.OtherNames = otherNames;
+        actorInfo.OtherNameList = otherNames;
 
         var thumbNode = htmlDoc.DocumentNode.SelectSingleNode("/html/body/section/section/section/div[@class='act-area']/div[@class='thumb']/img");
         if (thumbNode == null) return actorInfo;
@@ -101,7 +105,7 @@ public class GetActorInfoFromNetwork
 
         if (string.IsNullOrEmpty(imgUrl)) return actorInfo;
 
-        actorInfo.ImageUrl = $"{AppSettings.MinnanoAvBaseUrl}{imgUrl}";
+        actorInfo.ProfilePath = $"{AppSettings.MinnanoAvBaseUrl}{imgUrl}";
         return actorInfo;
     }
 }

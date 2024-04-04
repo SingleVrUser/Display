@@ -9,14 +9,14 @@ public class Bwh
     [Key]
     [Column("bwh")]
     [StringLength(100)]
-    public string Bwh1 { get; set; } = null!;
+    public string BwhContent { get; init; } = null!;
 
     [Column("bust")]
-    public int? Bust { get; set; }
+    public int Bust { get; init; }
 
     [Column("waist")]
-    public int? Waist { get; set; }
+    public int Waist { get; init; }
 
     [Column("hips")]
-    public int? Hips { get; set; }
+    public int Hips { get; init; }
 }

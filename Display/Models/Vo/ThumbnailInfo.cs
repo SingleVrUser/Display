@@ -2,32 +2,25 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Display.Models.Entities.OneOneFive;
+using DataAccess.Models.Entity;
 using Display.Models.Enums;
-using Display.Models.Enums.OneOneFive;
-using Display.Models.Vo;
 
-namespace Display.Models.Dto.OneOneFive;
+namespace Display.Models.Vo;
 
-public class ThumbnailInfo : INotifyPropertyChanged
+public sealed class ThumbnailInfo : INotifyPropertyChanged
 {
     public ThumbnailInfo(VideoInfo videoInfo)
     {
         Name = videoInfo.TrueName;
 
-        var tmpList = videoInfo.SampleImageList.Split(',').ToList();
-        if (tmpList.Count > 1)
-        {
-            ThumbnailDownUrlList = tmpList;
-        }
+        if (videoInfo.SampleImageList != null)
+            ThumbnailDownUrlList = videoInfo.SampleImageList.Split(',').ToArray();
 
-        if (videoInfo.Category.Contains("VR") || videoInfo.Series.Contains("VR"))
-        {
-            IsVr = true;
-        }
+        IsVr = (videoInfo.Category != null && videoInfo.Category.Contains("VR")) ||
+               (videoInfo.Series != null && videoInfo.Series.Contains("VR"));
     }
 
-    public bool IsVr;
+    public readonly bool IsVr;
 
     public string Name { get; set; }
     public int Count;
@@ -44,44 +37,41 @@ public class ThumbnailInfo : INotifyPropertyChanged
         }
     }
 
-    public List<string> ThumbnailDownUrlList { get; set; } = [];
+    public string[] ThumbnailDownUrlList { get; init; }
 
     private Status _status = Status.BeforeStart;
     public Status Status
     {
         get => _status;
-        set
-        {
-            _status = value;
-            OnPropertyChanged();
-        }
+        set => SetField(ref _status, value);
     }
 
     private string _genderInfo;
     public string GenderInfo
     {
         get => _genderInfo;
-        set
-        {
-            _genderInfo = value;
-            OnPropertyChanged();
-        }
+        set => SetField(ref _genderInfo, value);
     }
 
     private string _ageInfo;
     public string AgeInfo
     {
         get => _ageInfo;
-        set
-        {
-            _ageInfo = value;
-            OnPropertyChanged();
-        }
+        set => SetField(ref _ageInfo, value);
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
-    public void OnPropertyChanged([CallerMemberName] string propertyName = "")
+
+    private void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    private bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
     }
 }

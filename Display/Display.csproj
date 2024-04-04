@@ -183,9 +183,6 @@
     <Page Update="Views\Windows\MediaPlayWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Views\Windows\StartWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Update="Views\Windows\SingleFrameWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -242,6 +239,9 @@
     <None Update="FFmpeg\bin\x86\swscale-7.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
   </ItemGroup>
 
 </Project>

@@ -26,7 +26,7 @@ namespace Display.Views.Pages.More.Import115DataToLocalDataAccess;
 
 public sealed partial class Progress
 {
-    private readonly List<FilesInfo> _fileInfos;
+    private readonly List<DetailFileInfo> _fileInfos;
     private readonly WebApi _webapi = WebApi.GlobalWebApi;
     private readonly ObservableCollection<FileCategory> _fileCategoryCollection = [];
     public Status Status { get; set; }
@@ -39,7 +39,7 @@ public sealed partial class Progress
         InitializeComponent();
     }
 
-    public Progress(List<FilesInfo> fileInfos)
+    public Progress(List<DetailFileInfo> fileInfos)
     {
         InitializeComponent();
 
@@ -92,13 +92,13 @@ public sealed partial class Progress
 
         // 1.预准备，获取所有文件的全部信息（大小和数量）
         //1-1.获取数据
-        List<FilesInfo> filesWithoutRootList = [];
+        List<DetailFileInfo> filesWithoutRootList = [];
 
         // 剔除根目录 并 获取进度
         foreach (var info in _fileInfos)
         {
             // 文件
-            if (info.Type == FilesInfo.FileType.File)
+            if (info.Type == FileType.File)
             {
                 filesWithoutRootList.Add(info);
                 _overallCount++;
@@ -119,7 +119,7 @@ public sealed partial class Progress
 
                     var foldersInfoInRoot = rootFileInfo.Data;
 
-                    filesWithoutRootList.AddRange(foldersInfoInRoot.Select(datum => new FilesInfo(datum)));
+                    filesWithoutRootList.AddRange(foldersInfoInRoot.Select(datum => new DetailFileInfo(datum)));
                 }
                 else
                 {
@@ -128,7 +128,7 @@ public sealed partial class Progress
             }
         }
 
-        foreach (var folderInfo in filesWithoutRootList.Where(i => i.Type == FilesInfo.FileType.Folder && i.Id != null))
+        foreach (var folderInfo in filesWithoutRootList.Where(i => i.Type == FileType.Folder && i.Id != null))
         {
             var item = await _webapi.GetFolderCategory((long)folderInfo.Id!);
 

@@ -10,23 +10,24 @@ using Windows.Media.Playback;
 using Windows.Media.Streaming.Adaptive;
 using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Vo;
 using Display.Models.Vo.OneOneFive;
 using Display.Streams;
 
 namespace Display.Services;
 
-public class MediaPlayerWithStreamSource(string url, FilesInfo filesInfo)
+public class MediaPlayerWithStreamSource(string url, DetailFileInfo detailFileInfo)
 {
     private HttpRandomAccessStream _stream;
     private MediaSource _ms;
     public MediaPlayer MediaPlayer = new();
-    public FilesInfo FilesInfo = filesInfo;
+    public DetailFileInfo DetailFileInfo = detailFileInfo;
 
     public string Url { get; } = url;
 
-    public static async Task<MediaPlayerWithStreamSource> CreateMediaPlayer(string videoUrl, SubInfo subInfo = null, FilesInfo filesInfo = null)
+    public static async Task<MediaPlayerWithStreamSource> CreateMediaPlayer(string videoUrl, SubInfo subInfo = null, DetailFileInfo detailFileInfo = null)
     {
-        var mediaPlayerWithStreamSource = new MediaPlayerWithStreamSource(videoUrl, filesInfo);
+        var mediaPlayerWithStreamSource = new MediaPlayerWithStreamSource(videoUrl, detailFileInfo);
 
         var mediaPlayer = mediaPlayerWithStreamSource.MediaPlayer;
 

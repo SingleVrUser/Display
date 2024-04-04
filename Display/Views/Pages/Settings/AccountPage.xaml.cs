@@ -1,5 +1,6 @@
 using System;
 using Windows.ApplicationModel.DataTransfer;
+using DataAccess.Dao.Interface;
 using Display.Helper.FileProperties.Name;
 using Display.Models.Enums;
 using Display.Providers;
@@ -13,6 +14,8 @@ namespace Display.Views.Pages.Settings;
 public sealed partial class AccountPage
 {
     private static readonly WebApi WebApi = WebApi.GlobalWebApi;
+
+    private readonly IDownHistoryDao _downHistoryDao = App.GetService<IDownHistoryDao>();
 
     public AccountPage()
     {
@@ -160,8 +163,7 @@ public sealed partial class AccountPage
 
     private void ClearDownRecordButton_Click(object sender, RoutedEventArgs e)
     {
-        DataAccess.Delete.DeleteTable(DataAccess.TableName.DownHistory);
-
+        _downHistoryDao.Delete();
         ShowTeachingTip("已清空");
     }
 

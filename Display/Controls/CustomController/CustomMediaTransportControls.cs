@@ -9,7 +9,7 @@ using Display.Models.Enums;
 namespace Display.Controls.CustomController;
 
 /// <summary>
-/// 自定义MediaPlayer重的TransportControls
+/// 自定义MediaPlayer的TransportControls
 /// </summary>
 public class CustomMediaTransportControls : MediaTransportControls
 {

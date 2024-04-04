@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DataAccess.Models.Entity;
 using Display.Models.Api.OneOneFive.File;
 
 namespace Display.Models.Vo;
@@ -13,5 +14,5 @@ public class GetFilesProgressInfo
 
     public List<long?> FailCid { get; set; } = [];
 
-    public List<Datum> AddToDataAccessList = [];
+    public List<FilesInfo> AddToDataAccessList = [];
 }

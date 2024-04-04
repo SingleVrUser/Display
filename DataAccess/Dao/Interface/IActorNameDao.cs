@@ -2,6 +2,7 @@
 
 namespace DataAccess.Dao.Interface;
 
-internal interface IActorNameDao : IDao<ActorName>
+public interface IActorNameDao : IDao<ActorName>
 {
+    void ExecuteRemoveByName(string name);
 }

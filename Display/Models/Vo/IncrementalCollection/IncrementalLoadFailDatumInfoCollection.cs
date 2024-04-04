@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Display.Models.Api.OneOneFive.File;
+using DataAccess.Models.Entity;
 using Display.Models.Enums.OneOneFive;
 using Display.Providers;
 using Microsoft.UI.Xaml.Data;
@@ -10,7 +10,7 @@ using SharpCompress;
 
 namespace Display.Models.Vo.IncrementalCollection;
 
-public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum>, ISupportIncrementalLoading
+public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<FilesInfo>, ISupportIncrementalLoading
 {
 
     public void SetShowType(FailType showType)
@@ -45,10 +45,10 @@ public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum
 
     public async Task LoadData(int startShowCount = 20)
     {
-        var newItems = await DataAccess.Get.GetFailFileInfoWithDatum(0, startShowCount, FilterName, OrderBy, IsDesc, ShowType);
+        var newItems = DataAccessLocal.Get.GetFailFileInfoWithFilesInfo(0, startShowCount, FilterName, OrderBy, IsDesc, ShowType);
         if (Count == 0)
         {
-            AllCount = DataAccess.Get.GetCountOfFailDatumFiles(FilterName, ShowType);
+            AllCount = DataAccessLocal.Get.GetCountOfFailFilesInfoFiles(FilterName, ShowType);
         }
         else
             Clear();
@@ -59,7 +59,7 @@ public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Datum
 
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        var failLists = await DataAccess.Get.GetFailFileInfoWithDatum(Items.Count, (int)count, FilterName, OrderBy, IsDesc, ShowType);
+        var failLists = DataAccessLocal.Get.GetFailFileInfoWithFilesInfo(Items.Count, (int)count, FilterName, OrderBy, IsDesc, ShowType);
 
         if (failLists == null)
         {

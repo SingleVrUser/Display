@@ -5,15 +5,15 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using DataAccess.Models.Entity;
 using Display.Helper.Network;
 using Display.Models.Api.OneOneFive.File;
-using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
-using Display.Models.Entities.OneOneFive;
 using Display.Models.Enums;
 using Display.Models.Enums.OneOneFive;
 using Display.Models.Vo;
+using Display.Models.Vo.IncrementalCollection;
 using Display.Models.Vo.OneOneFive;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -44,8 +44,8 @@ public sealed partial class MainPage : INotifyPropertyChanged
         }
     }
 
-    private Datum _selectedDatum;
-    public Datum SelectedDatum
+    private FilesInfo _selectedDatum;
+    public FilesInfo SelectedDatum
     {
         get => _selectedDatum;
         set
@@ -72,8 +72,8 @@ public sealed partial class MainPage : INotifyPropertyChanged
     /// <summary>
     /// 展开Expander初始化检查图片路径和网络
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="args"></param>
+    /// <param name="sender"></param>
+    /// <param name="args"></param>
     private void Expander_Expanding(Expander sender, ExpanderExpandingEventArgs args)
     {
         if (sender.Content as ConditionalCheck == null)
@@ -166,10 +166,10 @@ public sealed partial class MainPage : INotifyPropertyChanged
         page.CreateWindow();
     }
 
-    private Tuple<List<string>, List<Datum>> GetCurrentSelectedFolder()
+    private Tuple<List<string>, List<FilesInfo>> GetCurrentSelectedFolder()
     {
-        List<string> selectFilesNameList = new();
-        List<Datum> datumList = new();
+        List<string> selectFilesNameList = [];
+        List<FilesInfo> datumList = [];
         foreach (var node in Explorer.FolderTreeView.SelectedNodes)
         {
             if (node.Content is not ExplorerItem explorer) continue;
@@ -178,22 +178,22 @@ public sealed partial class MainPage : INotifyPropertyChanged
             selectFilesNameList.Add(explorer.Name);
 
             //文件夹下的文件和文件夹
-            var items = Explorer.GetFilesFromItems(explorer.Id, FilesInfo.FileType.File);
+            var items = Explorer.GetFilesFromItems(explorer.Id, FileType.File);
 
             datumList.AddRange(items);
         }
 
-        return new Tuple<List<string>, List<Datum>>(selectFilesNameList, datumList);
+        return new Tuple<List<string>, List<FilesInfo>>(selectFilesNameList, datumList);
     }
 
     /// <summary>
     /// 点击显示文件信息
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void ExplorerItemClick(object sender, ItemClickEventArgs e)
     {
-        if (e.ClickedItem is not FilesInfo itemInfo) return;
+        if (e.ClickedItem is not DetailFileInfo itemInfo) return;
 
         if (FileInfoShowGrid.Visibility == Visibility.Collapsed) FileInfoShowGrid.Visibility = Visibility.Visible;
         SelectedDatum = itemInfo.Datum;
@@ -251,17 +251,17 @@ public sealed partial class MainPage : INotifyPropertyChanged
             //正则匹配失败
             case nameof(ShowMatchFailComboBoxItem):
                 FailList.SetShowType(FailType.MatchFail);
-                await FailList.LoadData();
+                FailList.LoadData();
                 break;
             //搜刮失败
             case nameof(ShowSpiderFailComboBoxItem):
                 FailList.SetShowType(FailType.SpiderFail);
-                await FailList.LoadData();
+                FailList.LoadData();
                 break;
             //所有
             default:
                 FailList.SetShowType(FailType.All);
-                await FailList.LoadData();
+                FailList.LoadData();
                 break;
         }
     }
@@ -290,7 +290,7 @@ public sealed partial class MainPage : INotifyPropertyChanged
 
     private async void Explorer_OnPlayVideoClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
+        if (sender is not MenuFlyoutItem { DataContext: DetailFileInfo info }) return;
 
         var mediaPlayItem = new MediaPlayItem(info);
         await PlayVideoHelper.PlayVideo(new Collection<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this);
@@ -298,7 +298,7 @@ public sealed partial class MainPage : INotifyPropertyChanged
 
     private async void Explorer_OnPlayWithPlayerClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info, Tag: PlayerType playerType }) return;
+        if (sender is not MenuFlyoutItem { DataContext: DetailFileInfo info, Tag: PlayerType playerType }) return;
 
         await Task.Delay(1);
 

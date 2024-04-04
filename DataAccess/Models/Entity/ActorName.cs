@@ -4,15 +4,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Models.Entity;
 
-[PrimaryKey("Id", "Name")]
+[PrimaryKey(nameof(Id), nameof(Name))]
 [Table("Actor_Names")]
 public class ActorName
 {
     [Key]
     [Column("id")]
-    public int Id { get; set; }
+    public long Id { get; init; }
 
     [Key]
     [StringLength(20)]
-    public string Name { get; set; } = null!;
+    [Column("Name")]
+    public string Name { get; init; } = null!;
 }

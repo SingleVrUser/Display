@@ -24,6 +24,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using DataAccess.Dao.Interface;
+using DataAccess.Models.Entity;
 using Display.Helper.Notifications;
 using Display.Models.Api.Aria2;
 using Display.Models.Api.OneOneFive;
@@ -58,6 +60,9 @@ internal class WebApi
     private static long NowDate => DateTimeOffset.Now.ToUnixTimeSeconds();
 
     private static WebApi _webApi;
+    
+    private readonly IFilesInfoDao _filesInfoDao = App.GetService<IFilesInfoDao>();
+    private static readonly IDownHistoryDao DownHistoryDao = App.GetService<IDownHistoryDao>();
 
     public static WebApi GlobalWebApi => _webApi ??= new WebApi();
 
@@ -166,12 +171,12 @@ internal class WebApi
     /// <param name="token"></param>
     /// <param name="progress"></param>
     /// <returns></returns>
-    public async Task GetAllFileInfoToDataAccess(List<FilesInfo> fileInfos, CancellationToken token, IProgress<GetFileProgressIProgress> progress = null)
+    public async Task GetAllFileInfoToDataAccess(List<DetailFileInfo> fileInfos, CancellationToken token, IProgress<GetFileProgressIProgress> progress = null)
     {
         var getFilesProgressInfo = new GetFilesProgressInfo();
 
         // 文件夹，获取文件夹下文件信息后添加
-        foreach (var info in fileInfos.Where(x => x.Type == FilesInfo.FileType.Folder))
+        foreach (var info in fileInfos.Where(x => x.Type == FileType.Folder))
         {
             if (token.IsCancellationRequested)
             {
@@ -181,7 +186,7 @@ internal class WebApi
         }
 
         // 文件，直接添加
-        foreach (var info in fileInfos.Where(x => x.Type == FilesInfo.FileType.File))
+        foreach (var info in fileInfos.Where(x => x.Type == FileType.File))
         {
 
             if (token.IsCancellationRequested)
@@ -189,7 +194,7 @@ internal class WebApi
                 return;
             }
 
-            await DataAccess.Add.AddFilesInfoAsync(info.Datum);
+            _filesInfoDao.Add(info.Datum);
 
             getFilesProgressInfo!.FilesCount++;
 
@@ -221,15 +226,15 @@ internal class WebApi
         }
 
         // 获取上一次已添加文件夹的pid（如果存在，且修改时间不变；不存在的默认值为string.empty）
-        var pid = DataAccess.Get.GetLatestFolderPid(cidCategory.pick_code, cidCategory.utime);
+        var folderInfo = _filesInfoDao.GetOneByPickCode(cidCategory.pick_code);
 
         // 该文件已存在数据库里，且修改时间不变
-        if (pid >= 0 && StaticData.IsJumpExistsFolder)
+        if (StaticData.IsJumpExistsFolder && folderInfo != null && folderInfo.TimeEdit == cidCategory.utime)
         {
             //如果修改时间未变，但移动了位置
-            if (pid == cidCategory.paths.Last().FileId)
+            if (folderInfo.ParentId == cidCategory.Paths.Last().FileId)
             {
-                await DataAccess.Add.AddFilesInfoAsync(FileCategory.ConvertFolderToDatum(cidCategory, cid));
+                _filesInfoDao.Add(FileCategory.ConvertFolderToDatum(cidCategory, cid));
             }
 
             //统计上下级文件夹所含文件的数量
@@ -254,21 +259,21 @@ internal class WebApi
             var addToDataAccessList = getFilesProgressInfo.AddToDataAccessList;
 
             //删除后重新添加
-            DataAccess.Delete.DeleteAllDirectoryAndFiles_InFilesInfoTable(cid);
+            _filesInfoDao.RemoveAllByFolderId(cid);
 
             if (addToDataAccessList.Count > 0)
             {
                 //需要添加进数据库的Datum
                 foreach (var item in addToDataAccessList)
                 {
-                    await DataAccess.Add.AddFilesInfoAsync(item);
+                    _filesInfoDao.Add(item);
                 }
             }
 
             //不添加有错误的目录进数据库（添加数据库时会跳过已经添加过的目录，对于出现错误的目录不添加方便后续重新添加）
             if (getFilesProgressInfo.FailCid.Count == 0)
             {
-                await DataAccess.Add.AddFilesInfoAsync(FileCategory.ConvertFolderToDatum(cidCategory, cid));
+                _filesInfoDao.Add(FileCategory.ConvertFolderToDatum(cidCategory, cid));
             }
         }
 
@@ -283,7 +288,7 @@ internal class WebApi
     /// <param name="token"></param>
     /// <param name="progress"></param>
     /// <returns></returns>
-    public async Task<GetFilesProgressInfo> TraverseAllFileInfo(long? cid, GetFilesProgressInfo getFilesProgressInfo, CancellationToken token, IProgress<GetFileProgressIProgress> progress = null)
+    private async Task<GetFilesProgressInfo> TraverseAllFileInfo(long? cid, GetFilesProgressInfo getFilesProgressInfo, CancellationToken token, IProgress<GetFileProgressIProgress> progress = null)
     {
         if (token.IsCancellationRequested) return getFilesProgressInfo;
 
@@ -310,7 +315,7 @@ internal class WebApi
                 }
 
                 //文件夹
-                if (item.Fid == default)
+                if (item.FileId == default)
                 {
                     getFilesProgressInfo.FolderCount++;
 
@@ -318,16 +323,24 @@ internal class WebApi
                     getFilesProgressInfo.AddToDataAccessList.Add(item);
 
                     //查询数据库是否存在
-                    if (DataAccess.Get.GetLatestFolderPid(item.PickCode, item.TimeEdit) >= 0 && StaticData.IsJumpExistsFolder)
+                    var isUseDbData = StaticData.IsJumpExistsFolder;
+
+                    if (!isUseDbData)
+                    {
+                        var folderInfo = _filesInfoDao.GetOneByPickCode(item.PickCode);
+                        isUseDbData = folderInfo != null && folderInfo.TimeEdit == item.TimeEdit;
+                    }
+                    
+                    if (isUseDbData)
                     {
                         //统计下级文件夹所含文件的数量
                         //通过数据库获取
-                        var datumList = DataAccess.Get.GetAllFilesTraverse(item.Cid);
+                        var datumList = _filesInfoDao.GetAllFilesListByFolderId(item.CurrentId);
 
-                        if (datumList == null)
-                        {
-                            continue;
-                        }
+                        // if (datumList == null)
+                        // {
+                        //     continue;
+                        // }
 
                         getFilesProgressInfo.AddToDataAccessList.AddRange(datumList);
 
@@ -335,11 +348,11 @@ internal class WebApi
                         getFilesProgressInfo.FilesCount += datumList.Count;
 
                         var cpm = 60 / (NowDate - lastDate);
-                        progress?.Report(new GetFileProgressIProgress() { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
+                        progress?.Report(new GetFileProgressIProgress { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
                     }
                     else
                     {
-                        getFilesProgressInfo = await TraverseAllFileInfo(item.Cid, getFilesProgressInfo, token, progress);
+                        getFilesProgressInfo = await TraverseAllFileInfo(item.CurrentId, getFilesProgressInfo, token, progress);
                     }
                 }
                 //文件
@@ -630,7 +643,7 @@ internal class WebApi
         return await Client.SendAsync<RenameRequest>(HttpMethod.Post, url, content);
     }
 
-    public async Task<bool> RenameForce(FilesInfo data, string newName)
+    public async Task<bool> RenameForce(DetailFileInfo data, string newName)
     {
         if (data is not { NoId: false }) return false;
 
@@ -802,7 +815,7 @@ internal class WebApi
     }
 
     public enum DownType { _115, Bc, Aria2 };
-    public async Task<bool> RequestDown(List<Datum> videoInfoList, DownType downType = DownType._115, string savePath = null, string topFolderName = null)
+    public async Task<bool> RequestDown(List<FilesInfo> videoInfoList, DownType downType = DownType._115, string savePath = null, string topFolderName = null)
     {
         var success = downType switch
         {
@@ -827,7 +840,7 @@ internal class WebApi
     /// </summary>
     /// <param name="videoInfoList"></param>
     /// <returns></returns>
-    async Task<bool> RequestDownBy115Browser(List<Datum> videoInfoList)
+    async Task<bool> RequestDownBy115Browser(List<FilesInfo> videoInfoList)
     {
         var downRequest = new Browser115Request
         {
@@ -847,7 +860,7 @@ internal class WebApi
         {
             Count = videoInfoList.Count,
             List = [],
-            RefUrl = $"https://115.com/?cid={videoInfoList[0].Cid}&offset=0&mode=wangpan"
+            RefUrl = $"https://115.com/?cid={videoInfoList[0].CurrentId}&offset=0&mode=wangpan"
         };
 
         foreach (var videoInfo in videoInfoList)
@@ -888,7 +901,7 @@ internal class WebApi
     /// <param name="savePath"></param>
     /// <param name="topFolderName"></param>
     /// <returns></returns>
-    private async Task<bool> RequestDownByBitComet(List<Datum> videoInfoList, string ua, string savePath, string topFolderName = null)
+    private async Task<bool> RequestDownByBitComet(List<FilesInfo> videoInfoList, string ua, string savePath, string topFolderName = null)
     {
         var success = true;
 
@@ -920,7 +933,7 @@ internal class WebApi
         foreach (var datum in videoInfoList)
         {
             //文件夹
-            if (datum.Fid is null)
+            if (datum.FileId is null)
             {
                 var newSavePath = Path.Combine(savePath, datum.Name);
                 //遍历文件夹并下载
@@ -1019,7 +1032,7 @@ internal class WebApi
     /// <param name="savePath"></param>
     /// <param name="topFolderName"></param>
     /// <returns></returns>
-    async Task<bool> RequestDownByAria2(List<Datum> videoInfoList, string ua, string savePath, string topFolderName = null)
+    async Task<bool> RequestDownByAria2(List<FilesInfo> videoInfoList, string ua, string savePath, string topFolderName = null)
     {
         var aria2Settings = AppSettings.Aria2Settings;
 
@@ -1037,7 +1050,7 @@ internal class WebApi
         return await GetAllFilesTraverseAndDownByAria2(videoInfoList, aria2Settings.ApiUrl, aria2Settings.Password, savePath, ua);
     }
 
-    public async Task<bool> GetAllFilesTraverseAndDownByAria2(List<Datum> videoInfoList, string apiUrl, string password, string savePath, string ua)
+    public async Task<bool> GetAllFilesTraverseAndDownByAria2(List<FilesInfo> videoInfoList, string apiUrl, string password, string savePath, string ua)
     {
         var success = true;
 
@@ -1046,10 +1059,10 @@ internal class WebApi
         foreach (var datum in videoInfoList)
         {
             //文件夹
-            if (datum.Fid == null)
+            if (datum.FileId == null)
             {
                 //获取该文件夹下的文件和文件夹
-                var webFileInfo = await GetFileAsync(datum.Cid, loadAll: true);
+                var webFileInfo = await GetFileAsync(datum.CurrentId, loadAll: true);
                 if (webFileInfo.Count == 0)
                 {
                     success = false;
@@ -1157,7 +1170,7 @@ internal class WebApi
         return success;
     }
 
-    private async Task<bool> pushOneFileDownRequestToBitComet(HttpClient client, string baseUrl, Datum datum, string ua, string savePath)
+    private async Task<bool> pushOneFileDownRequestToBitComet(HttpClient client, string baseUrl, FilesInfo datum, string ua, string savePath)
     {
         var urlList = await GetDownUrl(datum.PickCode, ua);
 
@@ -1169,19 +1182,19 @@ internal class WebApi
             urlList.First().Value,
             savePath,
             datum.Name,
-            $"https://115.com/?cid={datum.Cid}=0&tab=download&mode=wangpan",
+            $"https://115.com/?cid={datum.CurrentId}=0&tab=download&mode=wangpan",
             ua);
     }
 
-    public async void GetAllFilesTraverseAndDownByBitComet(HttpClient client, string baseUrl, Datum datum, string ua, string savePath)
+    public async void GetAllFilesTraverseAndDownByBitComet(HttpClient client, string baseUrl, FilesInfo datum, string ua, string savePath)
     {
         //获取该文件夹下的文件和文件夹
-        var webFileInfo = await GetFileAsync(datum.Cid, loadAll: true);
+        var webFileInfo = await GetFileAsync(datum.CurrentId, loadAll: true);
 
         foreach (var data in webFileInfo.Data)
         {
             //文件夹
-            if (data.Fid == null)
+            if (data.FileId == null)
             {
                 var newSavePath = Path.Combine(savePath, data.Name);
                 GetAllFilesTraverseAndDownByBitComet(client, baseUrl, data, ua, newSavePath);
@@ -1378,7 +1391,8 @@ internal class WebApi
 
         if (isRecodeDownRequest)
         {
-            var downUrlInfo = DataAccess.Get.GetDownHistoryByPcAndUa(pickCode, ua);
+           
+            var downUrlInfo = DownHistoryDao.FindByPickCodeAndUa(pickCode, ua);
 
             //检查链接是否失效
             if (downUrlInfo != null && tm - downUrlInfo.AddTime < AppSettings.DownUrlOverdueTime)
@@ -1430,11 +1444,11 @@ internal class WebApi
         //添加下载记录
         if (isRecodeDownRequest && downUrlList.Count != 0)
         {
-            DataAccess.Add.AddDownHistory(new DownInfo
+            DownHistoryDao.Add(new DownHistory
             {
                 FileName = downUrlList.First().Key,
                 TrueUrl = downUrlList.First().Value,
-                PickCode = pickCode,
+                FilePickCode = pickCode,
                 Ua = ua
             });
         }

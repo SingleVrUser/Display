@@ -1,6 +1,8 @@
 ﻿using Windows.Storage;
 using Display.Models.Dto.Settings;
 using Display.Models.Enums;
+using Display.Models.Records;
+using Display.Views.Pages;
 
 namespace Display.Constants;
 public static class DefaultSettings
@@ -25,7 +27,6 @@ public static class DefaultSettings
         {
             public const bool IsNavigationViewPaneOpen = false;
             public const NavigationViewItemEnum StartPageEnum = NavigationViewItemEnum.SettingPage;
-            public const int StartPageIndex = 0;
         }
     }
 
@@ -95,7 +96,6 @@ public static class DefaultSettings
 
     public static class App
     {
-        public const bool IsUpdatedDataAccessFrom014 = false;
         public const bool IsCheckUpdate = true;
         public const string IgnoreUpdateAppVersion = "";
 
@@ -142,36 +142,25 @@ public static class DefaultSettings
 
     public static class NavigationViewItem
     {
-        public static readonly MenuItem[] DefaultMenuItems =
+        public static readonly PageEnumAndIsVisible[] DefaultMenuItems =
         [
-            new MenuItem("主页", "\xE10F", NavigationViewItemEnum.HomePage),
-            new MenuItem("展示", "\xE8BA",NavigationViewItemEnum.VideoViewPage),
-            new MenuItem("演员", "\xE77B", NavigationViewItemEnum.ActorPage),
-            new MenuItem("其他", "\xE10C", NavigationViewItemEnum.MorePage)
+            new PageEnumAndIsVisible(NavigationViewItemEnum.HomePage),
+            new PageEnumAndIsVisible(NavigationViewItemEnum.VideoViewPage),
+            new PageEnumAndIsVisible(NavigationViewItemEnum.ActorPage),
+            new PageEnumAndIsVisible(NavigationViewItemEnum.MorePage)
         ];
 
-        public static readonly MenuItem[] DefaultFootMenuItems =
+        public static readonly PageEnumAndIsVisible[] DefaultFootMenuItems =
         [
-            new MenuItem("下载", "\xE118", NavigationViewItemEnum.DownPage)
-            {
-                CanSelected = false
-            },
-            new MenuItem("任务", "\xE174", NavigationViewItemEnum.TaskPage)
-            {
-                CanSelected = false
-            }
+            new PageEnumAndIsVisible(NavigationViewItemEnum.DownPage),
+            new PageEnumAndIsVisible(NavigationViewItemEnum.TaskPage)
         ];
 
-        public static readonly MoreMenuItem[] DefaultMoreMenuItems = [
-            new MoreMenuItem("文件列表",  "115中的文件列表", "/Assets/Svg/file_alt_icon.svg", NavigationViewItemEnum.FilePage),
-            new MoreMenuItem("搜刮信息", "搜刮本地数据库中视频对应的信息", "/Assets/Svg/find_internet_magnifier_search_security_icon.svg", NavigationViewItemEnum.SpiderPage),
-            new MoreMenuItem("演员头像", "从gfriends仓库中获取演员头像", "/Assets/Svg/face_male_man_portrait_icon.svg", NavigationViewItemEnum.ActorCoverPage),
-            new MoreMenuItem("缩略图", "获取视频缩略图", "/Assets/Svg/image_icon.svg", NavigationViewItemEnum.ThumbnailPage),
-            new MoreMenuItem("浏览器", "115网页版，并附加下载选项", "/Assets/Svg/explorer_internet_logo_logos_icon.svg", NavigationViewItemEnum.BrowserPage),
-            new MoreMenuItem("计算Sha1", "计算本地文件的Sha1", "/Assets/Svg/accounting_banking_business_calculate_calculator_icon.svg", NavigationViewItemEnum.CalculateSha1Page)
-            {
-                Label = "测试中"
-            }
+        public static readonly PageEnumAndIsVisible[] DefaultMoreMenuItems = [
+            new PageEnumAndIsVisible(NavigationViewItemEnum.FilePage),
+            new PageEnumAndIsVisible(NavigationViewItemEnum.SpiderPage),
+            new PageEnumAndIsVisible(NavigationViewItemEnum.BrowserPage),
+            new PageEnumAndIsVisible(NavigationViewItemEnum.CalculateSha1Page),
         ];
     }
 

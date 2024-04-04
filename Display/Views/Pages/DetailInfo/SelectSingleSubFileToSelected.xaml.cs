@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Vo;
 
 namespace Display.Views.Pages.DetailInfo;
 
@@ -19,7 +20,7 @@ public sealed partial class SelectSingleSubFileToSelected
         InitializeComponent();
 
         SubInfoList = subList;
-        this.TrueName = trueName;
+        TrueName = trueName;
     }
 
 }

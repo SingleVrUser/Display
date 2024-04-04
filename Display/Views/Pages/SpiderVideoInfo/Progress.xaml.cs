@@ -1,14 +1,12 @@
-﻿// Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DataAccess.Dao.Interface;
+using DataAccess.Models.Entity;
 using Display.Helper.FileProperties.Name;
 using Display.Managers;
-using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
 using Display.Models.Vo;
@@ -27,17 +25,16 @@ public sealed partial class Progress
 {
     private readonly CancellationTokenSource _sCts = new();
     private List<string> SelectedFilesNameList { get; }
-    private List<Datum> _fileList = [];
+    private List<FilesInfo> _fileList = [];
     private readonly List<FailDatum> _failDatumList = [];
 
     private List<MatchVideoResult> _matchVideoResults;
-    //private GetInfoFromNetwork _network;
-    //private List<SpiderInfo> _spiderInfos;
-    //private List<string> _failVideoNameList;
-
     public Window CurrentWindow;
 
-    public Progress(List<string> selectedFilesNameList, List<Datum> fileList)
+    private readonly IFileToInfoDao _fileToInfoDao = App.GetService<IFileToInfoDao>();
+    private readonly IFilesInfoDao _filesInfoDao = App.GetService<IFilesInfoDao>();
+
+    public Progress(List<string> selectedFilesNameList, List<FilesInfo> fileList)
     {
         this.InitializeComponent();
         this.SelectedFilesNameList = selectedFilesNameList;
@@ -66,7 +63,12 @@ public sealed partial class Progress
             _matchVideoResults.Add(new MatchVideoResult { Status = true, OriginalName = item.Datum.Name, Message = "匹配成功", StatusCode = 1, MatchName = item.MatchName });
 
             //替换数据库的数据
-            DataAccess.Add.AddFileToInfo(item.Datum.PickCode, item.MatchName, isReplace: true);
+            _fileToInfoDao.Add(new FileToInfo
+            {
+                FilePickCode = item.Datum.PickCode,
+                Truename = item.MatchName
+            });
+            // DataAccessLocal.Add.AddFileToInfo(item.Datum.PickCode, item.MatchName, isReplace: true);
         }
 
         ////显示进度环
@@ -113,13 +115,21 @@ public sealed partial class Progress
 
         //目前datumList仅有一级目录文件
         //遍历获取文件列表中所有的文件
-        _fileList = await DataAccess.Get.GetAllFilesInFolderListAsync(_fileList);
+
+        var newList = new List<FilesInfo>();
+        foreach (var filesInfo in _fileList.Where(i=> i.FileId == null))
+        {
+            var allFilesInFolder = _filesInfoDao.GetAllFilesListByFolderId(filesInfo.CurrentId);
+            newList.AddRange(allFilesInFolder);
+        }
+        
+        _fileList.AddRange(newList);
 
         //除去文件夹
-        _fileList = _fileList.Where(item => item.Fid != null).ToList();
+        _fileList = _fileList.Where(item => item.FileId != null).ToList();
 
         //去除重复文件
-        var newDictList = new Dictionary<string, Datum>();
+        var newDictList = new Dictionary<string, FilesInfo>();
         _fileList.ForEach(item => newDictList.TryAdd(item.PickCode, item));
 
         _fileList = newDictList.Values.ToList();
@@ -143,7 +153,7 @@ public sealed partial class Progress
     /// 显示饼形图
     /// </summary>
     /// <param name="datumList"></param>
-    private void ShowFilesPieCharts(List<Datum> datumList)
+    private void ShowFilesPieCharts(List<FilesInfo> datumList)
     {
         FileInfoPieChart.Visibility = Visibility.Visible;
 
@@ -158,14 +168,14 @@ public sealed partial class Progress
         foreach (var info in datumList)
         {
             //文件夹，暂不统计
-            if (info.Fid == null)
+            if (info.FileId == null)
             {
 
             }
             //视频文件
             else if (info.Iv == 1)
             {
-                var videoQuality = FilesInfo.GetVideoQualityFromVdi(info.Vdi);
+                var videoQuality = DetailFileInfo.GetVideoQualityFromVdi(info.Vdi);
 
                 UpdateFileStaticstics(info, videoInfo, videoQuality);
             }
@@ -213,7 +223,7 @@ public sealed partial class Progress
     /// <param name="dataInfo"></param>
     /// <param name="typeInfo"></param>
     /// <param name="name"></param>
-    private void UpdateFileStaticstics(Datum dataInfo, FileStatistics typeInfo, string name)
+    private void UpdateFileStaticstics(FilesInfo dataInfo, FileStatistics typeInfo, string name)
     {
         typeInfo.Size += dataInfo.Size;
         typeInfo.Count++;

@@ -2,15 +2,16 @@
 using System.Linq;
 using Display.Models.Dto.Settings;
 using Display.Models.Enums;
+using Display.Views.Pages.Tasks;
 
 namespace Display.ViewModels;
 
 internal partial class TaskViewModel : ObservableObject
 {
-    public MenuItem[] NavLinks =
+    public readonly MenuItem[] NavLinks =
     [
-        new MenuItem("上传", "\uF6FA", NavigationViewItemEnum.UploadTask),
-        new MenuItem("搜刮", "\uF6FA", NavigationViewItemEnum.SpiderTask),
+        new MenuItem(NavigationViewItemEnum.UploadTask, "上传", "\uF6FA", typeof(UploadTaskPage) ),
+        new MenuItem(NavigationViewItemEnum.SpiderTask, "搜刮", "\uF6FA", typeof(SpiderTaskPage)),
     ];
 
     [ObservableProperty]

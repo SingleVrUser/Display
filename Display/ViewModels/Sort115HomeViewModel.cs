@@ -32,13 +32,13 @@ public partial class Sort115HomeViewModel : ObservableObject
     [ObservableProperty]
     private string _buttonName = StartName;
 
-    public int FolderCount => SelectedFiles.Count(model => model.Info.Type == FilesInfo.FileType.Folder);
+    public int FolderCount => SelectedFiles.Count(model => model.Info.Type == FileType.Folder);
 
-    public int FileCount => SelectedFiles.Count(model => model.Info.Type == FilesInfo.FileType.File);
+    public int FileCount => SelectedFiles.Count(model => model.Info.Type == FileType.File);
 
-    public void SetFiles(List<FilesInfo> files)
+    public void SetFiles(List<DetailFileInfo> files)
     {
-        foreach (var info in files.Where(info => info is { Type: FilesInfo.FileType.File }).OrderBy(info => info.Type))
+        foreach (var info in files.Where(info => info is { Type: FileType.File }).OrderBy(info => info.Type))
         {
             SelectedFiles.Add(new Sort115HomeModel(info));
         }

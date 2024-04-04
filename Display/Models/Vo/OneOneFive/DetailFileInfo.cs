@@ -1,21 +1,23 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using Windows.ApplicationModel;
-using Display.Models.Api.OneOneFive.File;
+using DataAccess.Models.Entity;
 using Display.Models.Api.OneOneFive.Search;
+using Display.Models.Enums;
 
 namespace Display.Models.Vo.OneOneFive;
 
 /// <summary>
 /// 文件详情展示
 /// </summary>
-public class FilesInfo : INotifyPropertyChanged
+public class DetailFileInfo : INotifyPropertyChanged
 {
-    public readonly Datum Datum;
+    public readonly FilesInfo Datum;
     public readonly long? Id;
     public readonly bool NoId;
     public readonly long Cid;
@@ -23,7 +25,7 @@ public class FilesInfo : INotifyPropertyChanged
     public readonly string Sha1;
     public readonly string PickCode;
     public readonly FileType Type;
-    public readonly int Time;
+    public readonly int? Time;
     public readonly bool IsVideo;
     public readonly bool IsImage;
 
@@ -46,7 +48,7 @@ public class FilesInfo : INotifyPropertyChanged
         }
     }
 
-    public FilesInfo(SearchDatum data)
+    public DetailFileInfo(SearchDatum data)
     {
         Name = data.Name;
         Time = data.TimeEdit;
@@ -97,7 +99,7 @@ public class FilesInfo : INotifyPropertyChanged
 
     }
 
-    public FilesInfo(FileUploadResult result)
+    public DetailFileInfo(FileUploadResult result)
     {
         Name = result.Name;
         Id = result.Id;
@@ -122,29 +124,29 @@ public class FilesInfo : INotifyPropertyChanged
         IconPath = GetPathFromIcon(Ico);
 
     }
-    public FilesInfo(Datum data)
+    public DetailFileInfo(FilesInfo data)
     {
         Datum = data;
         Name = data.Name;
         Time = data.TimeEdit;
 
         //文件夹
-        if (data.Fid == null && data.Pid != null)
+        if (data.FileId == null && data.ParentId != null)
         {
             Type = FileType.Folder;
-            Id = data.Cid;
-            Cid = (long)data.Pid;
+            Id = data.CurrentId;
+            Cid = (long)data.ParentId;
             PickCode = data.PickCode;
             IconPath = Constants.FileType.FolderSvgPath;
         }
-        else if (data.Fid != null)
+        else if (data.FileId != null)
         {
             Type = FileType.File;
-            Id = data.Fid;
-            Cid = data.Cid;
+            Id = data.FileId;
+            Cid = data.CurrentId;
             PickCode = data.PickCode;
             Size = data.Size;
-            Sha1 = data.Sha1;
+            Sha1 = data.Sha;
 
             //视频文件
             if (data.Iv == 1)
@@ -276,7 +278,7 @@ public class FilesInfo : INotifyPropertyChanged
                     if (key3 != ico) continue;
 
                     var tmpStringBuilder = new StringBuilder(Constants.FileType.FileTypeBasePath).Append(key).Append('/').Append(key2).Append(".svg");
-                    if (System.IO.File.Exists(Path.Combine(Package.Current.InstalledLocation.Path, tmpStringBuilder.ToString())))
+                    if (File.Exists(Path.Combine(Package.Current.InstalledLocation.Path, tmpStringBuilder.ToString())))
                     {
                         iconPath = tmpStringBuilder.Insert(0, Constants.FileType.MsUri).ToString();
                     }
@@ -312,22 +314,7 @@ public class FilesInfo : INotifyPropertyChanged
         return "unknown";
     }
 
-    public static string GetFileIconFromType(FileType fileType)
-    {
-        var iconUrl = Constants.FileType.UnknownSvgPath;
 
-        switch (fileType)
-        {
-            case FileType.Folder:
-                iconUrl = Constants.FileType.FolderSvgPath;
-                break;
-            case FileType.File:
-                iconUrl = Constants.FileType.UnknownSvgPath;
-                break;
-        }
-
-        return iconUrl;
-    }
 
     public event PropertyChangedEventHandler PropertyChanged;
 
@@ -335,6 +322,4 @@ public class FilesInfo : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-
-    public enum FileType { Folder, File };
 }

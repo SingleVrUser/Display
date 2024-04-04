@@ -1,8 +1,8 @@
 ﻿using DataAccess.Models.Enum;
 
-namespace DataAccess.Models.Vo;
+namespace DataAccess.Models.Dto;
 
-public class VideoInfoInFailStatusQueryVo
+public class VideoInfoInFailStatusQueryDto
 {
     //int offset = 0,
     //int limit = -1,

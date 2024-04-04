@@ -107,17 +107,17 @@
 
                 <TextBlock Grid.Row="0"
                            Grid.Column="1"
-                           Text="{x:Bind _viewModel.CurrentFileItem.NameWithoutExtension, Mode=OneWay}"
+                           Text="{x:Bind _viewModel.CurrentDetailFileItem.NameWithoutExtension, Mode=OneWay}"
                            TextTrimming="CharacterEllipsis" />
                 <TextBlock Grid.Row="1"
                            Grid.Column="1"
                            Text="{x:Bind _viewModel.CurrentThumbnailItem.Dimensions, Mode=OneWay}" />
                 <TextBlock Grid.Row="2"
                            Grid.Column="1"
-                           Text="{x:Bind _viewModel.CurrentFileItem.Size,Converter={StaticResource BytesToSizeStrConverter},Mode=OneWay}" />
+                           Text="{x:Bind _viewModel.CurrentDetailFileItem.Size,Converter={StaticResource BytesToSizeStrConverter},Mode=OneWay}" />
                 <TextBlock Grid.Row="3"
                            Grid.Column="1"
-                           Text="{x:Bind _viewModel.CurrentFileItem.Time, Converter={StaticResource NumberToDateTimeStrConverter}, Mode=OneWay}" />
+                           Text="{x:Bind _viewModel.CurrentDetailFileItem.Time, Converter={StaticResource NumberToDateTimeStrConverter}, Mode=OneWay}" />
 
                 <TextBlock Grid.Row="4"
                            Grid.Column="1"
@@ -200,7 +200,7 @@
                            RelativePanel.RightOf="BackButton"
                             RelativePanel.AlignVerticalCenterWithPanel="True"
                             Margin="0,0"
-                            Text="{x:Bind _viewModel.CurrentFileItem.Name, Mode=OneWay}"
+                            Text="{x:Bind _viewModel.CurrentDetailFileItem.Name, Mode=OneWay}"
                             Style="{StaticResource SubtitleTextBlockStyle}"
                             IsTextSelectionEnabled="True" />
 

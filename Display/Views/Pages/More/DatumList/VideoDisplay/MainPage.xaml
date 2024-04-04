@@ -9,9 +9,7 @@
       xmlns:controls="using:CommunityToolkit.WinUI.Controls"
       xmlns:providers="using:Display.Providers"
       xmlns:userController="using:Display.Controls.UserController"
-      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
       xmlns:videoDisplay="using:Display.Views.Pages.More.DatumList.VideoDisplay"
-      xmlns:file="using:Display.Models.Api.OneOneFive.File"
       xmlns:oneOneFive1="using:Display.Models.Vo.OneOneFive"
       mc:Ignorable="d">
 
@@ -75,7 +73,7 @@
                                           Drop="Target_Drop"
                                           DragEnter="Target_DragEnter">
                                     <ListView.ItemTemplate>
-                                    <DataTemplate x:DataType="oneOneFive1:FilesInfo">
+                                    <DataTemplate x:DataType="oneOneFive1:DetailFileInfo">
                                             <Grid ColumnSpacing="5"
                                                   DoubleTapped="OpenFolder_Tapped">
                                                 <Grid.ContextFlyout>
@@ -204,7 +202,7 @@
                                           SelectionMode="Single"
                                           ItemsSource="{x:Bind _playingVideoInfos}">
                                     <ListView.ItemTemplate>
-                                    <DataTemplate x:DataType="oneOneFive1:FilesInfo">
+                                    <DataTemplate x:DataType="oneOneFive1:DetailFileInfo">
                                             <Grid ColumnSpacing="5">
                                                 <Grid.ContextFlyout>
                                                     <MenuFlyout>

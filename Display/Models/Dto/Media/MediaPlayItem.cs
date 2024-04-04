@@ -3,6 +3,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media.Playback;
+using DataAccess.Dao.Impl;
+using DataAccess.Dao.Interface;
+using DataAccess.Models.Entity;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.Network;
 using Display.Models.Api.OneOneFive.File;
@@ -13,7 +16,7 @@ using Display.Models.Enums;
 using Display.Models.Vo;
 using Display.Models.Vo.OneOneFive;
 using Display.Providers;
-using Display.Providers.Downloader;
+using SharpCompress;
 
 namespace Display.Models.Dto.Media;
 
@@ -29,20 +32,23 @@ public class MediaPlayItem
     public readonly long Cid;
     public string Description { get; set; }
     private List<M3U8Info> _m3U8Infos;
-    private readonly FilesInfo.FileType _type;
+    private readonly FileType _type;
 
-    private FailInfo _failInfo;
 
-    public FailInfo GetFailInfo()
+    private readonly IVideoInfoDao _videoInfoDao = App.GetService<IVideoInfoDao>();
+
+    private FailListIsLikeLookLater _failInfo;
+    
+    public FailListIsLikeLookLater GetFailInfo()
     {
-        return _failInfo ??= DataAccess.Get.GetSingleFailInfoByPickCode(PickCode);
+        return _failInfo ??= DataAccessLocal.Get.GetSingleFailInfoByPickCode(PickCode);
     }
 
     private VideoInfo _videoInfo;
 
     public VideoInfo GetVideoInfo()
     {
-        return _videoInfo ??= DataAccess.Get.GetSingleVideoInfoByTrueName(TrueName);
+        return _videoInfo ??= _videoInfoDao.GetOneByTrueName(TrueName);
     }
 
     public List<Quality> QualityInfos;
@@ -53,23 +59,23 @@ public class MediaPlayItem
     public bool IsRequestM3U8;
     public bool IsRequestOriginal;
 
-    public MediaPlayItem(FilesInfo filesInfo)
-        : this(filesInfo.PickCode, filesInfo.Name, filesInfo.Cid, filesInfo.Id, filesInfo.Size, filesInfo.Type)
+    public MediaPlayItem(DetailFileInfo detailFileInfo)
+        : this(detailFileInfo.PickCode, detailFileInfo.Name, detailFileInfo.Cid, detailFileInfo.Id, detailFileInfo.Size, detailFileInfo.Type)
     {
     }
 
-    public MediaPlayItem(Datum datum)
-        : this(datum.PickCode, datum.Name, datum.Cid, datum.Fid, datum.Size, datum.Fid is null ? FilesInfo.FileType.Folder : FilesInfo.FileType.File)
+    public MediaPlayItem(FilesInfo datum)
+        : this(datum.PickCode, datum.Name, datum.CurrentId, datum.FileId, datum.Size, datum.FileId is null ? FileType.Folder : FileType.File)
     {
     }
 
     public MediaPlayItem(FailVideoInfo failInfo)
-        : this(failInfo.PickCode, failInfo.FileName, failInfo.Cid, failInfo.Fid, failInfo.Size, FilesInfo.FileType.File)
+        : this(failInfo.PickCode, failInfo.FileName, failInfo.Cid, failInfo.Fid, failInfo.Size, FileType.File)
     {
 
     }
 
-    public MediaPlayItem(string pickCode, string fileName, long cid, long? fid, long? size, FilesInfo.FileType type)
+    private MediaPlayItem(string pickCode, string fileName, long cid, long? fid, long? size, FileType type)
     {
         Fid = fid;
         PickCode = pickCode;
@@ -84,12 +90,14 @@ public class MediaPlayItem
         Size = size;
         Cid = cid;
 
-        if (!AppSettings.IsFindSub || string.IsNullOrEmpty(pickCode) || type == FilesInfo.FileType.Folder) return;
+        if (!AppSettings.IsFindSub || string.IsNullOrEmpty(pickCode) || type == FileType.Folder) return;
 
         // 加载字幕
-        SubInfos = new List<SubInfo>();
-        var subDict = DataAccess.Get.GetSubFile(pickCode);
-        subDict.ToList().ForEach(item => SubInfos.Add(new SubInfo(item.Key, item.Value, pickCode, TrueName)));
+        var subArray = DataAccessLocal.Get.GetSubFile(pickCode);
+        
+        SubInfos = [];
+        subArray.ForEach(i =>
+            SubInfos.Add(new SubInfo(i.PickCode, i.Name, TrueName)));
         SubInfos = SubInfos.OrderBy(item => item.Name).ToList();
     }
 
@@ -213,13 +221,13 @@ public class MediaPlayItem
 
         foreach (var playItem in oldMediaPlayItems)
         {
-            if (playItem._type == FilesInfo.FileType.Folder)
+            if (playItem._type == FileType.Folder)
             {
                 var fileInfos = await webApi.GetFileAsync(playItem.Cid, loadAll: true);
 
                 newMediaPlayItems.AddRange(
                     fileInfos.Data
-                        .Where(x => x.Fid != null && x.Iv == 1)
+                        .Where(x => x.FileId != null && x.Iv == 1)
                         .Select(x => new MediaPlayItem(x)));
             }
             else

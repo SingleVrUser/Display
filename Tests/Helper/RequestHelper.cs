@@ -1,50 +1,49 @@
 ﻿using Display.Helper.Network;
 
-namespace Tests.Helper
+namespace Tests.Helper;
+
+public static class RequestHelper
 {
-    public class RequestHelper
+    private const string Cookie = UserInfo.Cookie;
+
+    private static HttpClient? _uploadClient;
+    public static HttpClient UploadClient
     {
-        private const string Cookie = UserInfo.Cookie;
-
-        private static HttpClient? _uploadClient;
-        public static HttpClient UploadClient
+        get
         {
-            get
+            if (_uploadClient != null) return _uploadClient;
+
+            var headers = new Dictionary<string, string>
             {
-                if (_uploadClient != null) return _uploadClient;
+                { "user-agent", Display.Constants.DefaultSettings.Network._115.UploadUserAgent },
+                { "Cookie", Cookie }
+            };
 
-                var headers = new Dictionary<string, string>
-                {
-                    { "user-agent", Display.Constants.DefaultSettings.Network._115.UploadUserAgent },
-                    { "Cookie", Cookie }
-                };
+            _uploadClient = NetworkHelper.CreateClient(headers);
 
-                _uploadClient = NetworkHelper.CreateClient(headers);
-
-                return _uploadClient;
-            }
+            return _uploadClient;
         }
-
-        private static HttpClient? _downClient;
-        public static HttpClient DownloadClient
-        {
-            get
-            {
-                if (_downClient != null) return _downClient;
-
-                var headers = new Dictionary<string, string>
-                {
-                    { "user-agent", Display.Constants.DefaultSettings.Network._115.DownUserAgent },
-                    { "Cookie", Cookie }
-                };
-
-                _downClient = NetworkHelper.CreateClient(headers);
-
-                return _downClient;
-            }
-        }
-
-
-
     }
+
+    private static HttpClient? _downClient;
+    public static HttpClient DownloadClient
+    {
+        get
+        {
+            if (_downClient != null) return _downClient;
+
+            var headers = new Dictionary<string, string>
+            {
+                { "user-agent", Display.Constants.DefaultSettings.Network._115.DownUserAgent },
+                { "Cookie", Cookie }
+            };
+
+            _downClient = NetworkHelper.CreateClient(headers);
+
+            return _downClient;
+        }
+    }
+
+
+
 }

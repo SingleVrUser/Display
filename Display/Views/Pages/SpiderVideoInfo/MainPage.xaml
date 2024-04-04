@@ -6,7 +6,6 @@
       xmlns:controls="using:CommunityToolkit.WinUI.Controls"
       xmlns:winUi="using:CommunityToolkit.WinUI"
       xmlns:userController="using:Display.Controls.UserController"
-      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
       xmlns:vo="using:Display.Models.Vo"
       mc:Ignorable="d">
 
@@ -299,7 +298,7 @@
 
                             <userController:TextBlockWithLongText Grid.Column="1"
                                                                   Grid.Row="0"
-                                                                  StringValue="{x:Bind SelectedDatum.Fid,Mode=OneWay}" />
+                                                                  StringValue="{x:Bind SelectedDatum.FileId,Mode=OneWay}" />
                             <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="1"
                                                            StringValue="{x:Bind SelectedDatum.Uid,Mode=OneWay}" />
@@ -308,7 +307,7 @@
                                                            StringValue="{x:Bind SelectedDatum.Aid,Mode=OneWay}" />
                             <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="3"
-                                                           StringValue="{x:Bind SelectedDatum.Cid,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.CurrentId,Mode=OneWay}" />
                             <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="4"
                                                            StringValue="{x:Bind SelectedDatum.Name,Mode=OneWay}" />
@@ -323,7 +322,7 @@
                                                            StringValue="{x:Bind SelectedDatum.Pt,Mode=OneWay}" />
                             <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="8"
-                                                           StringValue="{x:Bind SelectedDatum.Pid,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.ParentId,Mode=OneWay}" />
                             <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="9"
                                                            StringValue="{x:Bind SelectedDatum.PickCode,Mode=OneWay}" />
@@ -359,7 +358,7 @@
                                                            StringValue="{x:Bind SelectedDatum.Ico,Mode=OneWay}" />
                             <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="20"
-                                                           StringValue="{x:Bind SelectedDatum.Sha1,Mode=OneWay}" />
+                                                           StringValue="{x:Bind SelectedDatum.Sha,Mode=OneWay}" />
                             <userController:TextBlockWithLongText Grid.Column="1"
                                                            Grid.Row="21"
                                                            StringValue="{x:Bind SelectedDatum.Fdes,Mode=OneWay}" />

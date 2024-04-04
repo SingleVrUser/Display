@@ -2,11 +2,13 @@
 // Licensed under the MIT License.
 
 using System.Windows.Input;
+using Display.Models.Enums;
+using Display.Models.Vo.OneOneFive;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using static Display.Models.Vo.OneOneFive.FilesInfo;
+using static Display.Models.Vo.OneOneFive.DetailFileInfo;
 
 
 namespace Display.Controls.UserController;

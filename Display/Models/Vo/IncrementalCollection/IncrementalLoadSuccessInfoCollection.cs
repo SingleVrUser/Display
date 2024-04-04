@@ -8,9 +8,9 @@ using Display.Providers;
 using Microsoft.UI.Xaml.Data;
 using SharpCompress;
 
-namespace Display.Models.Data.IncrementalCollection;
+namespace Display.Models.Vo.IncrementalCollection;
 
-public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCoverDisplayClass>, ISupportIncrementalLoading
+public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoInfoVo>, ISupportIncrementalLoading
 {
     private const int DefaultCount = 30;
     private double ImageWidth { get; set; }
@@ -43,21 +43,22 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
         SetImageSize(imgWidth, imgHeight);
     }
 
-    public async Task LoadData(int startShowCount = 20)
+    public Task LoadData(int startShowCount = 20)
     {
         Clear();
-        var newItems = await DataAccess.Get.GetVideoInfo(startShowCount, 0, OrderBy, IsDesc, FilterConditionList, FilterKeywords, Ranges, IsFuzzyQueryActor);
+        var newItems = DataAccessLocal.Get.GetVideoInfo(startShowCount, 0, OrderBy, IsDesc, FilterConditionList, FilterKeywords, Ranges, IsFuzzyQueryActor);
 
-        var successCount = DataAccess.Get.GetCountOfVideoInfo(FilterConditionList, FilterKeywords, Ranges);
+        var successCount = DataAccessLocal.Get.GetCountOfVideoInfo(FilterConditionList, FilterKeywords, Ranges);
         var failCount = 0;
         if (IsContainFail)
         {
-            failCount = DataAccess.Get.GetCountOfFailFileInfoWithDatum(0, -1, FilterKeywords);
+            failCount = DataAccessLocal.Get.GetCountOfFailFileInfoWithFilesInfo(0, -1, FilterKeywords);
         }
 
         AllCount = successCount + failCount;
 
-        newItems?.ForEach(item => Add(new VideoCoverDisplayClass(item, ImageWidth, ImageHeight)));
+        newItems?.ForEach(item => Add(new VideoInfoVo(item, ImageWidth, ImageHeight)));
+        return Task.CompletedTask;
     }
 
     public void SetImageSize(double imgWidth, double imgHeight)
@@ -81,8 +82,8 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
 
     public void SetOrder(string orderBy, bool isDesc)
     {
-        this.OrderBy = orderBy;
-        this.IsDesc = isDesc;
+        OrderBy = orderBy;
+        IsDesc = isDesc;
     }
 
     public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
@@ -93,7 +94,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
 
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync()
     {
-        var lists = await DataAccess.Get.GetVideoInfo(DefaultCount, Count, OrderBy, IsDesc, FilterConditionList, FilterKeywords, Ranges, IsFuzzyQueryActor);
+        var lists = DataAccessLocal.Get.GetVideoInfo(DefaultCount, Count, OrderBy, IsDesc, FilterConditionList, FilterKeywords, Ranges, IsFuzzyQueryActor);
 
         //在最后的时候加载匹配失败的
         //用于展示搜索结果
@@ -105,12 +106,12 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
             //无筛选功能
             if (IsContainFail)
             {
-                var failList = await DataAccess.Get.GetFailFileInfoWithDatum(0, -1, FilterKeywords);
+                var failList = DataAccessLocal.Get.GetFailFileInfoWithFilesInfo(0, -1, FilterKeywords);
                 failList?.ForEach(item => Add(new FailVideoInfo(new FailVideoInfo(item), ImageWidth, ImageHeight)));
             }
         }
 
-        lists?.ForEach(item => Add(new VideoCoverDisplayClass(item, ImageWidth, ImageHeight)));
+        lists?.ForEach(item => Add(new VideoInfoVo(item, ImageWidth, ImageHeight)));
 
         return new LoadMoreItemsResult
         {

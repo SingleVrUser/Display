@@ -10,13 +10,11 @@ using Display.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
 namespace Display.Views.Pages.Settings;
 
 public sealed partial class UIShowPage
 {
+    // 首次启动展示的页面
     private readonly List<PageEnumAndName> _startPageList = [
         new PageEnumAndName(NavigationViewItemEnum.HomePage, "主页"),
         new PageEnumAndName(NavigationViewItemEnum.VideoViewPage, "展示"),
@@ -122,4 +120,25 @@ public sealed partial class UIShowPage
         e.DragUIOverride.IsGlyphVisible = false;
     }
 
+    private void MoreMenuItemIsVisibleChanged_OnClick(object sender, RoutedEventArgs e)
+    {
+        _viewModel.MoreNavigationItemViewModel.SaveSetting();
+    }
+
+    private void MoreMenuItems_OnDragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+    {
+        _viewModel.MoreNavigationItemViewModel.SaveSetting();
+    }
+
+    private void MenuItemIsVisibleChanged_OnClick(object sender, RoutedEventArgs e)
+    {
+        _viewModel.NavigationItemViewModel.SaveMenuItemEnumArray();
+        _viewModel.NavigationItemViewModel.SaveFootMenuItemEnumArray();
+    }
+
+    private void MenuItemListView_OnDragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+    {
+        _viewModel.NavigationItemViewModel.SaveMenuItemEnumArray();
+        _viewModel.NavigationItemViewModel.SaveFootMenuItemEnumArray(); 
+    }
 }

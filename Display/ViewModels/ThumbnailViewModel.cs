@@ -22,7 +22,7 @@ namespace Display.ViewModels;
 internal partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGeneratorService) : ObservableObject
 {
     private string _videoUrl;
-    private List<FilesInfo> _fileInfos;
+    private List<DetailFileInfo> _fileInfos;
 
     [ObservableProperty]
     private bool _loading;
@@ -30,7 +30,7 @@ internal partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGe
     internal readonly ObservableCollection<GroupThumbnailCollection> ThumbnailList = [];
 
     [ObservableProperty]
-    private FilesInfo _currentFileItem;
+    private DetailFileInfo _currentDetailFileItem;
 
     [ObservableProperty]
     private LocalThumbnail _currentThumbnailItem;
@@ -46,12 +46,12 @@ internal partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGe
             if (collection.All(item => dst != item)) continue;
 
             CurrentThumbnailItem = (LocalThumbnail)dst;
-            CurrentFileItem = _fileInfos[i];
+            CurrentDetailFileItem = _fileInfos[i];
             return;
         }
     }
 
-    public void SetData(List<FilesInfo> fileInfos)
+    public void SetData(List<DetailFileInfo> fileInfos)
     {
         _fileInfos = fileInfos;
 
@@ -153,9 +153,9 @@ internal partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGe
             if (collection.All(item => dst != item)) continue;
 
             // 从115中删除 
-            Debug.WriteLine($"删除{CurrentFileItem.Cid}下的{CurrentFileItem.Id}");
-            var deleteResult = CurrentFileItem.Id != null && await WebApi.GlobalWebApi.DeleteFiles(CurrentFileItem.Cid,
-                [(long)CurrentFileItem.Id]);
+            Debug.WriteLine($"删除{CurrentDetailFileItem.Cid}下的{CurrentDetailFileItem.Id}");
+            var deleteResult = CurrentDetailFileItem.Id != null && await WebApi.GlobalWebApi.DeleteFiles(CurrentDetailFileItem.Cid,
+                [(long)CurrentDetailFileItem.Id]);
 
             if (!deleteResult) return;
             _fileInfos.RemoveAt(i); // 要在ThumbnailList的Remove之前执行
@@ -168,7 +168,7 @@ internal partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGe
     }
 }
 
-public class GroupThumbnailCollection(FilesInfo info)
+public class GroupThumbnailCollection(DetailFileInfo info)
     : ObservableCollection<object>(new ObservableCollection<LocalThumbnail>())
 {
     public readonly string PickCode = info.PickCode;

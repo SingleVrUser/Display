@@ -2,6 +2,6 @@
 
 namespace DataAccess.Dao.Interface;
 
-internal interface IBwhDao : IDao<Bwh>
+public interface IBwhDao : IDao<Bwh>
 {
 }

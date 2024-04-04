@@ -19,7 +19,7 @@
             <ItemsWrapGrid Orientation="Horizontal" ItemHeight="100" ItemWidth="100"/>
         </ItemsPanelTemplate>
 
-        <DataTemplate x:DataType="oneOneFive:FilesInfo" x:Name="ListViewDataTemplate">
+        <DataTemplate x:DataType="oneOneFive:DetailFileInfo" x:Name="ListViewDataTemplate">
             <Grid ColumnDefinitions="32,*"
                   ColumnSpacing="10"
                   ToolTipService.ToolTip="{x:Bind Name}">
@@ -37,7 +37,7 @@
             </Grid>
         </DataTemplate>
 
-        <DataTemplate x:DataType="oneOneFive:FilesInfo" x:Name="GridViewDataTemplate">
+        <DataTemplate x:DataType="oneOneFive:DetailFileInfo" x:Name="GridViewDataTemplate">
             <Grid RowDefinitions="*,auto"
                   Padding="5"
                   ToolTipService.ToolTip="{x:Bind Name}">

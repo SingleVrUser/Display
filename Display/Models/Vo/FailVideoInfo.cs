@@ -1,10 +1,8 @@
-﻿using Display.Models.Api.OneOneFive.File;
-using Display.Models.Entities.OneOneFive;
-using Display.Models.Vo;
+﻿using DataAccess.Models.Entity;
 
-namespace Display.Models.Dto.OneOneFive;
+namespace Display.Models.Vo;
 
-public class FailVideoInfo : VideoCoverDisplayClass
+public class FailVideoInfo : VideoInfoVo
 {
     public long Cid { get; }
 
@@ -23,16 +21,16 @@ public class FailVideoInfo : VideoCoverDisplayClass
 
     }
 
-    public FailVideoInfo(Datum failDatum)
+    public FailVideoInfo(FilesInfo failDatum)
     {
         TrueName = failDatum.Name;
         ImagePath = "ms-appx:///Assets/Fail.jpg";
-        busUrl = ImagePath;
+        Url = ImagePath;
         Series = "fail";
         ReleaseTime = failDatum.Time;
 
-        Cid = failDatum.Cid;
-        Fid = failDatum.Fid;
+        Cid = failDatum.CurrentId;
+        Fid = failDatum.FileId;
         PickCode = failDatum.PickCode;
         FileName = failDatum.Name;
         Size = failDatum.Size;

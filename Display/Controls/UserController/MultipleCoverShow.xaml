@@ -7,6 +7,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
              xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
+             xmlns:vo="using:Display.Models.Vo"
              mc:Ignorable="d">
 
     <!--<UserControl.Resources>
@@ -84,7 +85,7 @@
                               ScrollViewer.HorizontalScrollMode="Enabled">
                 <oldControls:AdaptiveGridView.ItemTemplate>
 
-                    <DataTemplate x:DataType="oneOneFive:VideoCoverDisplayClass">
+                    <DataTemplate x:DataType="vo:VideoInfoVo">
                         <Border PointerEntered="Image_PointerEntered"
                                 PointerExited="Image_PointerExited"
                                 CornerRadius="2">

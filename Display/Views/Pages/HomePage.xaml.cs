@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Display.Models.Data.IncrementalCollection;
-using Display.Models.Dto.OneOneFive;
-using Display.Models.Entities.OneOneFive;
+using DataAccess.Dao.Interface;
+using DataAccess.Models.Entity;
 using Display.Models.Vo;
-using Display.Providers;
+using Display.Models.Vo.IncrementalCollection;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -19,15 +18,17 @@ namespace Display.Views.Pages;
 
 public sealed partial class HomePage
 {
-    private readonly IncrementalLoadSuccessInfoCollection _items;
-    private readonly ObservableCollection<VideoCoverDisplayClass> _lookLaterList = new();
-    private readonly ObservableCollection<VideoCoverDisplayClass> _recentCoverList = new();
-    private readonly ObservableCollection<VideoCoverDisplayClass> _loveCoverList = new();
+    private readonly IncrementalLoadSuccessInfoCollection _recentList;
+    private readonly ObservableCollection<VideoInfoVo> _lookLaterList = [];
+    private readonly ObservableCollection<VideoInfoVo> _recentCoverList = [];
+    private readonly ObservableCollection<VideoInfoVo> _loveCoverList = [];
+
+    private readonly IVideoInfoDao _videoInfoDao = App.GetService<IVideoInfoDao>();
 
     //过渡动画用
     private enum NavigationAnimationType { Image, GridView };
     private NavigationAnimationType _navigationType;
-    private VideoCoverDisplayClass _storedItem;
+    private VideoInfoVo _storedItem;
     private GridView _storedGridView;
     private Image _storedImage;
 
@@ -38,21 +39,21 @@ public sealed partial class HomePage
         //启动缓存
         NavigationCacheMode = NavigationCacheMode.Required;
 
-        _items = new IncrementalLoadSuccessInfoCollection();
-        _items.SetOrder("random", true);
+        _recentList = [];
+        _recentList.SetOrder("random", true);
 
         LoadCover();
     }
 
-    private async void LoadCover()
+    private void LoadCover()
     {
         //随机获取20个视频，每次启动自动获取一遍
-        var imageList = await DataAccess.Get.GetNameAndImageRandom();
+        var imageList = _videoInfoDao.GetRandomList(10);
         if (imageList == null) return;
 
-        foreach (var info in imageList.Select(item => new VideoCoverDisplayClass(item, 500, 300)))
+        foreach (var info in imageList.Select(item => new VideoInfoVo(item, 500, 300)))
         {
-            _items.Add(info);
+            _recentList.Add(info);
         }
 
         //var binding = new Binding { Path = new PropertyPath("SelectedIndex"), Mode = BindingMode.TwoWay };
@@ -61,7 +62,7 @@ public sealed partial class HomePage
 
     private void MultipleCoverShow_ItemClick(object sender, ItemClickEventArgs e)
     {
-        var coverInfo = (VideoCoverDisplayClass)e.ClickedItem;
+        var coverInfo = (VideoInfoVo)e.ClickedItem;
 
         _storedItem = coverInfo;
         _storedGridView = (GridView)sender;
@@ -75,11 +76,11 @@ public sealed partial class HomePage
 
     private void Image_Tapped(object sender, TappedRoutedEventArgs e)
     {
-        if (!(sender is Image image)) return;
+        if (sender is not Image image) return;
 
         _storedImage = image;
 
-        VideoCoverDisplayClass coverInfo = _storedImage.DataContext as VideoCoverDisplayClass;
+        var coverInfo = _storedImage.DataContext as VideoInfoVo;
 
         _navigationType = NavigationAnimationType.Image;
 
@@ -90,16 +91,12 @@ public sealed partial class HomePage
 
     private void Image_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        //Grid grid = sender as Grid;
-        //grid.BorderBrush = new SolidColorBrush(Microsoft.UI.Colors.LightGray);
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
 
     }
 
     private void Image_PointerExited(object sender, PointerRoutedEventArgs e)
     {
-        //Grid grid = sender as Grid;
-        //grid.BorderBrush = null;
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
     }
 
@@ -107,7 +104,7 @@ public sealed partial class HomePage
     {
         if (sender is not ListView listView) return;
 
-        if (videoInfoListView.ItemsSource is not ObservableCollection<VideoCoverDisplayClass> items) return;
+        if (videoInfoListView.ItemsSource is not ObservableCollection<VideoInfoVo> items) return;
 
         if (listView.SelectedItem is not VideoInfo videoInfo) return;
 
@@ -116,29 +113,6 @@ public sealed partial class HomePage
             videoInfoListView.ScrollIntoView(videoInfo);
         }
     }
-
-    //private async void UpdateRandomCover_Click(object sender, RoutedEventArgs e)
-    //{
-    //    RefreshHyperlinkButton.IsEnabled = false;
-
-    //    ImagePipsPager.ClearValue(PipsPager.SelectedPageIndexProperty);
-    //    videoInfoListView.SelectionChanged -= videoInfoListView_SelectionChanged;
-
-    //    Items.Clear();
-
-    //    //随机获取10个视频
-    //    foreach (var item in await DataAccess.Get.GetNameAndImageRandom())
-    //    {
-    //        Items.Add(new VideoCoverDisplayClass(item, 500, 300));
-    //    }
-
-    //    videoInfoListView.SelectionChanged += videoInfoListView_SelectionChanged;
-
-    //    var binding = new Binding { Path = new PropertyPath("SelectedIndex"), Mode = BindingMode.TwoWay };
-    //    ImagePipsPager.SetBinding(PipsPager.SelectedPageIndexProperty, binding);
-
-    //    RefreshHyperlinkButton.IsEnabled = true;
-    //}
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
@@ -170,7 +144,7 @@ public sealed partial class HomePage
         TryUpdateCoverShow();
     }
 
-    private void TryUpdateVideoCoverDisplayClass(VideoInfo[] videoInfos, ObservableCollection<VideoCoverDisplayClass> videoList)
+    private void TryUpdateVideoCoverDisplayClass(VideoInfo[] videoInfos, ObservableCollection<VideoInfoVo> videoList)
     {
         if (videoInfos == null) return;
 
@@ -178,7 +152,7 @@ public sealed partial class HomePage
         var addList = new List<VideoInfo>();
         foreach (var item in videoInfos)
         {
-            bool isAdd = true;
+            var isAdd = true;
             foreach (var showItem in videoList)
             {
                 if (showItem.TrueName == item.TrueName)
@@ -197,7 +171,7 @@ public sealed partial class HomePage
         var delList = new List<string>();
         foreach (var showItem in videoList)
         {
-            bool isDel = true;
+            var isDel = true;
             foreach (var item in videoInfos)
             {
                 if (showItem.TrueName == item.TrueName)
@@ -219,42 +193,42 @@ public sealed partial class HomePage
         }
         foreach (var item in addList)
         {
-            videoList.Add(new VideoCoverDisplayClass(item, 500, 300));
+            videoList.Add(new VideoInfoVo(item, 500, 300));
         }
     }
 
     private void MoreLikeVideoClick(object sender, RoutedEventArgs e)
     {
-        Tuple<List<string>, string, bool> TypesAndName = new(new() { "is_like" }, "1", false);
+        Tuple<List<string>, string, bool> typesAndName = new(["is_like"], "1", false);
 
-        Frame.Navigate(typeof(VideoCoverPage), TypesAndName);
+        Frame.Navigate(typeof(VideoCoverPage), typesAndName);
     }
 
     private void MoreLookLaterVideoClick(object sender, RoutedEventArgs e)
     {
-        Tuple<List<string>, string, bool> TypesAndName = new(new() { "look_later" }, "1", false);
+        Tuple<List<string>, string, bool> typesAndName = new(["look_later"], "1", false);
 
-        Frame.Navigate(typeof(VideoCoverPage), TypesAndName);
+        Frame.Navigate(typeof(VideoCoverPage), typesAndName);
     }
 
     private async void RefreshNewestVideoButtonClick(object sender, RoutedEventArgs e)
     {
         _recentCoverList.Clear();
 
-        foreach (var videoInfo in await DataAccess.Get.GetNameAndImageRecent())
+        foreach (var videoInfo in _videoInfoDao.GetLookLaterList(10))
         {
-            _recentCoverList.Add(new VideoCoverDisplayClass(videoInfo, 500, 300));
+            _recentCoverList.Add(new VideoInfoVo(videoInfo, 500, 300));
         }
 
     }
 
-    private async void RefreshLookLaterVideoButtonClick(object sender, RoutedEventArgs e)
+    private void RefreshLookLaterVideoButtonClick(object sender, RoutedEventArgs e)
     {
         _lookLaterList.Clear();
 
-        foreach (var videoInfo in await DataAccess.Get.GetNameAndImageFromLookLater())
+        foreach (var videoInfo in _videoInfoDao.GetLookLaterList(10))
         {
-            _lookLaterList.Add(new VideoCoverDisplayClass(videoInfo, 500, 300));
+            _lookLaterList.Add(new VideoInfoVo(videoInfo, 500, 300));
         }
     }
 
@@ -262,19 +236,19 @@ public sealed partial class HomePage
     {
         _loveCoverList.Clear();
 
-        foreach (var videoInfo in await DataAccess.Get.GetNameAndImageFromLike())
+        foreach (var videoInfo in _videoInfoDao.GetLikeList(10))
         {
-            _loveCoverList.Add(new VideoCoverDisplayClass(videoInfo, 500, 300));
+            _loveCoverList.Add(new VideoInfoVo(videoInfo, 500, 300));
         }
     }
 
-    private async void TryUpdateCoverShow()
+    private void TryUpdateCoverShow()
     {
         //最近视频
-        TryUpdateVideoCoverDisplayClass(await DataAccess.Get.GetNameAndImageRecent(), _recentCoverList);
+        TryUpdateVideoCoverDisplayClass(_videoInfoDao.GetRecentList(10), _recentCoverList);
         //稍后观看
-        TryUpdateVideoCoverDisplayClass(await DataAccess.Get.GetNameAndImageFromLookLater(), _lookLaterList);
+        TryUpdateVideoCoverDisplayClass(_videoInfoDao.GetLookLaterList(10), _lookLaterList);
         //喜欢视频
-        TryUpdateVideoCoverDisplayClass(await DataAccess.Get.GetNameAndImageFromLike(), _loveCoverList);
+        TryUpdateVideoCoverDisplayClass(_videoInfoDao.GetLikeList(10), _loveCoverList);
     }
 }

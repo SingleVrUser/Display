@@ -1,4 +1,5 @@
 ﻿using ByteSizeLib;
+using DataAccess.Models.Entity;
 using Display.Helper.Date;
 using Display.Models.Api.OneOneFive.File;
 
@@ -39,19 +40,19 @@ public class FileCategory
     
     public int file_category { get; set; }
     
-    public ParentPath[] paths { get; set; }
+    public ParentPath[] Paths { get; set; }
 
-    public int allCount => count + folder_count;
+    public int AllCount => count + folder_count;
 
-    public static Datum ConvertFolderToDatum(FileCategory fileCategory, long cid)
+    public static FilesInfo ConvertFolderToDatum(FileCategory fileCategory, long cid)
     {
-        Datum datum = new()
+        FilesInfo datum = new()
         {
             Uid = 0,
             Aid = 1,
-            Cid = cid,
+            CurrentId = cid,
             Name = fileCategory.file_name,
-            Pid = fileCategory.paths[^1].FileId,
+            ParentId = fileCategory.Paths[^1].FileId,
             PickCode = fileCategory.pick_code,
             Time = DateHelper.ConvertInt32ToDateTime(fileCategory.utime),
             TimeProduce = fileCategory.ptime,
@@ -66,7 +67,7 @@ public class FileCategory
 
     }
 
-    public FileCategory(Datum datum)
+    public FileCategory(FilesInfo datum)
     {
         file_name = datum.Name;
         pick_code = datum.PickCode;
@@ -74,7 +75,7 @@ public class FileCategory
         file_category = 1;
         utime = datum.TimeEdit;
         ptime = datum.TimeProduce;
-        sha1 = datum.Sha1;
+        sha1 = datum.Sha;
         size = ByteSize.FromBytes(datum.Size).ToString("#.#");
     }
 }

@@ -14,7 +14,7 @@ using SharpCompress;
 namespace Display.Models.Vo.IncrementalCollection;
 
 internal class IncrementalLoadDatumCollection(long cid, bool isOnlyFolder = false)
-    : ObservableCollection<FilesInfo>, ISupportIncrementalLoading
+    : ObservableCollection<DetailFileInfo>, ISupportIncrementalLoading
 {
     private WebApi WebApi { get; } = WebApi.GlobalWebApi;
 
@@ -51,7 +51,7 @@ internal class IncrementalLoadDatumCollection(long cid, bool isOnlyFolder = fals
         }
     }
 
-    public new void Insert(int index, FilesInfo item)
+    public new void Insert(int index, DetailFileInfo item)
     {
         base.Insert(index, item);
         AllCount++;
@@ -59,7 +59,7 @@ internal class IncrementalLoadDatumCollection(long cid, bool isOnlyFolder = fals
         if (IsNull) IsNull = false;
     }
 
-    public void AddArray(FilesInfo[] items)
+    public void AddArray(DetailFileInfo[] items)
     {
         items.ForEach(Add);
         AllCount += items.Length;
@@ -67,7 +67,7 @@ internal class IncrementalLoadDatumCollection(long cid, bool isOnlyFolder = fals
         if (IsNull) IsNull = false;
     }
 
-    public new void Remove(FilesInfo item)
+    public new void Remove(DetailFileInfo item)
     {
         base.Remove(item);
         AllCount--;
@@ -135,7 +135,7 @@ internal class IncrementalLoadDatumCollection(long cid, bool isOnlyFolder = fals
             return 0;
         }
 
-        filesInfo.Data.ForEach(i => Add(new FilesInfo(i)));
+        filesInfo.Data.ForEach(i => Add(new DetailFileInfo(i)));
 
         HasMoreItems = AllCount > Count;
         Debug.WriteLine($"[{Count}/{AllCount}] HasMoreItems = {HasMoreItems}");

@@ -2,25 +2,23 @@
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums.OneOneFive;
-using Display.Models.Vo;
 using Display.Providers;
 using Microsoft.UI.Xaml.Data;
 using SharpCompress;
 
-namespace Display.Models.Data.IncrementalCollection;
+namespace Display.Models.Vo.IncrementalCollection;
 
 public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<FailDatum>, ISupportIncrementalLoading
 {
-    public async Task LoadData(int startShowCount = 20)
+    public void LoadData(int startShowCount = 20)
     {
-        var newItems = await DataAccess.Get.GetFailFileInfoWithDatum(0, startShowCount, showType: ShowType);
+        var newItems = DataAccessLocal.Get.GetFailFileInfoWithFilesInfo(0, startShowCount, showType: ShowType);
 
         if (Count == 0)
         {
             HasMoreItems = true;
-            AllCount = DataAccess.Get.GetCountOfFailDatumFiles(showType: ShowType);
+            AllCount = DataAccessLocal.Get.GetCountOfFailFilesInfoFiles(showType: ShowType);
         }
         else
             Clear();
@@ -47,12 +45,12 @@ public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<Fail
     public string OrderBy { get; set; }
     public bool IsDesc { get; set; }
 
-    private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
+    private Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        var failLists = await DataAccess.Get.GetFailFileInfoWithDatum(Items.Count, (int)count, showType: ShowType);
+        var failLists = DataAccessLocal.Get.GetFailFileInfoWithFilesInfo(Items.Count, (int)count, showType: ShowType);
         if (failLists is null)
         {
-            return new LoadMoreItemsResult(0);
+            return Task.FromResult(new LoadMoreItemsResult(0));
         }
 
         if (failLists.Length < count)
@@ -62,9 +60,9 @@ public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<Fail
 
         failLists.ForEach(item => Add(new FailDatum(item)));
 
-        return new LoadMoreItemsResult
+        return Task.FromResult(new LoadMoreItemsResult
         {
             Count = (uint)failLists.Length
-        };
+        });
     }
 }

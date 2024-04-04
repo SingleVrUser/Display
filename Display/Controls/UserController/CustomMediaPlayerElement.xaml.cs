@@ -25,18 +25,13 @@ using Windows.Media.Streaming.Adaptive;
 using Windows.Storage;
 using Windows.System.Display;
 using Windows.Web.Http;
+using DataAccess.Dao.Interface;
+using DataAccess.Models.Entity;
 using Display.Helper.Network;
 using Display.Models.Dto.Media;
-using Display.Models.Dto.OneOneFive;
-using Display.Models.Entities;
-using Display.Models.Entities.OneOneFive;
-using Display.Models.Vo;
-using Display.Models.Vo.OneOneFive;
-using Display.Providers.Downloader;
 using Display.Streams;
 using Display.Views.Pages;
 using Display.Views.Windows;
-
 
 namespace Display.Controls.UserController;
 
@@ -62,11 +57,17 @@ public sealed partial class CustomMediaPlayerElement
     private readonly List<AdaptiveMediaSourceCreationResult> _adaptiveMediaSourceList =[];
     private readonly List<HttpRandomAccessStream> _httpRandomAccessStreamList = [];
 
+    private readonly IFailListIsLikeLookLaterDao _failListIsLikeLookLaterDao =
+        App.GetService<IFailListIsLikeLookLaterDao>();
+    
+    private readonly IVideoInfoDao _videoInfoDao =
+        App.GetService<IVideoInfoDao>();
+    
     public CustomMediaPlayerElement()
     {
         InitializeComponent();
     }
-
+    
     public void InitLoad(IList<MediaPlayItem> playItems, MediaPlayWindow window)
     {
         _allMediaPlayItems = new ObservableCollection<MediaPlayItem>(playItems);
@@ -82,7 +83,7 @@ public sealed partial class CustomMediaPlayerElement
 
     public IList<MediaPlayItem> ReLoad(IList<MediaPlayItem> playItems)
     {
-        playItems.ForEach(item => _allMediaPlayItems.Add(item));
+        playItems.ForEach(_allMediaPlayItems.Add);
 
         SetMediaPlayItems(playItems);
 
@@ -92,29 +93,27 @@ public sealed partial class CustomMediaPlayerElement
 
     public void DisposeMediaPlayer()
     {
-        MediaControl.MediaPlayer.MediaOpened -= MediaPlayer_MediaOpened;
-        MediaControl.MediaPlayer.PlaybackSession.PlaybackStateChanged -= MediaPlayerElement_CurrentStateChanged;
+        MyMediaPlayerElement.MediaPlayer.MediaOpened -= MediaPlayer_MediaOpened;
+        MyMediaPlayerElement.MediaPlayer.PlaybackSession.PlaybackStateChanged -= MediaPlayerElement_CurrentStateChanged;
 
-        if (MediaControl.MediaPlayer.Source is MediaPlaybackList mediaPlaybackList)
+        if (MyMediaPlayerElement.MediaPlayer.Source is MediaPlaybackList mediaPlaybackList)
         {
             mediaPlaybackList.CurrentItemChanged -= MediaPlaybackList_CurrentItemChanged;
 
             DisposeMediaPlayer(mediaPlaybackList);
 
-            // TODO 会报错
-            //MediaControl.MediaPlayer.Dispose();
         }
         else
         {
-            MediaControl.MediaPlayer.Dispose();
+            MyMediaPlayerElement.MediaPlayer.Dispose();
         }
     }
 
     private void DisposeMediaPlayer(MediaPlaybackList mediaPlaybackList)
     {
-        MediaControl.MediaPlayer.Pause();
+        MyMediaPlayerElement.MediaPlayer.Pause();
 
-        MediaControl.MediaPlayer.Source = null;
+        MyMediaPlayerElement.MediaPlayer.Source = null;
         foreach (var mediaPlayItem in mediaPlaybackList.Items)
         {
             mediaPlayItem.Source.Dispose();
@@ -148,13 +147,13 @@ public sealed partial class CustomMediaPlayerElement
             Source = _mediaPlaybackList,
         };
 
-        MediaControl.SetMediaPlayer(mediaPlayer);
+        MyMediaPlayerElement.SetMediaPlayer(mediaPlayer);
 
         // 播放时修改Slider精度
-        MediaControl.MediaPlayer.MediaOpened += MediaPlayer_MediaOpened;
+        MyMediaPlayerElement.MediaPlayer.MediaOpened += MediaPlayer_MediaOpened;
 
         // 播放时保持屏幕常亮，暂停播放则恢复
-        MediaControl.MediaPlayer.PlaybackSession.PlaybackStateChanged += MediaPlayerElement_CurrentStateChanged;
+        MyMediaPlayerElement.MediaPlayer.PlaybackSession.PlaybackStateChanged += MediaPlayerElement_CurrentStateChanged;
     }
 
     private void SetMediaPlayItems(IEnumerable<MediaPlayItem> items)
@@ -286,11 +285,12 @@ public sealed partial class CustomMediaPlayerElement
             }
             else
             {
-                _isLike = failInfo.IsLike;
+                _isLike = failInfo.IsLike ?? 0;
                 _lookLater = Convert.ToInt32(failInfo.LookLater);
-
-                isLike = _isLike == 1;
+                
+                isLike = failInfo.IsLike is 1;
                 isLookLater = _lookLater != 0;
+                
             }
 
             MediaTransportControls.SetLike_LookLater(isLike, isLookLater);
@@ -394,7 +394,7 @@ public sealed partial class CustomMediaPlayerElement
         DispatcherQueue.TryEnqueue(() =>
         {
             Debug.WriteLine("正在设置进度条");
-            var transportControlsTemplateRoot = (FrameworkElement)VisualTreeHelper.GetChild(MediaControl.TransportControls, 0);
+            var transportControlsTemplateRoot = (FrameworkElement)VisualTreeHelper.GetChild(MyMediaPlayerElement.TransportControls, 0);
             var sliderControl = (Slider)transportControlsTemplateRoot?.FindName("ProgressSlider");
             if (sliderControl == null || !(sender.PlaybackSession.NaturalDuration.TotalSeconds > 1000)) return;
 
@@ -419,11 +419,11 @@ public sealed partial class CustomMediaPlayerElement
         _qualityIndex = list.IndexOf(quality);
 
         //记录当前的时间
-        var time = MediaControl.MediaPlayer.Position;
+        var time = MyMediaPlayerElement.MediaPlayer.Position;
 
         Debug.WriteLine("销毁先前的设置");
         // 先销毁
-        if (MediaControl.MediaPlayer.Source is MediaPlaybackList mediaPlaybackList)
+        if (MyMediaPlayerElement.MediaPlayer.Source is MediaPlaybackList mediaPlaybackList)
         {
             DisposeMediaPlayer(mediaPlaybackList);
         }
@@ -434,7 +434,7 @@ public sealed partial class CustomMediaPlayerElement
 
         Debug.WriteLine("恢复之前的时间");
         //恢复之前的时间
-        MediaControl.MediaPlayer.Position = time;
+        MyMediaPlayerElement.MediaPlayer.Position = time;
     }
 
     private void mediaControls_FullWindow(object sender, RoutedEventArgs e)
@@ -465,8 +465,11 @@ public sealed partial class CustomMediaPlayerElement
 
         if (videoInfo != null)
         {
-            DataAccess.Update.UpdateSingleDataFromVideoInfo(trueName, "is_like", _isLike.ToString());
-
+            _videoInfoDao.UpdateSingle(new VideoInfo
+            {
+                TrueName = trueName,
+                IsLike = _isLike
+            });
             if (_isLike == 1) ShowTeachingTip("已添加进喜欢");
         }
         else
@@ -478,24 +481,33 @@ public sealed partial class CustomMediaPlayerElement
             if (failInfo == null)
             {
                 var capPath = await ScreenShotAsync(pickCode);
-                DataAccess.Add.AddOrReplaceFailList_IsLike_LookLater(new()
+                
+                _failListIsLikeLookLaterDao.Add(new FailListIsLikeLookLater()
                 {
                     PickCode = pickCode,
                     IsLike = _isLike,
                     ImagePath = capPath
                 });
-
+                
                 if (_isLike == 1) ShowTeachingTip("已添加进喜欢");
             }
             else
             {
-                DataAccess.Update.UpdateSingleFailInfo(pickCode, "is_like", _isLike.ToString());
+                _failListIsLikeLookLaterDao.UpdateSingle(new FailListIsLikeLookLater
+                {
+                    PickCode = pickCode,
+                    IsLike = _isLike
+                });
 
                 //需要截图
                 if (failInfo.ImagePath == FileType.NoPicturePath || !File.Exists(failInfo.ImagePath))
                 {
                     var capPath = await ScreenShotAsync(pickCode);
-                    DataAccess.Update.UpdateSingleFailInfo(pickCode, "image_path", capPath);
+                    _failListIsLikeLookLaterDao.UpdateSingle(new FailListIsLikeLookLater
+                    {
+                        PickCode = pickCode,
+                        ImagePath = capPath
+                    });
 
                     if (_isLike == 1) ShowTeachingTip("已添加进喜欢，并截取当前画面作为封面");
                 }
@@ -524,7 +536,11 @@ public sealed partial class CustomMediaPlayerElement
 
         if (videoInfo != null)
         {
-            DataAccess.Update.UpdateSingleDataFromVideoInfo(trueName, "look_later", _lookLater.ToString());
+            _videoInfoDao.UpdateSingle(new VideoInfo()
+            {
+                TrueName = trueName,
+                LookLater = _lookLater
+            });
 
             if (_lookLater != 0) ShowTeachingTip("已添加进稍后观看");
         }
@@ -535,24 +551,32 @@ public sealed partial class CustomMediaPlayerElement
             if (failInfo == null)
             {
                 var capPath = await ScreenShotAsync(pickCode);
-                DataAccess.Add.AddOrReplaceFailList_IsLike_LookLater(new()
+                _failListIsLikeLookLaterDao.Add(new FailListIsLikeLookLater
                 {
                     PickCode = pickCode,
                     LookLater = _lookLater,
                     ImagePath = capPath
                 });
-
                 if (_lookLater != 0) ShowTeachingTip("已添加进稍后观看");
             }
             else
             {
-                DataAccess.Update.UpdateSingleFailInfo(pickCode, "look_later", _lookLater.ToString());
+                _failListIsLikeLookLaterDao.UpdateSingle(new FailListIsLikeLookLater
+                {
+                    PickCode = pickCode,
+                    LookLater = _lookLater
+                });
 
                 //需要添加截图
                 if (failInfo.ImagePath == FileType.NoPicturePath || !File.Exists(failInfo.ImagePath))
                 {
                     var capPath = await ScreenShotAsync(pickCode);
-                    DataAccess.Update.UpdateSingleFailInfo(pickCode, "image_path", capPath);
+                    
+                    _failListIsLikeLookLaterDao.UpdateSingle(new FailListIsLikeLookLater
+                    {
+                        PickCode = pickCode,
+                        ImagePath = capPath
+                    });
 
                     if (_lookLater != 0) ShowTeachingTip("已添加进稍后观看，并截取当前画面作为封面");
                 }
@@ -570,22 +594,13 @@ public sealed partial class CustomMediaPlayerElement
         var playItem = _allMediaPlayItems[(int)_playIndex];
         var pickCode = playItem.PickCode;
 
-        var failInfo = DataAccess.Get.GetSingleFailInfoByPickCode(pickCode);
-
         var capPath = await ScreenShotAsync(pickCode);
 
-        if (failInfo == null)
+        _failListIsLikeLookLaterDao.Add(new FailListIsLikeLookLater
         {
-            DataAccess.Add.AddOrReplaceFailList_IsLike_LookLater(new FailInfo
-            {
-                PickCode = pickCode,
-                ImagePath = capPath
-            });
-        }
-        else
-        {
-            DataAccess.Update.UpdateSingleFailInfo(pickCode, "image_path", capPath);
-        }
+            PickCode = pickCode,
+            ImagePath = capPath
+        });
 
         ShowTeachingTip("已截取当前画面作为封面");
     }
@@ -599,10 +614,10 @@ public sealed partial class CustomMediaPlayerElement
 
         var canvasRenderTarget = new CanvasRenderTarget(
                 CanvasDevice.GetSharedDevice(),
-                MediaControl.MediaPlayer.PlaybackSession.NaturalVideoWidth,
-                MediaControl.MediaPlayer.PlaybackSession.NaturalVideoHeight,
+                MyMediaPlayerElement.MediaPlayer.PlaybackSession.NaturalVideoWidth,
+                MyMediaPlayerElement.MediaPlayer.PlaybackSession.NaturalVideoHeight,
                 96);
-        MediaControl.MediaPlayer.CopyFrameToVideoSurface(canvasRenderTarget);
+        MyMediaPlayerElement.MediaPlayer.CopyFrameToVideoSurface(canvasRenderTarget);
 
         await using var targetFileStream = await file.OpenStreamForWriteAsync();
         var stream = targetFileStream.AsRandomAccessStream();
@@ -687,7 +702,7 @@ public sealed partial class CustomMediaPlayerElement
 
         DispatcherQueue.TryEnqueue(() =>
         {
-            MediaControl.MediaPlayer.Volume = _changedVolume;
+            MyMediaPlayerElement.MediaPlayer.Volume = _changedVolume;
 
             _changedVolume = double.NaN;
 
@@ -702,7 +717,7 @@ public sealed partial class CustomMediaPlayerElement
 
         DispatcherQueue.TryEnqueue(() =>
         {
-            MediaControl.MediaPlayer.Position = _changedPositionTimeSpan;
+            MyMediaPlayerElement.MediaPlayer.Position = _changedPositionTimeSpan;
 
             _changedPositionTimeSpan = TimeSpan.MinValue;
 
@@ -715,7 +730,7 @@ public sealed partial class CustomMediaPlayerElement
     {
         if (_changedVolume is double.NaN)
         {
-            _changedVolume = MediaControl.MediaPlayer.Volume;
+            _changedVolume = MyMediaPlayerElement.MediaPlayer.Volume;
         }
 
         var tmpVolume = _changedVolume + step;
@@ -739,11 +754,11 @@ public sealed partial class CustomMediaPlayerElement
     private const string TimeFormat = @"hh\:mm\:ss";
     private void ChangedPositionText(int second)
     {
-        var naturalDurationTimeSpan = MediaControl.MediaPlayer.NaturalDuration;
+        var naturalDurationTimeSpan = MyMediaPlayerElement.MediaPlayer.NaturalDuration;
         var naturalDurationString = naturalDurationTimeSpan.ToString(TimeFormat);
 
-        var currentPositionTimeSpan = MediaControl.MediaPlayer.Position;
-        var currentPositionString = MediaControl.MediaPlayer.Position.ToString(TimeFormat);
+        var currentPositionTimeSpan = MyMediaPlayerElement.MediaPlayer.Position;
+        var currentPositionString = MyMediaPlayerElement.MediaPlayer.Position.ToString(TimeFormat);
 
         Debug.WriteLine($"总时长：{naturalDurationString}");
 
@@ -819,9 +834,9 @@ public sealed partial class CustomMediaPlayerElement
 
     private void KeyboardAcceleratorMute_OnInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
-        if (MediaControl.MediaPlayer == null) return;
+        if (MyMediaPlayerElement.MediaPlayer == null) return;
 
-        MediaControl.MediaPlayer.IsMuted = !MediaControl.MediaPlayer.IsMuted;
+        MyMediaPlayerElement.MediaPlayer.IsMuted = !MyMediaPlayerElement.MediaPlayer.IsMuted;
     }
 
     private async void ShowInfoItemClick(object sender, RoutedEventArgs e)
@@ -832,9 +847,9 @@ public sealed partial class CustomMediaPlayerElement
         {
             {"文件名",playItem.FileName},
             {"pid", playItem.PickCode},
-            {"分辨率",$"{MediaControl.MediaPlayer.PlaybackSession.NaturalVideoWidth} x {MediaControl.MediaPlayer.PlaybackSession.NaturalVideoHeight}"},
+            {"分辨率",$"{MyMediaPlayerElement.MediaPlayer.PlaybackSession.NaturalVideoWidth} x {MyMediaPlayerElement.MediaPlayer.PlaybackSession.NaturalVideoHeight}"},
             {"时长",
-                MediaControl.MediaPlayer.NaturalDuration.ToString(TimeFormat)},
+                MyMediaPlayerElement.MediaPlayer.NaturalDuration.ToString(TimeFormat)},
         };
 
         if (playItem.Size != null)
@@ -883,7 +898,7 @@ public sealed partial class CustomMediaPlayerElement
 
         if (result != ContentDialogResult.Primary) return;
 
-        var isSuccess = await _webApi.DeleteFiles(playItem.Cid, new[] { (long)playItem.Fid });
+        var isSuccess = await _webApi.DeleteFiles(playItem.Cid, [(long)playItem.Fid]);
         if (!isSuccess)
         {
             ShowTeachingTip("删除115文件失败");
@@ -894,4 +909,5 @@ public sealed partial class CustomMediaPlayerElement
     }
 
     public event Action<MediaPlayItem> DeleteFileClick;
+
 }

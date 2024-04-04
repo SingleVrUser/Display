@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DataAccess.Models.Entity;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Entities.OneOneFive;
 using Display.Models.Vo;
@@ -57,7 +58,7 @@ public class LibreDmm : BaseSpider
 
         var videoInfo = new VideoInfo
         {
-            busUrl = detailUrl,
+            Url = detailUrl,
             TrueName = cid,
             //dmm肯定没有步兵
             IsWm = 0
@@ -93,7 +94,7 @@ public class LibreDmm : BaseSpider
                     videoInfo.Producer = valueNodes[i].InnerText.Trim();
                     break;
                 case "Volume":
-                    videoInfo.Lengthtime = valueNodes[i].InnerText.Trim().Replace(" minutes", "分钟");
+                    videoInfo.LengthTime = valueNodes[i].InnerText.Trim().Replace(" minutes", "分钟");
                     break;
             }
         }

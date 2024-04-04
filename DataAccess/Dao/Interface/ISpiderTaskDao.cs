@@ -1,5 +1,7 @@
-﻿namespace DataAccess.Dao.Interface;
+﻿using DataAccess.Models.Entity;
 
-internal interface ISpiderTaskDao : IDao<ISpiderTaskDao>
+namespace DataAccess.Dao.Interface;
+
+public interface ISpiderTaskDao : IDao<SpiderTask>
 {
 }

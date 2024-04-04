@@ -2,6 +2,6 @@
 
 namespace DataAccess.Dao.Interface;
 
-internal interface IFileToInfoDao : IDao<FileToInfo>
+public interface IFileToInfoDao : IDao<FileToInfo>
 {
 }

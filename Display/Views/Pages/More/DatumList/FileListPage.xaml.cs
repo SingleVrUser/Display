@@ -1,7 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -13,6 +10,8 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using ByteSizeLib;
+using DataAccess.Dao.Interface;
+using DataAccess.Models.Entity;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.Network;
 using Display.Models.Api.OneOneFive.File;
@@ -69,6 +68,9 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private bool _isLoading = true;
 
+    private readonly IFilesInfoDao _filesInfoDao = App.GetService<IFilesInfoDao>();
+    
+
     /// <summary>
     /// 中转站文件
     /// </summary>
@@ -76,7 +78,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     public FileListPage()
     {
-        _units = new ObservableCollection<ExplorerItem>();
+        _units = [];
         InitializeComponent();
 
         InitData(0);
@@ -126,16 +128,16 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         MultipleSelectedCheckBox.IsChecked = false;
     }
 
-    private async void GoToFolder(FilesInfo filesInfo)
+    private async void GoToFolder(DetailFileInfo detailFileInfo)
     {
         _isLoading = true;
 
         //跳过文件
-        if (filesInfo.Type == FilesInfo.FileType.File) return;
-        if (filesInfo.Id == null) return;
+        if (detailFileInfo.Type == FileType.File) return;
+        if (detailFileInfo.Id == null) return;
 
 
-        var id = (long)filesInfo.Id;
+        var id = (long)detailFileInfo.Id;
 
         await FilesInfos.SetCid(id);
 
@@ -147,7 +149,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private void OpenFolder_Tapped(object sender, TappedRoutedEventArgs e)
     {
-        if (sender is not TextBlock { DataContext: FilesInfo filesInfo }) return;
+        if (sender is not TextBlock { DataContext: DetailFileInfo filesInfo }) return;
 
         GoToFolder(filesInfo);
     }
@@ -166,7 +168,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             return;
         }
 
-        var filesInfo = BaseExample.SelectedItems.Cast<FilesInfo>().ToList();
+        var filesInfo = BaseExample.SelectedItems.Cast<DetailFileInfo>().ToList();
 
         var page = new DatumList.VideoDisplay.MainPage(filesInfo, BaseExample);
         page.CreateWindow();
@@ -229,7 +231,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
 
         // 排除缺失Id的文件，比如秒传后临时添加的文件
-        var infos = e.Items.Cast<FilesInfo>().Where(x => !x.NoId).ToList();
+        var infos = e.Items.Cast<DetailFileInfo>().Where(x => !x.NoId).ToList();
         if (infos.Count == 0) return;
 
         // 添加数据
@@ -252,7 +254,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         if (sender is not Grid) return;
 
-        if (e.DataView.Properties.Values.FirstOrDefault() is not List<FilesInfo> sourceFilesInfos) return;
+        if (e.DataView.Properties.Values.FirstOrDefault() is not List<DetailFileInfo> sourceFilesInfos) return;
 
         if (_transferStationFiles == null)
         {
@@ -287,7 +289,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
 
         // 应用内的文件拖动
-        if (e.DataView.Properties.Values.FirstOrDefault() is List<FilesInfo> sourceFilesInfos)
+        if (e.DataView.Properties.Values.FirstOrDefault() is List<DetailFileInfo> sourceFilesInfos)
         {
             HandleCaption(e, target, sourceFilesInfos);
         }
@@ -302,7 +304,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     }
 
-    private void HandleCaption(DragEventArgs e, ListView target, ICollection<FilesInfo> sourceFilesInfos)
+    private void HandleCaption(DragEventArgs e, ListView target, ICollection<DetailFileInfo> sourceFilesInfos)
     {
         var index = GetInsertIndexInListView(target, e);
         // 范围之外
@@ -331,7 +333,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
                 e.DragUIOverride.Caption = null;
             }
             // 目标为文件，没法移动到文件，退出
-            else if (item.Type == FilesInfo.FileType.File)
+            else if (item.Type == FileType.File)
             {
                 e.AcceptedOperation = DataPackageOperation.None;
                 e.DragUIOverride.Caption = null;
@@ -353,7 +355,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         if (sender is not Grid) return;
 
-        if (e.DataView.Properties.Values.FirstOrDefault() is not List<FilesInfo> sourceFilesInfos) return;
+        if (e.DataView.Properties.Values.FirstOrDefault() is not List<DetailFileInfo> sourceFilesInfos) return;
 
         if (_transferStationFiles == null)
         {
@@ -398,7 +400,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         if (sender is not Grid) return;
 
-        if (e.DataView.Properties.Values.FirstOrDefault() is not List<FilesInfo> sourceFilesInfos) return;
+        if (e.DataView.Properties.Values.FirstOrDefault() is not List<DetailFileInfo> sourceFilesInfos) return;
 
         //115删除
         var dialog = new ContentDialog
@@ -427,7 +429,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     /// </summary>
     /// <param name="sourceFilesInfos"></param>
     /// <returns></returns>
-    private async Task Delete115Files(IList<FilesInfo> sourceFilesInfos)
+    private async Task Delete115Files(IList<DetailFileInfo> sourceFilesInfos)
     {
         if (sourceFilesInfos == null) return;
         
@@ -465,7 +467,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         if (sender is not ListView target) return;
 
-        if (e.DataView.Properties.Values.FirstOrDefault() is List<FilesInfo> sourceFilesInfos)
+        if (e.DataView.Properties.Values.FirstOrDefault() is List<DetailFileInfo> sourceFilesInfos)
         {
             await HandleFileDrop(e, target, sourceFilesInfos);
         }
@@ -491,7 +493,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
                     if (currentFolderCid != CurrentExplorerItem.Id) return;
 
                     // 上传成功后更新UI
-                    FilesInfos.Insert(0, new FilesInfo(result));
+                    FilesInfos.Insert(0, new DetailFileInfo(result));
                 });
             }
 
@@ -500,7 +502,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
     }
 
-    private async Task HandleFileDrop(DragEventArgs e, ListView target, List<FilesInfo> sourceFilesInfos)
+    private async Task HandleFileDrop(DragEventArgs e, ListView target, List<DetailFileInfo> sourceFilesInfos)
     {
         var index = GetInsertIndexInListView(target, e);
 
@@ -541,7 +543,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     /// 删除文件列表中的文件
     /// </summary>
     /// <param name="files"></param>
-    private void TryRemoveFilesInExplorer(IEnumerable<FilesInfo> files)
+    private void TryRemoveFilesInExplorer(IEnumerable<DetailFileInfo> files)
     {
         foreach (var item in files.Where(FilesInfos.Contains))
         {
@@ -557,7 +559,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         FilesInfos.Remove(info);
     }
 
-    private void TryRemoveFilesInTransfer(IEnumerable<FilesInfo> files)
+    private void TryRemoveFilesInTransfer(IEnumerable<DetailFileInfo> files)
     {
         if (_transferStationFiles is not { Count: > 0 }) return;
 
@@ -573,7 +575,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     /// 移动115文件
     /// </summary>
     /// <returns></returns>
-    private async Task Move115Files(long cid, IList<FilesInfo> files)
+    private async Task Move115Files(long cid, IList<DetailFileInfo> files)
     {
         await WebApi.MoveFiles(cid, files.Select(item => item.Id).ToArray());
 
@@ -616,9 +618,9 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         e.Data.Properties.Add("items", TransferStationFilesToFilesInfo(infos));
     }
 
-    private List<FilesInfo> TransferStationFilesToFilesInfo(TransferStationFiles[] srcList)
+    private List<DetailFileInfo> TransferStationFilesToFilesInfo(TransferStationFiles[] srcList)
     {
-        List<FilesInfo> infos = new();
+        List<DetailFileInfo> infos = new();
         foreach (var item in srcList)
         {
             infos.AddRange(item.TransferFiles);
@@ -643,7 +645,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         if (args.DropResult != DataPackageOperation.Move) return;
 
         // 删除文件列表
-        TryRemoveFilesInExplorer(args.Items.Cast<FilesInfo>().ToList());
+        TryRemoveFilesInExplorer(args.Items.Cast<DetailFileInfo>().ToList());
 
     }
 
@@ -651,13 +653,13 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         if (sender is not Button) return;
 
-        List<FilesInfo> files = [];
+        List<DetailFileInfo> files = [];
         List<string> folderList = [];
-        foreach (FilesInfo item in BaseExample.SelectedItems)
+        foreach (DetailFileInfo item in BaseExample.SelectedItems)
         {
             files.Add(item);
 
-            if (item.Type == FilesInfo.FileType.Folder)
+            if (item.Type == FileType.Folder)
             {
                 folderList.Add(item.Name);
             }
@@ -763,7 +765,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (result != ContentDialogResult.Primary) return;
 
-        DataAccess.Delete.DeleteTable(DataAccess.TableName.FilesInfo);
+        _filesInfoDao.Delete();
     }
 
     private async void DownButton_Click(object sender, RoutedEventArgs e)
@@ -789,20 +791,20 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             return;
         }
 
-        if (BaseExample.SelectedItems.FirstOrDefault() is not FilesInfo) return;
+        if (BaseExample.SelectedItems.FirstOrDefault() is not DetailFileInfo) return;
 
-        List<Datum> videoInfos = [];
+        List<FilesInfo> videoInfos = [];
 
         foreach (var item in BaseExample.SelectedItems)
         {
-            if (item is not FilesInfo fileInfo) continue;
+            if (item is not DetailFileInfo fileInfo) continue;
 
-            Datum datum = new()
+            FilesInfo datum = new()
             {
-                Cid = fileInfo.Cid,
+                CurrentId = fileInfo.Cid,
                 Name = fileInfo.Name,
                 PickCode = fileInfo.PickCode,
-                Fid = fileInfo.Id
+                FileId = fileInfo.Id
             };
             videoInfos.Add(datum);
         }
@@ -832,8 +834,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             }
 
             // 挑选视频文件，并转换为mediaPlayItem
-            var mediaPlayItems = BaseExample.SelectedItems.Cast<FilesInfo>()
-                .Where(x => x.Type == FilesInfo.FileType.Folder || x.IsVideo)
+            var mediaPlayItems = BaseExample.SelectedItems.Cast<DetailFileInfo>()
+                .Where(x => x.Type == FileType.Folder || x.IsVideo)
                 .Select(x => new MediaPlayItem(x)).ToList();
 
             await PlayVideoHelper.PlayVideo(mediaPlayItems, XamlRoot, lastPage: this);
@@ -842,9 +844,9 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
 
         // 单个播放
-        if (menuFlyoutItem.DataContext is not FilesInfo info) return;
+        if (menuFlyoutItem.DataContext is not DetailFileInfo info) return;
 
-        if (info.Type == FilesInfo.FileType.Folder || !info.IsVideo) return;
+        if (info.Type == FileType.Folder || !info.IsVideo) return;
 
         var mediaPlayItem = new MediaPlayItem(info);
         await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this);
@@ -853,10 +855,10 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     private void Sort115Button_Click(object sender, RoutedEventArgs e)
     {
         //检查选中的文件或文件夹
-        if (BaseExample.SelectedItems.FirstOrDefault() is not FilesInfo) return;
+        if (BaseExample.SelectedItems.FirstOrDefault() is not DetailFileInfo) return;
 
         //获取需要整理的文件
-        var folders = BaseExample.SelectedItems.Cast<FilesInfo>().ToList();
+        var folders = BaseExample.SelectedItems.Cast<DetailFileInfo>().ToList();
 
         var page = new Sort115.MainPage(folders);
         page.CreateWindow();
@@ -871,17 +873,17 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         if (BaseExample.SelectedItems.Count > 1)
         {
             //获取需要播放的文件
-            mediaPlayItems = BaseExample.SelectedItems.Cast<FilesInfo>()
-                .Where(x => x.Type == FilesInfo.FileType.Folder || x.IsVideo)
+            mediaPlayItems = BaseExample.SelectedItems.Cast<DetailFileInfo>()
+                .Where(x => x.Type == FileType.Folder || x.IsVideo)
                 .Select(x => new MediaPlayItem(x)).ToList();
         }
         // 选项栏只选中一个，则忽略。以右键项为准
         else
         {
             // 单个播放
-            if (menuFlyoutItem is not { DataContext: FilesInfo info }) return;
+            if (menuFlyoutItem is not { DataContext: DetailFileInfo info }) return;
 
-            if (info.Type == FilesInfo.FileType.Folder || !info.IsVideo) return;
+            if (info.Type == FileType.Folder || !info.IsVideo) return;
 
             mediaPlayItems = [new(info)];
         }
@@ -892,11 +894,11 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async void MoveToNewFolderItemClick(object sender, RoutedEventArgs e)
     {
-        List<FilesInfo> fileInfos;
+        List<DetailFileInfo> fileInfos;
         // 选中文件，对当前文件操作
         if (BaseExample.SelectedItems.Count == 0)
         {
-            if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
+            if (sender is not MenuFlyoutItem { DataContext: DetailFileInfo info }) return;
 
             fileInfos = [info];
 
@@ -904,7 +906,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         else
         {
             //获取需要整理的文件
-            fileInfos = BaseExample.SelectedItems.Cast<FilesInfo>().ToList();
+            fileInfos = BaseExample.SelectedItems.Cast<DetailFileInfo>().ToList();
 
         }
 
@@ -952,7 +954,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         // 更新UI
         // 新建文件夹
-        FilesInfos.Insert(0, new FilesInfo(new Datum { Cid = makeDirResult.Cid, Name = makeDirResult.Cname, Pid = LastExplorerItem.Id, TimeEdit = (int)DateTimeOffset.Now.ToUnixTimeSeconds() }));
+        FilesInfos.Insert(0, new DetailFileInfo(new FilesInfo { CurrentId = makeDirResult.Cid, Name = makeDirResult.Cname, ParentId = LastExplorerItem.Id, TimeEdit = (int)DateTimeOffset.Now.ToUnixTimeSeconds() }));
 
         // 删除文件
         TryRemoveFilesInExplorer(fileInfos);
@@ -960,7 +962,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async void RenameItemClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
+        if (sender is not MenuFlyoutItem { DataContext: DetailFileInfo info }) return;
 
         var stackPanel = new StackPanel
         {
@@ -976,7 +978,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         stackPanel.Children.Add(inputTextBox);
 
         CheckBox checkBox = null;
-        if (info.Type == FilesInfo.FileType.File)
+        if (info.Type == FileType.File)
         {
             checkBox = new CheckBox
             {
@@ -1048,7 +1050,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         if (sender is not TextBlock { DataContext: ExplorerItem item }) return;
 
         // 拖拽中的文件（可能多个）
-        if (e.DataView.Properties.Values.FirstOrDefault() is not List<FilesInfo> sourceFilesInfos) return;
+        if (e.DataView.Properties.Values.FirstOrDefault() is not List<DetailFileInfo> sourceFilesInfos) return;
 
         // 目标cid
         var cid = item.Id;
@@ -1067,7 +1069,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         }
     }
 
-    private static List<FilesInfo> GetFilesInfosExceptInCid(long cid, IList<FilesInfo> infos)
+    private static List<DetailFileInfo> GetFilesInfosExceptInCid(long cid, IList<DetailFileInfo> infos)
     {
         return infos.Where(x => x.Cid != cid).ToList();
     }
@@ -1077,7 +1079,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         if (sender is not TextBlock { DataContext: ExplorerItem item }) return;
 
         // 拖拽中的文件（可能多个）
-        if (e.DataView.Properties.Values.FirstOrDefault() is not List<FilesInfo> sourceFilesInfos) return;
+        if (e.DataView.Properties.Values.FirstOrDefault() is not List<DetailFileInfo> sourceFilesInfos) return;
 
         var canMoveList = GetFilesInfosExceptInCid(item.Id, sourceFilesInfos);
 
@@ -1141,7 +1143,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async void ShowInfoClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
+        if (sender is not MenuFlyoutItem { DataContext: DetailFileInfo info }) return;
 
         string title;
 
@@ -1150,7 +1152,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             {"名称",info.Name }
         };
 
-        if (info.Type == FilesInfo.FileType.Folder)
+        if (info.Type == FileType.Folder)
         {
             infos.Add("id", info.Id.ToString());
             infos.Add("pickCode", info.PickCode);
@@ -1200,19 +1202,19 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     private bool _isSelectedListView;
 
     private DateTime _lastTapTime = DateTime.MinValue;
-    private FilesInfo _lastInfo;
+    private DetailFileInfo _lastInfo;
     private async void BaseExample_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         var nowTime = DateTime.Now;
 
-        FilesInfo info = null;
-        if (e.AddedItems.FirstOrDefault() is FilesInfo)
+        DetailFileInfo info = null;
+        if (e.AddedItems.FirstOrDefault() is DetailFileInfo)
         {
-            info = e.AddedItems.FirstOrDefault() as FilesInfo;
+            info = e.AddedItems.FirstOrDefault() as DetailFileInfo;
         }
-        else if (e.RemovedItems.FirstOrDefault() is FilesInfo)
+        else if (e.RemovedItems.FirstOrDefault() is DetailFileInfo)
         {
-            info = e.RemovedItems.FirstOrDefault() as FilesInfo;
+            info = e.RemovedItems.FirstOrDefault() as DetailFileInfo;
         }
 
         if (info == null) return;
@@ -1222,7 +1224,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         {
             _lastTapTime = nowTime;
 
-            if (info.Type == FilesInfo.FileType.Folder)
+            if (info.Type == FileType.Folder)
             {
                 GoToFolder(info);
                 return;
@@ -1288,7 +1290,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     }
 
     #region 设置图片控件
-    public void NavigationToImagePage(List<FilesInfo> files, FilesInfo currentInfo)
+    public void NavigationToImagePage(List<DetailFileInfo> files, DetailFileInfo currentInfo)
     {
         var images = files.Where(i => i.IsImage).ToList();
         var currentIndex = images.IndexOf(currentInfo);
@@ -1341,7 +1343,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             return;
         }
 
-        SearchResultListView.ItemsSource = result.Data.Select(x => new FilesInfo(x)).ToList();
+        SearchResultListView.ItemsSource = result.Data.Select(x => new DetailFileInfo(x)).ToList();
     }
 
     private void SearchTeachingTip_OnClosed(TeachingTip sender, TeachingTipClosedEventArgs args)
@@ -1351,12 +1353,12 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async void SearchResultListView_OnItemClick(object sender, ItemClickEventArgs e)
     {
-        if (e.ClickedItem is not FilesInfo info) return;
+        if (e.ClickedItem is not DetailFileInfo info) return;
 
         if (info.Id == null) return;
 
         // 打开文件夹
-        if (info.Type == FilesInfo.FileType.Folder)
+        if (info.Type == FileType.Folder)
         {
             if (info.Id == null) return;
 
@@ -1367,7 +1369,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
         // 打开图片
         if (info.IsImage)
         {
-            if (info.Id == null || SearchResultListView.ItemsSource is not List<FilesInfo> infos) return;
+            if (info.Id == null || SearchResultListView.ItemsSource is not List<DetailFileInfo> infos) return;
 
             NavigationToImagePage(infos, info);
             return;
@@ -1394,7 +1396,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private async void OpenFolderInSearchResult_ItemClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
+        if (sender is not MenuFlyoutItem { DataContext: DetailFileInfo info }) return;
 
         await OpenFolder(info.Cid);
 
@@ -1412,8 +1414,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private void GetThumbnailButton_Click(object sender, RoutedEventArgs e)
     {
-        var infos = BaseExample.SelectedItems.Cast<FilesInfo>()
-            .Where(x => x.Type == FilesInfo.FileType.Folder || x.IsVideo).ToList();
+        var infos = BaseExample.SelectedItems.Cast<DetailFileInfo>()
+            .Where(x => x.Type == FileType.Folder || x.IsVideo).ToList();
         Frame.Navigate(typeof(ThumbnailPage), infos, new EntranceNavigationTransitionInfo());
     }
 }

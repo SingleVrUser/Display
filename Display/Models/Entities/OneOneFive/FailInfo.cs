@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using DataAccess.Models.Entity;
 using Display.Models.Api.OneOneFive.File;
 using Newtonsoft.Json;
 
@@ -33,7 +34,7 @@ public class FailInfo : INotifyPropertyChanged
     public string ImagePath { get; set; } = Constants.FileType.NoPicturePath;
 
     [JsonProperty(propertyName: nameof(Datum))]
-    public Datum Datum { get; set; }
+    public FilesInfo Datum { get; set; }
 
     public event PropertyChangedEventHandler PropertyChanged;
 

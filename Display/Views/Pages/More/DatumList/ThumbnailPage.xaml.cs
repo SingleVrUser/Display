@@ -32,7 +32,7 @@ public sealed partial class ThumbnailPage : Page
     {
         base.OnNavigatedTo(e);
 
-        if (e.Parameter is not List<FilesInfo> filesInfos) return;
+        if (e.Parameter is not List<DetailFileInfo> filesInfos) return;
 
         _viewModel.SetData(filesInfos);
         ThumbnailsCvs.Source = _viewModel.ThumbnailList;

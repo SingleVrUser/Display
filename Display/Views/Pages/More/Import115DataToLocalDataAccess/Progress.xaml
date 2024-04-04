@@ -103,7 +103,7 @@
                                 <ColumnDefinition Width="70"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{x:Bind file_name}" TextWrapping="Wrap" MinWidth="100" MaxWidth="300" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="{x:Bind allCount}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{x:Bind AllCount}" VerticalAlignment="Center"/>
                             <TextBlock Grid.Column="2" Text="{x:Bind size}" VerticalAlignment="Center"/>
                         </Grid>
                     </DataTemplate>
