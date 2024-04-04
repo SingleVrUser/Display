@@ -77,7 +77,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoIn
 
     public void SetRange(Dictionary<string, string> ranges)
     {
-        this.Ranges = ranges;
+        Ranges = ranges;
     }
 
     public void SetOrder(string orderBy, bool isDesc)
@@ -107,7 +107,14 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoIn
             if (IsContainFail)
             {
                 var failList = DataAccessLocal.Get.GetFailFileInfoWithFilesInfo(0, -1, FilterKeywords);
-                failList?.ForEach(item => Add(new FailVideoInfo(new FailVideoInfo(item), ImageWidth, ImageHeight)));
+                
+                foreach (var filesInfo in failList)
+                {
+                    var failVideoInfo = new FailVideoInfo(filesInfo);
+                    // var videoInfo = new FailVideoInfo(failVideoInfo, ImageWidth, ImageHeight);
+                    Add(failVideoInfo);
+                }
+                
             }
         }
 

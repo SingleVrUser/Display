@@ -11,9 +11,7 @@
              xmlns:controls="using:CommunityToolkit.WinUI.Controls"
              xmlns:providers="using:Display.Providers"
              xmlns:userController="using:Display.Controls.UserController"
-             xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
-             xmlns:file="using:Display.Models.Api.OneOneFive.File"
-             xmlns:oneOneFive2="using:Display.Models.Entities.OneOneFive"
+             xmlns:oneOneFive="using:Display.Models.Entities.OneOneFive"
              xmlns:vo="using:Display.Models.Vo"
              xmlns:entity="using:DataAccess.Models.Entity"
              mc:Ignorable="d"
@@ -237,7 +235,7 @@
                     <!--图片-->
                     <Grid x:Name="showImage">
                         <oldControls:ImageEx x:Name="CoverImage" Stretch="UniformToFill"
-                                          Source="{x:Bind ImagePath,Mode=OneWay}"
+                                          Source="{x:Bind ImagePath, Converter={StaticResource NotExistsImagePathConverter},Mode=OneWay}"
                                           Width="{x:Bind ImageWidth,Mode=OneWay}"
                                           Height="{x:Bind ImageHeight,Mode=OneWay}"
                                           DecodePixelWidth="{x:Bind ImageWidth,Converter={StaticResource DoubleToInt32Converter},Mode=OneWay}"
@@ -492,10 +490,12 @@
 
                     <!--图片-->
                     <Grid x:Name="showImage"
+                          CornerRadius="5"
                           BorderThickness="2"
                           Padding="0">
 
-                        <Image Width="{x:Bind ImageWidth,Mode=OneWay}"
+                        <Image Source="{x:Bind ImagePath}"
+                               Width="{x:Bind ImageWidth,Mode=OneWay}"
                                Height="{x:Bind ImageHeight,Mode=OneWay}">
 
                         </Image>
@@ -573,7 +573,7 @@
 
         <!--匹配失败中的喜欢或稍后观看的展示样式-->
         <DataTemplate x:Key="LikeOrLookLaterInFailCoverTemplate"
-                      x:DataType="oneOneFive2:FailInfo">
+                      x:DataType="oneOneFive:FailInfo">
 
             <Grid Padding="3,0"
                   HorizontalAlignment="Center"
