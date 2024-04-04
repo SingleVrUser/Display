@@ -2,6 +2,6 @@
 
 namespace DataAccess.Dao.Interface;
 
-internal interface IIsWmDao : IDao<IsWm>
+public interface IIsWmDao : IDao<IsWm>
 {
 }

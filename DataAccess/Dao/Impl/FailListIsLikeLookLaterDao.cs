@@ -1,12 +1,13 @@
 ﻿using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using DataAccess.Models.Enum;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Dao.Impl;
 
-public class FailListIsLikeLookLaterDao : DaoImpl<FailListIslikeLookLater>, IFailListIsLikeLookLaterDao
+public class FailListIsLikeLookLaterDao : DaoImpl<FailListIsLikeLookLater>, IFailListIsLikeLookLaterDao
 {
-    public List<FailListIslikeLookLater> GetInfoList(int position = 0, int take = 100, FailInfoShowType showType = FailInfoShowType.Like)
+    public List<FailListIsLikeLookLater> GetInfoList(int position = 0, int take = 100, FailInfoShowType showType = FailInfoShowType.Like)
     {
         return DbSet
             .Skip(position)
@@ -15,5 +16,8 @@ public class FailListIsLikeLookLaterDao : DaoImpl<FailListIslikeLookLater>, IFai
             .ToList();
     }
 
-
+    public FailListIsLikeLookLater? GetByPickCode(string pickCode)
+    {
+        return DbSet.Find(pickCode);
+    }
 }

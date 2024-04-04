@@ -4,20 +4,34 @@ using System.Collections.Specialized;
 using System.Linq;
 using Display.Models.Dto.Settings;
 using Display.Models.Enums;
+using Display.Models.Records;
 
 namespace Display.ViewModels.Sub;
 
 internal class NavigationItemViewModel
 {
-    public readonly ObservableCollection<MenuItem> MenuItems = new(AppSettings.MenuItemsArray);
-    public readonly ObservableCollection<MenuItem> FootMenuItems = new(AppSettings.FootMenuItemsArray);
-
-    public NavigationItemViewModel()
-    {
-        MonitorSettingChanged();
-
-    }
-
+    public readonly ObservableCollection<MenuItem> MenuItems = new(AppSettings.MenuItemEnumArray
+        .Select(enumAndVisible =>
+        {
+            var firstOrDefault = Constants.MenuItems.MainMenuItems.FirstOrDefault(item => item.PageEnum == enumAndVisible.PageEnum);
+            if (firstOrDefault != null && !enumAndVisible.IsVisible)
+                firstOrDefault.IsVisible = false;
+            return firstOrDefault;
+        })
+        .Where(i=>i != null)
+    );
+    
+    public readonly ObservableCollection<MenuItem> FootMenuItems = new(AppSettings.FootMenuItemEnumArray
+        .Select(enumAndVisible =>
+        {
+            var firstOrDefault = Constants.MenuItems.FootMenuItems.FirstOrDefault(item => item.PageEnum == enumAndVisible.PageEnum);
+            if (firstOrDefault != null && !enumAndVisible.IsVisible)
+                firstOrDefault.IsVisible = false;
+            return firstOrDefault;
+        })
+        .Where(i=>i != null)
+    );
+    
     public object GetMenuItem(NavigationViewItemEnum pageEnum, object settingItem)
     {
         if (pageEnum == NavigationViewItemEnum.SettingPage) return settingItem;
@@ -26,36 +40,20 @@ internal class NavigationItemViewModel
 
         if (tmpItem != null) return tmpItem;
 
-
         tmpItem = FootMenuItems.FirstOrDefault(item => item.PageEnum == pageEnum);
 
         return tmpItem;
     }
 
-    private void MonitorSettingChanged()
+
+    public void SaveFootMenuItemEnumArray()
     {
-        MenuItems.CollectionChanged += NavigationMenuItems_CollectionChanged;
-        FootMenuItems.CollectionChanged += NavigationMenuItems_CollectionChanged;
-
-        foreach (var menuItem in MenuItems)
-            menuItem.PropertyChanged += (_, _) =>
-            {
-                AppSettings.MenuItemsArray = [.. MenuItems];
-            };
-
-        foreach (var footMenuItem in FootMenuItems)
-            footMenuItem.PropertyChanged += (_, _) =>
-            {
-                AppSettings.FootMenuItemsArray = [.. FootMenuItems];
-            };
+        AppSettings.FootMenuItemEnumArray = [.. FootMenuItems.Select(i => new PageEnumAndIsVisible(i.PageEnum, i.IsVisible))];
     }
 
-    private void NavigationMenuItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    public void SaveMenuItemEnumArray()
     {
-        if (e.Action != NotifyCollectionChangedAction.Add) return;
-
-        AppSettings.MenuItemsArray = [.. MenuItems];
-        AppSettings.FootMenuItemsArray = [.. FootMenuItems];
+        AppSettings.MenuItemEnumArray = [.. MenuItems.Select(i => new PageEnumAndIsVisible(i.PageEnum, i.IsVisible))];
     }
 
 

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using DataAccess.Models.Entity;
 using Display.Helper.Network;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Entities.OneOneFive;
@@ -102,7 +103,7 @@ public class Common
         VideoInfo videoInfo = new()
         {
             TrueName = cid,
-            busUrl = detailUrl
+            Url = detailUrl
         };
 
         //封面图
@@ -208,7 +209,7 @@ public class Common
                     videoInfo.ReleaseTime = info.Value;
                     break;
                 case "长度":
-                    videoInfo.Lengthtime = info.Value;
+                    videoInfo.LengthTime = info.Value;
                     break;
                 case "导演":
                     videoInfo.Director = info.Value;

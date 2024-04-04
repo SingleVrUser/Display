@@ -16,7 +16,7 @@
     <Control.Resources>
         <!--ListView 的 文件 DataTemplate-->
         <DataTemplate x:Key="FileInSelectFolderTemplate"
-                      x:DataType="oneOneFive1:FilesInfo">
+                      x:DataType="oneOneFive1:DetailFileInfo">
             <ListViewItem>
                 <Grid ColumnSpacing="10" Background="Transparent">
                     <Grid.ContextFlyout>
@@ -81,7 +81,7 @@
 
         <!--ListView 的 文件夹 DataTemplate-->
         <DataTemplate x:Key="FolderInSelectFolderTemplate"
-                      x:DataType="oneOneFive1:FilesInfo">
+                      x:DataType="oneOneFive1:DetailFileInfo">
             <ListViewItem>
                 <StackPanel Orientation="Horizontal" Spacing="5">
                     <Grid ColumnSpacing="10">

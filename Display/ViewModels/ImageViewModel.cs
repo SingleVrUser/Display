@@ -23,7 +23,7 @@ internal partial class ImageViewModel : ObservableObject
     [ObservableProperty]
     private List<SubImageModel> _photos = [];
 
-    public readonly ObservableCollection<FilesInfo> Infos = [];
+    public readonly ObservableCollection<DetailFileInfo> Infos = [];
 
     [ObservableProperty]
     private bool _loading;
@@ -37,7 +37,7 @@ internal partial class ImageViewModel : ObservableObject
     [ObservableProperty]
     private SubImageModel _currentPhotoModel;
 
-    public async Task SetDataAndCurrentIndex(List<FilesInfo> files, int currentIndex)
+    public async Task SetDataAndCurrentIndex(List<DetailFileInfo> files, int currentIndex)
     {
         _currentIndex = currentIndex;
 
@@ -100,7 +100,7 @@ internal partial class ImageViewModel : ObservableObject
     [RelayCommand]
     private async Task ExportCurrentImageAsync(UIElement element)
     {
-        var fileName = CurrentPhotoModel.FileInfo.Name;
+        var fileName = CurrentPhotoModel.DetailFileInfo.Name;
 
         if (string.IsNullOrEmpty(fileName)) return;
 
@@ -123,7 +123,7 @@ internal partial class ImageViewModel : ObservableObject
     [RelayCommand]
     private async Task OpenWithOtherApplicationAsync()
     {
-        var filePath = LocalCacheHelper.GetCacheFilePath(CurrentPhotoModel.FileInfo.Name);
+        var filePath = LocalCacheHelper.GetCacheFilePath(CurrentPhotoModel.DetailFileInfo.Name);
         if (filePath == null) return;
         await Windows.System.Launcher.LaunchUriAsync(new Uri(filePath));
     }

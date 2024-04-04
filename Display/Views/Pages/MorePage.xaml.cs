@@ -15,17 +15,13 @@ public sealed partial class MorePage
 
     public MorePage()
     {
-        this.InitializeComponent();
+        InitializeComponent();
 
     }
 
     private void GridView_ItemClick(object sender, ItemClickEventArgs e)
     {
         if (e.ClickedItem is not MoreMenuItem item) return;
-
-        if (!PageTypeAndEnum.PageTypeAndEnumDict.TryGetValue(item.PageEnum, out var pageType)) return;
-
-        var page = (Page)Activator.CreateInstance(pageType);
 
         if (item.PageEnum == NavigationViewItemEnum.BrowserPage)
         {
@@ -35,6 +31,7 @@ public sealed partial class MorePage
         }
         else
         {
+            var page = (Page)Activator.CreateInstance(item.PageType);
             CommonWindow.CreateAndShowWindow(page);
         }
     }

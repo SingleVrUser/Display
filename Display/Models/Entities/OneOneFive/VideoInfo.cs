@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 
-namespace Display.Models.Entities.OneOneFive;
+namespace Display.Models.Entities.OneOneFives;
 
 /// <summary>
 /// 视频详细信息

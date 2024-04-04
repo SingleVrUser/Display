@@ -5,14 +5,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DataAccess.Models.Entity;
 
 [Table("SearchHistory")]
-[Index("Keyword", IsUnique = true)]
+[Index(nameof(Keyword), IsUnique = true)]
 public class SearchHistory
 {
     [Key]
     [Column("id")]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    public int Id { get; set; }
+    public int Id { get; init; }
 
     [Column("keyword", TypeName = "TEXT NO")]
-    public string? Keyword { get; set; }
+    public string? Keyword { get; init; }
 }

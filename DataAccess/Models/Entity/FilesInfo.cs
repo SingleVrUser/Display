@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace DataAccess.Models.Entity;
 
@@ -7,101 +8,140 @@ namespace DataAccess.Models.Entity;
 public class FilesInfo
 {
     [Column("fid")]
+    [JsonProperty("fid")]
     [StringLength(20)]
-    public string? Fid { get; init; }
+    public long? FileId { get; set; }
 
     [Column("uid")]
-    public int? Uid { get; init; }
+    [JsonProperty("uid")]
+    public long Uid { get; set; } = 0;
 
     [Column("aid")]
-    public int? Aid { get; init; }
+    [JsonProperty("aid")]
+    public int? Aid { get; set; }
 
+    /// <summary>
+    /// 当前目录Id
+    /// </summary>
     [Column("cid")]
-    [StringLength(20)]
-    public string? Cid { get; init; }
+    [JsonProperty("cid")]
+    public long CurrentId { get; set; }
 
+    /// <summary>
+    /// 父级目录Id
+    /// </summary>
+    [Column("pid")]
+    [JsonProperty("pid")]
+    public long? ParentId { get; set; }
+    
     [Column("n")]
-    public string? N { get; init; }
+    [JsonProperty("n")]
+    [StringLength(200)]
+    public string Name { get; set; }
 
     [Column("s")]
-    public int? S { get; init; }
+    [JsonProperty("s")]
+    public long Size { get; set; }
 
     [Column("sta")]
-    public int? Sta { get; init; }
+    [JsonProperty("sta")]
+    public int? Sta { get; set; }
 
     [Column("pt")]
-    public string? Pt { get; init; }
-
-    [Column("pid")]
-    public string? Pid { get; init; }
+    [JsonProperty("pt")]
+    public string? Pt { get; set; }
 
     [Key]
     [Column("pc")]
-    public string Pc { get; init; } = null!;
+    [JsonProperty("pc")]
+    [StringLength(18)]
+    public string PickCode { get; set; } = null!;
 
     [Column("p")]
-    public int? P { get; init; }
+    [JsonProperty("p")]
+    public int? P { get; set; }
 
     [Column("m")]
-    public int? M { get; init; }
+    [JsonProperty("m")]
+    public int? M { get; set; }
 
     [Column("t")]
-    public string? T { get; init; }
+    [JsonProperty("t")]
+    public string Time { get; set; }
 
     [Column("te")]
-    public int? Te { get; init; }
+    [JsonProperty("te")]
+    public int TimeEdit { get; set; }
 
     [Column("tp")]
-    public int? Tp { get; init; }
+    [JsonProperty("tp")]
+    public int TimeProduce { get; set; }
 
     [Column("d")]
-    public int? D { get; init; }
+    [JsonProperty("d")]
+    public int? D { get; set; }
 
     [Column("c")]
-    public int? C { get; init; }
+    [JsonProperty("c")]
+    public int? C { get; set; }
 
     [Column("sh")]
-    public int? Sh { get; init; }
+    [JsonProperty("sh")]
+    public int? Sh { get; set; }
 
     [Column("e")]
-    public string? E { get; init; }
+    [JsonProperty("e")]
+    public string? E { get; set; }
 
     [Column("ico")]
-    public string? Ico { get; init; }
+    [JsonProperty("ico")]
+    public string? Ico { get; set; }
 
     [Column("sha")]
-    public string? Sha { get; init; }
+    [JsonProperty("sha")]
+    public string? Sha { get; set; }
 
     [Column("fdes")]
-    public string? Fdes { get; init; }
+    [JsonProperty("fdes")]
+    public string? Fdes { get; set; }
 
     [Column("q")]
-    public int? Q { get; init; }
+    [JsonProperty("q")]
+    public int? Q { get; set; }
 
     [Column("hdf")]
-    public int? Hdf { get; init; }
+    [JsonProperty("hdf")]
+    public int? Hdf { get; set; }
 
     [Column("fvs")]
-    public int? Fvs { get; init; }
+    [JsonProperty("fvs")]
+    public int? Fvs { get; set; }
 
     [Column("u")]
-    public string? U { get; init; }
+    [JsonProperty("u")]
+    public string? U { get; set; }
 
     [Column("iv")]
-    public int? Iv { get; init; }
+    [JsonProperty("iv")]
+    public int? Iv { get; set; }
 
     [Column("current_time")]
-    public int? CurrentTime { get; init; }
+    [JsonProperty("current_time")]
+    public int? CurrentTime { get; set; }
 
     [Column("played_end")]
-    public int? PlayedEnd { get; init; }
+    [JsonProperty("played_end")]
+    public int? PlayedEnd { get; set; }
 
     [Column("last_time")]
-    public string? LastTime { get; init; }
+    [JsonProperty("last_time")]
+    public string? LastTime { get; set; }
 
     [Column("vdi")]
-    public int? Vdi { get; init; }
+    [JsonProperty("vdi")]
+    public int Vdi { get; set; }
 
     [Column("play_long")]
-    public double? PlayLong { get; init; }
+    [JsonProperty("play_long")]
+    public double? PlayLong { get; set; }
 }

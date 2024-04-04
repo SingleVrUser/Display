@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.System;
+using DataAccess.Dao.Interface;
+using DataAccess.Models.Entity;
 using Display.Models.Api.EditorCookie;
-using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.OneOneFive;
-using Display.Models.Entities.OneOneFive;
 using Display.Models.Vo;
 using Display.Providers;
 
@@ -20,12 +20,14 @@ namespace Display.Helper.FileProperties.Name;
 
 public static class FileMatch
 {
+    private static readonly IFilesInfoDao FilesInfoDao = App.GetService<IFilesInfoDao>();
+    
     /// <summary>
     /// 正则删除某些关键词
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public static string DeleteSomeKeywords(string name)
+    private static string DeleteSomeKeywords(string name)
     {
         var regReplaceList =
             new List<string> { "uur76", @"({\d}K)?\d{2,3}fps\d{0,}", @"part\d", "@18P2P", @"[^\d]\d{3,6}P", @"\[?[0-9a-z]+?[\._](com|cn|xyz|la|me|net|app|cc)\]?@?",
@@ -107,7 +109,7 @@ public static class FileMatch
         match = Regex.Match(noDomain, @"([a-z]{2,})0*(\d{2,5})", RegexOptions.IgnoreCase);
         if (match.Success)
         {
-            string number = match.Groups[2].Value;
+            var number = match.Groups[2].Value;
             //不满三位数，填充0
             number = number.PadLeft(3, '0');
 
@@ -146,14 +148,14 @@ public static class FileMatch
         //如果还是匹配不了，尝试将')('替换为'-'后再试，少部分影片的番号是由')('分隔的
         if (noDomain.Contains(")("))
         {
-            string avid = MatchName(noDomain.Replace(")(", "-"));
+            var avid = MatchName(noDomain.Replace(")(", "-"));
             if (!string.IsNullOrEmpty(avid))
                 return avid;
         }
 
         //如果最后仍然匹配不了番号，则尝试使用文件所在文件夹的名字去匹配
         if (fileCid == null) return null;
-        var folderDatum = DataAccess.Get.GetUpperLevelFolderCid((long)fileCid);
+        var folderDatum = FilesInfoDao.GetUpperLevelFolderInfoByFolderId((long)fileCid);
 
         return !string.IsNullOrEmpty(folderDatum?.Name) ? MatchName(folderDatum.Name) : null;
     }
@@ -163,9 +165,9 @@ public static class FileMatch
         return isLike != 0;
     }
 
-    public static bool? IsLookLater(long lookLater)
+    public static bool IsLookLater(long? lookLater)
     {
-        return lookLater != 0;
+        return lookLater != null && lookLater != 0;
     }
 
     //是否显示喜欢图标
@@ -208,7 +210,7 @@ public static class FileMatch
                 //失败比较特殊
                 //从另外的表中查找
                 case "失败" or "fail":
-                    var failItems = await DataAccess.Get.GetFailFileInfoWithDatum(n: keywords, limit: limit);
+                    var failItems = DataAccessLocal.Get.GetFailFileInfoWithFilesInfo(n: keywords, limit: limit);
                     failItems?.ForEach(item => dictionary.TryAdd(item.Name, new FailVideoInfo(item)));
                     continue;
                 default:
@@ -221,7 +223,7 @@ public static class FileMatch
             // 当数量超过Limit数量时，跳过（不包括失败列表）
             if (leftCount <= 0) continue;
 
-            var newItems = DataAccess.Get.GetVideoInfoBySomeType(trueType, keywords, leftCount);
+            var newItems = DataAccessLocal.Get.GetVideoInfoBySomeType(trueType, keywords, leftCount);
 
             newItems?.ForEach(item => dictionary.TryAdd(item.TrueName, item));
         }
@@ -239,7 +241,7 @@ public static class FileMatch
     /// </summary>
     /// <param name="data"></param>
     /// <returns></returns>
-    public static List<MatchVideoResult> GetVideoAndMatchFile(List<Datum> data)
+    public static List<MatchVideoResult> GetVideoAndMatchFile(List<FilesInfo> data)
     {
         //根据视频信息匹配视频文件
         List<MatchVideoResult> resultList = [];
@@ -252,10 +254,10 @@ public static class FileMatch
             if (fileInfo.Iv == 1)
             {
                 //根据视频名称匹配番号
-                var videoName = MatchName(fileName, fileInfo.Cid);
+                var videoName = MatchName(fileName, fileInfo.CurrentId);
 
                 //无论匹配与否，都存入数据库
-                DataAccess.Add.AddFileToInfo(fileInfo.PickCode, videoName, isReplace: true);
+                FilesInfoDao.Add(fileInfo);
 
                 //未匹配
                 if (videoName == null)

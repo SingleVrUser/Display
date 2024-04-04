@@ -1,34 +1,34 @@
 ﻿using Display.Providers;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
+using Display.Constants;
+using Display.Extensions;
 using Display.Models.Dto.Settings;
+using Display.Models.Records;
 
 namespace Display.ViewModels.Sub;
 
 internal class MoreNavigationItemViewModel
 {
-    public readonly ObservableCollection<MoreMenuItem> MoreMenuItems = new(AppSettings.MoreMenuItemsArray);
+    public readonly ObservableCollection<MoreMenuItem> MoreMenuItems;
 
     public MoreNavigationItemViewModel()
     {
-        foreach (var moreMenuItem in MoreMenuItems)
-            moreMenuItem.PropertyChanged += (_, _) =>
+        MoreMenuItems = new ObservableCollection<MoreMenuItem>(AppSettings.MoreMenuItemEnumArray
+            .Select(enumAndVisible =>
             {
-                SaveSetting();
-            };
-
-        MoreMenuItems.CollectionChanged += MoreMenuItemsCollectionChanged;
+                var firstOrDefault = MenuItems.MoreMenuItems.FirstOrDefault(item => item.PageEnum == enumAndVisible.PageEnum);
+                if (firstOrDefault != null && !enumAndVisible.IsVisible)
+                    firstOrDefault.IsVisible = false;
+                return firstOrDefault;
+            })
+            .Where(i=>i != null)
+        );
     }
 
-    private void MoreMenuItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    public void SaveSetting()
     {
-        if (e.Action != NotifyCollectionChangedAction.Add) return;
-
-        SaveSetting();
-    }
-
-    private void SaveSetting()
-    {
-        AppSettings.MoreMenuItemsArray = [.. MoreMenuItems];
+        AppSettings.MoreMenuItemEnumArray = [.. MoreMenuItems.Select(i=>new PageEnumAndIsVisible(i.PageEnum, i.IsVisible))];
     }
 }

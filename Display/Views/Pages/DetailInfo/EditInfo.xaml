@@ -8,7 +8,7 @@
     xmlns:details="using:Display.Models.Entities.Details"
     xmlns:detailInfo1="using:Display.Views.Pages.DetailInfo"
     xmlns:records="using:Display.Models.Records"
-    xmlns:oneOneFive="using:Display.Models.Entities.OneOneFive"
+    xmlns:entity="using:DataAccess.Models.Entity"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -22,7 +22,7 @@
                     <TextBlock Text="{x:Bind Initials}"
                                Foreground="White"
                                FontSize="10"
-                               FontWeight="Semibold"
+                               FontWeight="SemiBold"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center" />
                 </Border>
@@ -32,7 +32,7 @@
         </DataTemplate>
         
         <DataTemplate x:Key="ActorTemplate"
-                      x:DataType="oneOneFive:ActorInfo">
+                      x:DataType="entity:ActorInfo">
             <StackPanel Orientation="Horizontal">
                 <Border CornerRadius="9999"
                         Background="{x:Bind Name, Converter={StaticResource ObjectToColorConverter}}"
@@ -41,7 +41,7 @@
                     <TextBlock Text="{x:Bind Initials}"
                                Foreground="White"
                                FontSize="10"
-                               FontWeight="Semibold"
+                               FontWeight="SemiBold"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center" />
                 </Border>

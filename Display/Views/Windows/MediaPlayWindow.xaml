@@ -45,7 +45,7 @@
 
                 </VisualStateManager.VisualStateGroups>
 
-                <userController:CustomMediaPlayerElement x:Name="MediaControl"
+                <userController:CustomMediaPlayerElement Grid.Column="0" x:Name="MyMediaControl"
                                                          FullWindow="mediaControls_FullWindow"
                                                          MediaDoubleTapped="mediaControl_MediaDoubleTapped"
                                                          RightButtonClick="MediaControl_OnRightButtonClick"

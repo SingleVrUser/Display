@@ -1,5 +1,4 @@
 ﻿using Display.Helper.FileProperties.Name;
-using Display.Models.Data;
 using Display.Providers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -9,11 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.Foundation;
-using Display.Models.Api.OneOneFive.Search;
+using DataAccess.Dao.Interface;
+using DataAccess.Models.Entity;
 using Display.Models.Dto;
-using Display.Models.Dto.OneOneFive;
-using Display.Models.Entities.OneOneFive;
-using Display.Models.Vo;
+using SearchHistory = Display.Models.Api.OneOneFive.Search.SearchHistory;
 
 namespace Display.Controls.UserController;
 
@@ -24,10 +22,7 @@ public sealed partial class CustomAutoSuggestBox
     public event EventHandler<object> OpenAutoSuggestionBoxCompleted;
     public event EventHandler<object> CloseAutoSuggestionBoxCompleted;
 
-    public CustomAutoSuggestBox()
-    {
-        this.InitializeComponent();
-    }
+    private readonly ISearchHistoryDao _searchHistoryDao = App.GetService<ISearchHistoryDao>();
 
     //输入的Text改变
     private async void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
@@ -95,7 +90,7 @@ public sealed partial class CustomAutoSuggestBox
             }
 
             //保存到数据库
-            DataAccess.Add.AddHistoryHistory(args.QueryText);
+            _searchHistoryDao.Add(new DataAccess.Models.Entity.SearchHistory {Keyword = args.QueryText});
         }
 
         //初始化搜索框
@@ -113,7 +108,6 @@ public sealed partial class CustomAutoSuggestBox
     //    SuggestionChosen?.Invoke(sender, args);
     //}
 
-
     private void NavViewSearchBox_GotFocus(object sender, RoutedEventArgs e)
     {
         if (selectFoundMethodButton.Visibility != Visibility.Collapsed) return;
@@ -125,14 +119,7 @@ public sealed partial class CustomAutoSuggestBox
 
     private void ShowHistorySearch()
     {
-        var result = DataAccess.Get.GetAllSearchHistory();
-
-        if (result == null) return;
-
-        NavViewSearchBox.ItemsSource = new List<HistorySearchItem>
-        {
-            new(result)
-        };
+        NavViewSearchBox.ItemsSource = _searchHistoryDao.List();
     }
 
     private void NavViewSearchBox_LostFocus(object sender, RoutedEventArgs e)
@@ -155,15 +142,19 @@ public sealed partial class CustomAutoSuggestBox
     /// <returns></returns>
     private List<ToggleMenuFlyoutItem> GetAllSelectedMethodButton()
     {
-        return new List<ToggleMenuFlyoutItem> { SelectedCid_Toggle, SelectedActor_Toggle, SelectedCategory_Toggle, SelectedTitle_Toggle, SelectedProducter_Toggle, SelectedDirector_Toggle, SelectedFail_Toggle };
+        return
+        [
+            SelectedCid_Toggle, SelectedActor_Toggle, SelectedCategory_Toggle, SelectedTitle_Toggle,
+            SelectedProducter_Toggle, SelectedDirector_Toggle, SelectedFail_Toggle
+        ];
     }
 
     /// <summary>
     /// 切换搜索范围
     /// 左键单选
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void ChangedFindMethod_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not ToggleMenuFlyoutItem item) return;
@@ -188,8 +179,8 @@ public sealed partial class CustomAutoSuggestBox
     /// <summary>
     /// 搜索方式全选或重设
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void SelectedAllFindMethod_Clicked(object sender, RoutedEventArgs e)
     {
         if (sender is not ToggleMenuFlyoutItem item) return;
@@ -215,10 +206,10 @@ public sealed partial class CustomAutoSuggestBox
     /// 切换搜索范围
     /// 右键多选
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
-    private void ChangedFindMethod_RightTapped(object sender, Microsoft.UI.Xaml.Input.RightTappedRoutedEventArgs e)
-    {
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void ChangedFindMethod_RightTapped(object sender, RightTappedRoutedEventArgs e)
+    {   
         if (sender is not ToggleMenuFlyoutItem item) return;
 
         var items = GetAllSelectedMethodButton();
@@ -284,7 +275,7 @@ public sealed partial class CustomAutoSuggestBox
         var keyword = NavViewSearchBox.Text;
         SuggestionItemTapped?.Invoke(sender, keyword);
 
-        DataAccess.Add.AddHistoryHistory(keyword);
+        _searchHistoryDao.Add(new DataAccess.Models.Entity.SearchHistory {Keyword = keyword});
     }
 
     private bool _isBusy;
@@ -300,7 +291,7 @@ public sealed partial class CustomAutoSuggestBox
 
     private void ClearSearchHistoryClick(object sender, RoutedEventArgs e)
     {
-        DataAccess.Delete.DeleteAllSearchHistory();
+        _searchHistoryDao.Delete();
         NavViewSearchBox.ItemsSource = null;
     }
 }

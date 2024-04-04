@@ -2,6 +2,7 @@
 
 namespace DataAccess.Dao.Interface;
 
-internal interface IFailListIsLikeLookLaterDao : IDao<FailListIslikeLookLater>
+public interface IFailListIsLikeLookLaterDao : IDao<FailListIsLikeLookLater>
 {
+    FailListIsLikeLookLater? GetByPickCode(string pickCode);
 }

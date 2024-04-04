@@ -1,4 +1,4 @@
-﻿using Display.Models.Dto.OneOneFive;
+﻿using DataAccess.Models.Entity;
 using Newtonsoft.Json;
 
 namespace Display.Models.Api.OneOneFive.File;
@@ -6,7 +6,7 @@ namespace Display.Models.Api.OneOneFive.File;
 public class WebFileInfo
 {
     [JsonProperty("data")]
-    public Datum[] Data { get; set; }
+    public FilesInfo[] Data { get; set; }
     
     [JsonProperty("path")]
     public WebPath[] Path { get; set; }

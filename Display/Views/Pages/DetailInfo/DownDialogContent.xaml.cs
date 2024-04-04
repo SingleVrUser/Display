@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using DataAccess.Models.Entity;
 using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.OneOneFive;
 using Display.Providers;
@@ -17,14 +18,14 @@ public sealed partial class DownDialogContent : INotifyPropertyChanged
         InitializeComponent();
     }
 
-    public DownDialogContent(List<Datum> videoInfoList)
+    public DownDialogContent(List<FilesInfo> videoInfoList)
     {
         InitializeComponent();
 
         CreateCheckBox(videoInfoList);
     }
 
-    private void CreateCheckBox(List<Datum> videoInfoList)
+    private void CreateCheckBox(List<FilesInfo> videoInfoList)
     {
         videoInfoList.ForEach(videoInfo => ContentStackPanel.Children.Add(new CheckBox
         {

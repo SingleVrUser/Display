@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DataAccess.Models.Entity;
 using Display.Helper.Network;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Entities.OneOneFive;
@@ -84,7 +85,7 @@ public class JavBus : BaseSpider
 
         var videoInfo = new VideoInfo
         {
-            busUrl = detailUrl,
+            Url = detailUrl,
             TrueName = cid
         };
 
@@ -120,7 +121,7 @@ public class JavBus : BaseSpider
                     videoInfo.ReleaseTime = attributeNode.LastChild.InnerText.Trim();
                     break;
                 case "長度:":
-                    videoInfo.Lengthtime = attributeNode.LastChild.InnerText.Trim().Replace("分鐘", "分钟");
+                    videoInfo.LengthTime = attributeNode.LastChild.InnerText.Trim().Replace("分鐘", "分钟");
                     break;
                 case "導演:":
                     videoInfo.Director = attributeNode.LastChild.InnerText.Trim();

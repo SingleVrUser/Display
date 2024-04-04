@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace Display.Models.Entities.OneOneFive;
 
-public class ActorInfo : INotifyPropertyChanged
+public class ActorInfos : INotifyPropertyChanged
 {
     [JsonProperty(propertyName: "id")]
     public int Id { get; set; }
@@ -69,7 +69,7 @@ public class ActorInfo : INotifyPropertyChanged
     public string InfoUrl { get; set; } = string.Empty;
 
     [JsonProperty(propertyName: "is_like")]
-    public int IsLike { set; get; } = 0;
+    public int IsLike { set; get; }
 
     [JsonProperty(propertyName: "addtime")]
     public long AddTime { set; get; } = DateTimeOffset.Now.ToUnixTimeSeconds();
@@ -108,10 +108,7 @@ public class ActorInfo : INotifyPropertyChanged
 
     public string AgeInfo
     {
-        get
-        {
-            return _ageInfo;
-        }
+        get => _ageInfo;
         set
         {
             _ageInfo = value;
@@ -122,7 +119,7 @@ public class ActorInfo : INotifyPropertyChanged
     public string Initials => string.Empty + Name.FirstOrDefault();
 
     public event PropertyChangedEventHandler PropertyChanged;
-    public void OnPropertyChanged([CallerMemberName] string propertyName = "")
+    private void OnPropertyChanged([CallerMemberName] string propertyName = "")
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

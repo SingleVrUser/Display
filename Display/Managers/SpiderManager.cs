@@ -9,9 +9,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Display.Models.Dto.OneOneFive;
-using Display.Models.Entities.OneOneFive;
-using Display.Models.Vo;
+using DataAccess.Dao.Interface;
+using DataAccess.Models.Entity;
 using Display.Models.Vo.Spider;
 using Display.Providers;
 
@@ -32,6 +31,11 @@ public class SpiderManager
     private readonly ConcurrentQueue<VideoInfo> _successNameInfos = [];
 
     private readonly ConcurrentQueue<string> _failureNameInfos = [];
+
+    private readonly IFilesInfoDao _filesInfoDao = App.GetService<IFilesInfoDao>();
+    private readonly IFileToInfoDao _fileToInfoDao = App.GetService<IFileToInfoDao>();
+    private readonly IVideoInfoDao _videoInfoDao = App.GetService<IVideoInfoDao>();
+    
 
     /// <summary>
     /// 随机
@@ -305,9 +309,14 @@ public class SpiderManager
         _successNameInfos.Enqueue(item.Info);
 
         // TODO 当_nameInfos达到指定数量时才添加进数据库
-        await DataAccess.Add.AddVideoInfo_ActorInfo_IsWmAsync(item.Info);
-        DataAccess.Update.UpdateFileToInfo(item.Name, true);
-
+        await DataAccessLocal.Add.AddVideoInfo_ActorInfo_IsWmAsync(item.Info);
+        
+        _fileToInfoDao.UpdateSingle(new FileToInfo
+        {
+            Truename = item.Name,
+            Issuccess = 1
+            
+        });
     }
 
 
@@ -350,7 +359,7 @@ public class SpiderManager
         {
             var upperName = name.ToUpper();
             // 先从数据库中搜索
-            var singleVideoInfoByTrueName = DataAccess.Get.GetSingleVideoInfoByTrueName(upperName);
+            var singleVideoInfoByTrueName = _videoInfoDao.GetOneByTrueName(upperName);
             if(singleVideoInfoByTrueName != null) continue;
 
             _taskItemQueue.Enqueue(new SpiderItem(upperName));

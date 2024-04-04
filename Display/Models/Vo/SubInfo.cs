@@ -1,18 +1,9 @@
-﻿namespace Display.Models.Dto.OneOneFive;
+﻿namespace Display.Models.Vo;
 
-public class SubInfo
+public class SubInfo(string pickCode, string name, string trueName)
 {
-    public string PickCode { get; set; }
-    public string Name { get; set; }
-    public string FileBelongPickCode { get; set; }
+    public string PickCode { get; set; } = pickCode;
+    public string Name { get; set; } = name;
 
-    public string TrueName { get; set; }
-
-    public SubInfo(string pickCode, string name, string fileBelongPickCode, string trueName)
-    {
-        PickCode = pickCode;
-        Name = name;
-        FileBelongPickCode = fileBelongPickCode;
-        TrueName = trueName;
-    }
+    public string TrueName { get; set; } = trueName;
 }

@@ -6,7 +6,7 @@
       xmlns:helper="using:Display.Helper.FileProperties.Name"
       xmlns:animations="using:CommunityToolkit.WinUI.Animations"
       xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
-      xmlns:oneOneFive="using:Display.Models.Entities.OneOneFive"
+      xmlns:entity="using:DataAccess.Models.Entity"
       mc:Ignorable="d"
       NavigationCacheMode="Enabled">
 
@@ -63,13 +63,9 @@
                                             Value="霞鹜文楷 GB 屏幕阅读版" />
                                 </Style>
                             </StackPanel.Resources>
-                            <!--<Button Content="90后"/>
-                            <Button Content="80后"/>
-                            <Button Content="年轻"/>
-                            <Button Content="苗条"/>-->
                             <ProgressRing x:Name="ProgressRing" />
                         </StackPanel>
-                        <TextBlock x:Name="TotalCount_TextBlock"
+                        <TextBlock x:Name="TotalCountTextBlock"
                                    RelativePanel.AlignLeftWithPanel="True"
                                    RelativePanel.AlignVerticalCenterWithPanel="True"
                                    Margin="0,0,10,0"
@@ -103,10 +99,10 @@
                             <CubicEase EasingMode="EaseOut" />
                         </oldControls:Carousel.EasingFunction>
                         <oldControls:Carousel.ItemTemplate>
-                            <DataTemplate x:DataType="oneOneFive:ActorInfo">
+                            <DataTemplate x:DataType="entity:ActorInfo">
                                 <Image Width="300"
                                        Height="240"
-                                       Source="{x:Bind ProfilePath}"
+                                       Source="{x:Bind ProfilePath, Converter={StaticResource NotExistsImagePathConverter}}"
                                        Stretch="Uniform"
                                        Tapped="Image_Tapped"
                                        PointerEntered="Img_PointerEntered"
@@ -122,7 +118,7 @@
             </oldControls:AdaptiveGridView.Header>
 
             <oldControls:AdaptiveGridView.ItemTemplate>
-                <DataTemplate x:DataType="oneOneFive:ActorInfo">
+                <DataTemplate x:DataType="entity:ActorInfo">
                     <Grid CornerRadius="5"
                           Padding="5,0"
                           PointerEntered="Grid_PointerEntered"
@@ -134,7 +130,7 @@
                         </Grid.RowDefinitions>
 
                         <oldControls:ImageEx x:Name="ActorImage"
-                                          Source="{x:Bind ProfilePath}"
+                                          Source="{x:Bind ProfilePath, Converter={StaticResource NotExistsImagePathConverter}}"
                                           PlaceholderStretch="Uniform"
                                           CornerRadius="5"
                                           DecodePixelWidth="140"

@@ -13,10 +13,9 @@
              xmlns:userController="using:Display.Controls.UserController"
              xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
              xmlns:file="using:Display.Models.Api.OneOneFive.File"
-             xmlns:vo="using:Display.Models.Vo"
-             xmlns:oneOneFive1="using:Display.Models.Vo.OneOneFive"
-             xmlns:entities="using:Display.Models.Entities"
              xmlns:oneOneFive2="using:Display.Models.Entities.OneOneFive"
+             xmlns:vo="using:Display.Models.Vo"
+             xmlns:entity="using:DataAccess.Models.Entity"
              mc:Ignorable="d"
              CacheMode="BitmapCache">
 
@@ -210,7 +209,7 @@
 
         <!--预览展示样式-->
         <DataTemplate x:Key="ImageTemplate"
-                      x:DataType="oneOneFive:VideoCoverDisplayClass">
+                      x:DataType="vo:VideoInfoVo">
             <Grid Padding="3,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -240,9 +239,9 @@
                         <oldControls:ImageEx x:Name="CoverImage" Stretch="UniformToFill"
                                           Source="{x:Bind ImagePath,Mode=OneWay}"
                                           Width="{x:Bind ImageWidth,Mode=OneWay}"
-                                          Height="{x:Bind imageHeight,Mode=OneWay}"
+                                          Height="{x:Bind ImageHeight,Mode=OneWay}"
                                           DecodePixelWidth="{x:Bind ImageWidth,Converter={StaticResource DoubleToInt32Converter},Mode=OneWay}"
-                                          DecodePixelHeight="{x:Bind imageHeight,Converter={StaticResource DoubleToInt32Converter},Mode=OneWay}"/>
+                                          DecodePixelHeight="{x:Bind ImageHeight,Converter={StaticResource DoubleToInt32Converter},Mode=OneWay}"/>
 
                         <RelativePanel>
                             <!--喜欢就显示爱心-->
@@ -262,7 +261,7 @@
                                         VerticalAlignment="Top"
                                         CornerRadius="5"
                                         Opacity="0.9"
-                                        Visibility="{x:Bind isShowLabel}">
+                                        Visibility="{x:Bind IsShowLabel}">
                                 <TextBlock Text="{x:Bind ShowLabel}"
                                            Foreground="AntiqueWhite"
                                            FontFamily="Times New Roman"
@@ -275,7 +274,7 @@
                     <Grid Visibility="Collapsed"
                           Background="{StaticResource OperableGridBackground}"
                           Width="{x:Bind ImageWidth,Mode=OneWay}"
-                          Height="{x:Bind imageHeight,Mode=OneWay}">
+                          Height="{x:Bind ImageHeight,Mode=OneWay}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="*" />
@@ -479,7 +478,7 @@
 
         <!--匹配失败的仿图片展示样式-->
         <DataTemplate x:Key="FailCoverTemplate"
-                      x:DataType="oneOneFive:FailVideoInfo">
+                      x:DataType="vo:FailVideoInfo">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -497,7 +496,7 @@
                           Padding="0">
 
                         <Image Width="{x:Bind ImageWidth,Mode=OneWay}"
-                               Height="{x:Bind imageHeight,Mode=OneWay}">
+                               Height="{x:Bind ImageHeight,Mode=OneWay}">
 
                         </Image>
                         <TextBlock Text="{x:Bind TrueName}"
@@ -716,7 +715,7 @@
 
         <!--匹配失败的列表展示样式-->
         <DataTemplate x:Key="FailListTemplate"
-                      x:DataType="file:Datum">
+                      x:DataType="entity:FilesInfo">
             <Grid x:Name="FailGrid"
                   BorderBrush="{ThemeResource ControlElevationBorderBrush}"
                   BorderThickness="{StaticResource ButtonBorderThemeThickness}"
@@ -782,22 +781,7 @@
     </Control.Resources>
 
     <Grid RowDefinitions="auto,auto,*,auto,47">
-        <!--<Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="47" />
-        </Grid.RowDefinitions>-->
-
-        <!--提示信息--><!--
-        <InfoBar RelativePanel.AlignLeftWithPanel="True"
-                 IsOpen="False"
-                 Severity="Informational"
-                 Title="Title"
-                 x:Name="InfoBar"
-                 Message="Essential app message for your users to be informed of, acknowledge, or take action on." />-->
-
+        
         <RelativePanel Grid.Row="0" Margin="10,2">
             <!--搜索框（匹配失败列表显示时显示）-->
             <userController:FileAutoSuggestBox
@@ -822,35 +806,6 @@
                                         ToolTipService.ToolTip="稍后观看" />
             </controls:Segmented>
 
-            <!--<RadioButtons x:Name="FailShowChanged_RadioButtons"
-                          SelectedIndex="0"
-                          Grid.Column="2"
-                          MaxColumns="3"
-                          CharacterSpacing="30"
-                          RelativePanel.AlignRightWithPanel="True"
-                          Visibility="{x:Bind IsShowFailListView,Mode=OneWay,Converter={StaticResource BoolToVisibleConverter}}"
-                          SelectionChanged="ShowData_RadioButtons_SelectionChanged">
-                <RadioButton x:Name="AllFailRadioButton"
-                             Content="&#xE0A2;"
-                             FontSize="20"
-                             HorizontalContentAlignment="Center"
-                             Style="{StaticResource RadioButtonCustomizeStyle}"
-                             ToolTipService.ToolTip="全部" />
-                <RadioButton x:Name="FailLike_RadioButton"
-                             Content="&#xE006;"
-                             FontSize="20"
-                             HorizontalContentAlignment="Center"
-                             FontFamily="{StaticResource SymbolThemeFontFamily}"
-                             Style="{StaticResource RadioButtonCustomizeStyle}"
-                             ToolTipService.ToolTip="喜欢" />
-                <RadioButton x:Name="FailLookLater_RadioButton"
-                             Content="&#xE13B;"
-                             FontSize="20"
-                             FontFamily="{StaticResource SymbolThemeFontFamily}"
-                             HorizontalContentAlignment="Center"
-                             Style="{StaticResource RadioButtonCustomizeStyle}"
-                             ToolTipService.ToolTip="稍后观看" />
-            </RadioButtons>-->
         </RelativePanel>
 
         <!--封面预览-->
@@ -905,11 +860,11 @@
 
                                 <TextBlock Visibility="{x:Bind ActorInfo.Bwh,Converter={StaticResource NullToCollapsedConverter},Mode=OneWay}">
                                 <Run Foreground="Gray">三围：</Run>
-                                <Run Text="{x:Bind ActorInfo.Bust,Mode=OneWay}" />
+                                <Run Text="{x:Bind ActorInfo.BwhInfo.Bust,Mode=OneWay}" />
                                 <Run Text="/" />
-                                <Run Text="{x:Bind ActorInfo.Waist,Mode=OneWay}" />
+                                <Run Text="{x:Bind ActorInfo.BwhInfo.Waist,Mode=OneWay}" />
                                 <Run Text="/" />
-                                <Run Text="{x:Bind ActorInfo.Hips,Mode=OneWay}" />
+                                <Run Text="{x:Bind ActorInfo.BwhInfo.Hips,Mode=OneWay}" />
                                 </TextBlock>
 
                                 <TextBlock Visibility="{x:Bind ActorInfo.Height,Converter={StaticResource NullToCollapsedConverter},Mode=OneWay}">
@@ -934,11 +889,10 @@
                                     Margin="5,0"
                                     Visibility="{x:Bind IsShowHeaderCover,Mode=OneWay}">
 
-
-                            <HyperlinkButton x:Name="blog_HyperLink"
+                            <HyperlinkButton x:Name="BlogHyperLink"
                                              Content="博客"
                                              Visibility="{x:Bind ActorInfo.BlogUrl,Converter={StaticResource NullToCollapsedConverter},Mode=OneWay}" />
-                            <HyperlinkButton x:Name="info_HyperLink"
+                            <HyperlinkButton x:Name="InfoHyperLink"
                                              Content="更多信息"
                                              Visibility="{x:Bind ActorInfo.InfoUrl,Converter={StaticResource NullToCollapsedConverter},Mode=OneWay}" />
 
@@ -950,20 +904,6 @@
                                           Click="LikeButton_Click"
                                           Tag="{x:Bind ActorInfo.Id,Mode=OneWay}"
                                           Visibility="{x:Bind IsShowHeaderCover,Mode=OneWay}" />
-
-                            <!--<TextBlock Visibility="{x:Bind actorInfo.blog_url,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
-                            <Hyperlink x:Name="blog_HyperLink"
-                                       Click="blog_HyperLink_Click">
-                                博客
-                            </Hyperlink>
-                        </TextBlock>-->
-
-                            <!--<TextBlock Visibility="{x:Bind actorInfo.info_url,Converter={StaticResource CollapsedWhenNullConverter},Mode=OneWay}">
-                            <Hyperlink x:Name="info_HyperLink"
-                                       Click="info_HyperLink_Click">
-                                更多信息
-                            </Hyperlink>
-                        </TextBlock>-->
 
                         </StackPanel>
 

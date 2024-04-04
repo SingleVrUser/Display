@@ -3,25 +3,23 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
+using DataAccess.Dao.Interface;
+using DataAccess.Models.Entity;
 using Display.Helper.Network;
 using Display.Helper.Notifications;
-using Display.Models.Data.IncrementalCollection;
-using Display.Models.Dto.OneOneFive;
-using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo.IncrementalCollection;
 using Display.Providers;
-using Display.Providers.Downloader;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
-using SharpCompress;
 using Newtonsoft.Json;
+using DataAccess;
 
 namespace Display.Views.Pages;
 
@@ -30,6 +28,9 @@ public sealed partial class ActorsPage
     private IncrementalLoadActorInfoCollection _actorInfo;
     private readonly ObservableCollection<ActorInfo> _actorPartInfo = [];
 
+    private static readonly IActorInfoDao ActorInfoDao = App.GetService<IActorInfoDao>();
+    private static readonly IBwhDao BwhDao = App.GetService<IBwhDao>();
+    
     public static ActorsPage Current;
 
     //过渡动画用
@@ -53,9 +54,9 @@ public sealed partial class ActorsPage
 
         _actorInfo = new IncrementalLoadActorInfoCollection(new Dictionary<string, bool> { { "is_like", true }, { "prifile_path", true } });
         BasicGridView.ItemsSource = _actorInfo;
-        await _actorInfo.LoadData();
+        _actorInfo.LoadData();
 
-        TotalCount_TextBlock.Text = _actorInfo.AllCount.ToString();
+        TotalCountTextBlock.Text = _actorInfo.AllCount.ToString();
 
         LoadActorPartInfo();
 
@@ -72,12 +73,9 @@ public sealed partial class ActorsPage
         ProgressRing.IsActive = false;
     }
 
-    private async void LoadActorPartInfo(int count = 14)
+    private void LoadActorPartInfo(int count = 14)
     {
-        var infos = await DataAccess.Get.GetActorInfo(count, 0, orderByList: new Dictionary<string, bool> { { "RANDOM()", false } },
-            filterList: ["prifile_path != ''"]);
-
-        if (infos is null) return;
+        var infos = ActorInfoDao.GetList(0, count);
 
         infos.ForEach(_actorPartInfo.Add);
 
@@ -88,8 +86,8 @@ public sealed partial class ActorsPage
     /// <summary>
     /// 跳转至演员详情页
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name ="e"></param>
     private void BasicGridView_ItemClick(object sender, ItemClickEventArgs e)
     {
         if (BasicGridView.ContainerFromItem(e.ClickedItem) is not GridViewItem container) return;
@@ -221,7 +219,7 @@ public sealed partial class ActorsPage
             return;
         }
 
-        var infos = await DataAccess.Get.GetActorInfo(-1);
+        var infos = DataAccessLocal.Get.GetActorInfo(-1);
 
         var allCount = infos.Length;
         if (allCount == 0) return;
@@ -270,7 +268,7 @@ public sealed partial class ActorsPage
 
     }
 
-    private static async Task GetActorsInfo(ActorInfo[] infos, int startIndex = 0)
+    private async Task GetActorsInfo(ActorInfo[] infos, int startIndex = 0)
     {
         var allCount = infos.Length;
         if (allCount == 0) return;
@@ -325,36 +323,42 @@ public sealed partial class ActorsPage
         var actorInfo = await GetActorInfoFromNetwork.SearchInfoFromMinnanoAv(actorName, default);
         if (actorInfo == null) return null;
 
-        var actorId = DataAccess.Get.GetIdInActor_Names(actorName);
+        var actorId = DataAccessLocal.Get.GetIdInActor_Names(actorName);
         if (actorId == -1) return null;
 
-        DataAccess.Update.UpdateActorInfo(actorId, actorInfo);
-
+        actorInfo.Id = actorId;
+        
+        ActorInfoDao.UpdateSingle(actorInfo);
+        
         //获取到的信息有头像
-        if (!string.IsNullOrEmpty(actorInfo.ImageUrl))
+        if (!string.IsNullOrEmpty(actorInfo.ProfilePath))
         {
             //查询本地数据库中的数据
-            var actorInfos = await DataAccess.Get.GetActorInfo(1, filterList: new List<string> { $"id == '{actorId}'" });
+            var actorInfos = DataAccessLocal.Get.GetActorInfo(filterList: [$"id == '{actorId}'"]);
 
             if (actorInfos != null && actorInfos.Length != 0)
             {
                 var firstOrDefault = actorInfos.FirstOrDefault();
 
                 //数据库中无头像
-                if (firstOrDefault is { ProfilePath: Constants.FileType.NoPicturePath })
+                if (firstOrDefault is { ProfilePath: Constants.FileType.NoPicturePath } && actorInfo.InfoUrl != null)
                 {
                     var filePath = Path.Combine(AppSettings.ActorInfoSavePath, actorName);
 
                     Uri infoUri = new(actorInfo.InfoUrl);
 
-                    var profilePath = await DbNetworkHelper.DownloadFile(actorInfo.ImageUrl, filePath, "face", headers: new()
+                    var profilePath = await DbNetworkHelper.DownloadFile(actorInfo.ProfilePath, filePath, "face", headers: new Dictionary<string, string>
                     {
                         {"Host",infoUri.Host },
                         {"Referer", actorInfo.InfoUrl }
                     });
 
                     //更新头像
-                    DataAccess.Update.UpdateActorInfoProfilePath(actorId, profilePath);
+                    ActorInfoDao.UpdateSingle(new ActorInfo
+                    {
+                        Id = actorId,
+                        ProfilePath = profilePath
+                    });
 
                     actorInfo.ProfilePath = profilePath;
                 }
@@ -370,18 +374,23 @@ public sealed partial class ActorsPage
 
         //更新别名
         //别名
-        if (actorInfo.OtherNames is { Count: > 0 })
+        if (actorInfo.OtherNameList is { Count: > 0 })
         {
-            foreach (var otherName in actorInfo.OtherNames)
+            foreach (var otherName in actorInfo.OtherNameList)
             {
-                DataAccess.Add.AddOrIgnoreActor_Names(actorId, otherName);
+
+                Context.Instance.ActorNames.Add(new ActorName
+                {
+                    Id = actorId,
+                    Name = otherName
+                });
             }
         }
 
         //更新bwh
         if (!string.IsNullOrEmpty(actorInfo.Bwh))
         {
-            DataAccess.Add.AddOrIgnoreBwh(actorInfo.Bwh, actorInfo.Bust, actorInfo.Waist, actorInfo.Hips);
+            BwhDao.Add(actorInfo.BwhInfo);
         }
 
         return actorInfo;

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Windows.Storage.Pickers;
+using DataAccess.Dao.Interface;
 using Display.Helper.FileProperties.Name;
 using Display.Models.Dto.Settings.Options;
 using Display.Models.Enums;
@@ -17,6 +18,10 @@ namespace Display.Views.Pages.Settings;
 public sealed partial class StoragePage
 {
 
+    private readonly IVideoInfoDao _videoInfoDao = App.GetService<IVideoInfoDao>();
+    private readonly IActorInfoDao _actorInfoDao = App.GetService<IActorInfoDao>();
+    
+    
     private SavePath[] _savePaths;
 
     public StoragePage()
@@ -84,18 +89,23 @@ public sealed partial class StoragePage
         AppSettings.ActorInfoSavePath = dstPath;
 
         //检查数据库的是否需要修改
-        string imagePath = DataAccess.Get.GetOneActorProfilePath();
-        if (string.IsNullOrEmpty(imagePath))
+        var actorInfo = _actorInfoDao.GetOne();
+        if (actorInfo == null)
         {
             ShowTeachingTip("保存地址修改完成");
             return;
         }
 
-        var imageRelativePath = Path.GetRelativePath(srcPath, imagePath);
-        var isSrcPathError = imageRelativePath.Split('\\').Length > 2;
+        var imagePath = actorInfo.ProfilePath;
 
-        // 数据库的图片地址无需修改
-        if (!isSrcPathError && imagePath.Replace(srcPath, dstPath) == imagePath && File.Exists(imagePath)) return;
+        if (imagePath != null)
+        {
+            var imageRelativePath = Path.GetRelativePath(srcPath, imagePath);
+            var isSrcPathError = imageRelativePath.Split('\\').Length > 2;
+
+            // 数据库的图片地址无需修改
+            if (!isSrcPathError && imagePath.Replace(srcPath, dstPath) == imagePath && File.Exists(imagePath)) return;
+        }
 
         //提醒修改数据文件
         var dialog = new ContentDialog
@@ -114,7 +124,7 @@ public sealed partial class StoragePage
         if (result == ContentDialogResult.Primary)
         {
             //修改数据库图片地址
-            DataAccess.Update.UpdateActorProfilePath(updateImagePathPage.SrcPath, updateImagePathPage.DstPath);
+            _actorInfoDao.UpdateAllProfilePathList(updateImagePathPage.SrcPath, updateImagePathPage.DstPath);
             ShowTeachingTip("修改完成，部分修改内容重启后生效");
         }
         else
@@ -135,12 +145,13 @@ public sealed partial class StoragePage
         AppSettings.ImageSavePath = dstPath;
 
         //检查数据库的是否需要修改
-        string imagePath = DataAccess.Get.GetOneImagePath();
-        if (string.IsNullOrEmpty(imagePath))
+        var actorInfo = _actorInfoDao.GetOne();
+        if (actorInfo?.ProfilePath == null)
         {
             ShowTeachingTip("图片保存地址修改完成");
             return;
         }
+        var imagePath = actorInfo.ProfilePath;
 
         var imageRelativePath = Path.GetRelativePath(srcPath, imagePath);
         var isSrcPathError = imageRelativePath.Split('\\').Length > 2;
@@ -165,7 +176,7 @@ public sealed partial class StoragePage
         if (result == ContentDialogResult.Primary)
         {
             //修改数据库图片地址
-            DataAccess.Update.UpdateAllImagePath(updateImagePathPage.SrcPath, updateImagePathPage.DstPath);
+            _videoInfoDao.UpdateAllImagePathList(updateImagePathPage.SrcPath, updateImagePathPage.DstPath);
             ShowTeachingTip("修改完成，部分修改内容重启后生效");
         }
         else
@@ -222,12 +233,12 @@ public sealed partial class StoragePage
         var result = await dialog.ShowAsync();
         if (result != ContentDialogResult.Primary) return;
 
-        var dstDbFilepath = DataAccess.NewDbPath(dst);
+        var dstDbFilepath = DataAccessLocal.NewDbPath(dst);
 
         var textFileExists = "数据文件已存在，未复制原数据文件";
         if (dstDbFilepath != null && !File.Exists(dstDbFilepath))
         {
-            File.Copy(DataAccess.NewDbPath(src), dstDbFilepath, false);
+            File.Copy(DataAccessLocal.NewDbPath(src), dstDbFilepath, false);
             textFileExists = "原数据文件已复制到指定目录";
         }
 

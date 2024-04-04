@@ -1,10 +1,11 @@
-﻿using Display.Models.Api.OneOneFive.File;
+﻿using System.Collections.Generic;
+using DataAccess.Models.Entity;
 
 namespace Display.Models.Records;
 
 /// <summary>
 /// 存储Cid下面的文件列表
 /// </summary>
-public record StoreDatum(long Cid, Datum[] DatumList)
+public record StoreDatum(long Cid, List<FilesInfo> DatumList)
 {
 }

@@ -4,12 +4,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DataAccess.Models.Entity;
 
 [Table("ActorInfo")]
-public class ActorInfo
+public class ActorInfo 
 {
     [Key]
     [Column("id")]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    public int Id { get; init; }
+    public long Id { get; set; }
 
     [Column("name")]
     [StringLength(20)]
@@ -20,38 +20,51 @@ public class ActorInfo
 
     [Column("birthday")]
     [StringLength(20)]
-    public string? Birthday { get; init; }
+    public string? Birthday { get; set; }
 
     [Column("bwh")]
     [StringLength(10)]
-    public string? Bwh { get; init; }
-
+    public string? Bwh { get; set; }
+    
     [Column("height")]
-    public int? Height { get; init; }
+    public int? Height { get; set; }
 
     [Column("works_count")]
     public int? WorksCount { get; init; }
 
     [Column("work_time")]
     [StringLength(5)]
-    public string? WorkTime { get; init; }
+    public string? WorkTime { get; set; }
 
     [Column("prifile_path")]
     [StringLength(500)]
-    public string? PrifilePath { get; init; }
+    public string? ProfilePath { get; set; }
 
     [Column("blog_url")]
     [StringLength(500)]
-    public string? BlogUrl { get; init; }
+    public string? BlogUrl { get; set; }
 
     [Column("is_like")]
-    public int? IsLike { get; init; }
+    public int IsLike { get; init; }
 
     [Column("addtime")]
     [StringLength(20)]
-    public int? Addtime { get; init; }
+    public int? AddTime { get; init; }
 
     [Column("info_url")]
     [StringLength(100)]
-    public string? InfoUrl { get; init; }
+    public string? InfoUrl { get; set; }
+    
+    // 其他信息
+    [NotMapped]
+    public Bwh BwhInfo { get; set; }
+    
+    [NotMapped]
+    public int VideoCount { get; init; }
+    
+    [NotMapped]
+    public List<string> OtherNameList { get; set; }
+    
+    [NotMapped]
+    public string Initials => string.Empty + Name.FirstOrDefault();
 }

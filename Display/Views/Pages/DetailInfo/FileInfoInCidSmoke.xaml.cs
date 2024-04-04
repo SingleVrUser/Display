@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
-using Display.Models.Api.OneOneFive.File;
-using Display.Models.Dto.OneOneFive;
+using DataAccess.Dao.Interface;
+using DataAccess.Models.Entity;
 using Display.Providers;
 using Display.Views.Pages.More.DatumList;
 using Display.Views.Windows;
@@ -12,46 +12,48 @@ namespace Display.Views.Pages.DetailInfo;
 
 public sealed partial class FileInfoInCidSmoke
 {
+    private static readonly IFilesInfoDao FilesInfoDao = App.GetService<IFilesInfoDao>();
+    
     private readonly string _trueName;
 
     public FileInfoInCidSmoke(string trueName)
     {
         InitializeComponent();
 
-        this._trueName = trueName;
+        _trueName = trueName;
 
         Loaded += PageLoad;
     }
 
     private async void PageLoad(object sender, RoutedEventArgs e)
     {
-        var videoInfos = await DataAccess.Get.GetDatumByTrueName(_trueName, null);
+        var videoInfos = DataAccessLocal.Get.GetFilesInfoByTrueName(_trueName);
 
         InfosListView.ItemsSource = videoInfos;
     }
 
-    public static string GetFolderString(long folderCid)
+    private static string GetFolderString(long folderCid)
     {
         //从数据库中获取根目录信息
-        var folderToRootList = DataAccess.Get.GetRootByCid(folderCid);
+        var folderToRootList = FilesInfoDao.GetFolderListToRootByFolderId(folderCid);
 
         return string.Join(" > ", folderToRootList.Select(x => x.Name));
     }
 
     private void OpenCurrentFolderItem_OnClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem { DataContext: Datum info }) return;
+        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
 
-        CommonWindow.CreateAndShowWindow(new FileListPage(info.Cid));
+        CommonWindow.CreateAndShowWindow(new FileListPage(info.CurrentId));
     }
 
     private async void DeleteItem_OnClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem { DataContext: Datum info }) return;
+        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
 
-        if (info.Fid == null) return;
+        if (info.FileId == null) return;
 
-        var fileId = (long)info.Fid;
+        var fileId = (long)info.FileId;
 
         //115删除
         var dialog = new ContentDialog
@@ -70,12 +72,12 @@ public sealed partial class FileInfoInCidSmoke
         if (result != ContentDialogResult.Primary) return;
 
         // 从115中删除 
-        var deleteResult = await WebApi.GlobalWebApi.DeleteFiles(info.Cid,
+        var deleteResult = await WebApi.GlobalWebApi.DeleteFiles(info.CurrentId,
             [fileId]);
 
         if (!deleteResult) return;
 
         // 从数据库中删除
-        DataAccess.Delete.DeleteDataInFilesInfoAndFileToInfo(info.PickCode);
+        FilesInfoDao.RemoveByPickCode(info.PickCode);
     }
 }

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DataAccess.Models.Entity;
 using Display.Controls.UserController;
 using Display.Helper.Network;
-using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.Media;
-using Display.Models.Dto.OneOneFive;
+using Display.Models.Vo;
 using Display.Providers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -17,7 +17,7 @@ namespace Display.Views.Pages;
 public sealed partial class VideoCoverPage
 {
     //为返回动画做准备（需启动缓存）
-    private VideoCoverDisplayClass _storedItem;
+    private VideoInfoVo _storedItem;
 
 
     public VideoCoverPage()
@@ -114,7 +114,7 @@ public sealed partial class VideoCoverPage
     /// <param name="e"></param>
     private void OnClicked(object sender, RoutedEventArgs e)
     {
-        var item = (sender as Button)?.DataContext as VideoCoverDisplayClass;
+        var item = (sender as Button)?.DataContext as VideoInfoVo;
 
         //准备动画
         //videoControl.PrepareAnimation(item);
@@ -130,7 +130,7 @@ public sealed partial class VideoCoverPage
     private async void VideoPlay_Click(object sender, RoutedEventArgs e)
     {
         var videoPlayButton = (Button)sender;
-        if (videoPlayButton.DataContext is not VideoCoverDisplayClass videoInfo) return;
+        if (videoPlayButton.DataContext is not VideoInfoVo videoInfo) return;
 
         //播放失败列表
         if (videoInfo is FailVideoInfo failVideoInfo)
@@ -140,7 +140,7 @@ public sealed partial class VideoCoverPage
             return;
         }
 
-        var videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(videoInfo.TrueName);
+        var videoInfoList = DataAccessLocal.Get.GetSingleFileInfoByTrueName(videoInfo.TrueName);
 
         _storedItem = videoInfo;
 
@@ -167,7 +167,7 @@ public sealed partial class VideoCoverPage
 
     private async void SingleVideoPlayClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not Grid { DataContext: Datum datum }) return;
+        if (sender is not Grid { DataContext: FilesInfo datum }) return;
 
         var mediaPlayItem = new MediaPlayItem(datum);
         await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.Fail);

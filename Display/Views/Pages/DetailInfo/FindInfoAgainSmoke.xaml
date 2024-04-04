@@ -10,9 +10,7 @@
       xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:controls="using:CommunityToolkit.WinUI.Controls"
       xmlns:spider="using:Display.Providers.Spider"
-      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
-      xmlns:vo="using:Display.Models.Vo"
-      xmlns:oneOneFive1="using:Display.Models.Entities.OneOneFive"
+      xmlns:entity="using:DataAccess.Models.Entity"
       mc:Ignorable="d">
     <Page.Resources>
         <Style TargetType="Pivot">
@@ -38,7 +36,7 @@
             <VisualStateGroup>
                 <VisualState x:Name="validUrl">
                     <VisualState.StateTriggers>
-                        <winUi:RegexStateTrigger Value="{x:Bind SpecificUrl_TextBlock.Text, Mode=OneWay}"
+                        <winUi:RegexStateTrigger Value="{x:Bind SpecificUrlTextBlock.Text, Mode=OneWay}"
                                                     Expression="[a-zA-z]+:\/\/[^\s]{5,}"
                                                     Options="IgnoreCase" />
                     </VisualState.StateTriggers>
@@ -102,7 +100,7 @@
                               x:Name="NewInfoListView"
                               SelectionChanged="NewInfo_ListView_SelectionChanged">
                         <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="oneOneFive1:VideoInfo">
+                            <DataTemplate x:DataType="entity:VideoInfo">
                                 <Grid ColumnSpacing="3"
                                       Padding="0,2">
                                     <Grid.ColumnDefinitions>
@@ -180,7 +178,7 @@
                     </ListView>
 
 
-                    <Button x:Name="Confirm_Button"
+                    <Button x:Name="ConfirmButton"
                             Grid.Row="3"
                             Content="确定"
                             Click="Confirm_Button_Click"
@@ -199,7 +197,7 @@
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
                     <StackPanel Spacing="3">
-                        <TextBox x:Name="SpecificUrl_TextBlock"
+                        <TextBox x:Name="SpecificUrlTextBlock"
                                  PlaceholderText="含有信息的网页地址"
                                  VerticalAlignment="Top" />
                         <TextBlock x:Name="UrlState"

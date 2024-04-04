@@ -5,6 +5,7 @@ using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
 using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Enums;
 using Display.Models.Spider;
 using Display.Models.Vo.OneOneFive;
 using Display.Views.Windows;
@@ -18,7 +19,7 @@ public sealed partial class MainPage
 {
     //private List<FetchingSourceOptions> fetchingCommonSourceList;
 
-    public MainPage(List<FilesInfo> files)
+    public MainPage(List<DetailFileInfo> files)
     {
         InitializeComponent();
 
@@ -48,9 +49,9 @@ public sealed partial class MainPage
 
     private void FolderVideoDragOver(object sender, DragEventArgs e)
     {
-        if (!e.Data.Properties.TryGetValue("items", out var value) || value is not List<FilesInfo> files) return;
+        if (!e.Data.Properties.TryGetValue("items", out var value) || value is not List<DetailFileInfo> files) return;
 
-        if (files.Any(x => x.Type == FilesInfo.FileType.Folder))
+        if (files.Any(x => x.Type == FileType.Folder))
         {
             e.DragUIOverride.Caption = "暂不支持文件夹";
             return;
@@ -62,7 +63,7 @@ public sealed partial class MainPage
 
     private void FolderVideoListView_OnDrop(object sender, DragEventArgs e)
     {
-        if (!e.Data.Properties.TryGetValue("items", out var value) || value is not List<FilesInfo> files) return;
+        if (!e.Data.Properties.TryGetValue("items", out var value) || value is not List<DetailFileInfo> files) return;
 
         foreach (var info in files)
         {

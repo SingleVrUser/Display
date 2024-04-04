@@ -1,4 +1,6 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Display.Models.Enums;
+using Display.Models.Vo.OneOneFive;
+using Microsoft.UI.Xaml;
 
 namespace Display.Helper.UI;
 
@@ -15,5 +17,22 @@ internal static class ResourceHelper
 
         result = tmpResult;
         return true;
+    }
+    
+    internal static string GetFileIconFromType(FileType fileType)
+    {
+        var iconUrl = Constants.FileType.UnknownSvgPath;
+
+        switch (fileType)
+        {
+            case FileType.Folder:
+                iconUrl = Constants.FileType.FolderSvgPath;
+                break;
+            case FileType.File:
+                iconUrl = Constants.FileType.UnknownSvgPath;
+                break;
+        }
+
+        return iconUrl;
     }
 }

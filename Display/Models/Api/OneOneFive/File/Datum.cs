@@ -1,7 +1,8 @@
-﻿using Display.Models.Dto.OneOneFive;
+﻿using Display.Models.Api.OneOneFive.File;
+using Display.Models.Dto.OneOneFive;
 using Newtonsoft.Json;
 
-namespace Display.Models.Api.OneOneFive.File;
+namespace Display.Models.Api.OneOneFive.Files;
 
 public class Datum
 {

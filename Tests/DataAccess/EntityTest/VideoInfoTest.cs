@@ -2,7 +2,7 @@
 using DataAccess.Dao.Impl;
 using DataAccess.Models.Entity;
 
-namespace Tests.DataAccess;
+namespace Tests.DataAccess.EntityTest;
 
 [TestClass]
 public class VideoInfoTest
@@ -40,24 +40,25 @@ public class VideoInfoTest
     [ClassCleanup]
     public static void ClassCleanup()
     {
-        Context.Database.EnsureDeleted();
+        // Context.Database.EnsureDeleted();
     }
 
     // 增，删，改，查
     [TestMethod]
     public void CrudTest()
     {
-        var videoInfoDao = new VideoInfoDao();
-
+        var dao = new VideoInfoDao();
+        
+        dao.Delete();
         var info = VideoInfos.FirstOrDefault();
         if (info == null) return;
 
         // 增
-        VideoInfos.ForEach(videoInfoDao.Add);
+        VideoInfos.ForEach(dao.Add);
 
         // 查
         // 查询全部
-        var checkInfos = videoInfoDao.List();
+        var checkInfos = dao.List();
         // 大小断言
         Assert.AreEqual(VideoInfos.Count, checkInfos.Count);
         for (var i = 0; i < checkInfos.Count; i++)
@@ -67,33 +68,28 @@ public class VideoInfoTest
         }
 
         // Key查询
-        var databaseVideoInfo = videoInfoDao.Find(info.TrueName);
+        var databaseVideoInfo = dao.Find(info.TrueName);
         Assert.AreEqual(info, databaseVideoInfo);
 
         // 条件查询
-        databaseVideoInfo = videoInfoDao.FirstOrDefault(i => i.TrueName == info.TrueName);
+        databaseVideoInfo = dao.FirstOrDefault(i => i.TrueName == info.TrueName);
         Assert.AreEqual(info, databaseVideoInfo);
 
         // 改
         info.ImagePath = "15222222";
-        videoInfoDao.Update(info);
+        dao.UpdateSingle(info);
 
-        databaseVideoInfo = videoInfoDao.Find(info.TrueName);
+        databaseVideoInfo = dao.Find(info.TrueName);
         Assert.AreEqual(info, databaseVideoInfo);
 
         // 删
         for (var i = VideoInfos.Count - 1; i >= 0; i--)
         {
             var removeInfo = VideoInfos[i];
-            videoInfoDao.Remove(removeInfo);
+            dao.ExecuteRemoveSingle(removeInfo);
 
             VideoInfos.RemoveAt(i);
-            Assert.AreEqual(VideoInfos.Count, videoInfoDao.Count());
+            Assert.AreEqual(VideoInfos.Count, dao.Count());
         }
-
     }
-
-
-
-
 }

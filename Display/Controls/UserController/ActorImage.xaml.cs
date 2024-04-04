@@ -4,9 +4,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using System;
-using Display.Models.Dto.OneOneFive;
+using DataAccess.Dao.Interface;
+using DataAccess.Models.Entity;
 using Display.Models.Entities.OneOneFive;
-using Display.Providers;
 using Display.Views.Pages;
 
 namespace Display.Controls.UserController;
@@ -16,6 +16,8 @@ public sealed partial class ActorImage
     public readonly ActorInfo ActorInfo;
 
     private readonly string _releaseTime;
+
+    private readonly IActorInfoDao _actorInfoDao = App.GetService<IActorInfoDao>();
 
     public ActorImage(ActorInfo actorInfo, string releaseTime)
     {
@@ -87,7 +89,7 @@ public sealed partial class ActorImage
                 break;
         }
 
-        DataAccess.Update.UpdateSingleDataFromActorInfo(ActorInfo.Id.ToString(), "is_like", isLike.ToString());
+        _actorInfoDao.UpdateSingle(new ActorInfo {Id = ActorInfo.Id, IsLike = isLike});
     }
 
     private async void GetInfoMenuFlyoutItem_Click(object sender, RoutedEventArgs e)

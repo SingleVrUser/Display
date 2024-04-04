@@ -10,7 +10,7 @@ using Windows.System;
 
 namespace Display.Helper.Data;
 
-internal class LocalCacheHelper
+internal abstract class LocalCacheHelper
 {
     private const long MaxCount = 100;
     private const long MaxSize = 1024 * 1024 * 460;

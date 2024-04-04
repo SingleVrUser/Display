@@ -2,6 +2,6 @@
 
 namespace DataAccess.Dao.Interface;
 
-internal interface ISpiderLogDao : IDao<SpiderLog>
+public interface ISpiderLogDao : IDao<SpiderLog>
 {
 }

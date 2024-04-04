@@ -1,13 +1,10 @@
 ﻿using System.Collections.Generic;
+using DataAccess.Models.Entity;
 using Display.Controls.UserController;
 using Display.Helper.Network;
-using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.Media;
-using Display.Models.Dto.OneOneFive;
-using Display.Models.Entities;
 using Display.Models.Entities.OneOneFive;
 using Display.Models.Vo;
-using Display.Models.Vo.OneOneFive;
 using Display.Providers;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -20,7 +17,7 @@ namespace Display.Views.Pages;
 public sealed partial class VideoViewPage
 {
     //为返回动画做准备（需启动缓存）
-    private VideoCoverDisplayClass _storeditem;
+    private VideoInfoVo _storeditem;
     public VideoViewPage()
     {
         InitializeComponent();
@@ -36,7 +33,7 @@ public sealed partial class VideoViewPage
         MediaPlayItem mediaPlayItem;
         switch (videoPlayGrid.DataContext)
         {
-            case Datum datum:
+            case FilesInfo datum:
                 mediaPlayItem = new MediaPlayItem(datum);
                 break;
             case FailInfo failInfo:
@@ -56,7 +53,7 @@ public sealed partial class VideoViewPage
     /// </summary>
     private void OnClicked(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button { DataContext: VideoCoverDisplayClass item }) return;
+        if (sender is not Button { DataContext: VideoInfoVo item }) return;
 
         //准备动画
         //videoControl.PrepareAnimation(item);
@@ -73,9 +70,9 @@ public sealed partial class VideoViewPage
     {
         var VideoPlayButton = (Button)sender;
 
-        if (VideoPlayButton.DataContext is not VideoCoverDisplayClass videoInfo) return;
+        if (VideoPlayButton.DataContext is not VideoInfoVo videoInfo) return;
 
-        List<Datum> videoInfoList = DataAccess.Get.GetSingleFileInfoByTrueName(videoInfo.TrueName);
+        var videoInfoList = DataAccessLocal.Get.GetSingleFileInfoByTrueName(videoInfo.TrueName);
 
         //没有
         if (videoInfoList.Count == 0)
@@ -105,19 +102,18 @@ public sealed partial class VideoViewPage
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
-        ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("BackConnectedAnimation");
-        if (animation != null)
+        var animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("BackConnectedAnimation");
+        if (animation == null) return;
+
+        //开始动画
+        if (_storeditem != null)
         {
             //开始动画
-            if (_storeditem != null)
-            {
-                //开始动画
-                VideoControl.StartAnimation(animation, _storeditem);
-            }
-            else
-            {
-                animation.TryStart(VideoControl.PageShow_Grid);
-            }
+            VideoControl.StartAnimation(animation, _storeditem);
+        }
+        else
+        {
+            animation.TryStart(VideoControl.PageShow_Grid);
         }
     }
 

@@ -1,14 +1,14 @@
-﻿using Microsoft.Extensions.Configuration;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Tests.Models;
 
-namespace Tests.DataAccess;
+namespace Tests;
 
 [TestClass]
 public class LocalSettingTest
 {
     [AssemblyInitialize]
-    public static async Task AssemblyInitialize(TestContext testContext)
+    public static Task AssemblyInitialize(TestContext testContext)
     {
         var config = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
@@ -18,6 +18,7 @@ public class LocalSettingTest
         var settings = config.GetRequiredSection("Parent").Get<Parent>();
 
         Debug.WriteLine(settings);
+        return Task.CompletedTask;
     }
 
 

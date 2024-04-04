@@ -33,8 +33,7 @@ public sealed partial class MediaPlayWindow
 
         _appWindow = App.GetAppWindow(this);
 
-        MediaControl.InitLoad(playItems, this);
-
+        MyMediaControl.InitLoad(playItems, this);
         if (playItems.Count > 1)
         {
             InitMoreGrid(playItems);
@@ -81,13 +80,13 @@ public sealed partial class MediaPlayWindow
         Debug.WriteLine("aTimer Stop");
         _aTimer?.Stop();
 
-        if (MediaControl.IsLoaded && VideoPlayGrid.Children.Contains(MediaControl))
+        if (MyMediaControl.IsLoaded && VideoPlayGrid.Children.Contains(MyMediaControl))
         {
             Debug.WriteLine("取消监听 PointerExited");
-            MediaControl.PointerEntered -= MediaControl_OnPointerEntered;
-            MediaControl.PointerExited -= MediaControl_OnPointerExited;
+            MyMediaControl.PointerEntered -= MediaControl_OnPointerEntered;
+            MyMediaControl.PointerExited -= MediaControl_OnPointerExited;
 
-            MediaControl.DisposeMediaPlayer();
+            MyMediaControl.DisposeMediaPlayer();
         }
 
         Debug.WriteLine("remove MediaControl");
@@ -127,7 +126,7 @@ public sealed partial class MediaPlayWindow
 
         VisualStateManager.GoToState(MyUserControl, "FullWindow", true);
 
-        VisualStateManager.GoToState(MediaControl.MediaTransportControls, "FullWindowState", true);
+        VisualStateManager.GoToState(MyMediaControl.MediaTransportControls, "FullWindowState", true);
 
     }
 
@@ -148,7 +147,7 @@ public sealed partial class MediaPlayWindow
 
         VisualStateManager.GoToState(MyUserControl, "NoFullWindow", true);
 
-        VisualStateManager.GoToState(MediaControl.MediaTransportControls, "NoFullWindowState", true);
+        VisualStateManager.GoToState(MyMediaControl.MediaTransportControls, "NoFullWindowState", true);
     }
 
     private void RootGrid_KeyDown(object sender, KeyRoutedEventArgs e)
@@ -255,12 +254,12 @@ public sealed partial class MediaPlayWindow
     {
         Debug.WriteLine("拖动");
 
-        if (e.DataView.Properties.Values.FirstOrDefault() is not List<FilesInfo> addInfos) return;
+        if (e.DataView.Properties.Values.FirstOrDefault() is not List<DetailFileInfo> addInfos) return;
 
         var addMediaPlayItems = new List<MediaPlayItem>();
         addInfos.ForEach(info => { addMediaPlayItems.Add(new MediaPlayItem(info)); });
 
-        var allMediaPlayItems = MediaControl.ReLoad(addMediaPlayItems);
+        var allMediaPlayItems = MyMediaControl.ReLoad(addMediaPlayItems);
 
         if (allMediaPlayItems.Count > 1)
         {

@@ -10,6 +10,7 @@ using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Enums;
 using Display.Models.Vo.OneOneFive;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
@@ -52,7 +53,7 @@ public sealed partial class CalculateLocalFileSha1
             {
                 if (item.IsOfType(StorageItemTypes.Folder))
                 {
-                    _sha1InfoList.Add(new LocalFileSha1Info() { Name = item.Name, FullPath = item.Path, FileType = FilesInfo.FileType.Folder });
+                    _sha1InfoList.Add(new LocalFileSha1Info() { Name = item.Name, FullPath = item.Path, FileType = FileType.Folder });
 
                 }
                 else if (item.IsOfType(StorageItemTypes.File))
@@ -80,7 +81,7 @@ public sealed partial class CalculateLocalFileSha1
         foreach (var item in _sha1InfoList)
         {
             //文件夹
-            if (item.FileType == FilesInfo.FileType.Folder)
+            if (item.FileType == FileType.Folder)
             {
                 var fileitems = GetAllFilesInDiretory(item.FullPath);
                 item.ProgressBarMaximum = fileitems.Count;
@@ -205,10 +206,10 @@ public sealed partial class CalculateLocalFileSha1
 public class LocalFileSha1Info : INotifyPropertyChanged
 {
     public string Name;
-    public FilesInfo.FileType FileType { get; set; } = FilesInfo.FileType.File;
+    public FileType FileType { get; set; } = FileType.File;
     public long FilesCount { get; set; } = 1;
     public string Icon;
-    public string IconPath => FileType == FilesInfo.FileType.File ? FilesInfo.GetPathFromIcon(Icon) : Constants.FileType.FolderSvgPath;
+    public string IconPath => FileType == FileType.File ? DetailFileInfo.GetPathFromIcon(Icon) : Constants.FileType.FolderSvgPath;
 
     public string FullPath;
 

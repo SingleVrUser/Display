@@ -5,7 +5,7 @@ namespace DataAccess;
 
 public class Context : DbContext
 {
-    private const string DbName = "115_uwp.db";
+    public const string DbName = "115_uwp.db";
 
     public static string DbPath = SetSavePath();
 
@@ -19,7 +19,7 @@ public class Context : DbContext
 
     public virtual DbSet<DownHistory> DownHistories { get; set; } = null!;
 
-    public virtual DbSet<FailListIslikeLookLater> FailListIsLikeLookLater { get; set; } = null!;
+    public virtual DbSet<FailListIsLikeLookLater> FailListIsLikeLookLater { get; set; } = null!;
 
     public virtual DbSet<FileToInfo> FileToInfos { get; set; } = null!;
 
@@ -60,7 +60,6 @@ public class Context : DbContext
             _context = new Context();
             return _context;
         }
-        set => _context = value;
     }
 
 

@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using Display.Models.Dto.Settings;
 using Display.Models.Dto.Settings.Options;
 using Display.Models.Enums;
+using Display.Models.Records;
 using static Display.Constants.DefaultSettings;
 using DefaultValue = Display.Constants.DefaultSettings;
 using MenuItem = Display.Models.Dto.Settings.MenuItem;
@@ -96,15 +97,6 @@ public class AppSettings
     public static bool IsFindSub
     {
         get => GetValue(Network._115.IsFindSub);
-        set => SetValue(value);
-    }
-
-    /// <summary>
-    /// 是否已经升级了数据库
-    /// </summary>
-    public static bool IsUpdatedDataAccessFrom014
-    {
-        get => GetValue(DefaultSettings.App.IsUpdatedDataAccessFrom014);
         set => SetValue(value);
     }
 
@@ -424,11 +416,6 @@ public class AppSettings
     }
 
     /// <summary>
-    /// 演员头像仓库文件保存地址
-    /// </summary>
-    public static string ActorFileTreeSavePath => Path.Combine(DataSavePath, "Filetree.json");
-
-    /// <summary>
     /// 数据文件存储地址
     /// </summary>
     public static string DataAccessSavePath
@@ -513,19 +500,19 @@ public class AppSettings
     }
 
 
-    public static MenuItem[] MenuItemsArray
+    public static PageEnumAndIsVisible[] MenuItemEnumArray
     {
         get => GetValue(NavigationViewItem.DefaultMenuItems);
         set => SetValue(value);
     }
 
-    public static MenuItem[] FootMenuItemsArray
+    public static PageEnumAndIsVisible[] FootMenuItemEnumArray
     {
         get => GetValue(NavigationViewItem.DefaultFootMenuItems);
         set => SetValue(value);
     }
 
-    public static MoreMenuItem[] MoreMenuItemsArray
+    public static PageEnumAndIsVisible[] MoreMenuItemEnumArray
     {
         get => GetValue(NavigationViewItem.DefaultMoreMenuItems);
         set => SetValue(value);

@@ -1,4 +1,5 @@
 ﻿using Display.Models.Api.OneOneFive.Upload;
+using Display.Models.Enums;
 
 namespace Display.Models.Vo.OneOneFive;
 
@@ -12,7 +13,7 @@ public class FileUploadResult(string name)
     public string Sha1;
     public string ThumbUrl;
 
-    public readonly FilesInfo.FileType Type = FilesInfo.FileType.File;
+    public readonly FileType Type = FileType.File;
 
     public bool Success;
 
@@ -24,7 +25,7 @@ public class FileUploadResult(string name)
         {
             if (_isVideo != null) return (bool)_isVideo;
 
-            _isVideo = FilesInfo.GetTypeFromIcon(Name.Split('.')[^1]) == "video";
+            _isVideo = DetailFileInfo.GetTypeFromIcon(Name.Split('.')[^1]) == "video";
             return (bool)_isVideo;
         }
         private set => _isVideo = value;

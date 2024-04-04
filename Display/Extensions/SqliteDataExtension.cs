@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Reflection;
+using DataAccess.Models.Entity;
 using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.OneOneFive;
 
@@ -118,9 +119,9 @@ internal static class SqLiteDataExtension
             {
                 propertyInfo.SetValue(data, reader.GetNullableFieldValue<long>(fieldName));
             }
-            else if (type == typeof(Datum))
+            else if (type == typeof(FilesInfo))
             {
-                propertyInfo.SetValue(data, reader.Export<Datum>());
+                propertyInfo.SetValue(data, reader.Export<FilesInfo>());
             }
         }
 

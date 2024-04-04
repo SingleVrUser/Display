@@ -1,20 +1,22 @@
-﻿using Display.Models.Entities.OneOneFive;
-using Display.Models.Vo;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using DataAccess.Models.Entity;
 using Microsoft.UI.Xaml;
 
-namespace Display.Models.Dto.OneOneFive;
+namespace Display.Models.Vo;
 
 /// <summary>
 /// 视频封面缩略信息
 /// </summary>
-public class VideoCoverDisplayClass : VideoInfo
+public class VideoInfoVo : VideoInfo, INotifyPropertyChanged
 {
-    public VideoCoverDisplayClass()
+    public VideoInfoVo()
     {
-        OnPropertyChanged();
+        
     }
-
-    public VideoCoverDisplayClass(VideoInfo videoInfo)
+    
+    private VideoInfoVo(VideoInfo videoInfo)
     {
         foreach (var videoInfoItem in videoInfo.GetType().GetProperties())
         {
@@ -47,77 +49,61 @@ public class VideoCoverDisplayClass : VideoInfo
             }
         }
 
-        if (!string.IsNullOrEmpty(ReleaseTime))
+        if (ReleaseTime != null && !string.IsNullOrEmpty(ReleaseTime) && videoInfo.ReleaseTime != null)
         {
-            if (videoInfo.ReleaseTime.Contains("/"))
-            {
-                ReleaseYear = videoInfo.ReleaseTime.Split('/')[0];
-            }
-            else
-            {
-                ReleaseYear = videoInfo.ReleaseTime.Split('-')[0];
-            }
+            ReleaseYear = videoInfo.ReleaseTime.Contains('/') ? videoInfo.ReleaseTime.Split('/')[0] : videoInfo.ReleaseTime.Split('-')[0];
         }
 
-        this.isShowLabel = isShowLabel;
+        this.IsShowLabel = isShowLabel;
         ShowLabel = showLabel;
         Score = videoInfo.Score;
     }
 
-    public VideoCoverDisplayClass(VideoInfo videoInfo, double imgWidth, double imgHeight) : this(videoInfo)
+    public VideoInfoVo(VideoInfo videoInfo, double imgWidth, double imgHeight) : this(videoInfo)
     {
         //图片大小
-        imageHeight = imgHeight;
+        ImageHeight = imgHeight;
         ImageWidth = imgWidth;
     }
 
     public string ReleaseYear { get; set; }
-    public Visibility isShowLabel { get; set; } = Visibility.Collapsed;
+    public Visibility IsShowLabel { get; set; }
     public string ShowLabel { get; set; }
 
     private Visibility _isDeleted = Visibility.Collapsed;
     public Visibility IsDeleted
     {
         get => _isDeleted;
-        set
-        {
-            _isDeleted = value;
-            OnPropertyChanged();
-        }
+        set => SetField(ref _isDeleted, value);
     }
 
     private double _imageWidth;
     public double ImageWidth
     {
         get => _imageWidth;
-        set
-        {
-            _imageWidth = value;
-            OnPropertyChanged();
-        }
+        set => SetField(ref _imageWidth, value);
     }
 
     private double _imageHeight;
-    public double imageHeight
+    public double ImageHeight
     {
-        get
-        {
-            return _imageHeight;
-        }
-        set
-        {
-            _imageHeight = value;
-            OnPropertyChanged();
-        }
+        get => _imageHeight;
+        set => SetField(ref _imageHeight, value);
     }
 
-    //public event PropertyChangedEventHandler PropertyChanged;
-    //protected void RaisePropertyChanged([CallerMemberName] string Name = "")
-    //{
-    //    if (PropertyChanged != null)
-    //    {
-    //        PropertyChanged(this, new PropertyChangedEventArgs(Name));
-    //    }
-    //}
 
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    private bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
+    }
 }

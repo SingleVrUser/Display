@@ -98,18 +98,18 @@
 
                 <TextBlock Grid.Row="0"
                            Grid.Column="1"
-                           Text="{x:Bind ViewModel.CurrentPhotoModel.FileInfo.Name,Mode=OneWay}"
+                           Text="{x:Bind ViewModel.CurrentPhotoModel.DetailFileInfo.Name,Mode=OneWay}"
                            TextTrimming="CharacterEllipsis" />
                 <TextBlock Grid.Row="1"
                            Grid.Column="1"
                            Text="{x:Bind ImageViewer.CurrentItemSource.Dimensions,Mode=OneWay}" />
                 <TextBlock Grid.Row="2"
                            Grid.Column="1"
-                           Text="{x:Bind ViewModel.CurrentPhotoModel.FileInfo.Size,Converter={StaticResource BytesToSizeStrConverter},Mode=OneWay}" />
+                           Text="{x:Bind ViewModel.CurrentPhotoModel.DetailFileInfo.Size,Converter={StaticResource BytesToSizeStrConverter},Mode=OneWay}" />
 
                 <TextBlock Grid.Row="3"
                            Grid.Column="1"
-                           Text="{x:Bind ViewModel.CurrentPhotoModel.FileInfo.Time, Converter={StaticResource NumberToDateTimeStrConverter}, Mode=OneWay}" />
+                           Text="{x:Bind ViewModel.CurrentPhotoModel.DetailFileInfo.Time, Converter={StaticResource NumberToDateTimeStrConverter}, Mode=OneWay}" />
             </Grid>
 
             <oldControls:AdaptiveGridView Grid.Row="1"
@@ -133,7 +133,7 @@
                 </oldControls:AdaptiveGridView.HeaderTemplate>
 
                 <oldControls:AdaptiveGridView.ItemTemplate>
-                    <DataTemplate x:DataType="oneOneFive1:FilesInfo">
+                    <DataTemplate x:DataType="oneOneFive1:DetailFileInfo">
                         <oldControls:ImageEx Source="{x:Bind ThumbnailUrl}"
                                             Height="60" />
                     </DataTemplate>
@@ -175,7 +175,7 @@
                 <TextBlock  RelativePanel.RightOf="BackButton"
                             RelativePanel.AlignVerticalCenterWithPanel="True"
                             Margin="0,0"
-                            Text="{x:Bind  ViewModel.CurrentPhotoModel.FileInfo.Name,Mode=OneWay}"
+                            Text="{x:Bind  ViewModel.CurrentPhotoModel.DetailFileInfo.Name,Mode=OneWay}"
                             Style="{StaticResource SubtitleTextBlockStyle}"
                             IsTextSelectionEnabled="True" />
 

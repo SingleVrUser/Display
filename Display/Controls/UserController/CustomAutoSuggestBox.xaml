@@ -1,17 +1,15 @@
 ﻿<UserControl x:Class="Display.Controls.UserController.CustomAutoSuggestBox"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="using:Display.Controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:data="using:Display.Models.Data"
              xmlns:controls="using:CommunityToolkit.WinUI.Controls"
              xmlns:userController="using:Display.Controls.UserController"
-             xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
              xmlns:search="using:Display.Models.Api.OneOneFive.Search"
              xmlns:dto="using:Display.Models.Dto"
              xmlns:vo="using:Display.Models.Vo"
              xmlns:oneOneFive1="using:Display.Models.Entities.OneOneFive"
+             xmlns:entity="using:DataAccess.Models.Entity"
              mc:Ignorable="d">
 
     <UserControl.Resources>
@@ -25,7 +23,7 @@
             <userController:ItemsContainerStyleSelector x:Key="AutoSuggestionBoxItemsContainerStyleSelector"
                                                NoPointerOverStyle="{StaticResource NoPointerOverListViewItemStyle}"/>
             <DataTemplate x:Key="FoundedSuggestionBox"
-                          x:DataType="oneOneFive1:VideoInfo">
+                          x:DataType="entity:VideoInfo">
                 <Grid Margin="5"
                       ColumnSpacing="5"
                       Tapped="ItemTapped"

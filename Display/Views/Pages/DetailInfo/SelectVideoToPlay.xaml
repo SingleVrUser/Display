@@ -3,8 +3,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
-      xmlns:file="using:Display.Models.Api.OneOneFive.File"
+      xmlns:entity="using:DataAccess.Models.Entity"
       mc:Ignorable="d">
 
     <StackPanel Spacing="5"
@@ -15,14 +14,14 @@
                   ItemsSource="{x:Bind _pickCodeInfoList}"
                   IsItemClickEnabled="True">
             <ListView.ItemTemplate>
-                <DataTemplate x:DataType="file:Datum">
+                <DataTemplate x:DataType="entity:FilesInfo">
                     <Grid RowDefinitions="auto,auto" ColumnDefinitions="*,auto" RowSpacing="5" Padding="5">
                         <TextBlock Text="{x:Bind Name}"
                                    TextWrapping="Wrap" />
 
                         <TextBlock Grid.Row="1"
                                    Grid.Column="0"
-                                   Text="{x:Bind Time}"
+                                   Text="{x:Bind CurrentTime}"
                                    Opacity="0.5" />
 
                         <TextBlock Grid.Row="1"

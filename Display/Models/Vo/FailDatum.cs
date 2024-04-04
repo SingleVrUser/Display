@@ -1,10 +1,11 @@
-﻿using Display.Models.Api.OneOneFive.File;
+﻿using DataAccess.Models.Entity;
+using Display.Models.Api.OneOneFive.File;
 
 namespace Display.Models.Vo;
 
-public class FailDatum(Datum datum)
+public class FailDatum(FilesInfo datum)
 {
-    public Datum Datum { get; private set; } = datum;
+    public FilesInfo Datum { get; private set; } = datum;
 
     public string MatchName { get; set; }
 

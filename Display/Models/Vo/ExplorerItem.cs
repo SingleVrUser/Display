@@ -1,7 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using Display.Models.Api.OneOneFive.File;
-using Display.Models.Vo.OneOneFive;
+using DataAccess.Models.Entity;
+using Display.Helper.UI;
+using Display.Models.Enums;
 
 namespace Display.Models.Vo;
 
@@ -13,7 +14,7 @@ public class ExplorerItem : INotifyPropertyChanged
     public string Name { get; init; }
     public long Id { get; init; }
     public bool HasUnrealizedChildren { get; init; }
-    public FilesInfo.FileType Type { get; init; }
+    public FileType Type { get; init; }
     private ObservableCollection<ExplorerItem> _mChildren;
     public ObservableCollection<ExplorerItem> Children
     {
@@ -21,7 +22,7 @@ public class ExplorerItem : INotifyPropertyChanged
         set => _mChildren = value;
     }
 
-    public Datum Datum;
+    public FilesInfo Datum;
 
     private string _iconPath;
     public string IconPath
@@ -29,7 +30,7 @@ public class ExplorerItem : INotifyPropertyChanged
         get
         {
             if (_iconPath != null) return _iconPath;
-            _iconPath = FilesInfo.GetFileIconFromType(Type);
+            _iconPath = ResourceHelper.GetFileIconFromType(Type);
 
             return _iconPath;
         }

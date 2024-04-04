@@ -32,6 +32,5 @@ public enum NavigationViewItemEnum
     SpiderPage,
     CalculateSha1Page,
     BrowserPage,
-    ActorCoverPage,
     ThumbnailPage
 }

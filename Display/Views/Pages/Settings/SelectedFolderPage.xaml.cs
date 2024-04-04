@@ -6,9 +6,9 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using DataAccess.Models.Entity;
 using Display.Helper.UI;
 using Display.Models.Api.OneOneFive.File;
-using Display.Models.Data.IncrementalCollection;
 using Display.Models.Dto.OneOneFive;
 using Display.Models.Vo;
 using Display.Models.Vo.IncrementalCollection;
@@ -94,7 +94,7 @@ public sealed partial class SelectedFolderPage
 
     private void ListViewBase_OnItemClick(object sender, ItemClickEventArgs e)
     {
-        if (e.ClickedItem is not FilesInfo info) return;
+        if (e.ClickedItem is not DetailFileInfo info) return;
 
         OpenFolder(info.Id);
     }
@@ -132,7 +132,7 @@ public sealed partial class SelectedFolderPage
             var makeDirResult = await WebApi.GlobalWebApi.RequestMakeDir(currentFolder.Id, NewCreateFolderTextBox.Text);
             if (makeDirResult == null) return;
 
-            _folderInfos.Insert(0, new FilesInfo(new Datum { Cid = makeDirResult.Cid, Name = makeDirResult.Cname }));
+            _folderInfos.Insert(0, new DetailFileInfo(new FilesInfo { CurrentId = makeDirResult.Cid, Name = makeDirResult.Cname }));
         }
 
         CreateNewFolderGrid.Visibility = Visibility.Collapsed;

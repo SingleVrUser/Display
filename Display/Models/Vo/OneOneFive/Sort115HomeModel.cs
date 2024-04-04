@@ -5,9 +5,9 @@ using Display.Models.Enums;
 
 namespace Display.Models.Vo.OneOneFive;
 
-public partial class Sort115HomeModel(FilesInfo info) : ObservableObject
+public partial class Sort115HomeModel(DetailFileInfo info) : ObservableObject
 {
-    public readonly FilesInfo Info = info;
+    public readonly DetailFileInfo Info = info;
 
     [ObservableProperty]
     private string _destinationName;

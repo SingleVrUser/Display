@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Vo;
 using Display.Views.Pages;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -32,7 +33,7 @@ public sealed partial class MultipleCoverShow
 
     public string ShowName { get; set; }
 
-    public ObservableCollection<VideoCoverDisplayClass> CoverList { get; set; } = new();
+    public ObservableCollection<VideoInfoVo> CoverList { get; set; } = new();
 
     public MultipleCoverShow()
     {

@@ -39,7 +39,6 @@
                     Value="30" />
         </Style>
 
-
         <DataTemplate x:Key="MenuItemsTemplate"
                       x:DataType="settings2:BaseMenuItem">
             <Grid ColumnDefinitions="auto, *, auto"
@@ -51,7 +50,8 @@
                 <ToggleButton Grid.Column="2"
                               IsChecked="{x:Bind IsVisible, Converter={StaticResource BoolNegationConverter}, Mode=TwoWay}"
                               BorderThickness="0"
-                              Background="Transparent">
+                              Background="Transparent"
+                              Click="MenuItemIsVisibleChanged_OnClick">
                     <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                               Glyph="{x:Bind IsVisible, Converter={StaticResource BoolToObjectConverter},Mode=OneWay}" />
                 </ToggleButton>
@@ -69,7 +69,8 @@
                 <ToggleButton Grid.Column="2"
                               IsChecked="{x:Bind IsVisible, Converter={StaticResource BoolNegationConverter}, Mode=TwoWay}"
                               BorderThickness="0"
-                              Background="Transparent">
+                              Background="Transparent"
+                              Click="MoreMenuItemIsVisibleChanged_OnClick">
                     <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
                               Glyph="{x:Bind IsVisible, Converter={StaticResource BoolToObjectConverter},Mode=OneWay}" />
                 </ToggleButton>
@@ -111,6 +112,7 @@
                               ItemsSource="{x:Bind _viewModel.NavigationItemViewModel.MenuItems}"
                               ItemTemplate="{StaticResource MenuItemsTemplate}"
                               Style="{StaticResource MenuItemListStyle}"
+                              DragItemsCompleted="MenuItemListView_OnDragItemsCompleted"
                               DragItemsStarting="FootListView_OnDragItemsStarting"
                               DragOver="MenuItemListView_OnDragOver"
                               Drop="UIElement_OnDrop" />
@@ -124,6 +126,7 @@
                               ItemsSource="{x:Bind _viewModel.NavigationItemViewModel.FootMenuItems}"
                               ItemTemplate="{StaticResource MenuItemsTemplate}"
                               Style="{StaticResource MenuItemListStyle}"
+                              DragItemsCompleted="MenuItemListView_OnDragItemsCompleted"
                               DragItemsStarting="FootListView_OnDragItemsStarting"
                               DragOver="MenuItemListView_OnDragOver"
                               Drop="UIElement_OnDrop" />
@@ -134,6 +137,7 @@
                                        ContentAlignment="Vertical">
 
                     <ListView ItemsSource="{x:Bind _viewModel.MoreNavigationItemViewModel.MoreMenuItems}"
+                              DragItemsCompleted="MoreMenuItems_OnDragItemsCompleted"
                               ItemTemplate="{StaticResource MoreMenuItemsTemplate}"
                               Style="{StaticResource MenuItemListStyle}" />
                 </controls:SettingsCard>

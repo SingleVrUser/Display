@@ -50,14 +50,19 @@ public class VideoInfo
     public string? Url { get; set; }
 
     [Column("look_later")]
-    public int? LookLater { get; set; }
+    public long LookLater { get; set; }
 
     [Column("score")]
-    public int? Score { get; set; }
+    public double Score { get; set; }
 
     [Column("is_like")]
-    public int? IsLike { get; set; }
+    public int IsLike { get; set; }
 
     [Column("addtime")]
     public int? AddTime { get; set; }
+    
+    // 其他信息
+    
+    [NotMapped]
+    public int IsWm { get; set; }
 }

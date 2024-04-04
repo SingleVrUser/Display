@@ -10,20 +10,20 @@ using Display.Models.Vo.OneOneFive;
 
 namespace Display.Models.Dto.Media;
 
-internal class SubImageModel(FilesInfo fileInfo) : BaseImage
+internal class SubImageModel(DetailFileInfo detailFileInfo) : BaseImage
 {
-    public readonly FilesInfo FileInfo = fileInfo;
+    public readonly DetailFileInfo DetailFileInfo = detailFileInfo;
     private ImageInfo? _imageInfo;
 
     public bool IsDowning;
 
     public async Task LoadThumbnailFromInternetAsync(IProgress<int>? progress = null)
     {
-        if (Thumbnail is null && FileInfo.PickCode is not null)
+        if (Thumbnail is null && DetailFileInfo.PickCode is not null)
         {
             IsDowning = true;
 
-            _imageInfo ??= await NetworkHelper.GetImageInfo(FileInfo.PickCode);
+            _imageInfo ??= await NetworkHelper.GetImageInfo(DetailFileInfo.PickCode);
             if (_imageInfo is not { State: true })
             {
                 IsDowning = false;

@@ -4,6 +4,7 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using DataAccess.Models.Entity;
 using Display.Models.Entities.OneOneFive;
 using Display.Models.Vo.Spider;
 

@@ -32,7 +32,7 @@ internal sealed partial class ImagePage
     {
         base.OnNavigatedTo(e);
 
-        if (e.Parameter is not Tuple<List<FilesInfo>, int> tuple) return;
+        if (e.Parameter is not Tuple<List<DetailFileInfo>, int> tuple) return;
 
         var (files, currentIndex) = tuple;
 

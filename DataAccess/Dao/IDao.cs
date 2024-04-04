@@ -1,8 +1,14 @@
 ﻿namespace DataAccess.Dao;
 
-internal interface IDao<T>
+public interface IDao<T>
 {
     void Add(T entity);
 
     List<T> List();
+
+    void SaveChanges();
+
+    void UpdateSingle(T entity);
+
+    void Delete();
 }

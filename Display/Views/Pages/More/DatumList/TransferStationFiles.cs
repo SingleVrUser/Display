@@ -9,9 +9,9 @@ namespace Display.Views.Pages.More.DatumList;
 internal class TransferStationFiles
 {
     public string Name { get; set; }
-    public List<FilesInfo> TransferFiles { get; set; }
+    public List<DetailFileInfo> TransferFiles { get; set; }
 
-    public TransferStationFiles(List<FilesInfo> transferFiles)
+    public TransferStationFiles(List<DetailFileInfo> transferFiles)
     {
         if (transferFiles.Count == 1)
         {

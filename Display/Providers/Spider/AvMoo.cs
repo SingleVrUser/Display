@@ -2,10 +2,8 @@
 using HtmlAgilityPack;
 using System.Threading;
 using System.Threading.Tasks;
-using Display.Models.Dto.OneOneFive;
-using Display.Models.Entities.OneOneFive;
+using DataAccess.Models.Entity;
 using Display.Models.Spider;
-using Display.Models.Vo;
 
 namespace Display.Providers.Spider;
 

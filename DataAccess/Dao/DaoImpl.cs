@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Data;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace DataAccess.Dao;
@@ -15,26 +16,29 @@ public class DaoImpl<T> : IDao<T> where T : class
     }
 
     public List<T> List() => DbSet.ToList();
+    public void SaveChanges()
+    {
+        Context.SaveChanges();
+    }
 
     public List<T> List(Expression<Func<T, bool>> predicate)
     {
         return DbSet.Where(predicate).ToList();
     }
 
-    public void Update(T entity)
+    public void UpdateSingle(T entity)
     {
         DbSet.Update(entity);
         Context.SaveChanges();
     }
 
-    public void Remove(T entity)
+    public void ExecuteRemoveSingle(T entity)
     {
         DbSet.Remove(entity);
         Context.SaveChanges();
     }
 
     public T? Find(params object[] keyValues) => DbSet.Find(keyValues);
-
 
     public T? FirstOrDefault(Expression<Func<T, bool>> predicate)
     {
@@ -44,5 +48,10 @@ public class DaoImpl<T> : IDao<T> where T : class
     public int Count()
     {
         return DbSet.Count();
+    }
+
+    public void Delete()
+    {
+        DbSet.ExecuteDelete();
     }
 }
