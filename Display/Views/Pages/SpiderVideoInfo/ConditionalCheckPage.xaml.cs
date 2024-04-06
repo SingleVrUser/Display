@@ -17,12 +17,12 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Display.Views.Pages.SpiderVideoInfo;
 
-public sealed partial class ConditionalCheck
+public sealed partial class ConditionalCheckPage
 {
     private ObservableCollection<ConditionCheck> _conditionCheckItems;
     private ConditionCheck _imageItem;
 
-    public ConditionalCheck()
+    public ConditionalCheckPage()
     {
         InitializeComponent();
 
