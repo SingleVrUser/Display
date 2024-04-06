@@ -18,7 +18,8 @@ namespace Display.Views.Pages;
 
 public sealed partial class HomePage
 {
-    private readonly IncrementalLoadSuccessInfoCollection _recentList;
+    private readonly IncrementalLoadSuccessInfoCollection _recentList = [];
+
     private readonly ObservableCollection<VideoInfoVo> _lookLaterList = [];
     private readonly ObservableCollection<VideoInfoVo> _recentCoverList = [];
     private readonly ObservableCollection<VideoInfoVo> _loveCoverList = [];
@@ -39,26 +40,29 @@ public sealed partial class HomePage
         //启动缓存
         NavigationCacheMode = NavigationCacheMode.Required;
 
-        _recentList = [];
-        _recentList.SetOrder("random", true);
-
-        LoadCover();
+        LoadRandomList();
     }
 
-    private void LoadCover()
+    private async void LoadRandomList()
     {
-        //随机获取20个视频，每次启动自动获取一遍
-        var imageList = _videoInfoDao.GetRandomList(10);
-        if (imageList == null) return;
-
-        foreach (var info in imageList.Select(item => new VideoInfoVo(item, 500, 300)))
-        {
-            _recentList.Add(info);
-        }
-
-        //var binding = new Binding { Path = new PropertyPath("SelectedIndex"), Mode = BindingMode.TwoWay };
-        //ImagePipsPager.SetBinding(PipsPager.SelectedPageIndexProperty, binding);
+        _recentList.SetOrder("random", true);
+        await _recentList.LoadData();
     }
+
+    //private void LoadCover()
+    //{
+    //    // 随机获取20个视频，每次启动自动获取一遍
+    //    var imageList = await _videoInfoDao.GetRandomListAsync(10);
+    //    if (imageList.Length == 0) return;
+
+    //    foreach (var info in imageList.Select(item => new VideoInfoVo(item, 500, 300)))
+    //    {
+    //        _recentList.Add(info);
+    //    }
+
+    //    //var binding = new Binding { Path = new PropertyPath("SelectedIndex"), Mode = BindingMode.TwoWay };
+    //    //ImagePipsPager.SetBinding(PipsPager.SelectedPageIndexProperty, binding);
+    //}
 
     private void MultipleCoverShow_ItemClick(object sender, ItemClickEventArgs e)
     {
@@ -104,13 +108,13 @@ public sealed partial class HomePage
     {
         if (sender is not ListView listView) return;
 
-        if (videoInfoListView.ItemsSource is not ObservableCollection<VideoInfoVo> items) return;
+        if (VideoInfoListView.ItemsSource is not ObservableCollection<VideoInfoVo> items) return;
 
         if (listView.SelectedItem is not VideoInfo videoInfo) return;
 
         if (items.Contains(videoInfo))
         {
-            videoInfoListView.ScrollIntoView(videoInfo);
+            VideoInfoListView.ScrollIntoView(videoInfo);
         }
     }
 
@@ -193,7 +197,7 @@ public sealed partial class HomePage
         }
         foreach (var item in addList)
         {
-            videoList.Add(new VideoInfoVo(item, 500, 300));
+            videoList.Add(new VideoInfoVo(item));
         }
     }
 
@@ -215,20 +219,20 @@ public sealed partial class HomePage
     {
         _recentCoverList.Clear();
 
-        foreach (var videoInfo in _videoInfoDao.GetLookLaterList(10))
+        foreach (var videoInfo in await _videoInfoDao.GetRecentListAsync(10))
         {
-            _recentCoverList.Add(new VideoInfoVo(videoInfo, 500, 300));
+            _recentCoverList.Add(new VideoInfoVo(videoInfo));
         }
 
     }
 
-    private void RefreshLookLaterVideoButtonClick(object sender, RoutedEventArgs e)
+    private async void RefreshLookLaterVideoButtonClick(object sender, RoutedEventArgs e)
     {
         _lookLaterList.Clear();
 
-        foreach (var videoInfo in _videoInfoDao.GetLookLaterList(10))
+        foreach (var videoInfo in await _videoInfoDao.GetLookLaterListAsync(10))
         {
-            _lookLaterList.Add(new VideoInfoVo(videoInfo, 500, 300));
+            _lookLaterList.Add(new VideoInfoVo(videoInfo));
         }
     }
 
@@ -236,19 +240,19 @@ public sealed partial class HomePage
     {
         _loveCoverList.Clear();
 
-        foreach (var videoInfo in _videoInfoDao.GetLikeList(10))
+        foreach (var videoInfo in await _videoInfoDao.GetLikeListAsync(10))
         {
-            _loveCoverList.Add(new VideoInfoVo(videoInfo, 500, 300));
+            _loveCoverList.Add(new VideoInfoVo(videoInfo));
         }
     }
 
-    private void TryUpdateCoverShow()
+    private async void TryUpdateCoverShow()
     {
         //最近视频
-        TryUpdateVideoCoverDisplayClass(_videoInfoDao.GetRecentList(10), _recentCoverList);
+        //TryUpdateVideoCoverDisplayClass(await _videoInfoDao.GetRecentListAsync(10), _recentCoverList);
         //稍后观看
-        TryUpdateVideoCoverDisplayClass(_videoInfoDao.GetLookLaterList(10), _lookLaterList);
+        TryUpdateVideoCoverDisplayClass(await _videoInfoDao.GetLookLaterListAsync(10), _lookLaterList);
         //喜欢视频
-        TryUpdateVideoCoverDisplayClass(_videoInfoDao.GetLikeList(10), _loveCoverList);
+        TryUpdateVideoCoverDisplayClass(await _videoInfoDao.GetLikeListAsync(10), _loveCoverList);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Display.Models.Dto.OneOneFive;
+﻿namespace Display.Models.Vo;
 
 public class MatchVideoResult
 {

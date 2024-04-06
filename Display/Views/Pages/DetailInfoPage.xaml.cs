@@ -55,7 +55,7 @@ public sealed partial class DetailInfoPage
         DetailInfo = e.Parameter switch
         {
             VideoInfoVo detailInfo => detailInfo,
-            VideoInfo videoInfo => new VideoInfoVo(videoInfo, 500, 300),
+            VideoInfo videoInfo => new VideoInfoVo(videoInfo),
             _ => DetailInfo
         };
     }
@@ -204,7 +204,6 @@ public sealed partial class DetailInfoPage
             Frame.GoBack();
         }
     }
-
 
 
     private async void CoverTapped(object sender, TappedRoutedEventArgs e)

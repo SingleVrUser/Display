@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DataAccess;
+using DataAccess.Dao.Impl;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using Display.Helper.FileProperties.Name;
@@ -11,7 +13,6 @@ using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
 using Display.Models.Vo;
 using Display.Models.Vo.OneOneFive;
-using Display.Providers;
 using Display.Views.Windows;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
@@ -29,33 +30,33 @@ public sealed partial class Progress
     private readonly List<FailDatum> _failDatumList = [];
 
     private List<MatchVideoResult> _matchVideoResults;
-    public Window CurrentWindow;
+    private Window _currentWindow;
 
     private readonly IFileToInfoDao _fileToInfoDao = App.GetService<IFileToInfoDao>();
     private readonly IFilesInfoDao _filesInfoDao = App.GetService<IFilesInfoDao>();
 
     public Progress(List<string> selectedFilesNameList, List<FilesInfo> fileList)
     {
-        this.InitializeComponent();
-        this.SelectedFilesNameList = selectedFilesNameList;
-        this._fileList = fileList;
-        this.Loaded += PageLoaded;
+        InitializeComponent();
+        SelectedFilesNameList = selectedFilesNameList;
+        _fileList = fileList;
+        Loaded += PageLoaded;
     }
 
     public Progress(List<FailDatum> failDatumList)
     {
-        this.InitializeComponent();
-        this._failDatumList = failDatumList;
-        this.Loaded += ReSpiderPageLoaded;
+        InitializeComponent();
+        _failDatumList = failDatumList;
+        Loaded += ReSpiderPageLoaded;
     }
 
-    private async void ReSpiderPageLoaded(object sender, RoutedEventArgs e)
+    private void ReSpiderPageLoaded(object sender, RoutedEventArgs e)
     {
         Loaded -= ReSpiderPageLoaded;
 
         if (_failDatumList == null || _failDatumList.Count == 0) return;
 
-        CurrentWindow.Closed += CurrentWindow_Closed;
+        _currentWindow.Closed += CurrentWindow_Closed;
         _matchVideoResults ??= [];
 
         foreach (var item in _failDatumList)
@@ -63,41 +64,32 @@ public sealed partial class Progress
             _matchVideoResults.Add(new MatchVideoResult { Status = true, OriginalName = item.Datum.Name, Message = "匹配成功", StatusCode = 1, MatchName = item.MatchName });
 
             //替换数据库的数据
-            _fileToInfoDao.Add(new FileToInfo
+            _fileToInfoDao.ExecuteUpdate(new FileToInfo
             {
                 FilePickCode = item.Datum.PickCode,
-                Truename = item.MatchName
+                TrueName = item.MatchName
             });
-            // DataAccessLocal.Add.AddFileToInfo(item.Datum.PickCode, item.MatchName, isReplace: true);
         }
 
-        ////显示进度环
-        //ShowProgress(_matchVideoResults.Count);
+        SpiderVideoInfo();
 
-        if (_sCts.IsCancellationRequested) return;
-        await SpiderVideoInfo();
-        if (_sCts.IsCancellationRequested) return;
-
-        CurrentWindow.Closed -= CurrentWindow_Closed;
+        _currentWindow.Closed -= CurrentWindow_Closed;
 
         TopProgressRing.IsActive = false;
+        TotalProgressTextBlock.Text = "完成";
     }
 
     private async void PageLoaded(object sender, RoutedEventArgs e)
     {
         Loaded -= PageLoaded;
 
-        CurrentWindow.Closed += CurrentWindow_Closed;
+        _currentWindow.Closed += CurrentWindow_Closed;
 
         await ShowMatchResult();
 
-        if (_sCts.IsCancellationRequested) return;
+        SpiderVideoInfo();
 
-        await SpiderVideoInfo();
-
-        if (_sCts.IsCancellationRequested) return;
-
-        CurrentWindow.Closed -= CurrentWindow_Closed;
+        _currentWindow.Closed -= CurrentWindow_Closed;
 
         TopProgressRing.IsActive = false;
         TotalProgressTextBlock.Text = "完成";
@@ -117,16 +109,16 @@ public sealed partial class Progress
         //遍历获取文件列表中所有的文件
 
         var newList = new List<FilesInfo>();
-        foreach (var filesInfo in _fileList.Where(i=> i.FileId == null))
+        foreach (var filesInfo in _fileList.Where(i=> i.FileId == default))
         {
-            var allFilesInFolder = _filesInfoDao.GetAllFilesListByFolderId(filesInfo.CurrentId);
+            var allFilesInFolder = await _filesInfoDao.GetAllFilesListByFolderIdAsync(filesInfo.CurrentId);
             newList.AddRange(allFilesInFolder);
         }
         
         _fileList.AddRange(newList);
 
         //除去文件夹
-        _fileList = _fileList.Where(item => item.FileId != null).ToList();
+        _fileList = _fileList.Where(item => item.FileId != default).ToList();
 
         //去除重复文件
         var newDictList = new Dictionary<string, FilesInfo>();
@@ -143,9 +135,6 @@ public sealed partial class Progress
         //挑选符合条件的视频文件
         _matchVideoResults = await Task.Run(() => FileMatch.GetVideoAndMatchFile(_fileList));
 
-        ////显示进度环
-        //ShowProgress(totalCount);
-
         TopProgressRing.IsActive = false;
     }
 
@@ -158,17 +147,16 @@ public sealed partial class Progress
         FileInfoPieChart.Visibility = Visibility.Visible;
 
         //1.视频文件，其中SD:x个，hd:x个，fhd:x个，1080p:x个，4k:x个，原画:x个
-        var videoInfo = new FileStatistics(FileFormat.Video);
-        var subInfo = new FileStatistics(FileFormat.Subtitles);
-        var torrentInfo = new FileStatistics(FileFormat.Torrent);
-        var imageInfo = new FileStatistics(FileFormat.Image);
-        var audioInfo = new FileStatistics(FileFormat.Audio);
-        //FileStatistics ArchiveInfo = new FileStatistics(FileFormat.Archive);
+        var videoInfo = new FileStatistics(FileFormatEnum.Video);
+        var subInfo = new FileStatistics(FileFormatEnum.Subtitles);
+        var torrentInfo = new FileStatistics(FileFormatEnum.Torrent);
+        var imageInfo = new FileStatistics(FileFormatEnum.Image);
+        var audioInfo = new FileStatistics(FileFormatEnum.Audio);
 
         foreach (var info in datumList)
         {
             //文件夹，暂不统计
-            if (info.FileId == null)
+            if (info.FileId == default)
             {
 
             }
@@ -177,7 +165,7 @@ public sealed partial class Progress
             {
                 var videoQuality = DetailFileInfo.GetVideoQualityFromVdi(info.Vdi);
 
-                UpdateFileStaticstics(info, videoInfo, videoQuality);
+                UpdateFileStatistics(info, videoInfo, videoQuality);
             }
             //其他文件
             else
@@ -186,19 +174,19 @@ public sealed partial class Progress
                 {
                     //字幕
                     case "ass" or "srt" or "ssa":
-                        UpdateFileStaticstics(info, subInfo, info.Ico);
+                        UpdateFileStatistics(info, subInfo, info.Ico);
                         break;
                     //种子
                     case "torrent":
-                        UpdateFileStaticstics(info, torrentInfo, info.Ico);
+                        UpdateFileStatistics(info, torrentInfo, info.Ico);
                         break;
                     //图片
                     case "gif" or "bmp" or "tiff" or "exif" or "jpg" or "png" or "raw" or "svg":
-                        UpdateFileStaticstics(info, imageInfo, info.Ico);
+                        UpdateFileStatistics(info, imageInfo, info.Ico);
                         break;
                     //音频
                     case "ape" or "wav" or "midi" or "mid" or "flac" or "aac" or "m4a" or "ogg" or "amr":
-                        UpdateFileStaticstics(info, audioInfo, info.Ico);
+                        UpdateFileStatistics(info, audioInfo, info.Ico);
                         break;
                     //case "7z" or "cab" or "dmg" or "iso" or "rar" or "zip":
                     //    UpdateFileStaticstics(info, ArchiveInfo, info.ico);
@@ -208,11 +196,11 @@ public sealed partial class Progress
         }
 
         CountPercentPieChart.Series = new ISeries[] {
-            new PieSeries<double> { Values = new List<double> { videoInfo.Count }, Pushout = 5, Name = "视频"},
-            new PieSeries<double> { Values = new List<double> { audioInfo.Count }, Pushout = 0, Name = "音频"},
-            new PieSeries<double> { Values = new List<double> { subInfo.Count }, Pushout = 0, Name = "字幕"},
-            new PieSeries<double> { Values = new List<double> { torrentInfo.Count }, Pushout = 0, Name = "种子"},
-            new PieSeries<double> { Values = new List<double> { imageInfo.Count }, Pushout = 0, Name = "图片"}
+            new PieSeries<double> { Values = [videoInfo.Count], Pushout = 5, Name = "视频"},
+            new PieSeries<double> { Values = [audioInfo.Count], Pushout = 0, Name = "音频"},
+            new PieSeries<double> { Values = [subInfo.Count], Pushout = 0, Name = "字幕"},
+            new PieSeries<double> { Values = [torrentInfo.Count], Pushout = 0, Name = "种子"},
+            new PieSeries<double> { Values = [imageInfo.Count], Pushout = 0, Name = "图片"}
         };
 
     }
@@ -223,18 +211,18 @@ public sealed partial class Progress
     /// <param name="dataInfo"></param>
     /// <param name="typeInfo"></param>
     /// <param name="name"></param>
-    private void UpdateFileStaticstics(FilesInfo dataInfo, FileStatistics typeInfo, string name)
+    private void UpdateFileStatistics(FilesInfo dataInfo, FileStatistics typeInfo, string name)
     {
         typeInfo.Size += dataInfo.Size;
         typeInfo.Count++;
 
-        if (typeInfo.data.Count != 0)
+        if (typeInfo.FileInfo.Count != 0)
         {
-            var tmpData = typeInfo.data.FirstOrDefault(x => x.Name == name);
+            var tmpData = typeInfo.FileInfo.FirstOrDefault(x => x.Name == name);
 
             if (tmpData == null)
             {
-                typeInfo.data.Add(new FileStatistics.Data { Name = name, Count = 1, Size = dataInfo.Size });
+                typeInfo.FileInfo.Add(new FileStatistics.Data { Name = name, Count = 1, Size = dataInfo.Size });
             }
             else
             {
@@ -244,28 +232,29 @@ public sealed partial class Progress
         }
         else
         {
-            typeInfo.data.Add(new FileStatistics.Data { Name = name, Count = 1, Size = dataInfo.Size });
+            typeInfo.FileInfo.Add(new FileStatistics.Data { Name = name, Count = 1, Size = dataInfo.Size });
         }
     }
 
     /// <summary>
     /// 开始从网络中检索视频信息
     /// </summary>
-    private Task SpiderVideoInfo()
+    private void SpiderVideoInfo()
     {
-        if (_matchVideoResults == null)
-            return Task.CompletedTask;
+        if (_matchVideoResults == null) return;
 
-        var list = _matchVideoResults.Where(item => !string.IsNullOrEmpty(item.MatchName))
+        var matchNameList = _matchVideoResults.Where(item => !string.IsNullOrEmpty(item.MatchName))
             .Select(match => match.MatchName).ToList();
+
+        if (matchNameList.Count == 0) return;
+
         var spiderManager = App.GetService<SpiderManager>();
-        spiderManager.AddTask(list);
+        spiderManager.AddTask(matchNameList);
 
         // 展示页面
         TaskPage.ShowSingleWindow(NavigationViewItemEnum.SpiderTask);
 
         TopProgressRing.IsActive = false;
-        return Task.CompletedTask;
     }
 
 
@@ -304,7 +293,7 @@ public sealed partial class Progress
     public void CreateWindow()
     {
         var window = new CommonWindow("匹配名称");
-        CurrentWindow = window;
+        _currentWindow = window;
         window.SetWindowSize(950, 730);
         window.Content = this;
         window.Activate();

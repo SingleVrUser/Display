@@ -1,3 +1,3 @@
 ﻿namespace Display.Models.Enums;
 
-public enum FileFormat { Video, Subtitles, Torrent, Image, Audio, Archive }
+public enum FileFormatEnum { Video, Subtitles, Torrent, Image, Audio, Archive }

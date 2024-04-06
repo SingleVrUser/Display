@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -19,7 +18,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using Newtonsoft.Json;
-using DataAccess;
+using DataAccess.Dao.Impl;
 
 namespace Display.Views.Pages;
 
@@ -29,6 +28,7 @@ public sealed partial class ActorsPage
     private readonly ObservableCollection<ActorInfo> _actorPartInfo = [];
 
     private static readonly IActorInfoDao ActorInfoDao = App.GetService<IActorInfoDao>();
+    private static readonly IActorNameDao ActorNameDao = App.GetService<IActorNameDao>();
     private static readonly IBwhDao BwhDao = App.GetService<IBwhDao>();
     
     public static ActorsPage Current;
@@ -54,7 +54,7 @@ public sealed partial class ActorsPage
 
         _actorInfo = new IncrementalLoadActorInfoCollection(new Dictionary<string, bool> { { "is_like", true }, { "prifile_path", true } });
         BasicGridView.ItemsSource = _actorInfo;
-        _actorInfo.LoadData();
+        await _actorInfo.LoadDataAsync();
 
         TotalCountTextBlock.Text = _actorInfo.AllCount.ToString();
 
@@ -219,7 +219,7 @@ public sealed partial class ActorsPage
             return;
         }
 
-        var infos = DataAccessLocal.Get.GetActorInfo(-1);
+        var infos = await DataAccessLocal.Get.GetActorInfoAsync(-1);
 
         var allCount = infos.Length;
         if (allCount == 0) return;
@@ -297,7 +297,7 @@ public sealed partial class ActorsPage
                 continue;
             }
 
-            await GetActorInfo(info);
+            await UpdateActorInfo(info);
 
             await ToastGetActorInfoWithProgressBar.AddValue(i + 1, allCount);
 
@@ -309,7 +309,7 @@ public sealed partial class ActorsPage
         AppSettings.GetActorInfoLastIndex = -1;
     }
 
-    public static async Task<ActorInfo> GetActorInfo(ActorInfo info)
+    public static async Task<ActorInfo> UpdateActorInfo(ActorInfo info)
     {
         var actorName = info.Name;
 
@@ -320,66 +320,77 @@ public sealed partial class ActorsPage
         if (Regex.Match(actorName, @"\d+").Success) return null;
 
         //从网站中获取信息
-        var actorInfo = await GetActorInfoFromNetwork.SearchInfoFromMinnanoAv(actorName, default);
-        if (actorInfo == null) return null;
+        var actorInfoFromInternet = await GetActorInfoFromNetwork.SearchInfoFromMinnanoAv(actorName, default);
+        if (actorInfoFromInternet == null) return null;
 
+        //查询本地数据库中的数据
         var actorInfoFromDb = ActorInfoDao.GetPartInfoByActorName(actorName);
+
+        //查询不到，异常
         if (actorInfoFromDb == null) return null;
+
+        ActorInfoDao.Attach(actorInfoFromDb);
+
         var actorId = actorInfoFromDb.Id;
-        actorInfo.Id = actorId;
-        
-        ActorInfoDao.UpdateSingle(actorInfo);
-        
-        //获取到的信息有头像
-        if (!string.IsNullOrEmpty(actorInfo.ProfilePath))
+
+        actorInfoFromDb.Birthday = actorInfoFromInternet.Birthday;
+        actorInfoFromDb.BlogUrl = actorInfoFromInternet.BlogUrl;
+        actorInfoFromDb.Height = actorInfoFromInternet.Height;
+        actorInfoFromDb.IsWoman = actorInfoFromInternet.IsWoman;
+        actorInfoFromDb.WorkTime = actorInfoFromInternet.WorkTime;
+        actorInfoFromDb.WorksCount = actorInfoFromInternet.WorksCount;
+
+        //更新bwh
+        if (!string.IsNullOrEmpty(actorInfoFromInternet.Bwh))
         {
-            //查询本地数据库中的数据
-            var actorInfos = DataAccessLocal.Get.GetActorInfo(filterList: [$"id == '{actorId}'"]);
+            actorInfoFromDb.Bwh = actorInfoFromInternet.Bwh;
+            var bwh = new Bwh(actorInfoFromInternet.Bwh);
+            actorInfoFromDb.BwhInfo = bwh;
 
-            if (actorInfos != null && actorInfos.Length != 0)
+            if (BwhDao.GetOne(actorInfoFromInternet.Bwh) == null)
             {
-                var firstOrDefault = actorInfos.FirstOrDefault();
-
-                //数据库中无头像
-                if (firstOrDefault is { ProfilePath: Constants.FileType.NoPicturePath } && actorInfo.InfoUrl != null)
-                {
-                    var filePath = Path.Combine(AppSettings.ActorInfoSavePath, actorName);
-
-                    Uri infoUri = new(actorInfo.InfoUrl);
-
-                    var profilePath = await DbNetworkHelper.DownloadFile(actorInfo.ProfilePath, filePath, "face", headers: new Dictionary<string, string>
-                    {
-                        {"Host",infoUri.Host },
-                        {"Referer", actorInfo.InfoUrl }
-                    });
-
-                    //更新头像
-                    ActorInfoDao.UpdateSingle(new ActorInfo
-                    {
-                        Id = actorId,
-                        ProfilePath = profilePath
-                    });
-
-                    actorInfo.ProfilePath = profilePath;
-                }
-                //数据库中有头像
-                else if (firstOrDefault != null)
-                {
-                    actorInfo.ProfilePath = firstOrDefault.ProfilePath;
-                }
-
+                BwhDao.ExecuteAdd(bwh);
             }
-
         }
+
+        //获取到的信息有头像
+        if (!string.IsNullOrEmpty(actorInfoFromInternet.ProfilePath) && actorInfoFromInternet.InfoUrl != null)
+        {
+            //数据库中无头像/为默认头像/没有转化为本地
+            if (actorInfoFromDb.ProfilePath is null ||
+                actorInfoFromDb.ProfilePath.Equals(Constants.FileType.NoPicturePath) ||
+                actorInfoFromDb.ProfilePath.Contains("http"))
+            {
+                var filePath = Path.Combine(AppSettings.ActorInfoSavePath, actorName);
+
+                Uri infoUri = new(actorInfoFromInternet.InfoUrl);
+
+                var profilePath = await DbNetworkHelper.DownloadFile(actorInfoFromInternet.ProfilePath, filePath, "face", headers: new Dictionary<string, string>
+                {
+                    {"Host",infoUri.Host },
+                    {"Referer", actorInfoFromInternet.InfoUrl }
+                });
+
+                //更新头像
+                actorInfoFromDb.ProfilePath = profilePath;
+                //actorInfoFromInternet.ProfilePath = profilePath;
+            }
+        }
+
+        //ActorInfoDao.ExecuteUpdate(actorInfoFromDb);
+        ActorInfoDao.SaveChanges();
 
         //更新别名
         //别名
-        if (actorInfo.OtherNameList is { Count: > 0 })
+        if (actorInfoFromInternet.OtherNameList is { Count: > 0 })
         {
-            foreach (var otherName in actorInfo.OtherNameList)
+            foreach (var otherName in actorInfoFromInternet.OtherNameList)
             {
+                // 先删除
+                ActorNameDao.ExecuteRemoveByName(otherName);
 
-                Context.Instance.ActorNames.Add(new ActorName
+                // 后添加
+                ActorNameDao.ExecuteAdd(new ActorName
                 {
                     Id = actorId,
                     Name = otherName
@@ -387,13 +398,7 @@ public sealed partial class ActorsPage
             }
         }
 
-        //更新bwh
-        if (!string.IsNullOrEmpty(actorInfo.Bwh))
-        {
-            BwhDao.Add(actorInfo.BwhInfo);
-        }
-
-        return actorInfo;
+        return actorInfoFromInternet;
     }
 
     public void ShowButtonWithShowToastAgain()

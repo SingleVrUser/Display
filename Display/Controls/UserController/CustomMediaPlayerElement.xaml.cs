@@ -465,7 +465,7 @@ public sealed partial class CustomMediaPlayerElement
 
         if (videoInfo != null)
         {
-            _videoInfoDao.UpdateSingle(new VideoInfo
+            _videoInfoDao.ExecuteUpdate(new VideoInfo
             {
                 TrueName = trueName,
                 IsLike = _isLike
@@ -482,7 +482,7 @@ public sealed partial class CustomMediaPlayerElement
             {
                 var capPath = await ScreenShotAsync(pickCode);
                 
-                _failListIsLikeLookLaterDao.Add(new FailListIsLikeLookLater()
+                _failListIsLikeLookLaterDao.ExecuteAdd(new FailListIsLikeLookLater()
                 {
                     PickCode = pickCode,
                     IsLike = _isLike,
@@ -493,7 +493,7 @@ public sealed partial class CustomMediaPlayerElement
             }
             else
             {
-                _failListIsLikeLookLaterDao.UpdateSingle(new FailListIsLikeLookLater
+                _failListIsLikeLookLaterDao.ExecuteUpdate(new FailListIsLikeLookLater
                 {
                     PickCode = pickCode,
                     IsLike = _isLike
@@ -503,7 +503,7 @@ public sealed partial class CustomMediaPlayerElement
                 if (failInfo.ImagePath == FileType.NoPicturePath || !File.Exists(failInfo.ImagePath))
                 {
                     var capPath = await ScreenShotAsync(pickCode);
-                    _failListIsLikeLookLaterDao.UpdateSingle(new FailListIsLikeLookLater
+                    _failListIsLikeLookLaterDao.ExecuteUpdate(new FailListIsLikeLookLater
                     {
                         PickCode = pickCode,
                         ImagePath = capPath
@@ -536,7 +536,7 @@ public sealed partial class CustomMediaPlayerElement
 
         if (videoInfo != null)
         {
-            _videoInfoDao.UpdateSingle(new VideoInfo()
+            _videoInfoDao.ExecuteUpdate(new VideoInfo()
             {
                 TrueName = trueName,
                 LookLater = _lookLater
@@ -551,7 +551,7 @@ public sealed partial class CustomMediaPlayerElement
             if (failInfo == null)
             {
                 var capPath = await ScreenShotAsync(pickCode);
-                _failListIsLikeLookLaterDao.Add(new FailListIsLikeLookLater
+                _failListIsLikeLookLaterDao.ExecuteAdd(new FailListIsLikeLookLater
                 {
                     PickCode = pickCode,
                     LookLater = _lookLater,
@@ -561,7 +561,7 @@ public sealed partial class CustomMediaPlayerElement
             }
             else
             {
-                _failListIsLikeLookLaterDao.UpdateSingle(new FailListIsLikeLookLater
+                _failListIsLikeLookLaterDao.ExecuteUpdate(new FailListIsLikeLookLater
                 {
                     PickCode = pickCode,
                     LookLater = _lookLater
@@ -572,7 +572,7 @@ public sealed partial class CustomMediaPlayerElement
                 {
                     var capPath = await ScreenShotAsync(pickCode);
                     
-                    _failListIsLikeLookLaterDao.UpdateSingle(new FailListIsLikeLookLater
+                    _failListIsLikeLookLaterDao.ExecuteUpdate(new FailListIsLikeLookLater
                     {
                         PickCode = pickCode,
                         ImagePath = capPath
@@ -596,7 +596,7 @@ public sealed partial class CustomMediaPlayerElement
 
         var capPath = await ScreenShotAsync(pickCode);
 
-        _failListIsLikeLookLaterDao.Add(new FailListIsLikeLookLater
+        _failListIsLikeLookLaterDao.ExecuteAdd(new FailListIsLikeLookLater
         {
             PickCode = pickCode,
             ImagePath = capPath

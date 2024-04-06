@@ -19,7 +19,7 @@ public interface IFilesInfoDao : IDao<FilesInfo>
     /// </summary>
     /// <param name="folderId"></param>
     /// <returns></returns>
-    List<FilesInfo> GetAllFilesListByFolderId(long folderId);
+    Task<List<FilesInfo>> GetAllFilesListByFolderIdAsync(long folderId);
     
     /// <summary>
     /// 获取文件夹pid为id的文件夹列表，深度只有一级
@@ -28,12 +28,20 @@ public interface IFilesInfoDao : IDao<FilesInfo>
     /// <param name="limit">限制数量</param>
     /// <returns></returns>
     List<FilesInfo> GetPartFolderListByPid(long pid, int? limit = null);
+
+    /// <summary>
+    /// 获取文件夹里面的文件，包括文件夹，深度只有一级
+    /// </summary>
+    /// <param name="folderId"></param>
+    /// <param name="limit"></param>
+    /// <returns></returns>
+    List<FilesInfo> GetPartFileListByPid(long folderId, int? limit = null); 
     
     /// <summary>
     /// 通过文件夹的id删除该文件夹以及文件夹下的所有文件和文件夹
     /// </summary>
     /// <param name="folderId">文件id或者文件夹id</param>
-    void RemoveAllByFolderId(long folderId);
+    Task RemoveAllByFolderIdAsync(long folderId);
 
     /// <summary>
     /// 通过pickCode删除记录
@@ -54,6 +62,17 @@ public interface IFilesInfoDao : IDao<FilesInfo>
     /// <returns></returns>
     FilesInfo? GetOneByPickCode(string pickCode);
 
+
     FilesInfo? GetUpperLevelFolderInfoByFolderId(long id);
+    
+    /// <summary>
+    /// 获取当前文件夹到跟文件夹的文件信息
+    /// </summary>
+    /// <param name="folderCid"></param>
+    /// <returns></returns>
     List<FilesInfo> GetFolderListToRootByFolderId(long folderCid);
+
+
+    Task ExecuteRemoveAllByFolderIdAsync(long folderId);
+    bool IsFolderExistsById(long id);
 }

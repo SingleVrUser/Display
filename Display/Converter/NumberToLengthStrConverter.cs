@@ -15,6 +15,7 @@ internal class NumberToLengthStrConverter : IValueConverter
     {
         return value switch
         {
+            null => string.Empty,
             int intValue => DateHelper.ConvertDoubleToLengthStr(intValue),
             double doubleValue => DateHelper.ConvertDoubleToLengthStr(doubleValue),
             string stringValue when !stringValue.IsNumber() => stringValue,

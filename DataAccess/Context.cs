@@ -62,12 +62,12 @@ public class Context : DbContext
         }
     }
 
-
-    private Context()
+    public Context()
     {
     }
 
-
     protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options.UseSqlite($"Data Source={DbPath}");
+        => options
+            .EnableSensitiveDataLogging()
+            .UseSqlite($"Data Source={DbPath}");
 }

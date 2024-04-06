@@ -6,65 +6,40 @@ namespace DataAccess.Dao.Impl;
 
 public class VideoInfoDao: DaoImpl<VideoInfo>, IVideoInfoDao
 {
-    public void UpdateCompleted(VideoInfo info)
-    {
-        // 更新表VideoInfo
-        DbSet.Update(info);
-        
-        //更新是否步兵
-        Context.IsWms.Add(new IsWm { Truename = info.TrueName, IsWm1 = info.IsWm });
-
-        if (info.Actor == null) return;
-        
-        var actors = info.Actor.Split(",");
-        if (actors.Length <= 0) return;
-            
-        //更新演员_视频中间表
-        
-        //先删除Actor_Videos中所有Video_name的数据
-        Context.ActorVideos.RemoveRange(Context.ActorVideos.Where(i => i.VideoName == info.TrueName));
-    
-        //查询演员id列表
-        foreach (var actorId in Context.ActorInfos.Where(i => actors.Contains(i.Name.TrimEnd('♀', '♀'))).Select(i=>i.Id))
-        {
-            Context.ActorVideos.Add(new ActorVideo { ActorId =  actorId, VideoName = info.TrueName});
-        }
-        
-        SaveChanges();
-    }
-
     public void UpdateAllImagePathList(string srcPath, string dstPath)
     {
-        var videoInfos = DbSet.Where(i => i.ImagePath != null && i.ImagePath.Contains(srcPath)).ToList();
-        videoInfos.ForEach(i=>i.ImagePath= i.ImagePath!.Replace(srcPath, dstPath));
+        var videoInfos = DbSet.Where(i => i.ImagePath.Contains(srcPath)).ToList();
+        videoInfos.ForEach(i=>i.ImagePath= i.ImagePath.Replace(srcPath, dstPath));
         SaveChanges();
-        
     }
 
-    public VideoInfo[] GetLookLaterList(int limit)
+    public async Task<VideoInfo[]> GetLookLaterListAsync(int limit)
     {
-        return DbSet.Where(i => i.LookLater > 0).OrderByDescending(i => i.LookLater).Take(limit).ToArray();
+        return await DbSet.AsNoTracking().Where(i => i.LookLater > 0).OrderByDescending(i => i.LookLater).Take(limit).ToArrayAsync();
     }
 
-    public VideoInfo[] GetLikeList(int limit)
+    public async Task<VideoInfo[]> GetLikeListAsync(int limit)
     {
-        return DbSet.Where(i => i.IsLike != 0).Take(limit).ToArray();
+        return await DbSet.AsNoTracking().Where(i => i.IsLike != 0).Take(limit).ToArrayAsync();
     }
 
-    public VideoInfo[] GetRandomList(int limit)
+    public async Task<VideoInfo[]> GetRecentListAsync(int limit)
     {
-        return DbSet.Where(i => i.IsLike != 0).OrderBy(_ => EF.Functions.Random()).Take(limit).ToArray();
+        return await DbSet.AsNoTracking().OrderByDescending(i=>i.AddTime).Take(limit).ToArrayAsync();
     }
 
-    public VideoInfo[] GetRecentList(int limit)
+    public void ExecuteUpdateByTrueName(string trueName, Action<VideoInfo> updateAction)
     {
-        return DbSet.OrderByDescending(i=>i.AddTime).Take(limit).ToArray();
-    }
+        var info = DbSet.FirstOrDefault(i => i.TrueName == trueName);
+        if (info == null) return;
 
+        updateAction.Invoke(info);
+        SaveChanges();
+    }
 
     public VideoInfo? GetOneByTrueName(string name)
     {
-        return DbSet.Find(name);
+        return DbSet.AsNoTracking().FirstOrDefault(i=>i.TrueName == name);
     }
 
     public List<VideoInfo> GetInfoListByTrueName(string name)

@@ -4,7 +4,7 @@ namespace Display.Models.Vo.Progress;
 
 public class GetFileProgressIProgress
 {
-    public ProgressStatus status { get; set; } = ProgressStatus.normal;
-    public GetFilesProgressInfo getFilesProgressInfo { get; set; }
-    public long sendCountPerMinutes { get; set; }
+    public ProgressStatus Status { get; set; } = ProgressStatus.normal;
+    public GetFilesProgressInfo GetFilesProgressInfo { get; set; }
+    public long SendCountPerMinutes { get; set; }
 }

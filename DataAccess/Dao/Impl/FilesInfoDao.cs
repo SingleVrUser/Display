@@ -18,7 +18,7 @@ public class FilesInfoDao : DaoImpl<FilesInfo>, IFilesInfoDao
         return (from fileInfo in DbSet
                 join fileToInfo in Context.FileToInfos
                     on fileInfo.PickCode equals fileToInfo.FilePickCode
-                where EF.Functions.Like(fileToInfo.Truename, name)
+                where EF.Functions.Like(fileToInfo.TrueName, name)
                 select fileInfo).ToList();
     }
 
@@ -28,7 +28,7 @@ public class FilesInfoDao : DaoImpl<FilesInfo>, IFilesInfoDao
         var query = DbSet.SelectMany(
             i => Context.FileToInfos
                 .Where(middle => middle.FilePickCode.Equals(i.PickCode)
-                                     && EF.Functions.Like(middle.Truename, queryDto.Name))
+                                     && EF.Functions.Like(middle.TrueName, queryDto.Name))
                 .DefaultIfEmpty(),
             (i, _) => i
         ).Skip(queryDto.Position)
@@ -44,9 +44,9 @@ public class FilesInfoDao : DaoImpl<FilesInfo>, IFilesInfoDao
         }
     }
 
-    public List<FilesInfo> GetAllFilesListByFolderId(long folderId)
+    public async Task<List<FilesInfo>> GetAllFilesListByFolderIdAsync(long folderId)
     {
-        return GetAllFileListTraverse(folderId, []);
+        return await GetAllFileListTraverseAsync(folderId, []);
     }
 
     public List<FilesInfo> GetPartFolderListByPid(long pid, int? limit = null)
@@ -55,24 +55,60 @@ public class FilesInfoDao : DaoImpl<FilesInfo>, IFilesInfoDao
         
         if (limit != null) queryable = queryable.Take(limit.Value);
 
-        return queryable.ToList();
-    }   
-    
-    public void RemoveAllByFolderId(long folderId)
+        return queryable.AsNoTracking().ToList();
+    }
+
+    public List<FilesInfo> GetPartFileListByPid(long folderId, int? limit = null)
     {
-        var allFiles = GetAllFilesListByFolderId(folderId);
-        DbSet.RemoveRange(allFiles);
+        // i.FileId != default无法过滤
+        // var queryable = DbSet.Where(i => (i.FileId != default && i.CurrentId == folderId ) || i.ParentId == folderId); 
+        var queryable = DbSet.Where(i => (i.FileId > 0 && i.CurrentId == folderId ) || i.ParentId == folderId);  
         
+        if (limit != null) queryable = queryable.Take(limit.Value);
+
+
+        var filesInfos = queryable.AsNoTracking().ToList();
+        return filesInfos;
+    }
+
+    public async Task ExecuteRemoveAllByFolderIdAsync(long folderId)
+    {
+        await RemoveAllByFolderIdAsync(folderId);
+        await Context.Instance.SaveChangesAsync();
+    }
+
+    public bool IsFolderExistsById(long id)
+    {
+        return DbSet.FirstOrDefault(i => i.FileId <= 0 && i.CurrentId == id) != null;
+    }
+
+    public async Task RemoveAllByFolderIdAsync(long folderId)
+    {
+        //加上文件夹本身
+        var folderInfo = DbSet.AsNoTracking().FirstOrDefault(i => i.CurrentId == folderId);
+        if (folderInfo == null) return;
+
+        List<FilesInfo> removeList = [folderInfo];
+
+        //文件夹下所有的文件
+        var filesInFolder = await GetAllFilesListByFolderIdAsync(folderId);
+
+        removeList.AddRange(filesInFolder);
+
+        DbSet.RemoveRange(removeList);
+
         // 删除中间表
-        
-        
-        SaveChanges();
+        foreach (var filesInfo in removeList)
+        {
+            Context.FileToInfos.RemoveRange(
+                Context.FileToInfos.Where(i=>i.FilePickCode == filesInfo.PickCode));
+        }
     }
 
     public void RemoveByPickCode(string pickCode)
     {
-        DbSet.Where(i => i.PickCode == pickCode).ExecuteDelete();
-        
+        // DbSet.Where(i => i.PickCode == pickCode).ExecuteDelete();
+        //
         // 删除中间表
         Context.FileToInfos.RemoveRange(Context.FileToInfos.Where(i => i.FilePickCode == pickCode));
         
@@ -84,7 +120,7 @@ public class FilesInfoDao : DaoImpl<FilesInfo>, IFilesInfoDao
         DbSet.RemoveRange(DbSet.Where(i => i.Name == trueName));
         
         // 删除中间表
-        Context.FileToInfos.RemoveRange(Context.FileToInfos.Where(i => i.Truename == trueName));
+        Context.FileToInfos.RemoveRange(Context.FileToInfos.Where(i => i.TrueName == trueName));
         
         SaveChanges();
     }
@@ -97,7 +133,7 @@ public class FilesInfoDao : DaoImpl<FilesInfo>, IFilesInfoDao
 
     public FilesInfo? GetUpperLevelFolderInfoByFolderId(long id)
     {
-        return DbSet.FirstOrDefault(i => i.FileId == null && i.CurrentId == id);
+        return DbSet.FirstOrDefault(i => i.FileId <= 0 && i.CurrentId == id);
 
     }
 
@@ -115,7 +151,7 @@ public class FilesInfoDao : DaoImpl<FilesInfo>, IFilesInfoDao
         for (var i = 0; i < maxDepth; i++)
         {
             if (pid == null) break;
-            var upperFileInfo = GetUpperLevelFolderInfoByFolderId((long)pid);
+            var upperFileInfo = GetUpperLevelFolderInfoByFolderId(pid.Value);
             
             if (upperFileInfo == null) break;
             
@@ -135,18 +171,19 @@ public class FilesInfoDao : DaoImpl<FilesInfo>, IFilesInfoDao
         return folderToRootList;
     }
 
-    private List<FilesInfo> GetAllFileListTraverse(long id, List<FilesInfo> allFileList)
+    private async Task<List<FilesInfo>> GetAllFileListTraverseAsync(long id, List<FilesInfo> allFileList)
     {
-        var list = DbSet.Where(i => (i.FileId != default && i.CurrentId == id) || i.ParentId == id).ToList();
+        var list = await DbSet.Where(i => (i.FileId > 0 && i.CurrentId == id) || i.ParentId == id)
+            .AsNoTracking().ToListAsync();
         
-        list.ForEach(item =>
+        foreach (var item in list)
         {
             // 文件夹，再向下查询
             if (item.FileId == default)
             {
-                allFileList = GetAllFileListTraverse(item.CurrentId, allFileList);
+                allFileList = await GetAllFileListTraverseAsync(item.CurrentId, allFileList);
             }
-        });
+        }
         
         allFileList.AddRange(list);
         return allFileList;

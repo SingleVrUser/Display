@@ -7,9 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using DataAccess.Models.Entity;
 using Display.Helper.Network;
-using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.Media;
-using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
 using Display.Models.Enums.OneOneFive;
 using Display.Models.Vo;
@@ -18,51 +16,24 @@ using Display.Models.Vo.OneOneFive;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
 namespace Display.Views.Pages.SpiderVideoInfo;
 
-
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
 public sealed partial class MainPage : INotifyPropertyChanged
 {
     private IncrementalLoadFailSpiderInfoCollection _failList;
     private IncrementalLoadFailSpiderInfoCollection FailList
     {
         get => _failList;
-        set
-        {
-            if (_failList == value)
-                return;
-
-            _failList = value;
-
-            OnPropertyChanged();
-        }
+        set => SetField(ref _failList, value);
     }
 
     private FilesInfo _selectedDatum;
     public FilesInfo SelectedDatum
     {
         get => _selectedDatum;
-        set
-        {
-            if (_selectedDatum == value)
-                return;
-            _selectedDatum = value;
-
-            OnPropertyChanged();
-        }
+        private set => SetField(ref _selectedDatum, value);
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
-    public void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 
     public MainPage()
     {
@@ -70,37 +41,10 @@ public sealed partial class MainPage : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// 展开Expander初始化检查图片路径和网络
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="args"></param>
-    private void Expander_Expanding(Expander sender, ExpanderExpandingEventArgs args)
-    {
-        if (sender.Content as ConditionalCheck == null)
-        {
-            sender.Content = new ConditionalCheck();
-        }
-
-        sender.SetValue(Grid.ColumnProperty, 0);
-        sender.SetValue(Grid.ColumnSpanProperty, 2);
-    }
-
-    /// <summary>
-    /// 关闭Expander
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="args"></param>
-    private void Expander_Collapsed(Expander sender, ExpanderCollapsedEventArgs args)
-    {
-        sender.SetValue(Grid.ColumnProperty, 1);
-        sender.SetValue(Grid.ColumnSpanProperty, 1);
-    }
-
-    /// <summary>
     /// 点击匹配按钮开始匹配
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void StartMatchName_ButtonClick(object sender, RoutedEventArgs e)
     {
         //从本地数据库中搜刮
@@ -195,15 +139,16 @@ public sealed partial class MainPage : INotifyPropertyChanged
     {
         if (e.ClickedItem is not DetailFileInfo itemInfo) return;
 
-        if (FileInfoShowGrid.Visibility == Visibility.Collapsed) FileInfoShowGrid.Visibility = Visibility.Visible;
+        FileInfoShowGrid.Visibility = Visibility.Visible;
+        
         SelectedDatum = itemInfo.Datum;
     }
 
     /// <summary>
     /// 点击TreeView的Item显示文件信息
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="args"></param>
+    /// <param name="sender"></param>
+    /// <param name="args"></param>
     private void TreeView_ItemInvoked(TreeView sender, TreeViewItemInvokedEventArgs args)
     {
         if (args.InvokedItem is not TreeViewNode { Content: ExplorerItem content }) return;
@@ -211,35 +156,34 @@ public sealed partial class MainPage : INotifyPropertyChanged
         if (FileInfoShowGrid.Visibility == Visibility.Collapsed) FileInfoShowGrid.Visibility = Visibility.Visible;
         SelectedDatum = content.Datum;
     }
-
+    
     /// <summary>
     /// 点击失败列表显示文件信息
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
-    private void FailListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    /// <exception cref="NotImplementedException"></exception>
+    private void FailListView_OnItemClick(object sender, ItemClickEventArgs e)
     {
-        if (e.AddedItems.Count != 1)
-            return;
+        if (e.ClickedItem is not FailDatum failDatum) return;
 
-        //if (FileInfoShow_Grid.Visibility == Visibility.Collapsed) FileInfoShow_Grid.Visibility = Visibility.Visible;
-
-        //SelectedDatum = (e.AddedItems[0] as FailDatum).Datum;
+        FileInfoShowGrid.Visibility = Visibility.Visible;
+        
+        SelectedDatum = failDatum.Datum;
     }
 
     private void FailTypeComboBoxChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (e.AddedItems[0] is ComboBoxItem comboBoxItem)
-        {
-            ChangedFailListType(comboBoxItem);
-        }
+        if (e.AddedItems.FirstOrDefault() is not ComboBoxItem comboBoxItem) return;
+        
+        ChangedFailListType(comboBoxItem);
     }
 
-    private async void ChangedFailListType(ComboBoxItem comboBoxItem)
+    private void ChangedFailListType(ComboBoxItem comboBoxItem)
     {
         if (FailListView.ItemsSource == null)
         {
-            FailList = new();
+            FailList = [];
         }
         else if (FailList.Count != 0)
         {
@@ -269,6 +213,8 @@ public sealed partial class MainPage : INotifyPropertyChanged
     private void ShowData_RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (e.AddedItems[0] is not ListViewItem item) return;
+
+        if (FailShowTypeComboBox == null) return;
 
         switch (item.Name)
         {
@@ -306,37 +252,21 @@ public sealed partial class MainPage : INotifyPropertyChanged
         var mediaPlayItem = new MediaPlayItem(info);
         await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this, playerType: playerType);
     }
-}
 
-public class SpiderInfoProgress
-{
-    public VideoInfo VideoInfo { get; set; }
-    public MatchVideoResult MatchResult { get; set; }
+    
+    public event PropertyChangedEventHandler PropertyChanged;
 
-    public int Index { get; set; } = 0;
-}
-
-public enum FileFormat { Video, Subtitles, Torrent, Image, Audio, Archive }
-
-public class FileStatistics
-{
-    public FileStatistics(FileFormat name)
+    private void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
-        Type = name;
-        Size = 0;
-        Count = 0;
-        data = new();
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public FileFormat Type { get; set; }
-    public long Size { get; set; }
-    public int Count { get; set; }
-    public List<Data> data { get; set; }
-
-    public class Data
+    private bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
     {
-        public string Name { get; set; }
-        public int Count { get; set; } = 0;
-        public long Size { get; set; } = 0;
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
     }
+
 }

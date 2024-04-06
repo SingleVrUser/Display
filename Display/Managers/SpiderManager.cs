@@ -13,6 +13,7 @@ using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using Display.Models.Vo.Spider;
 using Display.Providers;
+using DataAccess.Dao.Impl;
 
 namespace Display.Managers;
 
@@ -223,7 +224,7 @@ public class SpiderManager
 
                     if (newInfo is null)
                     {
-                        Debug.WriteLine("搜索结果为空");
+                        Debug.WriteLine($"{spider.Name}搜索: {item.Name} - 搜索结果为空");
                     }
                     else
                     {
@@ -254,7 +255,6 @@ public class SpiderManager
             {
                 var onSpiderCount = Spiders.Count(curSpider => curSpider.IsOn);
 
-                Debug.WriteLine(onSpiderCount);
                 isThisNameDone = item.DoneSpiderNameArray.Count >= onSpiderCount;
             }
 
@@ -354,8 +354,12 @@ public class SpiderManager
             var upperName = name.ToUpper();
             // 先从数据库中搜索
             var singleVideoInfoByTrueName = _videoInfoDao.GetOneByTrueName(upperName);
-            if(singleVideoInfoByTrueName != null) continue;
-
+            if (singleVideoInfoByTrueName != null)
+            {
+                //替换数据库的数据
+                _fileToInfoDao.UpdateIsSuccessByTrueName(upperName, 1);
+                continue;
+            }
             _taskItemQueue.Enqueue(new SpiderItem(upperName));
         }
 

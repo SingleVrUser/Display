@@ -54,7 +54,7 @@ public class VideoInfoTest
         if (info == null) return;
 
         // 增
-        VideoInfos.ForEach(dao.Add);
+        VideoInfos.ForEach(dao.ExecuteAdd);
 
         // 查
         // 查询全部
@@ -77,7 +77,7 @@ public class VideoInfoTest
 
         // 改
         info.ImagePath = "15222222";
-        dao.UpdateSingle(info);
+        dao.ExecuteUpdate(info);
 
         databaseVideoInfo = dao.Find(info.TrueName);
         Assert.AreEqual(info, databaseVideoInfo);

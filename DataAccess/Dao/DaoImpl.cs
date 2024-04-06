@@ -7,16 +7,23 @@ namespace DataAccess.Dao;
 
 public class DaoImpl<T> : IDao<T> where T : class
 {
-    protected readonly Context Context = Context.Instance;
-    protected readonly DbSet<T> DbSet = Context.Instance.Set<T>();
+    protected readonly Context Context;
+    protected readonly DbSet<T> DbSet;
 
-    public void Add(T entity)
+    public DaoImpl()
+    {
+        Context = new Context();
+        DbSet = Context.Set<T>();
+
+    }
+
+    public void ExecuteAdd(T entity)
     {
         DbSet.Add(entity);
         Context.SaveChanges();
     }
 
-    public List<T> List() => DbSet.ToList();
+    public List<T> List() => DbSet.AsNoTracking().ToList();
     public void SaveChanges()
     {
         Context.SaveChanges();
@@ -24,14 +31,13 @@ public class DaoImpl<T> : IDao<T> where T : class
 
     public List<T> List(Expression<Func<T, bool>> predicate)
     {
-        return DbSet.Where(predicate).ToList();
+        return DbSet.Where(predicate).AsNoTracking().ToList();
     }
 
-    public void UpdateSingle(T entity)
+    public void ExecuteUpdate(T entity)
     {
         DbSet.Update(entity);
-
-        Context.SaveChanges();
+        SaveChanges();
     }
 
     public void ExecuteRemoveSingle(T entity)
@@ -56,4 +62,21 @@ public class DaoImpl<T> : IDao<T> where T : class
     {
         DbSet.ExecuteDelete();
     }
+
+    public void Attach(T entity)
+    {
+        DbSet.Attach(entity);
+    }
+
+    public EntityState GetEntityState(T entity)
+    {
+        return Context.Entry(entity).State;
+    }
+
+    public void Remove(T entity)
+    {
+        DbSet.Remove(entity);
+    }
+
+
 }

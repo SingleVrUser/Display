@@ -27,7 +27,6 @@ public sealed partial class ConditionalCheckPage
         InitializeComponent();
 
         InitializeView();
-
     }
 
     private void InitializeView()

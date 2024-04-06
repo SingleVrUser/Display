@@ -13,6 +13,4 @@ public class GetFilesProgressInfo
     public int AllCount => FolderCount + FilesCount;
 
     public List<long?> FailCid { get; set; } = [];
-
-    public List<FilesInfo> AddToDataAccessList = [];
 }

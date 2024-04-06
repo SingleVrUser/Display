@@ -15,7 +15,8 @@
     <converter:NullToCollapsedConverter x:Key="NullToCollapsedConverter" />
     <converter:DoubleToInt32Converter x:Key="DoubleToInt32Converter" />
     <converter:ObjectToColorConverter x:Key="ObjectToColorConverter" />
-    <converter:NotExistsImagePathConverter x:Key="NotExistsImagePathConverter" />
+    <converter:NotExistsImageBitmapConverter x:Key="NotExistsImageBitmapConverter" />
+    <converter:NotExistsImageUriConverter x:Key="NotExistsImageUriConverter" />
     <converter:TrueToVisibleConverter x:Key="TrueToVisibleConverter" />
     <converter:ZeroToVisibleConverter x:Key="ZeroToVisibleConverter" />
     <converter:FloatToPercentageConverter x:Key="FloatToPercentageConverter" />

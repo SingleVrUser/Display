@@ -102,7 +102,7 @@
                             <DataTemplate x:DataType="entity:ActorInfo">
                                 <Image Width="300"
                                        Height="240"
-                                       Source="{x:Bind ProfilePath, Converter={StaticResource NotExistsImagePathConverter}}"
+                                       Source="{x:Bind ProfilePath, Converter={StaticResource NotExistsImageBitmapConverter}}"
                                        Stretch="Uniform"
                                        Tapped="Image_Tapped"
                                        PointerEntered="Img_PointerEntered"
@@ -129,12 +129,20 @@
                             <RowDefinition Height="auto" />
                         </Grid.RowDefinitions>
 
-                        <oldControls:ImageEx x:Name="ActorImage"
+
+                        <Image x:Name="ActorImage" >
+                            <Image.Source>
+                                <BitmapImage UriSource="{x:Bind ProfilePath, Converter={StaticResource NotExistsImageUriConverter}}"
+                                             DecodePixelWidth="140"/>
+                            </Image.Source>
+                        </Image>
+
+                        <!--<oldControls:ImageEx x:Name="ActorImage"
                                           Source="{x:Bind ProfilePath, Converter={StaticResource NotExistsImagePathConverter}}"
                                           PlaceholderStretch="Uniform"
                                           CornerRadius="5"
                                           DecodePixelWidth="140"
-                                          DecodePixelHeight="140" />
+                                          DecodePixelHeight="140" />-->
 
                         <FontIcon Grid.Row="0" FontFamily="{StaticResource SymbolThemeFontFamily}"
                                   Glyph="&#xE00B;"

@@ -12,7 +12,6 @@ using Windows.System;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using Display.Models.Api.EditorCookie;
-using Display.Models.Dto.OneOneFive;
 using Display.Models.Vo;
 using Display.Providers;
 
@@ -21,6 +20,8 @@ namespace Display.Helper.FileProperties.Name;
 public static class FileMatch
 {
     private static readonly IFilesInfoDao FilesInfoDao = App.GetService<IFilesInfoDao>();
+
+    private static readonly IFileToInfoDao FileToInfoDao = App.GetService<IFileToInfoDao>();
     
     /// <summary>
     /// 正则删除某些关键词
@@ -46,29 +47,29 @@ public static class FileMatch
     public static string MatchName(string srcText, long? fileCid = null)
     {
         //提取文件名
-        var name = Regex.Replace(srcText, @"(\.\w{3,5}?)$", "", RegexOptions.IgnoreCase);
+        var name = Regex.Replace(srcText, @"(\.\w{3,5}?)$", "");
 
         //删除空格
         name = name.Replace(" ", "_");
 
-        //转小写
-        var nameLc = name.ToLower();
+        //转大写
+        var nameUp = name.ToUpper();
 
         Match match;
-        var noDomain = name;
-        if (nameLc.Contains("fc"))
+        var noDomain = nameUp;
+        if (nameUp.Contains("FC"))
         {
             //根据FC2 Club的影片数据，FC2编号为5-7个数字
-            match = Regex.Match(name, @"fc2?[^a-z\d]{0,5}(ppv[^a-z\d]{0,5})?(\d{5,7})", RegexOptions.IgnoreCase);
+            match = Regex.Match(nameUp, @"FC2?[^A-Z\d]{0,5}(PPV[^A-Z\d]{0,5})?(\d{5,7})");
 
             if (match.Success)
             {
                 return $"FC2-{match.Groups[2].Value}";
             }
         }
-        else if (nameLc.Contains("heydouga"))
+        else if (nameUp.Contains("HEYDOUGA"))
         {
-            match = Regex.Match(name, @"(heydouga)[-_]*(\d{4})[-_]+0?(\d{3,5})", RegexOptions.IgnoreCase);
+            match = Regex.Match(nameUp, @"(HEYDOUGA)[-_]*(\d{4})[-_]+0?(\d{3,5})");
 
             if (match.Success)
             {
@@ -78,9 +79,9 @@ public static class FileMatch
         else
         {
             //先尝试移除可疑关键词进行匹配，如果匹配不到再使用去掉关键词的名称进行匹配
-            noDomain = DeleteSomeKeywords(name);
+            noDomain = DeleteSomeKeywords(noDomain);
 
-            if (!string.IsNullOrEmpty(noDomain) && noDomain != name)
+            if (!string.IsNullOrEmpty(noDomain) && noDomain != nameUp)
             {
                 return MatchName(noDomain);
             }
@@ -89,13 +90,13 @@ public static class FileMatch
         if (noDomain == null) return string.Empty;
 
         //匹配缩写成hey的heydouga影片。由于番号分三部分，要先于后面分两部分的进行匹配
-        match = Regex.Match(noDomain, @"(?:hey)[-_]*(\d{4})[-_]+0?(\d{3,5})", RegexOptions.IgnoreCase);
+        match = Regex.Match(noDomain, @"(?:HEY)[-_]*(\d{4})[-_]+0?(\d{3,5})");
         if (match.Success)
         {
-            return $"heydouga-" + string.Join("-", match.Groups.Values.Skip(1));
+            return "HEYDOUGA-" + string.Join("-", match.Groups.Values.Skip(1));
         }
         //普通番号，优先尝试匹配带分隔符的（如ABC - 123）
-        match = Regex.Match(noDomain, @"([a-z]{2,10})[-_]+0*(\d{2,5})", RegexOptions.IgnoreCase);
+        match = Regex.Match(noDomain, @"([A-Z]{2,10})[-_]+0*(\d{2,5})");
         if (match.Success)
         {
             var number = match.Groups[2].Value;
@@ -106,7 +107,7 @@ public static class FileMatch
         }
 
         //然后再将影片视作缺失了 - 分隔符来匹配
-        match = Regex.Match(noDomain, @"([a-z]{2,})0*(\d{2,5})", RegexOptions.IgnoreCase);
+        match = Regex.Match(noDomain, @"([A-Z]{2,})0*(\d{2,5})");
         if (match.Success)
         {
             var number = match.Groups[2].Value;
@@ -119,28 +120,28 @@ public static class FileMatch
         //普通番号，运行到这里时表明无法匹配到带分隔符的番号
         //先尝试匹配东热的red, sky, ex三个不带 - 分隔符的系列
         //（这三个系列已停止更新，因此根据其作品编号将数字范围限制得小一些以降低误匹配概率）
-        match = Regex.Match(noDomain, @"(red[01]\d\d|sky[0-3]\d\d|ex00[01]\d)", RegexOptions.IgnoreCase);
+        match = Regex.Match(noDomain, @"(RED[01]\d\d|SKY[0-3]\d\d|EX00[01]\d)");
         if (match.Success)
         {
             var matchName = match.Groups[1].Value;
-            match = Regex.Match(matchName, @"([a-z]+)(\d+)", RegexOptions.IgnoreCase);
+            match = Regex.Match(matchName, @"([A-Z]+)(\d+)");
             return match.Success ? $"{match.Groups[1].Value}-{match.Groups[2].Value}" : matchName;
         }
 
         //尝试匹配TMA制作的影片（如'T28-557'，他家的番号很乱）
-        match = Regex.Match(noDomain, @"(T28[-_]+\d{3})", RegexOptions.IgnoreCase);
+        match = Regex.Match(noDomain, @"(T28[-_]+\d{3})");
         if (match.Success)
         {
             return match.Groups[1].Value;
         }
         //尝试匹配东热n, k系列
-        match = Regex.Match(noDomain, @"(n\d{4}|k\d{4})", RegexOptions.IgnoreCase);
+        match = Regex.Match(noDomain, @"(N\d{4}|K\d{4})");
         if (match.Success)
         {
             return match.Groups[1].Value;
         }
         //尝试匹配纯数字番号（无码影片）
-        match = Regex.Match(noDomain, @"(\d{6}[-_]+\d{2,3})", RegexOptions.IgnoreCase);
+        match = Regex.Match(noDomain, @"(\d{6}[-_]+\d{2,3})");
         if (match.Success)
         {
             return match.Groups[1].Value;
@@ -210,7 +211,7 @@ public static class FileMatch
                 //失败比较特殊
                 //从另外的表中查找
                 case "失败" or "fail":
-                    var failItems = DataAccessLocal.Get.GetFailFileInfoWithFilesInfo(n: keywords, limit: limit);
+                    var failItems = await DataAccessLocal.Get.GetFailFileInfoWithFilesInfoAsync(n: keywords, limit: limit);
                     failItems?.ForEach(item => dictionary.TryAdd(item.Name, new FailVideoInfo(item)));
                     continue;
                 default:
@@ -260,19 +261,31 @@ public static class FileMatch
                 if (videoName == null)
                 {
                     resultList.Add(new MatchVideoResult { Status = false, OriginalName = fileInfo.Name, StatusCode = -1, Message = "匹配失败" });
-                    continue;
+                }
+                //匹配后，查询是否重复匹配
+                else
+                {
+                    var existsResult = resultList.FirstOrDefault(x => x.MatchName == videoName);
+
+                    resultList.Add(existsResult == null
+                        ? new MatchVideoResult
+                        {
+                            Status = true,
+                            OriginalName = fileInfo.Name,
+                            Message = "匹配成功",
+                            StatusCode = 1,
+                            MatchName = videoName
+                        }
+                        : new MatchVideoResult { Status = true, OriginalName = fileInfo.Name, StatusCode = 2, Message = "已添加" });
                 }
 
-                //匹配后，查询是否重复匹配
-                var existsResult = resultList.FirstOrDefault(x => x.MatchName == videoName);
-
-                resultList.Add(existsResult == null
-                    ? new MatchVideoResult
-                    {
-                        Status = true, OriginalName = fileInfo.Name, Message = "匹配成功", StatusCode = 1,
-                        MatchName = videoName
-                    }
-                    : new MatchVideoResult { Status = true, OriginalName = fileInfo.Name, StatusCode = 2, Message = "已添加" });
+                // 添加到数据库
+                FileToInfoDao.ExecuteInitIfNoExists(new FileToInfo
+                {
+                    FilePickCode = fileInfo.PickCode,
+                    TrueName = videoName,
+                    IsSuccess = 0
+                });
             }
             else
             {

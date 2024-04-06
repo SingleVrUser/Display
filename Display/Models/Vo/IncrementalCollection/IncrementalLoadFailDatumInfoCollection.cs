@@ -45,10 +45,10 @@ public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Files
 
     public async Task LoadData(int startShowCount = 20)
     {
-        var newItems = DataAccessLocal.Get.GetFailFileInfoWithFilesInfo(0, startShowCount, FilterName, OrderBy, IsDesc, ShowType);
+        var newItems = await DataAccessLocal.Get.GetFailFileInfoWithFilesInfoAsync(0, startShowCount, FilterName, OrderBy, IsDesc, ShowType);
         if (Count == 0)
         {
-            AllCount = DataAccessLocal.Get.GetCountOfFailFilesInfoFiles(FilterName, ShowType);
+            AllCount = await DataAccessLocal.Get.GetCountOfFailFilesInfoFilesAsync(FilterName, ShowType);
         }
         else
             Clear();
@@ -59,7 +59,7 @@ public class IncrementalLoadFailDatumInfoCollection : ObservableCollection<Files
 
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        var failLists = DataAccessLocal.Get.GetFailFileInfoWithFilesInfo(Items.Count, (int)count, FilterName, OrderBy, IsDesc, ShowType);
+        var failLists = await DataAccessLocal.Get.GetFailFileInfoWithFilesInfoAsync(Items.Count, (int)count, FilterName, OrderBy, IsDesc, ShowType);
 
         if (failLists == null)
         {

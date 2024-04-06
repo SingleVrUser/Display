@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Display.Models.Enums;
 
-namespace Display.Views.Pages.SpiderVideoInfo;
+namespace Display.Models.Vo;
 
 public class FileStatistics(FileFormatEnum name)
 {

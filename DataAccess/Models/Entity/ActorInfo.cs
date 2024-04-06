@@ -16,7 +16,7 @@ public class ActorInfo
     public string Name { get; init; } = null!;
 
     [Column("is_woman")]
-    public int? IsWoman { get; init; }
+    public int? IsWoman { get; set; } = 1;
 
     [Column("birthday")]
     [StringLength(20)]
@@ -30,7 +30,7 @@ public class ActorInfo
     public int? Height { get; set; }
 
     [Column("works_count")]
-    public int? WorksCount { get; init; }
+    public int? WorksCount { get; set; }
 
     [Column("work_time")]
     [StringLength(5)]
@@ -49,7 +49,7 @@ public class ActorInfo
 
     [Column("addtime")]
     [StringLength(20)]
-    public int? AddTime { get; init; }
+    public long? AddTime { get; init; } = DateTimeOffset.Now.ToUnixTimeSeconds();
 
     [Column("info_url")]
     [StringLength(100)]

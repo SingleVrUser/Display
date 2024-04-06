@@ -15,8 +15,8 @@ public class FailVideoInfo : VideoInfoVo
     public long Size { get; }
 
 
-    public FailVideoInfo(VideoInfo info, double imgWidth, double imgHeight)
-        : base(info, imgWidth, imgHeight)
+    public FailVideoInfo(VideoInfo info, int imgWidth)
+        : base(info, imgWidth)
     {
 
     }

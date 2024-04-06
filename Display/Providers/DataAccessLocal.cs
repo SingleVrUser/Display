@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,7 +8,6 @@ using System.Threading.Tasks;
 using DataAccess;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
-using Display.Extensions;
 using Display.Helper.FileProperties.Name;
 using Display.Models.Enums.OneOneFive;
 using Display.Providers.Spider;
@@ -41,7 +39,7 @@ public static class DataAccessLocal
             Context.Instance.VideoInfos.Add(data);
             
             //添加演员信息
-            AddActorInfoByActorInfo(data, [data.TrueName]);
+            AddActorInfoByActorInfo(data);
 
             //添加是否步兵
             Context.Instance.IsWms.Add(new IsWm
@@ -72,8 +70,7 @@ public static class DataAccessLocal
         /// 升级ActorInfo
         /// </summary>
         /// <param name="videoInfo"></param>
-        /// <param name="videoNameList"></param>
-        private static void AddActorInfoByActorInfo(VideoInfo videoInfo, List<string> videoNameList)
+        private static void AddActorInfoByActorInfo(VideoInfo videoInfo)
         {
             var actorStr = videoInfo.Actor;
             if (actorStr == null) return;
@@ -97,35 +94,57 @@ public static class DataAccessLocal
                 // 新添加演员信息
                 else
                 {
-                    AddActorInfo(actorName, videoNameList);
+                    AddActorInfo(actorName, videoInfo.TrueName);
                 }
             }
 
         }
 
-        /// <summary>
-        /// 插入演员信息并返回actor_id
-        /// </summary>
-        /// <param name="info"></param>
-        /// <returns></returns>
-        private static long AddActorInfoAndReturnId(ActorInfo info)
+        public static void UpdateDataFromVideoInfo(VideoInfo info)
         {
-            Context.Instance.ActorInfos.Add(info);
-            Context.Instance.SaveChanges();
-            
-            // TODO 插入后可直接返回
-            Debug.WriteLine(info.Id);
+            // 更新表VideoInfo
+            Context.Instance.VideoInfos.Update(info);
+        
+            //更新是否步兵
+            Context.Instance.IsWms.RemoveRange(Context.Instance.IsWms.Where(i => i.Truename == info.TrueName));
+            Context.Instance.IsWms.Add(new IsWm { Truename = info.TrueName, IsWm1 = info.IsWm });
 
-            var firstInfo = Context.Instance.ActorInfos.FirstOrDefault(i=>i.Name==info.Name);
-            return firstInfo!.Id;
+            if (info.Actor == null) return;
+        
+            var actors = info.Actor.Split(",");
+            if (actors.Length <= 0) return;
+            
+            //更新演员_视频中间表
+        
+            //先删除Actor_Videos中所有Video_name的数据
+            Context.Instance.ActorVideos.RemoveRange(Context.Instance.ActorVideos.Where(i => i.VideoName == info.TrueName));
+    
+            //查询演员id列表
+            foreach (var actorName in actors)
+            {
+                var actorInfo = ActorInfoDao.GetPartInfoByActorName(JavDb.TrimGenderFromActorName(actorName));
+
+                if (actorInfo == null)
+                {
+                    AddActorInfo(actorName, info.TrueName);
+                }
+                else
+                {
+                    Context.Instance.ActorVideos.Add(new ActorVideo { ActorId =  actorInfo.Id, VideoName = info.TrueName});
+                }
+                
+                
+            }
+            
+            Context.Instance.SaveChanges();
         }
 
         /// <summary>
         /// 添加演员信息
         /// </summary>
         /// <param name="actorName"></param>
-        /// <param name="videoNameList"></param>
-        private static void AddActorInfo(string actorName, List<string> videoNameList)
+        /// <param name="videoName"></param>
+        private static long AddActorInfo(string actorName, string videoName)
         {
             string singleActorName;
             var isWoman = 1;
@@ -159,10 +178,10 @@ public static class DataAccessLocal
             
             var actorInfoFromDb = ActorInfoDao.GetPartInfoByActorName(singleActorName);
             long actorId;
-            //数据库中不存在该名称
+            //数据库中不存在拥有该名称的演员
             if (actorInfoFromDb == null)
             {
-                ActorInfo actorInfo = new() { Name = singleActorName, IsWoman = isWoman , BwhInfo = new Bwh()};
+                ActorInfo actorInfo = new() { Name = singleActorName, IsWoman = isWoman};
 
                 //检查演员图片是否存在
                 var imagePath = Path.Combine(AppSettings.ActorInfoSavePath, singleActorName, "face.jpg");
@@ -171,7 +190,10 @@ public static class DataAccessLocal
                     actorInfo.ProfilePath = imagePath;
                 }
 
-                actorId = AddActorInfoAndReturnId(actorInfo);
+                Context.Instance.ActorInfos.Add(actorInfo);
+                Context.Instance.SaveChanges();
+            
+                actorId = actorInfo.Id;
             }
             else
             {
@@ -206,15 +228,13 @@ public static class DataAccessLocal
             }
 
             //添加演员和作品的信息
-            foreach (var videoName in videoNameList)
+            Context.Instance.ActorVideos.Add(new ActorVideo
             {
+                ActorId = actorId,
+                VideoName = videoName
+            });
 
-                Context.Instance.ActorVideos.Add(new ActorVideo
-                {
-                    ActorId = actorId,
-                    VideoName = videoName
-                });
-            }
+            return actorId;
         }
     }
 
@@ -239,18 +259,12 @@ public static class DataAccessLocal
         /// <returns></returns>
         public static string GetOneTrueNameByName(string name)
         {
-            if (name.Contains('_'))
-            {
-                return Context.Instance.Database
-                    .SqlQuery<string>(
-                        $"SELECT truename FROM VideoInfo WHERE truename COLLATE NOCASE in ('{name}', '{name.Replace('_', '-')}', '{name.Replace("_", "")}' ) Limit 1")
-                    .FirstOrDefault();
-            }
+            var sql =
+                name.Contains('_')
+                    ? $"SELECT truename FROM VideoInfo WHERE truename COLLATE NOCASE in ('{name}', '{name.Replace('_', '-')}', '{name.Replace("_", "")}' ) Limit 1"
+                    : $"SELECT truename FROM VideoInfo WHERE truename COLLATE NOCASE in ('{name}', '{name.Replace("-", "_")}', '{name.Replace("-", "")}') Limit 1";
 
-            return Context.Instance.Database
-                .SqlQuery<string>(
-                    $"SELECT truename FROM VideoInfo WHERE truename COLLATE NOCASE in ('{name}', '{name.Replace("-", "_")}', '{name.Replace("-", "")}') Limit 1")
-                .FirstOrDefault();
+            return Context.Instance.VideoInfos.FromSqlRaw(sql).Select(i => i.TrueName).FirstOrDefault();
 
         }
 
@@ -280,7 +294,7 @@ public static class DataAccessLocal
         /// 查询失败列表（FilesInfo格式）
         /// </summary>
         /// <returns></returns>
-        public static FilesInfo[] GetFailFileInfoWithFilesInfo(int offset = 0, int limit = -1, string n = null, string orderBy = null, bool isDesc = false, FailType showType = FailType.All, SqliteConnection connection = null)
+        public static async Task<FilesInfo[]> GetFailFileInfoWithFilesInfoAsync(int offset = 0, int limit = -1, string n = null, string orderBy = null, bool isDesc = false, FailType showType = FailType.All, SqliteConnection connection = null)
         {
             var orderStr = GetOrderStr(orderBy, isDesc);
 
@@ -296,10 +310,10 @@ public static class DataAccessLocal
             var commandText =
                 $"SELECT * FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{showTypeStr}{queryStr}{orderStr} LIMIT {limit} offset {offset} ";
 
-            return Context.Instance.FilesInfos.FromSqlRaw(commandText).ToArray();
+            return await Context.Instance.FilesInfos.FromSqlRaw(commandText).AsNoTracking().ToArrayAsync();
         }
 
-        public static int GetCountOfFailFileInfoWithFilesInfo(int offset = 0, int limit = -1, string n = null, string orderBy = null, bool isDesc = false, FailType showType = FailType.All, SqliteConnection connection = null)
+        public static async Task<int> GetCountOfFailFileInfoWithFilesInfoAsync(int offset = 0, int limit = -1, string n = null, string orderBy = null, bool isDesc = false, FailType showType = FailType.All, SqliteConnection connection = null)
         {
             var queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n.Replace("'", "%")}%'";
 
@@ -321,7 +335,7 @@ public static class DataAccessLocal
                 $"SELECT pc FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{showTypeStr}{queryStr} LIMIT {limit} offset {offset} ";
 
 
-            return Context.Instance.FilesInfos.FromSqlRaw(commandText).Count();
+            return await Context.Instance.FilesInfos.FromSqlRaw(commandText).AsNoTracking().CountAsync();
         }
 
         /// <summary>
@@ -330,7 +344,7 @@ public static class DataAccessLocal
         /// <param name="filterList"></param>
         /// <param name="connection"></param>
         /// <returns></returns>
-        public static int GetCountOfActorInfo(IEnumerable<string> filterList = null, SqliteConnection connection = null)
+        public static async Task<int> GetCountOfActorInfoAsync(IEnumerable<string> filterList = null, SqliteConnection connection = null)
         {
             var filterStr = string.Empty;
             if (filterList != null)
@@ -340,7 +354,7 @@ public static class DataAccessLocal
 
             var commandText = $"SELECT id FROM ActorInfo{filterStr}";
 
-            return Context.Instance.ActorInfos.FromSqlRaw(commandText).Count();
+            return await Context.Instance.ActorInfos.FromSqlRaw(commandText).AsNoTracking().CountAsync();
 
         }
         
@@ -353,11 +367,11 @@ public static class DataAccessLocal
                 ? "WHERE is_like = 1"
                 : "WHERE look_later != 0");
 
-            return Context.Instance.FailListIsLikeLookLater.FromSqlRaw(commandStringBuilder.ToString()).Count();
+            return Context.Instance.FailListIsLikeLookLater.FromSqlRaw(commandStringBuilder.ToString()).AsNoTracking().Count();
 
         }
 
-        public static int GetCountOfFailFilesInfoFiles(string n = "", FailType showType = FailType.All, SqliteConnection connection = null)
+        public static async Task<int> GetCountOfFailFilesInfoFilesAsync(string n = "", FailType showType = FailType.All, SqliteConnection connection = null)
         {
             var commandStringBuilder = new StringBuilder("SELECT FilesInfo.* FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode");
 
@@ -377,7 +391,7 @@ public static class DataAccessLocal
                 commandStringBuilder.Append(" And FilesInfo.n LIKE '%").Append(n).Append("%'");
             }
 
-            return Context.Instance.FileToInfos.FromSqlRaw(commandStringBuilder.ToString()).Count();
+            return await Context.Instance.FileToInfos.FromSqlRaw(commandStringBuilder.ToString()).AsNoTracking().CountAsync();
         }
 
         /// <summary>
@@ -388,7 +402,7 @@ public static class DataAccessLocal
         /// <param name="rangesDicts"></param>
         /// <param name="connection"></param>
         /// <returns></returns>
-        public static int GetCountOfVideoInfo(List<string> filterConditionList = null, string filterKeywords = null, Dictionary<string, string> rangesDicts = null, SqliteConnection connection = null)
+        public static async Task<int> GetCountOfVideoInfoAsync(List<string> filterConditionList = null, string filterKeywords = null, Dictionary<string, string> rangesDicts = null, SqliteConnection connection = null)
         {
             //筛选
             var filterStr = GetVideoInfoFilterStr(filterConditionList, filterKeywords, rangesDicts);
@@ -412,7 +426,7 @@ public static class DataAccessLocal
                 commandText = $"SELECT * from VideoInfo{filterStr}";
             }
 
-            return Context.Instance.VideoInfos.FromSqlRaw(commandText).Count();
+            return await Context.Instance.VideoInfos.FromSqlRaw(commandText).AsNoTracking().CountAsync();
         }
 
         private static string GetVideoInfoFilterStr(List<string> filterConditionList = null, string filterKeywords = null, Dictionary<string, string> rangesDicts = null)
@@ -500,7 +514,7 @@ public static class DataAccessLocal
         /// <param name="isFuzzyQueryActor"></param>
         /// <param name="connection"></param>
         /// <returns></returns>
-        public static VideoInfo[] GetVideoInfo(int limit = 1, int offset = 0, string orderBy = null, bool isDesc = false, List<string> filterConditionList = null, string filterKeywords = null, Dictionary<string, string> rangesDicts = null, bool isFuzzyQueryActor = true, SqliteConnection connection = null)
+        public static async Task<VideoInfo[]> GetVideoInfoAsync(int limit = 1, int offset = 0, string orderBy = null, bool isDesc = false, List<string> filterConditionList = null, string filterKeywords = null, Dictionary<string, string> rangesDicts = null, bool isFuzzyQueryActor = true, SqliteConnection connection = null)
         {
             string commandText;
 
@@ -535,10 +549,11 @@ public static class DataAccessLocal
                 commandText += GetOrderStr(orderBy, isDesc);
             }
 
-            return Context.Instance.VideoInfos.FromSqlRaw(commandText).Skip(offset).Take(limit).ToArray();
+            return await Context.Instance.VideoInfos.FromSqlRaw(commandText)
+                .AsNoTracking().Skip(offset).Take(limit).ToArrayAsync();
         }
 
-        public static ActorInfo[] GetActorInfo(int limit = 1, int offset = 0, Dictionary<string, bool> orderByList = null, List<string> filterList = null, SqliteConnection connection = null)
+        public static async Task<ActorInfo[]> GetActorInfoAsync(int limit = 1, int offset = 0, Dictionary<string, bool> orderByList = null, List<string> filterList = null, SqliteConnection connection = null)
         {
             var orderStr = string.Empty;
             if (orderByList != null)
@@ -563,7 +578,7 @@ public static class DataAccessLocal
             var commandText =
                 $"SELECT ActorInfo.*,bwh.bust,bwh.waist,bwh.hips,COUNT(id) as video_count FROM ActorInfo LEFT JOIN Actor_Video ON Actor_Video.actor_id = ActorInfo.id LEFT JOIN bwh ON ActorInfo.bwh = bwh.bwh{filterStr} GROUP BY id{orderStr} LIMIT {limit} offset {offset}";
 
-            return Context.Instance.ActorInfos.FromSqlRaw(commandText).ToArray();
+            return await Context.Instance.ActorInfos.FromSqlRaw(commandText).AsNoTracking().ToArrayAsync();
         }
 
         /// <summary>

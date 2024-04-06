@@ -16,6 +16,7 @@ internal class NumberToDateTimeStrConverter : IValueConverter
         //2022-09-18 17:24 或者 1663493094
         return value switch
         {
+            null => string.Empty,
             int intValue => DateHelper.ConvertInt32ToDateTime(intValue),
             string stringValue when !stringValue.IsNumber() => stringValue,
             string numValue => DateHelper.ConvertInt32ToDateTime(int.Parse(numValue)),

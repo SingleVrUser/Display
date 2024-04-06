@@ -10,8 +10,6 @@ using Display.Models.Enums;
 using Display.Models.Records;
 using Display.Models.Vo;
 using Display.Models.Vo.OneOneFive;
-using Display.Providers;
-using Microsoft.Data.Sqlite;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -29,7 +27,7 @@ public sealed partial class Explorer
     }
 
     private ObservableCollection<ExplorerItem> TreeViewDataSource { get; }
-    private ObservableCollection<ExplorerItem> SelectFolderName { get; }
+    internal ObservableCollection<ExplorerItem> SelectFolderName { get; }
     private ObservableCollection<DetailFileInfo> FileInSelectFolder { get; }
 
     //存储获取过的Datum，避免重复获取
@@ -74,7 +72,7 @@ public sealed partial class Explorer
         var item = _storeDataList.FirstOrDefault(x => x.Cid == folderCid);
         if (item == null)
         {
-            items = _filesInfoDao.GetPartFolderListByPid(folderCid);
+            items = _filesInfoDao.GetPartFileListByPid(folderCid);
 
             //排序
             items = items.OrderByDescending(x => x.TimeEdit).ToList();
@@ -88,7 +86,7 @@ public sealed partial class Explorer
 
         if (outType == FileType.Folder)
         {
-            items = items.Where(x => x.FileId == null).ToList();
+            items = items.Where(x => x.FileId == default).ToList();
         }
 
         return items;
@@ -134,10 +132,6 @@ public sealed partial class Explorer
         
         var cid = content.Id;
 
-        //避免重复点击
-        if (cid == _lastInvokedCid) return;
-
-        _lastInvokedCid = cid;
         TryUpdateFolderInfo(cid);
 
         ItemInvoked?.Invoke(sender, args);
@@ -150,6 +144,11 @@ public sealed partial class Explorer
     /// <param name="folderCid"></param>
     private void TryUpdateFolderInfo(long folderCid)
     {
+        //避免重复点击
+        if (folderCid == _lastInvokedCid) return;
+
+        _lastInvokedCid = folderCid;
+        
         var items = GetFilesFromItems(folderCid, FileType.File);
 
         //更新右侧文件夹目录
@@ -171,7 +170,7 @@ public sealed partial class Explorer
         if (folderCid == 0)
         {
             SelectFolderName.Clear();
-            SelectFolderName.Add(new ExplorerItem()
+            SelectFolderName.Add(new ExplorerItem
             {
                 Name = "根目录",
                 Id = 0
@@ -215,8 +214,8 @@ public sealed partial class Explorer
     /// <summary>
     /// TreeView 展开
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="args"></param>
+    /// <param name="sender"></param>
+    /// <param name="args"></param>
     private void TreeView_Expanding(TreeView sender, TreeViewExpandingEventArgs args)
     {
         //标记为 内含未加载项
@@ -225,19 +224,18 @@ public sealed partial class Explorer
 
         if (_markShowPartFolderItemList.Count > 0)
         {
-            var currentCid = (args.Node.Content as ExplorerItem).Id;
+            var currentCid = ((ExplorerItem)args.Node.Content).Id;
             foreach (var item in _markShowPartFolderItemList)
             {
                 //找到之前未加载完成的记录，
                 //即之前加载过了，无需重复加载
-                if ((item.InsertNode.Content as ExplorerItem).Id == currentCid)
-                {
-                    ShowNumTextBlock.Visibility = Visibility.Visible;
-                    ShowNumTip.Text = $"{item.ShowNum}/{item.LastFolderItem.Count}";
-                    _lastFolderItemList = item;
-                    isNeedLoad = false;
-                    break;
-                }
+                if (((ExplorerItem)item.InsertNode.Content).Id != currentCid) continue;
+                
+                ShowNumTextBlock.Visibility = Visibility.Visible;
+                ShowNumTip.Text = $"{item.ShowNum}/{item.LastFolderItem.Count}";
+                _lastFolderItemList = item;
+                isNeedLoad = false;
+                break;
             }
         }
 
@@ -247,7 +245,7 @@ public sealed partial class Explorer
         }
     }
 
-    private List<LastUnAllShowFolderItem> _markShowPartFolderItemList = new();
+    private readonly List<LastUnAllShowFolderItem> _markShowPartFolderItemList = [];
     private LastUnAllShowFolderItem _lastFolderItemList;
 
     public Explorer(ObservableCollection<ExplorerItem> selectFolderName)
@@ -255,13 +253,13 @@ public sealed partial class Explorer
         SelectFolderName = selectFolderName;
     }
 
-
     /// <summary>
     /// 填充之前TreeView未加载的子节点
     /// </summary>
-    /// <param Name="node"></param>
-    /// <param Name="MaxNum"></param>
-    private void FillTreeNode(TreeViewNode node, int MaxNum = 30, bool isInsertLeft = false)
+    /// <param name="node"></param>
+    /// <param name="maxNum"></param>
+    /// <param name="isInsertLeft"></param>
+    private void FillTreeNode(TreeViewNode node, int maxNum = 30, bool isInsertLeft = false)
     {
         if (node.Content is not ExplorerItem folder) return;
 
@@ -270,7 +268,7 @@ public sealed partial class Explorer
         if (isInsertLeft && _lastFolderItemList != null)
         {
             itemsList = _lastFolderItemList.LastFolderItem;
-            itemsList = itemsList.GetRange(MaxNum, MaxNum);
+            itemsList = itemsList.GetRange(maxNum, maxNum);
             _markShowPartFolderItemList.Remove(_lastFolderItemList);
             _lastFolderItemList = null;
         }
@@ -291,16 +289,16 @@ public sealed partial class Explorer
         var hasUnrealizedChildren = false;
 
         // 显示部分
-        if (itemsList.Count > MaxNum)
+        if (itemsList.Count > maxNum)
         {
             ShowNumTextBlock.Visibility = Visibility.Visible;
-            ShowNumTip.Text = $"{MaxNum}/{itemsList.Count}";
-            itemsPartList = itemsList.GetRange(0, MaxNum);
+            ShowNumTip.Text = $"{maxNum}/{itemsList.Count}";
+            itemsPartList = itemsList.GetRange(0, maxNum);
             _lastFolderItemList = new LastUnAllShowFolderItem()
             {
                 InsertNode = node,
                 LastFolderItem = itemsList,
-                ShowNum = MaxNum
+                ShowNum = maxNum
             };
             _markShowPartFolderItemList.Add(_lastFolderItemList);
             hasUnrealizedChildren = true;
@@ -312,19 +310,19 @@ public sealed partial class Explorer
             ShowNumTextBlock.Visibility = Visibility.Collapsed;
         }
 
-        startUpdateTreeView(node, itemsPartList);
+        StartUpdateTreeView(node, itemsPartList);
 
         //标记 下一级是否有未加载的
         node.HasUnrealizedChildren = hasUnrealizedChildren;
     }
 
-    private async void startUpdateTreeView(TreeViewNode node, List<FilesInfo> itemsList)
+    private async void StartUpdateTreeView(TreeViewNode node, List<FilesInfo> itemsList)
     {
-        readFileProgressBar.Maximum = itemsList.Count;
-        readFileProgressBar.Value = 0;
-        readFileProgressBar.Visibility = Visibility.Visible;
+        ReadFileProgressBar.Maximum = itemsList.Count;
+        ReadFileProgressBar.Value = 0;
+        ReadFileProgressBar.Visibility = Visibility.Visible;
 
-        var progress = new Progress<int>(progressPercent => readFileProgressBar.Value = progressPercent);
+        var progress = new Progress<int>(progressPercent => ReadFileProgressBar.Value = progressPercent);
 
         ////排序
         //itemsList = itemsList.OrderBy(x => x.pid).ToList();
@@ -349,8 +347,8 @@ public sealed partial class Explorer
             node.Children.Add(newNode);
         }
 
-        readFileProgressBar.Value = 0;
-        readFileProgressBar.Visibility = Visibility.Collapsed;
+        ReadFileProgressBar.Value = 0;
+        ReadFileProgressBar.Visibility = Visibility.Collapsed;
     }
 
     /// <summary>
@@ -381,8 +379,8 @@ public sealed partial class Explorer
     /// <summary>
     /// 全选
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void CheckBox_Checked(object sender, RoutedEventArgs e)
     {
         FolderTreeView.SelectAll();
@@ -391,8 +389,8 @@ public sealed partial class Explorer
     /// <summary>
     /// 清空选项
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
 
@@ -402,37 +400,36 @@ public sealed partial class Explorer
     /// <summary>
     /// 点击显示目录跳转指定位置
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="args"></param>
-    private void FolderBreadcrumbBar_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
+    /// <param name="sender"></param>
+    /// <param name="args"></param>
+    internal void FolderBreadcrumbBar_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args)
     {
         // Don't process last index (current location)
-        if (args.Index < SelectFolderName.Count - 1)
+        if (args.Index >= SelectFolderName.Count - 1) return;
+        
+        // Home is special case.
+        if (args.Index == 0)
         {
-            // Home is special case.
-            if (args.Index == 0)
-            {
-                TryUpdateFolderInfo(0);
-            }
-            // Go back to the clicked item.
-            else
-            {
-                var item = (ExplorerItem)args.Item;
+            TryUpdateFolderInfo(0);
+        }
+        // Go back to the clicked item.
+        else
+        {
+            var item = (ExplorerItem)args.Item;
 
-                //var data = DataAccessLocal.GetListByCid(item.Cid);
-                //FileInSelectFolder.Clear();
-                //foreach (var file_info in data)
-                //{
-                //    FileInSelectFolder.Add(file_info);
-                //}
+            //var data = DataAccessLocal.GetListByCid(item.Cid);
+            //FileInSelectFolder.Clear();
+            //foreach (var file_info in data)
+            //{
+            //    FileInSelectFolder.Add(file_info);
+            //}
 
-                // Remove breadcrumbs at the end until 
-                // you get to the one that was clicked.
-                while (SelectFolderName.Count > args.Index + 1)
-                {
-                    SelectFolderName.RemoveAt(SelectFolderName.Count - 1);
-                    TryUpdateFolderInfo(item.Id);
-                }
+            // Remove breadcrumbs at the end until 
+            // you get to the one that was clicked.
+            while (SelectFolderName.Count > args.Index + 1)
+            {
+                SelectFolderName.RemoveAt(SelectFolderName.Count - 1);
+                TryUpdateFolderInfo(item.Id);
             }
         }
     }
@@ -456,9 +453,9 @@ public sealed partial class Explorer
         //文件夹
         if (itemInfo.Type == FileType.Folder)
         {
-            if (itemInfo.Id == null) return;
+            if (itemInfo.Id == default) return;
 
-            TryUpdateFolderInfo((long)itemInfo.Id);
+            TryUpdateFolderInfo(itemInfo.Id);
         }
 
         ItemClick?.Invoke(sender, e);
@@ -467,9 +464,11 @@ public sealed partial class Explorer
     //删除文件夹
     private async void DeletedCid_Click(object sender, RoutedEventArgs e)
     {
-        var item = ((sender as MenuFlyoutItem).DataContext as TreeViewNode).Content as ExplorerItem;
+        if (sender is not MenuFlyoutItem { DataContext: TreeViewNode { Content: ExplorerItem item } })
+            return;
 
-        var dialog = new ContentDialog()
+
+        var dialog = new ContentDialog
         {
             XamlRoot = XamlRoot,
             Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
@@ -483,12 +482,12 @@ public sealed partial class Explorer
         var result = await dialog.ShowAsync();
         if (result == ContentDialogResult.Primary)
         {
-            DeletedNodeAndDataAccessByCid(FolderTreeView.RootNodes, item.Id);
+            await DeletedNodeAndDataAccessByCid(FolderTreeView.RootNodes, item.Id);
 
         }
     }
 
-    private void DeletedNodeAndDataAccessByCid(IList<TreeViewNode> nodeChildren, long cid)
+    private async Task DeletedNodeAndDataAccessByCid(IList<TreeViewNode> nodeChildren, long cid)
     {
         foreach (var node in nodeChildren)
         {
@@ -496,13 +495,13 @@ public sealed partial class Explorer
             {
                 nodeChildren.Remove(node);
                 
-                _filesInfoDao.RemoveAllByFolderId(cid);
+                await  _filesInfoDao.ExecuteRemoveAllByFolderIdAsync(cid);
                 return;
             }
             var treeViewNodes = node.Children;
             if (treeViewNodes.Count != 0)
             {
-                DeletedNodeAndDataAccessByCid(treeViewNodes, cid);
+                await DeletedNodeAndDataAccessByCid(treeViewNodes, cid);
             }
         }
 
@@ -540,7 +539,7 @@ public class ExplorerItemTemplateSelector : DataTemplateSelector
     //官方代码
     protected override DataTemplate SelectTemplateCore(object item)
     {
-        var explorerItem = (ExplorerItem)(item as TreeViewNode).Content;
+        var explorerItem = (ExplorerItem)((TreeViewNode)item).Content;
         return explorerItem.Type == FileType.Folder ? FolderTemplate : FileTemplate;
     }
 }

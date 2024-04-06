@@ -2,14 +2,11 @@
     x:Class="Display.Controls.UserController.Explorer"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Display.Controls"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:enums1="using:Display.Models.Enums"
     xmlns:userController="using:Display.Controls.UserController"
-    xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
-    xmlns:file="using:Display.Models.Api.OneOneFive.File"
     xmlns:oneOneFive1="using:Display.Models.Vo.OneOneFive"
     xmlns:vo="using:Display.Models.Vo"
     mc:Ignorable="d">
@@ -213,12 +210,13 @@
                               MaxWidth="600"
                               Width="180"/>
             <ColumnDefinition />
-
             <ColumnDefinition Width="2"/>
         </Grid.ColumnDefinitions>
         
         <!--左，文件夹栏-->
-        <Grid Margin="0,0,12,0">
+        <Grid BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+              BorderThickness="1"
+              CornerRadius="3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -228,7 +226,7 @@
 
             <Grid>
                 <ProgressBar VerticalAlignment="Top"
-                             x:Name="readFileProgressBar"
+                             x:Name="ReadFileProgressBar"
                              IsIndeterminate="False"
                              Visibility="Collapsed" />
                 <RelativePanel>
@@ -256,12 +254,13 @@
             </ScrollViewer>
         </Grid>
 
+        <!-- 分割线 -->
         <controls:GridSplitter HorizontalAlignment="Left"
                                Grid.Column="1"
                                ResizeDirection="Columns"
                                ResizeBehavior="BasedOnAlignment">
             <controls:GridSplitter.RenderTransform>
-                <TranslateTransform X="-15" />
+                <TranslateTransform X="-7" />
             </controls:GridSplitter.RenderTransform>
         </controls:GridSplitter>
 
@@ -281,7 +280,8 @@
                       IsItemClickEnabled="True"
                       Margin="5"
                       ItemClick="FilesInfoListView_ItemClick">
-                <ListView.Header>
+                
+                <!--<ListView.Header>
                     <BreadcrumbBar ItemClicked="FolderBreadcrumbBar_ItemClicked"
                                    ItemsSource="{x:Bind SelectFolderName}">
                         <BreadcrumbBar.ItemTemplate>
@@ -300,7 +300,8 @@
                             </DataTemplate>
                         </BreadcrumbBar.ItemTemplate>
                     </BreadcrumbBar>
-                </ListView.Header>
+                </ListView.Header>-->
+                
             </ListView>
 
         </Grid>

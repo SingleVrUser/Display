@@ -10,7 +10,7 @@ public class FilesInfo
     [Column("fid")]
     [JsonProperty("fid")]
     [StringLength(20)]
-    public long? FileId { get; set; }
+    public long FileId { get; set; }
 
     [Column("uid")]
     [JsonProperty("uid")]

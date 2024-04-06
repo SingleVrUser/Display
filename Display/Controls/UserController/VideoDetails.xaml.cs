@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using Windows.Foundation;
 using Windows.Foundation.Metadata;
 using Windows.Storage;
 using Windows.Storage.Streams;
+using DataAccess;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using Display.Helper.FileProperties.Name;
@@ -31,6 +33,7 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using FileInfoInCidSmoke = Display.Views.Pages.DetailInfo.FileInfoInCidSmoke;
 using FindInfoAgainSmoke = Display.Views.Pages.DetailInfo.FindInfoAgainSmoke;
 using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
+using DataAccess.Dao.Impl;
 
 namespace Display.Controls.UserController;
 
@@ -48,7 +51,6 @@ public sealed partial class VideoDetails
     private readonly IVideoInfoDao _videoInfoDao = App.GetService<IVideoInfoDao>();
     private readonly IActorInfoDao _actorInfoDao = App.GetService<IActorInfoDao>();
     
-    
     public VideoDetails()
     {
         InitializeComponent();
@@ -56,12 +58,61 @@ public sealed partial class VideoDetails
 
     private readonly ObservableCollection<string> _showImageList = [];
 
-    private async void LoadData()
+    private void LoadData()
     {
         if (ResultInfo == null) return;
 
         //标题
         TitleTextBlock.Text = ResultInfo.Title;
+
+        //缩略图
+        //检查缩略图是否存在
+        List<string> thumbnailList = [];
+        switch (AppSettings.ThumbnailOriginType)
+        {
+            //来源为网络
+            case ThumbnailOriginType.Web:
+            {
+                var videoInfo = _videoInfoDao.GetOneByTrueName(ResultInfo.TrueName);
+
+                var sampleImageListStr = videoInfo?.SampleImageList;
+                if (!string.IsNullOrEmpty(sampleImageListStr))
+                {
+                    thumbnailList = sampleImageListStr.Split(",").ToList();
+                }
+
+                break;
+                }
+            //来源为本地
+            case (int)ThumbnailOriginType.Local:
+                {
+                    var folderFullName = Path.Combine(AppSettings.ImageSavePath, ResultInfo.TrueName);
+                    var theFolder = new DirectoryInfo(folderFullName);
+
+                    if (theFolder.Exists)
+                    {
+                        //文件
+                        foreach (var nextFile in theFolder.GetFiles())
+                        {
+                            if (nextFile.Name.Contains("Thumbnail_"))
+                            {
+                                thumbnailList.Add(nextFile.FullName);
+                            }
+                        }
+                    }
+
+                    break;
+                }
+        }
+
+        if (thumbnailList.Count > 0)
+        {
+            thumbnailList = thumbnailList.OrderByNatural(emp => emp.ToString()).ToList();
+            ThumbnailGridView.ItemsSource = thumbnailList;
+            ThumbnailStackPanel.Visibility = Visibility; 
+        };
+
+
 
         //演员
         //之前有数据，清空
@@ -109,52 +160,6 @@ public sealed partial class VideoDetails
             CategoryWrapPanel.Children.Insert(i, button);
         }
 
-        //缩略图
-        //检查缩略图是否存在
-        List<string> thumbnailList = new();
-
-        switch (AppSettings.ThumbnailOriginType)
-        {
-            //来源为本地
-            case (int)ThumbnailOriginType.Local:
-            {
-                var folderFullName = Path.Combine(AppSettings.ImageSavePath, ResultInfo.TrueName);
-                var theFolder = new DirectoryInfo(folderFullName);
-
-                if (theFolder.Exists)
-                {
-                    //文件
-                    foreach (var nextFile in theFolder.GetFiles())
-                    {
-                        if (nextFile.Name.Contains("Thumbnail_"))
-                        {
-                            thumbnailList.Add(nextFile.FullName);
-                        }
-                    }
-                }
-
-                break;
-            }
-            //来源为网络
-            case ThumbnailOriginType.Web:
-            {
-                var videoInfo = _videoInfoDao.GetOneByTrueName(ResultInfo.TrueName);
-
-                var sampleImageListStr = videoInfo?.SampleImageList;
-                if (!string.IsNullOrEmpty(sampleImageListStr))
-                {
-                    thumbnailList = sampleImageListStr.Split(",").ToList();
-                }
-
-                break;
-            }
-        }
-
-        if (thumbnailList.Count <= 0) return;
-        
-        thumbnailList = thumbnailList.OrderByNatural(emp => emp.ToString()).ToList();
-        ThumbnailGridView.ItemsSource = thumbnailList;
-        ThumbnailStackPanel.Visibility = Visibility;
 
     }
 
@@ -236,8 +241,7 @@ public sealed partial class VideoDetails
                 break;
         }
 
-        string savePath = AppSettings.BitCometSavePath;
-
+        var savePath = AppSettings.BitCometSavePath;
 
         //下载全部
         if (result == ContentDialogResult.Primary)
@@ -275,8 +279,13 @@ public sealed partial class VideoDetails
 
             ShowTeachingTip(isOk ? "发送下载请求成功" : "发送下载请求失败");
         }
-            
-        //DialogResult.Text = "User cancelled the dialog";
+    }
+
+    private void RatingControl_ValueChanged(RatingControl sender, object args)
+    {
+        var score = sender.Value == 0 ? -1 : sender.Value;
+        ResultInfo.Score = score;
+        _videoInfoDao.ExecuteUpdateByTrueName(ResultInfo.TrueName, info => info.Score = score);
     }
 
     private void UpdateLookLater(bool? val)
@@ -284,11 +293,7 @@ public sealed partial class VideoDetails
         var lookLaterT = val == true ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
 
         ResultInfo.LookLater = lookLaterT;
-        _videoInfoDao.UpdateSingle(new VideoInfo()
-        {
-            TrueName = ResultInfo.TrueName,
-            LookLater = lookLaterT
-        });
+        _videoInfoDao.ExecuteUpdateByTrueName(ResultInfo.TrueName, info => info.LookLater = lookLaterT);
     }
 
     private void UpdateLike(bool? val)
@@ -296,11 +301,7 @@ public sealed partial class VideoDetails
         var isLike = val == true ? 1 : 0;
 
         ResultInfo.IsLike = isLike;
-        _videoInfoDao.UpdateSingle(new VideoInfo
-        {
-            TrueName = ResultInfo.TrueName,
-            IsLike = isLike
-        });
+        _videoInfoDao.ExecuteUpdateByTrueName(ResultInfo.TrueName, info => info.IsLike = isLike);
     }
 
     private void Animation_Completed(ConnectedAnimation sender, object args)
@@ -366,8 +367,10 @@ public sealed partial class VideoDetails
                 Path.Combine(AppSettings.ImageSavePath, videoInfo.TrueName), videoInfo.TrueName, true);
         }
 
+        Context.Instance.ChangeTracker.Clear();
+        
         //更新数据库
-        _videoInfoDao.UpdateSingle(videoInfo);
+        DataAccessLocal.Add.UpdateDataFromVideoInfo(videoInfo);
 
         //更新ResultInfo数据
         foreach (var item in videoInfo.GetType().GetProperties())
@@ -561,7 +564,7 @@ public sealed partial class VideoDetails
             var name = item.Name;
 
             //忽略自定义数据
-            if (name == "look_later" || name == "score" || name == "is_like")
+            if (name is "look_later" or "score" or "is_like")
                 continue;
 
             //新值
@@ -605,17 +608,6 @@ public sealed partial class VideoDetails
     private void ShowImageFlipView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         ShoeImageName.Text = GetFileIndex();
-    }
-
-    private void RatingControl_ValueChanged(RatingControl sender, object args)
-    {
-        var score = sender.Value == 0 ? -1 : sender.Value;
-
-        _videoInfoDao.UpdateSingle(new VideoInfo
-        {
-            TrueName = ResultInfo.TrueName,
-            Score = (int)score
-        });
     }
 
     private void ShowTeachingTip(string subtitle, string content = null)

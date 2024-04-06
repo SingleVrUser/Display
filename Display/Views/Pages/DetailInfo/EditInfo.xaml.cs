@@ -121,7 +121,7 @@ public sealed partial class EditInfo
             _actorsSuggestion.SetFilter([$"name LIKE '%{sender.Text}%'"]);
         }
 
-        if (_actorsSuggestion.Count == 0) _actorsSuggestion.LoadData(20);
+        if (_actorsSuggestion.Count == 0) _actorsSuggestion.LoadDataAsync(20);
         //_acv.RefreshFilter();
     }
 

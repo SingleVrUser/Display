@@ -39,7 +39,7 @@ public class DownHistoryTest
         if (info == null) return;
 
         // 增
-        _infos.ForEach(_dao.Add);
+        _infos.ForEach(_dao.ExecuteAdd);
 
         // 查
         // 查询全部
@@ -62,7 +62,7 @@ public class DownHistoryTest
 
         // 改
         info.TrueUrl = "15222222";
-        _dao.UpdateSingle(info);
+        _dao.ExecuteUpdate(info);
 
         databaseVideoInfo = _dao.Find(info.FilePickCode, info.Ua);
         Assert.AreEqual(info, databaseVideoInfo);

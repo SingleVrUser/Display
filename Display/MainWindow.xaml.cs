@@ -21,9 +21,7 @@ using Windows.Foundation;
 using Windows.System;
 using DataAccess.Models.Entity;
 using Display.Models.Dto.Media;
-using Display.Models.Dto.OneOneFive;
 using Display.Models.Dto.Settings;
-using Display.Models.Entities.OneOneFive;
 using Display.Models.Enums;
 using Display.Models.Vo;
 using Display.Views.Pages;
@@ -370,7 +368,7 @@ public sealed partial class MainWindow
         else
         {
             //加载应用记录的图片默认大小
-            var newItem = new VideoInfoVo(nowItem, AppSettings.ImageWidth, AppSettings.ImageHeight);
+            var newItem = new VideoInfoVo(nowItem, AppSettings.ImageWidth);
             ContentFrame.Navigate(typeof(DetailInfoPage), newItem, new SuppressNavigationTransitionInfo());
         }
 

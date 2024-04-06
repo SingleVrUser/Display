@@ -6,7 +6,7 @@ namespace Display.Models.Vo.OneOneFive;
 public class FileUploadResult(string name)
 {
     public readonly string Name = name;
-    public long? Id;
+    public long Id;
     public long FileSize;
     public long Cid;
     public string PickCode;

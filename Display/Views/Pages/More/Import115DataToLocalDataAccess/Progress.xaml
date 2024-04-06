@@ -8,7 +8,6 @@
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     xmlns:providers="using:Display.Providers"
     xmlns:userController="using:Display.Controls.UserController"
-    xmlns:oneOneFive="using:Display.Models.Dto.OneOneFive"
     xmlns:vo="using:Display.Models.Vo">
     <Page.Resources>
         <Style TargetType="TextBlock">

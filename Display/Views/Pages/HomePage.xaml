@@ -5,7 +5,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:userController="using:Display.Controls.UserController"
-      xmlns:entity="using:DataAccess.Models.Entity"
+      xmlns:vo="using:Display.Models.Vo"
       mc:Ignorable="d">
 
     <ScrollViewer>
@@ -72,46 +72,51 @@
                                       ItemsSource="{x:Bind _recentList}"
                                       Background="Transparent">
                                 <FlipView.ItemTemplate>
-                                    <DataTemplate x:DataType="entity:VideoInfo">
+                                    <DataTemplate x:DataType="vo:VideoInfoVo">
                                         <Border x:Name="Image_Grid"
                                                 PointerEntered="Image_PointerEntered"
                                                 PointerExited="Image_PointerExited"
                                                 HorizontalAlignment="Center"
                                                 VerticalAlignment="Center"
                                                 CornerRadius="3">
-                                            <Image Source="{x:Bind ImagePath}"
-                                                   Tapped="Image_Tapped" />
+                                            <Image Tapped="Image_Tapped">
+                                                <Image.Source>
+                                                    <BitmapImage UriSource="{x:Bind ImagePath, Converter={StaticResource NotExistsImageUriConverter}}"/>
+                                                </Image.Source>
+                                            </Image>
                                         </Border>
 
                                     </DataTemplate>
                                 </FlipView.ItemTemplate>
                             </FlipView>
-
-                            <!--<PipsPager x:Name="ImagePipsPager"
-                                       Grid.Row="1"
-                                       HorizontalAlignment="Center"
-                                       NumberOfPages="{x:Bind _items.Count}"
-                                       DataContext="{x:Bind randomImageFlipView}" />-->
                         </Grid>
 
-                        <ListView x:Name="videoInfoListView"
+                        <ListView x:Name="VideoInfoListView"
                                   Grid.Column="1"
                                   ItemsSource="{x:Bind _recentList}"
                                   SelectedIndex="{x:Bind RandomImageFlipView.SelectedIndex, Mode=TwoWay}"
                                   SelectionChanged="videoInfoListView_SelectionChanged">
                             <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="entity:VideoInfo">
+                                <DataTemplate x:DataType="vo:VideoInfoVo">
                                     <Grid Margin="2">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="auto" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
 
-                                        <oldControls:ImageEx Source="{x:Bind ImagePath}"
+                                        <!--<oldControls:ImageEx Source="{x:Bind ImagePath}"
                                                           Width="120"
+                                                          MinHeight="80"
                                                           DecodePixelWidth="120"
-                                                          CornerRadius="2">
-                                        </oldControls:ImageEx>
+                                                          CornerRadius="2">-->
+                                        <!--</oldControls:ImageEx>-->
+                                        <Image Width="120" MinHeight="80">
+                                            <Image.Source>
+                                                <BitmapImage UriSource="{x:Bind ImagePath, Converter={StaticResource NotExistsImageUriConverter}}"
+                                                             DecodePixelWidth="120"/>
+                                            </Image.Source>
+                                        </Image>
+
 
                                         <StackPanel Grid.Column="1"
                                                     VerticalAlignment="Center"
@@ -128,9 +133,7 @@
                             </ListView.ItemTemplate>
                         </ListView>
                     </Grid>
-
                 </Grid>
-
             </Grid>
 
 

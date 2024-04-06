@@ -8,7 +8,7 @@ public class VideoInfo
 {
     [Key]
     [Column("truename")]
-    public string TrueName { get; set; } = null!;
+    public string TrueName { get; set; }
 
     [Column("title")]
     public string? Title { get; set; }
@@ -44,25 +44,25 @@ public class VideoInfo
     public string? SampleImageList { get; set; }
 
     [Column("imagepath")]
-    public string? ImagePath { get; set; }
+    public string ImagePath { get; set; }
 
     [Column("busurl")]
-    public string? Url { get; set; }
+    public string Url { get; set; }
 
     [Column("look_later")]
     public long LookLater { get; set; }
 
     [Column("score")]
-    public double Score { get; set; }
+    public double Score { get; set; } = -1;
 
     [Column("is_like")]
     public int IsLike { get; set; }
 
     [Column("addtime")]
-    public int? AddTime { get; set; }
-    
+    public long AddTime { get; set; } = DateTimeOffset.Now.ToUnixTimeSeconds();
+
     // 其他信息
-    
+
     [NotMapped]
     public int IsWm { get; set; }
 }

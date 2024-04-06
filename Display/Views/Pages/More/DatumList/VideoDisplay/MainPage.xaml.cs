@@ -18,7 +18,6 @@ using Display.Helper.FileProperties.Name;
 using Display.Helper.Network;
 using Display.Helper.UI;
 using Display.Managers;
-using Display.Models.Entities.OneOneFive;
 using Display.Models.Enums;
 using Display.Models.Vo.IncrementalCollection;
 using Display.Models.Vo.OneOneFive;
@@ -33,6 +32,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SharpCompress;
+using Display.Models.Vo;
 
 namespace Display.Views.Pages.More.DatumList.VideoDisplay;
 
@@ -56,6 +56,8 @@ public sealed partial class MainPage : IDisposable
     private bool _isDisposing;
 
     private readonly IVideoInfoDao _videoInfoDao = App.GetService<IVideoInfoDao>();
+
+    //private string currentPickCode
 
     /// <summary>
     /// 可播放的最大数量
@@ -199,7 +201,7 @@ public sealed partial class MainPage : IDisposable
     private async void ChangedFolder(DetailFileInfo detailFileInfo)
     {
         //跳过文件
-        if (detailFileInfo.Type == FileType.File || detailFileInfo.Id == null) return;
+        if (detailFileInfo.Type == FileType.File || detailFileInfo.Id == default) return;
 
         var folderId = (long)detailFileInfo.Id;
 
@@ -368,7 +370,8 @@ public sealed partial class MainPage : IDisposable
             });
         };
 
-        mediaPlayerElement.GotFocus += MediaPlayerElement_GotFocus;
+        mediaPlayerElement.Tapped += MediaPlayerElement_Tapped;
+        //mediaPlayerElement.GotFocus += MediaPlayerElement_GotFocus;
 
         if (addIndex == -1)
         {
@@ -378,18 +381,34 @@ public sealed partial class MainPage : IDisposable
         {
             VideoUniformGrid.Children.Insert(addIndex, mediaPlayerElement);
         }
-
     }
 
-    private void MediaPlayerElement_GotFocus(object sender, RoutedEventArgs e)
+    private void MediaPlayerElement_Tapped(object sender, TappedRoutedEventArgs e)
     {
-        if (sender is not MediaPlayerElement focusMedia) return;
+        if (sender is not MediaPlayerElement { Tag: MediaPlayerWithStreamSource source } focusMedia) return;
 
+        if (_currentSelectedInfo == source.DetailFileInfo) return;
+        _currentSelectedInfo = source.DetailFileInfo;
+
+        // 切换右侧图片
         var index = VideoUniformGrid.Children.IndexOf(focusMedia);
-
-        if (VideoPlayListView.SelectedIndex != index && VideoPlayListView.Items.Count > index)
-            VideoPlayListView.SelectedIndex = index;
+        if (VideoPlayListView.SelectedIndex == index || VideoPlayListView.Items.Count <= index) return;
+        VideoPlayListView.SelectedIndex = index;
     }
+
+    private DetailFileInfo _currentSelectedInfo;
+    //private void MediaPlayerElement_GotFocus(object sender, RoutedEventArgs e)
+    //{
+    //    if (sender is not MediaPlayerElement { Tag: MediaPlayerWithStreamSource source } focusMedia) return;
+
+    //    if (_currentSelectedInfo == source.DetailFileInfo) return;
+    //    _currentSelectedInfo = source.DetailFileInfo;
+
+    //    // 切换右侧图片
+    //    var index = VideoUniformGrid.Children.IndexOf(focusMedia);
+    //    if (VideoPlayListView.SelectedIndex == index || VideoPlayListView.Items.Count <= index) return;
+    //    VideoPlayListView.SelectedIndex = index;
+    //}
 
 
     private static void ChangMediaPlayerPositionWhenMediaOpened(MediaPlayer sender)
@@ -420,6 +439,7 @@ public sealed partial class MainPage : IDisposable
         }
 
         VideoPlayPivot.SelectedIndex = 1;
+        _currentSelectedInfo = filesInfo.FirstOrDefault();
 
         // 搜索影片信息
         _cidInfos.Clear();
@@ -451,7 +471,7 @@ public sealed partial class MainPage : IDisposable
             Debug.WriteLine("正在添加信息：" + trueName);
 
             // cidInfo已经存在
-            var cidInfo = _cidInfos.FirstOrDefault(item => item.VideoInfo.TrueName.ToUpper().Equals(trueName.ToUpper()));
+            var cidInfo = _cidInfos.FirstOrDefault(item => item.VideoInfoVo.TrueName.ToUpper().Equals(trueName.ToUpper()));
             if (cidInfo is not null)
             {
                 _cidInfos.Add(cidInfo);
@@ -612,12 +632,11 @@ public sealed partial class MainPage : IDisposable
         return fid;
     }
 
-
     private void RemoveCidInfo(DetailFileInfo detailFileInfo)
     {
         //移除cid信息（预览图/信息）
         var removeCid = _cidInfos.FirstOrDefault(item =>
-            item.VideoInfo.TrueName == detailFileInfo.Name || item.VideoInfo.TrueName.Equals(FileMatch.MatchName(detailFileInfo.Name)?.ToUpper(), StringComparison.CurrentCultureIgnoreCase));
+            item.VideoInfoVo.TrueName == detailFileInfo.Name || item.VideoInfoVo.TrueName.Equals(FileMatch.MatchName(detailFileInfo.Name)?.ToUpper(), StringComparison.CurrentCultureIgnoreCase));
 
         if (removeCid == null) return;
 
@@ -648,7 +667,7 @@ public sealed partial class MainPage : IDisposable
         }
     }
 
-    private async Task<ContentDialogResult> TipDeletedFiles()
+    private async Task<ContentDialogResult> TipDeletedFiles(string name)
     {
         var dialog = new ContentDialog
         {
@@ -658,7 +677,7 @@ public sealed partial class MainPage : IDisposable
             PrimaryButtonText = "删除",
             CloseButtonText = "返回",
             DefaultButton = ContentDialogButton.Close,
-            Content = "该操作将删除115网盘中的文件，确认删除？"
+            Content = $"该操作将删除115网盘中的文件:\n\"{name}\"\n确认删除？"
         };
 
         return await dialog.ShowAsync();
@@ -740,7 +759,7 @@ public sealed partial class MainPage : IDisposable
 
         SmokeGrid.Visibility = Visibility.Visible;
 
-        EnlargeImage.Source = new BitmapImage(new Uri(cidInfo.VideoInfo.ImagePath));
+        EnlargeImage.Source = new BitmapImage(new Uri(cidInfo.VideoInfoVo.ImagePath));
 
     }
 
@@ -766,24 +785,6 @@ public sealed partial class MainPage : IDisposable
         {
             VisualStateManager.GoToState(sender as Control, "EnlargeButtonHidden", true);
         }
-    }
-
-
-    /// <summary>
-    /// 从播放列表中移除
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private async void RemoveFileFromListButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not MenuFlyoutItem { DataContext: DetailFileInfo fileInfo }) return;
-
-        // 从播放列表中删除
-        DeletedFileFromListAsync(fileInfo);
-
-        // 移除视频后，如果播放列表中有其余的视频则插入到播放中
-        await TryRemoveCurrentVideoAndPlayNextVideo(fileInfo);
-
     }
 
     private MediaPlayerElement GetFirstElementPlayPickCode(string pc)
@@ -848,6 +849,63 @@ public sealed partial class MainPage : IDisposable
         await AddMediaElement(videoInfo);
     }
 
+    private async void CloseMediaPlayer_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (_currentSelectedInfo == null) return;
+        var info = _currentSelectedInfo;
+        _currentSelectedInfo = null;
+
+        Debug.WriteLine("即将从列表中删除" + info.Name);
+
+        await TryDeletedFileFromList(info);
+
+        _currentSelectedInfo = _playingVideoInfos.FirstOrDefault();
+
+        Debug.WriteLine("接下来选择：" + info.Name);
+    }
+
+    private async void Deleted115File_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (_currentSelectedInfo == null) return;
+        var info = _currentSelectedInfo;
+        _currentSelectedInfo = null;
+
+        Debug.WriteLine("即将从115中删除" + info.Name);
+
+
+
+        var needDeleted = await TryDeletedFileFrom115(info);
+        if (!needDeleted)
+        {
+            _currentSelectedInfo = info;
+            return;
+        }
+
+        _currentSelectedInfo = _playingVideoInfos.FirstOrDefault();
+        Debug.WriteLine("接下来选择：" + info.Name);
+    }
+
+    /// <summary>
+    /// 从播放列表中移除
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private async void RemoveFileFromListButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem { DataContext: DetailFileInfo fileInfo }) return;
+
+        await TryDeletedFileFromList(fileInfo);
+    }
+
+    private async Task TryDeletedFileFromList(DetailFileInfo fileInfo)
+    {
+        // 从播放列表中删除
+        DeletedFileFromListAsync(fileInfo);
+
+        // 移除视频后，如果播放列表中有其余的视频则插入到播放中
+        await TryRemoveCurrentVideoAndPlayNextVideo(fileInfo);
+    }
+
 
     /// <summary>
     /// 从115中删除
@@ -858,13 +916,23 @@ public sealed partial class MainPage : IDisposable
     {
         if (sender is not MenuFlyoutItem { DataContext: DetailFileInfo fileInfo }) return;
 
-        var result = await TipDeletedFiles();
+        await TryDeletedFileFrom115(fileInfo);
+    }
+
+    private async Task<bool> TryDeletedFileFrom115(DetailFileInfo fileInfo)
+    {
+        var result = await TipDeletedFiles(fileInfo.Name);
 
         if (result == ContentDialogResult.Primary)
         {
             await DeletedFileFrom115Async(fileInfo);
+            return true;
         }
+
+        return false;
+
     }
+
 
     /// <summary>
     /// 重新加载视频
@@ -1007,28 +1075,29 @@ public sealed partial class MainPage : IDisposable
         });
 
     }
+
 }
 
 public class CidInfo
 {
-    public VideoInfo VideoInfo;
+    public VideoInfoVo VideoInfoVo;
 
     public CidInfo(string name, string imagePath)
     {
-        VideoInfo = new VideoInfo { TrueName = name, ImagePath = imagePath };
+        VideoInfoVo = new VideoInfoVo { TrueName = name, ImagePath = imagePath };
     }
 
     public CidInfo(VideoInfo info)
     {
-        VideoInfo = info;
+        VideoInfoVo = new VideoInfoVo(info);
     }
 
     public void UpdateInfo(VideoInfo info)
     {
-        VideoInfo.TrueName = info.TrueName;
-        VideoInfo.ImagePath = info.ImagePath;
-        VideoInfo.ReleaseTime = info.ReleaseTime;
-        VideoInfo.Actor = info.Actor;
+        VideoInfoVo.TrueName = info.TrueName;
+        VideoInfoVo.ImagePath = info.ImagePath;
+        VideoInfoVo.ReleaseTime = info.ReleaseTime;
+        VideoInfoVo.Actor = info.Actor;
     }
 
     public CancellationTokenSource CancellationTokenSource { get; set; } = new();
