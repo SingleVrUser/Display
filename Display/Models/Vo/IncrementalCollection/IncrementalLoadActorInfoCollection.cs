@@ -30,11 +30,11 @@ public class IncrementalLoadActorInfoCollection : ObservableCollection<ActorInfo
         SetOrder(orderByList);
     }
 
-    public int LoadData(int limit = 40, int offset = 0)
+    public async Task<int> LoadDataAsync(int limit = 40, int offset = 0)
     {
         System.Diagnostics.Debug.WriteLine($"加载{offset}-{offset + limit} 中……");
 
-        var actorInfos = DataAccessLocal.Get.GetActorInfo(limit, offset, OrderByList, FilterList);
+        var actorInfos = await DataAccessLocal.Get.GetActorInfoAsync(limit, offset, OrderByList, FilterList);
         if (actorInfos == null)
         {
             HasMoreItems = false;
@@ -43,7 +43,7 @@ public class IncrementalLoadActorInfoCollection : ObservableCollection<ActorInfo
 
         if (Count == 0)
         {
-            AllCount = DataAccessLocal.Get.GetCountOfActorInfo(FilterList);
+            AllCount = await DataAccessLocal.Get.GetCountOfActorInfoAsync(FilterList);
             System.Diagnostics.Debug.WriteLine($"总数量:{AllCount}");
 
             System.Diagnostics.Debug.WriteLine($"HasMoreItems:{HasMoreItems}");
@@ -77,14 +77,14 @@ public class IncrementalLoadActorInfoCollection : ObservableCollection<ActorInfo
     }
 
     private readonly int _defaultAddCount;
-    private Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync()
+    private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync()
     {
-        var getCount = LoadData(_defaultAddCount, Count);
+        var getCount = await LoadDataAsync(_defaultAddCount, Count);
 
-        return Task.FromResult(new LoadMoreItemsResult
+        return new LoadMoreItemsResult
         {
             Count = (uint)getCount
-        });
+        };
     }
 }
 

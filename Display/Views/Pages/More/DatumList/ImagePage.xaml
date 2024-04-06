@@ -134,8 +134,15 @@
 
                 <oldControls:AdaptiveGridView.ItemTemplate>
                     <DataTemplate x:DataType="oneOneFive1:DetailFileInfo">
-                        <oldControls:ImageEx Source="{x:Bind ThumbnailUrl}"
-                                            Height="60" />
+                        <Image x:Name="ActorImage"
+                               Height="60">
+                            <Image.Source>
+                                <BitmapImage UriSource="{x:Bind ThumbnailUrl}"
+                                             DecodePixelHeight="60" />
+                            </Image.Source>
+                        </Image>
+                        <!--<oldControls:ImageEx Source="{x:Bind ThumbnailUrl}"
+                                             Height="60" />-->
                     </DataTemplate>
                 </oldControls:AdaptiveGridView.ItemTemplate>
             </oldControls:AdaptiveGridView>

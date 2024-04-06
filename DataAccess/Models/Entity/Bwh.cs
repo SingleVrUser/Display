@@ -19,4 +19,18 @@ public class Bwh
 
     [Column("hips")]
     public int Hips { get; init; }
+
+    public Bwh(){}
+
+    public Bwh(string bwhContent)
+    {
+        BwhContent = bwhContent;
+
+        var splitArray = bwhContent.Split('_');
+
+        if (splitArray.Length != 3) return;
+        if(int.TryParse(splitArray[0], out var bust)) Bust = bust ;
+        if(int.TryParse(splitArray[1], out var waist)) Waist = waist;
+        if(int.TryParse(splitArray[2], out var hips)) Hips = hips;
+    }
 }

@@ -31,11 +31,11 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <Grid CornerRadius="2">
-                        <Image Source="{x:Bind ImagePath, Converter={StaticResource NotExistsImagePathConverter}}"
+                    <Border CornerRadius="2">
+                        <Image Source="{x:Bind ImagePath, Converter={StaticResource NotExistsImageBitmapConverter}}"
                                Width="150"
                                x:Name="Cover_image" />
-                    </Grid>
+                    </Border>
                     <StackPanel Grid.Column="1">
                         <TextBlock Text="{x:Bind TrueName}"
                                    TextTrimming="CharacterEllipsis" />

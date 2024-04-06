@@ -86,7 +86,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     public FileListPage(long cid)
     {
-        _units = new ObservableCollection<ExplorerItem>();
+        _units = [];
         InitializeComponent();
 
         InitData(cid);
@@ -134,10 +134,10 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         //跳过文件
         if (detailFileInfo.Type == FileType.File) return;
-        if (detailFileInfo.Id == null) return;
+        if (detailFileInfo.Id == default) return;
 
 
-        var id = (long)detailFileInfo.Id;
+        var id = detailFileInfo.Id;
 
         await FilesInfos.SetCid(id);
 
@@ -443,7 +443,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         // 从115中删除
         var result = await WebApi.DeleteFiles(cid,
-             sourceFilesInfos.Where(item => item.Id != null).Select(item => (long)item.Id).ToArray());
+             sourceFilesInfos.Where(item => item.Id != default).Select(item => item.Id).ToArray());
 
         if (!result) ShowTeachingTip("删除文件失败");
     }
@@ -533,9 +533,9 @@ public sealed partial class FileListPage : INotifyPropertyChanged
                 return;
             }
 
-            if (folderInfo.Id == null) return;
+            if (folderInfo.Id == default) return;
 
-            await Move115Files((long)folderInfo.Id, sourceFilesInfos);
+            await Move115Files(folderInfo.Id, sourceFilesInfos);
         }
     }
 
@@ -1239,7 +1239,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
             }
             else if (info.IsImage)
             {
-                if (info.Id == null) return;
+                if (info.Id == default) return;
 
                 NavigationToImagePage(FilesInfos.ToList(), info);
             }
@@ -1290,7 +1290,8 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     }
 
     #region 设置图片控件
-    public void NavigationToImagePage(List<DetailFileInfo> files, DetailFileInfo currentInfo)
+
+    private void NavigationToImagePage(List<DetailFileInfo> files, DetailFileInfo currentInfo)
     {
         var images = files.Where(i => i.IsImage).ToList();
         var currentIndex = images.IndexOf(currentInfo);
@@ -1303,7 +1304,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler PropertyChanged;
 
-    public void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    private void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
         // Raise the PropertyChanged event, passing the Name of the property whose value has changed.
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -1355,21 +1356,21 @@ public sealed partial class FileListPage : INotifyPropertyChanged
     {
         if (e.ClickedItem is not DetailFileInfo info) return;
 
-        if (info.Id == null) return;
+        if (info.Id == default) return;
 
         // 打开文件夹
         if (info.Type == FileType.Folder)
         {
-            if (info.Id == null) return;
+            if (info.Id == default) return;
 
-            await OpenFolder((long)info.Id);
+            await OpenFolder(info.Id);
             return;
         }
 
         // 打开图片
         if (info.IsImage)
         {
-            if (info.Id == null || SearchResultListView.ItemsSource is not List<DetailFileInfo> infos) return;
+            if (info.Id == default || SearchResultListView.ItemsSource is not List<DetailFileInfo> infos) return;
 
             NavigationToImagePage(infos, info);
             return;

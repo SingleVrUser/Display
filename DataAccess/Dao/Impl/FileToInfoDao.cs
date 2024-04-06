@@ -8,11 +8,21 @@ public class FileToInfoDao : DaoImpl<FileToInfo>, IFileToInfoDao
 {
     public void UpdateIsSuccessByTrueName(string trueName, int isSuccess)
     {
-        var fileToInfos = DbSet.Where(i => i.Truename == trueName).ToList();
+        var fileToInfos = DbSet.Where(i => i.TrueName == trueName).ToList();
         foreach (var fileToInfo in fileToInfos)
         {
-            fileToInfo.Issuccess = isSuccess;
+            fileToInfo.IsSuccess = isSuccess;
         }
         SaveChanges();
     }
+
+    public void ExecuteInitIfNoExists(FileToInfo info)
+    {
+        var fileToInfo = DbSet.AsNoTracking().FirstOrDefault(i => i.FilePickCode == info.FilePickCode);
+        if (fileToInfo != null) return;
+
+        DbSet.Add(info);
+        SaveChanges();
+    }
+
 }

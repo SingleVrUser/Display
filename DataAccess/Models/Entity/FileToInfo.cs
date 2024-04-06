@@ -13,8 +13,8 @@ public class FileToInfo
     public string FilePickCode { get; set; } = null!;
 
     [Column("truename")]
-    public string? Truename { get; set; }
+    public string? TrueName { get; set; }
 
     [Column("issuccess")]
-    public int? Issuccess { get; set; }
+    public int IsSuccess { get; set; } = 0;
 }

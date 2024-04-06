@@ -8,22 +8,71 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7e630695-b381-4f87-ba1b-fc0a833f8434" name="Changes" comment="Fix bug in null image">
+    <list default="true" id="7e630695-b381-4f87-ba1b-fc0a833f8434" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Display/Models/Enums/FileFormatEnum.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Display/Models/Vo/FileStatistics.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Display/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Display/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataAccess/Dao/DaoImpl.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/DaoImpl.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataAccess/Dao/IDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/IDao.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/FileToInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Impl/FileToInfoDao.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/FilesInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Impl/FilesInfoDao.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/VideoInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Impl/VideoInfoDao.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFileToInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFileToInfoDao.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFilesInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFilesInfoDao.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Interface/IVideoInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IVideoInfoDao.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/FileToInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/FileToInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/FilesInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/FilesInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/VideoInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/VideoInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Constants/DefaultSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Constants/DefaultSettings.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/ActorImage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/ActorImage.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/CustomAutoSuggestBox.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/CustomAutoSuggestBox.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/CustomMediaPlayerElement.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/CustomMediaPlayerElement.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/Explorer.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/Explorer.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/Explorer.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/Explorer.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/VideoCoverDisplay.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/VideoCoverDisplay.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/VideoCoverDisplay.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/VideoCoverDisplay.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/VideoDetails.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/VideoDetails.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Converter/NumberToDateTimeStrConverter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Converter/NumberToDateTimeStrConverter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Converter/NumberToLengthStrConverter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Converter/NumberToLengthStrConverter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Extensions/HttpClientExtension.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Extensions/HttpClientExtension.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Display/Helper/FileProperties/Name/FileMatch.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Helper/FileProperties/Name/FileMatch.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Display/Managers/SpiderManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Managers/SpiderManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Models/Api/OneOneFive/Search/SearchDatum.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Api/OneOneFive/Search/SearchDatum.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Models/Dto/Media/MediaPlayItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Dto/Media/MediaPlayItem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Models/Entities/OneOneFive/VideoInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Entities/OneOneFive/VideoInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/FailVideoInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/FailVideoInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/GetFilesProgressInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/GetFilesProgressInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadActorInfoCollection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadActorInfoCollection.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadFailDatumInfoCollection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadFailDatumInfoCollection.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadFailSpiderInfoCollection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadFailSpiderInfoCollection.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadSuccessInfoCollection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadSuccessInfoCollection.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/MatchVideoResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/MatchVideoResult.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/OneOneFive/DetailFileInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/OneOneFive/DetailFileInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/OneOneFive/FileUploadResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/OneOneFive/FileUploadResult.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/Progress/GetFileProgressIProgress.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/Progress/GetFileProgressIProgress.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/Spider/SpiderItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/Spider/SpiderItem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/VideoInfoVo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/VideoInfoVo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Display/Providers/DataAccessLocal.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Providers/DataAccessLocal.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Display/Providers/WebApi.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Providers/WebApi.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/ViewModels/SpiderTaskViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/ViewModels/SpiderTaskViewModel.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Display/Views/Pages/ActorsPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/ActorsPage.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/DetailInfo/DownDialogContent.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/DetailInfo/DownDialogContent.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/DetailInfo/EditInfo.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/DetailInfo/EditInfo.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/HomePage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/HomePage.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/HomePage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/HomePage.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/FileListPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/FileListPage.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/VideoDisplay/MainPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/VideoDisplay/MainPage.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/VideoDisplay/MainPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/VideoDisplay/MainPage.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/More/Import115DataToLocalDataAccess/Progress.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/Import115DataToLocalDataAccess/Progress.xaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Display/Views/Pages/More/Import115DataToLocalDataAccess/Progress.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/Import115DataToLocalDataAccess/Progress.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/ConditionalCheck.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/ConditionalCheckPage.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/ConditionalCheck.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/ConditionalCheckPage.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/MainPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/MainPage.xaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/MainPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/MainPage.xaml.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/Progress.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/Progress.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tests/DataAccess/EntityTest/ActorInfoTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/DataAccess/EntityTest/ActorInfoTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tests/DataAccess/EntityTest/DownHistoryTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/DataAccess/EntityTest/DownHistoryTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tests/DataAccess/EntityTest/FailListIsLikeLookLaterTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/DataAccess/EntityTest/FailListIsLikeLookLaterTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tests/DataAccess/EntityTest/VideoInfoTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/DataAccess/EntityTest/VideoInfoTest.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,8 +95,6 @@
     </option>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/.nuget/packages/microsoft.net.test.sdk/17.8.0/build/netcoreapp3.1/Microsoft.NET.Test.Sdk.Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.ComponentModel.Annotations/src/System/ComponentModel/DataAnnotations/Schema/DatabaseGeneratedAttribute.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Private.CoreLib/src/System/Collections/Generic/Dictionary.cs" root0="SKIP_HIGHLIGHTING" />
@@ -61,6 +108,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3fa134a4f7024c6a9faff12697fb4fb9c8e8a0/49/a30af049/ExecutionContext.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3fa134a4f7024c6a9faff12697fb4fb9c8e8a0/4d/aabe2050/DefaultInterpolatedStringHandler.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3fa134a4f7024c6a9faff12697fb4fb9c8e8a0/8c/8a5db4a4/Activator.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4b008bfa35d1486a933022f2008b3fdd13908/09/726f23f7/INotifyPropertyChanged.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/4b008bfa35d1486a933022f2008b3fdd13908/fa/2a966109/ObservableCollection`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/86986e3b5ab142e1a33017545ca2e53926a820/3d/53a02aa0/DbContext.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9bbdf87048bd43de89b63f272a61b8876dfc20/17/413f7edc/IXamlType.cs" root0="SKIP_HIGHLIGHTING" />
@@ -74,7 +122,9 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9bbdf87048bd43de89b63f272a61b8876dfc20/a0/15b15e62/ItemsControl.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9bbdf87048bd43de89b63f272a61b8876dfc20/b9/da8978b4/IApplicationStaticsMethods.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9bbdf87048bd43de89b63f272a61b8876dfc20/e4/600b272f/ButtonBase.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9bbdf87048bd43de89b63f272a61b8876dfc20/f4/8c505172/CommandBar.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9bbdf87048bd43de89b63f272a61b8876dfc20/f6/5033c525/_EventSource_global__Microsoft_UI_Xaml_UnhandledEx.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9bbdf87048bd43de89b63f272a61b8876dfc20/fd/888f4cef/RangeBaseValueChangedEventArgs.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/a6ca83fd68634bcf88b36fa07a3599b426a020/f0/fe8b6706/DbContext.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b25c6c7bed3c4257968cca26f3724ce384908/e8/bebe01fc/Enumerable.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/d2ef6d96d3bf411eb028281c690d074a14aca28/ce/69de0544/SpeechRecognitionQualityDegradingEventArgs.cs" root0="SKIP_HIGHLIGHTING" />
@@ -86,13 +136,6 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/94a622829d23a99e6859dc73690c2f724f2d4373af0699883e3f70ac955577/TokenizingTextBox.Events.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/97b37ca73f6f8bd6e576f661f8650c6a1f5107d827c14ff82eb2689e5964bc/Utility.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/98c377d82be4c36912d3e59d6d7e2a55a14898ee9757311a192711c5f4115e7/TestMethodInfo.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://D:/Work/WinUi/GitHub/Display/DataAccess/Models/Entity/ActorInfo.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Constants/Account.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Constants/Account.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Controls/UserController/CustomMediaPlayerElement.xaml" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Controls/UserController/CustomMediaPlayerElement.xaml.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Providers/AppSettings.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://D:/Work/WinUi/GitHub/Display/Display/Views/Windows/MediaPlayWindow.xaml" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/App.g.i.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Controls/UserController/ActorImage.g.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Controls/UserController/CustomAutoSuggestBox.g.cs" root0="SKIP_HIGHLIGHTING" />
@@ -120,38 +163,38 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET Launch Settings Profile.Display: Display (Unpackaged).executor": "Debug",
-    "19a8c101-55f0-4356-838b-1cdf6d2e047e.executor": "Debug",
-    "98af082e-e617-42ce-9c94-6373b6751ea3.executor": "Debug",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "UWP.Display.executor": "Debug",
-    "XThreadsFramesViewSplitterKey": "0.37213403",
-    "b6d00020-21dd-433e-828c-9ee31090f2eb.executor": "Debug",
-    "f8910c43-d913-4048-823e-f4c9916b2f46.executor": "Debug",
-    "git-widget-placeholder": "main",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "CodeLensConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET Launch Settings Profile.Display: Display (Unpackaged).executor&quot;: &quot;Debug&quot;,
+    &quot;19a8c101-55f0-4356-838b-1cdf6d2e047e.executor&quot;: &quot;Debug&quot;,
+    &quot;98af082e-e617-42ce-9c94-6373b6751ea3.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;UWP.Display.executor&quot;: &quot;Debug&quot;,
+    &quot;XThreadsFramesViewSplitterKey&quot;: &quot;0.5026455&quot;,
+    &quot;b6d00020-21dd-433e-828c-9ee31090f2eb.executor&quot;: &quot;Debug&quot;,
+    &quot;f8910c43-d913-4048-823e-f4c9916b2f46.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;CodeLensConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql",
-      "sqlite"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;,
+      &quot;sqlite&quot;
     ],
-    "rider.external.source.directories": [
-      "C:\\Users\\liuzu\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\DecompilerCache",
-      "C:\\Users\\liuzu\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\SourcesCache",
-      "C:\\Users\\liuzu\\AppData\\Local\\Symbols\\src"
+    &quot;rider.external.source.directories&quot;: [
+      &quot;C:\\Users\\liuzu\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\DecompilerCache&quot;,
+      &quot;C:\\Users\\liuzu\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\SourcesCache&quot;,
+      &quot;C:\\Users\\liuzu\\AppData\\Local\\Symbols\\src&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="UWP.Display">
     <configuration name="Display: Display (Unpackaged)" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/Display/Display.csproj" />
@@ -201,7 +244,10 @@
       <workItem from="1712109459015" duration="16231000" />
       <workItem from="1712150320346" duration="5574000" />
       <workItem from="1712156685420" duration="6467000" />
-      <workItem from="1712198315779" duration="39873000" />
+      <workItem from="1712198315779" duration="47916000" />
+      <workItem from="1712281039198" duration="19007000" />
+      <workItem from="1712399000749" duration="484000" />
+      <workItem from="1712399569770" duration="1869000" />
     </task>
     <task id="LOCAL-00001" summary="clean views">
       <option name="closed" value="true" />
@@ -299,7 +345,15 @@
       <option name="project" value="LOCAL" />
       <updated>1712229050956</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Fix some about import video info">
+      <option name="closed" value="true" />
+      <created>1712240555803</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1712240555803</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -329,7 +383,8 @@
     <MESSAGE value="Add entity framework" />
     <MESSAGE value="fix some bug in search" />
     <MESSAGE value="Fix bug in null image" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix bug in null image" />
+    <MESSAGE value="Fix some about import video info" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix some about import video info" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -339,10 +394,10 @@
           <line>21</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Tests\DataAccess\EntityTest\ActorInfoTest.cs" initialLine="21" containingFunctionPresentation="Method 'UploadSingleTest'">
             <startOffsets>
-              <option value="471" />
+              <option value="472" />
             </startOffsets>
             <endOffsets>
-              <option value="498" />
+              <option value="499" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="1" />
@@ -352,10 +407,10 @@
           <line>883</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Controls\UserController\CustomMediaPlayerElement.xaml.cs" initialLine="878" containingFunctionPresentation="Method 'DeleteFileFrom115Button_Click'">
             <startOffsets>
-              <option value="27717" />
+              <option value="27744" />
             </startOffsets>
             <endOffsets>
-              <option value="27768" />
+              <option value="27795" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="5" />
@@ -365,10 +420,10 @@
           <line>843</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Controls\UserController\CustomMediaPlayerElement.xaml.cs" initialLine="838" containingFunctionPresentation="Method 'ShowInfoItemClick'">
             <startOffsets>
-              <option value="26394" />
+              <option value="26421" />
             </startOffsets>
             <endOffsets>
-              <option value="26445" />
+              <option value="26472" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="6" />
@@ -378,10 +433,10 @@
           <line>836</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Controls\UserController\CustomMediaPlayerElement.xaml.cs" initialLine="831" containingFunctionPresentation="Method 'KeyboardAcceleratorMute_OnInvoked'">
             <startOffsets>
-              <option value="26149" />
+              <option value="26176" />
             </startOffsets>
             <endOffsets>
-              <option value="26194" />
+              <option value="26221" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="7" />
@@ -391,10 +446,10 @@
           <line>829</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Controls\UserController\CustomMediaPlayerElement.xaml.cs" initialLine="824" containingFunctionPresentation="Method 'KeyboardAcceleratorShiftRight_OnInvoked'">
             <startOffsets>
-              <option value="25950" />
+              <option value="25977" />
             </startOffsets>
             <endOffsets>
-              <option value="25972" />
+              <option value="25999" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="8" />
@@ -404,10 +459,10 @@
           <line>822</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Controls\UserController\CustomMediaPlayerElement.xaml.cs" initialLine="817" containingFunctionPresentation="Method 'KeyboardAcceleratorRight_OnInvoked'">
             <startOffsets>
-              <option value="25745" />
+              <option value="25772" />
             </startOffsets>
             <endOffsets>
-              <option value="25767" />
+              <option value="25794" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="9" />
@@ -417,10 +472,10 @@
           <line>815</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Controls\UserController\CustomMediaPlayerElement.xaml.cs" initialLine="810" containingFunctionPresentation="Method 'KeyboardAcceleratorShiftLeft_OnInvoked'">
             <startOffsets>
-              <option value="25544" />
+              <option value="25571" />
             </startOffsets>
             <endOffsets>
-              <option value="25566" />
+              <option value="25593" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="10" />
@@ -430,10 +485,10 @@
           <line>808</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Controls\UserController\CustomMediaPlayerElement.xaml.cs" initialLine="803" containingFunctionPresentation="Method 'KeyboardAcceleratorLeft_OnInvoked'">
             <startOffsets>
-              <option value="25339" />
+              <option value="25366" />
             </startOffsets>
             <endOffsets>
-              <option value="25361" />
+              <option value="25388" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="11" />
@@ -443,10 +498,10 @@
           <line>801</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Controls\UserController\CustomMediaPlayerElement.xaml.cs" initialLine="796" containingFunctionPresentation="Method 'KeyboardAcceleratorDown_OnInvoked'">
             <startOffsets>
-              <option value="25141" />
+              <option value="25168" />
             </startOffsets>
             <endOffsets>
-              <option value="25161" />
+              <option value="25188" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="12" />
@@ -456,10 +511,10 @@
           <line>794</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Controls\UserController\CustomMediaPlayerElement.xaml.cs" initialLine="789" containingFunctionPresentation="Method 'KeyboardAcceleratorUp_OnInvoked'">
             <startOffsets>
-              <option value="24944" />
+              <option value="24971" />
             </startOffsets>
             <endOffsets>
-              <option value="24964" />
+              <option value="24991" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="13" />
@@ -469,10 +524,10 @@
           <line>756</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Controls\UserController\CustomMediaPlayerElement.xaml.cs" initialLine="751" containingFunctionPresentation="Method 'ChangedPositionText'">
             <startOffsets>
-              <option value="23513" />
+              <option value="23540" />
             </startOffsets>
             <endOffsets>
-              <option value="23592" />
+              <option value="23619" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="14" />
@@ -482,10 +537,10 @@
           <line>730</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Controls\UserController\CustomMediaPlayerElement.xaml.cs" initialLine="725" containingFunctionPresentation="Method 'ChangedVolumeText'">
             <startOffsets>
-              <option value="22918" />
+              <option value="22945" />
             </startOffsets>
             <endOffsets>
-              <option value="22951" />
+              <option value="22978" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="15" />
@@ -495,10 +550,10 @@
           <line>713</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Controls\UserController\CustomMediaPlayerElement.xaml.cs" initialLine="708" containingFunctionPresentation="Method 'PTimerElapsed'">
             <startOffsets>
-              <option value="22472" />
+              <option value="22499" />
             </startOffsets>
             <endOffsets>
-              <option value="22522" />
+              <option value="22549" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="17" />
@@ -508,10 +563,10 @@
           <line>698</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Controls\UserController\CustomMediaPlayerElement.xaml.cs" initialLine="693" containingFunctionPresentation="Method 'VTimerElapsed'">
             <startOffsets>
-              <option value="22042" />
+              <option value="22069" />
             </startOffsets>
             <endOffsets>
-              <option value="22075" />
+              <option value="22102" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="18" />
@@ -521,10 +576,10 @@
           <line>681</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Controls\UserController\CustomMediaPlayerElement.xaml.cs" initialLine="676" containingFunctionPresentation="Method 'InitPositionContent'">
             <startOffsets>
-              <option value="21634" />
+              <option value="21661" />
             </startOffsets>
             <endOffsets>
-              <option value="21654" />
+              <option value="21681" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="19" />
@@ -534,10 +589,10 @@
           <line>664</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Controls\UserController\CustomMediaPlayerElement.xaml.cs" initialLine="659" containingFunctionPresentation="Method 'InitVolumeContent'">
             <startOffsets>
-              <option value="21267" />
+              <option value="21294" />
             </startOffsets>
             <endOffsets>
-              <option value="21287" />
+              <option value="21314" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="20" />
@@ -547,10 +602,10 @@
           <line>630</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Controls\UserController\CustomMediaPlayerElement.xaml.cs" initialLine="625" containingFunctionPresentation="Method 'PlayerChanged'">
             <startOffsets>
-              <option value="19990" />
+              <option value="20017" />
             </startOffsets>
             <endOffsets>
-              <option value="20045" />
+              <option value="20072" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="22" />
@@ -560,10 +615,10 @@
           <line>609</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Controls\UserController\CustomMediaPlayerElement.xaml.cs" initialLine="604" containingFunctionPresentation="Method 'ScreenShotAsync'">
             <startOffsets>
-              <option value="18913" />
+              <option value="18940" />
             </startOffsets>
             <endOffsets>
-              <option value="18978" />
+              <option value="19005" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="23" />
@@ -752,94 +807,42 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Display/Providers/DataAccessLocal.cs</url>
-          <line>270</line>
+          <line>286</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Providers\DataAccessLocal.cs" initialLine="265" containingFunctionPresentation="Method 'GetFailFileInfoWithFailInfo'">
             <startOffsets>
-              <option value="9058" />
+              <option value="9836" />
             </startOffsets>
             <endOffsets>
-              <option value="9160" />
+              <option value="9938" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="93" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Display/Providers/DataAccessLocal.cs</url>
-          <line>113</line>
-          <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Providers\DataAccessLocal.cs" initialLine="113" containingFunctionPresentation="Method 'AddActorInfoAndReturnId'">
+          <url>file://$PROJECT_DIR$/Display/Controls/UserController/CustomAutoSuggestBox.xaml.cs</url>
+          <line>228</line>
+          <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Controls\UserController\CustomAutoSuggestBox.xaml.cs" initialLine="228" containingFunctionPresentation="Method 'ChangedFindMethod_RightTapped'">
             <startOffsets>
-              <option value="3435" />
+              <option value="6609" />
             </startOffsets>
             <endOffsets>
-              <option value="3466" />
+              <option value="6685" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="151" />
+          <option name="timeStamp" value="207" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/DataAccess/Dao/Impl/FilesInfoDao.cs</url>
-          <line>139</line>
-          <properties documentPath="D:\Work\WinUi\GitHub\Display\DataAccess\Dao\Impl\FilesInfoDao.cs" initialLine="139" containingFunctionPresentation="Method 'GetAllFileListTraverse'">
+          <line>112</line>
+          <properties documentPath="D:\Work\WinUi\GitHub\Display\DataAccess\Dao\Impl\FilesInfoDao.cs" initialLine="89" containingFunctionPresentation="Method 'RemoveByPickCode'">
             <startOffsets>
-              <option value="4144" />
+              <option value="3062" />
             </startOffsets>
             <endOffsets>
-              <option value="4245" />
+              <option value="3154" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="173" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Display/Providers/WebApi.cs</url>
-          <line>238</line>
-          <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Providers\WebApi.cs" initialLine="238" containingFunctionPresentation="Method 'TryAddFolderToDataAccess'">
-            <startOffsets>
-              <option value="7330" />
-            </startOffsets>
-            <endOffsets>
-              <option value="7408" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="174" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Display/Providers/WebApi.cs</url>
-          <line>186</line>
-          <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Providers\WebApi.cs" initialLine="186" containingFunctionPresentation="Method 'GetAllFileInfoToDataAccess'">
-            <startOffsets>
-              <option value="5495" />
-            </startOffsets>
-            <endOffsets>
-              <option value="5604" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="175" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/DataAccess/Dao/Impl/FilesInfoDao.cs</url>
-          <line>150</line>
-          <properties documentPath="D:\Work\WinUi\GitHub\Display\DataAccess\Dao\Impl\FilesInfoDao.cs" initialLine="150" containingFunctionPresentation="Method 'GetAllFileListTraverse'">
-            <startOffsets>
-              <option value="4499" />
-            </startOffsets>
-            <endOffsets>
-              <option value="4526" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="177" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/DataAccess/Dao/Impl/FilesInfoDao.cs</url>
-          <line>146</line>
-          <properties documentPath="D:\Work\WinUi\GitHub\Display\DataAccess\Dao\Impl\FilesInfoDao.cs" initialLine="146" containingFunctionPresentation="Lambda expression inside Method 'GetAllFileListTraverse'">
-            <startOffsets>
-              <option value="4389" />
-            </startOffsets>
-            <endOffsets>
-              <option value="4455" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="178" />
+          <option name="timeStamp" value="235" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -219,8 +219,13 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <oldControls:ImageEx Source="{x:Bind _videoInfo.ImageUrl,Converter={StaticResource NotExistsImagePathConverter},Mode=OneWay}"
-                                          CornerRadius="5" />
+                        <Image>
+                            <Image.Source>
+                                <BitmapImage UriSource="{x:Bind _videoInfo.ImageUrl,Converter={StaticResource NotExistsImageUriConverter},Mode=OneWay}"/>
+                            </Image.Source>
+                        </Image>
+                        <!--<oldControls:ImageEx Source="{x:Bind _videoInfo.ImageUrl,Converter={StaticResource NotExistsImagePathConverter},Mode=OneWay}"
+                                          CornerRadius="5" />-->
 
                         <StackPanel Grid.Column="1"
                                     VerticalAlignment="Center"

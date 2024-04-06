@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -18,7 +17,7 @@ namespace Display.Models.Vo.OneOneFive;
 public class DetailFileInfo : INotifyPropertyChanged
 {
     public readonly FilesInfo Datum;
-    public readonly long? Id;
+    public readonly long Id;
     public readonly bool NoId;
     public readonly long Cid;
     public readonly long Size;
@@ -54,7 +53,7 @@ public class DetailFileInfo : INotifyPropertyChanged
         Time = data.TimeEdit;
 
         // 文件
-        if (data.Fid != null)
+        if (data.Fid != default)
         {
             Type = FileType.File;
             Id = data.Fid;
@@ -88,7 +87,7 @@ public class DetailFileInfo : INotifyPropertyChanged
             IconPath ??= Constants.FileType.UnknownSvgPath;
         }
         //文件夹
-        else if (data.Fid == null && data.Pid != null)
+        else if (data.Fid == default && data.Pid != null)
         {
             Type = FileType.Folder;
             Id = data.Cid;
@@ -108,7 +107,7 @@ public class DetailFileInfo : INotifyPropertyChanged
         Size = result.FileSize;
         Sha1 = result.Sha1;
         Type = result.Type;
-        NoId = Id == null;
+        NoId = Id == default;
         Time = (int)DateTimeOffset.Now.ToUnixTimeSeconds();
 
         IsVideo = result.IsVideo;
@@ -131,7 +130,7 @@ public class DetailFileInfo : INotifyPropertyChanged
         Time = data.TimeEdit;
 
         //文件夹
-        if (data.FileId == null && data.ParentId != null)
+        if (data.FileId == default && data.ParentId != null)
         {
             Type = FileType.Folder;
             Id = data.CurrentId;
@@ -139,7 +138,7 @@ public class DetailFileInfo : INotifyPropertyChanged
             PickCode = data.PickCode;
             IconPath = Constants.FileType.FolderSvgPath;
         }
-        else if (data.FileId != null)
+        else if (data.FileId != default)
         {
             Type = FileType.File;
             Id = data.FileId;
@@ -175,7 +174,7 @@ public class DetailFileInfo : INotifyPropertyChanged
 
         }
 
-        NoId = Id == null;
+        NoId = Id == default;
     }
 
 

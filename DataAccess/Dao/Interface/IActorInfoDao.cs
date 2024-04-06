@@ -25,4 +25,5 @@ public interface IActorInfoDao : IDao<ActorInfo>
     void UpdateAllProfilePathList(string srcPath, string dstPath);
 
     ActorInfo? GetOne();
+    void ExecuteUpdateById(long id, Action<ActorInfo> updateAction);
 }

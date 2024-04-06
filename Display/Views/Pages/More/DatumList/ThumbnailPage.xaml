@@ -155,8 +155,13 @@
                 <oldControls:AdaptiveGridView.ItemTemplate>
 
                     <DataTemplate x:DataType="media1:LocalThumbnail">
-                        <oldControls:ImageEx Source="{x:Bind Thumbnail}"
-                                            Height="60" />
+
+                        <Image x:Name="ActorImage"
+                               Height="60"
+                               Source="{x:Bind Thumbnail}">
+                        </Image>
+                        <!--<oldControls:ImageEx Source="{x:Bind Thumbnail}"
+                                             Height="60" />-->
                     </DataTemplate>
                 </oldControls:AdaptiveGridView.ItemTemplate>
 

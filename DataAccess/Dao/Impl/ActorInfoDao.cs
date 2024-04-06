@@ -68,7 +68,7 @@ public class ActorInfoDao : DaoImpl<ActorInfo>, IActorInfoDao
                 BwhInfo = bwh ?? new Bwh()
             };
             
-        return actorInfoQueryable.ToList();
+        return actorInfoQueryable.AsNoTracking().ToList();
     }
 
     public List<ActorInfo> GetList(int index, int limit)
@@ -117,6 +117,17 @@ public class ActorInfoDao : DaoImpl<ActorInfo>, IActorInfoDao
         return DbSet.FirstOrDefault();
     }
 
+    public void ExecuteUpdateById(long id, Action<ActorInfo> updateAction)
+    {
+        var info = DbSet.FirstOrDefault(i => i.Id == id);
+        if (info == null) return;
+
+        updateAction.Invoke(info);
+        SaveChanges();
+    }
+
+
+
     public ActorInfo? GetPartInfoByActorName(string showName)
     {
         var query = from actorInfo in DbSet
@@ -143,7 +154,6 @@ public class ActorInfoDao : DaoImpl<ActorInfo>, IActorInfoDao
                 InfoUrl = actorInfo.InfoUrl,
                 BwhInfo = bwh ?? new Bwh()
             };
-        
         return query.FirstOrDefault();
     }
 }

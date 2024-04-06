@@ -10,21 +10,6 @@
              xmlns:vo="using:Display.Models.Vo"
              mc:Ignorable="d">
 
-    <!--<UserControl.Resources>
-        <Style TargetType="oldControls:ImageEx"
-               x:Key="NewAddCoverResources">
-            <Setter Property="MaxHeight"
-                    Value="210" />
-            <Setter Property="MaxWidth"
-                    Value="300" />
-            <Setter Property="MinHeight"
-                    Value="200" />
-            <Setter Property="MinWidth"
-                    Value="300" />
-            <Setter Property="Stretch"
-                    Value="UniformToFill" />
-        </Style>
-    </UserControl.Resources>-->
 
     <StackPanel Padding="5">
         <RelativePanel>

@@ -9,21 +9,16 @@ namespace Display.Converter;
 /// <summary>
 /// imagePath is empty or not exists => $"{NoPicturePath}"
 /// </summary>
-internal class NotExistsImagePathConverter : IValueConverter
+internal class NotExistsImageUriConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        ImageSource imageSource;
         if (value is string imagePath && File.Exists(imagePath))
         {
-            imageSource = new BitmapImage(new Uri(imagePath));
-
-            return imageSource;
+            return new Uri(imagePath);
         }
 
-        imageSource = new BitmapImage(new Uri(Constants.FileType.NoPicturePath));
-
-        return imageSource;
+        return new Uri(Constants.FileType.NoPicturePath);
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)

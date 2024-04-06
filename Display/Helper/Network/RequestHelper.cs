@@ -26,7 +26,7 @@ internal static class RequestHelper
             try
             {
                 // 设置超时时间（5s）
-                var timeoutCancelToken = new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token;
+                var timeoutCancelToken = new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token;
 
                 // 添加额外的退出条件
                 var compositeCancel = CancellationTokenSource.CreateLinkedTokenSource(timeoutCancelToken, token);

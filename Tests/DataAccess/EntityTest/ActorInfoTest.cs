@@ -17,7 +17,7 @@ public class ActorInfoTest
         {
             IsLike = 1
         };
-        _actorInfoDao.UpdateSingle(actorInfo);
+        _actorInfoDao.ExecuteUpdate(actorInfo);
 
         Debug.WriteLine(actorInfo);
     }

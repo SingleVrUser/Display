@@ -17,12 +17,12 @@ public interface IVideoInfoDao : IDao<VideoInfo>
     /// <param name="name"></param>
     void ExecuteRemoveByName(string name);
 
-    void UpdateCompleted(VideoInfo info);
 
     void UpdateAllImagePathList(string srcPath, string dstPath);
-    VideoInfo[] GetLookLaterList(int limit);
+    Task<VideoInfo[]> GetLookLaterListAsync(int limit);
 
-    VideoInfo[] GetLikeList(int limit);
-    VideoInfo[] GetRandomList(int limit);
-    VideoInfo[] GetRecentList(int limit);
+    Task<VideoInfo[]> GetLikeListAsync(int limit);
+    Task<VideoInfo[]> GetRecentListAsync(int limit);
+
+    void ExecuteUpdateByTrueName(string trueName, Action<VideoInfo> updateAction);
 }

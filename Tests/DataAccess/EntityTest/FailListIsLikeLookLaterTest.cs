@@ -31,7 +31,7 @@ public class FailListIsLikeLookLaterTest
         if (info == null) return;
 
         // 增
-        _dataList.ForEach(_dao.Add);
+        _dataList.ForEach(_dao.ExecuteAdd);
 
         // 查
         // 查询全部
@@ -54,7 +54,7 @@ public class FailListIsLikeLookLaterTest
 
         // 改
         info.IsLike = 1;
-        _dao.UpdateSingle(info);
+        _dao.ExecuteUpdate(info);
 
         databaseVideoInfo = _dao.Find(info.PickCode);
         Assert.AreEqual(info, databaseVideoInfo);

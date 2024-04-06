@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using DataAccess.Models.Entity;
 using Display.Helper.Data;
-using Display.Models.Entities.OneOneFive;
 using Display.Models.Spider;
 
 namespace Display.Models.Vo.Spider;

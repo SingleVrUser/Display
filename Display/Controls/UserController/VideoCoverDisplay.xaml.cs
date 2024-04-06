@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -332,7 +331,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
         //失败列表不调整
         if (IsShowFailListView) return;
 
-        if (gridWidth == -1)
+        if (gridWidth <= 0)
             gridWidth = BasicGridView.ActualWidth;
 
         var imageCountPerRow = Math.Floor(gridWidth / (_markSliderValue + HorizontalPadding));
@@ -365,45 +364,39 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     {
         if (SuccessInfoCollection == null) return;
 
-        var height = width / 3 * 2;
+        //var height = width / 3 * 2;
 
         foreach (var t in SuccessInfoCollection)
         {
             t.ImageWidth = width;
-            t.ImageHeight = height;
         }
 
         //更改应用设置
-        ImageSize = new Tuple<double, double>(width, height);
+        ImageWidth = width;
 
         //当前匹配的是成功
         //更新获取图片大小的值
         if (IsShowSuccessListView)
         {
-            SuccessInfoCollection.SetImageSize(width, height);
+            SuccessInfoCollection.SetImageSize(width);
         }
     }
 
+    private double? _imageWidth;
 
-    private Tuple<double, double> _imageSize;
-    private Tuple<double, double> ImageSize
+    public double ImageWidth
     {
         get
         {
-            _imageSize ??= new Tuple<double, double>(AppSettings.ImageWidth, AppSettings.ImageHeight);
-
-            return _imageSize;
+            _imageWidth ??= AppSettings.ImageWidth;
+            return _imageWidth.Value;
         }
         set
         {
-            var imageWidth = value.Item1;
-            var imageHeight = value.Item2;
-
-            _imageSize = new Tuple<double, double>(imageWidth, imageHeight);
-
-            AppSettings.ImageWidth = imageWidth;
-            AppSettings.ImageHeight = imageHeight;
+            _imageWidth = value;
+            AppSettings.ImageWidth = value;
         }
+
     }
 
     private void MoreButton_Click(object sender, RoutedEventArgs e)
@@ -414,8 +407,8 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     /// <summary>
     /// 鼠标悬停在Grid，显示可操作按钮
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void Grid_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
         if (sender is not Grid grid) return;
@@ -458,7 +451,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
         videoInfo.IsLike = button.IsChecked == true ? 1 : 0;
 
-        _videoInfoDao.UpdateSingle(new VideoInfo
+        _videoInfoDao.ExecuteUpdate(new VideoInfo
         {
             TrueName = videoInfo.TrueName,
             IsLike = videoInfo.IsLike
@@ -471,14 +464,14 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
         info.IsLike = button.IsChecked == true ? 1 : 0;
 
-        _failListIsLikeLookLaterDao.UpdateSingle(new FailListIsLikeLookLater(){PickCode = info.PickCode, IsLike = info.IsLike});
+        _failListIsLikeLookLaterDao.ExecuteUpdate(new FailListIsLikeLookLater(){PickCode = info.PickCode, IsLike = info.IsLike});
     }
 
     /// <summary>
     /// 点击了稍后观看
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void LookLaterToggleButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not AppBarToggleButton { DataContext: VideoInfoVo videoInfo } button) return;
@@ -486,7 +479,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
         videoInfo.LookLater = button.IsChecked == true ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
 
         
-        _videoInfoDao.UpdateSingle(new VideoInfo
+        _videoInfoDao.ExecuteUpdate(new VideoInfo
         {
             TrueName = videoInfo.TrueName,
             LookLater = videoInfo.LookLater
@@ -499,7 +492,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
         info.LookLater = button.IsChecked == true ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
 
-        _failListIsLikeLookLaterDao.UpdateSingle(new FailListIsLikeLookLater(){PickCode = info.PickCode, LookLater = info.LookLater});
+        _failListIsLikeLookLaterDao.ExecuteUpdate(new FailListIsLikeLookLater(){PickCode = info.PickCode, LookLater = info.LookLater});
     }
 
     /// <summary>
@@ -514,7 +507,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
         var score = videoInfo.Score == 0 ? -1 : sender.Value;
 
         
-        _videoInfoDao.UpdateSingle(new VideoInfo
+        _videoInfoDao.ExecuteUpdate(new VideoInfo
         {
             TrueName = videoInfo.TrueName,
             Score = (int)score
@@ -533,7 +526,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
         var score = info.Score == 0 ? -1 : sender.Value;
 
-        _failListIsLikeLookLaterDao.UpdateSingle(new FailListIsLikeLookLater(){PickCode = info.PickCode, Score = (int)score});
+        _failListIsLikeLookLaterDao.ExecuteUpdate(new FailListIsLikeLookLater(){PickCode = info.PickCode, Score = (int)score});
     }
 
 
@@ -557,19 +550,19 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     /// <summary>
     /// 按类型排序（用于成功列表）
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void OrderSuccessListView_ItemClick(object sender, ItemClickEventArgs e)
     {
-        ListView selectListView = (ListView)sender;
+        var selectListView = (ListView)sender;
         var clickStackPanel = e.ClickedItem as StackPanel;
         var selectTextBlock = clickStackPanel.Children.First(x => x is TextBlock) as TextBlock;
-        string selectOrderText = selectTextBlock.Text;
+        var selectOrderText = selectTextBlock.Text;
 
         var lastFontIcon = clickStackPanel.Children.Last(x => x is FontIcon) as FontIcon;
 
-        string upGlyph = "\xE014";
-        string downGlyph = "\xE015";
+        var upGlyph = "\xE014";
+        var downGlyph = "\xE015";
         string newGlyph;
 
         //原图标
@@ -626,8 +619,8 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     /// <summary>
     /// 按类型排序（用于失败列表）
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void OrderFailListView_ItemClick(object sender, ItemClickEventArgs e)
     {
         if (e.ClickedItem is not StackPanel clickStackPanel) return;
@@ -697,7 +690,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
         AllFailInfoCollection.OrderBy = FailListOrderBy;
         AllFailInfoCollection.IsDesc = FailListIsDesc;
-        var lists =  DataAccessLocal.Get.GetFailFileInfoWithFilesInfo(0, 30, _localCheckText, orderBy: FailListOrderBy, isDesc: FailListIsDesc);
+        var lists = await DataAccessLocal.Get.GetFailFileInfoWithFilesInfoAsync(0, 30, _localCheckText, orderBy: FailListOrderBy, isDesc: FailListIsDesc);
         lists?.ForEach(AllFailInfoCollection.Add);
 
 
@@ -797,9 +790,8 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     private async void TrySwitchToSuccessView()
     {
         //更新GridView的来源
-        var imgSize = ImageSize;
 
-        SuccessInfoCollection ??= new IncrementalLoadSuccessInfoCollection(imgSize.Item1, imgSize.Item2);
+        SuccessInfoCollection ??= new IncrementalLoadSuccessInfoCollection(ImageWidth);
         SuccessInfoCollection.SetFilter(_filterConditionList, _filterKeywords, _isFuzzyQueryActor);
         await SuccessInfoCollection.LoadData();
 
@@ -809,8 +801,8 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
         if (BasicGridView.Visibility == Visibility.Collapsed) BasicGridView.Visibility = Visibility.Visible;
 
         //初始化Slider的值
-        _markSliderValue = imgSize.Item1;
-        ImageSizeChangeSlider.Value = imgSize.Item1;
+        _markSliderValue = ImageWidth;
+        ImageSizeChangeSlider.Value = ImageWidth;
 
         //开始监听调整图片大小的Slider
         StartListeningSliderValueChanged();
@@ -1046,7 +1038,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
     private async void LoadDstSuccessInfoCollection()
     {
-        SuccessInfoCollection = new IncrementalLoadSuccessInfoCollection(ImageSize.Item1, ImageSize.Item2);
+        SuccessInfoCollection = new IncrementalLoadSuccessInfoCollection(ImageWidth);
         BasicGridView.ItemsSource = SuccessInfoCollection;
 
         SuccessInfoCollection.SetOrder(SuccessListOrderBy, SuccessListIsDesc);
@@ -1074,7 +1066,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
         var isLike = (bool)isLikeButton.IsChecked ? 1 : 0;
 
-        _actorInfoDao.UpdateSingle(new ActorInfo
+        _actorInfoDao.ExecuteUpdate(new ActorInfo
         {
             Id = actorId,
             IsLike = isLike
@@ -1199,7 +1191,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
         if (failInfo == null)
         {
-            _failListIsLikeLookLaterDao.Add(new FailListIsLikeLookLater()
+            _failListIsLikeLookLaterDao.ExecuteAdd(new FailListIsLikeLookLater()
             {
                 PickCode = pickCode,
                 IsLike = 1
@@ -1213,7 +1205,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
             switch (failInfo.IsLike)
             {
                 case 0:
-                    _failListIsLikeLookLaterDao.UpdateSingle(new FailListIsLikeLookLater()
+                    _failListIsLikeLookLaterDao.ExecuteUpdate(new FailListIsLikeLookLater()
                     {
                         PickCode = pickCode,
                         IsLike = 1
@@ -1239,7 +1231,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
         if (failInfo == null)
         {
-            _failListIsLikeLookLaterDao.Add(new FailListIsLikeLookLater()
+            _failListIsLikeLookLaterDao.ExecuteAdd(new FailListIsLikeLookLater()
             {
                 PickCode = pickCode,
                 IsLike = 1
@@ -1254,7 +1246,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
             switch (failInfo.LookLater)
             {
                 case 0:
-                    _failListIsLikeLookLaterDao.UpdateSingle(new FailListIsLikeLookLater
+                    _failListIsLikeLookLaterDao.ExecuteUpdate(new FailListIsLikeLookLater
                     {
                         PickCode = pickCode, LookLater = DateTimeOffset.Now.ToUnixTimeSeconds()
                     });

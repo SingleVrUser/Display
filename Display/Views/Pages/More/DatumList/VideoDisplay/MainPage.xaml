@@ -31,7 +31,15 @@
         </Style>
     </Page.Resources>
 
-    <Grid>
+    <Grid KeyboardAcceleratorPlacementMode="Hidden">
+        <Grid.KeyboardAccelerators>
+            <KeyboardAccelerator Key="W"
+                                 Modifiers="Control"
+                                 Invoked="CloseMediaPlayer_Invoked" />
+            <KeyboardAccelerator Key="D"
+                                 Modifiers="Control"
+                                 Invoked="Deleted115File_Invoked" />
+        </Grid.KeyboardAccelerators>
         <SplitView x:Name="RootSplitView" PanePlacement="Right" IsPaneOpen="True" DisplayMode="Inline" OpenPaneLength="380">
             <SplitView.Pane>
                 <Pivot x:Name="VideoPlayPivot"
@@ -157,7 +165,7 @@
                                                     <Grid CornerRadius="5"
                                                           HorizontalAlignment="Center"
                                                           VerticalAlignment="Center">
-                                                        <Image Source="{x:Bind VideoInfo.ImagePath, Mode=OneWay}"
+                                                        <Image Source="{x:Bind VideoInfoVo.ImagePath, Mode=OneWay}"
                                                                Height="230" />
 
                                                         <Button x:Name="EnlargeButton"
@@ -174,10 +182,10 @@
 
                                                     <StackPanel Grid.Row="1"
                                                                 HorizontalAlignment="Center">
-                                                        <TextBlock Text="{x:Bind VideoInfo.TrueName, Mode=OneWay}"
+                                                        <TextBlock Text="{x:Bind VideoInfoVo.TrueName, Mode=OneWay}"
                                                                        IsTextSelectionEnabled="True" />
-                                                        <TextBlock Text="{x:Bind VideoInfo.ReleaseTime, Mode=OneWay}" />
-                                                        <userController:TextBlockWithLongText StringValue="{x:Bind VideoInfo.Actor, Mode=OneWay}" />
+                                                        <TextBlock Text="{x:Bind VideoInfoVo.ReleaseTime, Mode=OneWay}" />
+                                                        <userController:TextBlockWithLongText StringValue="{x:Bind VideoInfoVo.Actor, Mode=OneWay}" />
                                                     </StackPanel>
 
                                                     <StackPanel Orientation="Horizontal"
@@ -271,7 +279,6 @@
                                         SnapsTo="Ticks" />
                                 <Slider Header="起始位置"
                                         Value="{x:Bind providers:AppSettings.AutoPlayPositionPercentage,Mode=TwoWay}" />
-
 
                             <ToggleSwitch Header="从网络中搜刮信息"
                                           IsOn="{x:Bind providers:AppSettings.IsAutoSpiderInVideoDisplay,Mode=TwoWay}" />

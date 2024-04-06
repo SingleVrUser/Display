@@ -12,7 +12,6 @@
 
     <StackPanel Spacing="10">
 
-
         <ListView ItemsSource="{x:Bind _conditionCheckItems}" SelectionMode="None">
             <ListView.Header>
                 <!--标题-->

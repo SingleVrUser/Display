@@ -471,14 +471,14 @@ public abstract class AppSettings
         set => SetValue(value);
     }
 
-    /// <summary>
-    /// 图片高度
-    /// </summary>
-    public static double ImageHeight
-    {
-        get => GetValue(Ui.ImageSize.Height);
-        set => SetValue(value);
-    }
+    ///// <summary>
+    ///// 图片高度
+    ///// </summary>
+    //public static double ImageHeight
+    //{
+    //    get => GetValue(Ui.ImageSize.Height);
+    //    set => SetValue(value);
+    //}
 
     /// <summary>
     /// 是否动态调整图片大小

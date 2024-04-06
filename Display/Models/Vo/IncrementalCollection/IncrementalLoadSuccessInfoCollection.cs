@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Display.Models.Dto.OneOneFive;
 using Display.Providers;
 using Microsoft.UI.Xaml.Data;
 using SharpCompress;
+using DataAccess;
 
 namespace Display.Models.Vo.IncrementalCollection;
 
 public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoInfoVo>, ISupportIncrementalLoading
 {
-    private const int DefaultCount = 30;
     private double ImageWidth { get; set; }
-    private double ImageHeight { get; set; }
+    //private double ImageHeight { get; set; }
     private bool IsFuzzyQueryActor { get; set; }
 
     private bool IsContainFail => FilterConditionList != null && FilterConditionList.Contains("fail");
@@ -38,33 +38,31 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoIn
 
     }
 
-    public IncrementalLoadSuccessInfoCollection(double imgWidth, double imgHeight)
+    public IncrementalLoadSuccessInfoCollection(double imgWidth)
     {
-        SetImageSize(imgWidth, imgHeight);
+        SetImageSize(imgWidth);
     }
 
-    public Task LoadData(int startShowCount = 20)
+    public async Task LoadData(int startShowCount = 20)
     {
         Clear();
-        var newItems = DataAccessLocal.Get.GetVideoInfo(startShowCount, 0, OrderBy, IsDesc, FilterConditionList, FilterKeywords, Ranges, IsFuzzyQueryActor);
+        var newItems = await DataAccessLocal.Get.GetVideoInfoAsync(startShowCount, 0, OrderBy, IsDesc, FilterConditionList, FilterKeywords, Ranges, IsFuzzyQueryActor);
 
-        var successCount = DataAccessLocal.Get.GetCountOfVideoInfo(FilterConditionList, FilterKeywords, Ranges);
+        var successCount = await DataAccessLocal.Get.GetCountOfVideoInfoAsync(FilterConditionList, FilterKeywords, Ranges);
         var failCount = 0;
         if (IsContainFail)
         {
-            failCount = DataAccessLocal.Get.GetCountOfFailFileInfoWithFilesInfo(0, -1, FilterKeywords);
+            failCount = await DataAccessLocal.Get.GetCountOfFailFileInfoWithFilesInfoAsync(0, -1, FilterKeywords);
         }
 
         AllCount = successCount + failCount;
 
-        newItems?.ForEach(item => Add(new VideoInfoVo(item, ImageWidth, ImageHeight)));
-        return Task.CompletedTask;
+        newItems?.ForEach(item => Add(new VideoInfoVo(item, ImageWidth)));
     }
 
-    public void SetImageSize(double imgWidth, double imgHeight)
+    public void SetImageSize(double imgWidth)
     {
         ImageWidth = imgWidth;
-        ImageHeight = imgHeight;
     }
 
     public void SetFilter(List<string> filterConditionList, string filterKeywords, bool isFuzzyQueryActor)
@@ -88,17 +86,18 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoIn
 
     public IAsyncOperation<LoadMoreItemsResult> LoadMoreItemsAsync(uint count)
     {
-        return InnerLoadMoreItemsAsync().AsAsyncOperation();
+        Debug.WriteLine("请求加载:"+count);
+
+        return InnerLoadMoreItemsAsync((int)count).AsAsyncOperation();
     }
 
-
-    private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync()
+    private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(int count)
     {
-        var lists = DataAccessLocal.Get.GetVideoInfo(DefaultCount, Count, OrderBy, IsDesc, FilterConditionList, FilterKeywords, Ranges, IsFuzzyQueryActor);
+        var lists = await DataAccessLocal.Get.GetVideoInfoAsync(count, Count, OrderBy, IsDesc, FilterConditionList, FilterKeywords, Ranges, IsFuzzyQueryActor);
 
         //在最后的时候加载匹配失败的
         //用于展示搜索结果
-        if (lists == null || lists.Length < DefaultCount)
+        if (lists == null || lists.Length < count)
         {
             HasMoreItems = false;
 
@@ -106,7 +105,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoIn
             //无筛选功能
             if (IsContainFail)
             {
-                var failList = DataAccessLocal.Get.GetFailFileInfoWithFilesInfo(0, -1, FilterKeywords);
+                var failList = await DataAccessLocal.Get.GetFailFileInfoWithFilesInfoAsync(0, -1, FilterKeywords);
                 
                 foreach (var filesInfo in failList)
                 {
@@ -118,11 +117,10 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoIn
             }
         }
 
-        lists?.ForEach(item => Add(new VideoInfoVo(item, ImageWidth, ImageHeight)));
+        lists?.ForEach(item => Add(new VideoInfoVo(item, ImageWidth)));
 
-        return new LoadMoreItemsResult
-        {
-            Count = (uint)(lists?.Length ?? 0)
-        };
+        var result = new LoadMoreItemsResult((uint)(lists?.Length ?? 0));
+
+        return result;
     }
 }

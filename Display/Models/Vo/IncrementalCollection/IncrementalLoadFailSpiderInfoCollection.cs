@@ -11,14 +11,14 @@ namespace Display.Models.Vo.IncrementalCollection;
 
 public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<FailDatum>, ISupportIncrementalLoading
 {
-    public void LoadData(int startShowCount = 20)
+    public async void LoadData(int startShowCount = 20)
     {
-        var newItems = DataAccessLocal.Get.GetFailFileInfoWithFilesInfo(0, startShowCount, showType: ShowType);
+        var newItems = await DataAccessLocal.Get.GetFailFileInfoWithFilesInfoAsync(0, startShowCount, showType: ShowType);
 
         if (Count == 0)
         {
             HasMoreItems = true;
-            AllCount = DataAccessLocal.Get.GetCountOfFailFilesInfoFiles(showType: ShowType);
+            AllCount = await DataAccessLocal.Get.GetCountOfFailFilesInfoFilesAsync(showType: ShowType);
         }
         else
             Clear();
@@ -45,12 +45,12 @@ public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<Fail
     public string OrderBy { get; set; }
     public bool IsDesc { get; set; }
 
-    private Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
+    private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(uint count)
     {
-        var failLists = DataAccessLocal.Get.GetFailFileInfoWithFilesInfo(Items.Count, (int)count, showType: ShowType);
+        var failLists = await DataAccessLocal.Get.GetFailFileInfoWithFilesInfoAsync(Items.Count, (int)count, showType: ShowType);
         if (failLists is null)
         {
-            return Task.FromResult(new LoadMoreItemsResult(0));
+            return new LoadMoreItemsResult(0);
         }
 
         if (failLists.Length < count)
@@ -60,9 +60,9 @@ public class IncrementalLoadFailSpiderInfoCollection : ObservableCollection<Fail
 
         failLists.ForEach(item => Add(new FailDatum(item)));
 
-        return Task.FromResult(new LoadMoreItemsResult
+        return new LoadMoreItemsResult
         {
             Count = (uint)failLists.Length
-        });
+        };
     }
 }

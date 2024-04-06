@@ -12,7 +12,7 @@ public static class DefaultSettings
         public static class ImageSize
         {
             public const double Width = 500;
-            public const double Height = 300;
+            //public const int Height = 300;
         }
 
         public const bool IsAutoAdjustImageSize = true;

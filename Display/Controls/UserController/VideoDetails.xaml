@@ -205,7 +205,7 @@
 
                         <Image x:FieldModifier="public"
                                x:Name="CoverImage"
-                               Source="{x:Bind ResultInfo.ImagePath}"
+                               Source="{x:Bind ResultInfo.ImagePath, Converter={StaticResource NotExistsImageBitmapConverter}}"
                                HorizontalAlignment="Left"
                                VerticalAlignment="Center"
                                MaxHeight="500" />
@@ -258,6 +258,7 @@
                                        FontSize="26"
                                        FontWeight="Bold" />
 
+                            <!--NavigateUri为空时会报错-->
                             <HyperlinkButton NavigateUri="{x:Bind ResultInfo.Url,Mode=OneWay}"
                                              Opacity="1"
                                              CornerRadius="10"
@@ -425,7 +426,19 @@
                                                 </VisualStateGroup>
                                             </VisualStateManager.VisualStateGroups>
 
-                                            <oldControls:ImageEx x:Name="Thumbnail_Image"
+
+                                            <Image x:Name="Thumbnail_Image"
+                                                   Stretch="UniformToFill"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   PointerEntered="Thumbnail_Image_PointerEntered"
+                                                   PointerExited="Thumbnail_Image_PointerExited">
+                                                <Image.Source>
+                                                    <BitmapImage UriSource="{x:Bind}" />
+                                                </Image.Source>
+                                            </Image>
+
+                                            <!--<oldControls:ImageEx x:Name="Thumbnail_Image"
                                                               Source="{x:Bind}"
                                                               Stretch="UniformToFill"
                                                               PlaceholderSource="/Assets/NoPicture.jpg"
@@ -433,7 +446,7 @@
                                                               HorizontalAlignment="Center"
                                                               VerticalAlignment="Center"
                                                               PointerEntered="Thumbnail_Image_PointerEntered"
-                                                              PointerExited="Thumbnail_Image_PointerExited" />
+                                                              PointerExited="Thumbnail_Image_PointerExited" />-->
 
                                             <Button x:Name="EnlargeButton"
                                                     BorderThickness="0"

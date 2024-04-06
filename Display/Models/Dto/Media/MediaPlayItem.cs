@@ -65,7 +65,7 @@ public class MediaPlayItem
     }
 
     public MediaPlayItem(FilesInfo datum)
-        : this(datum.PickCode, datum.Name, datum.CurrentId, datum.FileId, datum.Size, datum.FileId is null ? FileType.Folder : FileType.File)
+        : this(datum.PickCode, datum.Name, datum.CurrentId, datum.FileId, datum.Size, datum.FileId == default ? FileType.Folder : FileType.File)
     {
     }
 

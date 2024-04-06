@@ -64,12 +64,11 @@ internal static class HttpClientExtension
     {
         return await SendAsync(client, request, CancellationToken.None, completionOption, defaultValue);
     }
+
     public static async Task<T> SendAsync<T>(this HttpClient client, HttpMethod method, string url, CancellationToken token, HttpContent content = null, HttpCompletionOption completionOption = HttpCompletionOption.ResponseHeadersRead, T defaultValue = default)
     {
-        using var request = new HttpRequestMessage(method, url)
-        {
-            Content = content
-        };
+        using var request = new HttpRequestMessage(method, url);
+        request.Content = content;
 
         return await SendAsync(client, request, token, completionOption, defaultValue);
     }

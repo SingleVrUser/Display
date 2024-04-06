@@ -9,7 +9,6 @@ using Windows.Storage;
 using Windows.System;
 using Display.Helper.Date;
 using Display.Models.Api.OneOneFive.File;
-using Display.Models.Dto.OneOneFive;
 using Display.Models.Enums;
 using Display.Models.Enums.OneOneFive;
 using Display.Models.Vo;
@@ -108,9 +107,7 @@ public sealed partial class Progress
             // 文件夹
             else
             {
-                if (info.Id == null) continue;
-
-                var cid = (long)info.Id;
+                var cid = info.Id;
 
                 //cid为0（根目录）无法使用GetFolderCategory接口获取文件信息，故将0目录变为0目录下的目录
                 if (cid == 0)
@@ -128,9 +125,13 @@ public sealed partial class Progress
             }
         }
 
-        foreach (var folderInfo in filesWithoutRootList.Where(i => i.Type == FileType.Folder && i.Id != null))
+        ParentPath[] parentPaths = null;
+
+        foreach (var folderInfo in filesWithoutRootList
+                     .Where(i => i.Type == FileType.Folder))
         {
-            var item = await _webapi.GetFolderCategory((long)folderInfo.Id!);
+            var item = await _webapi.GetFolderCategory(folderInfo.Id);
+            parentPaths ??= item.Paths;
 
             //添加文件和文件夹数量
             _overallCount += item.folder_count;
@@ -161,14 +162,14 @@ public sealed partial class Progress
         //进度条
         var progress = new Progress<GetFileProgressIProgress>(progressPercent =>
         {
-            switch (progressPercent.status)
+            switch (progressPercent.Status)
             {
                 //正常
                 case ProgressStatus.normal:
-                    _successCount = progressPercent.getFilesProgressInfo.AllCount;
+                    _successCount = progressPercent.GetFilesProgressInfo.AllCount;
                     UpdateProgress();
-                    CpsTextBlock.Text = $"{progressPercent.sendCountPerMinutes} 次/分钟";
-                    LeftTimeRun.Text = DateHelper.ConvertDoubleToLengthStr(1.5 * (_folderCount - progressPercent.getFilesProgressInfo.FolderCount));
+                    CpsTextBlock.Text = $"{progressPercent.SendCountPerMinutes} 次/分钟";
+                    LeftTimeRun.Text = DateHelper.ConvertDoubleToLengthStr(1.5 * (_folderCount - progressPercent.GetFilesProgressInfo.FolderCount));
                     //updateSendSpeed(progressPercent.sendCountPerSecond);
                     break;
                 case ProgressStatus.done:
@@ -188,8 +189,11 @@ public sealed partial class Progress
 
                         FailExpander.IsExpanded = true;
 
-                        FailListView.ItemsSource = progressPercent.getFilesProgressInfo?.FailCid;
-                        FailCountTextBlock.Text = progressPercent.getFilesProgressInfo?.FailCid.Count.ToString();
+                        if (progressPercent.GetFilesProgressInfo is not null)
+                        {
+                            FailListView.ItemsSource = progressPercent.GetFilesProgressInfo.FailCid;
+                            FailCountTextBlock.Text = progressPercent.GetFilesProgressInfo.FailCid.Count.ToString();
+                        }
 
                         //通知
                         TryToast("任务已结束", $"完成情况：{_successCount}/{_overallCount}，问题不大 😋");
@@ -221,6 +225,9 @@ public sealed partial class Progress
         // 2.获取数据，获取所有文件的全部信息（大小和数量）
         await _webapi.GetAllFileInfoToDataAccess(filesWithoutRootList, _sCts.Token, progress);
 
+        // 最后检查数据库中存在根目录，若没有根目录，后续就无法正常展示数据库文件
+        await _webapi.AddRootFolderInfoIfNotExists(parentPaths, filesWithoutRootList.FirstOrDefault(), _sCts.Token);
+
         _currentWindow.Closed -= CurrentWindow_Closed;
 
         //搜刮完成,是否自动搜刮
@@ -229,7 +236,7 @@ public sealed partial class Progress
             //提示将会开始搜刮
             WillStartSpiderTaskTip.IsOpen = true;
 
-            await Task.Delay(1000, _sCts.Token);
+            await Task.Delay(3000, _sCts.Token);
 
             if (_sCts.Token.IsCancellationRequested) return;
 

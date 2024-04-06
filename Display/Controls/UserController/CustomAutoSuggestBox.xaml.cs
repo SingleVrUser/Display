@@ -6,7 +6,6 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Windows.Foundation;
 using DataAccess.Dao.Interface;
@@ -24,9 +23,13 @@ public sealed partial class CustomAutoSuggestBox
 
     private readonly ISearchHistoryDao _searchHistoryDao = App.GetService<ISearchHistoryDao>();
 
+    private readonly List<SearchHistory> _historySearchItemList;
+
     public CustomAutoSuggestBox()
     {
         InitializeComponent();
+            
+        _historySearchItemList = _searchHistoryDao.List().OrderByDescending(i=>i.Id).ToList();
     }
     
     //输入的Text改变
@@ -78,7 +81,6 @@ public sealed partial class CustomAutoSuggestBox
         var allSelectedButtons = GetAllSelectedMethodButton();
         var selectedTypes = allSelectedButtons.Where(item => item.IsChecked).ToList().Select(item => item.Tag.ToString()).ToList();
 
-
         return selectedTypes;
     }
 
@@ -94,13 +96,7 @@ public sealed partial class CustomAutoSuggestBox
                 QuerySubmitted?.Invoke(sender, args);
             }
 
-            var keyword = args.QueryText;
-            if (!string.IsNullOrEmpty(keyword))
-            {
-                //保存到数据库
-                _searchHistoryDao.Add(new SearchHistory {Keyword = keyword});
-            }
-            
+            TrySaveSearchHistory(args.QueryText);
         }
 
         //初始化搜索框
@@ -108,15 +104,17 @@ public sealed partial class CustomAutoSuggestBox
         sender.ItemsSource = null;
     }
 
-    //选中AutoSuggest的选项值
-    //public event TypedEventHandler<AutoSuggestBox, AutoSuggestBoxSuggestionChosenEventArgs> SuggestionChosen;
-    //private void AutoSuggestBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
-    //{   
-    //    //准备动画
-    //    ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", sender);
-
-    //    SuggestionChosen?.Invoke(sender, args);
-    //}
+    private void TrySaveSearchHistory(string keyword)
+    {
+        if (string.IsNullOrEmpty(keyword) ||
+            _historySearchItemList.FirstOrDefault(i => i.Keyword == keyword) != null) return;
+        
+        var searchHistory = new SearchHistory {Keyword = keyword};
+        _historySearchItemList.Insert(0,searchHistory);
+            
+        //保存到数据库
+        _searchHistoryDao.ExecuteAdd(searchHistory);
+    }
 
     private void NavViewSearchBox_GotFocus(object sender, RoutedEventArgs e)
     {
@@ -129,7 +127,7 @@ public sealed partial class CustomAutoSuggestBox
 
     private void ShowHistorySearch()
     {
-        var searchHistories = _searchHistoryDao.List().ToArray();
+        var searchHistories = _historySearchItemList.ToArray();
         NavViewSearchBox.ItemsSource = new List<HistorySearchItem>
         {
             new(searchHistories)
@@ -289,7 +287,7 @@ public sealed partial class CustomAutoSuggestBox
         var keyword = NavViewSearchBox.Text;
         SuggestionItemTapped?.Invoke(sender, keyword);
 
-        _searchHistoryDao.Add(new SearchHistory {Keyword = keyword});
+        TrySaveSearchHistory(keyword);
     }
 
     private bool _isBusy;
@@ -302,9 +300,10 @@ public sealed partial class CustomAutoSuggestBox
         NavViewSearchBox.IsSuggestionListOpen = true;
         NavViewSearchBox.Text = keyword;
     }
-
+    
     private void ClearSearchHistoryClick(object sender, RoutedEventArgs e)
     {
+        _historySearchItemList.Clear();
         _searchHistoryDao.Delete();
         NavViewSearchBox.ItemsSource = null;
     }

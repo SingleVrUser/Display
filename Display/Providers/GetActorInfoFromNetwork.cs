@@ -37,7 +37,6 @@ public static class GetActorInfoFromNetwork
         var profileNodes = htmlDoc.DocumentNode.SelectNodes("/html/body/section/section/section/div[@class='act-profile']/table/tr");
         if (profileNodes == null) return null;
 
-
         var otherNames = new List<string>();
 
         foreach (var profileNode in profileNodes)

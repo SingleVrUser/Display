@@ -89,14 +89,14 @@ public sealed partial class ActorImage
                 break;
         }
 
-        _actorInfoDao.UpdateSingle(new ActorInfo {Id = ActorInfo.Id, IsLike = isLike});
+        _actorInfoDao.ExecuteUpdate(new ActorInfo {Id = ActorInfo.Id, IsLike = isLike});
     }
 
     private async void GetInfoMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
     {
         GetActorInfoProgressRing.Visibility = Visibility.Visible;
 
-        var newInfo = await ActorsPage.GetActorInfo(ActorInfo);
+        var newInfo = await ActorsPage.UpdateActorInfo(ActorInfo);
         if (newInfo == null)
         {
             GetActorInfoProgressRing.Visibility = Visibility.Collapsed;

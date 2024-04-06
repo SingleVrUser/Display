@@ -13,7 +13,7 @@ public class SearchDatum
     public long Cid { get; set; }
 
     [JsonProperty(propertyName: "fid")]
-    public long? Fid { get; set; }
+    public long Fid { get; set; }
 
     [JsonProperty(propertyName: "pid")]
     public long? Pid { get; set; }

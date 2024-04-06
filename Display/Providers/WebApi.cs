@@ -167,6 +167,80 @@ internal class WebApi
     }
 
     /// <summary>
+    /// 检查是否能通过文件夹id向上查询到根目录(cid = 0)，如果不存在，则根据文件夹id添加
+    /// 若没有，后续就无法正常展示数据库文件
+    /// </summary>
+    /// <param name="parentPaths"></param>
+    /// <param name="filesInfo"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public async Task AddRootFolderInfoIfNotExists(ParentPath[] parentPaths, DetailFileInfo filesInfo, CancellationToken token)
+    {
+        if (parentPaths != null)
+        {
+            foreach (var parentPath in parentPaths)
+            {
+                var id = parentPath.FileId;
+
+                if (id == 0) continue;
+
+                // 检查是否存在
+                if(_filesInfoDao.IsFolderExistsById(id)) continue;
+
+                // 如果不存在
+                await TryAddFolderInfoById(id);
+            }
+
+            return;
+        }
+
+        // parentPaths为空，说明之前没有获取到文件夹信息
+        if (filesInfo == null) return;
+
+
+        var currentFolderId = filesInfo.Id;
+        var parentFolderId = filesInfo.Cid;
+        while (token.IsCancellationRequested)
+        {
+            // 从数据库中查看上一级的目录信息
+            var upperFolderInfo = _filesInfoDao.GetUpperLevelFolderInfoByFolderId(currentFolderId);
+
+            // 没有上一级目录信息
+            if (upperFolderInfo == null)
+            {
+                await TryAddFolderInfoById(parentFolderId);
+                break;
+            }
+
+            // 有上一级目录信息
+
+            // 文件夹的parentId不可能为空
+            if (upperFolderInfo.ParentId == null) break;
+
+            currentFolderId = upperFolderInfo.CurrentId;
+            if (currentFolderId == 0) break;
+
+            parentFolderId = upperFolderInfo.ParentId.Value;
+        }
+    }
+
+    private async Task TryAddFolderInfoById(long id)
+    {
+        var folderCategory = await GetFolderCategory(id);
+
+        _filesInfoDao.ExecuteAdd(new FilesInfo
+        {
+            Name = folderCategory.file_name,
+            CurrentId = id,
+            PickCode = folderCategory.pick_code,
+            ParentId = folderCategory.Paths.LastOrDefault()!.FileId,
+            Time = DateHelper.ConvertInt32ToDateTime(folderCategory.utime),
+            TimeEdit = folderCategory.utime,
+            TimeProduce = folderCategory.utime
+        });
+    }
+
+    /// <summary>
     /// 导入CidList获取到的所有信息到数据库
     /// </summary>
     /// <param name="fileInfos"></param>
@@ -184,32 +258,37 @@ internal class WebApi
             {
                 return;
             }
-            getFilesProgressInfo = await TryAddFolderToDataAccess(token, progress, (long)info.Id!, getFilesProgressInfo);
+            getFilesProgressInfo = await TryAddFolderToDataAccess(token, progress, info.Id, getFilesProgressInfo);
         }
 
         // 文件，直接添加
         foreach (var info in fileInfos.Where(x => x.Type == FileType.File))
         {
-
             if (token.IsCancellationRequested)
             {
                 return;
             }
 
             var existsInfo = _filesInfoDao.GetOneByPickCode(info.Datum.PickCode);
-            if (existsInfo == null) _filesInfoDao.Add(info.Datum);
-            else _filesInfoDao.UpdateSingle(info.Datum);
+            if (existsInfo == null) _filesInfoDao.ExecuteAdd(info.Datum);
+            else
+            {
+                Context.Instance.Entry(existsInfo).State = EntityState.Detached;
+                Context.Instance.FilesInfos.Update(info.Datum);
+            }
 
-            getFilesProgressInfo!.FilesCount++;
+            getFilesProgressInfo.FilesCount++;
 
-            progress?.Report(new GetFileProgressIProgress
-            { getFilesProgressInfo = getFilesProgressInfo });
+            progress?.Report(
+                new GetFileProgressIProgress{ GetFilesProgressInfo = getFilesProgressInfo });
         }
 
+        await Context.Instance.SaveChangesAsync(token);
+
         progress?.Report(token.IsCancellationRequested
-            ? new GetFileProgressIProgress { status = ProgressStatus.cancel }
+            ? new GetFileProgressIProgress { Status = ProgressStatus.cancel }
             // 完成
-            : new GetFileProgressIProgress { status = ProgressStatus.done });
+            : new GetFileProgressIProgress { Status = ProgressStatus.done });
     }
 
     private async Task<GetFilesProgressInfo> TryAddFolderToDataAccess(CancellationToken token, IProgress<GetFileProgressIProgress> progress, long cid, GetFilesProgressInfo getFilesProgressInfo)
@@ -217,19 +296,20 @@ internal class WebApi
         var lastDate = NowDate;
 
         await Task.Delay(1000, token);
-        // 一开始只有cid，先获取cid的属性
+
+        // 需要获取parentPath[]，当前目录下的文件数量
         var cidCategory = await GetFolderCategory(cid);
 
         //正常不为空，为空说明有异常
         if (cidCategory == null)
         {
-            progress?.Report(new GetFileProgressIProgress { getFilesProgressInfo = getFilesProgressInfo, status = ProgressStatus.error, sendCountPerMinutes = 1 });
+            progress?.Report(new GetFileProgressIProgress { GetFilesProgressInfo = getFilesProgressInfo, Status = ProgressStatus.error, SendCountPerMinutes = 1 });
 
             // 退出
             return null;
         }
 
-        // 获取上一次已添加文件夹的pid（如果存在，且修改时间不变；不存在的默认值为string.empty）
+        // 获取上一次已添加文件夹的pid（如果存在，且修改时间不变）
         var folderInfo = _filesInfoDao.GetOneByPickCode(cidCategory.pick_code);
 
         // 该文件已存在数据库里
@@ -252,56 +332,57 @@ internal class WebApi
                 //统计上下级文件夹所含文件的数量
 
                 //文件数量
-                getFilesProgressInfo!.FilesCount += cidCategory.count;
+                getFilesProgressInfo.FilesCount += cidCategory.count;
 
                 //文件夹数量
-                getFilesProgressInfo!.FolderCount += cidCategory.folder_count;
+                getFilesProgressInfo.FolderCount += cidCategory.folder_count;
 
                 var cpm = 60 / (NowDate - lastDate);
 
                 progress?.Report(new GetFileProgressIProgress
-                    { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
+                    { GetFilesProgressInfo = getFilesProgressInfo, SendCountPerMinutes = cpm });
             }
             else
             {
                 //删除后重新添加
-                _filesInfoDao.RemoveAllByFolderId(cid);
+                await _filesInfoDao.RemoveAllByFolderIdAsync(cid);
+                Context.Instance.FilesInfos.Remove(folderInfo);
                 folderInfo = null;
             }
         }
 
         if (folderInfo == null)
         {
+            List<FilesInfo> addToDataAccessList = [];
+
             //获取当前文件夹下所有文件信息和文件夹信息（从网络）
-            getFilesProgressInfo = await TraverseAllFileInfo(cid, getFilesProgressInfo, token, progress);
+            await TraverseAllFileInfo(cid, addToDataAccessList, getFilesProgressInfo, token, progress);
+
+            if (addToDataAccessList.Count > 0)
+            {
+                //需要添加进数据库的Datum
+                foreach (var item in addToDataAccessList)
+                {
+                    var existFileInfo = _filesInfoDao.GetOneByPickCode(item.PickCode);
+                    if (existFileInfo == null)
+                        Context.Instance.FilesInfos.Add(item);
+                    else
+                    {
+                        Context.Instance.Entry(existFileInfo).State = EntityState.Detached;
+                        Context.Instance.FilesInfos.Update(item);
+                    }
+
+                }
+
+
+                addToDataAccessList.Clear();
+            }
         }
         
-        var addToDataAccessList = getFilesProgressInfo.AddToDataAccessList;
-
-        if (addToDataAccessList.Count > 0)
-        {
-            //需要添加进数据库的Datum
-            foreach (var item in addToDataAccessList)
-            {
-                var existFileInfo = _filesInfoDao.GetOneByPickCode(item.PickCode);
-                if (existFileInfo == null)
-                    Context.Instance.FilesInfos.Add(item);
-                else
-                {
-                    Context.Instance.Entry(existFileInfo).State = EntityState.Detached;
-                    Context.Instance.FilesInfos.Update(item);
-                }
-                
-            }
-            
-            
-            addToDataAccessList.Clear();
-        }
-
         //不添加有错误的目录进数据库（添加数据库时会跳过已经添加过的目录，对于出现错误的目录不添加方便后续重新添加）
         if (getFilesProgressInfo.FailCid.Count == 0 && folderInfo == null)
         {
-            _filesInfoDao.Add(FileCategory.ConvertFolderToDatum(cidCategory, cid));
+            _filesInfoDao.ExecuteAdd(FileCategory.ConvertFolderToDatum(cidCategory, cid));
         }
 
         await Context.Instance.SaveChangesAsync(token);
@@ -313,13 +394,14 @@ internal class WebApi
     /// 获取所有文件信息
     /// </summary>
     /// <param name="cid"></param>
+    /// <param name="addFilesInfos"></param>
     /// <param name="getFilesProgressInfo"></param>
     /// <param name="token"></param>
     /// <param name="progress"></param>
     /// <returns></returns>
-    private async Task<GetFilesProgressInfo> TraverseAllFileInfo(long? cid, GetFilesProgressInfo getFilesProgressInfo, CancellationToken token, IProgress<GetFileProgressIProgress> progress = null)
+    private async Task TraverseAllFileInfo(long cid, List<FilesInfo> addFilesInfos, GetFilesProgressInfo getFilesProgressInfo, CancellationToken token, IProgress<GetFileProgressIProgress> progress = null)
     {
-        if (token.IsCancellationRequested) return getFilesProgressInfo;
+        if (token.IsCancellationRequested) return;
 
         var lastDate = NowDate;
 
@@ -333,14 +415,14 @@ internal class WebApi
             //  下级目录为空
             if (webFileInfo.Data is null)
             {
-                return getFilesProgressInfo;
+                return;
             }
 
             foreach (var item in webFileInfo.Data)
             {
                 if (token.IsCancellationRequested)
                 {
-                    return getFilesProgressInfo;
+                    return;
                 }
 
                 //文件夹
@@ -349,7 +431,7 @@ internal class WebApi
                     getFilesProgressInfo.FolderCount++;
 
                     //先添加文件夹后添加文件，方便删除已有文件夹中的文件
-                    getFilesProgressInfo.AddToDataAccessList.Add(item);
+                    addFilesInfos.Add(item);
 
                     //查询数据库是否存在
                     var isUseDbData = StaticData.IsJumpExistsFolder;
@@ -360,28 +442,29 @@ internal class WebApi
                         isUseDbData = folderInfo != null && folderInfo.TimeEdit == item.TimeEdit;
                     }
                     
+                    List<FilesInfo> datumList = [];
                     if (isUseDbData)
                     {
                         //统计下级文件夹所含文件的数量
                         //通过数据库获取
-                        var datumList = _filesInfoDao.GetAllFilesListByFolderId(item.CurrentId);
+                        datumList = await _filesInfoDao.GetAllFilesListByFolderIdAsync(item.CurrentId);
 
-                        // if (datumList == null)
-                        // {
-                        //     continue;
-                        // }
+                        if (datumList.Count != 0)
+                        {
+                            addFilesInfos.AddRange(datumList);
 
-                        getFilesProgressInfo.AddToDataAccessList.AddRange(datumList);
+                            //文件数量
+                            getFilesProgressInfo.FilesCount += datumList.Count;
 
-                        //文件数量
-                        getFilesProgressInfo.FilesCount += datumList.Count;
-
-                        var cpm = 60 / (NowDate - lastDate);
-                        progress?.Report(new GetFileProgressIProgress { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
+                            var cpm = 60 / (NowDate - lastDate);
+                            progress?.Report(new GetFileProgressIProgress { GetFilesProgressInfo = getFilesProgressInfo, SendCountPerMinutes = cpm });
+                        }
                     }
-                    else
+
+                    // 之前没获取到数据
+                    if (datumList.Count == 0)
                     {
-                        getFilesProgressInfo = await TraverseAllFileInfo(item.CurrentId, getFilesProgressInfo, token, progress);
+                        await TraverseAllFileInfo(item.CurrentId, addFilesInfos, getFilesProgressInfo, token, progress);
                     }
                 }
                 //文件
@@ -390,9 +473,9 @@ internal class WebApi
                     getFilesProgressInfo.FilesCount++;
 
                     var cpm = 60 / (NowDate - lastDate);
-                    progress?.Report(new GetFileProgressIProgress { getFilesProgressInfo = getFilesProgressInfo, sendCountPerMinutes = cpm });
+                    progress?.Report(new GetFileProgressIProgress { GetFilesProgressInfo = getFilesProgressInfo, SendCountPerMinutes = cpm });
 
-                    getFilesProgressInfo.AddToDataAccessList.Add(item);
+                    addFilesInfos.Add(item);
                 }
             }
         }
@@ -401,7 +484,6 @@ internal class WebApi
             getFilesProgressInfo.FailCid.Add(cid);
         }
 
-        return getFilesProgressInfo;
     }
 
     /// <summary>
@@ -626,9 +708,9 @@ internal class WebApi
     /// <param name="cid"></param>
     /// <param name="ids"></param>
     /// <returns></returns>
-    public async Task<MakeDirRequest> MoveFiles(long cid, long?[] ids)
+    public async Task<MakeDirRequest> MoveFiles(long cid, long[] ids)
     {
-        ids = ids.Where(id => id != null).ToArray();
+        ids = ids.Where(id => id != default).ToArray();
 
         if (ids is not { Length: > 0 }) return null;
 
@@ -962,7 +1044,7 @@ internal class WebApi
         foreach (var datum in videoInfoList)
         {
             //文件夹
-            if (datum.FileId is null)
+            if (datum.FileId == default)
             {
                 var newSavePath = Path.Combine(savePath, datum.Name);
                 //遍历文件夹并下载
@@ -1083,12 +1165,12 @@ internal class WebApi
     {
         var success = true;
 
-        Dictionary<string, string> fileList = new();
+        var fileList = new Dictionary<string, string>();
 
         foreach (var datum in videoInfoList)
         {
             //文件夹
-            if (datum.FileId == null)
+            if (datum.FileId == default)
             {
                 //获取该文件夹下的文件和文件夹
                 var webFileInfo = await GetFileAsync(datum.CurrentId, loadAll: true);
@@ -1473,7 +1555,7 @@ internal class WebApi
         //添加下载记录
         if (isRecodeDownRequest && downUrlList.Count != 0)
         {
-            DownHistoryDao.Add(new DownHistory
+            DownHistoryDao.ExecuteAdd(new DownHistory
             {
                 FileName = downUrlList.First().Key,
                 TrueUrl = downUrlList.First().Value,

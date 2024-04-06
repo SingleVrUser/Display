@@ -20,7 +20,10 @@ public abstract partial class BaseImage : ObservableObject
     {
         Path = path;
 
-        Thumbnail = new BitmapImage();
+        Thumbnail = new BitmapImage
+        {
+            DecodePixelHeight = 60
+        };
         var imageFile = await StorageFile.GetFileFromPathAsync(path);
         using var fileStream = await imageFile.OpenAsync(FileAccessMode.Read);
         await Thumbnail.SetSourceAsync(fileStream);

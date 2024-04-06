@@ -1,19 +1,19 @@
 ﻿<UserControl x:Class="Display.Controls.UserController.VideoCoverDisplay"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-             xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
-            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:helper="using:Display.Helper.FileProperties.Name"
-             xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
              xmlns:winUi="using:CommunityToolkit.WinUI"
+             xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
              xmlns:controls="using:CommunityToolkit.WinUI.Controls"
-             xmlns:providers="using:Display.Providers"
+             xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
+             xmlns:entity="using:DataAccess.Models.Entity"
              xmlns:userController="using:Display.Controls.UserController"
+             xmlns:helper="using:Display.Helper.FileProperties.Name"
              xmlns:oneOneFive="using:Display.Models.Entities.OneOneFive"
              xmlns:vo="using:Display.Models.Vo"
-             xmlns:entity="using:DataAccess.Models.Entity"
+             xmlns:providers="using:Display.Providers"
+             xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
              mc:Ignorable="d"
              CacheMode="BitmapCache">
 
@@ -234,12 +234,12 @@
 
                     <!--图片-->
                     <Grid x:Name="showImage">
-                        <oldControls:ImageEx x:Name="CoverImage" Stretch="UniformToFill"
-                                          Source="{x:Bind ImagePath, Converter={StaticResource NotExistsImagePathConverter},Mode=OneWay}"
-                                          Width="{x:Bind ImageWidth,Mode=OneWay}"
-                                          Height="{x:Bind ImageHeight,Mode=OneWay}"
-                                          DecodePixelWidth="{x:Bind ImageWidth,Converter={StaticResource DoubleToInt32Converter},Mode=OneWay}"
-                                          DecodePixelHeight="{x:Bind ImageHeight,Converter={StaticResource DoubleToInt32Converter},Mode=OneWay}"/>
+                        <Image Stretch="UniformToFill" Width="{x:Bind ImageWidth,Mode=OneWay}">
+                            <Image.Source>
+                                <BitmapImage UriSource="{x:Bind ImagePath, Mode=OneWay}"
+                                             DecodePixelWidth="{x:Bind ImageWidth, Converter={StaticResource DoubleToInt32Converter}, Mode=OneWay}"/>
+                            </Image.Source>
+                        </Image> 
 
                         <RelativePanel>
                             <!--喜欢就显示爱心-->
@@ -271,8 +271,7 @@
                     <!--可操作按钮-->
                     <Grid Visibility="Collapsed"
                           Background="{StaticResource OperableGridBackground}"
-                          Width="{x:Bind ImageWidth,Mode=OneWay}"
-                          Height="{x:Bind ImageHeight,Mode=OneWay}">
+                          Width="{x:Bind ImageWidth,Mode=OneWay}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
                             <RowDefinition Height="*" />
@@ -495,8 +494,7 @@
                           Padding="0">
 
                         <Image Source="{x:Bind ImagePath}"
-                               Width="{x:Bind ImageWidth,Mode=OneWay}"
-                               Height="{x:Bind ImageHeight,Mode=OneWay}">
+                               Width="{x:Bind ImageWidth,Mode=OneWay}">
 
                         </Image>
                         <TextBlock Text="{x:Bind TrueName}"
@@ -915,7 +913,7 @@
                                                        Visibility="{x:Bind IsShowHeaderCover,Mode=OneWay}">
                             <Image x:FieldModifier="public"
                                    x:Name="HeaderCover"
-                                   Source="{x:Bind ActorInfo.ProfilePath,Converter={StaticResource NotExistsImagePathConverter},Mode=OneWay}" />
+                                   Source="{x:Bind ActorInfo.ProfilePath,Converter={StaticResource NotExistsImageBitmapConverter},Mode=OneWay}" />
                         </Grid>
                     </Grid>
 

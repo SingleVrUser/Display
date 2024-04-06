@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using CommunityToolkit.Mvvm.ComponentModel;
 using DataAccess.Models.Entity;
 using Microsoft.UI.Xaml;
+using WinRT.Interop;
 
 namespace Display.Models.Vo;
 
@@ -11,12 +13,40 @@ namespace Display.Models.Vo;
 /// </summary>
 public class VideoInfoVo : VideoInfo, INotifyPropertyChanged
 {
+    private string _trueName;
+    public new string TrueName
+    {
+        get => _trueName;
+        set => SetField(ref _trueName, value);
+    }
+
+    private string _imagePath;
+    public new string ImagePath
+    {
+        get => _imagePath;
+        set => SetField(ref _imagePath, value);
+    }
+
+    private string _releaseTime;
+    public new string ReleaseTime
+    {
+        get => _releaseTime;
+        set => SetField(ref _releaseTime, value);
+    }
+
+    private string _actor;
+    public new string Actor
+    {
+        get => _actor;
+        set => SetField(ref _actor, value);
+    }
+
     public VideoInfoVo()
     {
         
     }
     
-    private VideoInfoVo(VideoInfo videoInfo)
+    public VideoInfoVo(VideoInfo videoInfo)
     {
         foreach (var videoInfoItem in videoInfo.GetType().GetProperties())
         {
@@ -34,7 +64,7 @@ public class VideoInfoVo : VideoInfo, INotifyPropertyChanged
         var category = videoInfo.Category;
         var isShowLabel = Visibility.Collapsed;
 
-        string showLabel = string.Empty;
+        var showLabel = string.Empty;
         if (!string.IsNullOrEmpty(category))
         {
             if (category.Contains("VR") || !string.IsNullOrEmpty(videoInfo.Series) && videoInfo.Series.Contains("VR"))
@@ -54,16 +84,16 @@ public class VideoInfoVo : VideoInfo, INotifyPropertyChanged
             ReleaseYear = videoInfo.ReleaseTime.Contains('/') ? videoInfo.ReleaseTime.Split('/')[0] : videoInfo.ReleaseTime.Split('-')[0];
         }
 
-        this.IsShowLabel = isShowLabel;
+        IsShowLabel = isShowLabel;
         ShowLabel = showLabel;
         Score = videoInfo.Score;
     }
 
-    public VideoInfoVo(VideoInfo videoInfo, double imgWidth, double imgHeight) : this(videoInfo)
+    public VideoInfoVo(VideoInfo videoInfo, double imgWidth = 500) : this(videoInfo)
     {
         //图片大小
-        ImageHeight = imgHeight;
         ImageWidth = imgWidth;
+        //ImageHeight = imgHeight;
     }
 
     public string ReleaseYear { get; set; }
@@ -84,13 +114,12 @@ public class VideoInfoVo : VideoInfo, INotifyPropertyChanged
         set => SetField(ref _imageWidth, value);
     }
 
-    private double _imageHeight;
-    public double ImageHeight
-    {
-        get => _imageHeight;
-        set => SetField(ref _imageHeight, value);
-    }
-
+    //private double _imageHeight;
+    //public double ImageHeight
+    //{
+    //    get => _imageHeight;
+    //    set => SetField(ref _imageHeight, value);
+    //}
 
     public event PropertyChangedEventHandler PropertyChanged;
 
