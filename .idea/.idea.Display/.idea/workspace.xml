@@ -9,9 +9,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7e630695-b381-4f87-ba1b-fc0a833f8434" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Tests/DataAccess/UpdateDatabaseTest.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Display/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Display/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataAccess/Context.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Context.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/DaoImpl.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/DaoImpl.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Migrations/20240226014212_InitialCreate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Migrations/20240226014212_InitialCreate.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,6 +77,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/94a622829d23a99e6859dc73690c2f724f2d4373af0699883e3f70ac955577/TokenizingTextBox.Events.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/97b37ca73f6f8bd6e576f661f8650c6a1f5107d827c14ff82eb2689e5964bc/Utility.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/98c377d82be4c36912d3e59d6d7e2a55a14898ee9757311a192711c5f4115e7/TestMethodInfo.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://D:/Work/WinUi/GitHub/Display/DataAccess/Context.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://D:/Work/WinUi/GitHub/Display/DataAccess/Context.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://D:/Work/WinUi/GitHub/Display/DataAccess/Dao/DaoImpl.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/App.g.i.cs" root0="SKIP_HIGHLIGHTING" />
@@ -191,7 +193,8 @@
       <workItem from="1712399000749" duration="484000" />
       <workItem from="1712399569770" duration="1869000" />
       <workItem from="1712449306229" duration="2198000" />
-      <workItem from="1712461722927" duration="109000" />
+      <workItem from="1712461722927" duration="747000" />
+      <workItem from="1712490840250" duration="241000" />
     </task>
     <task id="LOCAL-00001" summary="clean views">
       <option name="closed" value="true" />
@@ -297,7 +300,15 @@
       <option name="project" value="LOCAL" />
       <updated>1712240555803</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Fix some bug">
+      <option name="closed" value="true" />
+      <created>1712461843687</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1712461843687</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -328,7 +339,8 @@
     <MESSAGE value="fix some bug in search" />
     <MESSAGE value="Fix bug in null image" />
     <MESSAGE value="Fix some about import video info" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix some about import video info" />
+    <MESSAGE value="Fix some bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix some bug" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

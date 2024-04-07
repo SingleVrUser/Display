@@ -7,7 +7,7 @@ public sealed class Context : DbContext
 {
     public const string DbName = "115_uwp.db";
 
-    private static string _dbPath = SetSavePath();
+    public static string DbPath = SetSavePath();
 
     public DbSet<ActorInfo> ActorInfos { get; set; } = null!;
 
@@ -44,10 +44,10 @@ public sealed class Context : DbContext
         savePath ??= Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
         var path = Path.Combine(savePath, DbName);
-        if (_dbPath == path) return path;
+        if (DbPath == path) return path;
 
         _context = null;
-        _dbPath = path;
+        DbPath = path;
         return path;
     }
 
@@ -70,5 +70,5 @@ public sealed class Context : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options
             .EnableSensitiveDataLogging()
-            .UseSqlite($"Data Source={_dbPath}");
+            .UseSqlite($"Data Source={DbPath}");
 }
