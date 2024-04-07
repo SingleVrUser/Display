@@ -10,11 +10,10 @@ public class DaoImpl<T> : IDao<T> where T : class
     protected readonly Context Context;
     protected readonly DbSet<T> DbSet;
 
-    public DaoImpl()
+    protected DaoImpl()
     {
         Context = new Context();
         DbSet = Context.Set<T>();
-
     }
 
     public void ExecuteAdd(T entity)
@@ -46,9 +45,9 @@ public class DaoImpl<T> : IDao<T> where T : class
         Context.SaveChanges();
     }
 
-    public T? Find(params object[] keyValues) => DbSet.Find(keyValues);
+    public T Find(params object[] keyValues) => DbSet.Find(keyValues);
 
-    public T? FirstOrDefault(Expression<Func<T, bool>> predicate)
+    public T FirstOrDefault(Expression<Func<T, bool>> predicate)
     {
         return DbSet.FirstOrDefault(predicate);
     }

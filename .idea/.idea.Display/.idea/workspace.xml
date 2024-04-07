@@ -9,70 +9,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7e630695-b381-4f87-ba1b-fc0a833f8434" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Display/Models/Enums/FileFormatEnum.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Display/Models/Vo/FileStatistics.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Display/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Display/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Context.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Context.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataAccess/Dao/DaoImpl.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/DaoImpl.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/IDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/IDao.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/FileToInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Impl/FileToInfoDao.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/FilesInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Impl/FilesInfoDao.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/VideoInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Impl/VideoInfoDao.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFileToInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFileToInfoDao.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFilesInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFilesInfoDao.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Interface/IVideoInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IVideoInfoDao.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/FileToInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/FileToInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/FilesInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/FilesInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/VideoInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/VideoInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Constants/DefaultSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Constants/DefaultSettings.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/ActorImage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/ActorImage.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/CustomAutoSuggestBox.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/CustomAutoSuggestBox.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/CustomMediaPlayerElement.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/CustomMediaPlayerElement.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/Explorer.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/Explorer.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/Explorer.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/Explorer.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/VideoCoverDisplay.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/VideoCoverDisplay.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/VideoCoverDisplay.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/VideoCoverDisplay.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Controls/UserController/VideoDetails.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Controls/UserController/VideoDetails.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Converter/NumberToDateTimeStrConverter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Converter/NumberToDateTimeStrConverter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Converter/NumberToLengthStrConverter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Converter/NumberToLengthStrConverter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Extensions/HttpClientExtension.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Extensions/HttpClientExtension.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Helper/FileProperties/Name/FileMatch.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Helper/FileProperties/Name/FileMatch.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Managers/SpiderManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Managers/SpiderManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Api/OneOneFive/Search/SearchDatum.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Api/OneOneFive/Search/SearchDatum.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Dto/Media/MediaPlayItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Dto/Media/MediaPlayItem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Entities/OneOneFive/VideoInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Entities/OneOneFive/VideoInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/FailVideoInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/FailVideoInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/GetFilesProgressInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/GetFilesProgressInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadActorInfoCollection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadActorInfoCollection.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadFailDatumInfoCollection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadFailDatumInfoCollection.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadFailSpiderInfoCollection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadFailSpiderInfoCollection.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadSuccessInfoCollection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/IncrementalCollection/IncrementalLoadSuccessInfoCollection.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/MatchVideoResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/MatchVideoResult.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/OneOneFive/DetailFileInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/OneOneFive/DetailFileInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/OneOneFive/FileUploadResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/OneOneFive/FileUploadResult.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/Progress/GetFileProgressIProgress.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/Progress/GetFileProgressIProgress.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/Spider/SpiderItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/Spider/SpiderItem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Models/Vo/VideoInfoVo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Models/Vo/VideoInfoVo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Providers/DataAccessLocal.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Providers/DataAccessLocal.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Providers/WebApi.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Providers/WebApi.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/ActorsPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/ActorsPage.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/DetailInfo/DownDialogContent.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/DetailInfo/DownDialogContent.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/DetailInfo/EditInfo.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/DetailInfo/EditInfo.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/HomePage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/HomePage.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/HomePage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/HomePage.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/FileListPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/FileListPage.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/VideoDisplay/MainPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/VideoDisplay/MainPage.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/VideoDisplay/MainPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/DatumList/VideoDisplay/MainPage.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/More/Import115DataToLocalDataAccess/Progress.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/Import115DataToLocalDataAccess/Progress.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/More/Import115DataToLocalDataAccess/Progress.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/More/Import115DataToLocalDataAccess/Progress.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/ConditionalCheck.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/ConditionalCheckPage.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/ConditionalCheck.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/ConditionalCheckPage.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/MainPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/MainPage.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/MainPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/MainPage.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/Progress.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Display/Views/Pages/SpiderVideoInfo/Progress.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Tests/DataAccess/EntityTest/ActorInfoTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/DataAccess/EntityTest/ActorInfoTest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Tests/DataAccess/EntityTest/DownHistoryTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/DataAccess/EntityTest/DownHistoryTest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Tests/DataAccess/EntityTest/FailListIsLikeLookLaterTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/DataAccess/EntityTest/FailListIsLikeLookLaterTest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Tests/DataAccess/EntityTest/VideoInfoTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/DataAccess/EntityTest/VideoInfoTest.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,6 +35,7 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$USER_HOME$/.nuget/packages/microsoft.net.test.sdk/17.8.0/build/netcoreapp3.1/Microsoft.NET.Test.Sdk.Program.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/efcore/c2f996919858eb11d2836705d47b531b5a174c79/src/EFCore/DbContext.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.ComponentModel.Annotations/src/System/ComponentModel/DataAnnotations/Schema/DatabaseGeneratedAttribute.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Private.CoreLib/src/System/Collections/Generic/Dictionary.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Private.CoreLib/src/System/Collections/Generic/List.cs" root0="SKIP_HIGHLIGHTING" />
@@ -136,6 +76,8 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/94a622829d23a99e6859dc73690c2f724f2d4373af0699883e3f70ac955577/TokenizingTextBox.Events.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/97b37ca73f6f8bd6e576f661f8650c6a1f5107d827c14ff82eb2689e5964bc/Utility.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/98c377d82be4c36912d3e59d6d7e2a55a14898ee9757311a192711c5f4115e7/TestMethodInfo.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://D:/Work/WinUi/GitHub/Display/DataAccess/Context.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://D:/Work/WinUi/GitHub/Display/DataAccess/Dao/DaoImpl.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/App.g.i.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Controls/UserController/ActorImage.g.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Controls/UserController/CustomAutoSuggestBox.g.cs" root0="SKIP_HIGHLIGHTING" />
@@ -248,6 +190,8 @@
       <workItem from="1712281039198" duration="19007000" />
       <workItem from="1712399000749" duration="484000" />
       <workItem from="1712399569770" duration="1869000" />
+      <workItem from="1712449306229" duration="2198000" />
+      <workItem from="1712461722927" duration="109000" />
     </task>
     <task id="LOCAL-00001" summary="clean views">
       <option name="closed" value="true" />
@@ -807,7 +751,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Display/Providers/DataAccessLocal.cs</url>
-          <line>286</line>
+          <line>284</line>
           <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Providers\DataAccessLocal.cs" initialLine="265" containingFunctionPresentation="Method 'GetFailFileInfoWithFailInfo'">
             <startOffsets>
               <option value="9836" />
