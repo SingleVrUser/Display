@@ -18,7 +18,6 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using Newtonsoft.Json;
-using DataAccess.Dao.Impl;
 
 namespace Display.Views.Pages;
 

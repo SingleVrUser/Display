@@ -2,7 +2,7 @@
 
 namespace DataAccess.Dao.Interface;
 
-public interface IDownHistoryDao : IDao<DownHistory>
+public interface IDownHistoryDao
 {
     DownHistory? FindByPickCodeAndUa(string pickCode, string ua);
 }

@@ -1,19 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DataAccess.Models.Entity;
 
-[PrimaryKey(nameof(ActorId), nameof(VideoName))]
-[Table("Actor_Video")]
 public class ActorVideo
 {
     [Key]
-    [Column("actor_id")]
+    public long Id { get; init; }
+    
     public long ActorId { get; init; }
 
-    [Key]
-    [Column("video_name")]
     [StringLength(20)]
-    public string VideoName { get; init; } = null!;
+    public required string VideoName { get; init; }
 }

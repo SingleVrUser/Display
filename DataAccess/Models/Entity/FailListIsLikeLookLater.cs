@@ -1,26 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Models.Entity;
 
-[Table("FailList_islike_looklater")]
-public class FailListIsLikeLookLater
+public class FailListIsLikeLookLater : BaseEntity
 {
-    [Key]
-    [Column("pc")]
     [StringLength(20)]
-    public string PickCode { get; set; } = null!;
+    public required string PickCode { get; set; }
 
-    [Column("is_like")]
     public int? IsLike { get; set; }
 
-    [Column("score")]
     public int? Score { get; set; }
 
-    [Column("look_later")]
     public long LookLater { get; set; }
 
-    [Column("image_path")]
     [StringLength(500)]
     public string? ImagePath { get; set; }
 }

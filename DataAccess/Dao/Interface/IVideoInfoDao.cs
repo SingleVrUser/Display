@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Dao.Interface;
 
-public interface IVideoInfoDao : IDao<VideoInfo>
+public interface IVideoInfoDao
 {
-    VideoInfo? GetOneByTrueName(string name);
+    Video? GetOneByTrueName(string name);
     
-    List<VideoInfo>? GetInfoListByTrueName(string name);
+    List<Video>? GetInfoListByTrueName(string name);
 
     string? GetTrueNameByLikeName(string name);
 
@@ -19,10 +19,10 @@ public interface IVideoInfoDao : IDao<VideoInfo>
 
 
     void UpdateAllImagePathList(string srcPath, string dstPath);
-    Task<VideoInfo[]> GetLookLaterListAsync(int limit);
+    Task<Video[]> GetLookLaterListAsync(int limit);
 
-    Task<VideoInfo[]> GetLikeListAsync(int limit);
-    Task<VideoInfo[]> GetRecentListAsync(int limit);
+    Task<Video[]> GetLikeListAsync(int limit);
+    Task<Video[]> GetRecentListAsync(int limit);
 
-    void ExecuteUpdateByTrueName(string trueName, Action<VideoInfo> updateAction);
+    void ExecuteUpdateByTrueName(string trueName, Action<Video> updateAction);
 }
