@@ -1,15 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Models.Entity;
 
-[Table("Is_Wm")]
 public class IsWm
 {
     [Key]
-    [Column("truename")]
-    public string Truename { get; set; } = null!;
+    public long Id { get; init; }
+    
+    [StringLength(10)]
+    public required string TrueName { get; set; }
 
-    [Column("is_wm")]
-    public int? IsWm1 { get; set; }
+    public bool IsVideoWm { get; set; }
 }

@@ -96,8 +96,6 @@ public partial class App
                     .AddSingleton<IIsWmDao, IsWmDao>()
                     .AddSingleton<IProducerInfoDao, ProducerInfoDao>()
                     .AddSingleton<ISearchHistoryDao, SearchHistoryDao>()
-                    .AddSingleton<ISpiderLogDao, SpiderLogDao>()
-                    .AddSingleton<ISpiderTaskDao, SpiderTaskDao>()
                     .AddSingleton<IVideoInfoDao, VideoInfoDao>()
                     
                     .AddSingleton<UploadViewModel>()

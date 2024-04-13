@@ -1,68 +1,64 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Models.Entity;
 
-[Table("VideoInfo")]
-public class VideoInfo
-{
-    [Key]
-    [Column("truename")]
-    public string TrueName { get; set; }
 
-    [Column("title")]
+public class Video : BaseEntity
+{
+    [StringLength(10)]
+    public required string TrueName { get; init; }
+
+    [StringLength(100)]
     public string? Title { get; set; }
 
-    [Column("releasetime")]
+    [StringLength(15)]
     public string? ReleaseTime { get; set; }
 
-    [Column("lengthtime")]
+    [StringLength(15)]
     public string? LengthTime { get; set; }
 
-    [Column("director")]
+    [StringLength(20)]
     public string? Director { get; set; }
 
-    [Column("producer")]
+    [StringLength(20)]
     public string? Producer { get; set; }
 
-    [Column("publisher")]
+    [StringLength(20)]
     public string? Publisher { get; set; }
 
-    [Column("series")]
+    [StringLength(100)]
     public string? Series { get; set; }
 
-    [Column("category")]
+    [StringLength(100)]
     public string? Category { get; set; }
 
-    [Column("actor")]
+    [StringLength(100)]
     public string? Actor { get; set; }
 
-    [Column("imageurl")]
+    [StringLength(100)]
     public string? ImageUrl { get; set; }
 
-    [Column("sampleImageList")]
+    [StringLength(200)]
     public string? SampleImageList { get; set; }
 
-    [Column("imagepath")]
-    public string ImagePath { get; set; }
+    [StringLength(200)]
+    public string ImagePath { get; set; } = string.Empty;
 
-    [Column("busurl")]
-    public string Url { get; set; }
+    [StringLength(200)]
+    public string? Url { get; set; }
 
-    [Column("look_later")]
     public long LookLater { get; set; }
 
-    [Column("score")]
     public double Score { get; set; } = -1;
 
-    [Column("is_like")]
-    public int IsLike { get; set; }
-
-    [Column("addtime")]
-    public long AddTime { get; set; } = DateTimeOffset.Now.ToUnixTimeSeconds();
+    public bool IsLike { get; set; }
 
     // 其他信息
-
     [NotMapped]
     public int IsWm { get; set; }
+    
+    public List<Files> Files { get; set; }
+    
 }

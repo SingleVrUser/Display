@@ -2,7 +2,7 @@
 
 namespace DataAccess.Dao.Interface;
 
-public interface ISearchHistoryDao : IDao<SearchHistory>
+public interface ISearchHistoryDao
 {
     /// <summary>
     /// 通过id删除

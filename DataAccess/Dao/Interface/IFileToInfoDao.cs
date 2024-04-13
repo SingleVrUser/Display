@@ -2,8 +2,8 @@
 
 namespace DataAccess.Dao.Interface;
 
-public interface IFileToInfoDao : IDao<FileToInfo>
+public interface IFileToInfoDao
 {
-    void UpdateIsSuccessByTrueName(string trueName, int isSuccess);
-    void ExecuteInitIfNoExists(FileToInfo info);
+    void UpdateIsSuccessByTrueName(string trueName, bool isSuccess);
+    void ExecuteInitIfNoExists(FileVideo info);
 }
