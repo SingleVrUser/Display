@@ -12,6 +12,8 @@ public class VideoContext : BaseContext
     public DbSet<Video> VideoInfos { get; set; } = null!;
     
     public DbSet<IsWm> IsWms { get; set; } = null!;
+
+    public DbSet<VideoInterest> VideoInterests { get; set; } = null!;
     
     public DbSet<ProducerInfo> ProducerInfos { get; set; } = null!;
 }

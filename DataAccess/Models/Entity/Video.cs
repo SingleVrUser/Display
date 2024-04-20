@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Models.Entity;
 
@@ -49,16 +48,12 @@ public class Video : BaseEntity
     [StringLength(200)]
     public string? Url { get; set; }
 
-    public long LookLater { get; set; }
-
-    public double Score { get; set; } = -1;
-
-    public bool IsLike { get; set; }
-
     // 其他信息
     [NotMapped]
     public int IsWm { get; set; }
     
     public List<Files> Files { get; set; }
+    
+    public VideoInterest Interest { get; set; }
     
 }
