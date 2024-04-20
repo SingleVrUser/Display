@@ -1,7 +1,5 @@
-﻿using System.Diagnostics;
-using DataAccess.Context;
+﻿using DataAccess.Context;
 using DataAccess.Dao.Interface;
-using DataAccess.Models.Dto;
 using DataAccess.Models.Entity;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,30 +9,28 @@ public class FilesInfoDao : IFilesInfoDao
 {
     private readonly FileContext _fileContext = new();
 
-    public void Test()
+    public void InitTest()
     {
         _fileContext.Database.EnsureDeleted();
         _fileContext.Database.EnsureCreated();
-        var filesInfos = _fileContext.Files.ToList();
-        Debug.WriteLine(filesInfos);
     }
-    
     
     public void AddTest()
     {
-        var files = new Files()
+        var files = new Files
         {
             Time = "123",
             PickCode = "123",
-            Name = "nihao"
-        };
-        files.Videos = new List<Video>
-        {
-            new Video
-            {
-                Actor = "nihao",
-                TrueName = "1153"
-            }
+            Name = "nihao",
+            Videos =
+            [
+                new Video
+                {
+                    Actor = "nihao",
+                    TrueName = "1153",
+                    Interest = new VideoInterest { IsLike = true }
+                }
+            ]
         };
 
         _fileContext.Add(files);

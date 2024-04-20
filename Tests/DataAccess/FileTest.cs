@@ -7,16 +7,13 @@ namespace Tests.DataAccess;
 [TestClass]
 public class FileTest
 {
-    
-    
     [TestMethod]
     public void GetFileInfo()
     {
         var filesInfoDao = new FilesInfoDao();
-        filesInfoDao.Test();
+        filesInfoDao.InitTest();
 
         filesInfoDao.AddTest();
-
 
         // var postContext = new PostContext();
         // postContext.Database.EnsureDeleted();
