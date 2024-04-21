@@ -1,12 +1,46 @@
-﻿// using DataAccess.Dao.Interface;
-// using DataAccess.Models.Entity;
-// using Microsoft.EntityFrameworkCore;
-//
-// namespace DataAccess.Dao.Impl;
-//
-// public class VideoInfoDao: DaoImpl<VideoInfo>, IVideoInfoDao
-// {
-//     public void UpdateAllImagePathList(string srcPath, string dstPath)
+﻿using DataAccess.Context;
+using DataAccess.Dao.Interface;
+using DataAccess.Models.Entity;
+
+namespace DataAccess.Dao.Impl;
+
+public class VideoInfoDao: IVideoInfoDao
+{
+    private readonly VideoInfoContext _videoInfoContext = new();
+    
+    public void AddAndSaveChanges(long fileId, VideoInfo videoInfo)
+    {
+        // 在文件信息中添加该视频信息的id
+        var fileInfo = _videoInfoContext.FileInfo.Find(fileId);
+        if (fileInfo == null) return;
+
+        using var transaction = _videoInfoContext.Database.BeginTransaction();
+
+        // 添加视频信息
+        _videoInfoContext.Add(videoInfo);
+        _videoInfoContext.SaveChanges();
+        
+        fileInfo.VideoId = videoInfo.Id;
+        _videoInfoContext.Update(fileInfo);
+        _videoInfoContext.SaveChanges();
+        
+        transaction.Commit();
+    }
+
+    public void AddAndSaveChanges(VideoInfo videoInfo)
+    {
+        _videoInfoContext.Add(videoInfo);
+        _videoInfoContext.SaveChanges();
+    }
+
+    public void InitData()
+    {
+        _videoInfoContext.Database.EnsureDeleted();
+        _videoInfoContext.Database.EnsureCreated();
+    }
+
+
+    //     public void UpdateAllImagePathList(string srcPath, string dstPath)
 //     {
 //         var videoInfos = DbSet.Where(i => i.ImagePath.Contains(srcPath)).ToList();
 //         videoInfos.ForEach(i=>i.ImagePath= i.ImagePath.Replace(srcPath, dstPath));
@@ -60,4 +94,5 @@
 //         DbSet.Where(i => i.TrueName == name).ExecuteDelete();
 //     }
 //
-// }
+
+}

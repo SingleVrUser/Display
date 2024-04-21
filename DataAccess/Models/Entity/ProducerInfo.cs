@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Models.Entity;
 
-
 public class ProducerInfo : BaseEntity
 {
     [StringLength(10)]

@@ -4,7 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DataAccess.Models.Entity;
 
 
-public class Video : BaseEntity
+[Table("video")]
+public class VideoInfo : BaseEntity
 {
     [StringLength(10)]
     public required string TrueName { get; init; }
@@ -52,8 +53,12 @@ public class Video : BaseEntity
     [NotMapped]
     public int IsWm { get; set; }
     
-    public List<Files> Files { get; set; }
+    public VideoInterest? Interest { get; set; }
     
-    public VideoInterest Interest { get; set; }
+    public List<FileInfo> FileInfos { get; set; }
+    
+    public List<ActorInfo> ActorInfos { get; set; }
+    
+    
     
 }

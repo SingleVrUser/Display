@@ -5,7 +5,7 @@ namespace DataAccess.Context;
 
 public class SearchHistoryContext : BaseContext
 {
-    private DbSet<SearchHistory> _searchHistories = null!;
+    private DbSet<SearchHistory> SearchHistories { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

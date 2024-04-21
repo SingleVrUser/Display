@@ -1,11 +1,12 @@
-﻿// using DataAccess.Dao.Interface;
-// using DataAccess.Models.Entity;
-// using Microsoft.EntityFrameworkCore;
-//
-// namespace DataAccess.Dao.Impl;
-//
-// public class ActorInfoDao : DaoImpl<ActorInfo>, IActorInfoDao
-// {
+﻿using DataAccess.Context;
+using DataAccess.Dao.Interface;
+
+namespace DataAccess.Dao.Impl;
+
+public class ActorInfoDao : IActorInfoDao
+{
+    private readonly ActorContext _actorContext = new();
+
 //     public List<ActorInfo> GetPartListByVideoName(string videoName)
 //     {
 //         // video_count有误
@@ -154,4 +155,4 @@
 //             };
 //         return query.FirstOrDefault();
 //     }
-// }
+}

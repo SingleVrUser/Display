@@ -5,5 +5,5 @@ namespace DataAccess.Context;
 
 public class PostContext : BaseContext
 {
-    public DbSet<Post> context { get; set; }
+    public DbSet<Post> Context { get; set; }
 }

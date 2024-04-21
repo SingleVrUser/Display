@@ -12,5 +12,5 @@ public class FileSpiderResult : BaseEntity
     
     public bool IsSuccess { get; set; }
     
-    public Files File { get; set; }
+    public FileInfo FileInfo { get; set; }
 }
