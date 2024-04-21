@@ -23,7 +23,7 @@ public class VideoInfoVo : VideoInfo, INotifyPropertyChanged
     private string _imagePath;
     public new string ImagePath
     {
-        get => _imagePath;
+        get => _imagePath ?? Constants.FileType.NoPicturePath;
         set => SetField(ref _imagePath, value);
     }
 

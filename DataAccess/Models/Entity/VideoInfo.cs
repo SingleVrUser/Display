@@ -44,7 +44,7 @@ public class VideoInfo
     public string? SampleImageList { get; set; }
 
     [Column("imagepath")]
-    public string ImagePath { get; set; }
+    public string? ImagePath { get; set; }
 
     [Column("busurl")]
     public string Url { get; set; }
