@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Models.Entity;
 
+[Table("is_wm")]
 public class IsWm
 {
     [Key]

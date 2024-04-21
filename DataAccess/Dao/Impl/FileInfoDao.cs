@@ -2,10 +2,11 @@
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using Microsoft.EntityFrameworkCore;
+using FileInfo = DataAccess.Models.Entity.FileInfo;
 
 namespace DataAccess.Dao.Impl;
 
-public class FilesInfoDao : IFilesInfoDao
+public class FileInfoDao : IFileInfoDao
 {
     private readonly FileContext _fileContext = new();
 
@@ -15,27 +16,13 @@ public class FilesInfoDao : IFilesInfoDao
         _fileContext.Database.EnsureCreated();
     }
     
-    public void AddTest()
+    public void AddAndSaveChanges(FileInfo fileInfo)
     {
-        var files = new Files
-        {
-            Time = "123",
-            PickCode = "123",
-            Name = "nihao",
-            Videos =
-            [
-                new Video
-                {
-                    Actor = "nihao",
-                    TrueName = "1153",
-                    Interest = new VideoInterest { IsLike = true }
-                }
-            ]
-        };
-
-        _fileContext.Add(files);
+        _fileContext.Add(fileInfo);
         _fileContext.SaveChanges();
     }
+    
+    
     //
     // public List<FilesInfo> GetListByTrueName(string name)
     // {
@@ -74,25 +61,25 @@ public class FilesInfoDao : IFilesInfoDao
     //     }
     // }
 
-    public async Task<List<Files>> GetAllFilesListByFolderIdAsync(long folderId)
+    public async Task<List<FileInfo>> GetAllFilesListByFolderIdAsync(long folderId)
     {
         return await GetAllFileListTraverseAsync(folderId, []);
     }
 
-    public List<Files> GetPartFolderListByPid(long pid, int? limit = null)
+    public List<FileInfo> GetPartFolderListByPid(long pid, int? limit = null)
     {
-        var queryable = _fileContext.Files.Where(i => i.ParentId == pid);
+        var queryable = _fileContext.FileInfo.Where(i => i.ParentId == pid);
         
         if (limit != null) queryable = queryable.Take(limit.Value);
 
         return queryable.AsNoTracking().ToList();
     }
 
-    public List<Files> GetPartFileListByPid(long folderId, int? limit = null)
+    public List<FileInfo> GetPartFileListByPid(long folderId, int? limit = null)
     {
         // i.FileId != default无法过滤
         // var queryable = DbSet.Where(i => (i.FileId != default && i.CurrentId == folderId ) || i.ParentId == folderId); 
-        var queryable = _fileContext.Files.Where(i => (i.FileId > 0 && i.CurrentId == folderId ) || i.ParentId == folderId);  
+        var queryable = _fileContext.FileInfo.Where(i => (i.FileId > 0 && i.CurrentId == folderId ) || i.ParentId == folderId);  
         
         if (limit != null) queryable = queryable.Take(limit.Value);
 
@@ -109,7 +96,7 @@ public class FilesInfoDao : IFilesInfoDao
 
     public bool IsFolderExistsById(long id)
     {
-        return _fileContext.Files.FirstOrDefault(i => i.FileId <= 0 && i.CurrentId == id) != null;
+        return _fileContext.FileInfo.FirstOrDefault(i => i.FileId <= 0 && i.CurrentId == id) != null;
     }
     //
     // public async Task RemoveAllByFolderIdAsync(long folderId)
@@ -156,14 +143,14 @@ public class FilesInfoDao : IFilesInfoDao
     }
 
 
-    public Files? GetOneByPickCode(string pickCode)
+    public FileInfo? GetOneByPickCode(string pickCode)
     {
-        return _fileContext.Files.FirstOrDefault(i => i.PickCode == pickCode);
+        return _fileContext.FileInfo.FirstOrDefault(i => i.PickCode == pickCode);
     }
 
-    public Files? GetUpperLevelFolderInfoByFolderId(long id)
+    public FileInfo? GetUpperLevelFolderInfoByFolderId(long id)
     {
-        return _fileContext.Files.FirstOrDefault(i => i.FileId <= 0 && i.CurrentId == id);
+        return _fileContext.FileInfo.FirstOrDefault(i => i.FileId <= 0 && i.CurrentId == id);
 
     }
     //
@@ -201,9 +188,9 @@ public class FilesInfoDao : IFilesInfoDao
     //     return folderToRootList;
     // }
 
-    private async Task<List<Files>> GetAllFileListTraverseAsync(long id, List<Files> allFileList)
+    private async Task<List<FileInfo>> GetAllFileListTraverseAsync(long id, List<FileInfo> allFileList)
     {
-        var list = await _fileContext.Files.Where(i => (i.FileId > 0 && i.CurrentId == id) || i.ParentId == id)
+        var list = await _fileContext.FileInfo.Where(i => (i.FileId > 0 && i.CurrentId == id) || i.ParentId == id)
             .AsNoTracking().ToListAsync();
         
         foreach (var item in list)

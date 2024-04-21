@@ -1,10 +1,16 @@
 ﻿using DataAccess.Models.Dto;
 using DataAccess.Models.Entity;
+using FileInfo = DataAccess.Models.Entity.FileInfo;
 
 namespace DataAccess.Dao.Interface;
 
-public interface IFilesInfoDao
+public interface IFileInfoDao
 {
+    /// <summary>
+    /// 添加并保存
+    /// </summary>
+    void AddAndSaveChanges(FileInfo fileInfo);
+
     // /// <summary>
     // /// 通过name获取列表
     // /// </summary>

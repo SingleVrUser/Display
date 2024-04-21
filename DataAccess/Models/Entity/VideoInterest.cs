@@ -1,4 +1,7 @@
-﻿namespace DataAccess.Models.Entity;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace DataAccess.Models.Entity;
+
 
 public class VideoInterest : BaseEntity
 {

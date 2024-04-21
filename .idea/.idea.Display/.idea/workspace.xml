@@ -9,12 +9,33 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7e630695-b381-4f87-ba1b-fc0a833f8434" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/VideoInterest.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests/DataAccess/VideoInfoTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Display/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Display/.idea/dataSources.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Display/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Display/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Context/VideoContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Context/VideoContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/FilesInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Impl/FilesInfoDao.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/Files.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/Files.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/Video.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/Video.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Context/BaseContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Context/BaseContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Context/FileContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Context/FileContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Context/PostContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Context/PostContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Context/SearchHistoryContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Context/SearchHistoryContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Context/VideoContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Context/VideoInfoContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/ActorInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Impl/ActorInfoDao.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/ActorNameDao.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/ActorVideoDao.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/FilesInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Impl/FileInfoDao.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/VideoInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Impl/VideoInfoDao.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Interface/IActorInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IActorInfoDao.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFileToInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFileToInfoDao.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFilesInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFileInfoDao.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Interface/IVideoInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IVideoInfoDao.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/ActorInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/ActorInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/ActorVideo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/ActorVideo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/BaseEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/BaseEntity.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/Bwh.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/Bwh.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/FileSpiderResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/FileSpiderResult.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/Files.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/FileInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/IsWm.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/IsWm.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/ProducerInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/ProducerInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/Video.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/VideoInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/VideoInterest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/VideoInterest.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Tests/DataAccess/FileTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/DataAccess/FileTest.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -33,12 +54,12 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "SingleVrUser"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;SingleVrUser&quot;
   }
-}]]></component>
+}</component>
   <component name="GithubProjectSettings">
     <option name="branchProtectionPatterns">
       <list>
@@ -46,12 +67,12 @@
       </list>
     </option>
   </component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/SingleVrUser/Display",
-    "accountId": "e1db3ad1-aeb6-4a26-ae03-700b09e5f964"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/SingleVrUser/Display&quot;,
+    &quot;accountId&quot;: &quot;e1db3ad1-aeb6-4a26-ae03-700b09e5f964&quot;
   }
-}]]></component>
+}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$USER_HOME$/.nuget/packages/microsoft.net.test.sdk/17.8.0/build/netcoreapp3.1/Microsoft.NET.Test.Sdk.Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/efcore/a97f6ffcf78100056683c8c3b116721a89e5c58c/src/EFCore.Relational/Extensions/RelationalEntityTypeBuilderExtensions.ToTable.cs" root0="SKIP_HIGHLIGHTING" />
@@ -72,6 +93,7 @@
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Private.CoreLib/src/System/IO/FileSystem.Windows.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Private.CoreLib/src/System/Int32.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Private.CoreLib/src/System/Nullable.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/86986e3b5ab142e1a33017545ca2e53926a820/08/bb521cf3/ModelValidator.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3bd4df5aff92cabbc4d630be64227073db1b8539b3a1e47786b4b189d7cdb7/DbContext.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/App.g.i.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Controls/UserController/ActorImage.g.cs" root0="SKIP_HIGHLIGHTING" />
@@ -79,6 +101,10 @@
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Controls/UserController/VideoCoverDisplay.g.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/XamlTypeInfo.g.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
+  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
+}]]></component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -110,6 +136,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;UWP.Display.executor&quot;: &quot;Debug&quot;,
+    &quot;a6eb3f36-3273-4846-baae-9e2615f292e0.executor&quot;: &quot;Debug&quot;,
     &quot;b6d00020-21dd-433e-828c-9ee31090f2eb.executor&quot;: &quot;Debug&quot;,
     &quot;f8910c43-d913-4048-823e-f4c9916b2f46.executor&quot;: &quot;Debug&quot;,
     &quot;git-widget-placeholder&quot;: &quot;Database&quot;,
@@ -172,7 +199,9 @@
       <workItem from="1713009363919" duration="814000" />
       <workItem from="1713010629381" duration="30000" />
       <workItem from="1713010669005" duration="6498000" />
-      <workItem from="1713612261168" duration="3509000" />
+      <workItem from="1713612261168" duration="3591000" />
+      <workItem from="1713660223808" duration="1767000" />
+      <workItem from="1713677313356" duration="7172000" />
     </task>
     <task id="LOCAL-00001" summary="clean views">
       <option name="closed" value="true" />
@@ -302,7 +331,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713016638158</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="update interest">
+      <option name="closed" value="true" />
+      <created>1713615894510</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1713615894510</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -338,7 +375,8 @@
     <MESSAGE value="Fix some bug" />
     <MESSAGE value="Set public sqlite file path" />
     <MESSAGE value="Modify entity" />
-    <option name="LAST_COMMIT_MESSAGE" value="Modify entity" />
+    <MESSAGE value="update interest" />
+    <option name="LAST_COMMIT_MESSAGE" value="update interest" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

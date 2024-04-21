@@ -1,9 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+
+using DataAccess.Models.Entity;
+using Microsoft.EntityFrameworkCore;
+using FileInfo = DataAccess.Models.Entity.FileInfo;
 
 namespace DataAccess.Context;
 
 public abstract class BaseContext : DbContext
 {
+    public DbSet<FileInfo> FileInfo { get; set; } = null!;
+    
+    public DbSet<VideoInfo> VideoInfo { get; set; } = null!;
+
+    public DbSet<VideoInterest> VideoInterest { get; set; } = null!;
+
+    public DbSet<ActorInfo> ActorInfo { get; set; } = null!;
+    
+    public DbSet<ActorVideo> ActorVideo { get; set; } = null!;
+    
     private const string DbName = "115_uwp.db";
 
     private static string _dbPath = SetSavePath();
@@ -18,7 +32,15 @@ public abstract class BaseContext : DbContext
         _dbPath = path;
         return path;
     }
-    
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<VideoInfo>()
+            .HasMany(e => e.ActorInfos)
+            .WithMany(e => e.VideoInfos)
+            .UsingEntity<ActorVideo>();
+    }
+
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options
             .UseSnakeCaseNamingConvention() // 使用Snake case命名法

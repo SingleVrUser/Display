@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
 namespace DataAccess.Models.Entity;
 
-public class Files : BaseEntity
+public class FileInfo : BaseEntity
 {
     [JsonProperty("fid")]
     public long FileId { get; set; }
@@ -108,8 +109,15 @@ public class Files : BaseEntity
 
     [JsonProperty("play_long")]
     public double? PlayLong { get; set; }
+
+    #region 外键
     
-    public List<Video> Videos { get; set; }
+    [ForeignKey(nameof(VideoInfo))]
+    public long? VideoId { get; set; }
     
-    // public List<FileSpiderResult> FileSpiderResults { get; set; }
+    #endregion
+    
+    public VideoInfo? VideoInfo { get; set; }
+    
+    
 }

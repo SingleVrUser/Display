@@ -1,11 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DataAccess.Models.Entity;
 
+[Table("actor")]
 public class ActorInfo : BaseEntity
 {
     [StringLength(20)]
@@ -16,8 +14,6 @@ public class ActorInfo : BaseEntity
     [StringLength(20)]
     public string? Birthday { get; set; }
 
-    [StringLength(10)]
-    public string? Bwh { get; set; }
     
     public int? Height { get; set; }
 
@@ -34,13 +30,13 @@ public class ActorInfo : BaseEntity
 
     public bool IsLike { get; init; }
 
-    [Column("info_url")]
     [StringLength(100)]
     public string? InfoUrl { get; set; }
     
+    [ForeignKey(nameof(Bwh))]
+    public long? BwhId { get; set; }
+    
     // 其他信息
-    [NotMapped]
-    public Bwh? BwhInfo { get; set; }
     
     [NotMapped]
     public int VideoCount { get; init; }
@@ -50,4 +46,8 @@ public class ActorInfo : BaseEntity
     
     [NotMapped]
     public string Initials => string.Empty + Name.FirstOrDefault();
+    
+    public List<VideoInfo> VideoInfos { get; set; }
+    
+    public Bwh? BwhInfo { get; set; }
 }

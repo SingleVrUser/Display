@@ -7,7 +7,7 @@ namespace DataAccess.Models.Entity;
 [PrimaryKey(nameof(Id))]
 public abstract class BaseEntity
 {
-    public long Id;
+    public long Id { get; set; }
     
     public DateTime CreateTime { get; set; }
     
