@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -42,18 +43,20 @@ public static class DataAccessLocal
             AddActorInfoByActorInfo(data);
 
             //添加是否步兵
-            Context.Instance.IsWms.Add(new IsWm
+            var isWm = new IsWm
             {
                 Truename = data.TrueName,
                 IsWm1 = data.IsWm
-            });
-
+            };
+            if (Context.Instance.IsWms.Any(i=>i.Truename == data.TrueName))
+                Context.Instance.IsWms.Update(isWm);
+            else
+                Context.Instance.IsWms.Add(isWm);
+            
             if (data.Producer != null)
             {
                 //添加厂商信息
-                var producerInfo = Context.Instance.ProducerInfos.FirstOrDefault(i=>i.Name == data.Producer);
-
-                if (producerInfo == null)
+                if (!Context.Instance.ProducerInfos.Any(i=>i.Name == data.Producer))
                 {
                     Context.Instance.ProducerInfos.Add(new ProducerInfo
                     {
@@ -67,7 +70,7 @@ public static class DataAccessLocal
         }
 
         /// <summary>
-        /// 升级ActorInfo
+        /// 添加ActorInfo
         /// </summary>
         /// <param name="videoInfo"></param>
         private static void AddActorInfoByActorInfo(VideoInfo videoInfo)
@@ -79,23 +82,7 @@ public static class DataAccessLocal
             foreach (var actorName in actorList)
             {
                 //查询Actor_ID
-                var actorInfo = ActorInfoDao.GetPartInfoByActorName(JavDb.TrimGenderFromActorName(actorName));
-                
-                if(actorInfo != null)
-                {
-                    //添加信息，如果已经存在则忽略
-                    Context.Instance.ActorVideos.Add(new ActorVideo
-                    {
-                        ActorId = actorInfo.Id,
-                        VideoName = videoInfo.TrueName
-                    });
-                }
-                // 没有该演员信息的话
-                // 新添加演员信息
-                else
-                {
-                    AddActorInfo(actorName, videoInfo.TrueName);
-                }
+                TryAddActorInfo(actorName, videoInfo.TrueName);
             }
 
         }
@@ -122,18 +109,7 @@ public static class DataAccessLocal
             //查询演员id列表
             foreach (var actorName in actors)
             {
-                var actorInfo = ActorInfoDao.GetPartInfoByActorName(JavDb.TrimGenderFromActorName(actorName));
-
-                if (actorInfo == null)
-                {
-                    AddActorInfo(actorName, info.TrueName);
-                }
-                else
-                {
-                    Context.Instance.ActorVideos.Add(new ActorVideo { ActorId =  actorInfo.Id, VideoName = info.TrueName});
-                }
-                
-                
+                TryAddActorInfo(actorName, info.TrueName);
             }
             
             Context.Instance.SaveChanges();
@@ -144,8 +120,10 @@ public static class DataAccessLocal
         /// </summary>
         /// <param name="actorName"></param>
         /// <param name="videoName"></param>
-        private static long AddActorInfo(string actorName, string videoName)
+        private static void TryAddActorInfo(string actorName, string videoName)
         {
+            actorName = JavDb.TrimGenderFromActorName(actorName);
+            
             string singleActorName;
             var isWoman = 1;
             string[] otherNames = null;
@@ -194,6 +172,14 @@ public static class DataAccessLocal
                 Context.Instance.SaveChanges();
             
                 actorId = actorInfo.Id;
+                
+                //主名称
+                Context.Instance.ActorNames.Update(new ActorName
+                {
+                    Id = actorId,
+                    Name = singleActorName
+                });
+                
             }
             else
             {
@@ -204,37 +190,39 @@ public static class DataAccessLocal
                 {
                     Context.Instance.ActorInfos.Update(new ActorInfo { Id = actorId, IsWoman = isWoman });
                 }
+                
             }
 
+            Debug.WriteLine($"添加演员{actorId} : {singleActorName}");
+
             //添加Actor_Names
-            //主名称
-            Context.Instance.ActorNames.Add(new ActorName
-            {
-                Id = actorId,
-                Name = singleActorName
-            });
 
             //别名
             if (otherNames != null)
             {
                 foreach (var name in otherNames)
                 {
-                    Context.Instance.ActorNames.Add(new ActorName
+                    if (!Context.Instance.ActorNames.Any(i => i.Id == actorId && i.Name == name))
                     {
-                        Id = actorId,
-                        Name = name
-                    });
+                        Context.Instance.ActorNames.Add(new ActorName
+                        {
+                            Id = actorId,
+                            Name = name
+                        });
+                    }
                 }
             }
 
             //添加演员和作品的信息
-            Context.Instance.ActorVideos.Add(new ActorVideo
+            if (!Context.Instance.ActorVideos.Any(i => i.ActorId == actorId && i.VideoName == videoName))
             {
-                ActorId = actorId,
-                VideoName = videoName
-            });
+                Context.Instance.ActorVideos.Add(new ActorVideo
+                {
+                    ActorId = actorId,
+                    VideoName = videoName
+                });
+            }
 
-            return actorId;
         }
     }
 

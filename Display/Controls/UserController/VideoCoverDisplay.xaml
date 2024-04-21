@@ -236,7 +236,7 @@
                     <Grid x:Name="showImage">
                         <Image Stretch="UniformToFill" Width="{x:Bind ImageWidth,Mode=OneWay}">
                             <Image.Source>
-                                <BitmapImage UriSource="{x:Bind ImagePath, Mode=OneWay}"
+                                <BitmapImage UriSource="{x:Bind ImagePath, Converter={StaticResource NotExistsImageUriConverter}, Mode=OneWay}"
                                              DecodePixelWidth="{x:Bind ImageWidth, Converter={StaticResource DoubleToInt32Converter}, Mode=OneWay}"/>
                             </Image.Source>
                         </Image> 
