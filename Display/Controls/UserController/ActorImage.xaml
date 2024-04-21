@@ -18,8 +18,7 @@
             <MenuFlyoutItem Text="喜欢"
                             Click="LikeMenuFlyoutItem_Click">
                 <MenuFlyoutItem.Icon>
-                    <FontIcon Glyph="&#xE00B;"
-                              Foreground="OrangeRed" />
+                    <FontIcon Glyph="&#xE006;"/>
                 </MenuFlyoutItem.Icon>
             </MenuFlyoutItem>
             
