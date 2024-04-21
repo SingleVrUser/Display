@@ -760,7 +760,6 @@ public sealed partial class MainPage : IDisposable
         SmokeGrid.Visibility = Visibility.Visible;
 
         EnlargeImage.Source = new BitmapImage(new Uri(cidInfo.VideoInfoVo.ImagePath));
-
     }
 
     private void EnlargeButton_PointerExited(object sender, PointerRoutedEventArgs e)
@@ -1094,6 +1093,8 @@ public class CidInfo
 
     public void UpdateInfo(VideoInfo info)
     {
+        Debug.WriteLine(info.ImagePath);
+        
         VideoInfoVo.TrueName = info.TrueName;
         VideoInfoVo.ImagePath = info.ImagePath;
         VideoInfoVo.ReleaseTime = info.ReleaseTime;
