@@ -47,14 +47,6 @@
             <TextBlock Text="{x:Bind _viewModel.MaxProgressValue, Mode=OneWay}"/>
         </StackPanel>
 
-        <!--按钮-->
-        <StackPanel Grid.Row="2"
-                    Orientation="Horizontal"
-                    Spacing="5">
-            <Button Content="添加"
-                    Command="{x:Bind _viewModel.StartCommand}"/>
-        </StackPanel>
-
         <StackPanel Grid.Row="3">
             <!--搜刮源-->
             <ItemsRepeater ItemsSource="{x:Bind _viewModel.SpiderNames,Mode=OneWay}"

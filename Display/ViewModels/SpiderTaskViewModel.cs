@@ -48,21 +48,6 @@ internal partial class SpiderTaskViewModel : ObservableObject
         FailNameCollection = new ObservableCollection<string>(_manager.GetFailNames());
     }
 
-    [RelayCommand]
-    private void Start()
-    {
-        InitView();
-
-        //string[] names = ["abw-123", "abp-235", "eyan-200"];
-        //MaxProgressValue += names.Length;
-        //_manager.AddTask(names);
-    }
-
-    private void InitView()
-    {
-        IsTaskRunning = true;
-        ShowPause = false;
-    }
 
     [RelayCommand]
     private void Cancel()
