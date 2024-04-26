@@ -109,7 +109,7 @@ public sealed partial class MainPage : IDisposable
 
                         // 挑选视频数量
                         var videoInFolder = filesInfo.Data
-                            .Where(item => item.FileId != null && item.Iv == 1).Take(leftCount).ToList();
+                            .Where(item => item.Iv == 1).Take(leftCount).ToList();
                         var videoInFolderCount = videoInFolder.Count;
 
                         if (videoInFolderCount <= 0) continue;

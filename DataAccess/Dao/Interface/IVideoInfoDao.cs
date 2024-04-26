@@ -17,7 +17,6 @@ public interface IVideoInfoDao : IDao<VideoInfo>
     /// <param name="name"></param>
     void ExecuteRemoveByName(string name);
 
-
     void UpdateAllImagePathList(string srcPath, string dstPath);
     Task<VideoInfo[]> GetLookLaterListAsync(int limit);
 

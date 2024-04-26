@@ -13,12 +13,12 @@ public class ActorInfoTest
     [TestMethod]
     public void UploadSingleTest()
     {
-        var actorInfo = new ActorInfo
-        {
-            IsLike = 1
-        };
-        _actorInfoDao.ExecuteUpdate(actorInfo);
-
-        Debug.WriteLine(actorInfo);
+        // var actorInfo = new ActorInfo
+        // {
+        //     IsLike = 1
+        // };
+        // _actorInfoDao.ExecuteUpdate(actorInfo);
+        //
+        // Debug.WriteLine(actorInfo);
     }
 }

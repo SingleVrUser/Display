@@ -450,12 +450,9 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
         if (sender is not AppBarToggleButton { DataContext: VideoInfoVo videoInfo } button) return;
 
         videoInfo.IsLike = button.IsChecked == true ? 1 : 0;
-
-        _videoInfoDao.ExecuteUpdate(new VideoInfo
-        {
-            TrueName = videoInfo.TrueName,
-            IsLike = videoInfo.IsLike
-        });
+        
+        _videoInfoDao.ExecuteUpdate(i => string.Equals(videoInfo.TrueName, i.TrueName),
+            i => i.IsLike = videoInfo.IsLike);
     }
 
     private void FailLikeToggleButton_Click(object sender, RoutedEventArgs e)
@@ -464,7 +461,8 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
         info.IsLike = button.IsChecked == true ? 1 : 0;
 
-        _failListIsLikeLookLaterDao.ExecuteUpdate(new FailListIsLikeLookLater(){PickCode = info.PickCode, IsLike = info.IsLike});
+        _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(info.PickCode, i.PickCode),
+            i => i.IsLike = info.IsLike);
     }
 
     /// <summary>
@@ -477,13 +475,9 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
         if (sender is not AppBarToggleButton { DataContext: VideoInfoVo videoInfo } button) return;
 
         videoInfo.LookLater = button.IsChecked == true ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
-
         
-        _videoInfoDao.ExecuteUpdate(new VideoInfo
-        {
-            TrueName = videoInfo.TrueName,
-            LookLater = videoInfo.LookLater
-        });
+        _videoInfoDao.ExecuteUpdate(i => string.Equals(videoInfo.TrueName, i.TrueName),
+            i => i.LookLater = videoInfo.LookLater);
     }
 
     private void FailLookLaterToggleButton_Click(object sender, RoutedEventArgs e)
@@ -492,7 +486,8 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
         info.LookLater = button.IsChecked == true ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
 
-        _failListIsLikeLookLaterDao.ExecuteUpdate(new FailListIsLikeLookLater(){PickCode = info.PickCode, LookLater = info.LookLater});
+        _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(info.PickCode, i.PickCode),
+            i => i.LookLater = info.LookLater);
     }
 
     /// <summary>
@@ -506,12 +501,8 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
         var score = videoInfo.Score == 0 ? -1 : sender.Value;
 
-        
-        _videoInfoDao.ExecuteUpdate(new VideoInfo
-        {
-            TrueName = videoInfo.TrueName,
-            Score = (int)score
-        });
+        _videoInfoDao.ExecuteUpdate(i => string.Equals(videoInfo.TrueName, i.TrueName),
+            i => i.Score = (int)score);
 
     }
 
@@ -525,8 +516,9 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
         if (sender.DataContext is not FailInfo info) return;
 
         var score = info.Score == 0 ? -1 : sender.Value;
-
-        _failListIsLikeLookLaterDao.ExecuteUpdate(new FailListIsLikeLookLater(){PickCode = info.PickCode, Score = (int)score});
+        
+        _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(info.PickCode, i.PickCode),
+            i => i.Score = (int)score);
     }
 
 
@@ -1065,12 +1057,9 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
         if (isLikeButton.IsChecked == null) return;
 
         var isLike = (bool)isLikeButton.IsChecked ? 1 : 0;
-
-        _actorInfoDao.ExecuteUpdate(new ActorInfo
-        {
-            Id = actorId,
-            IsLike = isLike
-        });
+        
+        _actorInfoDao.ExecuteUpdate(i => string.Equals(actorId, i.Id),
+            i => i.IsLike = isLike);
     }
 
     private void ChangedHyperlink()
@@ -1205,11 +1194,8 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
             switch (failInfo.IsLike)
             {
                 case 0:
-                    _failListIsLikeLookLaterDao.ExecuteUpdate(new FailListIsLikeLookLater()
-                    {
-                        PickCode = pickCode,
-                        IsLike = 1
-                    });
+                    _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(pickCode, i.PickCode),
+                        i => i.IsLike = 1);
                     ShowTeachingTip("已添加进喜欢");
                     break;
                 default:
@@ -1246,10 +1232,8 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
             switch (failInfo.LookLater)
             {
                 case 0:
-                    _failListIsLikeLookLaterDao.ExecuteUpdate(new FailListIsLikeLookLater
-                    {
-                        PickCode = pickCode, LookLater = DateTimeOffset.Now.ToUnixTimeSeconds()
-                    });
+                    _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(pickCode, i.PickCode),
+                        i => i.LookLater = DateTimeOffset.Now.ToUnixTimeSeconds());
                     ShowTeachingTip("已添加进稍后观看");
                     break;
                 default:

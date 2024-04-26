@@ -45,7 +45,7 @@ public class ActorInfo
     public string? BlogUrl { get; set; }
 
     [Column("is_like")]
-    public int IsLike { get; init; }
+    public int IsLike { get; set; }
 
     [Column("addtime")]
     [StringLength(20)]
