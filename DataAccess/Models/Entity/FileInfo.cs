@@ -4,6 +4,9 @@ using Newtonsoft.Json;
 
 namespace DataAccess.Models.Entity;
 
+/// <summary>
+/// 文件信息
+/// </summary>
 public class FileInfo : BaseEntity
 {
     [JsonProperty("fid")]

@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Models.Entity;
 
+/// <summary>
+/// 是否步
+/// </summary>
 [Table("is_wm")]
 public class IsWm
 {

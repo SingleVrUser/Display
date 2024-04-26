@@ -6,23 +6,10 @@ using FileInfo = DataAccess.Models.Entity.FileInfo;
 
 namespace DataAccess.Dao.Impl;
 
-public class FileInfoDao : IFileInfoDao
+public class FileInfoDao : BaseDao<FileInfo>, IFileInfoDao
 {
     private readonly FileContext _fileContext = new();
 
-    public void InitTest()
-    {
-        _fileContext.Database.EnsureDeleted();
-        _fileContext.Database.EnsureCreated();
-    }
-    
-    public void AddAndSaveChanges(FileInfo fileInfo)
-    {
-        _fileContext.Add(fileInfo);
-        _fileContext.SaveChanges();
-    }
-    
-    
     //
     // public List<FilesInfo> GetListByTrueName(string name)
     // {

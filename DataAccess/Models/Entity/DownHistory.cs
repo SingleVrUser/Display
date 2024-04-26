@@ -4,6 +4,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Models.Entity;
 
+/// <summary>
+/// 下载记录
+/// </summary>
 [Table("tmp_down_histories")]
 public class DownHistory : BaseEntity
 {

@@ -1,10 +1,12 @@
 ﻿using DataAccess.Context;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
+using DataAccess.Models.Vo;
+using static System.String;
 
 namespace DataAccess.Dao.Impl;
 
-public class VideoInfoDao: IVideoInfoDao
+public class VideoInfoDao: BaseDao<VideoInfo>, IVideoInfoDao
 {
     private readonly VideoInfoContext _videoInfoContext = new();
     
@@ -27,18 +29,86 @@ public class VideoInfoDao: IVideoInfoDao
         transaction.Commit();
     }
 
-    public void AddAndSaveChanges(VideoInfo videoInfo)
+
+    public VideoInfo? GetById(long id)
     {
-        _videoInfoContext.Add(videoInfo);
-        _videoInfoContext.SaveChanges();
+        return _videoInfoContext.VideoInfo.Find(id);
     }
 
-    public void InitData()
+    public VideoInfo? GetOneByName(string name)
     {
-        _videoInfoContext.Database.EnsureDeleted();
-        _videoInfoContext.Database.EnsureCreated();
+        return _videoInfoContext.VideoInfo.FirstOrDefault(x => x.Name.Equals(name));
     }
 
+    public bool IsExistsName(string name)
+    {
+        return _videoInfoContext.VideoInfo.Any(x => x.Name.Equals(name));
+    }
+
+    public void AddByVideoInfoVo(VideoInfoVo vo)
+    {
+        // 查看是否有同name的视频信息
+        var isExistsName = IsExistsName(vo.Name);
+        // 数据库有该数据则退出
+        if (isExistsName) return;
+
+        var videoInfo = new VideoInfo(vo.Name)
+        {
+            Title = vo.Title,
+            SourceUrl = vo.SourceUrl,
+        };
+
+
+        // 导演
+        if (vo.DirectorName != null)
+            videoInfo.Director = _videoInfoContext.DirectorInfo.FirstOrDefault(i=>string.Equals(i.Name,vo.DirectorName))
+                            ?? new DirectorInfo(vo.DirectorName);
+        
+        // 厂商
+        if (vo.ProducerName != null)
+            videoInfo.Producer = _videoInfoContext.ProducerInfo.FirstOrDefault(i => string.Equals(i.Name,vo.ProducerName))
+                            ?? new ProducerInfo(vo.ProducerName);
+        
+        // 发行者
+        if (vo.PublisherName != null)
+            videoInfo.Publisher = _videoInfoContext.PublisherInfo.FirstOrDefault(i=> string.Equals(i.Name,vo.PublisherName))
+                                 ?? new PublisherInfo(vo.PublisherName);
+        
+        // 系列
+        if (vo.SeriesName != null)
+            videoInfo.Series = _videoInfoContext.SeriesInfo.FirstOrDefault(i=> string.Equals(i.Name,vo.SeriesName))
+                              ?? new SeriesInfo(vo.SeriesName);
+        
+        // 演员信息
+        if (vo.ActorNameList is { Count: > 0 })
+        {
+            videoInfo.ActorInfoList = [];
+            foreach (var actorInfo in
+                     from actorName in vo.ActorNameList
+                        let actorInfo = _videoInfoContext.ActorInfo.FirstOrDefault(i=>string.Equals(i.Name, actorName))
+                     where actorInfo == null
+                     select new ActorInfo(actorName))
+            {
+                videoInfo.ActorInfoList.Add(actorInfo);
+            }
+        }
+        
+        // 标签列表
+        if (vo.SampleImageList is { Count: > 0 })
+        {
+            videoInfo.SampleImages = Concat(vo.SampleImageList);
+        }
+        
+        // 文件信息
+        // 通过FileSpiderResult查询Named对应的FileId
+        videoInfo.FileInfoList = (from fileInfo in _videoInfoContext.FileInfo
+            join spiderResult in _videoInfoContext.FileSpiderResult
+                on fileInfo.Id equals spiderResult.FileId
+            where spiderResult.TrueName == vo.Name
+            select fileInfo).ToList();
+        
+        AddAndSaveChanges(videoInfo);
+    }
 
     //     public void UpdateAllImagePathList(string srcPath, string dstPath)
 //     {

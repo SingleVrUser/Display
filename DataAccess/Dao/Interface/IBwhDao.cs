@@ -4,5 +4,5 @@ namespace DataAccess.Dao.Interface;
 
 public interface IBwhDao
 {
-    Bwh? GetOne(string content);
+    BwhInfo? GetOne(string content);
 }
