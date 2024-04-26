@@ -22,6 +22,15 @@ public class DaoImpl<T> : IDao<T> where T : class
         Context.SaveChanges();
     }
 
+    public void ExecuteUpdate(Expression<Func<T, bool>> predicate, Action<T> updateAction)
+    {
+        var info = DbSet.FirstOrDefault(predicate);
+        if (info == null) return;
+
+        updateAction.Invoke(info);
+        SaveChanges();
+    }
+
     public List<T> List() => DbSet.AsNoTracking().ToList();
     public void SaveChanges()
     {
@@ -33,21 +42,15 @@ public class DaoImpl<T> : IDao<T> where T : class
         return DbSet.Where(predicate).AsNoTracking().ToList();
     }
 
-    public void ExecuteUpdate(T entity)
-    {
-        DbSet.Update(entity);
-        SaveChanges();
-    }
-
     public void ExecuteRemoveSingle(T entity)
     {
         DbSet.Remove(entity);
         Context.SaveChanges();
     }
 
-    public T Find(params object[] keyValues) => DbSet.Find(keyValues);
+    public T? Find(params object[] keyValues) => DbSet.Find(keyValues);
 
-    public T FirstOrDefault(Expression<Func<T, bool>> predicate)
+    public T? FirstOrDefault(Expression<Func<T, bool>> predicate)
     {
         return DbSet.FirstOrDefault(predicate);
     }
