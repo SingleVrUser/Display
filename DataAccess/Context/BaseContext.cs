@@ -6,17 +6,35 @@ using FileInfo = DataAccess.Models.Entity.FileInfo;
 
 namespace DataAccess.Context;
 
-public abstract class BaseContext : DbContext
+public class BaseContext : DbContext
 {
     public DbSet<FileInfo> FileInfo { get; set; } = null!;
     
     public DbSet<VideoInfo> VideoInfo { get; set; } = null!;
+    
+    // public DbSet<FileVideo> FileVideo { get; set; } = null!;
+    
+    public DbSet<FileSpiderResult> FileSpiderResult { get; set; } = null!;
+    
+    public DbSet<DirectorInfo> DirectorInfo { get; set; } = null!;
+    
+    public DbSet<ProducerInfo> ProducerInfo { get; set; } = null!;
+    
+    public DbSet<PublisherInfo> PublisherInfo { get; set; } = null!;
+    
+    public DbSet<SeriesInfo> SeriesInfo { get; set; } = null!;
 
     public DbSet<VideoInterest> VideoInterest { get; set; } = null!;
-
+    
     public DbSet<ActorInfo> ActorInfo { get; set; } = null!;
     
-    public DbSet<ActorVideo> ActorVideo { get; set; } = null!;
+    public DbSet<ActorName> ActorName { get; set; } = null!;
+    
+    // public DbSet<ActorVideo> ActorVideo { get; set; } = null!;
+    
+    public DbSet<CategoryInfo> Category { get; set; } = null!;
+    
+    public DbSet<ActorInterest> ActorInterest { get; set; } = null!;
     
     private const string DbName = "115_uwp.db";
 
@@ -35,8 +53,9 @@ public abstract class BaseContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // 多对多
         modelBuilder.Entity<VideoInfo>()
-            .HasMany(e => e.ActorInfos)
+            .HasMany(e => e.ActorInfoList)
             .WithMany(e => e.VideoInfos)
             .UsingEntity<ActorVideo>();
     }

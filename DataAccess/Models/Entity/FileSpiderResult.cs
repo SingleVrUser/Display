@@ -2,7 +2,9 @@
 
 namespace DataAccess.Models.Entity;
 
-
+/// <summary>
+/// 视频信息搜刮结果
+/// </summary>
 public class FileSpiderResult : BaseEntity
 {
     public long FileId { get; set; }
@@ -12,5 +14,5 @@ public class FileSpiderResult : BaseEntity
     
     public bool IsSuccess { get; set; }
     
-    public FileInfo FileInfo { get; set; }
+    // public FileInfo FileInfo { get; set; }
 }

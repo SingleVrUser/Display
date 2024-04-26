@@ -4,10 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Models.Entity;
 
-public class ProducerInfo : BaseEntity
+/// <summary>
+/// 厂商信息
+/// </summary>
+[Table("producer")]
+public class ProducerInfo(string name) : BaseInfoEntity(name)
 {
-    [StringLength(10)]
-    public required string Name { get; set; }
-
     public bool IsWm { get; set; }
 }

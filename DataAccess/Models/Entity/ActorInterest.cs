@@ -1,16 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Models.Entity;
-    
+
 /// <summary>
-/// 演员和视频的中间表
-/// 演员id - 视频id，多对多
+/// 对当前视频的个性化标注（是否喜欢、评分）
 /// </summary>
-public class ActorVideo
+public class ActorInterest : BaseEntity
 {
     [Column("actor_id")]
     public long ActorInfoId { get; set; }
+    
+    public bool IsLike { get; set; }
 
-    [Column("video_id")]
-    public long VideoInfoId { get; set; }
+    public double? Score { get; set; }
 }

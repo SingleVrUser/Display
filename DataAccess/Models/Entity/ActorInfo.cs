@@ -3,18 +3,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Models.Entity;
 
+/// <summary>
+/// 演员信息
+/// </summary>
 [Table("actor")]
-public class ActorInfo : BaseEntity
+public class ActorInfo(string name) : BaseEntity
 {
     [StringLength(20)]
-    public required string Name { get; init; }
+    public string Name { get; init; } = name;
 
     public bool IsWoman { get; set; } = true;
 
     [StringLength(20)]
     public string? Birthday { get; set; }
 
-    
     public int? Height { get; set; }
 
     public int? WorksCount { get; set; }
@@ -28,26 +30,36 @@ public class ActorInfo : BaseEntity
     [StringLength(500)]
     public string? BlogUrl { get; set; }
 
-    public bool IsLike { get; init; }
-
     [StringLength(100)]
     public string? InfoUrl { get; set; }
     
-    [ForeignKey(nameof(Bwh))]
-    public long? BwhId { get; set; }
     
     // 其他信息
     
-    [NotMapped]
-    public int VideoCount { get; init; }
-    
-    [NotMapped]
-    public List<string>? OtherNameList { get; set; }
+    // [NotMapped]
+    // public int VideoCount { get; init; }
+    //
+    // [NotMapped]
+    // public List<string>? OtherNameList { get; set; }
+    //
+    // [NotMapped]
+    // public bool IsLike { get; init; }
     
     [NotMapped]
     public string Initials => string.Empty + Name.FirstOrDefault();
     
-    public List<VideoInfo> VideoInfos { get; set; }
+    /// <summary>
+    /// 身材信息
+    /// </summary>
+    public BwhInfo? Bwh { get; set; }
     
-    public Bwh? BwhInfo { get; set; }
+    public List<ActorName> NameList { get; set; }
+    
+    /// <summary>
+    /// 个性化标注
+    /// </summary>
+    public ActorInterest? Interest { get; set; }
+    
+    // 其他信息
+    public List<VideoInfo> VideoInfos { get; set; }
 }

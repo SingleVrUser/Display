@@ -9,34 +9,43 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7e630695-b381-4f87-ba1b-fc0a833f8434" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Tests/DataAccess/VideoInfoTest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Display/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Display/.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DataAccess/Dao/Impl/BaseDao.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IBaseDao.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/ActorInterest.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/BaseInfoEntity.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/CategoryInfo.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/DirectorInfo.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/PublisherInfo.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/SeriesInfo.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DataAccess/Models/Vo/VideoInfoVo.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests/DataAccess/SingleTable/VideoInfoTest.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Tests/DataAccess/Step/ImportVideoInfoTest.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Display/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Display/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Context/ActorContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Context/ActorContext.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataAccess/Context/BaseContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Context/BaseContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Context/FileContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Context/FileContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Context/PostContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Context/PostContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Context/SearchHistoryContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Context/SearchHistoryContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Context/VideoContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Context/VideoInfoContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/ActorInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Impl/ActorInfoDao.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/ActorNameDao.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/ActorVideoDao.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/FilesInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Impl/FileInfoDao.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Context/FileSpiderResultContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Context/FileSpiderResultContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/FileInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Impl/FileInfoDao.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Impl/VideoInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Impl/VideoInfoDao.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Interface/IActorInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IActorInfoDao.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFileToInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFileToInfoDao.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFilesInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFileInfoDao.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Interface/IBwhDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IBwhDao.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFileInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IFileInfoDao.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataAccess/Dao/Interface/IVideoInfoDao.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Dao/Interface/IVideoInfoDao.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/ActorInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/ActorInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/ActorName.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/ActorName.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/ActorVideo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/ActorVideo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/BaseEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/BaseEntity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/Bwh.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/Bwh.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/Bwh.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/BwhInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/DownHistory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/DownHistory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/FileInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/FileInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/FileSpiderResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/FileSpiderResult.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/Files.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/FileInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/FileVideo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/FileVideo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/IsWm.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/IsWm.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/ProducerInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/ProducerInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/Video.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/VideoInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/SearchHistory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/SearchHistory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/VideoInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/VideoInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DataAccess/Models/Entity/VideoInterest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DataAccess/Models/Entity/VideoInterest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Tests/DataAccess/FileTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/DataAccess/FileTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tests/DataAccess/FileTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/DataAccess/SingleTable/FileTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tests/DataAccess/UpdateDatabaseTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/DataAccess/UpdateDatabaseTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tests/DataAccess/VideoInfoTest.cs" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,6 +93,7 @@
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/efcore/a97f6ffcf78100056683c8c3b116721a89e5c58c/src/EFCore.Relational/Migrations/Operations/Builders/CreateTableBuilder.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/efcore/c2f996919858eb11d2836705d47b531b5a174c79/src/EFCore.Relational/Query/Internal/SingleQueryingEnumerable.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/efcore/c2f996919858eb11d2836705d47b531b5a174c79/src/EFCore/DbContext.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/coreclr/System.Private.CoreLib/src/System/Runtime/CompilerServices/CastHelpers.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.ComponentModel.Annotations/src/System/ComponentModel/DataAnnotations/Schema/DatabaseGeneratedAttribute.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.ComponentModel.Annotations/src/System/ComponentModel/DataAnnotations/StringLengthAttribute.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Private.CoreLib/src/System/Collections/Generic/Dictionary.cs" root0="SKIP_HIGHLIGHTING" />
@@ -95,16 +105,19 @@
     <setting file="file://$USER_HOME$/AppData/Local/Symbols/src/dotnet/runtime/9f4b1f5d664afdfc80e1508ab7ed099dff210fbd/src/libraries/System.Private.CoreLib/src/System/Nullable.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/86986e3b5ab142e1a33017545ca2e53926a820/08/bb521cf3/ModelValidator.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3bd4df5aff92cabbc4d630be64227073db1b8539b3a1e47786b4b189d7cdb7/DbContext.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/4b21fc3f8a3abb5d25f06c622276fbec0fd3932f169cc6af520bf5abc6a46b4/DbSet.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/df3a5d166359f3be77c6a4c18d8b451173aecfe3a6673cbe1545fdc424a40/Assert.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Display/Models/Vo/VideoInfoVo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/App.g.i.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Controls/UserController/ActorImage.g.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Controls/UserController/CustomAutoSuggestBox.g.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/Controls/UserController/VideoCoverDisplay.g.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Display/obj/x64/Debug/net8.0-windows10.0.19041.0/XamlTypeInfo.g.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
-  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
-  <component name="KubernetesApiProvider"><![CDATA[{
-  "isMigrated": true
-}]]></component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -126,40 +139,43 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Launch Settings Profile.Display: Display (Unpackaged).executor&quot;: &quot;Debug&quot;,
-    &quot;19a8c101-55f0-4356-838b-1cdf6d2e047e.executor&quot;: &quot;Debug&quot;,
-    &quot;66ed3c7a-8b3d-4646-abab-f70f56ad1811.executor&quot;: &quot;Debug&quot;,
-    &quot;98af082e-e617-42ce-9c94-6373b6751ea3.executor&quot;: &quot;Debug&quot;,
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;UWP.Display.executor&quot;: &quot;Debug&quot;,
-    &quot;a6eb3f36-3273-4846-baae-9e2615f292e0.executor&quot;: &quot;Debug&quot;,
-    &quot;b6d00020-21dd-433e-828c-9ee31090f2eb.executor&quot;: &quot;Debug&quot;,
-    &quot;f8910c43-d913-4048-823e-f4c9916b2f46.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Database&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;terminal&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Launch Settings Profile.Display: Display (Unpackaged).executor": "Debug",
+    "19a8c101-55f0-4356-838b-1cdf6d2e047e.executor": "Debug",
+    "66ed3c7a-8b3d-4646-abab-f70f56ad1811.executor": "Debug",
+    "8e908b76-6d8a-4e62-b83d-295fdba74aa1.executor": "Debug",
+    "98af082e-e617-42ce-9c94-6373b6751ea3.executor": "Debug",
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "UWP.Display.executor": "Debug",
+    "a6eb3f36-3273-4846-baae-9e2615f292e0.executor": "Debug",
+    "b6d00020-21dd-433e-828c-9ee31090f2eb.executor": "Debug",
+    "f8910c43-d913-4048-823e-f4c9916b2f46.executor": "Debug",
+    "faac4537-f1df-492c-b5fd-01f1b0e24e7e.executor": "Debug",
+    "git-widget-placeholder": "Database",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "terminal",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;mysql&quot;,
-      &quot;sqlite&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql",
+      "sqlite"
     ],
-    &quot;rider.external.source.directories&quot;: [
-      &quot;C:\\Users\\liuzu\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\DecompilerCache&quot;,
-      &quot;C:\\Users\\liuzu\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\SourcesCache&quot;,
-      &quot;C:\\Users\\liuzu\\AppData\\Local\\Symbols\\src&quot;
+    "rider.external.source.directories": [
+      "C:\\Users\\liuzu\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\DecompilerCache",
+      "C:\\Users\\liuzu\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\SourcesCache",
+      "C:\\Users\\liuzu\\AppData\\Local\\Symbols\\src"
     ]
   }
-}</component>
+}]]></component>
+  <component name="RunManager" selected="a6eb3f36-3273-4846-baae-9e2615f292e0" />
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -202,6 +218,9 @@
       <workItem from="1713612261168" duration="3591000" />
       <workItem from="1713660223808" duration="1767000" />
       <workItem from="1713677313356" duration="7172000" />
+      <workItem from="1714047199816" duration="61000" />
+      <workItem from="1714103315554" duration="14875000" />
+      <workItem from="1714132801954" duration="2952000" />
     </task>
     <task id="LOCAL-00001" summary="clean views">
       <option name="closed" value="true" />
@@ -789,19 +808,6 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="38" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Display/Providers/DataAccessLocal.cs</url>
-          <line>284</line>
-          <properties documentPath="D:\Work\WinUi\GitHub\Display\Display\Providers\DataAccessLocal.cs" containingFunctionPresentation="Method 'GetFailFileInfoWithFailInfo'">
-            <startOffsets>
-              <option value="9836" />
-            </startOffsets>
-            <endOffsets>
-              <option value="9938" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="93" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Display/Controls/UserController/CustomAutoSuggestBox.xaml.cs</url>
