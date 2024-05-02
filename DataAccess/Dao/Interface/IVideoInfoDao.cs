@@ -9,10 +9,16 @@ public interface IVideoInfoDao : IBaseDao<VideoInfo>
     /// <summary>
     /// 添加视频信息，并与文件信息关联
     /// </summary>
-    /// <param name="fileId"></param>
-    /// <param name="videoInfo"></param>
-    void AddAndSaveChanges(long fileId, VideoInfo videoInfo);
+    /// <param name="vo"></param>
+    /// <param name="fileIdList"></param>
+    void AddOrUpdateInfoAndAttachFile(VideoInfoVo vo, List<long> fileIdList);
 
+    /// <summary>
+    /// 通过VideoInfoVo添加数据
+    /// </summary>
+    void AddOrUpdateByVideoInfoVo(VideoInfoVo vo);
+
+    
     /// <summary>
     /// 通过id获取视频信息
     /// </summary>
@@ -34,10 +40,6 @@ public interface IVideoInfoDao : IBaseDao<VideoInfo>
     /// <returns></returns>
     bool IsExistsName(string name);
 
-    /// <summary>
-    /// 通过VideoInfoVo添加数据
-    /// </summary>
-    void AddByVideoInfoVo(VideoInfoVo vo);
 
     // Video? GetOneByTrueName(string name);
     //

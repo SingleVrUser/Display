@@ -1,12 +1,13 @@
-﻿using DataAccess.Context;
+﻿using System.Linq.Expressions;
+using DataAccess.Context;
 using DataAccess.Dao.Interface;
+using DataAccess.Models.Entity;
 
 namespace DataAccess.Dao.Impl;
 
-public class ActorInfoDao : IActorInfoDao
+public class ActorInfoDao : BaseDao<ActorInfo>, IActorInfoDao
 {
-    private readonly ActorContext _actorContext = new();
-
+    
 //     public List<ActorInfo> GetPartListByVideoName(string videoName)
 //     {
 //         // video_count有误

@@ -465,11 +465,9 @@ public sealed partial class CustomMediaPlayerElement
 
         if (videoInfo != null)
         {
-            _videoInfoDao.ExecuteUpdate(new VideoInfo
-            {
-                TrueName = trueName,
-                IsLike = _isLike
-            });
+            _videoInfoDao.ExecuteUpdate(info=>info.Name.Equals(trueName), info =>
+                info.Interest.IsLike = _isLike == 1);
+            
             if (_isLike == 1) ShowTeachingTip("已添加进喜欢");
         }
         else

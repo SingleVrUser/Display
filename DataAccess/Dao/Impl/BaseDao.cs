@@ -1,4 +1,5 @@
-﻿using DataAccess.Context;
+﻿using System.Linq.Expressions;
+using DataAccess.Context;
 using DataAccess.Dao.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -7,27 +8,37 @@ namespace DataAccess.Dao.Impl;
 
 public abstract class BaseDao<TEntity>: IBaseDao<TEntity> where TEntity : class
 {
-    private readonly BaseContext _baseContext = new();
+    protected readonly BaseContext Context = new();
 
-    private readonly DbSet<TEntity> _currentDbSet;
+    protected readonly DbSet<TEntity> CurrentDbSet;
 
     private readonly DatabaseFacade _database;
 
     protected BaseDao()
     {
-        _currentDbSet = _baseContext.Set<TEntity>();
-        _database = _baseContext.Database;
+        CurrentDbSet = Context.Set<TEntity>();
+        _database = Context.Database;
     }
 
     public TEntity? GetById(params object?[]? keyValues)
-        =>_currentDbSet.Find(keyValues);
+        =>CurrentDbSet.Find(keyValues);
 
-    public void AddAndSaveChanges(TEntity entity)
+    public void ExecuteAdd(TEntity entity)
     {
-        _currentDbSet.Add(entity);
-        _baseContext.SaveChanges();
+        CurrentDbSet.Add(entity);
+        Context.SaveChanges();
     }
-    
+
+    public void ExecuteUpdate(Expression<Func<TEntity, bool>> predicate, Action<TEntity> updateAction)
+    {
+        var info = CurrentDbSet.FirstOrDefault(predicate);
+        if (info == null) return;
+
+        updateAction.Invoke(info);
+        Context.SaveChanges();
+    }
+
+
     public void InitData()
     {
         _database.EnsureDeleted();

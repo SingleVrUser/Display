@@ -2,18 +2,16 @@
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 
-namespace Tests.DataAccess.SingleTable;
+namespace DataAccessTest.SingleTable;
 
-[TestClass]
 public class VideoInfoTest
 {
     private readonly IVideoInfoDao _videoInfoDao = new VideoInfoDao();
-    private readonly IFileInfoDao _fileInfoDao = new FileInfoDao();
 
     /// <summary>
     /// 导入视频信息
     /// </summary>
-    [TestMethod]
+    [Test]
     public void AddVideoInfo()
     {
         _videoInfoDao.InitData();
@@ -27,10 +25,10 @@ public class VideoInfoTest
             }]
         };
 
-        _videoInfoDao.AddAndSaveChanges(videoInfo);
+        _videoInfoDao.ExecuteAdd(videoInfo);
         
-        Assert.AreEqual(1, videoInfo.Id);
+        Assert.That(videoInfo.Id, Is.EqualTo(1));
         var videoInfoDb = _videoInfoDao.GetById(videoInfo.Id);
-        Assert.AreNotEqual(null, videoInfoDb);
+        Assert.That(videoInfoDb, Is.Not.EqualTo(null));
     }
 }
