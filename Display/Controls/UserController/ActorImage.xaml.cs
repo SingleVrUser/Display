@@ -6,7 +6,6 @@ using Microsoft.UI.Xaml.Input;
 using System;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
-using Display.Models.Entities.OneOneFive;
 using Display.Views.Pages;
 
 namespace Display.Controls.UserController;
@@ -30,7 +29,7 @@ public sealed partial class ActorImage
         if (string.IsNullOrEmpty(actorInfo.Name)) return;
 
         //是否喜欢
-        if (actorInfo.IsLike == 1)
+        if (actorInfo.Interest?.IsLike == true)
         {
             LikeFontIcon.Visibility = Visibility.Visible;
         }
@@ -89,8 +88,8 @@ public sealed partial class ActorImage
                 break;
         }
         
-        _actorInfoDao.ExecuteUpdate(i => i.Id == ActorInfo.Id,
-            i => i.IsLike = isLike);
+        _actorInfoDao.UpdateIsLike(i => i.Id == ActorInfo.Id,
+            isLike == 1);
     }
 
     private async void GetInfoMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
