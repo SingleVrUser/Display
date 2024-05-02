@@ -110,9 +110,7 @@ public sealed partial class VideoDetails
             thumbnailList = thumbnailList.OrderByNatural(emp => emp.ToString()).ToList();
             ThumbnailGridView.ItemsSource = thumbnailList;
             ThumbnailStackPanel.Visibility = Visibility; 
-        };
-
-
+        }
 
         //演员
         //之前有数据，清空
@@ -159,8 +157,6 @@ public sealed partial class VideoDetails
             // stackpanel内添加button
             CategoryWrapPanel.Children.Insert(i, button);
         }
-
-
     }
 
     private void GridLoaded(object sender, RoutedEventArgs e)

@@ -465,8 +465,8 @@ public sealed partial class CustomMediaPlayerElement
 
         if (videoInfo != null)
         {
-            _videoInfoDao.ExecuteUpdate(info=>info.Name.Equals(trueName), info =>
-                info.Interest.IsLike = _isLike == 1);
+            _videoInfoDao.ExecuteUpdate(i => string.Equals(i.TrueName, trueName),
+                info => info.IsLike = _isLike);
             
             if (_isLike == 1) ShowTeachingTip("已添加进喜欢");
         }
@@ -480,32 +480,27 @@ public sealed partial class CustomMediaPlayerElement
             {
                 var capPath = await ScreenShotAsync(pickCode);
                 
-                _failListIsLikeLookLaterDao.ExecuteAdd(new FailListIsLikeLookLater()
-                {
-                    PickCode = pickCode,
-                    IsLike = _isLike,
-                    ImagePath = capPath
-                });
+                _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(pickCode, i.PickCode),
+                    i =>
+                    {
+                        i.IsLike = _isLike;
+                        i.ImagePath = capPath;
+                    });
                 
                 if (_isLike == 1) ShowTeachingTip("已添加进喜欢");
             }
             else
             {
-                _failListIsLikeLookLaterDao.ExecuteUpdate(new FailListIsLikeLookLater
-                {
-                    PickCode = pickCode,
-                    IsLike = _isLike
-                });
+                _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(pickCode, i.PickCode),
+                    i => i.IsLike = _isLike);
 
                 //需要截图
                 if (failInfo.ImagePath == FileType.NoPicturePath || !File.Exists(failInfo.ImagePath))
                 {
                     var capPath = await ScreenShotAsync(pickCode);
-                    _failListIsLikeLookLaterDao.ExecuteUpdate(new FailListIsLikeLookLater
-                    {
-                        PickCode = pickCode,
-                        ImagePath = capPath
-                    });
+                    
+                    _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(pickCode, i.PickCode),
+                        i => i.ImagePath = capPath);
 
                     if (_isLike == 1) ShowTeachingTip("已添加进喜欢，并截取当前画面作为封面");
                 }
@@ -534,11 +529,8 @@ public sealed partial class CustomMediaPlayerElement
 
         if (videoInfo != null)
         {
-            _videoInfoDao.ExecuteUpdate(new VideoInfo()
-            {
-                TrueName = trueName,
-                LookLater = _lookLater
-            });
+            _videoInfoDao.ExecuteUpdate(i => string.Equals(trueName, i.TrueName),
+                i => i.LookLater = _lookLater);
 
             if (_lookLater != 0) ShowTeachingTip("已添加进稍后观看");
         }
@@ -559,22 +551,16 @@ public sealed partial class CustomMediaPlayerElement
             }
             else
             {
-                _failListIsLikeLookLaterDao.ExecuteUpdate(new FailListIsLikeLookLater
-                {
-                    PickCode = pickCode,
-                    LookLater = _lookLater
-                });
+                _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(pickCode, i.PickCode),
+                    i => i.LookLater = _lookLater);
 
                 //需要添加截图
                 if (failInfo.ImagePath == FileType.NoPicturePath || !File.Exists(failInfo.ImagePath))
                 {
                     var capPath = await ScreenShotAsync(pickCode);
                     
-                    _failListIsLikeLookLaterDao.ExecuteUpdate(new FailListIsLikeLookLater
-                    {
-                        PickCode = pickCode,
-                        ImagePath = capPath
-                    });
+                    _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(pickCode, i.PickCode),
+                        i => i.ImagePath = capPath);
 
                     if (_lookLater != 0) ShowTeachingTip("已添加进稍后观看，并截取当前画面作为封面");
                 }
