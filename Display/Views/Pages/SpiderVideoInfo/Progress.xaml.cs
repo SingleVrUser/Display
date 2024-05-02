@@ -64,11 +64,8 @@ public sealed partial class Progress
             _matchVideoResults.Add(new MatchVideoResult { Status = true, OriginalName = item.Datum.Name, Message = "匹配成功", StatusCode = 1, MatchName = item.MatchName });
 
             //替换数据库的数据
-            _fileToInfoDao.ExecuteUpdate(new FileToInfo
-            {
-                FilePickCode = item.Datum.PickCode,
-                TrueName = item.MatchName
-            });
+            _fileToInfoDao.ExecuteUpdate(i => string.Equals(item.Datum.PickCode, i.FilePickCode),
+                i => i.TrueName = item.MatchName);
         }
 
         SpiderVideoInfo();

@@ -249,7 +249,7 @@ public sealed partial class HomePage
     private async void TryUpdateCoverShow()
     {
         //最近视频
-        //TryUpdateVideoCoverDisplayClass(await _videoInfoDao.GetRecentListAsync(10), _recentCoverList);
+        TryUpdateVideoCoverDisplayClass(await _videoInfoDao.GetRecentListAsync(10), _recentCoverList);
         //稍后观看
         TryUpdateVideoCoverDisplayClass(await _videoInfoDao.GetLookLaterListAsync(10), _lookLaterList);
         //喜欢视频

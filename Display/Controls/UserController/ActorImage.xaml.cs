@@ -88,8 +88,9 @@ public sealed partial class ActorImage
                 isLike = 1;
                 break;
         }
-
-        _actorInfoDao.ExecuteUpdate(new ActorInfo {Id = ActorInfo.Id, IsLike = isLike});
+        
+        _actorInfoDao.ExecuteUpdate(i => i.Id == ActorInfo.Id,
+            i => i.IsLike = isLike);
     }
 
     private async void GetInfoMenuFlyoutItem_Click(object sender, RoutedEventArgs e)

@@ -14,6 +14,7 @@ using DataAccess.Models.Entity;
 using Display.Models.Vo.Spider;
 using Display.Providers;
 using DataAccess.Dao.Impl;
+using FFmpeg.AutoGen.Abstractions;
 
 namespace Display.Managers;
 
@@ -284,8 +285,7 @@ public class SpiderManager
 
         return queueArray.All(item => item.DoneSpiderNameArray.Contains(curSpider.Name)) &&
                spiders.All(spider => spider.HandleItem == null ||
-                                     (spider.HandleItem != null && spider.HandleItem.DoneSpiderNameArray.Contains(curSpider.Name))
-                                     );
+                                     (spider.HandleItem != null && spider.HandleItem.DoneSpiderNameArray.Contains(curSpider.Name)));
     }
 
     /// <summary>
@@ -352,6 +352,8 @@ public class SpiderManager
         foreach (var name in names)
         {
             var upperName = name.ToUpper();
+
+            Debug.WriteLine(upperName);
             // 先从数据库中搜索
             var singleVideoInfoByTrueName = _videoInfoDao.GetOneByTrueName(upperName);
             if (singleVideoInfoByTrueName != null)
