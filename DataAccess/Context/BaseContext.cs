@@ -14,7 +14,7 @@ public class BaseContext : DbContext
     
     // public DbSet<FileVideo> FileVideo { get; set; } = null!;
     
-    public DbSet<FileSpiderResult> FileSpiderResult { get; set; } = null!;
+    // public DbSet<FileSpiderResult> FileSpiderResult { get; set; } = null!;
     
     public DbSet<DirectorInfo> DirectorInfo { get; set; } = null!;
     
@@ -58,6 +58,23 @@ public class BaseContext : DbContext
             .HasMany(e => e.ActorInfoList)
             .WithMany(e => e.VideoInfos)
             .UsingEntity<ActorVideo>();
+        
+        
+        modelBuilder.Entity<SearchHistory>().ToTable("search_histories");
+
+        modelBuilder.Entity<SearchHistory>(b =>
+            {
+                b.Property(t => t.UpdateTime)
+                    .HasColumnType("DATETIME")
+                    .HasColumnType("DATETIME")
+                    .HasDefaultValueSql("datetime('now')")
+                    .HasColumnName("create_time");
+                b.Property(t => t.CreateTime)
+                    .HasColumnType("DATETIME")
+                    .HasDefaultValueSql("datetime('now')")
+                    .HasColumnName("update_time");
+            }
+        );
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)

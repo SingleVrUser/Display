@@ -2,9 +2,8 @@
 using DataAccess.Dao.Interface;
 using FileInfo = DataAccess.Models.Entity.FileInfo;
 
-namespace Tests.DataAccess.SingleTable;
+namespace DataAccessTest.SingleTable;
 
-[TestClass]
 public class FileTest
 {
     private readonly IFileInfoDao _fileInfoDao = new FileInfoDao();
@@ -12,7 +11,7 @@ public class FileTest
     /// <summary>
     /// 导入115中的文件
     /// </summary>
-    [TestMethod]
+    [Test]
     public void AddFileInfoTest()
     {
         _fileInfoDao.InitData();
@@ -23,11 +22,11 @@ public class FileTest
             PickCode = "123",
             Name = "nihao"
         };
-        _fileInfoDao.AddAndSaveChanges(fileInfo);
+        _fileInfoDao.ExecuteAdd(fileInfo);
         
-        Assert.AreEqual(1, fileInfo.Id);
+        Assert.That(fileInfo.Id, Is.EqualTo(1));
         var fileInfoDb = _fileInfoDao.GetById(fileInfo.Id);
-        Assert.AreNotEqual(null, fileInfoDb);
+        Assert.That(fileInfoDb, Is.Not.EqualTo(null));
         
         fileInfo = new FileInfo
         {
@@ -35,9 +34,9 @@ public class FileTest
             PickCode = "124",
             Name = "wohao"
         };
-        _fileInfoDao.AddAndSaveChanges(fileInfo);
-        Assert.AreEqual(2, fileInfo.Id);
+        _fileInfoDao.ExecuteAdd(fileInfo);
+        Assert.That(fileInfo.Id, Is.EqualTo(2));
         fileInfoDb = _fileInfoDao.GetById(fileInfo.Id);
-        Assert.AreNotEqual(null, fileInfoDb);
+        Assert.That(fileInfoDb, Is.Not.EqualTo(null));
     }
 }

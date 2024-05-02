@@ -7,6 +7,7 @@ namespace DataAccess.Models.Entity;
 /// <summary>
 /// 文件信息
 /// </summary>
+[Table("file")]
 public class FileInfo : BaseEntity
 {
     [JsonProperty("fid")]

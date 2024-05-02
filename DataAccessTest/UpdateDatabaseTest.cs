@@ -1,13 +1,12 @@
 ﻿using DataAccess.Context;
 
-namespace Tests.DataAccess;
+namespace DataAccessTest.DataAccess;
 
-[TestClass]
 public class UpdateDatabaseTest
 {
-    private BaseContext _baseContext = new();
+    private readonly BaseContext _baseContext = new();
     
-    [TestMethod]
+    [Test]
     public void UpdateTest()
     {
         _baseContext.Database.EnsureDeleted();

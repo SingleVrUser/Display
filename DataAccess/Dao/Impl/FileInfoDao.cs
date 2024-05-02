@@ -8,7 +8,7 @@ namespace DataAccess.Dao.Impl;
 
 public class FileInfoDao : BaseDao<FileInfo>, IFileInfoDao
 {
-    private readonly FileContext _fileContext = new();
+    private readonly BaseContext _context = new();
 
     //
     // public List<FilesInfo> GetListByTrueName(string name)
@@ -55,7 +55,7 @@ public class FileInfoDao : BaseDao<FileInfo>, IFileInfoDao
 
     public List<FileInfo> GetPartFolderListByPid(long pid, int? limit = null)
     {
-        var queryable = _fileContext.FileInfo.Where(i => i.ParentId == pid);
+        var queryable = _context.FileInfo.Where(i => i.ParentId == pid);
         
         if (limit != null) queryable = queryable.Take(limit.Value);
 
@@ -66,7 +66,7 @@ public class FileInfoDao : BaseDao<FileInfo>, IFileInfoDao
     {
         // i.FileId != default无法过滤
         // var queryable = DbSet.Where(i => (i.FileId != default && i.CurrentId == folderId ) || i.ParentId == folderId); 
-        var queryable = _fileContext.FileInfo.Where(i => (i.FileId > 0 && i.CurrentId == folderId ) || i.ParentId == folderId);  
+        var queryable = _context.FileInfo.Where(i => (i.FileId > 0 && i.CurrentId == folderId ) || i.ParentId == folderId);  
         
         if (limit != null) queryable = queryable.Take(limit.Value);
 
@@ -83,7 +83,7 @@ public class FileInfoDao : BaseDao<FileInfo>, IFileInfoDao
 
     public bool IsFolderExistsById(long id)
     {
-        return _fileContext.FileInfo.FirstOrDefault(i => i.FileId <= 0 && i.CurrentId == id) != null;
+        return _context.FileInfo.FirstOrDefault(i => i.FileId <= 0 && i.CurrentId == id) != null;
     }
     //
     // public async Task RemoveAllByFolderIdAsync(long folderId)
@@ -132,12 +132,12 @@ public class FileInfoDao : BaseDao<FileInfo>, IFileInfoDao
 
     public FileInfo? GetOneByPickCode(string pickCode)
     {
-        return _fileContext.FileInfo.FirstOrDefault(i => i.PickCode == pickCode);
+        return _context.FileInfo.FirstOrDefault(i => i.PickCode == pickCode);
     }
 
     public FileInfo? GetUpperLevelFolderInfoByFolderId(long id)
     {
-        return _fileContext.FileInfo.FirstOrDefault(i => i.FileId <= 0 && i.CurrentId == id);
+        return _context.FileInfo.FirstOrDefault(i => i.FileId <= 0 && i.CurrentId == id);
 
     }
     //
@@ -177,7 +177,7 @@ public class FileInfoDao : BaseDao<FileInfo>, IFileInfoDao
 
     private async Task<List<FileInfo>> GetAllFileListTraverseAsync(long id, List<FileInfo> allFileList)
     {
-        var list = await _fileContext.FileInfo.Where(i => (i.FileId > 0 && i.CurrentId == id) || i.ParentId == id)
+        var list = await _context.FileInfo.Where(i => (i.FileId > 0 && i.CurrentId == id) || i.ParentId == id)
             .AsNoTracking().ToListAsync();
         
         foreach (var item in list)

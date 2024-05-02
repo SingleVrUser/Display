@@ -8,76 +8,96 @@ namespace DataAccess.Dao.Impl;
 
 public class VideoInfoDao: BaseDao<VideoInfo>, IVideoInfoDao
 {
-    private readonly VideoInfoContext _videoInfoContext = new();
-    
-    public void AddAndSaveChanges(long fileId, VideoInfo videoInfo)
+    public void AddOrUpdateInfoAndAttachFile(VideoInfoVo vo, List<long> fileIdList)
     {
         // 在文件信息中添加该视频信息的id
-        var fileInfo = _videoInfoContext.FileInfo.Find(fileId);
-        if (fileInfo == null) return;
+        var fileInfoList = Context.FileInfo.Where(i => fileIdList.Contains(i.Id)).ToList();
+        if (fileInfoList.Count == 0) return;
 
-        using var transaction = _videoInfoContext.Database.BeginTransaction();
+        using var transaction = Context.Database.BeginTransaction();
 
         // 添加视频信息
-        _videoInfoContext.Add(videoInfo);
-        _videoInfoContext.SaveChanges();
-        
-        fileInfo.VideoId = videoInfo.Id;
-        _videoInfoContext.Update(fileInfo);
-        _videoInfoContext.SaveChanges();
-        
+        var videoInfo = GetVideoInfoFromVo(vo);
+        // 不存在添加
+        if (videoInfo.Id.Equals(default))
+            CurrentDbSet.Add(videoInfo);
+        // 存在则更新
+        else
+            CurrentDbSet.Update(videoInfo);
+
+        // 更新file_info
+        fileInfoList.ForEach(i =>i.VideoId = videoInfo.Id);
+        Context.UpdateRange(fileInfoList);
+        Context.SaveChanges();
         transaction.Commit();
     }
+    
 
-
+    public void AddOrUpdateByVideoInfoVo(VideoInfoVo vo)
+    {
+        var videoInfo = GetVideoInfoFromVo(vo);
+        
+        // 不存在则添加，存在则更新
+        if(videoInfo.Id.Equals(default))
+            CurrentDbSet.Add(videoInfo);
+        else
+            CurrentDbSet.Update(videoInfo);
+        Context.SaveChanges();
+    }
+    
     public VideoInfo? GetById(long id)
     {
-        return _videoInfoContext.VideoInfo.Find(id);
+        return Context.VideoInfo.Find(id);
     }
 
     public VideoInfo? GetOneByName(string name)
     {
-        return _videoInfoContext.VideoInfo.FirstOrDefault(x => x.Name.Equals(name));
+        return Context.VideoInfo.FirstOrDefault(x => x.Name.Equals(name));
     }
 
     public bool IsExistsName(string name)
     {
-        return _videoInfoContext.VideoInfo.Any(x => x.Name.Equals(name));
+        return Context.VideoInfo.Any(x => x.Name.Equals(name));
     }
 
-    public void AddByVideoInfoVo(VideoInfoVo vo)
+    private VideoInfo GetVideoInfoFromVo(VideoInfoVo vo)
     {
         // 查看是否有同name的视频信息
-        var isExistsName = IsExistsName(vo.Name);
-        // 数据库有该数据则退出
-        if (isExistsName) return;
-
-        var videoInfo = new VideoInfo(vo.Name)
+        var videoInfo = GetOneByName(vo.Name);
+        
+        // 数据库没有改数据，则构建一个新的
+        videoInfo ??= new VideoInfo(vo.Name)
         {
-            Title = vo.Title,
-            SourceUrl = vo.SourceUrl,
+            SourceUrl = vo.SourceUrl
         };
-
-
+        
+        videoInfo.Title = vo.Title;
+        videoInfo.SourceUrl = vo.SourceUrl;
+        videoInfo.ReleaseTime = vo.ReleaseTime;
+        videoInfo.LengthTime = vo.LengthTime;
+        videoInfo.ImageUrl = vo.SampleImageList == null
+            ? null
+            : Join(",", vo.SampleImageList);
+        
         // 导演
         if (vo.DirectorName != null)
-            videoInfo.Director = _videoInfoContext.DirectorInfo.FirstOrDefault(i=>string.Equals(i.Name,vo.DirectorName))
-                            ?? new DirectorInfo(vo.DirectorName);
+            videoInfo.Director = Context.DirectorInfo.FirstOrDefault(i=>string.Equals(i.Name,vo.DirectorName))
+                                 ?? new DirectorInfo(vo.DirectorName);
         
         // 厂商
         if (vo.ProducerName != null)
-            videoInfo.Producer = _videoInfoContext.ProducerInfo.FirstOrDefault(i => string.Equals(i.Name,vo.ProducerName))
-                            ?? new ProducerInfo(vo.ProducerName);
+            videoInfo.Producer = Context.ProducerInfo.FirstOrDefault(i => string.Equals(i.Name,vo.ProducerName))
+                                 ?? new ProducerInfo(vo.ProducerName);
         
         // 发行者
         if (vo.PublisherName != null)
-            videoInfo.Publisher = _videoInfoContext.PublisherInfo.FirstOrDefault(i=> string.Equals(i.Name,vo.PublisherName))
-                                 ?? new PublisherInfo(vo.PublisherName);
+            videoInfo.Publisher = Context.PublisherInfo.FirstOrDefault(i=> string.Equals(i.Name,vo.PublisherName))
+                                  ?? new PublisherInfo(vo.PublisherName);
         
         // 系列
         if (vo.SeriesName != null)
-            videoInfo.Series = _videoInfoContext.SeriesInfo.FirstOrDefault(i=> string.Equals(i.Name,vo.SeriesName))
-                              ?? new SeriesInfo(vo.SeriesName);
+            videoInfo.Series = Context.SeriesInfo.FirstOrDefault(i=> string.Equals(i.Name,vo.SeriesName))
+                               ?? new SeriesInfo(vo.SeriesName);
         
         // 演员信息
         if (vo.ActorNameList is { Count: > 0 })
@@ -85,7 +105,7 @@ public class VideoInfoDao: BaseDao<VideoInfo>, IVideoInfoDao
             videoInfo.ActorInfoList = [];
             foreach (var actorInfo in
                      from actorName in vo.ActorNameList
-                        let actorInfo = _videoInfoContext.ActorInfo.FirstOrDefault(i=>string.Equals(i.Name, actorName))
+                        let actorInfo = Context.ActorInfo.FirstOrDefault(i=>string.Equals(i.Name, actorName))
                      where actorInfo == null
                      select new ActorInfo(actorName))
             {
@@ -99,15 +119,9 @@ public class VideoInfoDao: BaseDao<VideoInfo>, IVideoInfoDao
             videoInfo.SampleImages = Concat(vo.SampleImageList);
         }
         
-        // 文件信息
-        // 通过FileSpiderResult查询Named对应的FileId
-        videoInfo.FileInfoList = (from fileInfo in _videoInfoContext.FileInfo
-            join spiderResult in _videoInfoContext.FileSpiderResult
-                on fileInfo.Id equals spiderResult.FileId
-            where spiderResult.TrueName == vo.Name
-            select fileInfo).ToList();
-        
-        AddAndSaveChanges(videoInfo);
+        // 文件信息，搜刮的时候添加
+
+        return videoInfo;
     }
 
     //     public void UpdateAllImagePathList(string srcPath, string dstPath)

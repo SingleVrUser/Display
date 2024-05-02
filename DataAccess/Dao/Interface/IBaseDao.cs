@@ -1,4 +1,6 @@
-﻿namespace DataAccess.Dao.Interface;
+﻿using System.Linq.Expressions;
+
+namespace DataAccess.Dao.Interface;
 
 public interface IBaseDao<TEntity>
 {
@@ -8,10 +10,18 @@ public interface IBaseDao<TEntity>
     /// 添加并保存
     /// </summary>
     /// <param name="entity"></param>
-    void AddAndSaveChanges(TEntity entity);
+    void ExecuteAdd(TEntity entity);
+
+    /// <summary>
+    /// 更新并保存
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <param name="updateAction"></param>
+    void ExecuteUpdate(Expression<Func<TEntity, bool>> predicate, Action<TEntity> updateAction);
 
     /// <summary>
     /// 初始化数据库
     /// </summary>
     void InitData();
+
 }
