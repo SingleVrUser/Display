@@ -3,9 +3,13 @@ using DataAccess.Models.Entity;
 
 namespace DataAccess.Dao.Interface;
 
-public interface IActorInfoDao
+public interface IActorInfoDao : IBaseDao<ActorInfo>
 {
-    
+    /// <summary>
+    /// 更新喜欢
+    /// </summary>
+    void UpdateIsLike(Expression<Func<ActorInfo, bool>> predicate, bool isLike);
+
     // /// <summary>
     // /// 通过视频的Name获取出演者的部分信息列表（不包括出演视频数）
     // /// </summary>

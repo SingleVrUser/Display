@@ -1,7 +1,7 @@
 ﻿using DataAccess.Dao.Impl;
 using DataAccess.Models.Vo;
 
-namespace DataAccessTest.DataAccess.Step;
+namespace DataAccessTest.Step;
 
 public class UpdateVideoInfoTest
 {
