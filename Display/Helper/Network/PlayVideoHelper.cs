@@ -227,7 +227,7 @@ internal class PlayVideoHelper
     /// </summary>
     /// <param name="multisetList"></param>
     /// <param name="xamlRoot"></param>
-    public static async void ShowSelectedVideoToPlayPage(List<FilesInfo> multisetList, XamlRoot xamlRoot)
+    public static async void ShowSelectedVideoToPlayPage(List<FileInfo> multisetList, XamlRoot xamlRoot)
     {
         multisetList = multisetList.OrderBy(item => item.Name).ToList();
 

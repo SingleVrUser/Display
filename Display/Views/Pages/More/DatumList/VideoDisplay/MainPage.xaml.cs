@@ -471,7 +471,7 @@ public sealed partial class MainPage : IDisposable
             Debug.WriteLine("正在添加信息：" + trueName);
 
             // cidInfo已经存在
-            var cidInfo = _cidInfos.FirstOrDefault(item => item.VideoInfoVo.TrueName.ToUpper().Equals(trueName.ToUpper()));
+            var cidInfo = _cidInfos.FirstOrDefault(item => item.VideoCoverVo.Name.ToUpper().Equals(trueName.ToUpper()));
             if (cidInfo is not null)
             {
                 _cidInfos.Add(cidInfo);
@@ -636,7 +636,7 @@ public sealed partial class MainPage : IDisposable
     {
         //移除cid信息（预览图/信息）
         var removeCid = _cidInfos.FirstOrDefault(item =>
-            item.VideoInfoVo.TrueName == detailFileInfo.Name || item.VideoInfoVo.TrueName.Equals(FileMatch.MatchName(detailFileInfo.Name)?.ToUpper(), StringComparison.CurrentCultureIgnoreCase));
+            item.VideoCoverVo.Name == detailFileInfo.Name || item.VideoCoverVo.Name.Equals(FileMatch.MatchName(detailFileInfo.Name)?.ToUpper(), StringComparison.CurrentCultureIgnoreCase));
 
         if (removeCid == null) return;
 
@@ -759,7 +759,7 @@ public sealed partial class MainPage : IDisposable
 
         SmokeGrid.Visibility = Visibility.Visible;
 
-        EnlargeImage.Source = new BitmapImage(new Uri(cidInfo.VideoInfoVo.ImagePath));
+        EnlargeImage.Source = new BitmapImage(new Uri(cidInfo.VideoCoverVo.ImagePath));
     }
 
     private void EnlargeButton_PointerExited(object sender, PointerRoutedEventArgs e)
@@ -1079,26 +1079,26 @@ public sealed partial class MainPage : IDisposable
 
 public class CidInfo
 {
-    public VideoInfoVo VideoInfoVo;
+    public VideoCoverVo VideoCoverVo;
 
     public CidInfo(string name, string imagePath)
     {
-        VideoInfoVo = new VideoInfoVo { TrueName = name, ImagePath = imagePath };
+        VideoCoverVo = new VideoCoverVo { Name = name, ImagePath = imagePath };
     }
 
     public CidInfo(VideoInfo info)
     {
-        VideoInfoVo = new VideoInfoVo(info);
+        VideoCoverVo = new VideoCoverVo(info);
     }
 
     public void UpdateInfo(VideoInfo info)
     {
         Debug.WriteLine(info.ImagePath);
         
-        VideoInfoVo.TrueName = info.TrueName;
-        VideoInfoVo.ImagePath = info.ImagePath;
-        VideoInfoVo.ReleaseTime = info.ReleaseTime;
-        VideoInfoVo.Actor = info.Actor;
+        VideoCoverVo.Name = info.TrueName;
+        VideoCoverVo.ImagePath = info.ImagePath;
+        VideoCoverVo.ReleaseTime = info.ReleaseTime;
+        VideoCoverVo.Actor = info.Actor;
     }
 
     public CancellationTokenSource CancellationTokenSource { get; set; } = new();

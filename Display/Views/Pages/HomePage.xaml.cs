@@ -20,16 +20,16 @@ public sealed partial class HomePage
 {
     private readonly IncrementalLoadSuccessInfoCollection _recentList = [];
 
-    private readonly ObservableCollection<VideoInfoVo> _lookLaterList = [];
-    private readonly ObservableCollection<VideoInfoVo> _recentCoverList = [];
-    private readonly ObservableCollection<VideoInfoVo> _loveCoverList = [];
+    private readonly ObservableCollection<VideoCoverVo> _lookLaterList = [];
+    private readonly ObservableCollection<VideoCoverVo> _recentCoverList = [];
+    private readonly ObservableCollection<VideoCoverVo> _loveCoverList = [];
 
     private readonly IVideoInfoDao _videoInfoDao = App.GetService<IVideoInfoDao>();
 
     //过渡动画用
     private enum NavigationAnimationType { Image, GridView };
     private NavigationAnimationType _navigationType;
-    private VideoInfoVo _storedItem;
+    private VideoCoverVo _storedItem;
     private GridView _storedGridView;
     private Image _storedImage;
 
@@ -66,7 +66,7 @@ public sealed partial class HomePage
 
     private void MultipleCoverShow_ItemClick(object sender, ItemClickEventArgs e)
     {
-        var coverInfo = (VideoInfoVo)e.ClickedItem;
+        var coverInfo = (VideoCoverVo)e.ClickedItem;
 
         _storedItem = coverInfo;
         _storedGridView = (GridView)sender;
@@ -84,7 +84,7 @@ public sealed partial class HomePage
 
         _storedImage = image;
 
-        var coverInfo = _storedImage.DataContext as VideoInfoVo;
+        var coverInfo = _storedImage.DataContext as VideoCoverVo;
 
         _navigationType = NavigationAnimationType.Image;
 
@@ -108,7 +108,7 @@ public sealed partial class HomePage
     {
         if (sender is not ListView listView) return;
 
-        if (VideoInfoListView.ItemsSource is not ObservableCollection<VideoInfoVo> items) return;
+        if (VideoInfoListView.ItemsSource is not ObservableCollection<VideoCoverVo> items) return;
 
         if (listView.SelectedItem is not VideoInfo videoInfo) return;
 
@@ -148,7 +148,7 @@ public sealed partial class HomePage
         TryUpdateCoverShow();
     }
 
-    private void TryUpdateVideoCoverDisplayClass(VideoInfo[] videoInfos, ObservableCollection<VideoInfoVo> videoList)
+    private void TryUpdateVideoCoverDisplayClass(VideoInfo[] videoInfos, ObservableCollection<VideoCoverVo> videoList)
     {
         if (videoInfos == null) return;
 
@@ -159,7 +159,7 @@ public sealed partial class HomePage
             var isAdd = true;
             foreach (var showItem in videoList)
             {
-                if (showItem.TrueName == item.TrueName)
+                if (showItem.Name == item.TrueName)
                 {
                     isAdd = false;
                 }
@@ -178,7 +178,7 @@ public sealed partial class HomePage
             var isDel = true;
             foreach (var item in videoInfos)
             {
-                if (showItem.TrueName == item.TrueName)
+                if (showItem.Name == item.TrueName)
                 {
                     isDel = false;
                 }
@@ -186,18 +186,18 @@ public sealed partial class HomePage
 
             if (isDel)
             {
-                delList.Add(showItem.TrueName);
+                delList.Add(showItem.Name);
             }
         }
 
         foreach (var trueName in delList)
         {
-            var delItem = videoList.FirstOrDefault(x => x.TrueName == trueName);
+            var delItem = videoList.FirstOrDefault(x => x.Name == trueName);
             videoList.Remove(delItem);
         }
         foreach (var item in addList)
         {
-            videoList.Add(new VideoInfoVo(item));
+            videoList.Add(new VideoCoverVo(item));
         }
     }
 
@@ -221,7 +221,7 @@ public sealed partial class HomePage
 
         foreach (var videoInfo in await _videoInfoDao.GetRecentListAsync(10))
         {
-            _recentCoverList.Add(new VideoInfoVo(videoInfo));
+            _recentCoverList.Add(new VideoCoverVo(videoInfo));
         }
 
     }
@@ -232,7 +232,7 @@ public sealed partial class HomePage
 
         foreach (var videoInfo in await _videoInfoDao.GetLookLaterListAsync(10))
         {
-            _lookLaterList.Add(new VideoInfoVo(videoInfo));
+            _lookLaterList.Add(new VideoCoverVo(videoInfo));
         }
     }
 
@@ -242,7 +242,7 @@ public sealed partial class HomePage
 
         foreach (var videoInfo in await _videoInfoDao.GetLikeListAsync(10))
         {
-            _loveCoverList.Add(new VideoInfoVo(videoInfo));
+            _loveCoverList.Add(new VideoCoverVo(videoInfo));
         }
     }
 

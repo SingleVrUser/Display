@@ -8,24 +8,6 @@ namespace DataAccess.Dao.Impl;
 public class ActorInfoDao : BaseDao<ActorInfo>, IActorInfoDao
 {
     
-    public void UpdateIsLike(Expression<Func<ActorInfo, bool>> predicate, bool isLike)
-    {
-        ExecuteUpdate(predicate, i =>
-        {
-            if (i.Interest == null)
-            {
-                i.Interest = new ActorInterest
-                {
-                    IsLike = isLike
-                };
-            }
-            else
-            {
-                i.Interest.IsLike = isLike;
-            }
-        });
-    }
-    
 //     public List<ActorInfo> GetPartListByVideoName(string videoName)
 //     {
 //         // video_count有误

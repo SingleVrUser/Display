@@ -37,7 +37,7 @@ public class VideoInfo(string name) : BaseEntity
     /// 信息地址
     /// </summary>
     [StringLength(200)]
-    public required string SourceUrl { get; set; }
+    public string? SourceUrl { get; set; }
 
     /// <summary>
     /// 导演

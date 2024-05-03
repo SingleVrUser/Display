@@ -16,14 +16,14 @@ public sealed partial class DownDialogContent : INotifyPropertyChanged
         InitializeComponent();
     }
 
-    public DownDialogContent(List<FilesInfo> videoInfoList)
+    public DownDialogContent(List<FileInfo> videoInfoList)
     {
         InitializeComponent();
 
         CreateCheckBox(videoInfoList);
     }
 
-    private void CreateCheckBox(List<FilesInfo> videoInfoList)
+    private void CreateCheckBox(List<FileInfo> videoInfoList)
     {
         videoInfoList.ForEach(videoInfo => ContentStackPanel.Children.Add(new CheckBox
         {

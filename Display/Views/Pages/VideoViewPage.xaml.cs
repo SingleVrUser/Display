@@ -5,6 +5,7 @@ using Display.Helper.Network;
 using Display.Models.Dto.Media;
 using Display.Models.Entities.OneOneFive;
 using Display.Models.Vo;
+using Display.Models.Vo.OneOneFive;
 using Display.Providers;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -17,7 +18,7 @@ namespace Display.Views.Pages;
 public sealed partial class VideoViewPage
 {
     //为返回动画做准备（需启动缓存）
-    private VideoInfoVo _storeditem;
+    private VideoCoverVo _storeditem;
     public VideoViewPage()
     {
         InitializeComponent();
@@ -33,11 +34,8 @@ public sealed partial class VideoViewPage
         MediaPlayItem mediaPlayItem;
         switch (videoPlayGrid.DataContext)
         {
-            case FilesInfo datum:
-                mediaPlayItem = new MediaPlayItem(datum);
-                break;
-            case FailInfo failInfo:
-                mediaPlayItem = new MediaPlayItem(failInfo.Datum);
+            case FileInfo datum:
+                mediaPlayItem = new MediaPlayItem(new DetailFileInfo(datum));
                 break;
             default:
                 return;
@@ -53,7 +51,7 @@ public sealed partial class VideoViewPage
     /// </summary>
     private void OnClicked(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button { DataContext: VideoInfoVo item }) return;
+        if (sender is not Button { DataContext: VideoCoverVo item }) return;
 
         //准备动画
         //videoControl.PrepareAnimation(item);
@@ -70,9 +68,9 @@ public sealed partial class VideoViewPage
     {
         var VideoPlayButton = (Button)sender;
 
-        if (VideoPlayButton.DataContext is not VideoInfoVo videoInfo) return;
+        if (VideoPlayButton.DataContext is not VideoCoverVo videoInfo) return;
 
-        var videoInfoList = DataAccessLocal.Get.GetSingleFileInfoByTrueName(videoInfo.TrueName);
+        var videoInfoList = DataAccessLocal.Get.GetSingleFileInfoByTrueName(videoInfo.Name);
 
         //没有
         if (videoInfoList.Count == 0)
@@ -86,7 +84,7 @@ public sealed partial class VideoViewPage
         {
             _storeditem = videoInfo;
 
-            var mediaPlayItem = new MediaPlayItem(videoInfoList[0]);
+            var mediaPlayItem = new MediaPlayItem(new DetailFileInfo(videoInfoList[0]));
             await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this);
             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }

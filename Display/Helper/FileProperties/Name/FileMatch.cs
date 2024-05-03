@@ -14,12 +14,13 @@ using DataAccess.Models.Entity;
 using Display.Models.Api.EditorCookie;
 using Display.Models.Vo;
 using Display.Providers;
+using FileInfo = DataAccess.Models.Entity.FileInfo;
 
 namespace Display.Helper.FileProperties.Name;
 
 public static class FileMatch
 {
-    private static readonly IFilesInfoDao FilesInfoDao = App.GetService<IFilesInfoDao>();
+    private static readonly IFileInfoDao FilesInfoDao = App.GetService<IFileInfoDao>();
 
     private static readonly IFileToInfoDao FileToInfoDao = App.GetService<IFileToInfoDao>();
     
@@ -208,12 +209,6 @@ public static class FileMatch
                 case "导演" or "director":
                     trueType = "director";
                     break;
-                //失败比较特殊
-                //从另外的表中查找
-                case "失败" or "fail":
-                    var failItems = await DataAccessLocal.Get.GetFailFileInfoWithFilesInfoAsync(n: keywords, limit: limit);
-                    failItems?.ForEach(item => dictionary.TryAdd(item.Name, new FailVideoInfo(item)));
-                    continue;
                 default:
                     trueType = "truename";
                     break;
@@ -226,7 +221,7 @@ public static class FileMatch
 
             var newItems = DataAccessLocal.Get.GetVideoInfoBySomeType(trueType, keywords, leftCount);
 
-            newItems?.ForEach(item => dictionary.TryAdd(item.TrueName, item));
+            newItems?.ForEach(item => dictionary.TryAdd(item.Name, item));
         }
 
         return dictionary.Values.ToList();
@@ -242,7 +237,7 @@ public static class FileMatch
     /// </summary>
     /// <param name="data"></param>
     /// <returns></returns>
-    public static List<MatchVideoResult> GetVideoAndMatchFile(List<FilesInfo> data)
+    public static List<MatchVideoResult> GetVideoAndMatchFile(List<FileInfo> data)
     {
         //根据视频信息匹配视频文件
         List<MatchVideoResult> resultList = [];

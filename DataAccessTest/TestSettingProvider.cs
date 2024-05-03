@@ -1,5 +1,5 @@
 ﻿
-namespace Tests.DataAccess;
+namespace DataAccessTest;
 
 // internal class TestSettingProvider : ISettingProvider
 // {

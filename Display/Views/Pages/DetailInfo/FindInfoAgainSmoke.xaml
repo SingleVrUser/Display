@@ -153,7 +153,7 @@
 
                                         <TextBlock Grid.Column="1"
                                                    Grid.Row="0"
-                                                   Text="{x:Bind TrueName}"
+                                                   Text="{x:Bind Name}"
                                                    FontWeight="Bold" />
 
                                         <TextBlock Grid.Column="1"
@@ -240,7 +240,7 @@
                             <TextBlock>
                                     <Run>番号</Run>
                                     <Run FontWeight="Bold"
-                                         Text="{x:Bind _videoInfo.TrueName,Mode=OneWay}" />
+                                         Text="{x:Bind _videoInfo.Name,Mode=OneWay}" />
                             </TextBlock>
 
                             <TextBlock>

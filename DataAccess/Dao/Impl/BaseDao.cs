@@ -38,10 +38,33 @@ public abstract class BaseDao<TEntity>: IBaseDao<TEntity> where TEntity : class
         Context.SaveChanges();
     }
 
+    public void ExecuteUpdate(TEntity entity)
+    {
+        CurrentDbSet.Update(entity);
+        Context.SaveChanges();
+    }
+
+    public void ExecuteRemove(TEntity entity)
+    {
+        CurrentDbSet.Remove(entity);
+        Context.SaveChanges();
+    }
+
 
     public void InitData()
     {
         _database.EnsureDeleted();
         _database.EnsureCreated();
     }
+
+    public List<TEntity> List()
+    {
+        return CurrentDbSet.ToList();
+    }
+
+    public void ExecuteDeleteAll()
+    {
+        CurrentDbSet.ExecuteDelete();
+    }
+
 }

@@ -1,6 +1,6 @@
-﻿namespace DataAccess.Models.Vo;
+﻿namespace DataAccess.Models.Dto;
 
-public class VideoInfoVo
+public class VideoInfoDto
 {
     /// <summary>
     /// 名称

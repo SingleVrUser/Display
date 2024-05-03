@@ -1,5 +1,5 @@
 ﻿using DataAccess.Models.Entity;
-using DataAccess.Models.Vo;
+using DataAccess.Models.Dto;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Dao.Interface;
@@ -9,14 +9,14 @@ public interface IVideoInfoDao : IBaseDao<VideoInfo>
     /// <summary>
     /// 添加视频信息，并与文件信息关联
     /// </summary>
-    /// <param name="vo"></param>
+    /// <param name="dto"></param>
     /// <param name="fileIdList"></param>
-    void AddOrUpdateInfoAndAttachFile(VideoInfoVo vo, List<long> fileIdList);
+    void AddOrUpdateInfoAndAttachFile(VideoInfoDto dto, List<long> fileIdList);
 
     /// <summary>
     /// 通过VideoInfoVo添加数据
     /// </summary>
-    void AddOrUpdateByVideoInfoVo(VideoInfoVo vo);
+    void AddOrUpdateByVideoInfoVo(VideoInfoDto dto);
 
     
     /// <summary>
@@ -40,9 +40,12 @@ public interface IVideoInfoDao : IBaseDao<VideoInfo>
     /// <returns></returns>
     bool IsExistsName(string name);
 
+    /// <summary>
+    /// 通过id删除数据
+    /// </summary>
+    /// <param name="id"></param>
+    void ExecuteDeleteById(long id);
 
-    // Video? GetOneByTrueName(string name);
-    //
     // List<Video>? GetInfoListByTrueName(string name);
     //
     // string? GetTrueNameByLikeName(string name);

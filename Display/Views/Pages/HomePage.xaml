@@ -71,7 +71,7 @@
                                       ItemsSource="{x:Bind _recentList}"
                                       Background="Transparent">
                                 <FlipView.ItemTemplate>
-                                    <DataTemplate x:DataType="vo:VideoInfoVo">
+                                    <DataTemplate x:DataType="vo:VideoCoverVo">
                                         <Border x:Name="Image_Grid"
                                                 PointerEntered="Image_PointerEntered"
                                                 PointerExited="Image_PointerExited"
@@ -96,7 +96,7 @@
                                   SelectedIndex="{x:Bind RandomImageFlipView.SelectedIndex, Mode=TwoWay}"
                                   SelectionChanged="videoInfoListView_SelectionChanged">
                             <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="vo:VideoInfoVo">
+                                <DataTemplate x:DataType="vo:VideoCoverVo">
                                     <Grid Margin="2">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="auto" />
@@ -120,11 +120,11 @@
                                         <StackPanel Grid.Column="1"
                                                     VerticalAlignment="Center"
                                                     Margin="5">
-                                            <TextBlock Text="{x:Bind TrueName}"
+                                            <TextBlock Text="{x:Bind Name}"
                                                        FontFamily="JetBrains Mono" />
-                                            <userController:TextBlockWithLongText StringValue="{x:Bind Actor}"
+                                            <userController:TextBlockWithLongText StringValue="{x:Bind ActorName}"
                                                                                   IsFirstTextSelectionEnabled="False" />
-                                            <userController:TextBlockWithLongText StringValue="{x:Bind Category}"
+                                            <userController:TextBlockWithLongText StringValue="{x:Bind ca"
                                                                                   IsFirstTextSelectionEnabled="False" />
                                         </StackPanel>
                                     </Grid>

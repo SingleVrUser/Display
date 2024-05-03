@@ -34,19 +34,20 @@ using FileInfoInCidSmoke = Display.Views.Pages.DetailInfo.FileInfoInCidSmoke;
 using FindInfoAgainSmoke = Display.Views.Pages.DetailInfo.FindInfoAgainSmoke;
 using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
 using DataAccess.Dao.Impl;
+using FileInfo = DataAccess.Models.Entity.FileInfo;
 
 namespace Display.Controls.UserController;
 
 public sealed partial class VideoDetails
 {
-    public VideoInfoVo ResultInfo
+    public VideoCoverVo ResultCover
     {
-        get => (VideoInfoVo)GetValue(ResultInfoProperty);
-        set => SetValue(ResultInfoProperty, value);
+        get => (VideoCoverVo)GetValue(ResultCoverProperty);
+        set => SetValue(ResultCoverProperty, value);
     }
 
-    public static readonly DependencyProperty ResultInfoProperty =
-        DependencyProperty.Register(nameof(ResultInfo), typeof(string), typeof(VideoDetails), null);
+    public static readonly DependencyProperty ResultCoverProperty =
+        DependencyProperty.Register(nameof(ResultCover), typeof(string), typeof(VideoDetails), null);
 
     private readonly IVideoInfoDao _videoInfoDao = App.GetService<IVideoInfoDao>();
     private readonly IActorInfoDao _actorInfoDao = App.GetService<IActorInfoDao>();
@@ -60,10 +61,10 @@ public sealed partial class VideoDetails
 
     private void LoadData()
     {
-        if (ResultInfo == null) return;
+        if (ResultCover == null) return;
 
         //标题
-        TitleTextBlock.Text = ResultInfo.Title;
+        TitleTextBlock.Text = ResultCover.Title;
 
         //缩略图
         //检查缩略图是否存在
@@ -73,9 +74,9 @@ public sealed partial class VideoDetails
             //来源为网络
             case ThumbnailOriginType.Web:
             {
-                var videoInfo = _videoInfoDao.GetOneByTrueName(ResultInfo.TrueName);
+                var videoInfo = _videoInfoDao.GetOneByName(ResultCover.Name);
 
-                var sampleImageListStr = videoInfo?.SampleImageList;
+                var sampleImageListStr = videoInfo?.SampleImages;
                 if (!string.IsNullOrEmpty(sampleImageListStr))
                 {
                     thumbnailList = sampleImageListStr.Split(",").ToList();
@@ -86,7 +87,7 @@ public sealed partial class VideoDetails
             //来源为本地
             case (int)ThumbnailOriginType.Local:
                 {
-                    var folderFullName = Path.Combine(AppSettings.ImageSavePath, ResultInfo.TrueName);
+                    var folderFullName = Path.Combine(AppSettings.ImageSavePath, ResultCover.Name);
                     var theFolder = new DirectoryInfo(folderFullName);
 
                     if (theFolder.Exists)
@@ -117,12 +118,12 @@ public sealed partial class VideoDetails
         if (ActorStackPanel.Children.Count != 0) ActorStackPanel.Children.Clear();
 
         //查询该视频对应的演员列表
-        var actorList = _actorInfoDao.GetPartListByVideoName(ResultInfo.TrueName);
+        var actorList = _actorInfoDao.GetPartListByVideoName(ResultCover.Name);
 
         for (var i = 0; i < actorList.Count; i++)
         {
             var actor = actorList[i];
-            var actorImageControl = new ActorImage(actor, ResultInfo.ReleaseTime);
+            var actorImageControl = new ActorImage(actor, ResultCover.ReleaseYear);
 
             if (!string.IsNullOrEmpty(actor.Name))
                 actorImageControl.Click += ActorButtonOnClick;
@@ -133,7 +134,7 @@ public sealed partial class VideoDetails
         //标签
         //之前有数据，清空
         if (CategoryWrapPanel.Children.Count != 0) CategoryWrapPanel.Children.Clear();
-        var categoryList = ResultInfo.Category?.Split(",");
+        var categoryList = ResultCover.Category?.Split(",");
         for (var i = 0; i < categoryList?.Length; i++)
         {
             var content = categoryList[i];
@@ -192,7 +193,7 @@ public sealed partial class VideoDetails
 
     private async void DownButton_Click(object sender, RoutedEventArgs e)
     {
-        var name = ResultInfo.TrueName;
+        var name = ResultCover.Name;
         var videoInfoList = DataAccessLocal.Get.GetSingleFileInfoByTrueName(name);
 
         videoInfoList = videoInfoList.OrderBy(item => item.Name).ToList();
@@ -214,7 +215,7 @@ public sealed partial class VideoDetails
 
         var result = await dialog.ShowAsync();
 
-        var downVideoInfoList = new List<FilesInfo>();
+        var downVideoInfoList = new List<FileInfo>();
 
         var webApi = WebApi.GlobalWebApi;
 
@@ -280,24 +281,23 @@ public sealed partial class VideoDetails
     private void RatingControl_ValueChanged(RatingControl sender, object args)
     {
         var score = sender.Value == 0 ? -1 : sender.Value;
-        ResultInfo.Score = score;
-        _videoInfoDao.ExecuteUpdateByTrueName(ResultInfo.TrueName, info => info.Score = score);
+        ResultCover.Score = score;
+        _videoInfoDao.ExecuteUpdateByTrueName(ResultCover.Name, info => info.Score = score);
     }
 
     private void UpdateLookLater(bool? val)
     {
-        var lookLaterT = val == true ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
+        var lookLaterT = val == true;
 
-        ResultInfo.LookLater = lookLaterT;
-        _videoInfoDao.ExecuteUpdateByTrueName(ResultInfo.TrueName, info => info.LookLater = lookLaterT);
+        ResultCover.IsLookLater = lookLaterT;
+        _videoInfoDao.ExecuteUpdateByTrueName(ResultCover.Name, info => info.LookLater = lookLaterT);
     }
 
     private void UpdateLike(bool? val)
     {
-        var isLike = val == true ? 1 : 0;
-
-        ResultInfo.IsLike = isLike;
-        _videoInfoDao.ExecuteUpdateByTrueName(ResultInfo.TrueName, info => info.IsLike = isLike);
+        var isLike = val == true;
+        ResultCover.IsLike = isLike;
+        _videoInfoDao.ExecuteUpdateByTrueName(ResultCover.Name, info => info.IsLike = isLike);
     }
 
     private void Animation_Completed(ConnectedAnimation sender, object args)
@@ -322,7 +322,7 @@ public sealed partial class VideoDetails
         if (_findInfoAgainSmoke == null)
         {
 
-            _findInfoAgainSmoke = new FindInfoAgainSmoke(ResultInfo.TrueName);
+            _findInfoAgainSmoke = new FindInfoAgainSmoke(ResultCover.Name);
 
             _findInfoAgainSmoke.ConfirmClick += FindInfoAgainSmoke_ConfirmClick;
         }
@@ -360,10 +360,8 @@ public sealed partial class VideoDetails
         if (!string.IsNullOrEmpty(videoInfo.ImageUrl))
         {
             await DbNetworkHelper.DownloadFile(videoInfo.ImageUrl,
-                Path.Combine(AppSettings.ImageSavePath, videoInfo.TrueName), videoInfo.TrueName, true);
+                Path.Combine(AppSettings.ImageSavePath, videoInfo.Name), videoInfo.Name, true);
         }
-
-        Context.Instance.ChangeTracker.Clear();
         
         //更新数据库
         DataAccessLocal.Add.UpdateDataFromVideoInfo(videoInfo);
@@ -378,15 +376,15 @@ public sealed partial class VideoDetails
 
             var value = item.GetValue(videoInfo);
 
-            var newItem = ResultInfo.GetType().GetProperty(name);
-            newItem?.SetValue(ResultInfo, value);
+            var newItem = ResultCover.GetType().GetProperty(name);
+            newItem?.SetValue(ResultCover, value);
         }
 
         //图片地址不变，但内容变了
         //为了图片显示能够变化
-        var oldPath = ResultInfo.ImagePath;
+        var oldPath = ResultCover.ImagePath;
         var newPath = videoInfo.ImagePath;
-        if (oldPath != null && !oldPath.Contains("ms-appx:") && File.Exists(newPath))
+        if (!oldPath.Contains("ms-appx:") && File.Exists(newPath))
         {
             var file = await StorageFile.GetFileFromPathAsync(newPath);
 
@@ -533,7 +531,7 @@ public sealed partial class VideoDetails
 
     private async void EditAppBarButton_Click(object sender, RoutedEventArgs e)
     {
-        var editPage = new EditInfo(ResultInfo);
+        var editPage = new EditInfo(ResultCover);
         ContentDialog dialog = new()
         {   
             XamlRoot = this.XamlRoot,
@@ -551,7 +549,7 @@ public sealed partial class VideoDetails
         //确定修改
         var videoCoverDisplayClassInfo = editPage.GetInfoAfterEdit();
 
-        VideoInfo newInfo = new();
+        VideoInfo newInfo = new(videoCoverDisplayClassInfo.Name);
 
         //构建构建新的VideoInfo
         //更新UI
@@ -575,15 +573,15 @@ public sealed partial class VideoDetails
             }
 
             //原先的旧值
-            var oldItem = ResultInfo.GetType().GetProperty(name);
+            var oldItem = ResultCover.GetType().GetProperty(name);
             if (oldItem == null) continue;
                     
-            var oldValue = oldItem.GetValue(ResultInfo);
+            var oldValue = oldItem.GetValue(ResultCover);
 
             //与新值比较，判断是否需要更新正在显示的ResultInfo数据
             if (newValue != oldValue)
             {
-                oldItem.SetValue(ResultInfo, newValue);
+                oldItem.SetValue(ResultCover, newValue);
             }
         }
 
@@ -592,7 +590,7 @@ public sealed partial class VideoDetails
 
     private void OpenDirectory_Click(object sender, RoutedEventArgs e)
     {
-        var imagePath = Path.GetDirectoryName(ResultInfo.ImagePath);
+        var imagePath = Path.GetDirectoryName(ResultCover.ImagePath);
         if (imagePath == Constants.FileType.NoPicturePath)
         {
             return;
@@ -623,7 +621,7 @@ public sealed partial class VideoDetails
     {
         SmokeGrid.Visibility = Visibility.Visible;
 
-        FileInfoInCidSmokePage = new FileInfoInCidSmoke(ResultInfo.TrueName);
+        FileInfoInCidSmokePage = new FileInfoInCidSmoke(ResultCover.Name);
         SmokeGrid.Children.Add(FileInfoInCidSmokePage);
 
         SmokeCancelGrid.Tapped += FileInfoInCidSmokeCancelGrid_Tapped;
@@ -716,7 +714,7 @@ public sealed partial class VideoDetails
 
     private async void FindVideoAppBarButton_Click(object sender, RoutedEventArgs e)
     {
-        var tupleResult = await SearchLinkPage.ShowInContentDialog(ResultInfo.TrueName, XamlRoot);
+        var tupleResult = await SearchLinkPage.ShowInContentDialog(ResultCover.Name, XamlRoot);
 
         // 用户取消操作
         if (tupleResult == null) return;

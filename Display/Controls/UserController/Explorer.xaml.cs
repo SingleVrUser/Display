@@ -33,7 +33,7 @@ public sealed partial class Explorer
     //存储获取过的Datum，避免重复获取
     private readonly List<StoreDatum> _storeDataList = [];
 
-    private readonly IFilesInfoDao _filesInfoDao = App.GetService<IFilesInfoDao>();
+    private readonly IFileInfoDao _filesInfoDao = App.GetService<IFileInfoDao>();
     
     public Explorer()
     {
@@ -64,9 +64,9 @@ public sealed partial class Explorer
     /// <param name="folderCid"></param>
     /// <param name="outType"></param>
     /// <returns></returns>
-    public List<FilesInfo> GetFilesFromItems(long folderCid, FileType outType)
+    public List<FileInfo> GetFilesFromItems(long folderCid, FileType outType)
     {
-        List<FilesInfo> items;
+        List<FileInfo> items;
     
         //先从存储的List中获取
         var item = _storeDataList.FirstOrDefault(x => x.Cid == folderCid);
@@ -196,7 +196,7 @@ public sealed partial class Explorer
     /// 更新所选文件夹的文件列表
     /// </summary>
     /// <param name="items"></param>
-    private void TryUpdateFileInSelectFolder(List<FilesInfo> items)
+    private void TryUpdateFileInSelectFolder(List<FileInfo> items)
     {
         FileInSelectFolder.Clear();
 
@@ -263,7 +263,7 @@ public sealed partial class Explorer
     {
         if (node.Content is not ExplorerItem folder) return;
 
-        List<FilesInfo> itemsList;
+        List<FileInfo> itemsList;
 
         if (isInsertLeft && _lastFolderItemList != null)
         {
@@ -285,7 +285,7 @@ public sealed partial class Explorer
             return;
         }
 
-        List<FilesInfo> itemsPartList;
+        List<FileInfo> itemsPartList;
         var hasUnrealizedChildren = false;
 
         // 显示部分
@@ -316,7 +316,7 @@ public sealed partial class Explorer
         node.HasUnrealizedChildren = hasUnrealizedChildren;
     }
 
-    private async void StartUpdateTreeView(TreeViewNode node, List<FilesInfo> itemsList)
+    private async void StartUpdateTreeView(TreeViewNode node, List<FileInfo> itemsList)
     {
         ReadFileProgressBar.Maximum = itemsList.Count;
         ReadFileProgressBar.Value = 0;
@@ -357,9 +357,9 @@ public sealed partial class Explorer
     /// <param name="itemsList"></param>
     /// <param name="progress"></param>
     /// <returns></returns>
-    private Dictionary<FilesInfo, bool> GetNewNode(List<FilesInfo> itemsList, IProgress<int> progress)
+    private Dictionary<FileInfo, bool> GetNewNode(List<FileInfo> itemsList, IProgress<int> progress)
     {
-        var nodeHasUnrealizedChildrenDict = new Dictionary<FilesInfo, bool>();
+        var nodeHasUnrealizedChildrenDict = new Dictionary<FileInfo, bool>();
         
         var i = 0;
         foreach (var folderInfo in itemsList)
@@ -524,7 +524,7 @@ public sealed partial class Explorer
 public class LastUnAllShowFolderItem
 {
     public TreeViewNode InsertNode { get; init; }
-    public List<FilesInfo> LastFolderItem { get; init; }
+    public List<FileInfo> LastFolderItem { get; init; }
     public int ShowNum { get; init; }
 }
 

@@ -44,9 +44,9 @@ public class FileCategory
 
     public int AllCount => count + folder_count;
 
-    public static FilesInfo ConvertFolderToDatum(FileCategory fileCategory, long cid)
+    public static FileInfo ConvertFolderToDatum(FileCategory fileCategory, long cid)
     {
-        FilesInfo datum = new()
+        FileInfo datum = new()
         {
             Uid = 0,
             Aid = 1,
@@ -67,7 +67,7 @@ public class FileCategory
 
     }
 
-    public FileCategory(FilesInfo datum)
+    public FileCategory(FileInfo datum)
     {
         file_name = datum.Name;
         pick_code = datum.PickCode;

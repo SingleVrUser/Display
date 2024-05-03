@@ -11,7 +11,7 @@ using DataAccess;
 
 namespace Display.Models.Vo.IncrementalCollection;
 
-public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoInfoVo>, ISupportIncrementalLoading
+public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCoverVo>, ISupportIncrementalLoading
 {
     private double ImageWidth { get; set; }
     //private double ImageHeight { get; set; }
@@ -57,7 +57,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoIn
 
         AllCount = successCount + failCount;
 
-        newItems?.ForEach(item => Add(new VideoInfoVo(item, ImageWidth)));
+        newItems?.ForEach(item => Add(new VideoCoverVo(item, ImageWidth)));
     }
 
     public void SetImageSize(double imgWidth)
@@ -100,24 +100,9 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoIn
         if (lists == null || lists.Length < count)
         {
             HasMoreItems = false;
-
-            //最后显示匹配失败，如果需要显示的话
-            //无筛选功能
-            if (IsContainFail)
-            {
-                var failList = await DataAccessLocal.Get.GetFailFileInfoWithFilesInfoAsync(0, -1, FilterKeywords);
-                
-                foreach (var filesInfo in failList)
-                {
-                    var failVideoInfo = new FailVideoInfo(filesInfo);
-                    // var videoInfo = new FailVideoInfo(failVideoInfo, ImageWidth, ImageHeight);
-                    Add(failVideoInfo);
-                }
-                
-            }
         }
 
-        lists?.ForEach(item => Add(new VideoInfoVo(item, ImageWidth)));
+        lists?.ForEach(item => Add(new VideoCoverVo(item, ImageWidth)));
 
         var result = new LoadMoreItemsResult((uint)(lists?.Length ?? 0));
 
