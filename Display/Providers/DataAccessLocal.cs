@@ -15,6 +15,7 @@ using Display.Providers.Spider;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using static System.Int32;
+using FileInfo = DataAccess.Models.Entity.FileInfo;
 
 namespace Display.Providers;
 
@@ -45,8 +46,8 @@ public static class DataAccessLocal
             //添加是否步兵
             var isWm = new IsWm
             {
-                Truename = data.TrueName,
-                IsWm1 = data.IsWm
+                TrueName = data.Name,
+                IsVideoWm = data.IsWm
             };
             if (Context.Instance.IsWms.Any(i=>i.Truename == data.TrueName))
                 Context.Instance.IsWms.Update(isWm);
@@ -75,14 +76,10 @@ public static class DataAccessLocal
         /// <param name="videoInfo"></param>
         private static void AddActorInfoByActorInfo(VideoInfo videoInfo)
         {
-            var actorStr = videoInfo.Actor;
-            if (actorStr == null) return;
-            
-            var actorList = actorStr.Split(",");
-            foreach (var actorName in actorList)
+            foreach (var actorInfo in videoInfo.ActorInfoList)
             {
                 //查询Actor_ID
-                TryAddActorInfo(actorName, videoInfo.TrueName);
+                TryAddActorInfo(actorInfo.Name, videoInfo.Name);
             }
 
         }
@@ -94,7 +91,7 @@ public static class DataAccessLocal
         
             //更新是否步兵
             Context.Instance.IsWms.RemoveRange(Context.Instance.IsWms.Where(i => i.Truename == info.TrueName));
-            Context.Instance.IsWms.Add(new IsWm { Truename = info.TrueName, IsWm1 = info.IsWm });
+            Context.Instance.IsWms.Add(new IsWm { TrueName = info.TrueName, IsVideoWm = info.IsWm });
 
             if (info.Actor == null) return;
         
@@ -109,7 +106,7 @@ public static class DataAccessLocal
             //查询演员id列表
             foreach (var actorName in actors)
             {
-                TryAddActorInfo(actorName, info.TrueName);
+                TryAddActorInfo(actorName, info.Name);
             }
             
             Context.Instance.SaveChanges();
@@ -234,9 +231,9 @@ public static class DataAccessLocal
         /// <param name="trueName"></param>
         /// <param name="connection"></param>
         /// <returns></returns>
-        public static FilesInfo[] GetFilesInfoByTrueName(string trueName)
+        public static FileInfo[] GetFilesInfoByTrueName(string trueName)
         {
-            return Context.Instance.Database.SqlQuery<FilesInfo>(
+            return Context.Instance.Database.SqlQuery<FileInfo>(
                 $"SELECT * FROM FilesInfo,FileToInfo WHERE FilesInfo.pc == FileToInfo.file_pickcode AND FileToInfo.truename == '{trueName}' COLLATE NOCASE").ToArray();
         }
 
@@ -254,51 +251,6 @@ public static class DataAccessLocal
 
             return Context.Instance.VideoInfos.FromSqlRaw(sql).Select(i => i.TrueName).FirstOrDefault();
 
-        }
-
-        public static FailListIsLikeLookLater GetSingleFailInfoByPickCode(string pc, SqliteConnection connection = null)
-        {
-            var commandText =
-                $"SELECT info.*,fail.is_like, fail.score, fail.look_later, fail.image_path  FROM FailList_islike_looklater as fail LEFT JOIN FilesInfo as info on info.pc = fail.pc WHERE fail.pc = '{pc}' LIMIT 1";
-
-            return Context.Instance.FailListIsLikeLookLater.FromSqlRaw(commandText).FirstOrDefault();
-        }
-
-        /// <summary>
-        /// 查询失败列表（FailInfo格式）
-        /// </summary>
-        /// <returns></returns>
-        public static FailListIsLikeLookLater[] GetFailFileInfoWithFailInfo(int offset = 0, int limit = -1, FailInfoShowType showType = FailInfoShowType.like, SqliteConnection connection = null)
-        {
-            var showTypeStr = showType == FailInfoShowType.like ? " WHERE is_like = 1" : " WHERE look_later != 0";
-
-            var commandText =
-                $"SELECT info.*,fail.is_like, fail.score, fail.look_later, fail.image_path  FROM FailList_islike_looklater as fail LEFT JOIN FilesInfo as info on info.pc = fail.pc{showTypeStr} LIMIT {limit} offset {offset}";
-
-            return Context.Instance.FailListIsLikeLookLater.FromSqlRaw(commandText).ToArray();
-        }
-
-        /// <summary>
-        /// 查询失败列表（FilesInfo格式）
-        /// </summary>
-        /// <returns></returns>
-        public static async Task<FilesInfo[]> GetFailFileInfoWithFilesInfoAsync(int offset = 0, int limit = -1, string n = null, string orderBy = null, bool isDesc = false, FailType showType = FailType.All, SqliteConnection connection = null)
-        {
-            var orderStr = GetOrderStr(orderBy, isDesc);
-
-            var queryStr = string.IsNullOrEmpty(n) ? string.Empty : $" And FilesInfo.n LIKE '%{n.Replace("'", "%")}%'";
-
-            var showTypeStr = showType switch
-            {
-                FailType.MatchFail => " AND FileToInfo.truename == ''",
-                FailType.SpiderFail => " AND FileToInfo.truename != ''",
-                _ => string.Empty
-            };
-
-            var commandText =
-                $"SELECT * FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode{showTypeStr}{queryStr}{orderStr} LIMIT {limit} offset {offset} ";
-
-            return await Context.Instance.FilesInfos.FromSqlRaw(commandText).AsNoTracking().ToArrayAsync();
         }
 
         public static async Task<int> GetCountOfFailFileInfoWithFilesInfoAsync(int offset = 0, int limit = -1, string n = null, string orderBy = null, bool isDesc = false, FailType showType = FailType.All, SqliteConnection connection = null)
@@ -347,40 +299,6 @@ public static class DataAccessLocal
         }
         
 
-        public static int GetCountOfFailInfos(FailInfoShowType showType, SqliteConnection connection = null)
-        {
-            var commandStringBuilder = new StringBuilder("SELECT pc FROM FailList_islike_looklater ");
-
-            commandStringBuilder.Append(showType == FailInfoShowType.like
-                ? "WHERE is_like = 1"
-                : "WHERE look_later != 0");
-
-            return Context.Instance.FailListIsLikeLookLater.FromSqlRaw(commandStringBuilder.ToString()).AsNoTracking().Count();
-
-        }
-
-        public static async Task<int> GetCountOfFailFilesInfoFilesAsync(string n = "", FailType showType = FailType.All, SqliteConnection connection = null)
-        {
-            var commandStringBuilder = new StringBuilder("SELECT FilesInfo.* FROM FilesInfo,FileToInfo WHERE FileToInfo.issuccess == 0 AND FilesInfo.pc == FileToInfo.file_pickcode");
-
-            switch (showType)
-            {
-                case FailType.MatchFail:
-                    commandStringBuilder.Append(" AND FileToInfo.truename == ''");
-                    break;
-                case FailType.SpiderFail:
-                    commandStringBuilder.Append(" AND FileToInfo.truename != ''");
-                    break;
-            }
-
-            if (!string.IsNullOrEmpty(n))
-            {
-                n = n.Replace('\'', '%');
-                commandStringBuilder.Append(" And FilesInfo.n LIKE '%").Append(n).Append("%'");
-            }
-
-            return await Context.Instance.FileToInfos.FromSqlRaw(commandStringBuilder.ToString()).AsNoTracking().CountAsync();
-        }
 
         /// <summary>
         /// 检查VideoInfo表的数量
@@ -591,7 +509,7 @@ public static class DataAccessLocal
         /// </summary>
         /// <param name="trueName"></param>
         /// <returns></returns>
-        public static List<FilesInfo> GetSingleFileInfoByTrueName(string trueName)
+        public static List<FileInfo> GetSingleFileInfoByTrueName(string trueName)
         {
             var tuple = FileMatch.SplitLeftAndRightFromCid(trueName);
 
@@ -610,7 +528,7 @@ public static class DataAccessLocal
             var commText = $"SELECT * from FilesInfo WHERE uid != 0 AND iv = 1 AND n LIKE '%{leftName}%{rightNumber}%'";
             var tmpList = Context.Instance.FilesInfos.FromSqlRaw(commText).ToArray();
 
-            var data = new List<FilesInfo>();
+            var data = new List<FileInfo>();
 
             //进一步筛选，通过右侧数字
             // '%xxx%57%' 会选出 057、157、257之类的
@@ -658,7 +576,7 @@ public static class DataAccessLocal
         /// 查询PickCode文件对应的字幕文件（首先匹配文件名，其次匹配上一级文件夹的名称）
         /// </summary>
         /// <returns></returns>
-        public static FilesInfo[] GetSubFile(string filePickCode)
+        public static FileInfo[] GetSubFile(string filePickCode)
         {
             //查询字幕文件的信息
             var fileInfo = Context.Instance.FilesInfos.FirstOrDefault(i=>i.PickCode == filePickCode);

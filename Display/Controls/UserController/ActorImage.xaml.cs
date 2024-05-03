@@ -74,7 +74,7 @@ public sealed partial class ActorImage
 
     private void LikeMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
     {
-        var isLike = 0;
+        var isLike = false;
 
         //通过当前状态判断将要设置的值
         switch (LikeFontIcon.Visibility)
@@ -84,12 +84,14 @@ public sealed partial class ActorImage
                 break;
             case Visibility.Collapsed:
                 LikeFontIcon.Visibility = Visibility.Visible;
-                isLike = 1;
+                isLike = true;
                 break;
         }
+
+        ActorInfo.Interest ??= new ActorInterest();
+        ActorInfo.Interest.IsLike = isLike;
         
-        _actorInfoDao.UpdateIsLike(i => i.Id == ActorInfo.Id,
-            isLike == 1);
+        _actorInfoDao.ExecuteUpdate(ActorInfo);
     }
 
     private async void GetInfoMenuFlyoutItem_Click(object sender, RoutedEventArgs e)

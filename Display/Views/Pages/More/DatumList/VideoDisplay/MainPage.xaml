@@ -165,7 +165,7 @@
                                                     <Grid CornerRadius="5"
                                                           HorizontalAlignment="Center"
                                                           VerticalAlignment="Center">
-                                                        <Image Source="{x:Bind VideoInfoVo.ImagePath, Mode=OneWay}"
+                                                        <Image Source="{x:Bind VideoCoverVo.ImagePath, Mode=OneWay}"
                                                                Height="230" />
 
                                                         <Button x:Name="EnlargeButton"
@@ -182,10 +182,10 @@
 
                                                     <StackPanel Grid.Row="1"
                                                                 HorizontalAlignment="Center">
-                                                        <TextBlock Text="{x:Bind VideoInfoVo.TrueName, Mode=OneWay}"
+                                                        <TextBlock Text="{x:Bind VideoCoverVo.Name, Mode=OneWay}"
                                                                        IsTextSelectionEnabled="True" />
-                                                        <TextBlock Text="{x:Bind VideoInfoVo.ReleaseTime, Mode=OneWay}" />
-                                                        <userController:TextBlockWithLongText StringValue="{x:Bind VideoInfoVo.Actor, Mode=OneWay}" />
+                                                        <TextBlock Text="{x:Bind VideoCoverVo.ReleaseTime, Mode=OneWay}" />
+                                                        <userController:TextBlockWithLongText StringValue="{x:Bind VideoCoverVo.Actor, Mode=OneWay}" />
                                                     </StackPanel>
 
                                                     <StackPanel Orientation="Horizontal"

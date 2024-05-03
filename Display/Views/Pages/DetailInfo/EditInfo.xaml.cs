@@ -6,9 +6,7 @@ using System.Linq;
 using CommunityToolkit.WinUI.Collections;
 using CommunityToolkit.WinUI.Controls;
 using DataAccess.Models.Entity;
-using Display.Models.Dto.OneOneFive;
 using Display.Models.Entities.Details;
-using Display.Models.Entities.OneOneFive;
 using Display.Models.Records;
 using Display.Models.Vo;
 using Display.Models.Vo.IncrementalCollection;
@@ -28,22 +26,22 @@ public sealed partial class EditInfo
     private readonly IncrementalLoadActorInfoCollection _actorsSuggestion;
     private readonly ObservableCollection<ActorInfo> _actorItems;
 
-    private readonly VideoInfoVo _videoInfo;
+    private readonly VideoCoverVo _videoCover;
 
-    public EditInfo(VideoInfoVo videoInfo)
+    public EditInfo(VideoCoverVo videoCover)
     {
         InitializeComponent();
 
-        _videoInfo = videoInfo;
+        _videoCover = videoCover;
 
         _categoryItems = [];
-        _categories = videoInfo.Category.Split(",").Where(item => !string.IsNullOrEmpty(item)).Select(x => new TokenData(x)).ToList();
+        _categories = videoCover.Category.Split(",").Where(item => !string.IsNullOrEmpty(item)).Select(x => new TokenData(x)).ToList();
         _categories.ForEach(item => _categoryItems.Add(item));
 
         _actorItems = [];
-        var oldActors = videoInfo.Actor.Split(",")
+        var oldActors = videoCover.ActorName.Split(",")
             .Where(item => !string.IsNullOrEmpty(item))
-            .Select(x => new ActorInfo { Name = x }).ToList();
+            .Select(x => new ActorInfo(x)).ToList();
         
         oldActors.ForEach(item => _actorItems.Add(item));
 
@@ -75,13 +73,13 @@ public sealed partial class EditInfo
                 SymbolIconSource = new SymbolIconSource { Symbol = Symbol.AddFriend }
             },
 
-            new CommonEditOption { Header = "标题", MinWidth = 480, Text = videoInfo.Title },
-            new CommonEditOption { Header = "发布时间", Text = videoInfo.ReleaseTime },
-            new CommonEditOption { Header = "视频长度", Text = videoInfo.LengthTime },
-            new CommonEditOption { Header = "导演", Text = videoInfo.Director },
-            new CommonEditOption { Header = "制作商", Text = videoInfo.Producer },
-            new CommonEditOption { Header = "发行商", Text = videoInfo.Publisher },
-            new CommonEditOption { Header = "系列", Text = videoInfo.Series }
+            new CommonEditOption { Header = "标题", MinWidth = 480, Text = videoCover.Title },
+            new CommonEditOption { Header = "发布时间", Text = videoCover.ReleaseTime },
+            new CommonEditOption { Header = "视频长度", Text = videoCover.LengthTime },
+            new CommonEditOption { Header = "导演", Text = videoCover.Director },
+            new CommonEditOption { Header = "制作商", Text = videoCover.Producer },
+            new CommonEditOption { Header = "发行商", Text = videoCover.Publisher },
+            new CommonEditOption { Header = "系列", Text = videoCover.Series }
 
         ];
     }
@@ -130,10 +128,10 @@ public sealed partial class EditInfo
         // Take the user's text and convert it to our data type (if we have a matching one).
         args.Item = _actorsSuggestion.FirstOrDefault(item => item.Name.Contains(args.TokenText, StringComparison.CurrentCultureIgnoreCase)) ??
                     // Otherwise, create a new version of our data type
-                    new ActorInfo { Name = args.TokenText };
+                    new ActorInfo(args.TokenText);
     }
 
-    public VideoInfoVo GetInfoAfterEdit()
+    public VideoCoverVo GetInfoAfterEdit()
     {
         foreach (var option in _editOptions)
         {
@@ -143,25 +141,25 @@ public sealed partial class EditInfo
                     switch (commonEditOption.Header)
                     {
                         case "标题":
-                            _videoInfo.Title = commonEditOption.Text;
+                            _videoCover.Title = commonEditOption.Text;
                             break;
                         case "发布时间":
-                            _videoInfo.ReleaseTime = commonEditOption.Text;
+                            _videoCover.ReleaseTime = commonEditOption.Text;
                             break;
                         case "视频长度":
-                            _videoInfo.LengthTime = commonEditOption.Text;
+                            _videoCover.LengthTime = commonEditOption.Text;
                             break;
                         case "导演":
-                            _videoInfo.Director = commonEditOption.Text;
+                            _videoCover.Director = commonEditOption.Text;
                             break;
                         case "制作商":
-                            _videoInfo.Producer = commonEditOption.Text;
+                            _videoCover.Producer = commonEditOption.Text;
                             break;
                         case "发行商":
-                            _videoInfo.Publisher = commonEditOption.Text;
+                            _videoCover.Publisher = commonEditOption.Text;
                             break;
                         case "系列":
-                            _videoInfo.Series = commonEditOption.Text;
+                            _videoCover.Series = commonEditOption.Text;
                             break;
                     }
 
@@ -170,10 +168,10 @@ public sealed partial class EditInfo
                     switch (tokenizingEditOption.Header)
                     {
                         case "类别":
-                            _videoInfo.Category = string.Join(",", _categoryItems.Select(item => item.Name));
+                            _videoCover.Category = string.Join(",", _categoryItems.Select(item => item.Name));
                             break;
                         case "演员":
-                            _videoInfo.Actor = string.Join(",", _actorItems.Select(item => item.Name));
+                            _videoCover.Actor = string.Join(",", _actorItems.Select(item => item.Name));
                             break;
                     }
 
@@ -181,7 +179,7 @@ public sealed partial class EditInfo
             }
         }
 
-        return _videoInfo;
+        return _videoCover;
     }
 
 

@@ -7,9 +7,6 @@ namespace DataAccess.Models.Entity;
 /// </summary>
 public class ActorInterest : BaseEntity
 {
-    [Column("actor_id")]
-    public long ActorInfoId { get; set; }
-    
     public bool IsLike { get; set; }
 
     public double? Score { get; set; }

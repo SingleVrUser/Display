@@ -70,7 +70,7 @@
                               ScrollViewer.HorizontalScrollMode="Enabled">
                 <oldControls:AdaptiveGridView.ItemTemplate>
 
-                    <DataTemplate x:DataType="vo:VideoInfoVo">
+                    <DataTemplate x:DataType="vo:VideoCoverVo">
                         <Border PointerEntered="Image_PointerEntered"
                                 PointerExited="Image_PointerExited"
                                 CornerRadius="2">

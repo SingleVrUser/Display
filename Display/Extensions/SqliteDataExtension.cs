@@ -119,10 +119,6 @@ internal static class SqLiteDataExtension
             {
                 propertyInfo.SetValue(data, reader.GetNullableFieldValue<long>(fieldName));
             }
-            else if (type == typeof(FilesInfo))
-            {
-                propertyInfo.SetValue(data, reader.Export<FilesInfo>());
-            }
         }
 
         ////// 不可靠, 结果为空时异常

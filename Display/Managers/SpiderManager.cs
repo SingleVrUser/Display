@@ -310,7 +310,7 @@ public class SpiderManager
         // TODO 当_nameInfos达到指定数量时才添加进数据库
         await DataAccessLocal.Add.AddVideoInfo_ActorInfo_IsWmAsync(item.Info);
 
-        _fileToInfoDao.UpdateIsSuccessByTrueName(item.Name, 1);
+        _fileToInfoDao.UpdateIsSuccessByTrueName(item.Name, true);
     }
 
 

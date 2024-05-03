@@ -10,8 +10,17 @@ namespace DataAccess.Models.Entity;
 [Table("file")]
 public class FileInfo : BaseEntity
 {
+    /// <summary>
+    /// 文件id，如果是文件夹，则为null
+    /// </summary>
     [JsonProperty("fid")]
-    public long FileId { get; set; }
+    public long? FileId { get; set; }
+    
+    /// <summary>
+    /// 当前目录Id
+    /// </summary>
+    [JsonProperty("cid")]
+    public long CurrentId { get; set; }
 
     [JsonProperty("uid")]
     public long Uid { get; set; }
@@ -19,11 +28,6 @@ public class FileInfo : BaseEntity
     [JsonProperty("aid")]
     public int? Aid { get; set; }
 
-    /// <summary>
-    /// 当前目录Id
-    /// </summary>
-    [JsonProperty("cid")]
-    public long CurrentId { get; set; }
 
     /// <summary>
     /// 父级目录Id

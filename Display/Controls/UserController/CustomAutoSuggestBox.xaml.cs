@@ -11,6 +11,7 @@ using Windows.Foundation;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using Display.Models.Dto;
+using Display.Models.Vo;
 
 namespace Display.Controls.UserController;
 
@@ -69,8 +70,17 @@ public sealed partial class CustomAutoSuggestBox
                 resultList.Add("点击搜索资源");
             }
 
-            item.ForEach(resultList.Add);
+            item.ForEach(i=>resultList.Add(new SearchHistoryVo()
+            {
+                Name = i.Name,
+                ActorName = string.Join(",",i.ActorInfoList),
+                Category = i.CategoryList != null
+                    ? string.Join(",", i.CategoryList)
+                    : string.Empty,
+                ImagePath = i.ImagePath
+            }));
         }
+        
         sender.ItemsSource = resultList;
 
         _isBusy = false;
@@ -304,7 +314,7 @@ public sealed partial class CustomAutoSuggestBox
     private void ClearSearchHistoryClick(object sender, RoutedEventArgs e)
     {
         _historySearchItemList.Clear();
-        _searchHistoryDao.Delete();
+        _searchHistoryDao.ExecuteDeleteAll();
         NavViewSearchBox.ItemsSource = null;
     }
 }

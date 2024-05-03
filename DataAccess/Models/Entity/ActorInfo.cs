@@ -51,14 +51,14 @@ public class ActorInfo(string name) : BaseEntity
     /// <summary>
     /// 身材信息
     /// </summary>
-    public BwhInfo? Bwh { get; set; }
+    public BwhInfo Bwh { get; set; }
     
     public List<ActorName> NameList { get; set; }
     
     /// <summary>
     /// 个性化标注
     /// </summary>
-    public ActorInterest? Interest { get; set; }
+    public ActorInterest Interest { get; set; }
     
     // 其他信息
     public List<VideoInfo> VideoInfos { get; set; }

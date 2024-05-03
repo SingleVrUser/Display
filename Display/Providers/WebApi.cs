@@ -46,7 +46,7 @@ using Display.Models.Vo.OneOneFive;
 using Display.Models.Vo.Progress;
 using Display.Views.Pages.Settings.Account;
 using Microsoft.EntityFrameworkCore;
-using FileInfo = System.IO.FileInfo;
+
 
 namespace Display.Providers;
 
@@ -63,7 +63,7 @@ internal class WebApi
 
     private static WebApi _webApi;
     
-    private readonly IFilesInfoDao _filesInfoDao = App.GetService<IFilesInfoDao>();
+    private readonly IFileInfoDao _filesInfoDao = App.GetService<IFileInfoDao>();
     private static readonly IDownHistoryDao DownHistoryDao = App.GetService<IDownHistoryDao>();
 
     public static WebApi GlobalWebApi => _webApi ??= new WebApi();
@@ -228,7 +228,7 @@ internal class WebApi
     {
         var folderCategory = await GetFolderCategory(id);
 
-        _filesInfoDao.ExecuteAdd(new FilesInfo
+        _filesInfoDao.ExecuteAdd(new FileInfo
         {
             Name = folderCategory.file_name,
             CurrentId = id,
@@ -353,7 +353,7 @@ internal class WebApi
 
         if (folderInfo == null)
         {
-            List<FilesInfo> addToDataAccessList = [];
+            List<FileInfo> addToDataAccessList = [];
 
             //获取当前文件夹下所有文件信息和文件夹信息（从网络）
             await TraverseAllFileInfo(cid, addToDataAccessList, getFilesProgressInfo, token, progress);
@@ -926,7 +926,7 @@ internal class WebApi
     }
 
     public enum DownType { _115, Bc, Aria2 };
-    public async Task<bool> RequestDown(List<FilesInfo> videoInfoList, DownType downType = DownType._115, string savePath = null, string topFolderName = null)
+    public async Task<bool> RequestDown(List<FileInfo> videoInfoList, DownType downType = DownType._115, string savePath = null, string topFolderName = null)
     {
         var success = downType switch
         {
@@ -951,7 +951,7 @@ internal class WebApi
     /// </summary>
     /// <param name="videoInfoList"></param>
     /// <returns></returns>
-    async Task<bool> RequestDownBy115Browser(List<FilesInfo> videoInfoList)
+    async Task<bool> RequestDownBy115Browser(List<FileInfo> videoInfoList)
     {
         var downRequest = new Browser115Request
         {
@@ -1599,7 +1599,7 @@ internal class WebApi
 
             var strUrl = lineList[i + 1];
             var doubleSecond = Convert.ToDouble(re.Groups[1].Value);
-            m3U8Info.TsInfoList.Add(new tsInfo() { Second = doubleSecond, Url = strUrl });
+            m3U8Info.TsInfoList.Add(new TsInfo { Second = doubleSecond, Url = strUrl });
         }
 
         return m3U8Info;

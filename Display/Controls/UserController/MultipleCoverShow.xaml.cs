@@ -33,7 +33,7 @@ public sealed partial class MultipleCoverShow
 
     public string ShowName { get; set; }
 
-    public ObservableCollection<VideoInfoVo> CoverList { get; set; } = new();
+    public ObservableCollection<VideoCoverVo> CoverList { get; set; } = new();
 
     public MultipleCoverShow()
     {

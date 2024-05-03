@@ -1,14 +1,15 @@
 ﻿using DataAccess.Context;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
-using DataAccess.Models.Vo;
+using DataAccess.Models.Dto;
+using Microsoft.EntityFrameworkCore;
 using static System.String;
 
 namespace DataAccess.Dao.Impl;
 
 public class VideoInfoDao: BaseDao<VideoInfo>, IVideoInfoDao
 {
-    public void AddOrUpdateInfoAndAttachFile(VideoInfoVo vo, List<long> fileIdList)
+    public void AddOrUpdateInfoAndAttachFile(VideoInfoDto dto, List<long> fileIdList)
     {
         // 在文件信息中添加该视频信息的id
         var fileInfoList = Context.FileInfo.Where(i => fileIdList.Contains(i.Id)).ToList();
@@ -17,7 +18,7 @@ public class VideoInfoDao: BaseDao<VideoInfo>, IVideoInfoDao
         using var transaction = Context.Database.BeginTransaction();
 
         // 添加视频信息
-        var videoInfo = GetVideoInfoFromVo(vo);
+        var videoInfo = GetVideoInfoFromVo(dto);
         // 不存在添加
         if (videoInfo.Id.Equals(default))
             CurrentDbSet.Add(videoInfo);
@@ -33,9 +34,9 @@ public class VideoInfoDao: BaseDao<VideoInfo>, IVideoInfoDao
     }
     
 
-    public void AddOrUpdateByVideoInfoVo(VideoInfoVo vo)
+    public void AddOrUpdateByVideoInfoVo(VideoInfoDto dto)
     {
-        var videoInfo = GetVideoInfoFromVo(vo);
+        var videoInfo = GetVideoInfoFromVo(dto);
         
         // 不存在则添加，存在则更新
         if(videoInfo.Id.Equals(default))
@@ -60,51 +61,56 @@ public class VideoInfoDao: BaseDao<VideoInfo>, IVideoInfoDao
         return Context.VideoInfo.Any(x => x.Name.Equals(name));
     }
 
-    private VideoInfo GetVideoInfoFromVo(VideoInfoVo vo)
+    public void ExecuteDeleteById(long id)
+    {
+        CurrentDbSet.Where(i => i.Id.Equals(id)).ExecuteDelete();
+    }
+
+    private VideoInfo GetVideoInfoFromVo(VideoInfoDto dto)
     {
         // 查看是否有同name的视频信息
-        var videoInfo = GetOneByName(vo.Name);
+        var videoInfo = GetOneByName(dto.Name);
         
         // 数据库没有改数据，则构建一个新的
-        videoInfo ??= new VideoInfo(vo.Name)
+        videoInfo ??= new VideoInfo(dto.Name)
         {
-            SourceUrl = vo.SourceUrl
+            SourceUrl = dto.SourceUrl
         };
         
-        videoInfo.Title = vo.Title;
-        videoInfo.SourceUrl = vo.SourceUrl;
-        videoInfo.ReleaseTime = vo.ReleaseTime;
-        videoInfo.LengthTime = vo.LengthTime;
-        videoInfo.ImageUrl = vo.SampleImageList == null
+        videoInfo.Title = dto.Title;
+        videoInfo.SourceUrl = dto.SourceUrl;
+        videoInfo.ReleaseTime = dto.ReleaseTime;
+        videoInfo.LengthTime = dto.LengthTime;
+        videoInfo.ImageUrl = dto.SampleImageList == null
             ? null
-            : Join(",", vo.SampleImageList);
+            : Join(",", dto.SampleImageList);
         
         // 导演
-        if (vo.DirectorName != null)
-            videoInfo.Director = Context.DirectorInfo.FirstOrDefault(i=>string.Equals(i.Name,vo.DirectorName))
-                                 ?? new DirectorInfo(vo.DirectorName);
+        if (dto.DirectorName != null)
+            videoInfo.Director = Context.DirectorInfo.FirstOrDefault(i=>string.Equals(i.Name,dto.DirectorName))
+                                 ?? new DirectorInfo(dto.DirectorName);
         
         // 厂商
-        if (vo.ProducerName != null)
-            videoInfo.Producer = Context.ProducerInfo.FirstOrDefault(i => string.Equals(i.Name,vo.ProducerName))
-                                 ?? new ProducerInfo(vo.ProducerName);
+        if (dto.ProducerName != null)
+            videoInfo.Producer = Context.ProducerInfo.FirstOrDefault(i => string.Equals(i.Name,dto.ProducerName))
+                                 ?? new ProducerInfo(dto.ProducerName);
         
         // 发行者
-        if (vo.PublisherName != null)
-            videoInfo.Publisher = Context.PublisherInfo.FirstOrDefault(i=> string.Equals(i.Name,vo.PublisherName))
-                                  ?? new PublisherInfo(vo.PublisherName);
+        if (dto.PublisherName != null)
+            videoInfo.Publisher = Context.PublisherInfo.FirstOrDefault(i=> string.Equals(i.Name,dto.PublisherName))
+                                  ?? new PublisherInfo(dto.PublisherName);
         
         // 系列
-        if (vo.SeriesName != null)
-            videoInfo.Series = Context.SeriesInfo.FirstOrDefault(i=> string.Equals(i.Name,vo.SeriesName))
-                               ?? new SeriesInfo(vo.SeriesName);
+        if (dto.SeriesName != null)
+            videoInfo.Series = Context.SeriesInfo.FirstOrDefault(i=> string.Equals(i.Name,dto.SeriesName))
+                               ?? new SeriesInfo(dto.SeriesName);
         
         // 演员信息
-        if (vo.ActorNameList is { Count: > 0 })
+        if (dto.ActorNameList is { Count: > 0 })
         {
             videoInfo.ActorInfoList = [];
             foreach (var actorInfo in
-                     from actorName in vo.ActorNameList
+                     from actorName in dto.ActorNameList
                         let actorInfo = Context.ActorInfo.FirstOrDefault(i=>string.Equals(i.Name, actorName))
                      where actorInfo == null
                      select new ActorInfo(actorName))
@@ -114,9 +120,9 @@ public class VideoInfoDao: BaseDao<VideoInfo>, IVideoInfoDao
         }
         
         // 标签列表
-        if (vo.SampleImageList is { Count: > 0 })
+        if (dto.SampleImageList is { Count: > 0 })
         {
-            videoInfo.SampleImages = Concat(vo.SampleImageList);
+            videoInfo.SampleImages = Concat(dto.SampleImageList);
         }
         
         // 文件信息，搜刮的时候添加

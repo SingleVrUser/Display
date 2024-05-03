@@ -15,7 +15,7 @@
                                LabelClick="{x:Bind Label_Click}"
                                VideoPlayClick="{x:Bind VideoPlay_Click}"
                                DeleteClick="{x:Bind Delete_Click}"
-                               ResultInfo="{x:Bind DetailInfo, Mode=TwoWay}"
+                               ResultCover="{x:Bind DetailCover, Mode=TwoWay}"
                                CoverTapped="{x:Bind CoverTapped}">
             <userController:VideoDetails.Transitions>
                 <EntranceThemeTransition/>

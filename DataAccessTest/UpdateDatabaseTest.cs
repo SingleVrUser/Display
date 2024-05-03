@@ -1,6 +1,6 @@
 ﻿using DataAccess.Context;
 
-namespace DataAccessTest.DataAccess;
+namespace DataAccessTest;
 
 public class UpdateDatabaseTest
 {

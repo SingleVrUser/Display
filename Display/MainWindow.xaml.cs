@@ -358,19 +358,10 @@ public sealed partial class MainWindow
 
         if (grid.DataContext is not VideoInfo nowItem) return;
 
-        //选中的是失败项
-        if (nowItem is FailVideoInfo failVideoInfo)
-        {
-            var mediaPlayItem = new MediaPlayItem(failVideoInfo);
-            await PlayVideoHelper.PlayVideo([mediaPlayItem], ((Page)ContentFrame.Content).XamlRoot);
-        }
-        //正常点击
-        else
-        {
-            //加载应用记录的图片默认大小
-            var newItem = new VideoInfoVo(nowItem, AppSettings.ImageWidth);
-            ContentFrame.Navigate(typeof(DetailInfoPage), newItem, new SuppressNavigationTransitionInfo());
-        }
+        //加载应用记录的图片默认大小
+        var newItem = new VideoCoverVo(nowItem, AppSettings.ImageWidth);
+        ContentFrame.Navigate(typeof(DetailInfoPage), newItem, new SuppressNavigationTransitionInfo());
+
 
     }
 

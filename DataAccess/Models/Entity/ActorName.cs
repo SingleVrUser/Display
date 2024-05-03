@@ -7,14 +7,14 @@ namespace DataAccess.Models.Entity;
 /// 演员名称
 /// 演员id - 名称，一对多
 /// </summary>
-public class ActorName
+public class ActorName(string name)
 {
     [Key]
     public long Id { get; init; }
     
     [Column("actor_id")]
     public long ActorInfoId { get; init; }
-    
+
     [StringLength(10)]
-    public required string Name { get; init; }
+    public string Name { get; init; } = name;
 }

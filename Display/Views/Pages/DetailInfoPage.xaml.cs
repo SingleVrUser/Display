@@ -20,7 +20,7 @@ namespace Display.Views.Pages;
 
 public sealed partial class DetailInfoPage
 {
-    public VideoInfoVo DetailInfo;
+    public VideoCoverVo DetailCover;
 
     private readonly IFilesInfoDao _filesInfoDao = App.GetService<IFilesInfoDao>();
 
@@ -52,11 +52,11 @@ public sealed partial class DetailInfoPage
         //}
 
 
-        DetailInfo = e.Parameter switch
+        DetailCover = e.Parameter switch
         {
-            VideoInfoVo detailInfo => detailInfo,
-            VideoInfo videoInfo => new VideoInfoVo(videoInfo),
-            _ => DetailInfo
+            VideoCoverVo detailInfo => detailInfo,
+            VideoInfo videoInfo => new VideoCoverVo(videoInfo),
+            _ => DetailCover
         };
     }
 
@@ -138,7 +138,7 @@ public sealed partial class DetailInfoPage
         if (sender is not Button videoPlayButton)
             return;
 
-        var trueName = DetailInfo.TrueName;
+        var trueName = DetailCover.Name;
         var videoInfoList = DataAccessLocal.Get.GetSingleFileInfoByTrueName(trueName);
 
         //没有该数据
@@ -188,16 +188,16 @@ public sealed partial class DetailInfoPage
         if (sender is not AppBarButton) return;
         
         //从数据库中删除
-        _filesInfoDao.ExecuteRemoveByTrueName(DetailInfo.TrueName);
+        _filesInfoDao.ExecuteRemoveByTrueName(DetailCover.Name);
 
         //删除存储的文件夹
-        var savePath = Path.Combine(AppSettings.ImageSavePath, DetailInfo.TrueName);
+        var savePath = Path.Combine(AppSettings.ImageSavePath, DetailCover.Name);
         if (Directory.Exists(savePath))
         {
             Directory.Delete(savePath, true);
         }
 
-        DetailInfo.IsDeleted = Visibility.Visible;
+        DetailCover.IsDeleted = Visibility.Visible;
 
         if (Frame.CanGoBack)
         {
@@ -210,7 +210,7 @@ public sealed partial class DetailInfoPage
     {
         if (sender is not Grid) return;
 
-        var name = DetailInfo.TrueName;
+        var name = DetailCover.Name;
         var videoInfoList = DataAccessLocal.Get.GetSingleFileInfoByTrueName(name);
 
         //没有该数据
