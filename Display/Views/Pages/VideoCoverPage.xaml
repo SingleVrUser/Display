@@ -10,8 +10,6 @@
         <userController:VideoCoverDisplay x:Name="VideoControl"
             MoreButtonClick="OnClicked"
             VideoPlayClick="VideoPlay_Click"
-            SingleVideoPlayClick="SingleVideoPlayClick"
-            IsShowFailListView="False"
-            IsShowSearchListView="True"/>
+            SingleVideoPlayClick="SingleVideoPlayClick"/>
     </Grid>
 </Page>

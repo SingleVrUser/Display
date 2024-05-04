@@ -6,11 +6,10 @@
              xmlns:winUi="using:CommunityToolkit.WinUI"
              xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
              xmlns:controls="using:CommunityToolkit.WinUI.Controls"
-             xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
              xmlns:userController="using:Display.Controls.UserController"
-             xmlns:vo="using:Display.Models.Vo"
              xmlns:providers="using:Display.Providers"
              xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+             xmlns:video="using:Display.Models.Vo.Video"
              mc:Ignorable="d"
              CacheMode="BitmapCache">
 
@@ -117,7 +116,7 @@
 
         <!--预览展示样式-->
         <DataTemplate x:Key="ImageTemplate"
-                      x:DataType="vo:VideoCoverVo">
+                      x:DataType="video:VideoCoverVo">
             <Grid Padding="3,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -391,7 +390,7 @@
         <GridView Grid.Row="2"
                   Margin="4,0,0,0"
                   x:Name="BasicGridView"
-                  ItemsSource="{StaticResource ImageTemplate}">
+                  ItemTemplate="{StaticResource ImageTemplate}">
 
             <GridView.Header>
                 <Grid MinHeight="40"

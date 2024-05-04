@@ -22,8 +22,6 @@ public static class FileMatch
 {
     private static readonly IFileInfoDao FilesInfoDao = App.GetService<IFileInfoDao>();
 
-    private static readonly IFileToInfoDao FileToInfoDao = App.GetService<IFileToInfoDao>();
-    
     /// <summary>
     /// 正则删除某些关键词
     /// </summary>
@@ -162,22 +160,6 @@ public static class FileMatch
         return !string.IsNullOrEmpty(folderDatum?.Name) ? MatchName(folderDatum.Name) : null;
     }
 
-    public static bool IsLike(int isLike)
-    {
-        return isLike != 0;
-    }
-
-    public static bool IsLookLater(long? lookLater)
-    {
-        return lookLater != null && lookLater != 0;
-    }
-
-    //是否显示喜欢图标
-    public static Visibility IsShowLikeIcon(int isLike)
-    {
-        return isLike == 0 ? Visibility.Collapsed : Visibility.Visible;
-    }
-
     //根据类别搜索结果
     public static async Task<List<VideoInfo>> GetVideoInfoFromType(List<string> types, string keywords, int limit)
     {
@@ -185,44 +167,47 @@ public static class FileMatch
 
         //避免重复
         Dictionary<string, VideoInfo> dictionary = new();
-
-        foreach (var type in types)
-        {
-            string trueType;
-            switch (type)
-            {
-                case "番号" or "truename":
-                    trueType = "truename";
-                    break;
-                case "演员" or "actor":
-                    trueType = "actor";
-                    break;
-                case "标签" or "category":
-                    trueType = "category";
-                    break;
-                case "标题" or "title":
-                    trueType = "title";
-                    break;
-                case "片商" or "producer":
-                    trueType = "producer";
-                    break;
-                case "导演" or "director":
-                    trueType = "director";
-                    break;
-                default:
-                    trueType = "truename";
-                    break;
-            }
-
-            var leftCount = limit - dictionary.Count;
-
-            // 当数量超过Limit数量时，跳过（不包括失败列表）
-            if (leftCount <= 0) continue;
-
-            var newItems = DataAccessLocal.Get.GetVideoInfoBySomeType(trueType, keywords, leftCount);
-
-            newItems?.ForEach(item => dictionary.TryAdd(item.Name, item));
-        }
+        
+        // TODO 根据类别搜索结果
+        
+        //
+        // foreach (var type in types)
+        // {
+        //     string trueType;
+        //     switch (type)
+        //     {
+        //         case "番号" or "truename":
+        //             trueType = "truename";
+        //             break;
+        //         case "演员" or "actor":
+        //             trueType = "actor";
+        //             break;
+        //         case "标签" or "category":
+        //             trueType = "category";
+        //             break;
+        //         case "标题" or "title":
+        //             trueType = "title";
+        //             break;
+        //         case "片商" or "producer":
+        //             trueType = "producer";
+        //             break;
+        //         case "导演" or "director":
+        //             trueType = "director";
+        //             break;
+        //         default:
+        //             trueType = "truename";
+        //             break;
+        //     }
+        //
+        //     var leftCount = limit - dictionary.Count;
+        //
+        //     // 当数量超过Limit数量时，跳过（不包括失败列表）
+        //     if (leftCount <= 0) continue;
+        //
+        //     var newItems = DataAccessLocal.Get.GetVideoInfoBySomeType(trueType, keywords, leftCount);
+        //
+        //     newItems?.ForEach(item => dictionary.TryAdd(item.Name, item));
+        // }
 
         return dictionary.Values.ToList();
     }
@@ -274,13 +259,13 @@ public static class FileMatch
                         : new MatchVideoResult { Status = true, OriginalName = fileInfo.Name, StatusCode = 2, Message = "已添加" });
                 }
 
-                // 添加到数据库
-                FileToInfoDao.ExecuteInitIfNoExists(new FileToInfo
-                {
-                    FilePickCode = fileInfo.PickCode,
-                    TrueName = videoName,
-                    IsSuccess = 0
-                });
+                // // 添加到数据库
+                // FileToInfoDao.ExecuteInitIfNoExists(new FileToInfo
+                // {
+                //     FilePickCode = fileInfo.PickCode,
+                //     TrueName = videoName,
+                //     IsSuccess = 0
+                // });
             }
             else
             {

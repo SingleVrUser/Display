@@ -62,6 +62,17 @@ public abstract class BaseDao<TEntity>: IBaseDao<TEntity> where TEntity : class
         return CurrentDbSet.ToList();
     }
 
+    public List<TEntity> List(int offset, int limit)
+    {
+        return (from info in CurrentDbSet select info).Skip(offset).Take(limit).ToList();
+    }
+
+    public int TotalCount()
+    {
+        return CurrentDbSet.Count();
+    }
+
+
     public void ExecuteDeleteAll()
     {
         CurrentDbSet.ExecuteDelete();

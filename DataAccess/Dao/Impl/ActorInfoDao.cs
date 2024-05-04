@@ -8,75 +8,16 @@ namespace DataAccess.Dao.Impl;
 public class ActorInfoDao : BaseDao<ActorInfo>, IActorInfoDao
 {
     
-//     public List<ActorInfo> GetPartListByVideoName(string videoName)
-//     {
-//         // video_count有误
-//         // var actorInfoQueryable = from actorInfo in DbSet
-//         //     join actorVideo in Context.ActorVideos
-//         //         on actorInfo.Id equals actorVideo.ActorId
-//         //     where actorVideo.VideoName == trueName
-//         //     join bwh in Context.Bwhs
-//         //         on actorInfo.Bwh equals bwh.BwhContent into bwhEnumerable //  into bwhEnumerable是为了实现左联
-//         //         from bwh in bwhEnumerable.DefaultIfEmpty()
-//         //     group new
-//         //     {
-//         //         actorInfo,
-//         //         bwh
-//         //     } by actorInfo.Id
-//         //     into groupedActor
-//         //     select new ActorInfo
-//         //     {
-//         //         Id = groupedActor.FirstOrDefault().actorInfo.Id,
-//         //         Name = groupedActor.FirstOrDefault().actorInfo.Name,
-//         //         IsWoman = groupedActor.FirstOrDefault().actorInfo.IsWoman,
-//         //         Birthday = groupedActor.FirstOrDefault().actorInfo.Birthday,
-//         //         Bwh = groupedActor.FirstOrDefault().actorInfo.Bwh,
-//         //         Height = groupedActor.FirstOrDefault().actorInfo.Height,
-//         //         WorksCount = groupedActor.FirstOrDefault().actorInfo.WorksCount,
-//         //         WorkTime = groupedActor.FirstOrDefault().actorInfo.WorkTime,
-//         //         ProfilePath = groupedActor.FirstOrDefault().actorInfo.ProfilePath,
-//         //         BlogUrl = groupedActor.FirstOrDefault().actorInfo.BlogUrl,
-//         //         IsLike = groupedActor.FirstOrDefault().actorInfo.IsLike,
-//         //         AddTime = groupedActor.FirstOrDefault().actorInfo.AddTime,
-//         //         InfoUrl = groupedActor.FirstOrDefault().actorInfo.InfoUrl,
-//         //         
-//         //         BwhInfo = groupedActor.FirstOrDefault().bwh ?? new Bwh(),
-//         //         video_count = groupedActor.Count()
-//         //     };
-//
-//         var actorInfoQueryable = from actorInfo in DbSet
-//             join actorVideo in Context.ActorVideos
-//                 on actorInfo.Id equals actorVideo.ActorId
-//             where actorVideo.VideoName == videoName
-//
-//             join bwh in Context.Bwhs
-//                 on actorInfo.Bwh equals bwh.BwhContent into bwhEnumerable //  into bwhEnumerable是为了实现左联
-//                 from bwh in bwhEnumerable.DefaultIfEmpty()
-//             select new ActorInfo
-//             {
-//                 Id = actorInfo.Id,
-//                 Name = actorInfo.Name,
-//                 IsWoman = actorInfo.IsWoman,
-//                 Birthday = actorInfo.Birthday,
-//                 Bwh = actorInfo.Bwh,
-//                 Height = actorInfo.Height,
-//                 WorksCount = actorInfo.WorksCount,
-//                 WorkTime = actorInfo.WorkTime,
-//                 ProfilePath = actorInfo.ProfilePath,
-//                 BlogUrl = actorInfo.BlogUrl,
-//                 IsLike = actorInfo.IsLike,
-//                 InfoUrl = actorInfo.InfoUrl,
-//                 BwhInfo = bwh ?? new Bwh()
-//             };
-//             
-//         return actorInfoQueryable.AsNoTracking().ToList();
-//     }
-//
-//     public List<ActorInfo> GetList(int index, int limit)
-//     {
-//         return (from info in DbSet select info).Skip(index).Take(limit).ToList();
-//     }
-//
+     public List<ActorInfo> GetPartListByVideoName(string videoName)
+     {
+         return CurrentDbSet.Where(i =>
+                 i.VideoInfos.FirstOrDefault(videoInfo =>
+                     videoInfo.Name.Equals(videoName)) != null
+             ).ToList();
+     }
+
+
+     //
 //     public List<ActorInfo> GetPageList(int index, int limit, Dictionary<string, bool>? orderByList = null, List<string>? filterList = null)
 //     {
 //         var orderStr = string.Empty;
@@ -113,10 +54,10 @@ public class ActorInfoDao : BaseDao<ActorInfo>, IActorInfoDao
 //         SaveChanges();
 //     }
 //
-//     public ActorInfo? GetOne()
-//     {
-//         return DbSet.FirstOrDefault();
-//     }
+     public ActorInfo? GetOne()
+     {
+         return CurrentDbSet.FirstOrDefault();
+     }
 //
 //     public void ExecuteUpdateById(long id, Action<ActorInfo> updateAction)
 //     {
@@ -128,32 +69,34 @@ public class ActorInfoDao : BaseDao<ActorInfo>, IActorInfoDao
 //     }
 //
 //
-//
-//     public ActorInfo? GetPartInfoByActorName(string showName)
-//     {
-//         var query = from actorInfo in DbSet
-//             join actorName in Context.ActorNames
-//                 on actorInfo.Id equals actorName.Id 
-//             where actorName.Name == showName
-//             join bwh in Context.Bwhs
-//                 on actorInfo.Bwh equals bwh.BwhContent into bwhEnumerable //  into bwhEnumerable是为了实现左联
-//                 from bwh in bwhEnumerable.DefaultIfEmpty()
-//             select new ActorInfo
-//             {
-//                 Id = actorInfo.Id,
-//                 Name = actorInfo.Name,
-//                 IsWoman = actorInfo.IsWoman,
-//                 Birthday = actorInfo.Birthday,
-//                 Bwh = actorInfo.Bwh,
-//                 Height = actorInfo.Height,
-//                 WorksCount = actorInfo.WorksCount,
-//                 WorkTime = actorInfo.WorkTime,
-//                 ProfilePath = actorInfo.ProfilePath,
-//                 BlogUrl = actorInfo.BlogUrl,
-//                 IsLike = actorInfo.IsLike,
-//                 InfoUrl = actorInfo.InfoUrl,
-//                 BwhInfo = bwh ?? new Bwh()
-//             };
-//         return query.FirstOrDefault();
-//     }
+
+     public ActorInfo? GetPartInfoExceptVideoInfoByActorName(string showName)
+     {
+         // var query = from actorInfo in DbSet
+         //     join actorName in Context.ActorNames
+         //         on actorInfo.Id equals actorName.Id 
+         //     where actorName.Name == showName
+         //     join bwh in Context.Bwhs
+         //         on actorInfo.Bwh equals bwh.BwhContent into bwhEnumerable //  into bwhEnumerable是为了实现左联
+         //         from bwh in bwhEnumerable.DefaultIfEmpty()
+         //     select new ActorInfo
+         //     {
+         //         Id = actorInfo.Id,
+         //         Name = actorInfo.Name,
+         //         IsWoman = actorInfo.IsWoman,
+         //         Birthday = actorInfo.Birthday,
+         //         Bwh = actorInfo.Bwh,
+         //         Height = actorInfo.Height,
+         //         WorksCount = actorInfo.WorksCount,
+         //         WorkTime = actorInfo.WorkTime,
+         //         ProfilePath = actorInfo.ProfilePath,
+         //         BlogUrl = actorInfo.BlogUrl,
+         //         IsLike = actorInfo.IsLike,
+         //         InfoUrl = actorInfo.InfoUrl,
+         //         BwhInfo = bwh ?? new Bwh()
+         //     };
+         // return query.FirstOrDefault();
+
+         return CurrentDbSet.FirstOrDefault(i => i.NameList.FirstOrDefault(a => a.Name.Equals(showName)) != null);
+     }
 }

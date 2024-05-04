@@ -27,8 +27,6 @@ public sealed partial class ActorsPage
     private readonly ObservableCollection<ActorInfo> _actorPartInfo = [];
 
     private static readonly IActorInfoDao ActorInfoDao = App.GetService<IActorInfoDao>();
-    private static readonly IActorNameDao ActorNameDao = App.GetService<IActorNameDao>();
-    private static readonly IBwhDao BwhDao = App.GetService<IBwhDao>();
     
     public static ActorsPage Current;
 
@@ -74,7 +72,7 @@ public sealed partial class ActorsPage
 
     private void LoadActorPartInfo(int count = 14)
     {
-        var infos = ActorInfoDao.GetList(0, count);
+        var infos = ActorInfoDao.List(0, count);
 
         infos.ForEach(_actorPartInfo.Add);
 
@@ -217,24 +215,26 @@ public sealed partial class ActorsPage
             await dialog.ShowAsync();
             return;
         }
-
-        var infos = await DataAccessLocal.Get.GetActorInfoAsync(-1);
-
-        var allCount = infos.Length;
-        if (allCount == 0) return;
-
-        if (!ToastGetActorInfoWithProgressBar.SendToast(allCount)) return;
-
-        //创建断点续传文件
-        var savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "ActorInfo");
-        if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
-        var storageFolder = await StorageFolder.GetFolderFromPathAsync(savePath);
-        var sampleFile = await storageFolder.CreateFileAsync("getting.json", CreationCollisionOption.ReplaceExisting);
-        await FileIO.WriteTextAsync(sampleFile, JsonConvert.SerializeObject(infos));
-
-        await GetActorsInfo(infos);
-
-        button.IsEnabled = true;
+        
+        // TODO 获取演员信息
+        //
+        // var infos = await DataAccessLocal.Get.GetActorInfoAsync(-1);
+        //
+        // var allCount = infos.Length;
+        // if (allCount == 0) return;
+        //
+        // if (!ToastGetActorInfoWithProgressBar.SendToast(allCount)) return;
+        //
+        // //创建断点续传文件
+        // var savePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "ActorInfo");
+        // if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
+        // var storageFolder = await StorageFolder.GetFolderFromPathAsync(savePath);
+        // var sampleFile = await storageFolder.CreateFileAsync("getting.json", CreationCollisionOption.ReplaceExisting);
+        // await FileIO.WriteTextAsync(sampleFile, JsonConvert.SerializeObject(infos));
+        //
+        // await GetActorsInfo(infos);
+        //
+        // button.IsEnabled = true;
     }
     private async void ContinueGetActorInfoTaskButton_Click(object sender, RoutedEventArgs e)
     {
@@ -289,14 +289,15 @@ public sealed partial class ActorsPage
             var info = infos[i];
 
             //有数据说明已经搜索过了
-            if (!string.IsNullOrEmpty(info.Bwh))
+            if (info.Bwh != null)
             {
                 System.Diagnostics.Debug.WriteLine($"{i} 已经搜索过了");
                 await ToastGetActorInfoWithProgressBar.AddValue(i + 1, allCount);
                 continue;
             }
 
-            await UpdateActorInfo(info);
+            // await UpdateActorInfo(info);
+            // TODO 更新演员信息
 
             await ToastGetActorInfoWithProgressBar.AddValue(i + 1, allCount);
 
@@ -306,98 +307,6 @@ public sealed partial class ActorsPage
 
         //获取完成，初始化续传索引
         AppSettings.GetActorInfoLastIndex = -1;
-    }
-
-    public static async Task<ActorInfo> UpdateActorInfo(ActorInfo info)
-    {
-        var actorName = info.Name;
-
-        //跳过无效名称
-        if (string.IsNullOrEmpty(actorName)) return null;
-
-        //含有数字的一般搜索不到，跳过
-        if (Regex.Match(actorName, @"\d+").Success) return null;
-
-        //从网站中获取信息
-        var actorInfoFromInternet = await GetActorInfoFromNetwork.SearchInfoFromMinnanoAv(actorName, default);
-        if (actorInfoFromInternet == null) return null;
-
-        //查询本地数据库中的数据
-        var actorInfoFromDb = ActorInfoDao.GetPartInfoByActorName(actorName);
-
-        //查询不到，异常
-        if (actorInfoFromDb == null) return null;
-
-        ActorInfoDao.Attach(actorInfoFromDb);
-
-        var actorId = actorInfoFromDb.Id;
-
-        actorInfoFromDb.Birthday = actorInfoFromInternet.Birthday;
-        actorInfoFromDb.BlogUrl = actorInfoFromInternet.BlogUrl;
-        actorInfoFromDb.Height = actorInfoFromInternet.Height;
-        actorInfoFromDb.IsWoman = actorInfoFromInternet.IsWoman;
-        actorInfoFromDb.WorkTime = actorInfoFromInternet.WorkTime;
-        actorInfoFromDb.WorksCount = actorInfoFromInternet.WorksCount;
-
-        //更新bwh
-        if (!string.IsNullOrEmpty(actorInfoFromInternet.Bwh))
-        {
-            actorInfoFromDb.Bwh = actorInfoFromInternet.Bwh;
-            var bwh = new Bwh(actorInfoFromInternet.Bwh);
-            actorInfoFromDb.BwhInfo = bwh;
-
-            if (BwhDao.GetOne(actorInfoFromInternet.Bwh) == null)
-            {
-                BwhDao.ExecuteAdd(bwh);
-            }
-        }
-
-        //获取到的信息有头像
-        if (!string.IsNullOrEmpty(actorInfoFromInternet.ProfilePath) && actorInfoFromInternet.InfoUrl != null)
-        {
-            //数据库中无头像/为默认头像/没有转化为本地
-            if (actorInfoFromDb.ProfilePath is null ||
-                actorInfoFromDb.ProfilePath.Equals(Constants.FileType.NoPicturePath) ||
-                actorInfoFromDb.ProfilePath.Contains("http"))
-            {
-                var filePath = Path.Combine(AppSettings.ActorInfoSavePath, actorName);
-
-                Uri infoUri = new(actorInfoFromInternet.InfoUrl);
-
-                var profilePath = await DbNetworkHelper.DownloadFile(actorInfoFromInternet.ProfilePath, filePath, "face", headers: new Dictionary<string, string>
-                {
-                    {"Host",infoUri.Host },
-                    {"Referer", actorInfoFromInternet.InfoUrl }
-                });
-
-                //更新头像
-                actorInfoFromDb.ProfilePath = profilePath;
-                //actorInfoFromInternet.ProfilePath = profilePath;
-            }
-        }
-
-        //ActorInfoDao.ExecuteUpdate(actorInfoFromDb);
-        ActorInfoDao.SaveChanges();
-
-        //更新别名
-        //别名
-        if (actorInfoFromInternet.OtherNameList is { Count: > 0 })
-        {
-            foreach (var otherName in actorInfoFromInternet.OtherNameList)
-            {
-                // 先删除
-                ActorNameDao.ExecuteRemoveByName(otherName);
-
-                // 后添加
-                ActorNameDao.ExecuteAdd(new ActorName
-                {
-                    Id = actorId,
-                    Name = otherName
-                });
-            }
-        }
-
-        return actorInfoFromInternet;
     }
 
     public void ShowButtonWithShowToastAgain()

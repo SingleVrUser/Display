@@ -4,7 +4,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:userController="using:Display.Controls.UserController"
-      xmlns:vo="using:Display.Models.Vo"
+      xmlns:video="using:Display.Models.Vo.Video"
       mc:Ignorable="d">
 
     <ScrollViewer>
@@ -71,7 +71,7 @@
                                       ItemsSource="{x:Bind _recentList}"
                                       Background="Transparent">
                                 <FlipView.ItemTemplate>
-                                    <DataTemplate x:DataType="vo:VideoCoverVo">
+                                    <DataTemplate x:DataType="video:VideoCoverVo">
                                         <Border x:Name="Image_Grid"
                                                 PointerEntered="Image_PointerEntered"
                                                 PointerExited="Image_PointerExited"
@@ -96,7 +96,7 @@
                                   SelectedIndex="{x:Bind RandomImageFlipView.SelectedIndex, Mode=TwoWay}"
                                   SelectionChanged="videoInfoListView_SelectionChanged">
                             <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="vo:VideoCoverVo">
+                                <DataTemplate x:DataType="video:VideoCoverVo">
                                     <Grid Margin="2">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="auto" />
@@ -124,7 +124,7 @@
                                                        FontFamily="JetBrains Mono" />
                                             <userController:TextBlockWithLongText StringValue="{x:Bind ActorName}"
                                                                                   IsFirstTextSelectionEnabled="False" />
-                                            <userController:TextBlockWithLongText StringValue="{x:Bind ca"
+                                            <userController:TextBlockWithLongText StringValue="{x:Bind }"
                                                                                   IsFirstTextSelectionEnabled="False" />
                                         </StackPanel>
                                     </Grid>

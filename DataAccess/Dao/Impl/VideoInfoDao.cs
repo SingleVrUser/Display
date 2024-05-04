@@ -1,5 +1,4 @@
-﻿using DataAccess.Context;
-using DataAccess.Dao.Interface;
+﻿using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using DataAccess.Models.Dto;
 using Microsoft.EntityFrameworkCore;
@@ -137,30 +136,42 @@ public class VideoInfoDao: BaseDao<VideoInfo>, IVideoInfoDao
 //         SaveChanges();
 //     }
 //
-//     public async Task<VideoInfo[]> GetLookLaterListAsync(int limit)
-//     {
-//         return await DbSet.AsNoTracking().Where(i => i.LookLater > 0).OrderByDescending(i => i.LookLater).Take(limit).ToArrayAsync();
-//     }
-//
-//     public async Task<VideoInfo[]> GetLikeListAsync(int limit)
-//     {
-//         return await DbSet.AsNoTracking().Where(i => i.IsLike).Take(limit).ToArrayAsync();
-//     }
-//
-//     public async Task<VideoInfo[]> GetRecentListAsync(int limit)
-//     {
-//         return await DbSet.AsNoTracking().OrderByDescending(i=>i.CreateTime).Take(limit).ToArrayAsync();
-//     }
-//
-//     public void ExecuteUpdateByTrueName(string trueName, Action<VideoInfo> updateAction)
-//     {
-//         var info = DbSet.FirstOrDefault(i => i.TrueName == trueName);
-//         if (info == null) return;
-//
-//         updateAction.Invoke(info);
-//         SaveChanges();
-//     }
-//
+     public async Task<VideoInfo[]> GetLookLaterListAsync(int limit)
+     {
+         return await CurrentDbSet.Where(i => i.Interest.IsLookAfter)
+             .OrderByDescending(i => i.CreateTime)
+             .Take(limit).ToArrayAsync();
+     }
+
+     public async Task<VideoInfo[]> GetLikeListAsync(int limit)
+     {
+         return await CurrentDbSet.Where(i => i.Interest.IsLike).Take(limit).ToArrayAsync();
+     }
+
+     public async Task<VideoInfo[]> GetRecentListAsync(int limit)
+     {
+         return await CurrentDbSet.OrderByDescending(i=>i.CreateTime).Take(limit).ToArrayAsync();
+     }
+
+     public void ExecuteUpdateByTrueName(string trueName, Action<VideoInfo> updateAction)
+     {
+         var info = CurrentDbSet.FirstOrDefault(i => i.Name.Equals(trueName));
+         if (info == null) return;
+
+         updateAction.Invoke(info);
+         Context.SaveChanges();
+     }
+
+     public VideoInfo? getOneByFileId(long fileInfoId)
+     {
+         return CurrentDbSet.FirstOrDefault(videoInfo=>
+             videoInfo.FileInfoList.FirstOrDefault(fileInfo=>
+                 fileInfo.Id.Equals(fileInfoId)) != null);
+     }
+
+     
+     
+     //
 //     public VideoInfo? GetOneByTrueName(string name)
 //     {
 //         return DbSet.AsNoTracking().FirstOrDefault(i=>i.TrueName == name);

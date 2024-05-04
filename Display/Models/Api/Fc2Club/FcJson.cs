@@ -29,7 +29,7 @@ public class FcJson
     public string Duration { get; set; }
     
     [JsonProperty("actor")]
-    public object[] Actor { get; set; }
+    public string[] Actor { get; set; }
     
     [JsonProperty("genre")]
     public string[] Genre { get; set; }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ public static class GetActorInfoFromNetwork
 
         var client = NetworkHelper.CommonClient;
 
-        ActorInfo actorInfo = new() { Name = name };
+        ActorInfo actorInfo = new(name);
 
         var result = await RequestHelper.RequestHtml(client, url, token);
         if (result == null) return null;
@@ -72,13 +73,12 @@ public static class GetActorInfoFromNetwork
                         var waist = string.IsNullOrEmpty(match.Groups[3].Value) ? 0 : Convert.ToInt32(match.Groups[3].Value);
                         var hips = string.IsNullOrEmpty(match.Groups[4].Value) ? 0 : Convert.ToInt32(match.Groups[4].Value);
 
-                        actorInfo.BwhInfo = new Bwh
+                        actorInfo.Bwh = new BwhInfo
                         {
                             Bust = bust,
                             Waist = waist,
                             Hips = hips
                         };
-                        actorInfo.Bwh = $"{bust}_{waist}_{hips}";
                     }
                     break;
                 case "AV出演期間":
@@ -93,7 +93,8 @@ public static class GetActorInfoFromNetwork
         }
 
         Debug.WriteLine($"別名：{string.Join(",", otherNames)}");
-        actorInfo.OtherNameList = otherNames;
+        
+        actorInfo.NameList = otherNames.Select(i=>new ActorName(i)).ToList();
 
         var thumbNode = htmlDoc.DocumentNode.SelectSingleNode("/html/body/section/section/section/div[@class='act-area']/div[@class='thumb']/img");
         if (thumbNode == null) return actorInfo;

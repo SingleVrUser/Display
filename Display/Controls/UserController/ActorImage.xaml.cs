@@ -98,21 +98,24 @@ public sealed partial class ActorImage
     {
         GetActorInfoProgressRing.Visibility = Visibility.Visible;
 
-        var newInfo = await ActorsPage.UpdateActorInfo(ActorInfo);
-        if (newInfo == null)
-        {
-            GetActorInfoProgressRing.Visibility = Visibility.Collapsed;
-            return;
-        }
-
-        //更新头像
-        if (!string.IsNullOrEmpty(newInfo.ProfilePath))
-        {
-            ActorInfo.ProfilePath = newInfo.ProfilePath;
-        }
-
-        //更新年龄
-        TryShowActorAge(newInfo.Birthday);
+        // TODO 右击演员头像获取演员信息，视图响应
+        
+        // var newInfo = await ActorsPage.UpdateActorInfo(ActorInfo);
+        //
+        // if (newInfo == null)
+        // {
+        //     GetActorInfoProgressRing.Visibility = Visibility.Collapsed;
+        //     return;
+        // }
+        //
+        // //更新头像
+        // if (!string.IsNullOrEmpty(newInfo.ProfilePath))
+        // {
+        //     ActorInfo.ProfilePath = newInfo.ProfilePath;
+        // }
+        //
+        // //更新年龄
+        // TryShowActorAge(newInfo.Birthday);
 
         GetActorInfoProgressRing.Visibility = Visibility.Collapsed;
     }

@@ -149,18 +149,18 @@
 
         </NavigationView>
 
-        <StackPanel Canvas.ZIndex="1"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Visibility="Collapsed">
-            <TextBlock FontSize="30"
-                       CharacterSpacing="100">数据文件缺失，请检查以下文件是否存在</TextBlock>
-            <HyperlinkButton FontSize="20"
-                             HorizontalAlignment="Center"
-                             VerticalAlignment="Center"
-                             Content="{x:Bind providers:DataAccessLocal.DbPath}"
-                             Click="HyperlinkButton_Click" />
-        </StackPanel>
+        <!-- <StackPanel Canvas.ZIndex="1" -->
+        <!--             HorizontalAlignment="Center" -->
+        <!--             VerticalAlignment="Center" -->
+        <!--             Visibility="Collapsed"> -->
+        <!--     <TextBlock FontSize="30" -->
+        <!--                CharacterSpacing="100">数据文件缺失，请检查以下文件是否存在</TextBlock> -->
+        <!--     <HyperlinkButton FontSize="20" -->
+        <!--                      HorizontalAlignment="Center" -->
+        <!--                      VerticalAlignment="Center" -->
+        <!--                      Content="{x:Bind providers:DataAccessLocal.DbPath}" -->
+        <!--                      Click="HyperlinkButton_Click" /> -->
+        <!-- </StackPanel> -->
 
         <TeachingTip x:Name="LightDismissTeachingTip"
                      IsLightDismissEnabled="True"

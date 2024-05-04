@@ -58,10 +58,12 @@ public interface IVideoInfoDao : IBaseDao<VideoInfo>
     //
     //
     // void UpdateAllImagePathList(string srcPath, string dstPath);
-    // Task<Video[]> GetLookLaterListAsync(int limit);
-    //
-    // Task<Video[]> GetLikeListAsync(int limit);
-    // Task<Video[]> GetRecentListAsync(int limit);
-    //
-    // void ExecuteUpdateByTrueName(string trueName, Action<Video> updateAction);
+    Task<VideoInfo[]> GetLookLaterListAsync(int limit);
+    
+    Task<VideoInfo[]> GetLikeListAsync(int limit);
+    
+    Task<VideoInfo[]> GetRecentListAsync(int limit);
+    
+    void ExecuteUpdateByTrueName(string trueName, Action<VideoInfo> updateAction);
+    VideoInfo? getOneByFileId(long fileInfoId);
 }

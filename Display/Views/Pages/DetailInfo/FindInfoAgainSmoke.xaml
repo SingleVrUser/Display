@@ -7,10 +7,9 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:winUi="using:CommunityToolkit.WinUI"
-      xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:controls="using:CommunityToolkit.WinUI.Controls"
       xmlns:spider="using:Display.Providers.Spider"
-      xmlns:entity="using:DataAccess.Models.Entity"
+      xmlns:video="using:Display.Models.Vo.Video"
       mc:Ignorable="d">
     <Page.Resources>
         <Style TargetType="Pivot">
@@ -100,7 +99,7 @@
                               x:Name="NewInfoListView"
                               SelectionChanged="NewInfo_ListView_SelectionChanged">
                         <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="entity:VideoInfo">
+                            <DataTemplate x:DataType="video:VideoSearchVo">
                                 <Grid ColumnSpacing="3"
                                       Padding="0,2">
                                     <Grid.ColumnDefinitions>
@@ -158,12 +157,12 @@
 
                                         <TextBlock Grid.Column="1"
                                                    Grid.Row="1"
-                                                   Text="{x:Bind Actor}"
+                                                   Text="{x:Bind ActorName}"
                                                    TextTrimming="CharacterEllipsis" />
 
                                         <TextBlock Grid.Column="1"
                                                    Grid.Row="2"
-                                                   Text="{x:Bind Category}"
+                                                   Text="{x:Bind CategoryName}"
                                                    TextTrimming="CharacterEllipsis" />
 
                                         <TextBlock Grid.Column="1"
@@ -221,7 +220,7 @@
 
                         <Image>
                             <Image.Source>
-                                <BitmapImage UriSource="{x:Bind _videoInfo.ImageUrl,Converter={StaticResource NotExistsImageUriConverter},Mode=OneWay}"/>
+                                <BitmapImage UriSource="{x:Bind _videoSearchVo.ImageUrl,Converter={StaticResource NotExistsImageUriConverter},Mode=OneWay}"/>
                             </Image.Source>
                         </Image>
                         <!--<oldControls:ImageEx Source="{x:Bind _videoInfo.ImageUrl,Converter={StaticResource NotExistsImagePathConverter},Mode=OneWay}"
@@ -240,23 +239,23 @@
                             <TextBlock>
                                     <Run>番号</Run>
                                     <Run FontWeight="Bold"
-                                         Text="{x:Bind _videoInfo.Name,Mode=OneWay}" />
+                                         Text="{x:Bind _videoSearchVo.Name,Mode=OneWay}" />
                             </TextBlock>
 
                             <TextBlock>
                                     <Run>演员</Run>
-                                    <Run Text="{x:Bind _videoInfo.Actor,Mode=OneWay}" />
+                                    <Run Text="{x:Bind _videoSearchVo.ActorName,Mode=OneWay}" />
                             </TextBlock>
 
                             <TextBlock>
                                     
                                 <Run>类别</Run>
-                                    <Run Text="{x:Bind _videoInfo.Category,Mode=OneWay}" />
+                                    <Run Text="{x:Bind _videoSearchVo.CategoryName,Mode=OneWay}" />
                             </TextBlock>
 
                             <TextBlock>
                                     <Run>时间</Run>
-                                    <Run Text="{x:Bind _videoInfo.ReleaseTime,Mode=OneWay}" />
+                                    <Run Text="{x:Bind _videoSearchVo.ReleaseTime,Mode=OneWay}" />
                             </TextBlock>
                         </StackPanel>
 

@@ -37,7 +37,7 @@ public class FileInfo : BaseEntity
     
     [JsonProperty("n")]
     [StringLength(200)]
-    public required string Name { get; init; }
+    public string Name { get; set; }
 
     [JsonProperty("s")]
     public long Size { get; set; }
@@ -50,8 +50,8 @@ public class FileInfo : BaseEntity
 
     [JsonProperty("pc")]
     [StringLength(18)]
-    public required string PickCode { get; init; }
-
+    public string PickCode { get; set; }
+    
     [JsonProperty("p")]
     public int? P { get; set; }
 
@@ -59,7 +59,7 @@ public class FileInfo : BaseEntity
     public int? M { get; set; }
 
     [JsonProperty("t")]
-    public required string Time { get; set; }
+    public string? Time { get; set; }
 
     [JsonProperty("te")]
     public int TimeEdit { get; set; }

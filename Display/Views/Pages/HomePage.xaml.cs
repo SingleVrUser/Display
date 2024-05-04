@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
-using Display.Models.Vo;
 using Display.Models.Vo.IncrementalCollection;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -12,6 +11,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
+using VideoCoverVo = Display.Models.Vo.Video.VideoCoverVo;
 
 
 namespace Display.Views.Pages;
@@ -108,9 +108,9 @@ public sealed partial class HomePage
     {
         if (sender is not ListView listView) return;
 
-        if (VideoInfoListView.ItemsSource is not ObservableCollection<VideoCoverVo> items) return;
+        if (listView.ItemsSource is not ObservableCollection<VideoCoverVo> items) return;
 
-        if (listView.SelectedItem is not VideoInfo videoInfo) return;
+        if (listView.SelectedItem is not VideoCoverVo videoInfo) return;
 
         if (items.Contains(videoInfo))
         {
@@ -159,7 +159,7 @@ public sealed partial class HomePage
             var isAdd = true;
             foreach (var showItem in videoList)
             {
-                if (showItem.Name == item.TrueName)
+                if (showItem.Name.Equals(item.Name))
                 {
                     isAdd = false;
                 }
@@ -178,7 +178,7 @@ public sealed partial class HomePage
             var isDel = true;
             foreach (var item in videoInfos)
             {
-                if (showItem.Name == item.TrueName)
+                if (showItem.Name.Equals(item.Name))
                 {
                     isDel = false;
                 }
