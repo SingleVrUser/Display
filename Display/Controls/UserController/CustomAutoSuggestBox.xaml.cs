@@ -29,7 +29,9 @@ public sealed partial class CustomAutoSuggestBox
     public CustomAutoSuggestBox()
     {
         InitializeComponent();
-            
+
+        // _searchHistoryDao.InitData();
+
         _historySearchItemList = _searchHistoryDao.List().OrderByDescending(i=>i.Id).ToList();
     }
     

@@ -185,7 +185,7 @@
                                                         <TextBlock Text="{x:Bind VideoCoverVo.Name, Mode=OneWay}"
                                                                        IsTextSelectionEnabled="True" />
                                                         <TextBlock Text="{x:Bind VideoCoverVo.ReleaseTime, Mode=OneWay}" />
-                                                        <userController:TextBlockWithLongText StringValue="{x:Bind VideoCoverVo.Actor, Mode=OneWay}" />
+                                                        <userController:TextBlockWithLongText StringValue="{x:Bind VideoCoverVo.ActorName, Mode=OneWay}" />
                                                     </StackPanel>
 
                                                     <StackPanel Orientation="Horizontal"

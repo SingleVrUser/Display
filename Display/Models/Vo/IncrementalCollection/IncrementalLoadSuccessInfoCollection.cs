@@ -4,20 +4,19 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Display.Providers;
+using DataAccess.Dao.Interface;
 using Microsoft.UI.Xaml.Data;
-using SharpCompress;
-using DataAccess;
 
 namespace Display.Models.Vo.IncrementalCollection;
 
-public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCoverVo>, ISupportIncrementalLoading
+public class IncrementalLoadSuccessInfoCollection : ObservableCollection<Video.VideoCoverVo>, ISupportIncrementalLoading
 {
+    
+    private readonly IVideoInfoDao _videoInfoDao = App.GetService<IVideoInfoDao>();
+    
+    
     private double ImageWidth { get; set; }
-    //private double ImageHeight { get; set; }
     private bool IsFuzzyQueryActor { get; set; }
-
-    private bool IsContainFail => FilterConditionList != null && FilterConditionList.Contains("fail");
 
     private string OrderBy { get; set; }
     private bool IsDesc { get; set; }
@@ -46,18 +45,18 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
     public async Task LoadData(int startShowCount = 20)
     {
         Clear();
-        var newItems = await DataAccessLocal.Get.GetVideoInfoAsync(startShowCount, 0, OrderBy, IsDesc, FilterConditionList, FilterKeywords, Ranges, IsFuzzyQueryActor);
 
-        var successCount = await DataAccessLocal.Get.GetCountOfVideoInfoAsync(FilterConditionList, FilterKeywords, Ranges);
-        var failCount = 0;
-        if (IsContainFail)
-        {
-            failCount = await DataAccessLocal.Get.GetCountOfFailFileInfoWithFilesInfoAsync(0, -1, FilterKeywords);
-        }
+        var newItems = _videoInfoDao.List(0, startShowCount);
+        //
+        // var newItems = await DataAccessLocal.Get.GetVideoInfoAsync(startShowCount, 0, OrderBy, IsDesc, FilterConditionList, FilterKeywords, Ranges, IsFuzzyQueryActor);
 
-        AllCount = successCount + failCount;
+        // var successCount = await DataAccessLocal.Get.GetCountOfVideoInfoAsync(FilterConditionList, FilterKeywords, Ranges);
 
-        newItems?.ForEach(item => Add(new VideoCoverVo(item, ImageWidth)));
+        var successCount = _videoInfoDao.TotalCount();
+
+        AllCount = successCount;
+
+        newItems?.ForEach(item => Add(new Video.VideoCoverVo(item, ImageWidth)));
     }
 
     public void SetImageSize(double imgWidth)
@@ -93,18 +92,19 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<VideoCo
 
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(int count)
     {
-        var lists = await DataAccessLocal.Get.GetVideoInfoAsync(count, Count, OrderBy, IsDesc, FilterConditionList, FilterKeywords, Ranges, IsFuzzyQueryActor);
+        var lists = _videoInfoDao.List(Count, count);
+        // var lists = await DataAccessLocal.Get.GetVideoInfoAsync(count, Count, OrderBy, IsDesc, FilterConditionList, FilterKeywords, Ranges, IsFuzzyQueryActor);
 
         //在最后的时候加载匹配失败的
         //用于展示搜索结果
-        if (lists == null || lists.Length < count)
+        if (lists.Count < count)
         {
             HasMoreItems = false;
         }
 
-        lists?.ForEach(item => Add(new VideoCoverVo(item, ImageWidth)));
+        lists.ForEach(item => Add(new Video.VideoCoverVo(item, ImageWidth)));
 
-        var result = new LoadMoreItemsResult((uint)(lists?.Length ?? 0));
+        var result = new LoadMoreItemsResult((uint)lists.Count);
 
         return result;
     }

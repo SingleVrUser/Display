@@ -16,6 +16,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
+using VideoCoverVo = Display.Models.Vo.Video.VideoCoverVo;
 
 namespace Display.Controls.UserController;
 

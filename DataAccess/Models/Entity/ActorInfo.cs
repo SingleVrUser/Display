@@ -51,7 +51,7 @@ public class ActorInfo(string name) : BaseEntity
     /// <summary>
     /// 身材信息
     /// </summary>
-    public BwhInfo Bwh { get; set; }
+    public BwhInfo? Bwh { get; set; }
     
     public List<ActorName> NameList { get; set; }
     

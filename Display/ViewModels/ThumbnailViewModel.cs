@@ -154,8 +154,8 @@ internal partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGe
 
             // 从115中删除 
             Debug.WriteLine($"删除{CurrentDetailFileItem.Cid}下的{CurrentDetailFileItem.Id}");
-            var deleteResult = CurrentDetailFileItem.Id != null && await WebApi.GlobalWebApi.DeleteFiles(CurrentDetailFileItem.Cid,
-                [(long)CurrentDetailFileItem.Id]);
+            var deleteResult = await WebApi.GlobalWebApi.DeleteFiles(CurrentDetailFileItem.Cid,
+                [CurrentDetailFileItem.Id]);
 
             if (!deleteResult) return;
             _fileInfos.RemoveAt(i); // 要在ThumbnailList的Remove之前执行

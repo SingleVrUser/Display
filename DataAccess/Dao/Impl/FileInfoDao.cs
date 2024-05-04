@@ -1,6 +1,5 @@
 ﻿using DataAccess.Context;
 using DataAccess.Dao.Interface;
-using DataAccess.Models.Entity;
 using Microsoft.EntityFrameworkCore;
 using FileInfo = DataAccess.Models.Entity.FileInfo;
 
@@ -59,7 +58,7 @@ public class FileInfoDao : BaseDao<FileInfo>, IFileInfoDao
         
         if (limit != null) queryable = queryable.Take(limit.Value);
 
-        return queryable.AsNoTracking().ToList();
+        return queryable.ToList();
     }
 
     public List<FileInfo> GetPartFileListByPid(long folderId, int? limit = null)
@@ -74,50 +73,54 @@ public class FileInfoDao : BaseDao<FileInfo>, IFileInfoDao
         var filesInfos = queryable.AsNoTracking().ToList();
         return filesInfos;
     }
-    //
-    // public async Task ExecuteRemoveAllByFolderIdAsync(long folderId)
-    // {
-    //     await RemoveAllByFolderIdAsync(folderId);
-    //     await _fileContext.SaveChangesAsync();
-    // }
+
+    public async Task ExecuteRemoveAllByFolderIdAsync(long folderId)
+    {
+        await RemoveAllByFolderIdAsync(folderId);
+        await Context.SaveChangesAsync();
+    }
 
     public bool IsFolderExistsById(long id)
     {
         return _context.FileInfo.FirstOrDefault(i => i.FileId <= 0 && i.CurrentId == id) != null;
     }
-    //
-    // public async Task RemoveAllByFolderIdAsync(long folderId)
-    // {
-    //     //加上文件夹本身
-    //     var folderInfo = _fileContext.FilesInfos.AsNoTracking().FirstOrDefault(i => i.CurrentId == folderId);
-    //     if (folderInfo == null) return;
-    //
-    //     List<FilesInfo> removeList = [folderInfo];
-    //
-    //     //文件夹下所有的文件
-    //     var filesInFolder = await GetAllFilesListByFolderIdAsync(folderId);
-    //
-    //     removeList.AddRange(filesInFolder);
-    //
-    //     _fileContext.FilesInfos.RemoveRange(removeList);
-    //
-    //     // 删除中间表
-    //     foreach (var filesInfo in removeList)
-    //     {
-    //         _fileContext.FileToInfos.RemoveRange(
-    //             _fileContext.FileToInfos.Where(i=>i.FilePickCode == filesInfo.PickCode));
-    //     }
-    // }
-    //
-    // public void RemoveByPickCode(string pickCode)
-    // {
-    //     // DbSet.Where(i => i.PickCode == pickCode).ExecuteDelete();
-    //     //
-    //     // 删除中间表
-    //     _fileContext.FileToInfos.RemoveRange(_fileContext.FileToInfos.Where(i => i.FilePickCode == pickCode));
-    //     
-    //     _fileContext.SaveChanges();
-    // }
+
+    public void ExecuteRemoveById(long id)
+    {
+        CurrentDbSet.Where(i => i.Id.Equals(id)).ExecuteDelete();
+    }
+
+    public List<FileInfo> GetFileInfoListByVideoInfoId(long infoId)
+    {
+        return CurrentDbSet.Where(i => i.VideoId.Equals(infoId)).ToList();
+    }
+
+    public async Task RemoveAllByFolderIdAsync(long folderId)
+    {
+        //加上文件夹本身
+        var folderInfo = Context.FileInfo.FirstOrDefault(i => i.CurrentId == folderId);
+        if (folderInfo == null) return;
+    
+        List<FileInfo> removeList = [folderInfo];
+    
+        //文件夹下所有的文件
+        var filesInFolder = await GetAllFilesListByFolderIdAsync(folderId);
+    
+        removeList.AddRange(filesInFolder);
+    
+        Context.FileInfo.RemoveRange(removeList);
+    }
+    
+    public void RemoveByPickCode(string pickCode)
+    {
+        CurrentDbSet.Where(i => i.PickCode == pickCode).ExecuteDelete();
+        
+        //
+        // // 删除中间表
+        // _fileContext.FileToInfos.RemoveRange(_fileContext.FileToInfos.Where(i => i.FilePickCode == pickCode));
+        //
+        // _fileContext.SaveChanges();
+    }
 
     public void ExecuteRemoveByTrueName(string trueName)
     {
@@ -140,40 +143,41 @@ public class FileInfoDao : BaseDao<FileInfo>, IFileInfoDao
         return _context.FileInfo.FirstOrDefault(i => i.FileId <= 0 && i.CurrentId == id);
 
     }
-    //
-    // public List<Files> GetFolderListToRootByFolderId(long folderCid)
-    // {
-    //     const int maxDepth = 30;
-    //
-    //     List<Files> folderToRootList = [];
-    //
-    //     Files upperLevelFolder = new() { ParentId = folderCid };
-    //     if (upperLevelFolder.ParentId == null) return [];
-    //
-    //     var pid = upperLevelFolder.ParentId;
-    //     
-    //     for (var i = 0; i < maxDepth; i++)
-    //     {
-    //         if (pid == null) break;
-    //         var upperFileInfo = GetUpperLevelFolderInfoByFolderId(pid.Value);
-    //         
-    //         if (upperFileInfo == null) break;
-    //         
-    //         upperLevelFolder = upperFileInfo;
-    //         folderToRootList.Add(upperLevelFolder);
-    //
-    //         pid = upperLevelFolder.ParentId;
-    //
-    //         if (pid != 0) continue;
-    //             
-    //         folderToRootList.Add(new Files { CurrentId = 0, Name = "根目录" });
-    //         break;
-    //     }
-    //
-    //     folderToRootList.Reverse();
-    //
-    //     return folderToRootList;
-    // }
+    
+    public List<FileInfo> GetFolderListToRootByFolderId(long folderCid)
+    {
+        const int maxDepth = 30;
+    
+        List<FileInfo> folderToRootList = [];
+    
+        long? parentId = folderCid;
+        
+        for (var i = 0; i < maxDepth; i++)
+        {
+            if (parentId == null) break;
+            var upperFileInfo = GetUpperLevelFolderInfoByFolderId(parentId.Value);
+            
+            if (upperFileInfo == null) break;
+            
+            folderToRootList.Add(upperFileInfo);
+    
+            parentId = upperFileInfo.ParentId;
+
+            if (parentId != 0) continue;
+            
+            folderToRootList.Add(new FileInfo
+            {
+                CurrentId = 0,
+                Name = "根目录",
+                PickCode = String.Empty
+            });
+            break;
+        }
+    
+        folderToRootList.Reverse();
+    
+        return folderToRootList;
+    }
 
     private async Task<List<FileInfo>> GetAllFileListTraverseAsync(long id, List<FileInfo> allFileList)
     {

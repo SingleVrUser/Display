@@ -26,54 +26,19 @@ public sealed partial class Progress
 {
     private readonly CancellationTokenSource _sCts = new();
     private List<string> SelectedFilesNameList { get; }
-    private List<FilesInfo> _fileList = [];
-    private readonly List<FailDatum> _failDatumList = [];
+    private List<FileInfo> _fileList = [];
 
     private List<MatchVideoResult> _matchVideoResults;
     private Window _currentWindow;
 
-    private readonly IFileToInfoDao _fileToInfoDao = App.GetService<IFileToInfoDao>();
-    private readonly IFilesInfoDao _filesInfoDao = App.GetService<IFilesInfoDao>();
+    private readonly IFileInfoDao _filesInfoDao = App.GetService<IFileInfoDao>();
 
-    public Progress(List<string> selectedFilesNameList, List<FilesInfo> fileList)
+    public Progress(List<string> selectedFilesNameList, List<FileInfo> fileList)
     {
         InitializeComponent();
         SelectedFilesNameList = selectedFilesNameList;
         _fileList = fileList;
         Loaded += PageLoaded;
-    }
-
-    public Progress(List<FailDatum> failDatumList)
-    {
-        InitializeComponent();
-        _failDatumList = failDatumList;
-        Loaded += ReSpiderPageLoaded;
-    }
-
-    private void ReSpiderPageLoaded(object sender, RoutedEventArgs e)
-    {
-        Loaded -= ReSpiderPageLoaded;
-
-        if (_failDatumList == null || _failDatumList.Count == 0) return;
-
-        _currentWindow.Closed += CurrentWindow_Closed;
-        _matchVideoResults ??= [];
-
-        foreach (var item in _failDatumList)
-        {
-            _matchVideoResults.Add(new MatchVideoResult { Status = true, OriginalName = item.Datum.Name, Message = "匹配成功", StatusCode = 1, MatchName = item.MatchName });
-
-            //替换数据库的数据
-            _fileToInfoDao.ExecuteUpdate(i => string.Equals(item.Datum.PickCode, i.FilePickCode),
-                i => i.TrueName = item.MatchName);
-        }
-
-        SpiderVideoInfo();
-
-        _currentWindow.Closed -= CurrentWindow_Closed;
-
-        TopProgressRing.IsActive = false;
-        TotalProgressTextBlock.Text = "完成";
     }
 
     private async void PageLoaded(object sender, RoutedEventArgs e)
@@ -105,7 +70,7 @@ public sealed partial class Progress
         //目前datumList仅有一级目录文件
         //遍历获取文件列表中所有的文件
 
-        var newList = new List<FilesInfo>();
+        var newList = new List<FileInfo>();
         foreach (var filesInfo in _fileList.Where(i=> i.FileId == default))
         {
             var allFilesInFolder = await _filesInfoDao.GetAllFilesListByFolderIdAsync(filesInfo.CurrentId);
@@ -118,7 +83,7 @@ public sealed partial class Progress
         _fileList = _fileList.Where(item => item.FileId != default).ToList();
 
         //去除重复文件
-        var newDictList = new Dictionary<string, FilesInfo>();
+        var newDictList = new Dictionary<string, FileInfo>();
         _fileList.ForEach(item => newDictList.TryAdd(item.PickCode, item));
 
         _fileList = newDictList.Values.ToList();
@@ -139,7 +104,7 @@ public sealed partial class Progress
     /// 显示饼形图
     /// </summary>
     /// <param name="datumList"></param>
-    private void ShowFilesPieCharts(List<FilesInfo> datumList)
+    private void ShowFilesPieCharts(List<FileInfo> datumList)
     {
         FileInfoPieChart.Visibility = Visibility.Visible;
 
@@ -208,7 +173,7 @@ public sealed partial class Progress
     /// <param name="dataInfo"></param>
     /// <param name="typeInfo"></param>
     /// <param name="name"></param>
-    private void UpdateFileStatistics(FilesInfo dataInfo, FileStatistics typeInfo, string name)
+    private void UpdateFileStatistics(FileInfo dataInfo, FileStatistics typeInfo, string name)
     {
         typeInfo.Size += dataInfo.Size;
         typeInfo.Count++;

@@ -28,7 +28,7 @@
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    
+
 <!--    &lt;!&ndash; This bundles the .NET Core libraries &ndash;&gt;-->
 <!--    <SelfContained>true</SelfContained>-->
 

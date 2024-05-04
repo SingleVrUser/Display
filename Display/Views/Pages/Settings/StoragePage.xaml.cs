@@ -124,8 +124,9 @@ public sealed partial class StoragePage
         if (result == ContentDialogResult.Primary)
         {
             //修改数据库图片地址
-            _actorInfoDao.UpdateAllProfilePathList(updateImagePathPage.SrcPath, updateImagePathPage.DstPath);
-            ShowTeachingTip("修改完成，部分修改内容重启后生效");
+            // _actorInfoDao.UpdateAllProfilePathList(updateImagePathPage.SrcPath, updateImagePathPage.DstPath);
+            // ShowTeachingTip("修改完成，部分修改内容重启后生效");
+            ShowTeachingTip("待实现");
         }
         else
         {
@@ -175,9 +176,10 @@ public sealed partial class StoragePage
         var result = await dialog.ShowAsync();
         if (result == ContentDialogResult.Primary)
         {
-            //修改数据库图片地址
-            _videoInfoDao.UpdateAllImagePathList(updateImagePathPage.SrcPath, updateImagePathPage.DstPath);
-            ShowTeachingTip("修改完成，部分修改内容重启后生效");
+            // //修改数据库图片地址
+            // _videoInfoDao.UpdateAllImagePathList(updateImagePathPage.SrcPath, updateImagePathPage.DstPath);
+            // ShowTeachingTip("修改完成，部分修改内容重启后生效");
+            ShowTeachingTip("待实现");
         }
         else
         {
@@ -232,28 +234,30 @@ public sealed partial class StoragePage
         dialog.Content = textHighlightingRichTextBlock;
         var result = await dialog.ShowAsync();
         if (result != ContentDialogResult.Primary) return;
+        
+        // TODO 更新数据库文件
 
-        var dstDbFilepath = DataAccessLocal.NewDbPath(dst);
-
-        var textFileExists = "数据文件已存在，未复制原数据文件";
-        if (dstDbFilepath != null && !File.Exists(dstDbFilepath))
-        {
-            File.Copy(DataAccessLocal.NewDbPath(src), dstDbFilepath, false);
-            textFileExists = "原数据文件已复制到指定目录";
-        }
-
-        RichTextBlock successRichTextBlock = new();
-        Paragraph successParagraph = new();
-        successParagraph.Inlines.Add(new Run { Text = "数据文件存放目录修改完成，重启后生效。" });
-        successParagraph.Inlines.Add(new LineBreak());
-        successParagraph.Inlines.Add(new Run { Text = textFileExists, Foreground = new SolidColorBrush(Colors.OrangeRed) });
-        successParagraph.Inlines.Add(new LineBreak());
-        successParagraph.Inlines.Add(new Run { Text = "如需删除原数据文件，请关闭应用后自行删除" });
-        successRichTextBlock.Blocks.Add(successParagraph);
-
-        ShowTeachingTip(successRichTextBlock);
-        await Task.Delay(3000);
-        FileMatch.LaunchFolder(src);
+        // var dstDbFilepath = DataAccessLocal.NewDbPath(dst);
+        //
+        // var textFileExists = "数据文件已存在，未复制原数据文件";
+        // if (dstDbFilepath != null && !File.Exists(dstDbFilepath))
+        // {
+        //     File.Copy(DataAccessLocal.NewDbPath(src), dstDbFilepath, false);
+        //     textFileExists = "原数据文件已复制到指定目录";
+        // }
+        //
+        // RichTextBlock successRichTextBlock = new();
+        // Paragraph successParagraph = new();
+        // successParagraph.Inlines.Add(new Run { Text = "数据文件存放目录修改完成，重启后生效。" });
+        // successParagraph.Inlines.Add(new LineBreak());
+        // successParagraph.Inlines.Add(new Run { Text = textFileExists, Foreground = new SolidColorBrush(Colors.OrangeRed) });
+        // successParagraph.Inlines.Add(new LineBreak());
+        // successParagraph.Inlines.Add(new Run { Text = "如需删除原数据文件，请关闭应用后自行删除" });
+        // successRichTextBlock.Blocks.Add(successParagraph);
+        //
+        // ShowTeachingTip(successRichTextBlock);
+        // await Task.Delay(3000);
+        // FileMatch.LaunchFolder(src);
     }
 
 }

@@ -1,20 +1,23 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Linq;
+using CommunityToolkit.Mvvm.ComponentModel;
 using DataAccess.Models.Entity;
 using Microsoft.UI.Xaml;
 
-namespace Display.Models.Vo;
+namespace Display.Models.Vo.Video;
 
 /// <summary>
 /// 视频封面缩略信息
 /// </summary>
-public partial class VideoCoverVo : ObservableObject
+public partial class VideoCoverVo: ObservableObject
 {
-    public long Id { get; init; }
+    public long Id { get; set; }
     
-    public string Title { get; init; }
+    public string Title { get; set; }
     
-    public string Name { get; init; }
+    public string Name { get; set; }
     public string ReleaseYear { get;}
+    
+    public string ReleaseTime { get; set; }
     public Visibility IsShowLabel { get;}
     public string ShowLabel { get;}
     
@@ -23,6 +26,9 @@ public partial class VideoCoverVo : ObservableObject
 
     [ObservableProperty]
     private string _actorName;
+    
+    [ObservableProperty]
+    private string _categoryName;
 
     [ObservableProperty]
     private double _score;
@@ -49,9 +55,16 @@ public partial class VideoCoverVo : ObservableObject
         Name = videoInfo.Name;
 
         Title = videoInfo.Title;
+
+        ReleaseTime = videoInfo.ReleaseTime;
         
         //评分
         Score = videoInfo.Interest.Score ?? 0;
+
+        if (videoInfo.CategoryList != null)
+        {
+            CategoryName = string.Join(",", videoInfo.CategoryList.Select(i => i.Name));
+        }
         
         //演员
         ActorName = string.Join(",", videoInfo.ActorInfoList);

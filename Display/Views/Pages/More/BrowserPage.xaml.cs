@@ -67,8 +67,14 @@ public sealed partial class BrowserPage
         {
             _webApi ??= WebApi.GlobalWebApi;
 
-            List<FilesInfo> videoInfoList = [];
-            videoInfoList.AddRange(selectedItemList.Select(item => new FilesInfo { CurrentId = item.Id, Name = item.Name, PickCode = item.PickCode, FileId = item.FileId }));
+            List<FileInfo> videoInfoList = [];
+            videoInfoList.AddRange(selectedItemList.Select(item => new FileInfo
+            {
+                CurrentId = item.Id,
+                Name = item.Name,
+                PickCode = item.PickCode,
+                FileId = item.FileId
+            }));
 
             //BitComet只需要cid,n,pc三个值
             var isSuccess = await _webApi.RequestDown(videoInfoList, downtype);

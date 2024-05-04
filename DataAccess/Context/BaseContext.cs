@@ -40,7 +40,7 @@ public class BaseContext : DbContext
 
     private static string _dbPath = SetSavePath();
 
-    private static string SetSavePath(string? savePath = null)
+    public static string SetSavePath(string? savePath = null)
     {
         savePath ??= Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 

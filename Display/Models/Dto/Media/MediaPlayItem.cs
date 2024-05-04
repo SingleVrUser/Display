@@ -3,15 +3,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Media.Playback;
-using DataAccess.Dao.Impl;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.Network;
-using Display.Models.Api.OneOneFive.File;
-using Display.Models.Dto.OneOneFive;
-using Display.Models.Entities;
-using Display.Models.Entities.OneOneFive;
 using Display.Models.Enums;
 using Display.Models.Vo;
 using Display.Models.Vo.OneOneFive;
@@ -53,6 +48,12 @@ public class MediaPlayItem
     public bool IsRequestM3U8;
     public bool IsRequestOriginal;
 
+    public MediaPlayItem(FileInfo fileInfo)
+        : this(fileInfo.PickCode, fileInfo.Name, fileInfo.CurrentId, fileInfo.Id, fileInfo.Size, fileInfo.FileId == null ? FileType.Folder : FileType.File)
+    {
+        
+    }
+
     public MediaPlayItem(DetailFileInfo detailFileInfo)
         : this(detailFileInfo.PickCode, detailFileInfo.Name, detailFileInfo.Cid, detailFileInfo.Id, detailFileInfo.Size, detailFileInfo.Type)
     {
@@ -75,13 +76,15 @@ public class MediaPlayItem
 
         if (!AppSettings.IsFindSub || string.IsNullOrEmpty(pickCode) || type == FileType.Folder) return;
 
-        // 加载字幕
-        var subArray = DataAccessLocal.Get.GetSubFile(pickCode);
+        // TODO 加载字幕
         
-        SubInfos = [];
-        subArray.ForEach(i =>
-            SubInfos.Add(new SubInfo(i.PickCode, i.Name, Name)));
-        SubInfos = SubInfos.OrderBy(item => item.Name).ToList();
+        // // 加载字幕
+        // var subArray = DataAccessLocal.Get.GetSubFile(pickCode);
+        //
+        // SubInfos = [];
+        // subArray.ForEach(i =>
+        //     SubInfos.Add(new SubInfo(i.PickCode, i.Name, Name)));
+        // SubInfos = SubInfos.OrderBy(item => item.Name).ToList();
     }
 
     private static WebApi _webApi;
@@ -211,7 +214,7 @@ public class MediaPlayItem
                 newMediaPlayItems.AddRange(
                     fileInfos.Data
                         .Where(x => x.Iv == 1)
-                        .Select(x => new MediaPlayItem(new DetailFileInfo(x))));
+                        .Select(x => new MediaPlayItem(x)));
             }
             else
             {
