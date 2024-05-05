@@ -80,7 +80,7 @@
                                                 CornerRadius="3">
                                             <Image Tapped="Image_Tapped">
                                                 <Image.Source>
-                                                    <BitmapImage UriSource="{x:Bind ImagePath, Converter={StaticResource NotExistsImageUriConverter}}"/>
+                                                    <BitmapImage UriSource="{x:Bind ImagePath}"/>
                                                 </Image.Source>
                                             </Image>
                                         </Border>
@@ -102,20 +102,13 @@
                                             <ColumnDefinition Width="auto" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-
-                                        <!--<oldControls:ImageEx Source="{x:Bind ImagePath}"
-                                                          Width="120"
-                                                          MinHeight="80"
-                                                          DecodePixelWidth="120"
-                                                          CornerRadius="2">-->
-                                        <!--</oldControls:ImageEx>-->
+                                        
                                         <Image Width="120" MinHeight="80">
                                             <Image.Source>
-                                                <BitmapImage UriSource="{x:Bind ImagePath, Converter={StaticResource NotExistsImageUriConverter}}"
+                                                <BitmapImage UriSource="{x:Bind ImagePath}"
                                                              DecodePixelWidth="120"/>
                                             </Image.Source>
                                         </Image>
-
 
                                         <StackPanel Grid.Column="1"
                                                     VerticalAlignment="Center"
@@ -124,7 +117,7 @@
                                                        FontFamily="JetBrains Mono" />
                                             <userController:TextBlockWithLongText StringValue="{x:Bind ActorName}"
                                                                                   IsFirstTextSelectionEnabled="False" />
-                                            <userController:TextBlockWithLongText StringValue="{x:Bind }"
+                                            <userController:TextBlockWithLongText StringValue="{x:Bind CategoryName}"
                                                                                   IsFirstTextSelectionEnabled="False" />
                                         </StackPanel>
                                     </Grid>

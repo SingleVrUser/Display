@@ -72,16 +72,12 @@ public sealed partial class VideoDetails
             //来源为网络
             case ThumbnailOriginType.Web:
             {
-                var videoInfo = _videoInfoDao.GetOneByName(Info.Name);
+                // var videoInfo = _videoInfoDao.GetOneByName(Info.Name);
 
-                var sampleImageListStr = videoInfo?.SampleImages;
-                if (!string.IsNullOrEmpty(sampleImageListStr))
-                {
-                    thumbnailList = sampleImageListStr.Split(",").ToList();
-                }
+                thumbnailList = Info?.SampleImageList;
 
                 break;
-                }
+            }
             //来源为本地
             case (int)ThumbnailOriginType.Local:
                 {
@@ -91,22 +87,19 @@ public sealed partial class VideoDetails
                     if (theFolder.Exists)
                     {
                         //文件
-                        foreach (var nextFile in theFolder.GetFiles())
-                        {
-                            if (nextFile.Name.Contains("Thumbnail_"))
-                            {
-                                thumbnailList.Add(nextFile.FullName);
-                            }
-                        }
+                        thumbnailList = theFolder.GetFiles()
+                            .Where(i => i.Name.Contains("Thumbnail_"))
+                            .Select(i=>i.FullName)
+                            .ToList();
                     }
 
                     break;
                 }
         }
 
-        if (thumbnailList.Count > 0)
+        if (thumbnailList is { Count: > 0 })
         {
-            thumbnailList = thumbnailList.OrderByNatural(emp => emp.ToString()).ToList();
+            thumbnailList = thumbnailList.OrderByNatural(i => i.ToString()).ToList();
             ThumbnailGridView.ItemsSource = thumbnailList;
             ThumbnailStackPanel.Visibility = Visibility; 
         }
@@ -116,11 +109,9 @@ public sealed partial class VideoDetails
         if (ActorStackPanel.Children.Count != 0) ActorStackPanel.Children.Clear();
 
         //查询该视频对应的演员列表
-        var actorList = _actorInfoDao.GetPartListByVideoName(Info.Name);
-
-        for (var i = 0; i < actorList.Count; i++)
+        for (var i = 0; i < Info!.ActorInfoList.Count; i++)
         {
-            var actor = actorList[i];
+            var actor = Info.ActorInfoList[i];
             var actorImageControl = new ActorImage(actor, Info.ReleaseTime);
 
             if (!string.IsNullOrEmpty(actor.Name))

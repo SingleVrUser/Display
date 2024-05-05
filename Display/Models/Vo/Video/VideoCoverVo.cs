@@ -57,6 +57,11 @@ public partial class VideoCoverVo: ObservableObject
         Title = videoInfo.Title;
 
         ReleaseTime = videoInfo.ReleaseTime;
+
+        if (videoInfo.ImagePath != null)
+        {
+            ImagePath = videoInfo.ImagePath;
+        }
         
         //评分
         Score = videoInfo.Interest.Score ?? 0;
@@ -67,7 +72,8 @@ public partial class VideoCoverVo: ObservableObject
         }
         
         //演员
-        ActorName = string.Join(",", videoInfo.ActorInfoList);
+        if(videoInfo.ActorInfoList != null) ActorName = string.Join(",", videoInfo.ActorInfoList);
+        
             
         //是否显示右上角的标签
         if (videoInfo.CategoryList != null)

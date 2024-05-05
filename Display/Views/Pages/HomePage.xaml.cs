@@ -5,13 +5,13 @@ using System.Linq;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using Display.Models.Vo.IncrementalCollection;
+using Display.Models.Vo.Video;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
-using VideoCoverVo = Display.Models.Vo.Video.VideoCoverVo;
 
 
 namespace Display.Views.Pages;
@@ -48,22 +48,7 @@ public sealed partial class HomePage
         _recentList.SetOrder("random", true);
         await _recentList.LoadData();
     }
-
-    //private void LoadCover()
-    //{
-    //    // 随机获取20个视频，每次启动自动获取一遍
-    //    var imageList = await _videoInfoDao.GetRandomListAsync(10);
-    //    if (imageList.Length == 0) return;
-
-    //    foreach (var info in imageList.Select(item => new VideoInfoVo(item, 500, 300)))
-    //    {
-    //        _recentList.Add(info);
-    //    }
-
-    //    //var binding = new Binding { Path = new PropertyPath("SelectedIndex"), Mode = BindingMode.TwoWay };
-    //    //ImagePipsPager.SetBinding(PipsPager.SelectedPageIndexProperty, binding);
-    //}
-
+    
     private void MultipleCoverShow_ItemClick(object sender, ItemClickEventArgs e)
     {
         var coverInfo = (VideoCoverVo)e.ClickedItem;
@@ -71,7 +56,7 @@ public sealed partial class HomePage
         _storedItem = coverInfo;
         _storedGridView = (GridView)sender;
         _navigationType = NavigationAnimationType.GridView;
-
+        
         //准备动画
         _storedGridView.PrepareConnectedAnimation("ForwardConnectedAnimation", _storedItem, "showImage");
 
@@ -81,22 +66,20 @@ public sealed partial class HomePage
     private void Image_Tapped(object sender, TappedRoutedEventArgs e)
     {
         if (sender is not Image image) return;
-
         _storedImage = image;
-
-        var coverInfo = _storedImage.DataContext as VideoCoverVo;
-
+        
+        if (_storedImage.DataContext is not VideoCoverVo coverInfo) return;
+        
         _navigationType = NavigationAnimationType.Image;
 
         var animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("ForwardConnectedAnimation", _storedImage);
         animation.Configuration = new BasicConnectedAnimationConfiguration();
-        Frame.Navigate(typeof(DetailInfoPage), coverInfo, new SuppressNavigationTransitionInfo());
+        Frame.Navigate(typeof(DetailInfoPage), coverInfo.Id, new SuppressNavigationTransitionInfo());
     }
 
     private void Image_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
-
     }
 
     private void Image_PointerExited(object sender, PointerRoutedEventArgs e)
@@ -248,8 +231,10 @@ public sealed partial class HomePage
 
     private async void TryUpdateCoverShow()
     {
+        var recentListAsync = await _videoInfoDao.GetRecentListAsync(10);
+        
         //最近视频
-        TryUpdateVideoCoverDisplayClass(await _videoInfoDao.GetRecentListAsync(10), _recentCoverList);
+        TryUpdateVideoCoverDisplayClass(recentListAsync, _recentCoverList);
         //稍后观看
         TryUpdateVideoCoverDisplayClass(await _videoInfoDao.GetLookLaterListAsync(10), _lookLaterList);
         //喜欢视频

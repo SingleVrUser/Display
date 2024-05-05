@@ -10,8 +10,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using DataAccess.Dao.Interface;
 using Display.Models.Vo.Spider;
-using Display.Providers;
 using DataAccess.Models.Dto;
+using Display.Models.Dto;
 
 namespace Display.Managers;
 
@@ -33,7 +33,6 @@ public class SpiderManager
 
     private readonly IVideoInfoDao _videoInfoDao = App.GetService<IVideoInfoDao>();
     
-
     /// <summary>
     /// 随机
     /// </summary>
@@ -288,7 +287,7 @@ public class SpiderManager
     /// 任务完成后
     /// </summary>
     /// <param name="item"></param>
-    private async void DoWhenNameIsAllSearched(SpiderItem item)
+    private void DoWhenNameIsAllSearched(SpiderItem item)
     {
         // 搜索失败
         if (item.Info is null)
@@ -304,11 +303,8 @@ public class SpiderManager
         _successNameInfos.Enqueue(item.Info);
 
         // TODO 当_nameInfos达到指定数量时才添加进数据库
-        await DataAccessLocal.Add.AddVideoInfo_ActorInfo_IsWmAsync(item.Info);
-
-        // _fileToInfoDao.UpdateIsSuccessByTrueName(item.Name, true);
+        _videoInfoDao.AddOrUpdateInfoAndAttachFile(item.Info, item.FileIdList);
     }
-
 
     /// <summary>
     /// 获取当前cid的VideoInfo列表信息，所有搜刮源同步执行，所有搜刮源都搜一遍
@@ -341,15 +337,14 @@ public class SpiderManager
     /// <summary>
     /// 批量添加任务
     /// </summary>
-    /// <param name="names"></param>
-    public async void AddTask(IEnumerable<string> names)
+    /// <param name="taskList"></param>
+    public async void AddTask(IEnumerable<MatchVideoResult> taskList)
     {
         // 添加进任务队列
-        foreach (var name in names)
+        foreach (var task in taskList)
         {
-            var upperName = name.ToUpper();
+            var upperName = task.MatchName.ToUpper();
 
-            Debug.WriteLine(upperName);
             // 先从数据库中搜索
             var singleVideoInfoByTrueName = _videoInfoDao.GetOneByName(upperName);
             if (singleVideoInfoByTrueName != null)
@@ -358,7 +353,10 @@ public class SpiderManager
                 // _fileToInfoDao.UpdateIsSuccessByTrueName(upperName, 1);
                 continue;
             }
-            _taskItemQueue.Enqueue(new SpiderItem(upperName));
+            _taskItemQueue.Enqueue(new SpiderItem(upperName)
+            {
+                FileIdList = task.FileIdList
+            });
         }
 
         //记录当前任务队列的个数

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
 using Windows.Foundation;
@@ -8,8 +7,6 @@ using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using Display.Helper.Network;
 using Display.Models.Dto.Media;
-using Display.Models.Dto.OneOneFive;
-using Display.Models.Vo;
 using Display.Models.Vo.OneOneFive;
 using Display.Providers;
 using Microsoft.UI.Xaml;
@@ -55,19 +52,27 @@ public sealed partial class DetailInfoPage
         //    VideoDetailsControl.StartListCover_GridTapped();
         //}
 
+        VideoInfo videoInfo;
         switch (e.Parameter)
         {
             case VideoCoverVo detailInfo:
             {
-                var videoInfoId = detailInfo.Id;
-                var videoInfo = _videoInfoDao.GetById(videoInfoId);
-                VideoDetailVo = new VideoDetailVo(videoInfo);
+                videoInfo = _videoInfoDao.GetForDetailById(detailInfo.Id);
                 break;
             }
-            case VideoInfo videoInfo:
-                VideoDetailVo = new VideoDetailVo(videoInfo);
+            case long videoId:
+                videoInfo = _videoInfoDao.GetForDetailById(videoId);
                 break;
+            case VideoInfo info:
+                videoInfo = info;
+                break;
+            default:
+                return;
         }
+
+        if (videoInfo == null) return;
+
+        VideoDetailVo = new VideoDetailVo(videoInfo);
     }
 
     // Create connected animation back to collection page.
@@ -86,7 +91,7 @@ public sealed partial class DetailInfoPage
                 //例：不存在Image中Source指向的图片文件
                 if (VideoDetailsControl.CoverImage.DesiredSize == new Size(0, 0)) return;
 
-                ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("BackConnectedAnimation", VideoDetailsControl.CoverImage);
+                var animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("BackConnectedAnimation", VideoDetailsControl.CoverImage);
                 //返回动画应迅速
                 animation.Configuration = new DirectConnectedAnimationConfiguration();
             }

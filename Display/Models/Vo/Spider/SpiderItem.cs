@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using DataAccess.Models.Dto;
 using DataAccess.Models.Entity;
 using Display.Helper.Data;
@@ -11,6 +12,8 @@ public record SpiderItem(string Name)
     public ConcurrentQueue<SpiderSourceName> DoneSpiderNameArray { get; } = [];
 
     public VideoInfoDto Info { get; private set; }
+    
+    public required List<long> FileIdList { get; set; }
 
     public bool IsCompleted { get; private set; }
 
