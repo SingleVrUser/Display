@@ -46,18 +46,14 @@ public interface IVideoInfoDao : IBaseDao<VideoInfo>
     /// <param name="id"></param>
     void ExecuteDeleteById(long id);
 
-    // List<Video>? GetInfoListByTrueName(string name);
-    //
-    // string? GetTrueNameByLikeName(string name);
-    //
-    // /// <summary>
-    // /// 通过name删除
-    // /// </summary>
-    // /// <param name="name"></param>
-    // void ExecuteRemoveByName(string name);
-    //
-    //
-    // void UpdateAllImagePathList(string srcPath, string dstPath);
+    /// <summary>
+    /// 获取首页展示的列表
+    /// </summary>
+    /// <param name="offset"></param>
+    /// <param name="limit"></param>
+    /// <returns></returns>
+    List<VideoInfo> GetRandomList(int offset, int limit);
+
     Task<VideoInfo[]> GetLookLaterListAsync(int limit);
     
     Task<VideoInfo[]> GetLikeListAsync(int limit);

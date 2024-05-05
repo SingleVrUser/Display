@@ -64,7 +64,7 @@ public partial class VideoCoverVo: ObservableObject
         }
         
         //评分
-        Score = videoInfo.Interest.Score ?? 0;
+        Score = videoInfo.Interest.Score ?? -1;
 
         if (videoInfo.CategoryList != null)
         {
@@ -72,7 +72,7 @@ public partial class VideoCoverVo: ObservableObject
         }
         
         //演员
-        if(videoInfo.ActorInfoList != null) ActorName = string.Join(",", videoInfo.ActorInfoList);
+        if(videoInfo.ActorInfoList != null) ActorName = string.Join(",", videoInfo.ActorInfoList.Select(i=>i.Name));
         
             
         //是否显示右上角的标签

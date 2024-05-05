@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
-using Display.Models.Vo;
 using Display.Models.Vo.IncrementalCollection;
+using Display.Models.Vo.Video;
 using Display.Providers;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -16,7 +15,6 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
-using VideoCoverVo = Display.Models.Vo.Video.VideoCoverVo;
 
 namespace Display.Controls.UserController;
 
@@ -59,13 +57,13 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     /// 显示的数据
     /// 用于增量显示，成功列表
     /// </summary>
-    private IncrementalLoadSuccessInfoCollection _successInfoCollection;
-    public IncrementalLoadSuccessInfoCollection SuccessInfoCollection
+    private IncrementalLoadVideoInfoCollection _videoInfoCollection;
+    public IncrementalLoadVideoInfoCollection VideoInfoCollection
     {
-        get => _successInfoCollection;
+        get => _videoInfoCollection;
         private set
         {
-            _successInfoCollection = value;
+            _videoInfoCollection = value;
 
             OnPropertyChanged();
         }
@@ -92,6 +90,11 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     public VideoCoverDisplay()
     {
         InitializeComponent();
+
+        Loaded += (_, _) =>
+        {
+            ShowType_RadioButtons.SelectedIndex = 0;
+        };
     }
 
     /// <summary>
@@ -165,11 +168,11 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     /// <param name="width"></param>
     private void AdjustImageSize(double width)
     {
-        if (SuccessInfoCollection == null) return;
+        if (VideoInfoCollection == null) return;
 
         //var height = width / 3 * 2;
 
-        foreach (var t in SuccessInfoCollection)
+        foreach (var t in VideoInfoCollection)
         {
             t.ImageWidth = width;
         }
@@ -179,7 +182,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
         //当前匹配的是成功
         //更新获取图片大小的值
-        SuccessInfoCollection.SetImageSize(width);
+        VideoInfoCollection.SetImageSize(width);
     }
 
     private double? _imageWidth;
@@ -403,7 +406,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
         }
 
         //FileGrid.Remove(item);
-        SuccessInfoCollection.Remove(item);
+        VideoInfoCollection.Remove(item);
     }
 
     //开始动画
@@ -436,11 +439,11 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     {
         //更新GridView的来源
 
-        SuccessInfoCollection ??= new IncrementalLoadSuccessInfoCollection(ImageWidth);
-        SuccessInfoCollection.SetFilter(_filterConditionList, _filterKeywords, _isFuzzyQueryActor);
-        await SuccessInfoCollection.LoadData();
+        VideoInfoCollection ??= new IncrementalLoadVideoInfoCollection(ImageWidth);
+        VideoInfoCollection.SetFilter(_filterConditionList, _filterKeywords, _isFuzzyQueryActor);
+        await VideoInfoCollection.LoadData();
 
-        BasicGridView.ItemsSource = SuccessInfoCollection;
+        BasicGridView.ItemsSource = VideoInfoCollection;
 
         if (BasicGridView.Visibility == Visibility.Collapsed) BasicGridView.Visibility = Visibility.Visible;
 
@@ -465,7 +468,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     /// <param name="e"></param>
     private void ToTopButton_Click(object sender, RoutedEventArgs e)
     {
-        if (BasicGridView.ItemsSource is IncrementalLoadSuccessInfoCollection { Count: > 0 } successCollection)
+        if (BasicGridView.ItemsSource is IncrementalLoadVideoInfoCollection { Count: > 0 } successCollection)
         {
             BasicGridView.ScrollIntoView(successCollection.First());
         }
@@ -611,13 +614,13 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
     private async void LoadDstSuccessInfoCollection()
     {
-        SuccessInfoCollection = new IncrementalLoadSuccessInfoCollection(ImageWidth);
-        BasicGridView.ItemsSource = SuccessInfoCollection;
+        VideoInfoCollection = new IncrementalLoadVideoInfoCollection(ImageWidth);
+        BasicGridView.ItemsSource = VideoInfoCollection;
 
-        SuccessInfoCollection.SetOrder(_successListOrderBy, _successListIsDesc);
-        SuccessInfoCollection.SetRange(_filterRanges);
-        SuccessInfoCollection.SetFilter(_filterConditionList, _filterKeywords, _isFuzzyQueryActor);
-        await SuccessInfoCollection.LoadData();
+        VideoInfoCollection.SetOrder(_successListOrderBy, _successListIsDesc);
+        VideoInfoCollection.SetRange(_filterRanges);
+        VideoInfoCollection.SetFilter(_filterConditionList, _filterKeywords, _isFuzzyQueryActor);
+        await VideoInfoCollection.LoadData();
     }
 
     private void Filter_ToggleButton_Unchecked(object sender, RoutedEventArgs e)
@@ -639,8 +642,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
         var isLike = isLikeButton.IsChecked == true;
         
-        _actorInfoDao.ExecuteUpdate(i => Equals(actorId, i.Id),
-            i => i.Interest.IsLike = isLike);
+        _actorInfoDao.ExecuteUpdateLike(actorId, isLike);
     }
 
     private void ChangedHyperlink()
@@ -654,11 +656,6 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
         {
             InfoHyperLink.NavigateUri = new Uri(ActorInfo.InfoUrl);
         }
-    }
-
-    private void ShowData_RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        Debug.WriteLine("失败列表");
     }
 
     public event RoutedEventHandler VideoPlayClick;

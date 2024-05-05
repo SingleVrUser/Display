@@ -25,6 +25,8 @@ public interface IActorInfoDao : IBaseDao<ActorInfo>
     // void UpdateAllProfilePathList(string srcPath, string dstPath);
     
     ActorInfo? GetOne();
-    
+
+    void ExecuteUpdateLike(long id, bool isLike);
+
     // void ExecuteUpdateById(long id, Action<ActorInfo> updateAction);
 }

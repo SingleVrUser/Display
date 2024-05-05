@@ -414,7 +414,8 @@
 
                     <Grid ColumnDefinitions="*,auto"
                           HorizontalAlignment="Right"
-                          CornerRadius="5">
+                          CornerRadius="5"
+                          Visibility="Collapsed">
 
                         <!--演员信息-->
                         <Grid Grid.Column="0">
@@ -544,40 +545,22 @@
                                              ToolTipService.ToolTip="匹配成功" />
                     <controls:SegmentedItem x:Name="FailData_RadioButton"
                                             Icon="{winUi:FontIcon Glyph=&#xEA39;}"
-                                            ToolTipService.ToolTip="匹配失败" />
+                                            ToolTipService.ToolTip="匹配失败"
+                                            IsEnabled="False"/>
                 </controls:Segmented>
-
-
-                <!--<RadioButtons x:Name="ShowType_RadioButtons"
-                              MaxColumns="2"
-                              CharacterSpacing="30"
-                              SelectionChanged="ShowType_RadioButtons_SelectionChanged"
-                              Visibility="{x:Bind IsShowSucAndFailSwitchButton}">
-                    <RadioButton x:Name="SuccessData_RadioButton"
-                                 Content="&#xE930;"
-                                 FontSize="20"
-                                 HorizontalContentAlignment="Center"
-                                 Style="{StaticResource RadioButtonCustomizeStyle}"
-                                 ToolTipService.ToolTip="匹配成功" />
-                    <RadioButton x:Name="FailData_RadioButton"
-                                 Content="&#xEA39;"
-                                 FontSize="20"
-                                 HorizontalContentAlignment="Center"
-                                 Style="{StaticResource RadioButtonCustomizeStyle}"
-                                 ToolTipService.ToolTip="匹配失败" />
-                </RadioButtons>-->
 
                 <Button x:Name="OrderButton"
                         FontFamily="{StaticResource SymbolThemeFontFamily}"
                         Content="&#xE174;"
-                        Flyout="{StaticResource SuccessOrderFlyout}">
+                        Flyout="{StaticResource SuccessOrderFlyout}"
+                        IsEnabled="False">
                     <ToolTipService.ToolTip>
                         <ToolTip x:Uid="sortToolTip" />
                     </ToolTipService.ToolTip>
                 </Button>
 
                 <ToggleButton x:Name="FilterToggleButton"
-                              IsEnabled="True"
+                              IsEnabled="False"
                               FontFamily="{StaticResource SymbolThemeFontFamily}"
                               Content="&#xE16E;"
                               Unchecked="Filter_ToggleButton_Unchecked"/>
@@ -605,7 +588,7 @@
                             Grid.Row="0"
                             Minimum="{x:Bind userController:VideoCoverDisplay.SliderMinValue}"
                             Maximum="{x:Bind userController:VideoCoverDisplay.SliderMaxValue}"
-                            Width="200" />
+                            Width="200"/>
 
                     <ToggleButton x:Name="IsAutoAdjustImageSizeToggleButton"
                                   Grid.Column="1"
@@ -622,8 +605,8 @@
                       Grid.Column="1"
                       x:FieldModifier="public"
                       x:Name="PageShow_Grid">
-                    <userController:ShowCountControl CurrentCount="{x:Bind SuccessInfoCollection.Count,Mode=OneWay}"
-                                            AllCount="{x:Bind SuccessInfoCollection.AllCount,Mode=OneWay}"
+                    <userController:ShowCountControl CurrentCount="{x:Bind VideoInfoCollection.Count,Mode=OneWay}"
+                                            AllCount="{x:Bind VideoInfoCollection.AllCount,Mode=OneWay}"
                                             Clicked="ToTopButton_Click"
                                             HorizontalAlignment="Right" />
                 </Grid>

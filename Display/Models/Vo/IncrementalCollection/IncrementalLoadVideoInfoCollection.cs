@@ -9,11 +9,9 @@ using Microsoft.UI.Xaml.Data;
 
 namespace Display.Models.Vo.IncrementalCollection;
 
-public class IncrementalLoadSuccessInfoCollection : ObservableCollection<Video.VideoCoverVo>, ISupportIncrementalLoading
+public class IncrementalLoadVideoInfoCollection : ObservableCollection<Video.VideoCoverVo>, ISupportIncrementalLoading
 {
-    
     private readonly IVideoInfoDao _videoInfoDao = App.GetService<IVideoInfoDao>();
-    
     
     private double ImageWidth { get; set; }
     private bool IsFuzzyQueryActor { get; set; }
@@ -27,17 +25,16 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<Video.V
 
     private string FilterKeywords { get; set; }
 
-
     public int AllCount { get; private set; }
 
     public bool HasMoreItems { get; set; } = true;
 
-    public IncrementalLoadSuccessInfoCollection()
+    public IncrementalLoadVideoInfoCollection()
     {
 
     }
 
-    public IncrementalLoadSuccessInfoCollection(double imgWidth)
+    public IncrementalLoadVideoInfoCollection(double imgWidth)
     {
         SetImageSize(imgWidth);
     }
@@ -46,7 +43,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<Video.V
     {
         Clear();
 
-        var newItems = _videoInfoDao.List(0, startShowCount);
+        var newItems = _videoInfoDao.GetRandomList(0, startShowCount);
         //
         // var newItems = await DataAccessLocal.Get.GetVideoInfoAsync(startShowCount, 0, OrderBy, IsDesc, FilterConditionList, FilterKeywords, Ranges, IsFuzzyQueryActor);
 
@@ -56,7 +53,7 @@ public class IncrementalLoadSuccessInfoCollection : ObservableCollection<Video.V
 
         AllCount = successCount;
 
-        newItems?.ForEach(item => Add(new Video.VideoCoverVo(item, ImageWidth)));
+        newItems.ForEach(item => Add(new Video.VideoCoverVo(item, ImageWidth)));
     }
 
     public void SetImageSize(double imgWidth)
