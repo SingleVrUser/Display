@@ -18,7 +18,7 @@ namespace Display.Views.Pages;
 
 public sealed partial class HomePage
 {
-    private readonly IncrementalLoadSuccessInfoCollection _recentList = [];
+    private readonly IncrementalLoadVideoInfoCollection _recentList = [];
 
     private readonly ObservableCollection<VideoCoverVo> _lookLaterList = [];
     private readonly ObservableCollection<VideoCoverVo> _recentCoverList = [];

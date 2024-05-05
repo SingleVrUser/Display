@@ -126,7 +126,7 @@ public sealed partial class VideoDetails
         var categoryList = Info.CategoryList;
         for (var i = 0; i < categoryList?.Count; i++)
         {
-            var content = categoryList[i];
+            var content = categoryList[i].Name;
 
             // 定义button
             var button = new Button

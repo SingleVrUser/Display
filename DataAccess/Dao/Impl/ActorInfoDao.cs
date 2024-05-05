@@ -16,8 +16,6 @@ public class ActorInfoDao : BaseDao<ActorInfo>, IActorInfoDao
              ).ToList();
      }
 
-
-     //
 //     public List<ActorInfo> GetPageList(int index, int limit, Dictionary<string, bool>? orderByList = null, List<string>? filterList = null)
 //     {
 //         var orderStr = string.Empty;
@@ -58,7 +56,23 @@ public class ActorInfoDao : BaseDao<ActorInfo>, IActorInfoDao
      {
          return CurrentDbSet.FirstOrDefault();
      }
-//
+
+     public void ExecuteUpdateLike(long id, bool isLike)
+     {
+         ExecuteUpdate(i =>i.Id.Equals(id),
+             i =>
+             {
+                 if (i.Interest == null)
+                 {
+                     i.Interest = new ActorInterest { IsLike = isLike };
+                 }
+                 else
+                 {
+                     i.Interest.IsLike = isLike;
+                 }
+             });
+     }
+     //
 //     public void ExecuteUpdateById(long id, Action<ActorInfo> updateAction)
 //     {
 //         var info = DbSet.FirstOrDefault(i => i.Id == id);
@@ -97,6 +111,8 @@ public class ActorInfoDao : BaseDao<ActorInfo>, IActorInfoDao
          //     };
          // return query.FirstOrDefault();
 
-         return CurrentDbSet.FirstOrDefault(i => i.NameList.FirstOrDefault(a => a.Name.Equals(showName)) != null);
+         return CurrentDbSet.FirstOrDefault(i =>
+             i.NameList != null && i.NameList.FirstOrDefault(a =>
+                 a.Name.Equals(showName)) != null);
      }
 }

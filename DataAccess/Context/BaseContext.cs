@@ -59,7 +59,6 @@ public class BaseContext : DbContext
             .WithMany(e => e.VideoInfos)
             .UsingEntity<ActorVideo>();
         
-        
         modelBuilder.Entity<SearchHistory>().ToTable("search_histories");
 
         modelBuilder.Entity<SearchHistory>(b =>
