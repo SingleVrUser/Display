@@ -36,15 +36,19 @@ public class VideoDetailVo(VideoInfo videoInfo)
     
     public string Producer { get; set; } = videoInfo.Producer?.Name ?? string.Empty;
 
-    public List<ActorInfo> ActorInfoList { get; set; } = videoInfo.ActorInfoList;
-
-    public string ActorName { get; set; } = videoInfo.ActorInfoList.Count > 0
+    public string ActorName { get; set; } = videoInfo.ActorInfoList is { Count: > 0 }
         ? videoInfo.ActorInfoList.First().Name
         : string.Empty;
     
     public string CategoryName { get; set; } = videoInfo.CategoryList is { Count: > 0 }
         ? videoInfo.CategoryList.First().Name
         : string.Empty;
+    
+    public List<ActorInfo> ActorInfoList { get; set; } = videoInfo.ActorInfoList;
+
+    public List<string> SampleImageList { get; set; } = videoInfo.SampleImages != null
+        ? videoInfo.SampleImages.Split(",").ToList()
+        : [];
 
     public List<CategoryInfo> CategoryList { get; set; } = videoInfo.CategoryList ?? [];
 }   

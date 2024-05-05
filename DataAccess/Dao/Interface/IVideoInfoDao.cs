@@ -66,4 +66,5 @@ public interface IVideoInfoDao : IBaseDao<VideoInfo>
     
     void ExecuteUpdateByTrueName(string trueName, Action<VideoInfo> updateAction);
     VideoInfo? getOneByFileId(long fileInfoId);
+    VideoInfo? GetForDetailById(long id);
 }

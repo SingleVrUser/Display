@@ -47,12 +47,12 @@ public class VideoInfoDao: BaseDao<VideoInfo>, IVideoInfoDao
     
     public VideoInfo? GetById(long id)
     {
-        return Context.VideoInfo.Find(id);
+        return CurrentDbSet.Find(id);
     }
 
     public VideoInfo? GetOneByName(string name)
     {
-        return Context.VideoInfo.FirstOrDefault(x => x.Name.Equals(name));
+        return CurrentDbSet.FirstOrDefault(x => x.Name.Equals(name));
     }
 
     public bool IsExistsName(string name)
@@ -80,6 +80,7 @@ public class VideoInfoDao: BaseDao<VideoInfo>, IVideoInfoDao
         videoInfo.SourceUrl = dto.SourceUrl;
         videoInfo.ReleaseTime = dto.ReleaseTime;
         videoInfo.LengthTime = dto.LengthTime;
+        videoInfo.ImagePath = dto.ImagePath;
         videoInfo.ImageUrl = dto.SampleImageList == null
             ? null
             : Join(",", dto.SampleImageList);
@@ -121,7 +122,7 @@ public class VideoInfoDao: BaseDao<VideoInfo>, IVideoInfoDao
         // 标签列表
         if (dto.SampleImageList is { Count: > 0 })
         {
-            videoInfo.SampleImages = Concat(dto.SampleImageList);
+            videoInfo.SampleImages = Join(",",dto.SampleImageList);
         }
         
         // 文件信息，搜刮的时候添加
@@ -129,13 +130,6 @@ public class VideoInfoDao: BaseDao<VideoInfo>, IVideoInfoDao
         return videoInfo;
     }
 
-    //     public void UpdateAllImagePathList(string srcPath, string dstPath)
-//     {
-//         var videoInfos = DbSet.Where(i => i.ImagePath.Contains(srcPath)).ToList();
-//         videoInfos.ForEach(i=>i.ImagePath= i.ImagePath.Replace(srcPath, dstPath));
-//         SaveChanges();
-//     }
-//
      public async Task<VideoInfo[]> GetLookLaterListAsync(int limit)
      {
          return await CurrentDbSet.Where(i => i.Interest.IsLookAfter)
@@ -165,35 +159,19 @@ public class VideoInfoDao: BaseDao<VideoInfo>, IVideoInfoDao
      public VideoInfo? getOneByFileId(long fileInfoId)
      {
          return CurrentDbSet.FirstOrDefault(videoInfo=>
-             videoInfo.FileInfoList.FirstOrDefault(fileInfo=>
+             videoInfo.FileInfoList !=null && videoInfo.FileInfoList.FirstOrDefault(fileInfo=>
                  fileInfo.Id.Equals(fileInfoId)) != null);
      }
 
-     
-     
-     //
-//     public VideoInfo? GetOneByTrueName(string name)
-//     {
-//         return DbSet.AsNoTracking().FirstOrDefault(i=>i.TrueName == name);
-//     }
-//
-//     public List<VideoInfo> GetInfoListByTrueName(string name)
-//     {
-//         return DbSet.Where(i => i.TrueName == name).ToList();
-//     }
-//
-//     public string? GetTrueNameByLikeName(string name)
-//     {
-//         var pattern = name.Replace('-', '_');
-//
-//         return DbSet.Select(i => i.TrueName)
-//             .FirstOrDefault(item => EF.Functions.Like(item, pattern));
-//     }
-//
-//     public void ExecuteRemoveByName(string name)
-//     {
-//         DbSet.Where(i => i.TrueName == name).ExecuteDelete();
-//     }
-//
-
+     public VideoInfo? GetForDetailById(long id)
+     {
+         return CurrentDbSet
+             .Include(i=>i.Director)
+             .Include(i=>i.Producer)
+             .Include(i=>i.Series)
+             .Include(i=>i.CategoryList)
+             .Include(i => i.Interest)
+             .Include(i=>i.ActorInfoList)
+             .FirstOrDefault(i => i.Id.Equals(id));
+     }
 }

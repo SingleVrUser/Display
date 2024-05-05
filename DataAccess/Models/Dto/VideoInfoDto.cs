@@ -52,7 +52,7 @@ public class VideoInfoDto
     /// <summary>
     /// 下载好的图片
     /// </summary>
-    public string ImagePath { get; set; }
+    public string? ImagePath { get; set; }
     
     public bool IsWm { get; set; }
     

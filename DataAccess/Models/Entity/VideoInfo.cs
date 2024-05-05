@@ -67,12 +67,12 @@ public class VideoInfo(string name) : BaseEntity
     /// <summary>
     /// 文件列表
     /// </summary>
-    public List<FileInfo> FileInfoList { get; set; }
+    public List<FileInfo>? FileInfoList { get; set; }
     
     /// <summary>
     /// 演员列表
     /// </summary>
-    public List<ActorInfo> ActorInfoList { get; set; }
+    public List<ActorInfo>? ActorInfoList { get; set; }
     
     /// <summary>
     /// 标签列表

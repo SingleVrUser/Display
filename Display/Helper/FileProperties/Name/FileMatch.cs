@@ -12,8 +12,7 @@ using Windows.System;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using Display.Models.Api.EditorCookie;
-using Display.Models.Vo;
-using Display.Providers;
+using Display.Models.Dto;
 using FileInfo = DataAccess.Models.Entity.FileInfo;
 
 namespace Display.Helper.FileProperties.Name;
@@ -217,64 +216,6 @@ public static class FileMatch
         return $"https://v.anxia.com/?pickcode={pickCode}&share_id=0";
     }
 
-    /// <summary>
-    /// 从文件中挑选出视频文件
-    /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
-    public static List<MatchVideoResult> GetVideoAndMatchFile(List<FileInfo> data)
-    {
-        //根据视频信息匹配视频文件
-        List<MatchVideoResult> resultList = [];
-
-        foreach (var fileInfo in data)
-        {
-            var fileName = fileInfo.Name;
-
-            //挑选视频文件
-            if (fileInfo.Iv == 1)
-            {
-                //根据视频名称匹配番号
-                var videoName = MatchName(fileName, fileInfo.CurrentId);
-
-                //未匹配
-                if (videoName == null)
-                {
-                    resultList.Add(new MatchVideoResult { Status = false, OriginalName = fileInfo.Name, StatusCode = -1, Message = "匹配失败" });
-                }
-                //匹配后，查询是否重复匹配
-                else
-                {
-                    var existsResult = resultList.FirstOrDefault(x => x.MatchName == videoName);
-
-                    resultList.Add(existsResult == null
-                        ? new MatchVideoResult
-                        {
-                            Status = true,
-                            OriginalName = fileInfo.Name,
-                            Message = "匹配成功",
-                            StatusCode = 1,
-                            MatchName = videoName
-                        }
-                        : new MatchVideoResult { Status = true, OriginalName = fileInfo.Name, StatusCode = 2, Message = "已添加" });
-                }
-
-                // // 添加到数据库
-                // FileToInfoDao.ExecuteInitIfNoExists(new FileToInfo
-                // {
-                //     FilePickCode = fileInfo.PickCode,
-                //     TrueName = videoName,
-                //     IsSuccess = 0
-                // });
-            }
-            else
-            {
-                resultList.Add(new MatchVideoResult { Status = true, OriginalName = fileInfo.Name, StatusCode = 0, Message = "跳过非视频" });
-            }
-        }
-
-        return resultList;
-    }
 
     public static List<CookieFormat> ExportCookies(string cookie)
     {
