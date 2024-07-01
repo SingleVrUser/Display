@@ -11,10 +11,8 @@ public class BaseContext : DbContext
     public DbSet<FileInfo> FileInfo { get; set; } = null!;
     
     public DbSet<VideoInfo> VideoInfo { get; set; } = null!;
-    
-    // public DbSet<FileVideo> FileVideo { get; set; } = null!;
-    
-    // public DbSet<FileSpiderResult> FileSpiderResult { get; set; } = null!;
+
+    public DbSet<DownHistory> DownHistory { get; set; } = null!;
     
     public DbSet<DirectorInfo> DirectorInfo { get; set; } = null!;
     
