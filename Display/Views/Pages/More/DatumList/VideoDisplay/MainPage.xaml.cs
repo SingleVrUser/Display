@@ -1092,7 +1092,7 @@ public class CidInfo
         Debug.WriteLine(info.ImagePath);
         
         VideoCoverVo.Name = info.Name;
-        VideoCoverVo.ImagePath = info.ImagePath;
+        VideoCoverVo.ImagePath = info.ImagePath ?? Constants.FileType.NoPicturePath;
         VideoCoverVo.ReleaseTime = info.ReleaseTime;
         VideoCoverVo.ActorName = info.ActorNameList != null ? info.ActorNameList[0] : string.Empty;
     }
