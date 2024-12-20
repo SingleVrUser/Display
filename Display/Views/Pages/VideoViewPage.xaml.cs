@@ -16,7 +16,7 @@ using VideoCoverVo = Display.Models.Vo.Video.VideoCoverVo;
 
 namespace Display.Views.Pages;
 
-public sealed partial class VideoViewPage
+public sealed partial class VideoViewPage : Page
 {
     private readonly IFileInfoDao _filesInfoDao = App.GetService<IFileInfoDao>();
     

@@ -43,13 +43,14 @@ public interface IBaseDao<TEntity>
     List<TEntity> List();
 
     /// <summary>
-    /// 分页查询列表
+    /// 分页查询列表，单表
     /// </summary>
     /// <param name="offset"></param>
     /// <param name="limit"></param>
     /// <returns></returns>
     List<TEntity> List(int offset, int limit);
-    
+
+
     /// <summary>
     /// 查询总数量
     /// </summary>

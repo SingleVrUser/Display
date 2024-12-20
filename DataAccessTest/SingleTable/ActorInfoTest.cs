@@ -28,11 +28,11 @@ public class ActorInfoTest
     }
     
     
-    [Test, AutoData]
+    [Test]
     public void AddTest()
     {
-        _actorInfoDao.InitData();;
-        
+        _actorInfoDao.InitData();
+
         var actorInfo = new ActorInfo("演员名称1")
         {
             Birthday = "生日1",
@@ -53,7 +53,7 @@ public class ActorInfoTest
                 new ActorName(_fixture.Create<string>()),
                 new ActorName(_fixture.Create<string>())
             ],
-            Interest = new ActorInterest()
+            Interest = new ActorInterest
             {
                 IsLike = true,
                 Score = 2.0

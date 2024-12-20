@@ -106,13 +106,11 @@ public sealed partial class ImageViewer : INotifyPropertyChanged
         if (image.Thumbnail == null) return;
 
         var bitmapImage = image.Thumbnail;
+        ShowImage.Source = bitmapImage;
 
         var height = bitmapImage.PixelHeight;
         var width = bitmapImage.PixelWidth;
-
         var factor = Math.Min(MyScrollViewer.ViewportHeight / height, MyScrollViewer.ViewportWidth / width);
-
-        ShowImage.Source = bitmapImage;
         MyScrollViewer.ChangeView(null, null, factor > 1 ? 1 : (float)factor);
     }
 

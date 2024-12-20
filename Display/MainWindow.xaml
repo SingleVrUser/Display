@@ -83,7 +83,7 @@
                        Style="{ThemeResource BodyStrongTextBlockStyle}"
                        VerticalAlignment="Center"/>
 
-            <userController:CustomAutoSuggestBox x:Name="CustomAutoSuggestBox"
+            <userController:CustomAutoSuggestBox x:Name="customAutoSuggestBox"
                                                  Grid.Column="2"
                                                  SuggestionItemTapped="CustomAutoSuggestBox_OnSuggestionItemTapped"
                                                  QuerySubmitted="CustomAutoSuggestBox_QuerySubmitted">

@@ -7,11 +7,8 @@ namespace DataAccess.Models.Entity;
 /// 演员信息
 /// </summary>
 [Table("actor")]
-public class ActorInfo(string name) : BaseEntity
+public class ActorInfo(string name) : BaseInfoEntity(name)
 {
-    [StringLength(20)]
-    public string Name { get; init; } = name;
-
     public bool IsWoman { get; set; } = true;
 
     [StringLength(20)]
@@ -61,5 +58,5 @@ public class ActorInfo(string name) : BaseEntity
     public ActorInterest? Interest { get; set; }
     
     // 其他信息
-    public List<VideoInfo> VideoInfos { get; set; }
+    public List<VideoInfo>? VideoInfos { get; set; }
 }

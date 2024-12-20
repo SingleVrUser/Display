@@ -64,7 +64,7 @@ public partial class VideoCoverVo: ObservableObject
         }
         
         //评分
-        Score = videoInfo.Interest.Score ?? -1;
+        Score = videoInfo.Interest?.Score ?? -1;
 
         if (videoInfo.CategoryList != null)
         {

@@ -54,6 +54,14 @@ public interface IVideoInfoDao : IBaseDao<VideoInfo>
     /// <returns></returns>
     List<VideoInfo> GetRandomList(int offset, int limit);
 
+    /// <summary>
+    /// 分页查询列表，含有Actor信息
+    /// </summary>
+    /// <param name="offset"></param>
+    /// <param name="limit"></param>
+    /// <returns></returns>
+    List<VideoInfo> ListWithActor(int offset, int limit);
+
     Task<VideoInfo[]> GetLookLaterListAsync(int limit);
     
     Task<VideoInfo[]> GetLikeListAsync(int limit);

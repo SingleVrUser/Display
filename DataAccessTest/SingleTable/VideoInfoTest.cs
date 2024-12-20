@@ -16,6 +16,13 @@ public class VideoInfoTest
         var videoInfo = _videoInfoDao.GetById(1L);
         Debug.WriteLine(videoInfo);
     }
+
+    [Test]
+    public void RandomTest()
+    {
+        var list = _videoInfoDao.GetRandomList(0, 20);
+        Debug.WriteLine(list);
+    }
     
     /// <summary>
     /// 导入视频信息
@@ -24,18 +31,31 @@ public class VideoInfoTest
     public void AddVideoInfo()
     {
         _videoInfoDao.InitData();
-        
+
         var videoInfo = new VideoInfo("123")
         {
             SourceUrl = "123",
             ActorInfoList = [new ActorInfo("貂蝉")
             {
                 Bwh = new BwhInfo {Bust = 135, Waist = 150, Hips = 150}
-            }]
+            }],
+            CategoryList = [new CategoryInfo("标签1"), new CategoryInfo("标签2")]
+        };
+
+        var videoInfo2 = new VideoInfo("124")
+        {
+            SourceUrl = "124",
+            ActorInfoList = [new ActorInfo("貂蝉2")
+            {
+                Bwh = new BwhInfo {Bust = 135, Waist = 150, Hips = 150}
+            }],
+            CategoryList = [new CategoryInfo("标签1"), new CategoryInfo("标签2")]
         };
 
         _videoInfoDao.ExecuteAdd(videoInfo);
-        
+        _videoInfoDao.ExecuteAdd(videoInfo2);
+
+
         Assert.That(videoInfo.Id, Is.EqualTo(1));
         var videoInfoDb = _videoInfoDao.GetById(videoInfo.Id);
         Assert.That(videoInfoDb, Is.Not.EqualTo(null));

@@ -1712,7 +1712,7 @@ internal class WebApi
         //播放路径检查选择
         if (string.IsNullOrEmpty(savePath))
         {
-            var dialog = new ContentDialog()
+            var dialog = new ContentDialog
             {
                 XamlRoot = xamlRoot,
                 Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,

@@ -68,7 +68,7 @@ public class ThumbnailGeneratorService : IThumbnailGeneratorService
 
             if (!File.Exists(filePath))
             {
-                if (isWait) await NetworkHelper.RandomTimeDelay(10, 20);
+                if (isWait) await NetworkHelper.RandomTimeDelay(10, 60);
 
                 if (!vsd.TrySeekPosition(currentTime)) break;
 

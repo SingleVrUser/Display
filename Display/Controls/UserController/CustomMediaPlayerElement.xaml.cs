@@ -272,8 +272,8 @@ public sealed partial class CustomMediaPlayerElement
         // 先判断是否为成功，后判断是否为失败
         if (videoInfo != null)
         {
-            isLike = videoInfo.Interest.IsLike;
-            isLookLater = videoInfo.Interest.IsLookAfter;
+            isLike = videoInfo.Interest?.IsLike ?? false;
+            isLookLater = videoInfo.Interest?.IsLookAfter ?? false;
         }
         
         _isLike = isLike;

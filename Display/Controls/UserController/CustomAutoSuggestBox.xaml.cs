@@ -24,7 +24,7 @@ public sealed partial class CustomAutoSuggestBox
 
     private readonly ISearchHistoryDao _searchHistoryDao = App.GetService<ISearchHistoryDao>();
 
-    private readonly List<SearchHistory> _historySearchItemList;
+    private readonly List<SearchHistory> _historySearchItemList = [];
 
     public CustomAutoSuggestBox()
     {

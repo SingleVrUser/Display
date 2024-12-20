@@ -81,15 +81,15 @@ public sealed partial class MainWindow
             titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
             AppTitleBar.Loaded += AppTitleBar_Loaded;
             AppTitleBar.SizeChanged += AppTitleBar_SizeChanged;
-            CustomAutoSuggestBox.OpenAutoSuggestionBoxCompleted += OpenAutoSuggestionBoxCompleted;
-            CustomAutoSuggestBox.CloseAutoSuggestionBoxCompleted += CloseAutoSuggestionBoxCompleted;
+            customAutoSuggestBox.OpenAutoSuggestionBoxCompleted += OpenAutoSuggestionBoxCompleted;
+            customAutoSuggestBox.CloseAutoSuggestionBoxCompleted += CloseAutoSuggestionBoxCompleted;
         }
         else
         {
             NavView.AlwaysShowHeader = true;
             NavView.HeaderTemplate = RootGrid.Resources["HeaderTemplate"] as DataTemplate;
             ExtendsContentIntoTitleBar = true;
-            CustomAutoSuggestBox.Visibility = Visibility.Collapsed;
+            customAutoSuggestBox.Visibility = Visibility.Collapsed;
             SetTitleBar(AppTitleBar);
         }
 

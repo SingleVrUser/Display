@@ -10,7 +10,7 @@ using Microsoft.Web.WebView2.Core;
 
 namespace Display.Views.Pages.More;
 
-public sealed partial class BrowserPage
+public sealed partial class BrowserPage: Page
 {
     public BrowserPage(Window window, string url = "https://115.com/?cid=0&offset=0&mode=wangpan", bool isShowButton = false)
     {
