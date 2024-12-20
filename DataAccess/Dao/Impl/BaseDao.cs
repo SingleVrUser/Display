@@ -67,6 +67,7 @@ public abstract class BaseDao<TEntity>: IBaseDao<TEntity> where TEntity : class
         return (from info in CurrentDbSet select info).Skip(offset).Take(limit).ToList();
     }
 
+
     public int TotalCount()
     {
         return CurrentDbSet.Count();

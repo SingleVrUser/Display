@@ -39,7 +39,7 @@ public class IncrementalLoadVideoInfoCollection : ObservableCollection<Video.Vid
         SetImageSize(imgWidth);
     }
 
-    public async Task LoadData(int startShowCount = 20)
+    public Task LoadData(int startShowCount = 20)
     {
         Clear();
 
@@ -54,6 +54,7 @@ public class IncrementalLoadVideoInfoCollection : ObservableCollection<Video.Vid
         AllCount = successCount;
 
         newItems.ForEach(item => Add(new Video.VideoCoverVo(item, ImageWidth)));
+        return Task.CompletedTask;
     }
 
     public void SetImageSize(double imgWidth)
@@ -89,7 +90,7 @@ public class IncrementalLoadVideoInfoCollection : ObservableCollection<Video.Vid
 
     private async Task<LoadMoreItemsResult> InnerLoadMoreItemsAsync(int count)
     {
-        var lists = _videoInfoDao.List(Count, count);
+        var lists = _videoInfoDao.ListWithActor(Count, count);
         // var lists = await DataAccessLocal.Get.GetVideoInfoAsync(count, Count, OrderBy, IsDesc, FilterConditionList, FilterKeywords, Ranges, IsFuzzyQueryActor);
 
         //在最后的时候加载匹配失败的

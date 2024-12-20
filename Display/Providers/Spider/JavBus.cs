@@ -65,6 +65,7 @@ public class JavBus : BaseSpider
 
         return await GetInfoByHtmlDoc(cid, detailUrl, htmlDoc);
     }
+
     public override async Task<VideoInfoDto> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
     {
         //搜索封面

@@ -7,7 +7,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Display.Views.Windows;
 
-public sealed partial class VideoPlayWindow
+public sealed partial class VideoPlayWindow : Window
 {
     public string SourceUrl { get; set; }
     private readonly AppWindow _appwindow;

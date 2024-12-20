@@ -8,41 +8,29 @@ using static System.Int64;
 
 namespace Display.Helper.Media;
 
-public sealed unsafe class VideoStreamDecoder : IDisposable
+public sealed unsafe class VideoStreamDecoder(
+    UrlOptions urlOptions,
+    AVHWDeviceType hwDeviceType = AVHWDeviceType.AV_HWDEVICE_TYPE_NONE)
+    : IDisposable
 {
-    private readonly UrlOptions _urlOptions;
-    private readonly AVHWDeviceType _hwDeviceType;
-    private readonly AVFormatContext* _pFormatContext;
-    private readonly AVFrame* _receivedFrame;
+    private readonly AVFormatContext* _pFormatContext = ffmpeg.avformat_alloc_context();
+    private readonly AVFrame* _receivedFrame = ffmpeg.av_frame_alloc();
     private readonly AVDictionary* _options = null;
-    private readonly AVFrame* _pFrame;
-    private readonly AVPacket* _pPacket;
+    private readonly AVFrame* _pFrame = ffmpeg.av_frame_alloc();
+    private readonly AVPacket* _pPacket = ffmpeg.av_packet_alloc();
 
     private AVCodecContext* _pCodecContext;
     private int _streamIndex;
 
-    public VideoStreamDecoder(UrlOptions urlOptions, AVHWDeviceType hwDeviceType = AVHWDeviceType.AV_HWDEVICE_TYPE_NONE)
-    {
-        _urlOptions = urlOptions;
-        _hwDeviceType = hwDeviceType;
-        _pFormatContext = ffmpeg.avformat_alloc_context();
-        _receivedFrame = ffmpeg.av_frame_alloc();
-
-
-
-        _pPacket = ffmpeg.av_packet_alloc();
-        _pFrame = ffmpeg.av_frame_alloc();
-    }
-
     private void OpenInput()
     {
         var options = _options;
-        foreach (var (key, value) in _urlOptions.Headers)
+        foreach (var (key, value) in urlOptions.Headers)
         {
             ffmpeg.av_dict_set(&options, key, value, 0);
         }
         var pFormatContext = _pFormatContext;
-        ffmpeg.avformat_open_input(&pFormatContext, _urlOptions.Url, null, &options).ThrowExceptionIfError();
+        ffmpeg.avformat_open_input(&pFormatContext, urlOptions.Url, null, &options).ThrowExceptionIfError();
     }
 
     public void Init()
@@ -56,9 +44,9 @@ public sealed unsafe class VideoStreamDecoder : IDisposable
             .ThrowExceptionIfError();
         _pCodecContext = ffmpeg.avcodec_alloc_context3(codec); // _pCodecContext不能在Task.Run中，后续Dispose不在同一线程
 
-        if (_hwDeviceType != AVHWDeviceType.AV_HWDEVICE_TYPE_NONE)
+        if (hwDeviceType != AVHWDeviceType.AV_HWDEVICE_TYPE_NONE)
         {
-            ffmpeg.av_hwdevice_ctx_create(&_pCodecContext->hw_device_ctx, _hwDeviceType, null, null, 0)
+            ffmpeg.av_hwdevice_ctx_create(&_pCodecContext->hw_device_ctx, hwDeviceType, null, null, 0)
                 .ThrowExceptionIfError();
         }
 

@@ -70,6 +70,14 @@ public class VideoInfoDao : BaseDao<VideoInfo>, IVideoInfoDao
         CurrentDbSet.Where(i => i.Id.Equals(id)).ExecuteDelete();
     }
 
+    public List<VideoInfo> ListWithActor(int offset, int limit)
+    {
+        return CurrentDbSet.Include(i => i.ActorInfoList)
+            .Skip(offset)
+            .Take(limit)
+            .ToList();
+    }
+
     public List<VideoInfo> GetRandomList(int offset, int limit)
     {
         return CurrentDbSet.Include(i => i.ActorInfoList)
@@ -158,14 +166,14 @@ public class VideoInfoDao : BaseDao<VideoInfo>, IVideoInfoDao
 
     public async Task<VideoInfo[]> GetLookLaterListAsync(int limit)
     {
-        return await CurrentDbSet.Where(i => i.Interest.IsLookAfter)
+        return await CurrentDbSet.Where(i => i.Interest != null && i.Interest.IsLookAfter)
             .OrderByDescending(i => i.CreateTime)
             .Take(limit).ToArrayAsync();
     }
 
     public async Task<VideoInfo[]> GetLikeListAsync(int limit)
     {
-        return await CurrentDbSet.Where(i => i.Interest.IsLike).Take(limit).ToArrayAsync();
+        return await CurrentDbSet.Where(i => i.Interest != null && i.Interest.IsLike).Take(limit).ToArrayAsync();
     }
 
     public async Task<VideoInfo[]> GetRecentListAsync(int limit)

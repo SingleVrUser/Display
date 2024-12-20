@@ -62,7 +62,7 @@ public class VideoInfo(string name) : BaseEntity
     /// <summary>
     /// 兴趣
     /// </summary>
-    public VideoInterest Interest { get; set; } = new();
+    public VideoInterest? Interest { get; set; }
     
     /// <summary>
     /// 文件列表

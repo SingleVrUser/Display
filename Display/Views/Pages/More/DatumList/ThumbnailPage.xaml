@@ -20,10 +20,8 @@
     <Grid RowDefinitions="50,*">
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
-
-            <ColumnDefinition
-                MinWidth="0"
-                              MaxWidth="700"
+            <ColumnDefinition x:Name="InfoColumnDefinition"
+                              MinWidth="0" MaxWidth="700"
                               Width="0" />
         </Grid.ColumnDefinitions>
 
@@ -85,7 +83,7 @@
         <Grid x:Name="InfoGrid"
               Grid.Row="1"
               Grid.Column="1"
-              RowDefinitions="auto,*"
+              RowDefinitions="120,*"
               RowSpacing="10"
               Visibility="Collapsed"
               CornerRadius="10"
@@ -189,8 +187,8 @@
               PointerEntered="TopGrid_PointerEntered"
               PointerExited="TopGrid_PointerExited">
 
-            <RelativePanel
-                Background="{ThemeResource LayerOnMicaBaseAltFillColorDefaultBrush}"
+            <RelativePanel x:Name="TopPanel"
+                           Background="{ThemeResource LayerOnMicaBaseAltFillColorDefaultBrush}"
                            Visibility="Collapsed">
                 <HyperlinkButton x:Name="BackButton"
                                  Margin="8"
@@ -212,8 +210,8 @@
             </RelativePanel>
 
             <RelativePanel>
-                <StackPanel
-                    RelativePanel.LeftOf="MoreButton"
+                <StackPanel x:Name="MoreButtonStackPanel"
+                            RelativePanel.LeftOf="MoreButton"
                             RelativePanel.AlignVerticalCenterWithPanel="True"
                             Spacing="5"
                             Orientation="Horizontal"
@@ -228,7 +226,7 @@
                                  Click="OpenInfoButtonClick"
                                  Margin="10,0"
                                  Visibility="Collapsed">
-                    <SymbolIcon
+                    <SymbolIcon x:Name="MoreSymbolIcon"
                         Symbol="ClosePane" />
                 </HyperlinkButton>
             </RelativePanel>

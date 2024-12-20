@@ -14,11 +14,11 @@ public class VideoDetailVo(VideoInfo videoInfo)
 
     public string ReleaseTime { get; set; } = videoInfo.ReleaseTime;
 
-    public double Score { get; set; } = videoInfo.Interest.Score ?? -1;
+    public double Score { get; set; } = videoInfo.Interest?.Score ?? -1;
 
-    public bool IsLookLater { get; set; } = videoInfo.Interest.IsLookAfter;
+    public bool IsLookLater { get; set; } = videoInfo.Interest?.IsLookAfter ?? false;
     
-    public bool IsLike { get; set; } = videoInfo.Interest.IsLike;
+    public bool IsLike { get; set; } = videoInfo.Interest?.IsLike ?? false;
 
     public string ImageUrl { get; set; } = videoInfo.ImageUrl;
     

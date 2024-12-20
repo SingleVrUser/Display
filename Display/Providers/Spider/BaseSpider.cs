@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using DataAccess.Models.Dto;
-using DataAccess.Models.Entity;
 using Display.Models.Vo.Spider;
 
 namespace Display.Providers.Spider;

@@ -39,11 +39,11 @@ public partial class App
 
     public App()
     {
+        InitDataAccess();
+
         _host = ConfigureHost();
 
         InitAppCenter();
-
-        InitDataAccess();
 
         InitializeComponent();
 

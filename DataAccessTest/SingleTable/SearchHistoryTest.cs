@@ -22,4 +22,11 @@ public class SearchHistoryTest
         if (searchHistory == null) return;
         _searchHistoryDao.ExecuteRemove(searchHistory);
     }
+
+
+    [Test]
+    public void ListTest()
+    {
+        var searchHistory = _searchHistoryDao.List(0,10);
+    }
 }

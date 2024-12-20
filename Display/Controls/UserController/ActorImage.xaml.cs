@@ -6,7 +6,6 @@ using Microsoft.UI.Xaml.Input;
 using System;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
-using Display.Views.Pages;
 
 namespace Display.Controls.UserController;
 

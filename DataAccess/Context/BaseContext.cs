@@ -36,7 +36,9 @@ public class BaseContext : DbContext
     
     private const string DbName = "115_uwp.db";
 
-    private static string _dbPath = SetSavePath();
+    private static string? _dbPath;
+
+    private static string DbPath => _dbPath ?? SetSavePath();
 
     public static string SetSavePath(string? savePath = null)
     {
@@ -55,11 +57,52 @@ public class BaseContext : DbContext
         modelBuilder.Entity<VideoInfo>()
             .HasMany(e => e.ActorInfoList)
             .WithMany(e => e.VideoInfos)
+            // 中间表
             .UsingEntity<ActorVideo>();
-        
-        modelBuilder.Entity<SearchHistory>().ToTable("search_histories");
 
-        modelBuilder.Entity<SearchHistory>(b =>
+        modelBuilder.Entity<VideoInfo>()
+            .HasMany(e => e.CategoryList)
+            .WithMany(e => e.VideoInfos)
+            // 中间表
+            .UsingEntity<CategoryVideo>();
+
+        // TODO  标签页的多对多
+        
+        // 搜索历史
+        //modelBuilder.Entity<SearchHistory>().ToTable("search_histories");
+        //modelBuilder.Entity<SearchHistory>(b =>
+        //    {
+        //        b.Property(t => t.UpdateTime)
+        //            .HasColumnType("DATETIME")
+        //            .HasColumnType("DATETIME")
+        //            .HasDefaultValueSql("datetime('now')")
+        //            .HasColumnName("create_time");
+        //        b.Property(t => t.CreateTime)
+        //            .HasColumnType("DATETIME")
+        //            .HasDefaultValueSql("datetime('now')")
+        //            .HasColumnName("update_time");
+        //    }
+        //);
+
+        ConfigureTime<SearchHistory>(modelBuilder);
+        ConfigureTime<ActorInfo>(modelBuilder);
+        ConfigureTime<BwhInfo>(modelBuilder);
+        ConfigureTime<CategoryInfo>(modelBuilder);
+        ConfigureTime<DirectorInfo>(modelBuilder);
+        ConfigureTime<DownHistory>(modelBuilder);
+        ConfigureTime<FileInfo>(modelBuilder);
+        ConfigureTime<ProducerInfo>(modelBuilder);
+        ConfigureTime<PublisherInfo>(modelBuilder);
+        ConfigureTime<SearchHistory>(modelBuilder);
+        ConfigureTime<SeriesInfo>(modelBuilder);
+        ConfigureTime<VideoInfo>(modelBuilder);
+        ConfigureTime<VideoInterest>(modelBuilder);
+
+    }
+
+    private static void ConfigureTime<T>(ModelBuilder modelBuilder) where T : BaseEntity
+    {
+        modelBuilder.Entity<T>(b =>
             {
                 b.Property(t => t.UpdateTime)
                     .HasColumnType("DATETIME")
@@ -78,5 +121,5 @@ public class BaseContext : DbContext
         => options
             .UseSnakeCaseNamingConvention() // 使用Snake case命名法
             .EnableSensitiveDataLogging() // 出BUG时定位到具体那一行，调试时用
-            .UseSqlite($"Data Source={_dbPath}");
+            .UseSqlite($"Data Source={DbPath}");
 }
