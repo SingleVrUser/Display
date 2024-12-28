@@ -84,6 +84,8 @@ internal class DbNetworkHelper
                 NetworkHelper.CommonClient.DefaultRequestHeaders.Add("Cookie", "existmag=mag");
             }
 
+            NetworkHelper.CommonClient.DefaultRequestHeaders.Referrer = new Uri(url);
+
             for (var i = 0; i < maxTryCount; i++)
             {
                 try
@@ -96,14 +98,14 @@ internal class DbNetworkHelper
                 }
                 catch (HttpRequestException ex)
                 {
-                    Debug.WriteLine($"下载文件时发生错误：{ex.Message}");
+                    Debug.WriteLine($"下载文件时发生错误：{url}: {ex.Message}");
 
                     // 禁止访问，直接停止
                     if(ex.StatusCode.Equals(HttpStatusCode.Forbidden)) break;
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"下载文件时发生错误：{ex.Message}");
+                    Debug.WriteLine($"下载文件时发生错误：{url}: {ex.Message}");
                 }
             }
         }
