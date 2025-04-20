@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using Display.Models.Api.OneOneFive.Browser;
 using Display.Models.Dto.OneOneFive;
@@ -9,33 +10,40 @@ using Display.Views.Windows;
 using Microsoft.UI.Xaml;
 using Newtonsoft.Json;
 
+
 namespace Display.Views.Pages.Settings.Account
 {
+
     public sealed partial class VerifyAccountPage
     {
-        private static string RequestUrl => $"https://captchaapi.115.com/?ac=security_code&type=web&cb=Close911_{DateTimeOffset.Now.ToUnixTimeMilliseconds()}";
+        private static string DownRequestUrl = "https://captchaapi.115.com/?ac=security_code&type=web&cb=Close911_{0}";
+
+        private static string PlayUrl = "https://115vod.com/?pickcode={0}&share_id=0";
 
         private bool _isSucceeded;
 
         private readonly Window _currentWindow;
 
-        private VerifyAccountPage()
+        private VerifyAccountPage(string pickCode)
         {
             InitializeComponent();
 
             var window = new CommonWindow("验证账号", 360, 560);
             _currentWindow = window;
 
-            Browser.WebView.Source = new Uri(RequestUrl);
+            var url = pickCode == null ? string.Format(DownRequestUrl, DateTimeOffset.Now.ToUnixTimeMilliseconds())
+                : string.Format(PlayUrl, pickCode);
+
+            Browser.WebView.Source = new Uri(url);
             Browser.WebMessageReceived += Browser_WebMessageReceived;
 
             window.Content = this;
             window.Closed += Window_Closed;
         }
 
-        public static Window CreateVerifyAccountWindow()
+        public static Window CreateVerifyAccountWindow(string pickCode)
         {
-            var verifyAccountPage = new VerifyAccountPage();
+            var verifyAccountPage = new VerifyAccountPage(pickCode);
             return verifyAccountPage._currentWindow;
         }
 
@@ -49,9 +57,19 @@ namespace Display.Views.Pages.Settings.Account
         {
             if (args.Response == null) return;
 
-            if (!args.Request.Uri.Contains("webapi.115.com/user/captcha")) return;
+            Debug.WriteLine(args.Request.Uri);
 
-            if (args.Response == null || args.Response.ReasonPhrase != "OK") return;
+            if (!args.Request.Uri.Contains("user/captcha")) return;
+
+            //if (!args.Request.Uri.Contains("webapi.115.com/user/captcha")
+            //    || !args.Request.Uri.Contains("115vod.com/webapi/user/captcha")) return;
+
+            if (args.Response == null
+                || args.Response.StatusCode != 200) return;
+
+            if (!string.IsNullOrEmpty(args.Response.ReasonPhrase) && args.Response.ReasonPhrase != "OK") return;
+
+            Debug.WriteLine(args.Response.ReasonPhrase);
 
             var stream = await args.Response.GetContentAsync();
 
@@ -61,6 +79,8 @@ namespace Display.Views.Pages.Settings.Account
             var re = await tr.ReadToEndAsync();
 
             var result = JsonConvert.DeserializeObject<VerifyAccountResult>(re);
+
+            Debug.WriteLine(result);
 
             // TODO 在添加任务的异常中可用，但在播放m3u8视频的异常中无效
             if (result is not { State: true }) return;

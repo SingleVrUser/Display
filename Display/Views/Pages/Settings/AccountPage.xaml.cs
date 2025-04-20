@@ -163,7 +163,7 @@ public sealed partial class AccountPage
 
     private void ClearDownRecordButton_Click(object sender, RoutedEventArgs e)
     {
-        _downHistoryDao.Delete();
+        _downHistoryDao.ExecuteDeleteAll();
         ShowTeachingTip("已清空");
     }
 

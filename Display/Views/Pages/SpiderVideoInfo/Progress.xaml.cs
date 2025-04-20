@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DataAccess;
-using DataAccess.Dao.Impl;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using Display.Helper.FileProperties.Name;
 using Display.Managers;
-using Display.Models.Dto.OneOneFive;
+using Display.Models.Dto;
 using Display.Models.Enums;
 using Display.Models.Vo;
 using Display.Models.Vo.OneOneFive;
@@ -26,54 +24,19 @@ public sealed partial class Progress
 {
     private readonly CancellationTokenSource _sCts = new();
     private List<string> SelectedFilesNameList { get; }
-    private List<FilesInfo> _fileList = [];
-    private readonly List<FailDatum> _failDatumList = [];
+    private List<FileInfo> _fileList;
 
-    private List<MatchVideoResult> _matchVideoResults;
+    private Dictionary<string, List<long>> _matchDict = [];
     private Window _currentWindow;
 
-    private readonly IFileToInfoDao _fileToInfoDao = App.GetService<IFileToInfoDao>();
-    private readonly IFilesInfoDao _filesInfoDao = App.GetService<IFilesInfoDao>();
+    private readonly IFileInfoDao _filesInfoDao = App.GetService<IFileInfoDao>();
 
-    public Progress(List<string> selectedFilesNameList, List<FilesInfo> fileList)
+    public Progress(List<string> selectedFilesNameList, List<FileInfo> fileList)
     {
         InitializeComponent();
         SelectedFilesNameList = selectedFilesNameList;
         _fileList = fileList;
         Loaded += PageLoaded;
-    }
-
-    public Progress(List<FailDatum> failDatumList)
-    {
-        InitializeComponent();
-        _failDatumList = failDatumList;
-        Loaded += ReSpiderPageLoaded;
-    }
-
-    private void ReSpiderPageLoaded(object sender, RoutedEventArgs e)
-    {
-        Loaded -= ReSpiderPageLoaded;
-
-        if (_failDatumList == null || _failDatumList.Count == 0) return;
-
-        _currentWindow.Closed += CurrentWindow_Closed;
-        _matchVideoResults ??= [];
-
-        foreach (var item in _failDatumList)
-        {
-            _matchVideoResults.Add(new MatchVideoResult { Status = true, OriginalName = item.Datum.Name, Message = "匹配成功", StatusCode = 1, MatchName = item.MatchName });
-
-            //替换数据库的数据
-            _fileToInfoDao.ExecuteUpdate(i => string.Equals(item.Datum.PickCode, i.FilePickCode),
-                i => i.TrueName = item.MatchName);
-        }
-
-        SpiderVideoInfo();
-
-        _currentWindow.Closed -= CurrentWindow_Closed;
-
-        TopProgressRing.IsActive = false;
-        TotalProgressTextBlock.Text = "完成";
     }
 
     private async void PageLoaded(object sender, RoutedEventArgs e)
@@ -105,7 +68,7 @@ public sealed partial class Progress
         //目前datumList仅有一级目录文件
         //遍历获取文件列表中所有的文件
 
-        var newList = new List<FilesInfo>();
+        var newList = new List<FileInfo>();
         foreach (var filesInfo in _fileList.Where(i=> i.FileId == default))
         {
             var allFilesInFolder = await _filesInfoDao.GetAllFilesListByFolderIdAsync(filesInfo.CurrentId);
@@ -118,7 +81,7 @@ public sealed partial class Progress
         _fileList = _fileList.Where(item => item.FileId != default).ToList();
 
         //去除重复文件
-        var newDictList = new Dictionary<string, FilesInfo>();
+        var newDictList = new Dictionary<string, FileInfo>();
         _fileList.ForEach(item => newDictList.TryAdd(item.PickCode, item));
 
         _fileList = newDictList.Values.ToList();
@@ -130,16 +93,60 @@ public sealed partial class Progress
         TotalProgressTextBlock.Text = "正则匹配番号名中……";
 
         //挑选符合条件的视频文件
-        _matchVideoResults = await Task.Run(() => FileMatch.GetVideoAndMatchFile(_fileList));
+        _matchDict = await Task.Run(() => GetMatchNameList(_fileList));
 
         TopProgressRing.IsActive = false;
+    }
+    
+    /// <summary>
+    /// 从文件中挑选出视频文件
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    private static Dictionary<string, List<long>> GetMatchNameList(List<FileInfo> data)
+    {
+        //根据视频信息匹配视频文件
+
+        Dictionary<string, List<long>> matchDict = [];
+
+        foreach (var fileInfo in data)
+        {
+            var fileName = fileInfo.Name;
+
+            //挑选视频文件
+            if (fileInfo.Iv == 1)
+            {
+                //根据视频名称匹配番号
+                var videoName = FileMatch.MatchName(fileName, fileInfo.CurrentId);
+
+                //未匹配
+                if (videoName == null)
+                {
+                    // resultList.Add(new MatchVideoResult { FileId = fileInfo.Id, Status = false, OriginalName = fileInfo.Name, StatusCode = -1, Message = "匹配失败" });
+                }
+                //匹配后，查询是否重复匹配
+                else
+                {
+                    if (matchDict.ContainsKey(videoName))
+                    {
+                        matchDict[videoName].Add(fileInfo.Id);
+                    }
+                    else
+                    {
+                        matchDict[videoName] = [fileInfo.Id];
+                    }
+                }
+            }
+        }
+
+        return matchDict;
     }
 
     /// <summary>
     /// 显示饼形图
     /// </summary>
     /// <param name="datumList"></param>
-    private void ShowFilesPieCharts(List<FilesInfo> datumList)
+    private void ShowFilesPieCharts(List<FileInfo> datumList)
     {
         FileInfoPieChart.Visibility = Visibility.Visible;
 
@@ -208,7 +215,7 @@ public sealed partial class Progress
     /// <param name="dataInfo"></param>
     /// <param name="typeInfo"></param>
     /// <param name="name"></param>
-    private void UpdateFileStatistics(FilesInfo dataInfo, FileStatistics typeInfo, string name)
+    private void UpdateFileStatistics(FileInfo dataInfo, FileStatistics typeInfo, string name)
     {
         typeInfo.Size += dataInfo.Size;
         typeInfo.Count++;
@@ -238,15 +245,12 @@ public sealed partial class Progress
     /// </summary>
     private void SpiderVideoInfo()
     {
-        if (_matchVideoResults == null) return;
+        if (_matchDict.Count == 0) return;
 
-        var matchNameList = _matchVideoResults.Where(item => !string.IsNullOrEmpty(item.MatchName))
-            .Select(match => match.MatchName).ToList();
-
-        if (matchNameList.Count == 0) return;
+        var matchVideoResults = _matchDict.Select(i=>new MatchVideoResult {MatchName = i.Key, FileIdList = i.Value}).ToList();
 
         var spiderManager = App.GetService<SpiderManager>();
-        spiderManager.AddTask(matchNameList);
+        spiderManager.AddTask(matchVideoResults);
 
         // 展示页面
         TaskPage.ShowSingleWindow(NavigationViewItemEnum.SpiderTask);

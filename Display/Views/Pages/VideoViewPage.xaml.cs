@@ -1,23 +1,27 @@
 ﻿using System.Collections.Generic;
+using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using Display.Controls.UserController;
 using Display.Helper.Network;
 using Display.Models.Dto.Media;
-using Display.Models.Entities.OneOneFive;
 using Display.Models.Vo;
+using Display.Models.Vo.OneOneFive;
 using Display.Providers;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
+using VideoCoverVo = Display.Models.Vo.Video.VideoCoverVo;
 
 namespace Display.Views.Pages;
 
-public sealed partial class VideoViewPage
+public sealed partial class VideoViewPage : Page
 {
+    private readonly IFileInfoDao _filesInfoDao = App.GetService<IFileInfoDao>();
+    
     //为返回动画做准备（需启动缓存）
-    private VideoInfoVo _storeditem;
+    private VideoCoverVo _storeditem;
     public VideoViewPage()
     {
         InitializeComponent();
@@ -33,11 +37,8 @@ public sealed partial class VideoViewPage
         MediaPlayItem mediaPlayItem;
         switch (videoPlayGrid.DataContext)
         {
-            case FilesInfo datum:
+            case FileInfo datum:
                 mediaPlayItem = new MediaPlayItem(datum);
-                break;
-            case FailInfo failInfo:
-                mediaPlayItem = new MediaPlayItem(failInfo.Datum);
                 break;
             default:
                 return;
@@ -53,7 +54,7 @@ public sealed partial class VideoViewPage
     /// </summary>
     private void OnClicked(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button { DataContext: VideoInfoVo item }) return;
+        if (sender is not Button { DataContext: VideoCoverVo item }) return;
 
         //准备动画
         //videoControl.PrepareAnimation(item);
@@ -64,29 +65,29 @@ public sealed partial class VideoViewPage
     /// <summary>
     /// 视频播放页面跳转
     /// </summary>
-    /// <param Name="sender"></param>
-    /// <param Name="e"></param>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private async void VideoPlay_Click(object sender, RoutedEventArgs e)
     {
-        var VideoPlayButton = (Button)sender;
+        var videoPlayButton = (Button)sender;
 
-        if (VideoPlayButton.DataContext is not VideoInfoVo videoInfo) return;
+        if (videoPlayButton.DataContext is not VideoCoverVo videoInfo) return;
 
-        var videoInfoList = DataAccessLocal.Get.GetSingleFileInfoByTrueName(videoInfo.TrueName);
+        var fileInfoList = _filesInfoDao.GetFileInfoListByVideoInfoId(videoInfo.Id);
 
         //没有
-        if (videoInfoList.Count == 0)
+        if (fileInfoList.Count == 0)
         {
-            VideoPlayButton.Flyout = new Flyout
+            videoPlayButton.Flyout = new Flyout
             {
                 Content = new TextBlock { Text = "经查询，本地数据库无该文件，请导入后继续" }
             };
         }
-        else if (videoInfoList.Count == 1)
+        else if (fileInfoList.Count == 1)
         {
             _storeditem = videoInfo;
 
-            var mediaPlayItem = new MediaPlayItem(videoInfoList[0]);
+            var mediaPlayItem = new MediaPlayItem(new DetailFileInfo(fileInfoList[0]));
             await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this);
             ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         }
@@ -95,7 +96,7 @@ public sealed partial class VideoViewPage
         {
             _storeditem = videoInfo;
 
-            PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, this.XamlRoot);
+            PlayVideoHelper.ShowSelectedVideoToPlayPage(fileInfoList, XamlRoot);
 
         }
     }

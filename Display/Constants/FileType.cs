@@ -28,6 +28,8 @@ public static class FileType
     /// </summary>
     public const string NoPicturePath = AssetsFullBasePath + "NoPicture.jpg";
 
+    public const string FailPicturePath = AssetsFullBasePath + "Fail.jpg";
+
     /// <summary>
     /// ms-appx:///Assets/115/file_type/folder/folder.svg
     /// </summary>

@@ -1,21 +1,24 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using DataAccess.Models.Entity;
 using Display.Helper.Network;
 using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.Media;
 using Display.Models.Dto.OneOneFive;
+using Display.Models.Vo.OneOneFive;
+using FileInfo = DataAccess.Models.Entity.FileInfo;
 
 namespace Display.Views.Pages.DetailInfo;
 
 public sealed partial class SelectVideoToPlay
 {
-    private readonly List<FilesInfo> _pickCodeInfoList;
+    private readonly List<FileInfo> _pickCodeInfoList;
     public SelectVideoToPlay()
     {
         this.InitializeComponent();
     }
-    public SelectVideoToPlay(List<FilesInfo> pickCodeInfoList)
+    public SelectVideoToPlay(List<FileInfo> pickCodeInfoList)
     {
         InitializeComponent();
 
@@ -29,12 +32,12 @@ public sealed partial class SelectVideoToPlay
 
     public void PlaySelectedVideos()
     {
-        PlayVideos(ContentListView.SelectedItems.Cast<FilesInfo>().ToList());
+        PlayVideos(ContentListView.SelectedItems.Cast<FileInfo>().ToList());
     }
 
-    private async void PlayVideos(IEnumerable<FilesInfo> infos)
+    private async void PlayVideos(IEnumerable<FileInfo> infos)
     {
-        var playItems = infos.Select(x => new MediaPlayItem(x)).ToList();
+        var playItems = infos.Select(x => new MediaPlayItem(new DetailFileInfo(x))).ToList();
 
         await PlayVideoHelper.PlayVideo(playItems, this.XamlRoot, lastPage: this);
     }

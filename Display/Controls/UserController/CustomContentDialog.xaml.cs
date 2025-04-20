@@ -8,53 +8,52 @@ using System;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Display.Controls.UserController
+namespace Display.Controls.UserController;
+
+public sealed partial class CustomContentDialog
 {
-    public sealed partial class CustomContentDialog
+    public CustomContentDialog(UIElement contentPage, string title = "")
     {
-        public CustomContentDialog(UIElement contentPage, string title = "")
-        {
-            this.InitializeComponent();
+        this.InitializeComponent();
 
-            if (!string.IsNullOrEmpty(title))
+        if (!string.IsNullOrEmpty(title))
+        {
+            var titleTextBlock = new TextBlock()
             {
-                var titleTextBlock = new TextBlock()
-                {
-                    Style = this.Resources["BoldTextBlock"] as Style,
-                    Text = title
-                };
-                RootGrid.Children.Add(titleTextBlock);
+                Style = this.Resources["BoldTextBlock"] as Style,
+                Text = title
+            };
+            RootGrid.Children.Add(titleTextBlock);
 
-                var titleRowDefinition = new RowDefinition
-                {
-                    Height = GridLength.Auto
-                };
-
-                RootGrid.RowDefinitions.Insert(0, titleRowDefinition);
-                //titleTextBlock.SetValue(Grid.RowProperty, 0);
-                contentPage.SetValue(Grid.RowProperty, 1);
-                ButtonGrid.SetValue(Grid.RowProperty, 2);
-            }
-            else
+            var titleRowDefinition = new RowDefinition
             {
-                contentPage.SetValue(Grid.RowProperty, 0);
-                ButtonGrid.SetValue(Grid.RowProperty, 1);
-            }
+                Height = GridLength.Auto
+            };
 
-            RootGrid.Children.Add(contentPage);
+            RootGrid.RowDefinitions.Insert(0, titleRowDefinition);
+            //titleTextBlock.SetValue(Grid.RowProperty, 0);
+            contentPage.SetValue(Grid.RowProperty, 1);
+            ButtonGrid.SetValue(Grid.RowProperty, 2);
         }
-
-        public event EventHandler<RoutedEventArgs> PrimaryButtonClick;
-        private void PrimaryButton_OnClick(object sender, RoutedEventArgs e)
+        else
         {
-            PrimaryButtonClick?.Invoke(sender, e);
+            contentPage.SetValue(Grid.RowProperty, 0);
+            ButtonGrid.SetValue(Grid.RowProperty, 1);
         }
 
-        public event EventHandler<RoutedEventArgs> CancelButtonClick;
-        private void CancelButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            CancelButtonClick?.Invoke(sender, e);
-        }
-
+        RootGrid.Children.Add(contentPage);
     }
+
+    public event EventHandler<RoutedEventArgs> PrimaryButtonClick;
+    private void PrimaryButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        PrimaryButtonClick?.Invoke(sender, e);
+    }
+
+    public event EventHandler<RoutedEventArgs> CancelButtonClick;
+    private void CancelButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        CancelButtonClick?.Invoke(sender, e);
+    }
+
 }

@@ -6,12 +6,10 @@ using System.Linq;
 using CommunityToolkit.WinUI.Collections;
 using CommunityToolkit.WinUI.Controls;
 using DataAccess.Models.Entity;
-using Display.Models.Dto.OneOneFive;
 using Display.Models.Entities.Details;
-using Display.Models.Entities.OneOneFive;
 using Display.Models.Records;
-using Display.Models.Vo;
 using Display.Models.Vo.IncrementalCollection;
+using Display.Models.Vo.Video;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -28,22 +26,22 @@ public sealed partial class EditInfo
     private readonly IncrementalLoadActorInfoCollection _actorsSuggestion;
     private readonly ObservableCollection<ActorInfo> _actorItems;
 
-    private readonly VideoInfoVo _videoInfo;
+    private readonly VideoDetailVo _videoDetail;
 
-    public EditInfo(VideoInfoVo videoInfo)
+    public EditInfo(VideoDetailVo vo)
     {
         InitializeComponent();
 
-        _videoInfo = videoInfo;
+        _videoDetail = vo;
 
         _categoryItems = [];
-        _categories = videoInfo.Category.Split(",").Where(item => !string.IsNullOrEmpty(item)).Select(x => new TokenData(x)).ToList();
+        _categories = vo.CategoryList.Select(x => new TokenData(x.Name)).ToList();
         _categories.ForEach(item => _categoryItems.Add(item));
 
         _actorItems = [];
-        var oldActors = videoInfo.Actor.Split(",")
-            .Where(item => !string.IsNullOrEmpty(item))
-            .Select(x => new ActorInfo { Name = x }).ToList();
+        
+        var oldActors = vo.ActorInfoList
+            .Select(x => new ActorInfo(x.Name)).ToList();
         
         oldActors.ForEach(item => _actorItems.Add(item));
 
@@ -75,13 +73,13 @@ public sealed partial class EditInfo
                 SymbolIconSource = new SymbolIconSource { Symbol = Symbol.AddFriend }
             },
 
-            new CommonEditOption { Header = "标题", MinWidth = 480, Text = videoInfo.Title },
-            new CommonEditOption { Header = "发布时间", Text = videoInfo.ReleaseTime },
-            new CommonEditOption { Header = "视频长度", Text = videoInfo.LengthTime },
-            new CommonEditOption { Header = "导演", Text = videoInfo.Director },
-            new CommonEditOption { Header = "制作商", Text = videoInfo.Producer },
-            new CommonEditOption { Header = "发行商", Text = videoInfo.Publisher },
-            new CommonEditOption { Header = "系列", Text = videoInfo.Series }
+            new CommonEditOption { Header = "标题", MinWidth = 480, Text = vo.Title },
+            new CommonEditOption { Header = "发布时间", Text = vo.ReleaseTime },
+            new CommonEditOption { Header = "视频长度", Text = vo.LengthTime },
+            new CommonEditOption { Header = "导演", Text = vo.Director },
+            new CommonEditOption { Header = "制作商", Text = vo.Producer },
+            new CommonEditOption { Header = "发行商", Text = vo.Publisher },
+            new CommonEditOption { Header = "系列", Text = vo.Series }
 
         ];
     }
@@ -121,7 +119,7 @@ public sealed partial class EditInfo
             _actorsSuggestion.SetFilter([$"name LIKE '%{sender.Text}%'"]);
         }
 
-        if (_actorsSuggestion.Count == 0) _actorsSuggestion.LoadDataAsync(20);
+        if (_actorsSuggestion.Count == 0) _ = _actorsSuggestion.LoadDataAsync(20);
         //_acv.RefreshFilter();
     }
 
@@ -130,10 +128,10 @@ public sealed partial class EditInfo
         // Take the user's text and convert it to our data type (if we have a matching one).
         args.Item = _actorsSuggestion.FirstOrDefault(item => item.Name.Contains(args.TokenText, StringComparison.CurrentCultureIgnoreCase)) ??
                     // Otherwise, create a new version of our data type
-                    new ActorInfo { Name = args.TokenText };
+                    new ActorInfo(args.TokenText);
     }
 
-    public VideoInfoVo GetInfoAfterEdit()
+    public VideoDetailVo GetInfoAfterEdit()
     {
         foreach (var option in _editOptions)
         {
@@ -143,25 +141,25 @@ public sealed partial class EditInfo
                     switch (commonEditOption.Header)
                     {
                         case "标题":
-                            _videoInfo.Title = commonEditOption.Text;
+                            _videoDetail.Title = commonEditOption.Text;
                             break;
                         case "发布时间":
-                            _videoInfo.ReleaseTime = commonEditOption.Text;
+                            _videoDetail.ReleaseTime = commonEditOption.Text;
                             break;
                         case "视频长度":
-                            _videoInfo.LengthTime = commonEditOption.Text;
+                            _videoDetail.LengthTime = commonEditOption.Text;
                             break;
                         case "导演":
-                            _videoInfo.Director = commonEditOption.Text;
+                            _videoDetail.Director = commonEditOption.Text;
                             break;
                         case "制作商":
-                            _videoInfo.Producer = commonEditOption.Text;
+                            _videoDetail.Producer = commonEditOption.Text;
                             break;
                         case "发行商":
-                            _videoInfo.Publisher = commonEditOption.Text;
+                            _videoDetail.Publisher = commonEditOption.Text;
                             break;
                         case "系列":
-                            _videoInfo.Series = commonEditOption.Text;
+                            _videoDetail.Series = commonEditOption.Text;
                             break;
                     }
 
@@ -170,10 +168,10 @@ public sealed partial class EditInfo
                     switch (tokenizingEditOption.Header)
                     {
                         case "类别":
-                            _videoInfo.Category = string.Join(",", _categoryItems.Select(item => item.Name));
+                            _videoDetail.CategoryList = _categoryItems.Select(i=>new CategoryInfo(i.Name)).ToList();
                             break;
                         case "演员":
-                            _videoInfo.Actor = string.Join(",", _actorItems.Select(item => item.Name));
+                            _videoDetail.ActorInfoList = _actorItems.Select(i=>new ActorInfo(i.Name)).ToList();
                             break;
                     }
 
@@ -181,7 +179,7 @@ public sealed partial class EditInfo
             }
         }
 
-        return _videoInfo;
+        return _videoDetail;
     }
 
 

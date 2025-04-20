@@ -8,9 +8,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using DataAccess.Models.Entity;
+using DataAccess.Models.Dto;
 using Display.Models.Api.Fc2Club;
-using Display.Models.Entities.OneOneFive;
 
 namespace Display.Providers.Spider;
 
@@ -34,7 +33,7 @@ public class Fc2Hub : BaseSpider
         get => AppSettings.Fc2HubBaseUrl;
         set => AppSettings.Fc2HubBaseUrl = value;
     }
-    public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
+    public override async Task<VideoInfoDto> GetInfoByCid(string cid, CancellationToken token)
     {
         var url = NetworkHelper.UrlCombine(BaseUrl, $"search?kw={cid.Replace("FC2-", "")}");
 
@@ -63,12 +62,13 @@ public class Fc2Hub : BaseSpider
         return await GetInfoByHtmlDoc(cid, detailUrl, htmlDoc);
     }
 
-    public override async Task<VideoInfo> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
+    public override async Task<VideoInfoDto> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
     {
-        var videoInfo = new VideoInfo
+        var videoInfo = new VideoInfoDto
         {
-            Url = detailUrl,
-            IsWm = 1
+            Name = cid,
+            SourceUrl = detailUrl,
+            IsWm = true
         };
 
         var jsonCollection = htmlDoc.DocumentNode.SelectNodes("//script[@type='application/ld+json']");
@@ -82,18 +82,17 @@ public class Fc2Hub : BaseSpider
         if (json.Name == null || json.Image == null) return null;
 
         videoInfo.Title = json.Name;
-        videoInfo.TrueName = cid;
         videoInfo.ReleaseTime = json.DatePublished.Replace("/", "-");
         //PTxHxMxS转x分钟
         videoInfo.LengthTime = DateHelper.ConvertPtTimeToTotalMinute(json.Duration);
-        videoInfo.Director = json.Director;
-        videoInfo.Producer = "fc2";
+        videoInfo.DirectorName = json.Director;
+        videoInfo.ProducerName = "fc2";
 
         if (json.Genre != null)
-            videoInfo.Category = string.Join(",", json.Genre);
+            videoInfo.CategoryList = json.Genre.ToList();
 
         if (json.Actor != null)
-            videoInfo.Actor = string.Join(",", json.Actor);
+            videoInfo.ActorNameList = json.Actor.ToList();
 
 
         var imageUrl = string.Empty;

@@ -19,6 +19,7 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.IO;
 using DataAccess;
+using DataAccess.Context;
 using DataAccess.Dao.Impl;
 using DataAccess.Dao.Interface;
 using Display.Views.Windows;
@@ -38,11 +39,11 @@ public partial class App
 
     public App()
     {
+        InitDataAccess();
+
         _host = ConfigureHost();
 
         InitAppCenter();
-
-        InitDataAccess();
 
         InitializeComponent();
 
@@ -53,7 +54,7 @@ public partial class App
 
     private void InitDataAccess()
     {
-        Context.SetSavePath(AppSettings.DataAccessSavePath);
+        BaseContext.SetSavePath(AppSettings.DataAccessSavePath);
     }
 
     /**
@@ -83,21 +84,16 @@ public partial class App
                     // Services
                     //.AddSingleton<IThumbnailService, ThumbnailService>()
                     // Views and ViewModels
-                    .AddSingleton<IThumbnailGeneratorService, ThumbnailGeneratorService>()
+                    //.AddSingleton<IThumbnailGeneratorService, ThumbnailGeneratorService>()
+
+
+                    .AddTransient<IThumbnailGeneratorService, ThumbnailGeneratorService>()
 
                     .AddTransient<IActorInfoDao, ActorInfoDao>()
-                    .AddTransient<IActorNameDao, ActorNameDao>()
-                    .AddTransient<IActorVideoDao, ActorVideoDao>()
-                    .AddTransient<IBwhDao, BwhDao>()
                     .AddTransient<IDownHistoryDao, DownHistoryDao>()
-                    .AddTransient<IFailListIsLikeLookLaterDao, FailListIsLikeLookLaterDao>()
-                    .AddTransient<IFilesInfoDao, FilesInfoDao>()
-                    .AddTransient<IFileToInfoDao, FileToInfoDao>()
-                    .AddTransient<IIsWmDao, IsWmDao>()
-                    .AddTransient<IProducerInfoDao, ProducerInfoDao>()
+                    .AddTransient<IFileInfoDao, FileInfoDao>()
+                    // .AddTransient<IProducerInfoDao, ProducerInfoDao>()
                     .AddTransient<ISearchHistoryDao, SearchHistoryDao>()
-                    .AddTransient<ISpiderLogDao, SpiderLogDao>()
-                    .AddTransient<ISpiderTaskDao, SpiderTaskDao>()
                     .AddTransient<IVideoInfoDao, VideoInfoDao>()
                     
                     .AddSingleton<UploadViewModel>()

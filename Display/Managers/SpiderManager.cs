@@ -1,5 +1,4 @@
 ﻿using Display.Helper.Network;
-using Display.Models.Spider;
 using Display.Providers.Spider;
 using HtmlAgilityPack;
 using System;
@@ -10,11 +9,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DataAccess.Dao.Interface;
-using DataAccess.Models.Entity;
 using Display.Models.Vo.Spider;
-using Display.Providers;
-using DataAccess.Dao.Impl;
-using FFmpeg.AutoGen.Abstractions;
+using DataAccess.Models.Dto;
+using Display.Models.Dto;
 
 namespace Display.Managers;
 
@@ -30,14 +27,12 @@ public class SpiderManager
     /// <summary>
     /// 成功队列（存入数据库的临时空间）
     /// </summary>
-    private readonly ConcurrentQueue<VideoInfo> _successNameInfos = [];
+    private readonly ConcurrentQueue<VideoInfoDto> _successNameInfos = [];
 
     private readonly ConcurrentQueue<string> _failureNameInfos = [];
 
-    private readonly IFileToInfoDao _fileToInfoDao = App.GetService<IFileToInfoDao>();
     private readonly IVideoInfoDao _videoInfoDao = App.GetService<IVideoInfoDao>();
     
-
     /// <summary>
     /// 随机
     /// </summary>
@@ -73,11 +68,11 @@ public class SpiderManager
     /// <param name="cid"></param>
     /// <param name="token"></param>
     /// <returns>单条VideoInfo</returns>
-    public async Task<VideoInfo> DispatchSpiderInfoByCidInOrder(string cid, CancellationToken token)
+    public async Task<VideoInfoDto> DispatchSpiderInfoByCidInOrder(string cid, CancellationToken token)
     {
         cid = cid.ToUpper();
 
-        VideoInfo videoInfo = null;
+        VideoInfoDto videoInfo = null;
 
         foreach (var spider in Spiders)
         {
@@ -89,20 +84,20 @@ public class SpiderManager
 
         return videoInfo;
     }
-
-    /// <summary>
-    /// 通过指定搜刮源搜索VideoInfo
-    /// </summary>
-    /// <param name="cid"></param>
-    /// <param name="spiderName"></param>
-    /// <param name="token"></param>
-    /// <returns></returns>
-    public async Task<VideoInfo> DispatchSpecificSpiderInfoByCid(string cid, SpiderSourceName spiderName, CancellationToken token)
-    {
-        var spider = Spiders.FirstOrDefault(i => spiderName.Equals(i.Name));
-        if (spider == null) return null;
-        return await spider.GetInfoByCid(cid, token);
-    }
+    //
+    // /// <summary>
+    // /// 通过指定搜刮源搜索VideoInfo
+    // /// </summary>
+    // /// <param name="cid"></param>
+    // /// <param name="spiderName"></param>
+    // /// <param name="token"></param>
+    // /// <returns></returns>
+    // public async Task<VideoInfoDto> DispatchSpecificSpiderInfoByCid(string cid, SpiderSourceName spiderName, CancellationToken token)
+    // {
+    //     var spider = Spiders.FirstOrDefault(i => spiderName.Equals(i.Name));
+    //     if (spider == null) return null;
+    //     return await spider.GetInfoByCid(cid, token);
+    // }
 
     /// <summary>
     /// 通过指定网页搜索VideoInfo
@@ -111,7 +106,7 @@ public class SpiderManager
     /// <param name="detailUrl"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    public async Task<VideoInfo> DispatchSpiderInfoByDetailUrl(string cid, string detailUrl, CancellationToken token)
+    public async Task<VideoInfoDto> DispatchSpiderInfoByDetailUrl(string cid, string detailUrl, CancellationToken token)
     {
         //先访问detail_url，获取到标题
         //当访问JavDB且内容为FC2时，由于使用的是CommonClient，所以会提示需要登入
@@ -126,7 +121,7 @@ public class SpiderManager
 
         var title = titleNode.InnerText;
 
-        VideoInfo info = null;
+        VideoInfoDto info = null;
 
         //通过标题判断需要用哪种方式解析
         foreach (var spider in Spiders)
@@ -292,7 +287,7 @@ public class SpiderManager
     /// 任务完成后
     /// </summary>
     /// <param name="item"></param>
-    private async void DoWhenNameIsAllSearched(SpiderItem item)
+    private void DoWhenNameIsAllSearched(SpiderItem item)
     {
         // 搜索失败
         if (item.Info is null)
@@ -308,11 +303,8 @@ public class SpiderManager
         _successNameInfos.Enqueue(item.Info);
 
         // TODO 当_nameInfos达到指定数量时才添加进数据库
-        await DataAccessLocal.Add.AddVideoInfo_ActorInfo_IsWmAsync(item.Info);
-
-        _fileToInfoDao.UpdateIsSuccessByTrueName(item.Name, 1);
+        _videoInfoDao.AddOrUpdateInfoAndAttachFile(item.Info, item.FileIdList);
     }
-
 
     /// <summary>
     /// 获取当前cid的VideoInfo列表信息，所有搜刮源同步执行，所有搜刮源都搜一遍
@@ -320,11 +312,11 @@ public class SpiderManager
     /// <param name="cid"></param>
     /// <param name="token"></param>
     /// <returns>多条VideoInfo</returns>
-    public async Task<List<VideoInfo>> DispatchSpiderInfosByCidInOrder(string cid, CancellationToken token = default)
+    public async Task<List<VideoInfoDto>> DispatchSpiderInfosByCidInOrder(string cid, CancellationToken token = default)
     {
         cid = cid.ToUpper();
 
-        ConcurrentQueue<VideoInfo> videoInfoQueue = [];
+        ConcurrentQueue<VideoInfoDto> videoInfoQueue = [];
         var tasks = Spiders
             .Where(spider => spider.IsSearch(cid))
             .Select(spider =>
@@ -345,24 +337,26 @@ public class SpiderManager
     /// <summary>
     /// 批量添加任务
     /// </summary>
-    /// <param name="names"></param>
-    public async void AddTask(IEnumerable<string> names)
+    /// <param name="taskList"></param>
+    public async void AddTask(IEnumerable<MatchVideoResult> taskList)
     {
         // 添加进任务队列
-        foreach (var name in names)
+        foreach (var task in taskList)
         {
-            var upperName = name.ToUpper();
+            var upperName = task.MatchName.ToUpper();
 
-            Debug.WriteLine(upperName);
             // 先从数据库中搜索
-            var singleVideoInfoByTrueName = _videoInfoDao.GetOneByTrueName(upperName);
+            var singleVideoInfoByTrueName = _videoInfoDao.GetOneByName(upperName);
             if (singleVideoInfoByTrueName != null)
             {
                 //替换数据库的数据
-                _fileToInfoDao.UpdateIsSuccessByTrueName(upperName, 1);
+                // _fileToInfoDao.UpdateIsSuccessByTrueName(upperName, 1);
                 continue;
             }
-            _taskItemQueue.Enqueue(new SpiderItem(upperName));
+            _taskItemQueue.Enqueue(new SpiderItem(upperName)
+            {
+                FileIdList = task.FileIdList
+            });
         }
 
         //记录当前任务队列的个数

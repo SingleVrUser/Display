@@ -4,14 +4,10 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
-using Display.Helper.UI;
-using Display.Models.Entities.OneOneFive;
-using Display.Models.Enums.OneOneFive;
-using Display.Models.Vo;
 using Display.Models.Vo.IncrementalCollection;
+using Display.Models.Vo.Video;
 using Display.Providers;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -19,7 +15,6 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
-using SharpCompress;
 
 namespace Display.Controls.UserController;
 
@@ -29,19 +24,6 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     public static readonly DependencyProperty TitleProperty =
         DependencyProperty.Register(nameof(Title), typeof(string), typeof(VideoCoverDisplay), null);
 
-    //显示的是匹配成功的还是失败的
-    public static readonly DependencyProperty IsShowFailListViewProperty =
-        DependencyProperty.Register(nameof(IsShowFailListView), typeof(bool), typeof(VideoCoverDisplay), null);
-
-
-    public static readonly DependencyProperty IsShowSearchListViewProperty =
-        DependencyProperty.Register(nameof(IsShowSearchListView), typeof(bool), typeof(VideoCoverDisplay), PropertyMetadata.Create(() => false));
-
-    private bool IsShowSucAndFailSwitchButton => !IsShowSearchListView;
-
-    private readonly IFailListIsLikeLookLaterDao _failListIsLikeLookLaterDao =
-        App.GetService<IFailListIsLikeLookLaterDao>();
-    
     private readonly IVideoInfoDao _videoInfoDao = App.GetService<IVideoInfoDao>();
     private readonly IActorInfoDao _actorInfoDao = App.GetService<IActorInfoDao>();
 
@@ -49,27 +31,13 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     public ActorInfo ActorInfo
     {
         get => _actorInfo;
-        set
+        private set
         {
             if (_actorInfo == value) return;
 
             _actorInfo = value;
 
             ChangedHyperlink();
-
-            OnPropertyChanged();
-        }
-    }
-
-    private bool _isShowHeaderCover;
-    public bool IsShowHeaderCover
-    {
-        get => _isShowHeaderCover;
-        set
-        {
-            if (_isShowHeaderCover == value) return;
-
-            _isShowHeaderCover = value;
 
             OnPropertyChanged();
         }
@@ -84,106 +52,22 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
         set => SetValue(TitleProperty, value);
     }
 
-    /// <summary>
-    /// 是否显示成功列表
-    /// </summary>
-    private bool IsShowSuccessListView => !IsShowFailListView;
-
-    /// <summary>
-    /// 当前显示失败列表
-    /// </summary>
-    public bool IsShowFailListView
-    {
-        get => (bool)GetValue(IsShowFailListViewProperty);
-        set
-        {
-            if (IsShowFailListView == value) return;
-
-            SetValue(IsShowFailListViewProperty, value);
-
-            OnPropertyChanged(nameof(IsShowSuccessListView));
-
-        }
-    }
-
-    /// <summary>
-    /// 是否显示的是搜索结果
-    /// </summary>
-    public bool IsShowSearchListView
-    {
-        get => (bool)GetValue(IsShowSearchListViewProperty);
-        set => SetValue(IsShowSearchListViewProperty, value);
-    }
-
-
-    /// <summary>
-    /// 切换排序Flyout(成功或失败)
-    /// </summary>
-    /// <param name="isShowSuccessFlyout"></param>
-    private void ChangedOrderButtonFlyout(bool isShowSuccessFlyout)
-    {
-        if (this.TryGetResourceValue<Flyout>(
-                isShowSuccessFlyout
-                ? "SuccessOrderFlyout"
-                : "FailOrderFlyout", out var flout))
-            OrderButton.Flyout = flout;
-    }
 
     /// <summary>
     /// 显示的数据
     /// 用于增量显示，成功列表
     /// </summary>
-    private IncrementalLoadSuccessInfoCollection _successInfoCollection;
-    public IncrementalLoadSuccessInfoCollection SuccessInfoCollection
+    private IncrementalLoadVideoInfoCollection _videoInfoCollection;
+    public IncrementalLoadVideoInfoCollection VideoInfoCollection
     {
-        get => _successInfoCollection;
-        set
+        get => _videoInfoCollection;
+        private set
         {
-            _successInfoCollection = value;
+            _videoInfoCollection = value;
 
             OnPropertyChanged();
         }
     }
-
-    /// <summary>
-    /// 显示的数据
-    /// 用于增量显示，失败列表（全部）
-    /// </summary>
-    private IncrementalLoadFailDatumInfoCollection _allFailInfoCollection;
-    public IncrementalLoadFailDatumInfoCollection AllFailInfoCollection
-    {
-        get => _allFailInfoCollection;
-        set
-        {
-            if (_allFailInfoCollection == value)
-                return;
-
-            _allFailInfoCollection = value;
-
-            OnPropertyChanged();
-        }
-    }
-
-
-    /// <summary>
-    /// 显示的数据
-    /// 用于增量显示，失败列表（喜欢/稍后观看）
-    /// </summary>
-    private IncrementalLoadFailInfoCollection _likeOrLookLaterFailInfoCollection;
-    public IncrementalLoadFailInfoCollection LikeOrLookLaterFailInfoCollection
-    {
-        get => _likeOrLookLaterFailInfoCollection;
-        set
-        {
-            if (_likeOrLookLaterFailInfoCollection == value) return;
-
-            _likeOrLookLaterFailInfoCollection = value;
-
-            OnPropertyChanged();
-        }
-    }
-
-
 
     /// <summary>
     /// 图片的最小值
@@ -207,86 +91,11 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     {
         InitializeComponent();
 
-        Loaded += PageLoaded;
+        Loaded += (_, _) =>
+        {
+            ShowType_RadioButtons.SelectedIndex = 0;
+        };
     }
-
-    private void PageLoaded(object sender, RoutedEventArgs e)
-    {
-        //展示的是搜索结果
-        if (IsShowSearchListView)
-        {
-        }
-        else
-        {
-            //展示的是失败列表
-            ShowType_RadioButtons.SelectedIndex = IsShowFailListView ? 1 : 0;
-        }
-
-        Loaded -= PageLoaded;
-    }
-
-    /// <summary>
-    /// 加载搜索结果
-    /// </summary>
-    public void ReLoadSearchResult(List<string> types, string showName, bool isFuzzyQueryActor)
-    {
-        var isShowHeaderCover = false;
-
-        _isFuzzyQueryActor = isFuzzyQueryActor;
-
-        if (types.Count == 1)
-        {
-            switch (types.FirstOrDefault())
-            {
-                case "is_like":
-                    Title = "喜欢";
-                    break;
-                case "look_later":
-                    Title = "稍后观看";
-                    break;
-                case "fail":
-                    Title = showName;
-                    _localCheckText = showName;
-                    IsShowFailListView = true;
-                    FailInfoSuggestBox.Visibility = Visibility.Collapsed;
-                    TrySwitchToFailView();
-                    return;
-                case "actor":
-                    Title = showName;
-
-                    // 准确查询演员，一般来源于详情页和演员页
-                    if (!isFuzzyQueryActor)
-                    {
-                        var actorInfo = _actorInfoDao.GetPartInfoByActorName(showName);
-
-                        if (actorInfo != null)
-                        {
-                            ActorInfo = actorInfo;
-                            isShowHeaderCover = true;
-                        }
-                    }
-
-                    break;
-                default:
-                    Title = showName;
-                    break;
-            }
-
-
-        }
-        else
-        {
-            Title = showName;
-        }
-
-        IsShowHeaderCover = isShowHeaderCover;
-
-        _filterConditionList = types;
-        _filterKeywords = showName;
-        IsShowFailListView = false;
-        TrySwitchToSuccessView();
-    }
-
 
     /// <summary>
     /// 用于动态调整图片大小的值
@@ -328,9 +137,6 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     /// <param name="adjustSliderValue"></param>
     private void AutoAdjustImageSize(double gridWidth = -1, bool adjustSliderValue = false)
     {
-        //失败列表不调整
-        if (IsShowFailListView) return;
-
         if (gridWidth <= 0)
             gridWidth = BasicGridView.ActualWidth;
 
@@ -362,11 +168,11 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     /// <param name="width"></param>
     private void AdjustImageSize(double width)
     {
-        if (SuccessInfoCollection == null) return;
+        if (VideoInfoCollection == null) return;
 
         //var height = width / 3 * 2;
 
-        foreach (var t in SuccessInfoCollection)
+        foreach (var t in VideoInfoCollection)
         {
             t.ImageWidth = width;
         }
@@ -376,15 +182,12 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
         //当前匹配的是成功
         //更新获取图片大小的值
-        if (IsShowSuccessListView)
-        {
-            SuccessInfoCollection.SetImageSize(width);
-        }
+        VideoInfoCollection.SetImageSize(width);
     }
 
     private double? _imageWidth;
 
-    public double ImageWidth
+    private double ImageWidth
     {
         get
         {
@@ -447,24 +250,14 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     /// <param name="e"></param>
     private void LikeToggleButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not AppBarToggleButton { DataContext: VideoInfoVo videoInfo } button) return;
+        if (sender is not AppBarToggleButton { DataContext: VideoCoverVo videoInfo } button) return;
 
-        videoInfo.IsLike = button.IsChecked == true ? 1 : 0;
-        
-        _videoInfoDao.ExecuteUpdate(i => string.Equals(videoInfo.TrueName, i.TrueName),
-            i => i.IsLike = videoInfo.IsLike);
+        var isLike = button.IsChecked == true;
+        videoInfo.IsLike = isLike;
+        _videoInfoDao.ExecuteUpdate(i=>i.Id.Equals(videoInfo.Id), info
+            => info.Interest.IsLike = isLike);
     }
-
-    private void FailLikeToggleButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not AppBarToggleButton { DataContext: FailInfo info } button) return;
-
-        info.IsLike = button.IsChecked == true ? 1 : 0;
-
-        _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(info.PickCode, i.PickCode),
-            i => i.IsLike = info.IsLike);
-    }
-
+    
     /// <summary>
     /// 点击了稍后观看
     /// </summary>
@@ -472,22 +265,12 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     /// <param name="e"></param>
     private void LookLaterToggleButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not AppBarToggleButton { DataContext: VideoInfoVo videoInfo } button) return;
+        if (sender is not AppBarToggleButton { DataContext: VideoCoverVo videoInfo } button) return;
 
-        videoInfo.LookLater = button.IsChecked == true ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
-        
-        _videoInfoDao.ExecuteUpdate(i => string.Equals(videoInfo.TrueName, i.TrueName),
-            i => i.LookLater = videoInfo.LookLater);
-    }
-
-    private void FailLookLaterToggleButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not AppBarToggleButton { DataContext: FailInfo info } button) return;
-
-        info.LookLater = button.IsChecked == true ? DateTimeOffset.Now.ToUnixTimeSeconds() : 0;
-
-        _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(info.PickCode, i.PickCode),
-            i => i.LookLater = info.LookLater);
+        var isLookLater = button.IsChecked == true;
+        videoInfo.IsLike = isLookLater;
+        _videoInfoDao.ExecuteUpdate(i=>i.Id.Equals(videoInfo.Id), info
+            => info.Interest.IsLookAfter = isLookLater);
     }
 
     /// <summary>
@@ -497,34 +280,13 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     /// <param name="args"></param>
     private void RatingControl_ValueChanged(RatingControl sender, object args)
     {
-        if (sender.DataContext is not VideoInfoVo videoInfo) return;
+        if (sender.DataContext is not VideoCoverVo videoInfo) return;
 
         var score = videoInfo.Score == 0 ? -1 : sender.Value;
-
-        _videoInfoDao.ExecuteUpdate(i => string.Equals(videoInfo.TrueName, i.TrueName),
-            i => i.Score = (int)score);
-
-    }
-
-    /// <summary>
-    /// 修改失败列表的评分
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="args"></param>
-    private void FailRatingControl_ValueChanged(RatingControl sender, object args)
-    {
-        if (sender.DataContext is not FailInfo info) return;
-
-        var score = info.Score == 0 ? -1 : sender.Value;
         
-        _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(info.PickCode, i.PickCode),
-            i => i.Score = (int)score);
-    }
+        _videoInfoDao.ExecuteUpdate(i=>i.Id.Equals(videoInfo.Id), info
+            => info.Interest.Score = score);
 
-
-    private void FailGrid_Tapped(object sender, TappedRoutedEventArgs e)
-    {
-        SingleVideoPlayClick?.Invoke(sender, e);
     }
 
     /// <summary>
@@ -536,9 +298,9 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
         VideoPlayClick?.Invoke(sender, e);
     }
 
-
-    private string SuccessListOrderBy;
-    private bool SuccessListIsDesc;
+    private string _successListOrderBy;
+    private bool _successListIsDesc;
+    
     /// <summary>
     /// 按类型排序（用于成功列表）
     /// </summary>
@@ -546,12 +308,17 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     /// <param name="e"></param>
     private void OrderSuccessListView_ItemClick(object sender, ItemClickEventArgs e)
     {
-        var selectListView = (ListView)sender;
-        var clickStackPanel = e.ClickedItem as StackPanel;
-        var selectTextBlock = clickStackPanel.Children.First(x => x is TextBlock) as TextBlock;
-        var selectOrderText = selectTextBlock.Text;
+        if (sender is not ListView selectListView) return;
 
-        var lastFontIcon = clickStackPanel.Children.Last(x => x is FontIcon) as FontIcon;
+        if (e.ClickedItem is not StackPanel clickStackPanel) return;
+        
+        if (clickStackPanel.Children.First(x => x is TextBlock)
+            is not TextBlock selectTextBlock) return;
+
+        if (clickStackPanel.Children.Last(x => x is FontIcon)
+            is not FontIcon lastFontIcon) return;
+        
+        var selectOrderText = selectTextBlock.Text;
 
         var upGlyph = "\xE014";
         var downGlyph = "\xE015";
@@ -569,29 +336,29 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
         //现图标
         isUpSort = lastFontIcon.Glyph == upGlyph;
-        SuccessListIsDesc = !isUpSort;
+        _successListIsDesc = !isUpSort;
 
         switch (selectOrderText)
         {
             case "名称":
                 newGlyph = "\xE185";
-                SuccessListOrderBy = "truename";
+                _successListOrderBy = "truename";
                 break;
             case "演员":
                 newGlyph = "\xE13D";
-                SuccessListOrderBy = "actor";
+                _successListOrderBy = "actor";
                 break;
             case "年份":
                 newGlyph = "\xEC92";
-                SuccessListOrderBy = "releasetime";
+                _successListOrderBy = "releasetime";
                 break;
             case "随机":
                 newGlyph = "\xF463";
-                SuccessListOrderBy = "random";
+                _successListOrderBy = "random";
                 break;
             default:
                 newGlyph = "\xE185";
-                SuccessListOrderBy = "truename";
+                _successListOrderBy = "truename";
                 break;
         }
 
@@ -602,90 +369,6 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
         }
 
         LoadDstSuccessInfoCollection();
-    }
-
-
-    private string FailListOrderBy;
-    private bool FailListIsDesc;
-
-    /// <summary>
-    /// 按类型排序（用于失败列表）
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private async void OrderFailListView_ItemClick(object sender, ItemClickEventArgs e)
-    {
-        if (e.ClickedItem is not StackPanel clickStackPanel) return;
-
-        const string upGlyph = "\xE014";
-        const string downGlyph = "\xE015";
-
-        var selectListView = (ListView)sender;
-
-        var selectTextBlock = clickStackPanel.Children.First(x => x is TextBlock) as TextBlock;
-        var lastFontIcon = clickStackPanel.Children.Last(x => x is FontIcon) as FontIcon;
-
-        var selectOrderText = selectTextBlock.Text;
-
-
-        string newGlyph;
-
-        //原图标是否是升序
-        var isUpSort = lastFontIcon.Glyph == upGlyph;
-
-        //更新降序或升序图标
-        //注意：随机 无需升/降序
-        if (selectListView.SelectedItem == e.ClickedItem && selectOrderText != "随机")
-        {
-            lastFontIcon.Glyph = isUpSort ? downGlyph : upGlyph;
-        }
-
-        //现在是否是升序
-        isUpSort = lastFontIcon.Glyph == upGlyph;
-        FailListIsDesc = !isUpSort;
-
-        switch (selectOrderText)
-        {
-            case "名称":
-                newGlyph = "\xE185";
-                FailListOrderBy = "n";
-                break;
-            case "大小":
-                newGlyph = "\xEB05";
-                FailListOrderBy = "s";
-                break;
-            case "时间":
-                newGlyph = "\xE2AD";
-                FailListOrderBy = "tp";
-                break;
-            case "随机":
-                newGlyph = "\xF463";
-                FailListOrderBy = "random";
-                break;
-            default:
-                newGlyph = "\xE185";
-                FailListOrderBy = "n";
-                break;
-        }
-        //更新首图标
-        if (OrderButton.Content is string content && content != newGlyph)
-        {
-            OrderButton.Content = newGlyph;
-        }
-
-        //更新数据
-        AllFailInfoCollection.Clear();
-
-        //考虑当前是不是搜索过的
-        if (!string.IsNullOrEmpty(_localCheckText))
-            AllFailInfoCollection.FilterName = _localCheckText;
-
-        AllFailInfoCollection.OrderBy = FailListOrderBy;
-        AllFailInfoCollection.IsDesc = FailListIsDesc;
-        var lists = await DataAccessLocal.Get.GetFailFileInfoWithFilesInfoAsync(0, 30, _localCheckText, orderBy: FailListOrderBy, isDesc: FailListIsDesc);
-        lists?.ForEach(AllFailInfoCollection.Add);
-
-
     }
 
     /// <summary>
@@ -710,33 +393,31 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
         if (result != ContentDialogResult.Primary) return;
 
-        if (sender is not AppBarButton { DataContext: VideoInfoVo item }) return;
+        if (sender is not AppBarButton { DataContext: VideoCoverVo item }) return;
 
         //从数据库中删除
-        _videoInfoDao.ExecuteRemoveByName(item.TrueName);
+        _videoInfoDao.ExecuteDeleteById(item.Id);
 
         //删除存储的文件夹
-        var savePath = Path.Combine(AppSettings.ImageSavePath, item.TrueName);
+        var savePath = Path.Combine(AppSettings.ImageSavePath, item.Name);
         if (Directory.Exists(savePath))
         {
             Directory.Delete(savePath, true);
         }
 
         //FileGrid.Remove(item);
-        SuccessInfoCollection.Remove(item);
+        VideoInfoCollection.Remove(item);
     }
 
     //开始动画
-    public async void StartAnimation(ConnectedAnimation animation, VideoInfoVo item)
+    public async void StartAnimation(ConnectedAnimation animation, VideoCoverVo item)
     {
         if (BasicGridView.Items.Contains(item))
         {
             //开始动画
             await BasicGridView.TryStartConnectedAnimationAsync(animation, item, "showImage");
         }
-
     }
-
 
     private void ShowType_RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -746,34 +427,9 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
         {
             //匹配成功
             case nameof(SuccessData_RadioButton):
-                IsShowFailListView = false;
                 TrySwitchToSuccessView();
                 break;
-            //匹配失败
-            case nameof(FailData_RadioButton):
-                IsShowFailListView = true;
-                TrySwitchToFailView();
-                break;
         }
-    }
-
-    /// <summary>
-    /// 切换到失败视图
-    /// </summary>
-    private void TrySwitchToFailView()
-    {
-        //更新GridView的来源（全部/喜欢/稍后观看）
-        InitFailCollection();
-
-        //停止监听调整图片大小的Slider
-        CloseListeningSliderValueChanged();
-
-        //停止监听动态调整图片大小
-        CloseListeningGridSizeChanged();
-
-        //更改排序的Flyout
-        ChangedOrderButtonFlyout(false);
-
     }
 
     /// <summary>
@@ -783,13 +439,12 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     {
         //更新GridView的来源
 
-        SuccessInfoCollection ??= new IncrementalLoadSuccessInfoCollection(ImageWidth);
-        SuccessInfoCollection.SetFilter(_filterConditionList, _filterKeywords, _isFuzzyQueryActor);
-        await SuccessInfoCollection.LoadData();
+        VideoInfoCollection ??= new IncrementalLoadVideoInfoCollection(ImageWidth);
+        VideoInfoCollection.SetFilter(_filterConditionList, _filterKeywords, _isFuzzyQueryActor);
+        await VideoInfoCollection.LoadData();
 
-        BasicGridView.ItemsSource = SuccessInfoCollection;
+        BasicGridView.ItemsSource = VideoInfoCollection;
 
-        if (FailGridView.Visibility == Visibility.Visible) FailGridView.Visibility = Visibility.Collapsed;
         if (BasicGridView.Visibility == Visibility.Collapsed) BasicGridView.Visibility = Visibility.Visible;
 
         //初始化Slider的值
@@ -804,50 +459,6 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
         if (OrderButton.Visibility == Visibility.Collapsed) OrderButton.Visibility = Visibility.Visible;
 
-        //更改排序的Flyout
-        ChangedOrderButtonFlyout(true);
-    }
-
-    private void FailGrid_PointerEntered(object sender, PointerRoutedEventArgs e)
-    {
-        if (sender is not Grid grid) return;
-
-        ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
-
-        grid.Scale = new System.Numerics.Vector3(1.01f);
-    }
-
-    private void FailGrid_PointerExited(object sender, PointerRoutedEventArgs e)
-    {
-        if (sender is not Grid grid) return;
-
-        ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
-
-        grid.Scale = new System.Numerics.Vector3(1.0f);
-    }
-
-    /// <summary>
-    /// 记录失败列表搜索框里的数据值
-    /// 翻遍失败列表的增量加载
-    /// </summary>
-    private string _localCheckText;
-
-    /// <summary>
-    /// 失败列表输入框的值发生改变
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="args"></param>
-    private async void FileAutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
-    {
-        _localCheckText = sender.Text;
-
-        System.Diagnostics.Debug.WriteLine($"失败项的搜索框输入：{_localCheckText}");
-
-
-        AllFailInfoCollection.SetFilter(_localCheckText);
-        //AllFailInfoCollection = new IncrementalLoadFailDatumInfoCollection { filterName = _localCheckText, OrderBy = FailListOrderBy, IsDesc = FailListIsDesc };
-        //FailGridView.ItemsSource = AllFailInfoCollection;
-        await AllFailInfoCollection.LoadData();
     }
 
     /// <summary>
@@ -857,24 +468,9 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     /// <param name="e"></param>
     private void ToTopButton_Click(object sender, RoutedEventArgs e)
     {
-        if (IsShowFailListView)
+        if (BasicGridView.ItemsSource is IncrementalLoadVideoInfoCollection { Count: > 0 } successCollection)
         {
-            switch (FailGridView.ItemsSource)
-            {
-                case IncrementalLoadFailDatumInfoCollection { Count: > 0 } allFailCollection:
-                    FailGridView.ScrollIntoView(allFailCollection.First());
-                    break;
-                case IncrementalLoadFailInfoCollection { Count: > 0 } failCollection:
-                    FailGridView.ScrollIntoView(failCollection.First());
-                    break;
-            }
-        }
-        else
-        {
-            if (BasicGridView.ItemsSource is IncrementalLoadSuccessInfoCollection { Count: > 0 } successCollection)
-            {
-                BasicGridView.ScrollIntoView(successCollection.First());
-            }
+            BasicGridView.ScrollIntoView(successCollection.First());
         }
 
     }
@@ -882,7 +478,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     /// <summary>
     /// 打开对Grid大小的监听，以动态调整图片大小
     /// </summary>
-    public void TryStartListeningGridSizeChanged()
+    private void TryStartListeningGridSizeChanged()
     {
         if (IsAutoAdjustImageSizeToggleButton.IsChecked != true) return;
 
@@ -896,7 +492,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     /// <summary>
     /// 开始监听调整图片大小的Slider
     /// </summary>
-    public void StartListeningSliderValueChanged()
+    private void StartListeningSliderValueChanged()
     {
         ImageSizeChangeSlider.ValueChanged += Slider_valueChanged;
     }
@@ -907,14 +503,6 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     private void CloseListeningGridSizeChanged()
     {
         BasicGridView.SizeChanged -= BasicGridView_SizeChanged;
-    }
-
-    /// <summary>
-    /// 停止监听调整图片大小的Slider
-    /// </summary>
-    private void CloseListeningSliderValueChanged()
-    {
-        ImageSizeChangeSlider.ValueChanged -= Slider_valueChanged;
     }
 
     /// <summary>
@@ -964,7 +552,6 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
     private void AutoAdjustImageSize_ToggleButton_UnChecked(object sender, RoutedEventArgs e)
     {
         CloseListeningGridSizeChanged();
-        //System.Diagnostics.Debug.WriteLine("关闭图片大小的动态调整");
     }
 
     private void InfoListFilter_SplitButton_Click(SplitButton sender, SplitButtonClickEventArgs args)
@@ -977,18 +564,15 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
             switch (sender.Tag)
             {
                 case "Year":
-                    if (_filterRanges == null)
-                        _filterRanges = new();
+                    _filterRanges ??= new Dictionary<string, string>();
                     _filterRanges["Year"] = InfosFilter.Year;
                     break;
                 case "Score":
-                    if (_filterRanges == null)
-                        _filterRanges = new();
+                    _filterRanges ??= new Dictionary<string, string>();
                     _filterRanges["Score"] = InfosFilter.Score.ToString();
                     break;
                 case "Type":
-                    if (_filterRanges == null)
-                        _filterRanges = new();
+                    _filterRanges ??= new Dictionary<string, string>();
                     _filterRanges["Type"] = InfosFilter.Type;
                     break;
             }
@@ -1030,13 +614,13 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
     private async void LoadDstSuccessInfoCollection()
     {
-        SuccessInfoCollection = new IncrementalLoadSuccessInfoCollection(ImageWidth);
-        BasicGridView.ItemsSource = SuccessInfoCollection;
+        VideoInfoCollection = new IncrementalLoadVideoInfoCollection(ImageWidth);
+        BasicGridView.ItemsSource = VideoInfoCollection;
 
-        SuccessInfoCollection.SetOrder(SuccessListOrderBy, SuccessListIsDesc);
-        SuccessInfoCollection.SetRange(_filterRanges);
-        SuccessInfoCollection.SetFilter(_filterConditionList, _filterKeywords, _isFuzzyQueryActor);
-        await SuccessInfoCollection.LoadData();
+        VideoInfoCollection.SetOrder(_successListOrderBy, _successListIsDesc);
+        VideoInfoCollection.SetRange(_filterRanges);
+        VideoInfoCollection.SetFilter(_filterConditionList, _filterKeywords, _isFuzzyQueryActor);
+        await VideoInfoCollection.LoadData();
     }
 
     private void Filter_ToggleButton_Unchecked(object sender, RoutedEventArgs e)
@@ -1048,7 +632,7 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
         LoadDstSuccessInfoCollection();
     }
 
-    private void LikeButton_Click(object sender, RoutedEventArgs e)
+    private void LikeActorButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not ToggleButton isLikeButton) return;
 
@@ -1056,10 +640,9 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
 
         if (isLikeButton.IsChecked == null) return;
 
-        var isLike = (bool)isLikeButton.IsChecked ? 1 : 0;
+        var isLike = isLikeButton.IsChecked == true;
         
-        _actorInfoDao.ExecuteUpdate(i => string.Equals(actorId, i.Id),
-            i => i.IsLike = isLike);
+        _actorInfoDao.ExecuteUpdateLike(actorId, isLike);
     }
 
     private void ChangedHyperlink()
@@ -1075,216 +658,13 @@ public sealed partial class VideoCoverDisplay : INotifyPropertyChanged
         }
     }
 
-    private void ShowData_RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        InitFailCollection();
-    }
-
-    private async void InitFailCollection()
-    {
-        if (FailShowChanged_RadioButtons.SelectedItem is null)
-        {
-            FailShowChanged_RadioButtons.SelectedIndex = 0;
-            return;
-        }
-
-        if (FailShowChanged_RadioButtons.SelectedItem is not ListViewItem item) return;
-
-        bool isShowAllFail;
-
-        //更新GridView的来源
-        switch (item.Name)
-        {
-            //喜欢
-            case nameof(FailLike_RadioButton):
-                if (LikeOrLookLaterFailInfoCollection == null)
-                {
-                    LikeOrLookLaterFailInfoCollection = new IncrementalLoadFailInfoCollection(FailInfoShowType.like);
-                }
-                else if (LikeOrLookLaterFailInfoCollection.ShowType != FailInfoShowType.like)
-                {
-                    LikeOrLookLaterFailInfoCollection.SetShowType(FailInfoShowType.like);
-                }
-                FailGridView.ItemsSource = LikeOrLookLaterFailInfoCollection;
-
-                isShowAllFail = false;
-
-                break;
-            //稍后观看
-            case nameof(FailLookLater_RadioButton):
-                if (LikeOrLookLaterFailInfoCollection == null)
-                {
-                    LikeOrLookLaterFailInfoCollection = new IncrementalLoadFailInfoCollection(FailInfoShowType.look_later);
-                }
-                else if (LikeOrLookLaterFailInfoCollection.ShowType != FailInfoShowType.look_later)
-                {
-                    LikeOrLookLaterFailInfoCollection.SetShowType(FailInfoShowType.look_later);
-                }
-                FailGridView.ItemsSource = LikeOrLookLaterFailInfoCollection;
-
-                isShowAllFail = false;
-
-                break;
-            //默认全部
-            default:
-                if (AllFailInfoCollection == null || !string.IsNullOrEmpty(_localCheckText))
-                {
-                    AllFailInfoCollection = [];
-                    AllFailInfoCollection.SetOrder(FailListOrderBy, FailListIsDesc);
-                    AllFailInfoCollection.SetFilter(_localCheckText);
-                    await AllFailInfoCollection.LoadData();
-                }
-                FailGridView.ItemsSource = AllFailInfoCollection;
-
-                isShowAllFail = true;
-
-                break;
-        }
-
-        if (isShowAllFail)
-        {
-            //排列按钮
-            if (OrderButton.Visibility == Visibility.Collapsed) OrderButton.Visibility = Visibility.Visible;
-
-            //显示当前数量
-            if (AllFailShowCountControl.Visibility == Visibility.Collapsed) AllFailShowCountControl.Visibility = Visibility.Visible;
-            if (LikeOrLookLaterFailShowCountControl.Visibility == Visibility.Visible) LikeOrLookLaterFailShowCountControl.Visibility = Visibility.Collapsed;
-
-            //搜索框
-            if (FailInfoSuggestBox.Visibility == Visibility.Collapsed) FailInfoSuggestBox.Visibility = Visibility.Visible;
-
-        }
-        else
-        {
-            //排列按钮
-            if (OrderButton.Visibility == Visibility.Visible) OrderButton.Visibility = Visibility.Collapsed;
-
-            //显示当前数量
-            if (LikeOrLookLaterFailShowCountControl.Visibility == Visibility.Collapsed) LikeOrLookLaterFailShowCountControl.Visibility = Visibility.Visible;
-            if (AllFailShowCountControl.Visibility == Visibility.Visible) AllFailShowCountControl.Visibility = Visibility.Collapsed;
-
-            //搜索框
-            if (FailInfoSuggestBox.Visibility == Visibility.Visible) FailInfoSuggestBox.Visibility = Visibility.Collapsed;
-        }
-    }
-
-    private void FailItemAddToLikeButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not MenuFlyoutItem item) return;
-
-        if (item.DataContext is not FilesInfo datum) return;
-
-        var pickCode = datum.PickCode;
-
-        var failInfo = DataAccessLocal.Get.GetSingleFailInfoByPickCode(pickCode);
-
-        if (failInfo == null)
-        {
-            _failListIsLikeLookLaterDao.ExecuteAdd(new FailListIsLikeLookLater()
-            {
-                PickCode = pickCode,
-                IsLike = 1
-            });
-            ShowTeachingTip("已添加进喜欢");
-        }
-        //已添加进数据库但不是喜欢
-        //标记为喜欢
-        else
-        {
-            switch (failInfo.IsLike)
-            {
-                case 0:
-                    _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(pickCode, i.PickCode),
-                        i => i.IsLike = 1);
-                    ShowTeachingTip("已添加进喜欢");
-                    break;
-                default:
-                    ShowTeachingTip("已存在于喜欢，忽略该操作");
-                    break;
-            }
-        }
-    }
-
-    private void FailItemAddToLookLaterButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not MenuFlyoutItem item) return;
-
-        if (item.DataContext is not FilesInfo datum) return;
-
-        var pickCode = datum.PickCode;
-
-        var failInfo = DataAccessLocal.Get.GetSingleFailInfoByPickCode(pickCode);
-
-        if (failInfo == null)
-        {
-            _failListIsLikeLookLaterDao.ExecuteAdd(new FailListIsLikeLookLater()
-            {
-                PickCode = pickCode,
-                IsLike = 1
-            });
-            ShowTeachingTip("已添加进稍后观看");
-        }
-        //已添加进数据库但不是稍后观看
-        //标记为稍后观看
-        else
-        {
-
-            switch (failInfo.LookLater)
-            {
-                case 0:
-                    _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(pickCode, i.PickCode),
-                        i => i.LookLater = DateTimeOffset.Now.ToUnixTimeSeconds());
-                    ShowTeachingTip("已添加进稍后观看");
-                    break;
-                default:
-                    ShowTeachingTip("已存在于稍后观看，忽略该操作");
-                    break;
-            }
-        }
-    }
-
-    private async void ShowTeachingTip(string subTitle)
-    {
-        //之前的通知存在，先隐藏
-        if (FailList_TeachingTip.IsOpen) FailList_TeachingTip.IsOpen = false;
-
-        FailList_TeachingTip.Subtitle = subTitle;
-        FailList_TeachingTip.IsOpen = true;
-
-        await Task.Delay(1000);
-
-        if (FailList_TeachingTip.IsOpen) FailList_TeachingTip.IsOpen = false;
-    }
-
     public event RoutedEventHandler VideoPlayClick;
     public event RoutedEventHandler SingleVideoPlayClick;
     public event RoutedEventHandler MoreButtonClick;
     public event PropertyChangedEventHandler PropertyChanged;
 
-    public void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    private void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-}
-
-/// <summary>
-/// GridView样式选择
-/// </summary>
-public class CoverItemTemplateSelector : DataTemplateSelector
-{
-    public DataTemplate ImageTemplate { get; set; }
-    public DataTemplate FailCoverTemplate { get; set; }
-    public DataTemplate LikeOrLookLaterInFailCoverTemplate { get; set; }
-    public DataTemplate WithoutImageTemplate { get; set; }
-
-    protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
-    {
-        return item switch
-        {
-            FailVideoInfo => FailCoverTemplate,
-            VideoInfoVo => ImageTemplate,
-            FailInfo => LikeOrLookLaterInFailCoverTemplate,
-            _ => WithoutImageTemplate
-        };
     }
 }

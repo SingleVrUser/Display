@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using Display.Models.Dto.Media;
 using LocalThumbnail = Display.Models.Dto.Media.LocalThumbnail;
+using System.Threading;
 
 namespace Display.Services;
 
@@ -36,7 +37,8 @@ public class ThumbnailGeneratorService : IThumbnailGeneratorService
         throw new NotImplementedException();
     }
 
-    public async Task DecodeAllFramesToImages(ThumbnailGenerateOptions thumbnailGenerateOptions, IProgress<LocalThumbnail> progress = null, AVHWDeviceType hwDevice = AVHWDeviceType.AV_HWDEVICE_TYPE_NONE)
+
+    public async Task<bool> DecodeAllFramesToImages(ThumbnailGenerateOptions thumbnailGenerateOptions, CancellationToken cancellationToken, IProgress<LocalThumbnail> progress = null, AVHWDeviceType hwDevice = AVHWDeviceType.AV_HWDEVICE_TYPE_NONE)
     {
         using var vsd = new VideoStreamDecoder(thumbnailGenerateOptions.UrlOptions, hwDevice);
 
@@ -61,30 +63,52 @@ public class ThumbnailGeneratorService : IThumbnailGeneratorService
         // 非m3u8都要等待
         var isWait = !thumbnailGenerateOptions.UrlOptions.IsM3U8;
 
+        bool needWait = false;
+
         for (var i = 0; i < frameCount; i++, currentTime += increaseTime)
         {
             var filePath = GetFilePath(thumbnailGenerateOptions, currentTime);
             if (filePath == null) continue;
 
+            needWait = true;
+
             if (!File.Exists(filePath))
             {
-                if (isWait) await NetworkHelper.RandomTimeDelay(10, 20);
+                if (isWait && i != 0) await NetworkHelper.RandomTimeDelay(10, 60);
 
                 if (!vsd.TrySeekPosition(currentTime)) break;
 
                 AVFrame frame = default;
-                if (!await Task.Run(() => vsd.TryDecodeNextFrame(frame: out frame))) break;
+
+                var isSuccess = await Task.Run(async () =>
+                {
+                    try
+                    {
+                        return vsd.TryDecodeNextFrame(frame: out frame);
+                    }
+                    catch
+                    {
+                        await Task.Delay(5000);
+                    }
+
+                    return false;
+
+                });
+                if (!isSuccess) break;
 
                 var convertedFrame = vfc.Convert(frame);
 
                 FFmpegHelper.WriteFrame(convertedFrame, filePath);
             }
 
-            var localThumbnail = new LocalThumbnail(timeStamp: currentTime);
-            await localThumbnail.SetBitmap(filePath);
+            var localThumbnail = new LocalThumbnail(timeStamp: currentTime, path: filePath);
+            //await localThumbnail.SetBitmap(filePath);
 
             progress?.Report(localThumbnail);
+            if (cancellationToken.IsCancellationRequested) break;
         }
+
+        return needWait;
     }
 
     private static string GetFilePath(ThumbnailGenerateOptions thumbnailGenerateOptions, long currentTime)
@@ -96,7 +120,7 @@ public class ThumbnailGeneratorService : IThumbnailGeneratorService
         return filePath;
     }
 
-
+    
     private static void ConfigureHwDecoder(out AVHWDeviceType hwType)
     {
         hwType = AVHWDeviceType.AV_HWDEVICE_TYPE_NONE;

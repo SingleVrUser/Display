@@ -1,9 +1,10 @@
 ﻿using System;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace Display.Views.Pages.More;
 
-public sealed partial class VideoPlay
+public sealed partial class VideoPlay: Page
 {
     public VideoPlay()
     {

@@ -24,7 +24,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using DataAccess;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using Display.Helper.Notifications;
@@ -45,8 +44,8 @@ using Display.Models.Vo;
 using Display.Models.Vo.OneOneFive;
 using Display.Models.Vo.Progress;
 using Display.Views.Pages.Settings.Account;
-using Microsoft.EntityFrameworkCore;
-using FileInfo = System.IO.FileInfo;
+using FileInfo = DataAccess.Models.Entity.FileInfo;
+
 
 namespace Display.Providers;
 
@@ -63,7 +62,7 @@ internal class WebApi
 
     private static WebApi _webApi;
     
-    private readonly IFilesInfoDao _filesInfoDao = App.GetService<IFilesInfoDao>();
+    private readonly IFileInfoDao _filesInfoDao = App.GetService<IFileInfoDao>();
     private static readonly IDownHistoryDao DownHistoryDao = App.GetService<IDownHistoryDao>();
 
     public static WebApi GlobalWebApi => _webApi ??= new WebApi();
@@ -228,7 +227,7 @@ internal class WebApi
     {
         var folderCategory = await GetFolderCategory(id);
 
-        _filesInfoDao.ExecuteAdd(new FilesInfo
+        _filesInfoDao.ExecuteAdd(new FileInfo
         {
             Name = folderCategory.file_name,
             CurrentId = id,
@@ -273,8 +272,7 @@ internal class WebApi
             if (existsInfo == null) _filesInfoDao.ExecuteAdd(info.Datum);
             else
             {
-                Context.Instance.Entry(existsInfo).State = EntityState.Detached;
-                Context.Instance.FilesInfos.Update(info.Datum);
+                _filesInfoDao.ExecuteUpdate(info.Datum);
             }
 
             getFilesProgressInfo.FilesCount++;
@@ -282,8 +280,6 @@ internal class WebApi
             progress?.Report(
                 new GetFileProgressIProgress{ GetFilesProgressInfo = getFilesProgressInfo });
         }
-
-        await Context.Instance.SaveChangesAsync(token);
 
         progress?.Report(token.IsCancellationRequested
             ? new GetFileProgressIProgress { Status = ProgressStatus.cancel }
@@ -345,15 +341,15 @@ internal class WebApi
             else
             {
                 //删除后重新添加
-                await _filesInfoDao.RemoveAllByFolderIdAsync(cid);
-                Context.Instance.FilesInfos.Remove(folderInfo);
+                await _filesInfoDao.ExecuteRemoveAllByFolderIdAsync(cid);
+                _filesInfoDao.ExecuteRemove(folderInfo);
                 folderInfo = null;
             }
         }
 
         if (folderInfo == null)
         {
-            List<FilesInfo> addToDataAccessList = [];
+            List<FileInfo> addToDataAccessList = [];
 
             //获取当前文件夹下所有文件信息和文件夹信息（从网络）
             await TraverseAllFileInfo(cid, addToDataAccessList, getFilesProgressInfo, token, progress);
@@ -365,11 +361,10 @@ internal class WebApi
                 {
                     var existFileInfo = _filesInfoDao.GetOneByPickCode(item.PickCode);
                     if (existFileInfo == null)
-                        Context.Instance.FilesInfos.Add(item);
+                        _filesInfoDao.ExecuteAdd(item);
                     else
                     {
-                        Context.Instance.Entry(existFileInfo).State = EntityState.Detached;
-                        Context.Instance.FilesInfos.Update(item);
+                        _filesInfoDao.ExecuteUpdate(item);
                     }
 
                 }
@@ -385,8 +380,6 @@ internal class WebApi
             _filesInfoDao.ExecuteAdd(FileCategory.ConvertFolderToDatum(cidCategory, cid));
         }
 
-        await Context.Instance.SaveChangesAsync(token);
-
         return getFilesProgressInfo;
     }
 
@@ -399,7 +392,7 @@ internal class WebApi
     /// <param name="token"></param>
     /// <param name="progress"></param>
     /// <returns></returns>
-    private async Task TraverseAllFileInfo(long cid, List<FilesInfo> addFilesInfos, GetFilesProgressInfo getFilesProgressInfo, CancellationToken token, IProgress<GetFileProgressIProgress> progress = null)
+    private async Task TraverseAllFileInfo(long cid, List<FileInfo> addFilesInfos, GetFilesProgressInfo getFilesProgressInfo, CancellationToken token, IProgress<GetFileProgressIProgress> progress = null)
     {
         if (token.IsCancellationRequested) return;
 
@@ -442,7 +435,7 @@ internal class WebApi
                         isUseDbData = folderInfo != null && folderInfo.TimeEdit == item.TimeEdit;
                     }
                     
-                    List<FilesInfo> datumList = [];
+                    List<FileInfo> datumList = [];
                     if (isUseDbData)
                     {
                         //统计下级文件夹所含文件的数量
@@ -567,7 +560,7 @@ internal class WebApi
 
     public async Task<Tuple<bool, string>> CreateTorrentOfflineDown(long cid, string torrentPath)
     {
-        var torrentFile = new FileInfo(torrentPath);
+        var torrentFile = new System.IO.FileInfo(torrentPath);
         if (torrentFile.Length > 2097152)
         {
             // TODO: 转换为ed2k后添加
@@ -767,7 +760,7 @@ internal class WebApi
         if (result == null || string.IsNullOrEmpty(result.PickCode)) return false;
 
         // 删除原文件
-        return await DeleteFiles(FileUploadService.Client, data.Cid, new[] { (long)data.Id! });
+        return await DeleteFiles(FileUploadService.Client, data.Cid, [data.Id]);
     }
     public enum OrderBy
     {
@@ -824,7 +817,7 @@ internal class WebApi
             //item.t 可能是 "1658999027" 也可能是 "2022-07-28 17:03"
 
             //"1658999027"
-            if (item.Time.IsNumber())
+            if (item.Time != null && item.Time.IsNumber())
             {
                 dateInt = int.Parse(item.Time);
                 item.Time = DateHelper.ConvertInt32ToDateTime(dateInt);
@@ -926,7 +919,7 @@ internal class WebApi
     }
 
     public enum DownType { _115, Bc, Aria2 };
-    public async Task<bool> RequestDown(List<FilesInfo> videoInfoList, DownType downType = DownType._115, string savePath = null, string topFolderName = null)
+    public async Task<bool> RequestDown(List<FileInfo> videoInfoList, DownType downType = DownType._115, string savePath = null, string topFolderName = null)
     {
         var success = downType switch
         {
@@ -951,7 +944,7 @@ internal class WebApi
     /// </summary>
     /// <param name="videoInfoList"></param>
     /// <returns></returns>
-    async Task<bool> RequestDownBy115Browser(List<FilesInfo> videoInfoList)
+    async Task<bool> RequestDownBy115Browser(List<FileInfo> videoInfoList)
     {
         var downRequest = new Browser115Request
         {
@@ -1012,7 +1005,7 @@ internal class WebApi
     /// <param name="savePath"></param>
     /// <param name="topFolderName"></param>
     /// <returns></returns>
-    private async Task<bool> RequestDownByBitComet(List<FilesInfo> videoInfoList, string ua, string savePath, string topFolderName = null)
+    private async Task<bool> RequestDownByBitComet(List<FileInfo> videoInfoList, string ua, string savePath, string topFolderName = null)
     {
         var success = true;
 
@@ -1143,7 +1136,7 @@ internal class WebApi
     /// <param name="savePath"></param>
     /// <param name="topFolderName"></param>
     /// <returns></returns>
-    async Task<bool> RequestDownByAria2(List<FilesInfo> videoInfoList, string ua, string savePath, string topFolderName = null)
+    async Task<bool> RequestDownByAria2(List<FileInfo> videoInfoList, string ua, string savePath, string topFolderName = null)
     {
         var aria2Settings = AppSettings.Aria2Settings;
 
@@ -1161,7 +1154,7 @@ internal class WebApi
         return await GetAllFilesTraverseAndDownByAria2(videoInfoList, aria2Settings.ApiUrl, aria2Settings.Password, savePath, ua);
     }
 
-    public async Task<bool> GetAllFilesTraverseAndDownByAria2(List<FilesInfo> videoInfoList, string apiUrl, string password, string savePath, string ua)
+    public async Task<bool> GetAllFilesTraverseAndDownByAria2(List<FileInfo> videoInfoList, string apiUrl, string password, string savePath, string ua)
     {
         var success = true;
 
@@ -1281,7 +1274,7 @@ internal class WebApi
         return success;
     }
 
-    private async Task<bool> pushOneFileDownRequestToBitComet(HttpClient client, string baseUrl, FilesInfo datum, string ua, string savePath)
+    private async Task<bool> pushOneFileDownRequestToBitComet(HttpClient client, string baseUrl, FileInfo datum, string ua, string savePath)
     {
         var urlList = await GetDownUrl(datum.PickCode, ua);
 
@@ -1297,7 +1290,7 @@ internal class WebApi
             ua);
     }
 
-    public async void GetAllFilesTraverseAndDownByBitComet(HttpClient client, string baseUrl, FilesInfo datum, string ua, string savePath)
+    public async void GetAllFilesTraverseAndDownByBitComet(HttpClient client, string baseUrl, FileInfo datum, string ua, string savePath)
     {
         //获取该文件夹下的文件和文件夹
         var webFileInfo = await GetFileAsync(datum.CurrentId, loadAll: true);
@@ -1506,7 +1499,7 @@ internal class WebApi
             var downUrlInfo = DownHistoryDao.FindByPickCodeAndUa(pickCode, ua);
 
             //检查链接是否失效
-            if (downUrlInfo != null && tm - downUrlInfo.AddTime < AppSettings.DownUrlOverdueTime)
+            if (downUrlInfo != null && tm - downUrlInfo.UpdateTime.Millisecond < AppSettings.DownUrlOverdueTime)
             {
                 downUrlList.Add(downUrlInfo.FileName, downUrlInfo.TrueUrl);
                 return downUrlList;
@@ -1599,7 +1592,7 @@ internal class WebApi
 
             var strUrl = lineList[i + 1];
             var doubleSecond = Convert.ToDouble(re.Groups[1].Value);
-            m3U8Info.TsInfoList.Add(new tsInfo() { Second = doubleSecond, Url = strUrl });
+            m3U8Info.TsInfoList.Add(new TsInfo { Second = doubleSecond, Url = strUrl });
         }
 
         return m3U8Info;
@@ -1613,7 +1606,7 @@ internal class WebApi
         string strResult;
         try
         {
-            strResult = await Client.GetStringAsync($"https://v.anxia.com/site/api/video/m3u8/{pickCode}.m3u8");
+            strResult = await Client.GetStringAsync($"https://115vod.com/site/api/video/m3u8/{pickCode}.m3u8");
         }
         catch (Exception ex)
         {
@@ -1639,7 +1632,7 @@ internal class WebApi
         // 检查账号是否异常
         if (m3U8Infos.Count == 0 && strResult.Contains(Constants.Account.AccountAnomalyTip))
         {
-            var window = CreateWindowToVerifyAccount();
+            var window = CreateWindowToVerifyAccount(pickCode);
 
             if (window.Content is not VerifyAccountPage page) return m3U8Infos;
 
@@ -1677,7 +1670,7 @@ internal class WebApi
     }
 
 
-    public static Window CreateWindowToVerifyAccount() => VerifyAccountPage.CreateVerifyAccountWindow();
+    public static Window CreateWindowToVerifyAccount(string pickCode = null) => VerifyAccountPage.CreateVerifyAccountWindow(pickCode);
 
 
     /// <summary>
@@ -1719,7 +1712,7 @@ internal class WebApi
         //播放路径检查选择
         if (string.IsNullOrEmpty(savePath))
         {
-            var dialog = new ContentDialog()
+            var dialog = new ContentDialog
             {
                 XamlRoot = xamlRoot,
                 Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,

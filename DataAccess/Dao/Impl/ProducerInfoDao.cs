@@ -1,9 +1,9 @@
-﻿using DataAccess.Dao.Interface;
-using DataAccess.Models.Entity;
-
-namespace DataAccess.Dao.Impl;
-
-public class ProducerInfoDao : DaoImpl<ProducerInfo>, IProducerInfoDao
-{
-
-}
+﻿// using DataAccess.Dao.Interface;
+// using DataAccess.Models.Entity;
+//
+// namespace DataAccess.Dao.Impl;
+//
+// public class ProducerInfoDao : DaoImpl<ProducerInfo>, IProducerInfoDao
+// {
+//
+// }
