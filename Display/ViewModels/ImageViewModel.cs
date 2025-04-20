@@ -11,7 +11,9 @@ using System.IO;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.Media;
+using Display.Models.Dto.OneOneFive;
 using Display.Models.Vo.OneOneFive;
 
 namespace Display.ViewModels;
@@ -92,7 +94,7 @@ internal partial class ImageViewModel : ObservableObject
         await CurrentPhotoModel.LoadThumbnailFromInternetAsync(progress);
 
         Loading = false;
-        if (CurrentPhotoModel.FullImage is not null) IsEnableDownButton = true;
+        if (CurrentPhotoModel.Thumbnail is not null) IsEnableDownButton = true;
     }
 
     [RelayCommand]

@@ -1,20 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Models.Entity;
 
-/// <summary>
-/// 演员名称
-/// 演员id - 名称，一对多
-/// </summary>
-public class ActorName(string name)
+[PrimaryKey(nameof(Id), nameof(Name))]
+[Table("Actor_Names")]
+public class ActorName
 {
     [Key]
+    [Column("id")]
     public long Id { get; init; }
-    
-    [Column("actor_id")]
-    public long ActorInfoId { get; init; }
 
-    [StringLength(10)]
-    public string Name { get; init; } = name;
+    [Key]
+    [StringLength(20)]
+    [Column("Name")]
+    public string Name { get; init; } = null!;
 }

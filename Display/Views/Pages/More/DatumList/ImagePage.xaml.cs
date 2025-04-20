@@ -57,7 +57,7 @@ internal sealed partial class ImagePage
     private async void MyViewerOnSelectionChanged(object sender, int newValue)
     {
         await ViewModel.PreparePhotoCommand.ExecuteAsync(newValue);
-        await ImageViewer.ChangedImage(newValue);
+        ImageViewer.ChangedImage(newValue);
     }
 
     private void ClearImageClick(object sender, RoutedEventArgs e)

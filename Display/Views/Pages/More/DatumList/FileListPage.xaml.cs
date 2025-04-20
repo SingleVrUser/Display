@@ -23,7 +23,6 @@ using Display.Models.Vo.OneOneFive;
 using Display.Providers;
 using Display.ViewModels;
 using Display.Views.Pages.More.Import115DataToLocalDataAccess;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Text;
@@ -69,7 +68,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
     private bool _isLoading = true;
 
-    private readonly IFileInfoDao _filesInfoDao = App.GetService<IFileInfoDao>();
+    private readonly IFilesInfoDao _filesInfoDao = App.GetService<IFilesInfoDao>();
     
 
     /// <summary>
@@ -766,7 +765,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (result != ContentDialogResult.Primary) return;
 
-        _filesInfoDao.ExecuteDeleteAll();
+        _filesInfoDao.Delete();
     }
 
     private async void DownButton_Click(object sender, RoutedEventArgs e)
@@ -794,13 +793,13 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         if (BaseExample.SelectedItems.FirstOrDefault() is not DetailFileInfo) return;
 
-        List<FileInfo> videoInfos = [];
+        List<FilesInfo> videoInfos = [];
 
         foreach (var item in BaseExample.SelectedItems)
         {
             if (item is not DetailFileInfo fileInfo) continue;
 
-            FileInfo datum = new()
+            FilesInfo datum = new()
             {
                 CurrentId = fileInfo.Cid,
                 Name = fileInfo.Name,
@@ -955,14 +954,7 @@ public sealed partial class FileListPage : INotifyPropertyChanged
 
         // 更新UI
         // 新建文件夹
-        FilesInfos.Insert(0, new DetailFileInfo(new FileInfo
-        {
-            CurrentId = makeDirResult.Cid,
-            Name = makeDirResult.Cname,
-            ParentId = LastExplorerItem.Id,
-            TimeEdit = (int)DateTimeOffset.Now.ToUnixTimeSeconds(),
-            PickCode = string.Empty
-        }));
+        FilesInfos.Insert(0, new DetailFileInfo(new FilesInfo { CurrentId = makeDirResult.Cid, Name = makeDirResult.Cname, ParentId = LastExplorerItem.Id, TimeEdit = (int)DateTimeOffset.Now.ToUnixTimeSeconds() }));
 
         // 删除文件
         TryRemoveFilesInExplorer(fileInfos);

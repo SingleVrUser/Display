@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -10,7 +9,9 @@ using DataAccess.Models.Entity;
 using Display.Helper.Network;
 using Display.Models.Dto.Media;
 using Display.Models.Enums;
+using Display.Models.Enums.OneOneFive;
 using Display.Models.Vo;
+using Display.Models.Vo.IncrementalCollection;
 using Display.Models.Vo.OneOneFive;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -19,8 +20,15 @@ namespace Display.Views.Pages.SpiderVideoInfo;
 
 public sealed partial class MainPage : INotifyPropertyChanged
 {
-    private FileInfo _selectedDatum;
-    public FileInfo SelectedDatum
+    private IncrementalLoadFailSpiderInfoCollection _failList;
+    private IncrementalLoadFailSpiderInfoCollection FailList
+    {
+        get => _failList;
+        set => SetField(ref _failList, value);
+    }
+
+    private FilesInfo _selectedDatum;
+    public FilesInfo SelectedDatum
     {
         get => _selectedDatum;
         private set => SetField(ref _selectedDatum, value);
@@ -44,6 +52,35 @@ public sealed partial class MainPage : INotifyPropertyChanged
         {
             SpiderFromLocalData();
         }
+        //从失败列表中搜刮（带匹配名称）
+        else
+        {
+            SpiderFromFailList();
+        }
+    }
+
+    /// <summary>
+    /// 从失败列表中搜刮（带匹配名称）
+    /// </summary>
+    private void SpiderFromFailList()
+    {
+        if (FailList == null || FailList.Count == 0)
+        {
+            ShowTeachingTip("当前没有需要搜刮的内容");
+            return;
+        }
+
+        var failDatumList = FailList.Where(item => !string.IsNullOrEmpty(item.MatchName)).ToList();
+
+        if (failDatumList.Count == 0)
+        {
+            ShowTeachingTip("未填写任何番号，请填写后继续");
+            return;
+        }
+
+        //创建进度窗口
+        var page = new Progress(failDatumList);
+        page.CreateWindow();
     }
 
     private void ShowTeachingTip(string content)
@@ -73,10 +110,10 @@ public sealed partial class MainPage : INotifyPropertyChanged
         page.CreateWindow();
     }
 
-    private Tuple<List<string>, List<FileInfo>> GetCurrentSelectedFolder()
+    private Tuple<List<string>, List<FilesInfo>> GetCurrentSelectedFolder()
     {
         List<string> selectFilesNameList = [];
-        List<FileInfo> datumList = [];
+        List<FilesInfo> datumList = [];
         foreach (var node in Explorer.FolderTreeView.SelectedNodes)
         {
             if (node.Content is not ExplorerItem explorer) continue;
@@ -90,7 +127,7 @@ public sealed partial class MainPage : INotifyPropertyChanged
             datumList.AddRange(items);
         }
 
-        return new Tuple<List<string>, List<FileInfo>>(selectFilesNameList, datumList);
+        return new Tuple<List<string>, List<FilesInfo>>(selectFilesNameList, datumList);
     }
 
     /// <summary>
@@ -120,6 +157,21 @@ public sealed partial class MainPage : INotifyPropertyChanged
         SelectedDatum = content.Datum;
     }
     
+    /// <summary>
+    /// 点击失败列表显示文件信息
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    /// <exception cref="NotImplementedException"></exception>
+    private void FailListView_OnItemClick(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is not FailDatum failDatum) return;
+
+        FileInfoShowGrid.Visibility = Visibility.Visible;
+        
+        SelectedDatum = failDatum.Datum;
+    }
+
     private void FailTypeComboBoxChanged(object sender, SelectionChangedEventArgs e)
     {
         if (e.AddedItems.FirstOrDefault() is not ComboBoxItem comboBoxItem) return;
@@ -129,7 +181,33 @@ public sealed partial class MainPage : INotifyPropertyChanged
 
     private void ChangedFailListType(ComboBoxItem comboBoxItem)
     {
-        Debug.WriteLine("切换");
+        if (FailListView.ItemsSource == null)
+        {
+            FailList = [];
+        }
+        else if (FailList.Count != 0)
+        {
+            FailList.Clear();
+        }
+
+        switch (comboBoxItem.Name)
+        {
+            //正则匹配失败
+            case nameof(ShowMatchFailComboBoxItem):
+                FailList.SetShowType(FailType.MatchFail);
+                FailList.LoadData();
+                break;
+            //搜刮失败
+            case nameof(ShowSpiderFailComboBoxItem):
+                FailList.SetShowType(FailType.SpiderFail);
+                FailList.LoadData();
+                break;
+            //所有
+            default:
+                FailList.SetShowType(FailType.All);
+                FailList.LoadData();
+                break;
+        }
     }
 
     private void ShowData_RadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)

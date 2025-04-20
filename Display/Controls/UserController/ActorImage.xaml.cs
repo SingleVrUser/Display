@@ -6,6 +6,8 @@ using Microsoft.UI.Xaml.Input;
 using System;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
+using Display.Models.Entities.OneOneFive;
+using Display.Views.Pages;
 
 namespace Display.Controls.UserController;
 
@@ -28,7 +30,7 @@ public sealed partial class ActorImage
         if (string.IsNullOrEmpty(actorInfo.Name)) return;
 
         //是否喜欢
-        if (actorInfo.Interest?.IsLike == true)
+        if (actorInfo.IsLike == 1)
         {
             LikeFontIcon.Visibility = Visibility.Visible;
         }
@@ -73,7 +75,7 @@ public sealed partial class ActorImage
 
     private void LikeMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
     {
-        var isLike = false;
+        var isLike = 0;
 
         //通过当前状态判断将要设置的值
         switch (LikeFontIcon.Visibility)
@@ -83,38 +85,33 @@ public sealed partial class ActorImage
                 break;
             case Visibility.Collapsed:
                 LikeFontIcon.Visibility = Visibility.Visible;
-                isLike = true;
+                isLike = 1;
                 break;
         }
-
-        ActorInfo.Interest ??= new ActorInterest();
-        ActorInfo.Interest.IsLike = isLike;
         
-        _actorInfoDao.ExecuteUpdate(ActorInfo);
+        _actorInfoDao.ExecuteUpdate(i => i.Id == ActorInfo.Id,
+            i => i.IsLike = isLike);
     }
 
     private async void GetInfoMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
     {
         GetActorInfoProgressRing.Visibility = Visibility.Visible;
 
-        // TODO 右击演员头像获取演员信息，视图响应
-        
-        // var newInfo = await ActorsPage.UpdateActorInfo(ActorInfo);
-        //
-        // if (newInfo == null)
-        // {
-        //     GetActorInfoProgressRing.Visibility = Visibility.Collapsed;
-        //     return;
-        // }
-        //
-        // //更新头像
-        // if (!string.IsNullOrEmpty(newInfo.ProfilePath))
-        // {
-        //     ActorInfo.ProfilePath = newInfo.ProfilePath;
-        // }
-        //
-        // //更新年龄
-        // TryShowActorAge(newInfo.Birthday);
+        var newInfo = await ActorsPage.UpdateActorInfo(ActorInfo);
+        if (newInfo == null)
+        {
+            GetActorInfoProgressRing.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        //更新头像
+        if (!string.IsNullOrEmpty(newInfo.ProfilePath))
+        {
+            ActorInfo.ProfilePath = newInfo.ProfilePath;
+        }
+
+        //更新年龄
+        TryShowActorAge(newInfo.Birthday);
 
         GetActorInfoProgressRing.Visibility = Visibility.Collapsed;
     }

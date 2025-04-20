@@ -25,11 +25,7 @@
         </MenuFlyout>
     </UserControl.Resources>
 
-    <Grid x:Name="RootGrid"
-          DataContext="{x:Bind ShowText.Text,Mode=OneWay}"
-          Height="180" Width="120" Margin="5" CornerRadius="5" BorderBrush="AliceBlue" BorderThickness="1"
-          Tapped="Grid_Tapped"
-          ContextFlyout="{StaticResource LikeMenuFlyout}">
+    <Grid x:Name="RootGrid" DataContext="{x:Bind ShowText.Text,Mode=OneWay}" Height="180" Width="120" Margin="5" CornerRadius="5" BorderBrush="AliceBlue" BorderThickness="1" Tapped="Grid_Tapped">
         
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>

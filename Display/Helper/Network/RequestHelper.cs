@@ -9,7 +9,7 @@ namespace Display.Helper.Network;
 
 internal static class RequestHelper
 {
-    public static async Task<Tuple<string, string>> RequestHtml(HttpClient client, string url, CancellationToken token, int maxRequestCount = 2)
+    public static async Task<Tuple<string, string>> RequestHtml(HttpClient client, string url, CancellationToken token, int maxRequestCount = 3)
     {
         // 访问
         var strResult = string.Empty;

@@ -14,7 +14,7 @@
                   ItemsSource="{x:Bind _pickCodeInfoList}"
                   IsItemClickEnabled="True">
             <ListView.ItemTemplate>
-                <DataTemplate x:DataType="entity:FileInfo">
+                <DataTemplate x:DataType="entity:FilesInfo">
                     <Grid RowDefinitions="auto,auto" ColumnDefinitions="*,auto" RowSpacing="5" Padding="5">
                         <TextBlock Text="{x:Bind Name}"
                                    TextWrapping="Wrap" />

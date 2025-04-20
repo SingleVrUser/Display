@@ -8,7 +8,6 @@ using Windows.ApplicationModel;
 using DataAccess.Models.Entity;
 using Display.Models.Api.OneOneFive.Search;
 using Display.Models.Enums;
-using FileInfo = DataAccess.Models.Entity.FileInfo;
 
 namespace Display.Models.Vo.OneOneFive;
 
@@ -17,7 +16,7 @@ namespace Display.Models.Vo.OneOneFive;
 /// </summary>
 public class DetailFileInfo : INotifyPropertyChanged
 {
-    public readonly FileInfo Datum;
+    public readonly FilesInfo Datum;
     public readonly long Id;
     public readonly bool NoId;
     public readonly long Cid;
@@ -124,7 +123,7 @@ public class DetailFileInfo : INotifyPropertyChanged
         IconPath = GetPathFromIcon(Ico);
 
     }
-    public DetailFileInfo(FileInfo data)
+    public DetailFileInfo(FilesInfo data)
     {
         Datum = data;
         Name = data.Name;
@@ -139,11 +138,10 @@ public class DetailFileInfo : INotifyPropertyChanged
             PickCode = data.PickCode;
             IconPath = Constants.FileType.FolderSvgPath;
         }
-        // 文件
-        else if (data.FileId != null)
+        else if (data.FileId != default)
         {
             Type = FileType.File;
-            Id = data.FileId.Value;
+            Id = data.FileId;
             Cid = data.CurrentId;
             PickCode = data.PickCode;
             Size = data.Size;

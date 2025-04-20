@@ -132,12 +132,7 @@ public sealed partial class SelectedFolderPage
             var makeDirResult = await WebApi.GlobalWebApi.RequestMakeDir(currentFolder.Id, NewCreateFolderTextBox.Text);
             if (makeDirResult == null) return;
 
-            _folderInfos.Insert(0, new DetailFileInfo(new FileInfo
-            {
-                CurrentId = makeDirResult.Cid,
-                Name = makeDirResult.Cname,
-                PickCode = string.Empty
-            }));
+            _folderInfos.Insert(0, new DetailFileInfo(new FilesInfo { CurrentId = makeDirResult.Cid, Name = makeDirResult.Cname }));
         }
 
         CreateNewFolderGrid.Visibility = Visibility.Collapsed;

@@ -8,8 +8,9 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using DataAccess.Models.Dto;
+using DataAccess.Models.Entity;
 using Display.Helper.Notifications;
+using Display.Models.Entities.OneOneFive;
 using Display.Models.Spider;
 
 namespace Display.Providers.Spider;
@@ -65,7 +66,7 @@ public class JavDb : BaseSpider
             });
     }
 
-    public override async Task<VideoInfoDto> GetInfoByCid(string cid, CancellationToken token)
+    public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
     {
         var isUseCookie = cid.Contains("FC");
 
@@ -94,7 +95,7 @@ public class JavDb : BaseSpider
 
             Toast.TryToast("javDB", "Cookie失效");
             return null;
-        }
+        };
 
         var htmlString = tuple.Item2;
         if (string.IsNullOrEmpty(htmlString)) return null;
@@ -105,7 +106,7 @@ public class JavDb : BaseSpider
         return await GetInfoByHtmlDoc(cid, detailUrl, htmlDoc);
     }
 
-    public override async Task<VideoInfoDto> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
+    public override async Task<VideoInfo> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
     {
         var videoMetaPanelNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='video-meta-panel']");
 
@@ -131,10 +132,9 @@ public class JavDb : BaseSpider
                 return null;
         }
 
-        var videoInfo = new VideoInfoDto
+        var videoInfo = new VideoInfo
         {
-            Name = cid,
-            SourceUrl = detailUrl
+            Url = detailUrl
         };
 
         Uri uri = new(detailUrl);
@@ -149,6 +149,7 @@ public class JavDb : BaseSpider
 
         var attributeNodes = videoMetaPanelNode.SelectNodes(".//div[contains(@class,'panel-block')]");
 
+        videoInfo.TrueName = cid;
         //信息
         foreach (var currentNode in attributeNodes)
         {
@@ -168,26 +169,26 @@ public class JavDb : BaseSpider
             }
             else if (key.Contains("導演"))
             {
-                videoInfo.DirectorName = valueNode.InnerText;
+                videoInfo.Director = valueNode.InnerText;
             }
             else if (key.Contains("片商") || key.Contains("賣家"))
             {
-                videoInfo.ProducerName = valueNode.InnerText;
+                videoInfo.Producer = valueNode.InnerText;
             }
             else if (key.Contains("發行"))
             {
-                videoInfo.PublisherName = valueNode.InnerText;
+                videoInfo.Publisher = valueNode.InnerText;
             }
             else if (key.Contains("系列"))
             {
-                videoInfo.SeriesName = valueNode.InnerText;
+                videoInfo.Series = valueNode.InnerText;
             }
             else if (key.Contains("類別"))
             {
                 var categoryNodes = valueNode.SelectNodes("a");
                 List<string> categoryList = [];
                 categoryList.AddRange(categoryNodes.Select(node => node.InnerText));
-                videoInfo.CategoryList = categoryList;
+                videoInfo.Category = string.Join(",", categoryList);
             }
             else if (key.Contains("演員"))
             {
@@ -206,14 +207,14 @@ public class JavDb : BaseSpider
 
                     actorList.Add($"{actorNode.InnerText.Trim()}{genderNode.InnerText}");
                 }
-                videoInfo.ActorNameList = actorList;
+                videoInfo.Actor = string.Join(",", actorList);
             }
         }
 
         //标题
         var titleNode = htmlDoc.DocumentNode.SelectSingleNode(".//strong[@class='current-title']");
         var title = titleNode.InnerText;
-        videoInfo.Title = title.Replace(videoInfo.Name, "").Trim();
+        videoInfo.Title = title.Replace(videoInfo.TrueName, "").Trim();
 
         //下载封面
         var savePath = AppSettings.ImageSavePath;
@@ -238,7 +239,7 @@ public class JavDb : BaseSpider
             }
             sampleUrlList.Add(sampleImageUrl);
         }
-        videoInfo.SampleImageList = sampleUrlList;
+        videoInfo.SampleImageList = string.Join(",", sampleUrlList);
 
         return videoInfo;
     }

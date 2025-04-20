@@ -1,14 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Models.Entity;
 
-/// <summary>
-/// 搜索历史
-/// </summary>
-[Table("search_histories")]
-public class SearchHistory : BaseEntity
+[Table("SearchHistory")]
+[Index(nameof(Keyword), IsUnique = true)]
+public class SearchHistory
 {
-    [StringLength(20)] // 会被Fluent API替代
-    public required string Keyword { get; init; }
+    [Key]
+    [Column("id")]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; init; }
+
+    [Column("keyword", TypeName = "TEXT NO")]
+    public string? Keyword { get; init; }
 }

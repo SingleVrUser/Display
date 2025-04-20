@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Corporation and Contributors.
+// Licensed under the MIT License.
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -10,7 +13,6 @@ using Windows.Media.Playback;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.Controls;
 using DataAccess.Dao.Interface;
-using DataAccess.Models.Dto;
 using DataAccess.Models.Entity;
 using Display.Helper.FileProperties.Name;
 using Display.Helper.Network;
@@ -31,7 +33,6 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SharpCompress;
 using Display.Models.Vo;
-using VideoCoverVo = Display.Models.Vo.Video.VideoCoverVo;
 
 namespace Display.Views.Pages.More.DatumList.VideoDisplay;
 
@@ -55,7 +56,6 @@ public sealed partial class MainPage : IDisposable
     private bool _isDisposing;
 
     private readonly IVideoInfoDao _videoInfoDao = App.GetService<IVideoInfoDao>();
-    private readonly IFileInfoDao _fileInfoDao = App.GetService<IFileInfoDao>();
 
     //private string currentPickCode
 
@@ -456,11 +456,11 @@ public sealed partial class MainPage : IDisposable
         var spiderManager = App.GetService<SpiderManager>();
 
         //搜刮
-        foreach (var fileInfo in filesInfos)
+        foreach (var video in filesInfos)
         {
             if (_isDisposing) return;
 
-            var name = fileInfo.Name;
+            var name = video.Name;
             var trueName = FileMatch.MatchName(name);
             if (trueName == null)
             {
@@ -471,17 +471,20 @@ public sealed partial class MainPage : IDisposable
             Debug.WriteLine("正在添加信息：" + trueName);
 
             // cidInfo已经存在
-            var cidInfo = _cidInfos.FirstOrDefault(item => item.VideoCoverVo.Name.ToUpper().Equals(trueName.ToUpper()));
+            var cidInfo = _cidInfos.FirstOrDefault(item => item.VideoInfoVo.TrueName.ToUpper().Equals(trueName.ToUpper()));
             if (cidInfo is not null)
             {
                 _cidInfos.Add(cidInfo);
                 continue;
             }
 
-            VideoInfo videoInfo = _videoInfoDao.getOneByFileId(fileInfo.Id);
-            
-            if (videoInfo != null)
+            var result = DataAccessLocal.Get.GetOneTrueNameByName(trueName);
+            //数据库中有
+            if (!string.IsNullOrEmpty(result))
             {
+                //使用第一个符合条件的Name
+                var videoInfo = _videoInfoDao.GetOneByTrueName(result);
+
                 _cidInfos.Add(new CidInfo(videoInfo));
             }
             //网络中查询
@@ -495,16 +498,17 @@ public sealed partial class MainPage : IDisposable
                 FindCidInfoProgressRing.Visibility = Visibility.Visible;
 
                 // 直接使用await spiderManager.DispatchSpiderInfoByCidInOrder会阻塞UI线程
-                var videoInfoDto = await Task.Run(async () =>
+                var videoInfo = await Task.Run(async () =>
                     await spiderManager.DispatchSpiderInfoByCidInOrder(trueName, info.CancellationTokenSource.Token));
 
                 FindCidInfoProgressRing.Visibility = Visibility.Collapsed;
 
-                if (videoInfoDto == null || info.CancellationTokenSource.Token.IsCancellationRequested) continue;
+                if (videoInfo == null || info.CancellationTokenSource.Token.IsCancellationRequested) continue;
 
-                info.UpdateInfo(videoInfoDto);
+                info.UpdateInfo(videoInfo);
             }
         }
+
 
         VideoPlayListView.IsEnabled = true;
     }
@@ -632,7 +636,7 @@ public sealed partial class MainPage : IDisposable
     {
         //移除cid信息（预览图/信息）
         var removeCid = _cidInfos.FirstOrDefault(item =>
-            item.VideoCoverVo.Name == detailFileInfo.Name || item.VideoCoverVo.Name.Equals(FileMatch.MatchName(detailFileInfo.Name)?.ToUpper(), StringComparison.CurrentCultureIgnoreCase));
+            item.VideoInfoVo.TrueName == detailFileInfo.Name || item.VideoInfoVo.TrueName.Equals(FileMatch.MatchName(detailFileInfo.Name)?.ToUpper(), StringComparison.CurrentCultureIgnoreCase));
 
         if (removeCid == null) return;
 
@@ -755,7 +759,7 @@ public sealed partial class MainPage : IDisposable
 
         SmokeGrid.Visibility = Visibility.Visible;
 
-        EnlargeImage.Source = new BitmapImage(new Uri(cidInfo.VideoCoverVo.ImagePath));
+        EnlargeImage.Source = new BitmapImage(new Uri(cidInfo.VideoInfoVo.ImagePath));
     }
 
     private void EnlargeButton_PointerExited(object sender, PointerRoutedEventArgs e)
@@ -866,6 +870,8 @@ public sealed partial class MainPage : IDisposable
         _currentSelectedInfo = null;
 
         Debug.WriteLine("即将从115中删除" + info.Name);
+
+
 
         var needDeleted = await TryDeletedFileFrom115(info);
         if (!needDeleted)
@@ -1073,26 +1079,26 @@ public sealed partial class MainPage : IDisposable
 
 public class CidInfo
 {
-    public VideoCoverVo VideoCoverVo;
+    public VideoInfoVo VideoInfoVo;
 
     public CidInfo(string name, string imagePath)
     {
-        VideoCoverVo = new VideoCoverVo { Name = name, ImagePath = imagePath };
+        VideoInfoVo = new VideoInfoVo { TrueName = name, ImagePath = imagePath };
     }
 
     public CidInfo(VideoInfo info)
     {
-        VideoCoverVo = new VideoCoverVo(info);
+        VideoInfoVo = new VideoInfoVo(info);
     }
 
-    public void UpdateInfo(VideoInfoDto info)
+    public void UpdateInfo(VideoInfo info)
     {
         Debug.WriteLine(info.ImagePath);
         
-        VideoCoverVo.Name = info.Name;
-        VideoCoverVo.ImagePath = info.ImagePath ?? Constants.FileType.NoPicturePath;
-        VideoCoverVo.ReleaseTime = info.ReleaseTime;
-        VideoCoverVo.ActorName = info.ActorNameList != null ? info.ActorNameList[0] : string.Empty;
+        VideoInfoVo.TrueName = info.TrueName;
+        VideoInfoVo.ImagePath = info.ImagePath;
+        VideoInfoVo.ReleaseTime = info.ReleaseTime;
+        VideoInfoVo.Actor = info.Actor;
     }
 
     public CancellationTokenSource CancellationTokenSource { get; set; } = new();

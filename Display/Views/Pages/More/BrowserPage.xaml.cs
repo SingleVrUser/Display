@@ -10,7 +10,7 @@ using Microsoft.Web.WebView2.Core;
 
 namespace Display.Views.Pages.More;
 
-public sealed partial class BrowserPage: Page
+public sealed partial class BrowserPage
 {
     public BrowserPage(Window window, string url = "https://115.com/?cid=0&offset=0&mode=wangpan", bool isShowButton = false)
     {
@@ -67,14 +67,8 @@ public sealed partial class BrowserPage: Page
         {
             _webApi ??= WebApi.GlobalWebApi;
 
-            List<FileInfo> videoInfoList = [];
-            videoInfoList.AddRange(selectedItemList.Select(item => new FileInfo
-            {
-                CurrentId = item.Id,
-                Name = item.Name,
-                PickCode = item.PickCode,
-                FileId = item.FileId
-            }));
+            List<FilesInfo> videoInfoList = [];
+            videoInfoList.AddRange(selectedItemList.Select(item => new FilesInfo { CurrentId = item.Id, Name = item.Name, PickCode = item.PickCode, FileId = item.FileId }));
 
             //BitComet只需要cid,n,pc三个值
             var isSuccess = await _webApi.RequestDown(videoInfoList, downtype);

@@ -7,7 +7,6 @@
              xmlns:userController="using:Display.Controls.UserController"
              xmlns:dto="using:Display.Models.Dto"
              xmlns:entity="using:DataAccess.Models.Entity"
-             xmlns:vo="using:Display.Models.Vo"
              mc:Ignorable="d">
 
     <UserControl.Resources>
@@ -21,7 +20,7 @@
             <userController:ItemsContainerStyleSelector x:Key="AutoSuggestionBoxItemsContainerStyleSelector"
                                                NoPointerOverStyle="{StaticResource NoPointerOverListViewItemStyle}"/>
             <DataTemplate x:Key="FoundedSuggestionBox"
-                          x:DataType="vo:SearchHistoryVo">
+                          x:DataType="entity:VideoInfo">
                 <Grid Margin="5"
                       ColumnSpacing="5"
                       Tapped="ItemTapped"
@@ -38,9 +37,9 @@
                                x:Name="Cover_image" />
                     </Border>
                     <StackPanel Grid.Column="1">
-                        <TextBlock Text="{x:Bind Name}"
-                                   TextTrimming="CharacterEllipsis"/>
-                        <TextBlock Text="{x:Bind ActorName}"
+                        <TextBlock Text="{x:Bind TrueName}"
+                                   TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{x:Bind Actor}"
                                    TextTrimming="WordEllipsis"
                                    FontWeight="Normal" />
                         <TextBlock Text="{x:Bind Category}"

@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:helper="using:Display.Helper.FileProperties.Name"
       xmlns:animations="using:CommunityToolkit.WinUI.Animations"
       xmlns:oldControls="using:CommunityToolkit.WinUI.UI.Controls"
       xmlns:entity="using:DataAccess.Models.Entity"
@@ -150,7 +151,7 @@
                                   FontSize="30"
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Top"
-                                  Visibility="{x:Bind Interest.IsLike,Mode=OneWay}" />
+                                  Visibility="{x:Bind helper:FileMatch.IsShowLikeIcon(IsLike),Mode=OneWay}" />
 
                         <RelativePanel Grid.Row="1">
                             <TextBlock Text="{x:Bind Name}"
@@ -158,15 +159,12 @@
                                        IsTextSelectionEnabled="True"
                                        TextWrapping="Wrap"
                                        FontFamily="霞鹜文楷" />
-                            
-                            <!-- TODO 当前演员参演的视频数量 -->
-                            
-                            <!-- <TextBlock Text="{x:Bind VideoCount}" -->
-                            <!--            RelativePanel.AlignRightWithPanel="True" -->
-                            <!--            RelativePanel.AlignBottomWithPanel="True" -->
-                            <!--            FontFamily="JetBrains Mono" -->
-                            <!--            FontSize="10" -->
-                            <!--            Opacity="0.4" /> -->
+                            <TextBlock Text="{x:Bind VideoCount}"
+                                       RelativePanel.AlignRightWithPanel="True"
+                                       RelativePanel.AlignBottomWithPanel="True"
+                                       FontFamily="JetBrains Mono"
+                                       FontSize="10"
+                                       Opacity="0.4" />
                         </RelativePanel>
                     </Grid>
                 </DataTemplate>

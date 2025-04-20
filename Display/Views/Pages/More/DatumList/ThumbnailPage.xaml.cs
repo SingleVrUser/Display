@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using CommunityToolkit.WinUI.UI.Controls;
-using Display.Controls.UserController;
+using Display.Models.Api.OneOneFive.File;
+using Display.Models.Dto.OneOneFive;
 using Display.Models.Vo.OneOneFive;
 using Display.ViewModels;
 using Microsoft.UI.Xaml;
@@ -28,8 +25,6 @@ public sealed partial class ThumbnailPage : Page
     {
         InitializeComponent();
 
-        this.NavigationCacheMode = NavigationCacheMode.Disabled;
-
         _viewModel = App.GetService<ThumbnailViewModel>();
     }
 
@@ -51,14 +46,6 @@ public sealed partial class ThumbnailPage : Page
         });
     }
 
-    protected override void OnNavigatedFrom(NavigationEventArgs e)
-    {
-        base.OnNavigatedFrom(e);
-        _viewModel.ClearDataCommand.Execute(null);
-        _viewModel.ThumbnailList.CollectionChanged -= ThumbnailList_CollectionChanged;
-        ImageViewer.SelectionChanged -= ImageViewer_SelectionChanged;
-    }
-
     private void ThumbnailList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.Action != NotifyCollectionChangedAction.Remove) return;
@@ -70,24 +57,13 @@ public sealed partial class ThumbnailPage : Page
         }
         else
         {
-            //if (e.OldItems[0] is GroupThumbnailCollection removeCollection)
-            //{
-            //    var _viewModel.ThumbnailList.IndexOf(removeCollection);
-            //}
-            int count = 0;
-            for(int i = 0; i <  e.OldStartingIndex && i < _viewModel.ThumbnailList.Count - 1; i ++)
-            {
-                var item = _viewModel.ThumbnailList[i];
-                count += item.Count;
-            }
-
-            ImageViewer.SelectedIndex = Math.Max(0, count);
+            ImageViewer.SelectedIndex = 0;
         }
     }
 
     private void ImageViewer_SelectionChanged(object sender, int e)
     {
-        var _ = ImageViewer.ChangedImage(e);
+        ImageViewer.ChangedImage(e);
         _viewModel.SetCurrentItem(ThumbnailsCvs.View.CurrentItem);
     }
 
@@ -122,7 +98,6 @@ public sealed partial class ThumbnailPage : Page
 
     private async void DeleteItemClicked(object sender, RoutedEventArgs e)
     {
-
         //115删除
         var dialog = new ContentDialog
         {
@@ -141,10 +116,5 @@ public sealed partial class ThumbnailPage : Page
         {
             _viewModel.DeleteCommand.Execute(null);
         }
-    }
-
-    private void LocationImageClicked(object sender, RoutedEventArgs e)
-    {
-        adaptiveGridView.ScrollIntoView(ImageViewer.CurrentItemSource, ScrollIntoViewAlignment.Leading);
     }
 }

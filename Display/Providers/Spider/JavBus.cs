@@ -5,9 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DataAccess.Models.Dto;
+using DataAccess.Models.Entity;
 using Display.Helper.Network;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
 using Display.Models.Spider;
+using Display.Models.Vo;
 using HttpClient = System.Net.Http.HttpClient;
 
 namespace Display.Providers.Spider;
@@ -39,7 +42,7 @@ public class JavBus : BaseSpider
                 { "user-agent", DbNetworkHelper.DownUserAgent }
             });
 
-    public override async Task<VideoInfoDto> GetInfoByCid(string cid, CancellationToken token)
+    public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
     {
         var splitCid = cid.Split("-");
         if (splitCid.Length != 2) return null;
@@ -65,8 +68,7 @@ public class JavBus : BaseSpider
 
         return await GetInfoByHtmlDoc(cid, detailUrl, htmlDoc);
     }
-
-    public override async Task<VideoInfoDto> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
+    public override async Task<VideoInfo> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
     {
         //搜索封面
         var imageUrlNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@class='col-md-9 screencap']//a//img");
@@ -81,10 +83,10 @@ public class JavBus : BaseSpider
             imageUrl = NetworkHelper.UrlCombine(javBusUrl, imageUrl);
         }
 
-        var videoInfo = new VideoInfoDto
+        var videoInfo = new VideoInfo
         {
-            SourceUrl = detailUrl,
-            Name = cid
+            Url = detailUrl,
+            TrueName = cid
         };
 
         //标题
@@ -98,10 +100,10 @@ public class JavBus : BaseSpider
             switch (activeNavbarNode.InnerText)
             {
                 case "有碼":
-                    videoInfo.IsWm = false;
+                    videoInfo.IsWm = 0;
                     break;
                 case "無碼":
-                    videoInfo.IsWm = true;
+                    videoInfo.IsWm = 1;
                     break;
             }
         }
@@ -122,22 +124,22 @@ public class JavBus : BaseSpider
                     videoInfo.LengthTime = attributeNode.LastChild.InnerText.Trim().Replace("分鐘", "分钟");
                     break;
                 case "導演:":
-                    videoInfo.DirectorName = attributeNode.LastChild.InnerText.Trim();
+                    videoInfo.Director = attributeNode.LastChild.InnerText.Trim();
                     break;
                 case "製作商:":
-                    videoInfo.ProducerName = attributeNode.SelectSingleNode(".//a").InnerText.Trim();
+                    videoInfo.Producer = attributeNode.SelectSingleNode(".//a").InnerText.Trim();
                     break;
                 case "發行商:":
-                    videoInfo.PublisherName = attributeNode.SelectSingleNode(".//a").InnerText.Trim();
+                    videoInfo.Publisher = attributeNode.SelectSingleNode(".//a").InnerText.Trim();
                     break;
                 case "系列:":
-                    videoInfo.SeriesName = attributeNode.SelectSingleNode(".//a").InnerText.Trim();
+                    videoInfo.Series = attributeNode.SelectSingleNode(".//a").InnerText.Trim();
                     break;
                 case "類別:":
                     {
                         var categoryNodes = attributeNodes[i + 1].SelectNodes(".//span/label");
                         var categoryList = categoryNodes.Select(node => node.InnerText).ToList();
-                        videoInfo.CategoryList = categoryList;
+                        videoInfo.Category = string.Join(",", categoryList);
                         break;
                     }
                 case "演員" when i >= attributeNodes.Count - 1:
@@ -146,7 +148,7 @@ public class JavBus : BaseSpider
                     {
                         var actorNodes = attributeNodes[i + 1].SelectNodes(".//span/a");
                         var actorList = actorNodes.Select(node => node.InnerText).ToList();
-                        videoInfo.ActorNameList = actorList;
+                        videoInfo.Actor = string.Join(",", actorList);
                         break;
                     }
             }
@@ -175,7 +177,7 @@ public class JavBus : BaseSpider
             }
             sampleUrlList.Add(sampleImageUrl);
         }
-        videoInfo.SampleImageList = sampleUrlList;
+        videoInfo.SampleImageList = string.Join(",", sampleUrlList);
 
         return videoInfo;
     }
