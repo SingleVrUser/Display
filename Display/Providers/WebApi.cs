@@ -1606,7 +1606,7 @@ internal class WebApi
         string strResult;
         try
         {
-            strResult = await Client.GetStringAsync($"https://v.anxia.com/site/api/video/m3u8/{pickCode}.m3u8");
+            strResult = await Client.GetStringAsync($"https://115vod.com/site/api/video/m3u8/{pickCode}.m3u8");
         }
         catch (Exception ex)
         {
@@ -1632,7 +1632,7 @@ internal class WebApi
         // 检查账号是否异常
         if (m3U8Infos.Count == 0 && strResult.Contains(Constants.Account.AccountAnomalyTip))
         {
-            var window = CreateWindowToVerifyAccount();
+            var window = CreateWindowToVerifyAccount(pickCode);
 
             if (window.Content is not VerifyAccountPage page) return m3U8Infos;
 
@@ -1670,7 +1670,7 @@ internal class WebApi
     }
 
 
-    public static Window CreateWindowToVerifyAccount() => VerifyAccountPage.CreateVerifyAccountWindow();
+    public static Window CreateWindowToVerifyAccount(string pickCode = null) => VerifyAccountPage.CreateVerifyAccountWindow(pickCode);
 
 
     /// <summary>

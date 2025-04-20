@@ -71,8 +71,19 @@
                 <MenuFlyout>
                     <MenuFlyoutItem Text="从115中删除该文件"
                                     Click="DeleteItemClicked">
+                        <MenuFlyoutItem.KeyboardAccelerators>
+                            <KeyboardAccelerator Modifiers="Control"  Key="D"/>
+                        </MenuFlyoutItem.KeyboardAccelerators>
                         <MenuFlyoutItem.Icon>
                             <FontIcon Glyph="&#xE107;" />
+                        </MenuFlyoutItem.Icon>
+                    </MenuFlyoutItem>
+                    <MenuFlyoutItem Text="定位" Click="LocationImageClicked">
+                        <MenuFlyoutItem.KeyboardAccelerators>
+                            <KeyboardAccelerator Key="P"/>
+                        </MenuFlyoutItem.KeyboardAccelerators>
+                        <MenuFlyoutItem.Icon>
+                            <FontIcon Glyph="&#xE81D;" />
                         </MenuFlyoutItem.Icon>
                     </MenuFlyoutItem>
                 </MenuFlyout>
@@ -121,14 +132,14 @@
                            Grid.Column="1"
                            Text="{x:Bind _viewModel.CurrentThumbnailItem.TimeStamp,Converter={StaticResource TimeStampToStringConverter}, Mode=OneWay}" />
             </Grid>
-            <oldControls:AdaptiveGridView Grid.Row="1"
+            <oldControls:AdaptiveGridView x:Name="adaptiveGridView" Grid.Row="1"
                                          StretchContentForSingleRow="False"
                                          ItemsSource="{x:Bind ThumbnailsCvs.View}"
                                          SelectedIndex="{x:Bind ImageViewer.SelectedIndex, Mode=TwoWay}"
                                          ItemHeight="68"
                                          DesiredWidth="90"
-                                         HorizontalContentAlignment="Center">
-
+                                         HorizontalContentAlignment="Center"
+>
                 <oldControls:AdaptiveGridView.Header>
                     <RelativePanel>
                         <TextBlock Text="预览列表"
@@ -154,10 +165,13 @@
 
                     <DataTemplate x:DataType="media1:LocalThumbnail">
 
-                        <Image x:Name="ActorImage"
-                               Height="60"
-                               Source="{x:Bind Thumbnail}">
+                        <Image Height="60">
+                            <Image.Source>
+                                <BitmapImage UriSource="{x:Bind Path}"
+                                                 DecodePixelHeight="60" />
+                            </Image.Source>
                         </Image>
+                        
                         <!--<oldControls:ImageEx Source="{x:Bind Thumbnail}"
                                              Height="60" />-->
                     </DataTemplate>

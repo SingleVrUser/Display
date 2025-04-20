@@ -867,8 +867,6 @@ public sealed partial class MainPage : IDisposable
 
         Debug.WriteLine("即将从115中删除" + info.Name);
 
-
-
         var needDeleted = await TryDeletedFileFrom115(info);
         if (!needDeleted)
         {

@@ -64,7 +64,7 @@
                       VerticalScrollMode="Enabled"
                       HorizontalScrollBarVisibility="Visible">
 
-            <Image x:Name="ShowImage" />
+            <Image x:Name="ShowImage"/>
         </ScrollViewer>
 
         <!--提示框-->
