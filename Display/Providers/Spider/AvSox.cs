@@ -4,7 +4,6 @@ using HtmlAgilityPack;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using DataAccess.Models.Dto;
 using DataAccess.Models.Entity;
 
 namespace Display.Providers.Spider;
@@ -28,7 +27,7 @@ public class AvSox : BaseSpider
         get => AppSettings.AvSoxBaseUrl;
         set => AppSettings.AvSoxBaseUrl = value;
     }
-    public override async Task<VideoInfoDto> GetInfoByCid(string cid, CancellationToken token)
+    public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
     {
         var detailUrl = await GetDetailUrlFromCid(cid, token);
 
@@ -142,12 +141,12 @@ public class AvSox : BaseSpider
 
     }
 
-    public override async Task<VideoInfoDto> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
+    public override async Task<VideoInfo> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
     {
         var info = await Common.AnalysisHtmlDocInfoFromAvSoxOrAvMoo(cid, detailUrl, htmlDoc);
         if (info == null) return null;
 
-        info.IsWm = true;
+        info.IsWm = 1;
         return info;
     }
 }

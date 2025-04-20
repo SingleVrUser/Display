@@ -13,9 +13,6 @@ namespace Display.Models.Vo.IncrementalCollection;
 
 public class IncrementalLoadActorInfoCollection : ObservableCollection<ActorInfo>, ISupportIncrementalLoading
 {
-    
-    private readonly IActorInfoDao actorInfoDao = App.GetService<IActorInfoDao>();
-    
     public bool HasMoreItems { get; set; } = true;
 
     public int AllCount { get; private set; }
@@ -37,11 +34,8 @@ public class IncrementalLoadActorInfoCollection : ObservableCollection<ActorInfo
     {
         System.Diagnostics.Debug.WriteLine($"加载{offset}-{offset + limit} 中……");
 
-        var actorInfos = actorInfoDao.List(offset, limit);
-
-        // var actorInfos = await DataAccessLocal.Get.GetActorInfoAsync(limit, offset, OrderByList, FilterList);
-        
-        if (actorInfos.Count == 0)
+        var actorInfos = await DataAccessLocal.Get.GetActorInfoAsync(limit, offset, OrderByList, FilterList);
+        if (actorInfos == null)
         {
             HasMoreItems = false;
             return 0;
@@ -49,20 +43,20 @@ public class IncrementalLoadActorInfoCollection : ObservableCollection<ActorInfo
 
         if (Count == 0)
         {
-            AllCount = actorInfoDao.TotalCount();
+            AllCount = await DataAccessLocal.Get.GetCountOfActorInfoAsync(FilterList);
             System.Diagnostics.Debug.WriteLine($"总数量:{AllCount}");
-        
+
             System.Diagnostics.Debug.WriteLine($"HasMoreItems:{HasMoreItems}");
         }
 
         actorInfos.ForEach(Add);
 
-        if (AllCount > Count) return actorInfos.Count;
+        if (AllCount > Count) return actorInfos.Length;
 
         HasMoreItems = false;
         System.Diagnostics.Debug.WriteLine("记载完毕");
 
-        return actorInfos.Count;
+        return actorInfos.Length;
     }
 
     public void SetFilter(List<string> filterList)

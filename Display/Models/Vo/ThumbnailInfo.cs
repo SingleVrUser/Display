@@ -11,11 +11,16 @@ public sealed class ThumbnailInfo : INotifyPropertyChanged
 {
     public ThumbnailInfo(VideoInfo videoInfo)
     {
-        Name = videoInfo.Name;
+        Name = videoInfo.TrueName;
 
-        if (videoInfo.SampleImages != null)
-            ThumbnailDownUrlList = videoInfo.SampleImages.Split(',').ToArray();
+        if (videoInfo.SampleImageList != null)
+            ThumbnailDownUrlList = videoInfo.SampleImageList.Split(',').ToArray();
+
+        IsVr = (videoInfo.Category != null && videoInfo.Category.Contains("VR")) ||
+               (videoInfo.Series != null && videoInfo.Series.Contains("VR"));
     }
+
+    public readonly bool IsVr;
 
     public string Name { get; set; }
     public int Count;

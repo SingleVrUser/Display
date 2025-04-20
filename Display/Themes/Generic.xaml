@@ -2662,8 +2662,9 @@
                                 <VisualState x:Name="NoFullWindowState" />
                                 <VisualState x:Name="FullWindowState">
                                     <VisualState.Setters>
-                                        <Setter Target="ScreenFotIcon.Glyph"
-                                                Value="&#xE73F;" />
+                                        <Setter Target="FullWindowSymbol.Symbol"
+                                                Value="BackToWindow" />
+
                                         <Setter Target="TitleTextBlock.Visibility"
                                                 Value="Visible" />
                                     </VisualState.Setters>
@@ -3115,8 +3116,8 @@
                                                                      Key="F" />
                                             </AppBarButton.KeyboardAccelerators>
                                             <AppBarButton.Icon>
-                                                <FontIcon x:Name="ScreenFotIcon"
-                                                          Glyph="&#xE740;" />
+                                                <SymbolIcon x:Name="FullWindowSymbol"
+                                                            Symbol="FullScreen" />
                                             </AppBarButton.Icon>
                                         </AppBarButton>
                                     </StackPanel>

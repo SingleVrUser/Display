@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using DataAccess.Models.Entity;
 using Display.Managers;
-using Display.Models.Vo.Video;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -13,13 +12,15 @@ public sealed partial class FindInfoAgainSmoke
 
     private string CidName { get; }
 
-    private readonly ObservableCollection<VideoSearchVo> _searchResultList = [];
+    private readonly ObservableCollection<VideoInfo> _searchResultList = [];
 
-    private readonly VideoSearchVo _videoSearchVo;
+    private readonly VideoInfo _videoInfo;
 
     public FindInfoAgainSmoke(string cidName)
     {
         InitializeComponent();
+
+        _videoInfo = new VideoInfo();
 
         CidName = cidName;
 
@@ -41,7 +42,7 @@ public sealed partial class FindInfoAgainSmoke
         if (infos.Count > 0)
         {
             _searchResultList.Clear();
-            infos.ForEach(i => _searchResultList.Add(new VideoSearchVo(i)));
+            infos.ForEach(_searchResultList.Add);
         }
 
         ReCheckProgressRing.Visibility = Visibility.Collapsed;
@@ -111,8 +112,8 @@ public sealed partial class FindInfoAgainSmoke
             var name = item.Name;
             var value = item.GetValue(info);
 
-            var newItem = _videoSearchVo.GetType().GetProperty(name);
-            newItem?.SetValue(_videoSearchVo, value);
+            var newItem = _videoInfo.GetType().GetProperty(name);
+            newItem?.SetValue(_videoInfo, value);
         }
 
         ConfirmSpecificUrlButton.IsEnabled = true;
@@ -122,10 +123,10 @@ public sealed partial class FindInfoAgainSmoke
     private void ConfirmSpecificUrlButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not Button button) return;
-        if (_videoSearchVo == null) return;
+        if (_videoInfo == null) return;
 
         //修改一下
-        button.DataContext = _videoSearchVo;
+        button.DataContext = _videoInfo;
 
         ConfirmClick?.Invoke(button, e);
     }

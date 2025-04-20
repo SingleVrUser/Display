@@ -1,29 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
-using System.Threading.Tasks;
 using Windows.Foundation;
 using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using Display.Helper.Network;
 using Display.Models.Dto.Media;
-using Display.Models.Vo.OneOneFive;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Vo;
 using Display.Providers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
-using Display.Models.Vo.Video;
 
 namespace Display.Views.Pages;
 
 public sealed partial class DetailInfoPage
 {
-    public VideoDetailVo VideoDetailVo;
+    public VideoInfoVo DetailInfo;
 
-    private readonly IFileInfoDao _filesInfoDao = App.GetService<IFileInfoDao>();
-    private readonly IVideoInfoDao _videoInfoDao = App.GetService<IVideoInfoDao>();
+    private readonly IFilesInfoDao _filesInfoDao = App.GetService<IFilesInfoDao>();
 
     public DetailInfoPage()
     {
@@ -52,27 +51,13 @@ public sealed partial class DetailInfoPage
         //    VideoDetailsControl.StartListCover_GridTapped();
         //}
 
-        VideoInfo videoInfo;
-        switch (e.Parameter)
+
+        DetailInfo = e.Parameter switch
         {
-            case VideoCoverVo detailInfo:
-            {
-                videoInfo = _videoInfoDao.GetForDetailById(detailInfo.Id);
-                break;
-            }
-            case long videoId:
-                videoInfo = _videoInfoDao.GetForDetailById(videoId);
-                break;
-            case VideoInfo info:
-                videoInfo = info;
-                break;
-            default:
-                return;
-        }
-
-        if (videoInfo == null) return;
-
-        VideoDetailVo = new VideoDetailVo(videoInfo);
+            VideoInfoVo detailInfo => detailInfo,
+            VideoInfo videoInfo => new VideoInfoVo(videoInfo),
+            _ => DetailInfo
+        };
     }
 
     // Create connected animation back to collection page.
@@ -91,7 +76,7 @@ public sealed partial class DetailInfoPage
                 //例：不存在Image中Source指向的图片文件
                 if (VideoDetailsControl.CoverImage.DesiredSize == new Size(0, 0)) return;
 
-                var animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("BackConnectedAnimation", VideoDetailsControl.CoverImage);
+                ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("BackConnectedAnimation", VideoDetailsControl.CoverImage);
                 //返回动画应迅速
                 animation.Configuration = new DirectConnectedAnimationConfiguration();
             }
@@ -150,9 +135,31 @@ public sealed partial class DetailInfoPage
     /// <param name="e"></param>
     private async void VideoPlay_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button) return;
+        if (sender is not Button videoPlayButton)
+            return;
 
-        await PlayVideo(VideoDetailVo.Id);
+        var trueName = DetailInfo.TrueName;
+        var videoInfoList = DataAccessLocal.Get.GetSingleFileInfoByTrueName(trueName);
+
+        //没有该数据
+        if (videoInfoList == null || videoInfoList.Count == 0)
+        {
+            videoPlayButton.Flyout = new Flyout
+            {
+                Content = new TextBlock { Text = "经查询，本地数据库无该文件，请导入后继续" }
+            };
+        }
+        //一集
+        else if (videoInfoList.Count == 1)
+        {
+            var mediaPlayItem = new MediaPlayItem(videoInfoList[0]);
+            await PlayVideoHelper.PlayVideo(new Collection<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, lastPage: this);
+        }
+        //有多集
+        else
+        {
+            PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, this.XamlRoot);
+        }
     }
 
 
@@ -163,7 +170,7 @@ public sealed partial class DetailInfoPage
     /// <param name="e"></param>
     private async void Delete_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new ContentDialog
+        ContentDialog dialog = new ContentDialog()
         {
             XamlRoot = XamlRoot,
             Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
@@ -181,17 +188,16 @@ public sealed partial class DetailInfoPage
         if (sender is not AppBarButton) return;
         
         //从数据库中删除
-        _filesInfoDao.ExecuteRemoveById(VideoDetailVo.Id);
+        _filesInfoDao.ExecuteRemoveByTrueName(DetailInfo.TrueName);
 
         //删除存储的文件夹
-        var savePath = Path.Combine(AppSettings.ImageSavePath, VideoDetailVo.Name);
+        var savePath = Path.Combine(AppSettings.ImageSavePath, DetailInfo.TrueName);
         if (Directory.Exists(savePath))
         {
             Directory.Delete(savePath, true);
         }
 
-        //// TODO 删除文件后，视图发生相应改变
-        //VideoDetailVo.IsDeleted = Visibility.Visible;
+        DetailInfo.IsDeleted = Visibility.Visible;
 
         if (Frame.CanGoBack)
         {
@@ -204,15 +210,11 @@ public sealed partial class DetailInfoPage
     {
         if (sender is not Grid) return;
 
-        await PlayVideo(VideoDetailVo.Id);
-    }
-
-    private async Task PlayVideo(long videoInfoId)
-    {
-        var fileInfoList = _filesInfoDao.GetFileInfoListByVideoInfoId(videoInfoId);
+        var name = DetailInfo.TrueName;
+        var videoInfoList = DataAccessLocal.Get.GetSingleFileInfoByTrueName(name);
 
         //没有该数据
-        if (fileInfoList.Count == 0)
+        if (videoInfoList.Count == 0)
         {
             ContentDialog dialog = new()
             {
@@ -226,17 +228,17 @@ public sealed partial class DetailInfoPage
             await dialog.ShowAsync();
         }
         //一集
-        else if (fileInfoList.Count == 1)
+        else if (videoInfoList.Count == 1)
         {
 
-            var mediaPlayItem = new MediaPlayItem(new DetailFileInfo(fileInfoList[0]));
-            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, XamlRoot, lastPage: this);
+            var mediaPlayItem = new MediaPlayItem(videoInfoList[0]);
+            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem>() { mediaPlayItem }, this.XamlRoot, lastPage: this);
         }
 
         //有多集
         else
         {
-            PlayVideoHelper.ShowSelectedVideoToPlayPage(fileInfoList, XamlRoot);
+            PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, this.XamlRoot);
         }
     }
 }

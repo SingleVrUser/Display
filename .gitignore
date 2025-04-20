@@ -364,8 +364,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/DisplayAppTest/GetFilesTest.cs
-/DisplayAppTest/UserInfo.cs
+/Tests/Tests.csproj
+/Tests/GetFilesTest.cs
+/Tests/Constant.cs
+/Tests/UserInfo.cs
 /Display/Display_TemporaryKey.pfx
-
-.idea

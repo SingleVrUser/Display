@@ -6,8 +6,12 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using DataAccess.Models.Dto;
+using DataAccess.Models.Entity;
 using Display.Helper.Network;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
+using Display.Providers.Downloader;
 
 namespace Display.Providers.Spider;
 
@@ -94,12 +98,12 @@ public class Common
         return true;
     }
 
-    public static async Task<VideoInfoDto> AnalysisHtmlDocInfoFromAvSoxOrAvMoo(string cid, string detailUrl, HtmlDocument htmlDoc)
+    public static async Task<VideoInfo> AnalysisHtmlDocInfoFromAvSoxOrAvMoo(string cid, string detailUrl, HtmlDocument htmlDoc)
     {
-        VideoInfoDto videoInfo = new()
+        VideoInfo videoInfo = new()
         {
-            Name = cid,
-            SourceUrl = detailUrl
+            TrueName = cid,
+            Url = detailUrl
         };
 
         //封面图
@@ -208,19 +212,19 @@ public class Common
                     videoInfo.LengthTime = info.Value;
                     break;
                 case "导演":
-                    videoInfo.DirectorName = info.Value;
+                    videoInfo.Director = info.Value;
                     break;
                 case "制作商":
-                    videoInfo.ProducerName = info.Value;
+                    videoInfo.Producer = info.Value;
                     break;
                 case "发行商":
-                    videoInfo.PublisherName = info.Value;
+                    videoInfo.Publisher = info.Value;
                     break;
                 case "系列":
-                    videoInfo.SeriesName = info.Value;
+                    videoInfo.Series = info.Value;
                     break;
                 case "类别":
-                    videoInfo.CategoryList = info.Value.Split(",").ToList();
+                    videoInfo.Category = info.Value;
                     break;
             }
         }
@@ -228,7 +232,7 @@ public class Common
         //演员
         var actorNodes = htmlDoc.DocumentNode.SelectNodes("//div[@id='avatar-waterfall']/a[@class='avatar-box']/span");
         if (actorNodes != null)
-            videoInfo.ActorNameList = actorNodes.Select(item => item.InnerText.Trim()).ToList();
+            videoInfo.Actor = string.Join(",", actorNodes.Select(item => item.InnerText.Trim()).ToList());
 
         //样品图片
         var sampleUrlList = new List<string>();
@@ -238,13 +242,12 @@ public class Common
         {
             sampleUrlList.AddRange(sampleNodes.Select(sampleNode => sampleNode.GetAttributeValue("href", string.Empty)));
 
-            videoInfo.SampleImageList = sampleUrlList;
+            videoInfo.SampleImageList = string.Join(",", sampleUrlList);
         }
 
         //下载图片
         var filePath = Path.Combine(AppSettings.ImageSavePath, cid);
         videoInfo.ImageUrl = coverUrl;
-        
         videoInfo.ImagePath = await DbNetworkHelper.DownloadFile(coverUrl, filePath, cid);
 
         return videoInfo;

@@ -11,7 +11,7 @@ public abstract partial class BaseImage : ObservableObject
 {
     public string? Path { get; set; }
 
-    public BitmapImage? FullImage;
+    public BitmapImage? Thumbnail;
 
     [ObservableProperty]
     private string? _dimensions;
@@ -20,21 +20,14 @@ public abstract partial class BaseImage : ObservableObject
     {
         Path = path;
 
-        FullImage = await getImage(path);
-        Dimensions = $"{FullImage.PixelWidth} x {FullImage.PixelHeight}";
-    }
-
-    private static async Task<BitmapImage> getImage(string path, int? decodePixelHeight = null)
-    {
-        var bitmapImage = decodePixelHeight == null ? new BitmapImage(): new BitmapImage()
+        Thumbnail = new BitmapImage
         {
-            DecodePixelHeight = (int)decodePixelHeight
+            DecodePixelHeight = 60
         };
-
         var imageFile = await StorageFile.GetFileFromPathAsync(path);
         using var fileStream = await imageFile.OpenAsync(FileAccessMode.Read);
-        await bitmapImage.SetSourceAsync(fileStream);
+        await Thumbnail.SetSourceAsync(fileStream);
 
-        return bitmapImage;
+        Dimensions = $"{Thumbnail.PixelWidth} x {Thumbnail.PixelHeight}";
     }
 }

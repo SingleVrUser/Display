@@ -5,7 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DataAccess.Models.Dto;
+using DataAccess.Models.Entity;
+using Display.Models.Dto.OneOneFive;
+using Display.Models.Entities.OneOneFive;
+using Display.Models.Vo;
+using Display.Providers.Downloader;
 
 namespace Display.Providers.Spider;
 
@@ -26,7 +30,7 @@ public class LibreDmm : BaseSpider
         get => AppSettings.LibreDmmBaseUrl;
         set => AppSettings.LibreDmmBaseUrl = value;
     }
-    public override async Task<VideoInfoDto> GetInfoByCid(string cid, CancellationToken token)
+    public override async Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token)
     {
         var url = NetworkHelper.UrlCombine(BaseUrl, $"movies/{cid}");
 
@@ -42,7 +46,7 @@ public class LibreDmm : BaseSpider
         return await GetInfoByHtmlDoc(cid, detailUrl, htmlDoc);
     }
 
-    public override async Task<VideoInfoDto> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
+    public override async Task<VideoInfo> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc)
     {
         //搜索封面
         string imageUrl = null;
@@ -52,12 +56,12 @@ public class LibreDmm : BaseSpider
             imageUrl = imageUrlNode.Attributes["src"].Value;
         }
 
-        var videoInfo = new VideoInfoDto
+        var videoInfo = new VideoInfo
         {
-            SourceUrl = detailUrl,
-            Name = cid,
+            Url = detailUrl,
+            TrueName = cid,
             //dmm肯定没有步兵
-            IsWm = false
+            IsWm = 0
         };
 
         var titleNode = htmlDoc.DocumentNode.SelectSingleNode("//h1");
@@ -77,17 +81,17 @@ public class LibreDmm : BaseSpider
                     videoInfo.ReleaseTime = valueNodes[i].InnerText.Trim();
                     break;
                 case "Directors":
-                    videoInfo.DirectorName = valueNodes[i].InnerText.Trim();
+                    videoInfo.Director = valueNodes[i].InnerText.Trim();
                     break;
                 case "Genres":
                     var genresNodes = valueNodes[i].SelectNodes("ul/li");
-                    videoInfo.CategoryList = genresNodes.Select(x => x.InnerText.Trim()).ToList();
+                    videoInfo.Category = string.Join(",", genresNodes.Select(x => x.InnerText.Trim()));
                     break;
                 case "Labels":
-                    videoInfo.SeriesName = valueNodes[i].InnerText.Trim();
+                    videoInfo.Series = valueNodes[i].InnerText.Trim();
                     break;
                 case "Makers":
-                    videoInfo.ProducerName = valueNodes[i].InnerText.Trim();
+                    videoInfo.Producer = valueNodes[i].InnerText.Trim();
                     break;
                 case "Volume":
                     videoInfo.LengthTime = valueNodes[i].InnerText.Trim().Replace(" minutes", "分钟");
@@ -100,7 +104,7 @@ public class LibreDmm : BaseSpider
 
         if (actressesNodes != null)
         {
-            videoInfo.ActorNameList = actressesNodes.Select(x => x.InnerText.Trim()).ToList();
+            videoInfo.Actor = string.Join(",", actressesNodes.Select(x => x.InnerText.Trim()));
         }
 
         //下载封面

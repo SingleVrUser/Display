@@ -12,24 +12,24 @@ namespace Display.Views.Pages.DetailInfo;
 
 public sealed partial class FileInfoInCidSmoke
 {
-    private static readonly IFileInfoDao FilesInfoDao = App.GetService<IFileInfoDao>();
-
-    private readonly long _videoInfoId;
+    private static readonly IFilesInfoDao FilesInfoDao = App.GetService<IFilesInfoDao>();
     
-    public FileInfoInCidSmoke(long videoInfoId)
+    private readonly string _trueName;
+
+    public FileInfoInCidSmoke(string trueName)
     {
         InitializeComponent();
 
-        _videoInfoId = videoInfoId;
+        _trueName = trueName;
 
         Loaded += PageLoad;
     }
 
-    private void PageLoad(object sender, RoutedEventArgs e)
+    private async void PageLoad(object sender, RoutedEventArgs e)
     {
-        var fileInfoList = FilesInfoDao.GetFileInfoListByVideoInfoId(_videoInfoId);
-        
-        InfosListView.ItemsSource = fileInfoList;
+        var videoInfos = DataAccessLocal.Get.GetFilesInfoByTrueName(_trueName);
+
+        InfosListView.ItemsSource = videoInfos;
     }
 
     private static string GetFolderString(long folderCid)
@@ -42,14 +42,14 @@ public sealed partial class FileInfoInCidSmoke
 
     private void OpenCurrentFolderItem_OnClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem { DataContext: FileInfo info }) return;
+        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
 
         CommonWindow.CreateAndShowWindow(new FileListPage(info.CurrentId));
     }
 
     private async void DeleteItem_OnClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuFlyoutItem { DataContext: FileInfo info }) return;
+        if (sender is not MenuFlyoutItem { DataContext: FilesInfo info }) return;
 
         if (info.FileId == null) return;
 

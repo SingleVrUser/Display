@@ -75,6 +75,30 @@
                                      PlayVideoClick="Explorer_OnPlayVideoClick"
                                      PlayWithPlayerClick="Explorer_OnPlayWithPlayerClick"/>
 
+            <!--失败列表-->
+            <Grid
+                Visibility="{x:Bind MatchFailItem.IsSelected,Mode=OneWay}">
+                <ListView x:Name="FailListView"
+                          ItemClick="FailListView_OnItemClick"
+                          IsItemClickEnabled="True"
+                          SelectionMode="None"
+                          ItemsSource="{x:Bind FailList,Mode=OneWay}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="vo:FailDatum">
+                            <Grid>
+
+                                <TextBlock Text="{x:Bind Datum.Name}" />
+
+                                <TextBox PlaceholderText="番号"
+                                         HorizontalAlignment="Right"
+                                         MinWidth="300"
+                                         Text="{x:Bind MatchName,Mode=TwoWay}" />
+
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
         </Grid>
 
         <!--文件信息查看-->
@@ -377,13 +401,13 @@
                        HorizontalAlignment="Right"
                        Margin="0,0,20,0">
                 
-                    <Run Text="xx" />
+                    <Run Text="{x:Bind FailList.Count,Mode=OneWay}" />
                     <Run Text="/"
                          Foreground="DarkGray"
                          FontSize="12" />
                     <Run  Foreground="DarkGray"
                           FontSize="12"
-                          Text="xx" />
+                          Text="{x:Bind FailList.AllCount,Mode=OneWay}" />
             </TextBlock>
 
 

@@ -20,8 +20,10 @@
     <Grid RowDefinitions="50,*">
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
-            <ColumnDefinition x:Name="InfoColumnDefinition"
-                              MinWidth="0" MaxWidth="700"
+
+            <ColumnDefinition
+                MinWidth="0"
+                              MaxWidth="700"
                               Width="0" />
         </Grid.ColumnDefinitions>
 
@@ -71,19 +73,8 @@
                 <MenuFlyout>
                     <MenuFlyoutItem Text="从115中删除该文件"
                                     Click="DeleteItemClicked">
-                        <MenuFlyoutItem.KeyboardAccelerators>
-                            <KeyboardAccelerator Modifiers="Control"  Key="D"/>
-                        </MenuFlyoutItem.KeyboardAccelerators>
                         <MenuFlyoutItem.Icon>
                             <FontIcon Glyph="&#xE107;" />
-                        </MenuFlyoutItem.Icon>
-                    </MenuFlyoutItem>
-                    <MenuFlyoutItem Text="定位" Click="LocationImageClicked">
-                        <MenuFlyoutItem.KeyboardAccelerators>
-                            <KeyboardAccelerator Key="P"/>
-                        </MenuFlyoutItem.KeyboardAccelerators>
-                        <MenuFlyoutItem.Icon>
-                            <FontIcon Glyph="&#xE81D;" />
                         </MenuFlyoutItem.Icon>
                     </MenuFlyoutItem>
                 </MenuFlyout>
@@ -94,7 +85,7 @@
         <Grid x:Name="InfoGrid"
               Grid.Row="1"
               Grid.Column="1"
-              RowDefinitions="120,*"
+              RowDefinitions="auto,*"
               RowSpacing="10"
               Visibility="Collapsed"
               CornerRadius="10"
@@ -132,14 +123,14 @@
                            Grid.Column="1"
                            Text="{x:Bind _viewModel.CurrentThumbnailItem.TimeStamp,Converter={StaticResource TimeStampToStringConverter}, Mode=OneWay}" />
             </Grid>
-            <oldControls:AdaptiveGridView x:Name="adaptiveGridView" Grid.Row="1"
+            <oldControls:AdaptiveGridView Grid.Row="1"
                                          StretchContentForSingleRow="False"
                                          ItemsSource="{x:Bind ThumbnailsCvs.View}"
                                          SelectedIndex="{x:Bind ImageViewer.SelectedIndex, Mode=TwoWay}"
                                          ItemHeight="68"
                                          DesiredWidth="90"
-                                         HorizontalContentAlignment="Center"
->
+                                         HorizontalContentAlignment="Center">
+
                 <oldControls:AdaptiveGridView.Header>
                     <RelativePanel>
                         <TextBlock Text="预览列表"
@@ -165,13 +156,10 @@
 
                     <DataTemplate x:DataType="media1:LocalThumbnail">
 
-                        <Image Height="60">
-                            <Image.Source>
-                                <BitmapImage UriSource="{x:Bind Path}"
-                                                 DecodePixelHeight="60" />
-                            </Image.Source>
+                        <Image x:Name="ActorImage"
+                               Height="60"
+                               Source="{x:Bind Thumbnail}">
                         </Image>
-                        
                         <!--<oldControls:ImageEx Source="{x:Bind Thumbnail}"
                                              Height="60" />-->
                     </DataTemplate>
@@ -201,8 +189,8 @@
               PointerEntered="TopGrid_PointerEntered"
               PointerExited="TopGrid_PointerExited">
 
-            <RelativePanel x:Name="TopPanel"
-                           Background="{ThemeResource LayerOnMicaBaseAltFillColorDefaultBrush}"
+            <RelativePanel
+                Background="{ThemeResource LayerOnMicaBaseAltFillColorDefaultBrush}"
                            Visibility="Collapsed">
                 <HyperlinkButton x:Name="BackButton"
                                  Margin="8"
@@ -224,8 +212,8 @@
             </RelativePanel>
 
             <RelativePanel>
-                <StackPanel x:Name="MoreButtonStackPanel"
-                            RelativePanel.LeftOf="MoreButton"
+                <StackPanel
+                    RelativePanel.LeftOf="MoreButton"
                             RelativePanel.AlignVerticalCenterWithPanel="True"
                             Spacing="5"
                             Orientation="Horizontal"
@@ -240,7 +228,7 @@
                                  Click="OpenInfoButtonClick"
                                  Margin="10,0"
                                  Visibility="Collapsed">
-                    <SymbolIcon x:Name="MoreSymbolIcon"
+                    <SymbolIcon
                         Symbol="ClosePane" />
                 </HyperlinkButton>
             </RelativePanel>

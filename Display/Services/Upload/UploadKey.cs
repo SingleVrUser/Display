@@ -8,7 +8,7 @@ using Org.BouncyCastle.Security;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("DisplayAppTest")]
+[assembly: InternalsVisibleTo("Tests")]
 namespace Display.Services.Upload;
 
 internal class UploadKey

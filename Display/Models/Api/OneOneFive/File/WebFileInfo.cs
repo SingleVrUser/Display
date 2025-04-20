@@ -6,7 +6,7 @@ namespace Display.Models.Api.OneOneFive.File;
 public class WebFileInfo
 {
     [JsonProperty("data")]
-    public FileInfo[] Data { get; set; }
+    public FilesInfo[] Data { get; set; }
     
     [JsonProperty("path")]
     public WebPath[] Path { get; set; }

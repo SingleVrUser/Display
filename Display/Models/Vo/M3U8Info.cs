@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Display.Models.Dto.OneOneFive;
 
-namespace Display.Models.Vo;
+namespace Display.Models.Dto.OneOneFive;
 
 public class M3U8Info(string name, string bandwidth, string resolution, string url)
 {
@@ -29,6 +28,6 @@ public class M3U8Info(string name, string bandwidth, string resolution, string u
         }
     }
 
-    public List<TsInfo> TsInfoList = [];
+    public List<tsInfo> TsInfoList = [];
 
 }

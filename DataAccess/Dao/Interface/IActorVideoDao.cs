@@ -2,6 +2,6 @@
 
 namespace DataAccess.Dao.Interface;
 
-public interface IActorVideoDao
+public interface IActorVideoDao : IDao<ActorVideo>
 {
 }

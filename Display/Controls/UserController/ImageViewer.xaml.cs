@@ -2,13 +2,9 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using Display.Models.Dto.Media;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Media.Imaging;
-using Windows.Storage;
 using BaseImage = Display.Models.Dto.Media.BaseImage;
 using ScrollViewerViewChangedEventArgs = Microsoft.UI.Xaml.Controls.ScrollViewerViewChangedEventArgs;
 
@@ -33,7 +29,7 @@ public sealed partial class ImageViewer : INotifyPropertyChanged
         set => SetValue(ItemsSourceProperty, value);
     }
 
-    public int TotalCount
+    private int TotalCount
     {
         get
         {
@@ -50,9 +46,7 @@ public sealed partial class ImageViewer : INotifyPropertyChanged
 
     private bool HaveNext => SelectedIndex != TotalCount - 1;
 
-    private BitmapImage _sharedBitmapImage = new();
-
-    public LocalThumbnail CurrentItemSource
+    public BaseImage CurrentItemSource
     {
         get
         {
@@ -60,7 +54,7 @@ public sealed partial class ImageViewer : INotifyPropertyChanged
 
             if (ItemsSource is ICollectionView collectionView)
             {
-                return (LocalThumbnail)collectionView.CurrentItem;
+                return (BaseImage)collectionView.CurrentItem;
             }
 
             if (ItemsSource is not IList list) return null;
@@ -69,7 +63,7 @@ public sealed partial class ImageViewer : INotifyPropertyChanged
             var aObject = list[0];
             if (aObject is BaseImage)
             {
-                return (LocalThumbnail)list[SelectedIndex];
+                return (BaseImage)list[SelectedIndex];
             }
 
             return null;
@@ -104,21 +98,21 @@ public sealed partial class ImageViewer : INotifyPropertyChanged
         this.InitializeComponent();
     }
 
-    public async Task ChangedImage(int index)
+    public void ChangedImage(int index)
     {
         var image = CurrentItemSource;
         if (image is null) return;
 
-        if (image.Path == null) return;
+        if (image.Thumbnail == null) return;
 
-        var imageFile = await StorageFile.GetFileFromPathAsync(image.Path);
-        using var fileStream = await imageFile.OpenAsync(FileAccessMode.Read);
-        await _sharedBitmapImage.SetSourceAsync(fileStream);
-        ShowImage.Source = _sharedBitmapImage;
+        var bitmapImage = image.Thumbnail;
 
-        var height = _sharedBitmapImage.PixelHeight;
-        var width = _sharedBitmapImage.PixelWidth;
+        var height = bitmapImage.PixelHeight;
+        var width = bitmapImage.PixelWidth;
+
         var factor = Math.Min(MyScrollViewer.ViewportHeight / height, MyScrollViewer.ViewportWidth / width);
+
+        ShowImage.Source = bitmapImage;
         MyScrollViewer.ChangeView(null, null, factor > 1 ? 1 : (float)factor);
     }
 
@@ -214,5 +208,4 @@ public sealed partial class ImageViewer : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-
 }
