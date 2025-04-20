@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Display.Providers;
@@ -77,6 +78,14 @@ internal class DbNetworkHelper
                 }
             }
 
+            // cloudflare检测
+            if (!NetworkHelper.CommonClient.DefaultRequestHeaders.Contains("Cookie"))
+            {
+                NetworkHelper.CommonClient.DefaultRequestHeaders.Add("Cookie", "existmag=mag");
+            }
+
+            NetworkHelper.CommonClient.DefaultRequestHeaders.Referrer = new Uri(url);
+
             for (var i = 0; i < maxTryCount; i++)
             {
                 try
@@ -87,9 +96,16 @@ internal class DbNetworkHelper
                     isSuccessDown = true;
                     break;
                 }
+                catch (HttpRequestException ex)
+                {
+                    Debug.WriteLine($"下载文件时发生错误：{url}: {ex.Message}");
+
+                    // 禁止访问，直接停止
+                    if(ex.StatusCode.Equals(HttpStatusCode.Forbidden)) break;
+                }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"下载文件时发生错误：{ex.Message}");
+                    Debug.WriteLine($"下载文件时发生错误：{url}: {ex.Message}");
                 }
             }
         }

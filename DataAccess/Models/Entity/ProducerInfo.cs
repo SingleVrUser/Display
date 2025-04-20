@@ -1,14 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Models.Entity;
 
-[Table("ProducerInfo")]
-public class ProducerInfo
+/// <summary>
+/// 厂商信息
+/// </summary>
+[Table("producer")]
+public class ProducerInfo(string name) : BaseInfoEntity(name)
 {
-    [Key]
-    public string Name { get; set; } = null!;
-
-    [Column("is_wm", TypeName = "is_wm")]
-    public int? IsWm { get; set; }
+    public bool IsWm { get; set; }
 }

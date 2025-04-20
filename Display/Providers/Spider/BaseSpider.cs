@@ -4,8 +4,7 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using DataAccess.Models.Entity;
-using Display.Models.Entities.OneOneFive;
+using DataAccess.Models.Dto;
 using Display.Models.Vo.Spider;
 
 namespace Display.Providers.Spider;
@@ -38,9 +37,9 @@ public abstract class BaseSpider
     public virtual bool OnlyFc2 => false;
     public virtual string Cookie { get; set; }
 
-    public abstract Task<VideoInfo> GetInfoByCid(string cid, CancellationToken token);
+    public abstract Task<VideoInfoDto> GetInfoByCid(string cid, CancellationToken token);
 
-    public abstract Task<VideoInfo> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc);
+    public abstract Task<VideoInfoDto> GetInfoByHtmlDoc(string cid, string detailUrl, HtmlDocument htmlDoc);
 
     public CancellationTokenSource CancellationTokenSource { get; set; }
 

@@ -1,24 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DataAccess.Dao.Interface;
 using DataAccess.Models.Entity;
 using Display.Controls.UserController;
 using Display.Helper.Network;
 using Display.Models.Dto.Media;
 using Display.Models.Vo;
+using Display.Models.Vo.OneOneFive;
 using Display.Providers;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
+using VideoCoverVo = Display.Models.Vo.Video.VideoCoverVo;
 
 namespace Display.Views.Pages;
 
 public sealed partial class VideoCoverPage
 {
     //为返回动画做准备（需启动缓存）
-    private VideoInfoVo _storedItem;
+    private VideoCoverVo _storedItem;
 
+    private readonly IFileInfoDao _fileInfoDao = App.GetService<IFileInfoDao>();
 
     public VideoCoverPage()
     {
@@ -69,9 +73,9 @@ public sealed partial class VideoCoverPage
                 //需要显示的是搜索结果
                 if (item is Tuple<List<string>, string, bool> tuple)
                 {
-                    Tuple<List<string>, string> typesAndName = new(tuple.Item1, tuple.Item2);
+                    // Tuple<List<string>, string> typesAndName = new(tuple.Item1, tuple.Item2);
 
-                    LoadShowInfo(typesAndName, tuple.Item3);
+                    // LoadShowInfo(typesAndName, tuple.Item3);
                 }
                 else
                 {
@@ -101,11 +105,11 @@ public sealed partial class VideoCoverPage
                 throw new ArgumentOutOfRangeException();
         }
     }
-
-    private void LoadShowInfo(Tuple<List<string>, string> typesAndName, bool isFuzzyQueryActor)
-    {
-        VideoControl.ReLoadSearchResult(typesAndName.Item1, typesAndName.Item2, isFuzzyQueryActor);
-    }
+    //
+    // private void LoadShowInfo(Tuple<List<string>, string> typesAndName, bool isFuzzyQueryActor)
+    // {
+    //     VideoControl.ReLoadSearchResult(typesAndName.Item1, typesAndName.Item2, isFuzzyQueryActor);
+    // }
 
     /// <summary>
     /// 选项选中后跳转至详情页
@@ -114,7 +118,7 @@ public sealed partial class VideoCoverPage
     /// <param name="e"></param>
     private void OnClicked(object sender, RoutedEventArgs e)
     {
-        var item = (sender as Button)?.DataContext as VideoInfoVo;
+        var item = (sender as Button)?.DataContext as VideoCoverVo;
 
         //准备动画
         //videoControl.PrepareAnimation(item);
@@ -130,44 +134,46 @@ public sealed partial class VideoCoverPage
     private async void VideoPlay_Click(object sender, RoutedEventArgs e)
     {
         var videoPlayButton = (Button)sender;
-        if (videoPlayButton.DataContext is not VideoInfoVo videoInfo) return;
+        if (videoPlayButton.DataContext is not VideoCoverVo videoInfo) return;
 
-        //播放失败列表
-        if (videoInfo is FailVideoInfo failVideoInfo)
-        {
-            var mediaPlayItem = new MediaPlayItem(failVideoInfo);
-            await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.Fail);
-            return;
-        }
+        // //播放失败列表
+        // if (videoInfo is FailVideoCover failVideoInfo)
+        // {
+        //     var mediaPlayItem = new MediaPlayItem(failVideoInfo);
+        //     await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.Fail);
+        //     return;
+        // }
 
-        var videoInfoList = DataAccessLocal.Get.GetSingleFileInfoByTrueName(videoInfo.TrueName);
+        var fileInfoList = _fileInfoDao.GetFileInfoListByVideoInfoId(videoInfo.Id);
+
 
         _storedItem = videoInfo;
 
-        //没有
-        if (videoInfoList == null || videoInfoList.Count == 0)
+        switch (fileInfoList.Count)
         {
-            videoPlayButton.Flyout = new Flyout()
+            //没有
+            case 0:
+                videoPlayButton.Flyout = new Flyout
+                {
+                    Content = new TextBlock { Text = "经查询，本地数据库无该文件，请导入后继续" }
+                };
+                break;
+            case 1:
             {
-                Content = new TextBlock { Text = "经查询，本地数据库无该文件，请导入后继续" }
-            };
-        }
-        else if (videoInfoList.Count == 1)
-        {
-            var mediaPlayItem = new MediaPlayItem(videoInfoList[0]);
-            await PlayVideoHelper.PlayVideo([mediaPlayItem], XamlRoot, lastPage: this);
-        }
-
-        //有多集
-        else
-        {
-            PlayVideoHelper.ShowSelectedVideoToPlayPage(videoInfoList, XamlRoot);
+                var mediaPlayItem = new MediaPlayItem(fileInfoList[0]);
+                await PlayVideoHelper.PlayVideo([mediaPlayItem], XamlRoot, lastPage: this);
+                break;
+            }
+            //有多集
+            default:
+                PlayVideoHelper.ShowSelectedVideoToPlayPage(fileInfoList, XamlRoot);
+                break;
         }
     }
 
     private async void SingleVideoPlayClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not Grid { DataContext: FilesInfo datum }) return;
+        if (sender is not Grid { DataContext: FileInfo datum }) return;
 
         var mediaPlayItem = new MediaPlayItem(datum);
         await PlayVideoHelper.PlayVideo(new List<MediaPlayItem> { mediaPlayItem }, this.XamlRoot, playType: CustomMediaPlayerElement.PlayType.Fail);

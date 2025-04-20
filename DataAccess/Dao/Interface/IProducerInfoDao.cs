@@ -2,6 +2,6 @@
 
 namespace DataAccess.Dao.Interface;
 
-public interface IProducerInfoDao : IDao<ProducerInfo>
+public interface IProducerInfoDao
 {
 }

@@ -2,7 +2,7 @@
 
 namespace DataAccess.Dao.Interface;
 
-public interface IBwhDao : IDao<Bwh>
+public interface IBwhDao
 {
-    Bwh? GetOne(string content);
+    BwhInfo? GetOne(string content);
 }

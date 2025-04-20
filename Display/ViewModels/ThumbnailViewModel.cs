@@ -10,19 +10,19 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Display.Helper.Network;
-using Display.Models.Api.OneOneFive.File;
 using Display.Models.Dto.Media;
-using Display.Models.Dto.OneOneFive;
 using Display.Models.Vo.OneOneFive;
-using Display.Providers.Downloader;
 using LocalThumbnail = Display.Models.Dto.Media.LocalThumbnail;
+using System.Threading;
 
 namespace Display.ViewModels;
 
 internal partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGeneratorService) : ObservableObject
 {
-    private string _videoUrl;
     private List<DetailFileInfo> _fileInfos;
+
+    private CancellationTokenSource _source = new();
+    private CancellationToken cancellationToken => _source.Token;
 
     [ObservableProperty]
     private bool _loading;
@@ -65,9 +65,17 @@ internal partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGe
     {
         Loading = true;
         var isFirst = true;
-        foreach (var item in ThumbnailList)
+        var list = ThumbnailList.ToArray();
+        for (int i = 0; i < list.Length; i ++)
         {
+            var item = list[i];
+
+            string videoUrl = null;
             // 获取m3u8链接或者下载链接
+
+            Debug.WriteLine($"正在查询视频链接：{item.Title}");
+
+            bool isDownUrl = false;
 
             //转码成功，可以用m3u8
             if (item.HasM3U8)
@@ -76,22 +84,24 @@ internal partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGe
 
                 if (m3U8Infos.Count > 0)
                 {
-                    _videoUrl = m3U8Infos[0].Url;
+                    videoUrl = m3U8Infos[m3U8Infos.Count == 1 ? 0 : m3U8Infos.Count - 2].Url;
                 }
             }
 
-            if (string.IsNullOrEmpty(_videoUrl))
+
+            if (string.IsNullOrEmpty(videoUrl))
             {
+                isDownUrl = true;
                 // 视频未转码，m3u8链接为0，尝试获取直链
                 var downUrlList = await _webApi.GetDownUrl(item.PickCode, DbNetworkHelper.DownUserAgent);
 
                 if (downUrlList.Count > 0)
                 {
-                    _videoUrl = downUrlList.FirstOrDefault().Value;
+                    videoUrl = downUrlList.FirstOrDefault().Value;
                 }
             }
 
-            if (string.IsNullOrEmpty(_videoUrl)) return;
+            if (string.IsNullOrEmpty(videoUrl)) continue;
 
             var thumbnailGenerateOptions = new ThumbnailGenerateOptions
             {
@@ -99,11 +109,11 @@ internal partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGe
                 StringFormat = item.Title + "-{0}",
                 UrlOptions = new UrlOptions
                 {
-                    Url = _videoUrl,
+                    Url = videoUrl,
                     Headers = new Dictionary<string, string>
                     {
                         { "referer", "https://115.com" },
-                        { "user_agent",DbNetworkHelper.DownUserAgent }
+                        { "user_agent", DbNetworkHelper.DownUserAgent }
                     }
                 }
             };
@@ -121,12 +131,29 @@ internal partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGe
             try
             {
                 Debug.WriteLine("开始获取缩略图");
-                await thumbnailGeneratorService.DecodeAllFramesToImages(thumbnailGenerateOptions, progress);
-                Debug.WriteLine("成功获取缩略图");
+                bool needWait = await thumbnailGeneratorService.DecodeAllFramesToImages(thumbnailGenerateOptions, cancellationToken, progress);
+                Debug.WriteLine("成功获取缩略图，进入等待……");
+                if (needWait && i != list.Length - 1)
+                {
+                    if (isDownUrl)
+                    {
+                        await NetworkHelper.RandomTimeDelay(10, 30);
+                    }
+                    else
+                    {
+                        await NetworkHelper.RandomTimeDelay(10, 30);
+                    }
+                }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("ThumbnailViewModel捕获到异常", ex.Message);
+                await NetworkHelper.RandomTimeDelay(30, 60);
+            }
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                break;
             }
         }
 
@@ -138,6 +165,7 @@ internal partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGe
     private void ClearData()
     {
         _fileInfos = null;
+        _source.Cancel();
     }
 
     [RelayCommand]
@@ -154,10 +182,11 @@ internal partial class ThumbnailViewModel(IThumbnailGeneratorService thumbnailGe
 
             // 从115中删除 
             Debug.WriteLine($"删除{CurrentDetailFileItem.Cid}下的{CurrentDetailFileItem.Id}");
-            var deleteResult = CurrentDetailFileItem.Id != null && await WebApi.GlobalWebApi.DeleteFiles(CurrentDetailFileItem.Cid,
-                [(long)CurrentDetailFileItem.Id]);
+            var deleteResult = await WebApi.GlobalWebApi.DeleteFiles(CurrentDetailFileItem.Cid,
+                [CurrentDetailFileItem.Id]);
 
             if (!deleteResult) return;
+
             _fileInfos.RemoveAt(i); // 要在ThumbnailList的Remove之前执行
             ThumbnailList.Remove(collection);  // Remove会触发事件
 

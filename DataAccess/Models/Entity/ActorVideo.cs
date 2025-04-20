@@ -1,19 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Models.Entity;
-
-[PrimaryKey(nameof(ActorId), nameof(VideoName))]
-[Table("Actor_Video")]
+    
+/// <summary>
+/// 演员和视频的中间表
+/// 演员id - 视频id，多对多
+/// </summary>
 public class ActorVideo
 {
-    [Key]
     [Column("actor_id")]
-    public long ActorId { get; init; }
+    public long ActorInfoId { get; set; }
 
-    [Key]
-    [Column("video_name")]
-    [StringLength(20)]
-    public string VideoName { get; init; } = null!;
+    [Column("video_id")]
+    public long VideoInfoId { get; set; }
 }

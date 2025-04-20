@@ -1,6 +1,5 @@
 
 using ByteSizeLib;
-using Display.Constants;
 using Display.Controls.CustomController;
 using Display.Helper.UI;
 using Display.Providers;
@@ -37,8 +36,8 @@ namespace Display.Controls.UserController;
 
 public sealed partial class CustomMediaPlayerElement
 {
-    private int _isLike;
-    private int _lookLater;
+    private bool _isLike;
+    private bool _lookLater;
 
     public enum PlayType { Success, Fail }
     public event EventHandler<RoutedEventArgs> FullWindow;
@@ -57,9 +56,6 @@ public sealed partial class CustomMediaPlayerElement
     private readonly List<AdaptiveMediaSourceCreationResult> _adaptiveMediaSourceList =[];
     private readonly List<HttpRandomAccessStream> _httpRandomAccessStreamList = [];
 
-    private readonly IFailListIsLikeLookLaterDao _failListIsLikeLookLaterDao =
-        App.GetService<IFailListIsLikeLookLaterDao>();
-    
     private readonly IVideoInfoDao _videoInfoDao =
         App.GetService<IVideoInfoDao>();
     
@@ -268,48 +264,24 @@ public sealed partial class CustomMediaPlayerElement
     private void SetButton(MediaPlayItem playItem)
     {
         //设置喜欢、稍后观看
-        bool isLike;
-        bool isLookLater;
+        var isLike = false;
+        var isLookLater = false;
 
         var videoInfo = playItem.GetVideoInfo();
 
         // 先判断是否为成功，后判断是否为失败
-        if (videoInfo == null)
+        if (videoInfo != null)
         {
-            var failInfo = playItem.GetFailInfo();
-
-            if (failInfo == null)
-            {
-                isLike = false;
-                isLookLater = false;
-            }
-            else
-            {
-                _isLike = failInfo.IsLike ?? 0;
-                _lookLater = Convert.ToInt32(failInfo.LookLater);
-                
-                isLike = failInfo.IsLike is 1;
-                isLookLater = _lookLater != 0;
-                
-            }
-
-            MediaTransportControls.SetLike_LookLater(isLike, isLookLater);
-
-            MediaTransportControls.TrySetScreenButton();
-
+            isLike = videoInfo.Interest?.IsLike ?? false;
+            isLookLater = videoInfo.Interest?.IsLookAfter ?? false;
         }
-        else
-        {
-            _isLike = videoInfo.IsLike;
-            _lookLater = Convert.ToInt32(videoInfo.LookLater);
+        
+        _isLike = isLike;
+        _lookLater = isLookLater;
+        
+        MediaTransportControls.SetLike_LookLater(isLike, isLookLater);
 
-            isLike = _isLike == 1;
-            isLookLater = this._lookLater != 0;
-
-            MediaTransportControls.SetLike_LookLater(isLike, isLookLater);
-
-            MediaTransportControls.DisableScreenButton();
-        }
+        MediaTransportControls.DisableScreenButton();
     }
 
     private async void Binder_Binding(MediaBinder sender, MediaBindingEventArgs args)
@@ -448,128 +420,44 @@ public sealed partial class CustomMediaPlayerElement
         MediaDoubleTapped?.Invoke(sender, e);
     }
 
-    private async void LikeButtonClick(object sender, RoutedEventArgs e)
+    private void LikeButtonClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not AppBarToggleButton button) return;
+        if (!GetVideoInfoFromClickButton(sender, out var videoInfo, out AppBarToggleButton button)) return;
 
-        var playItem = _allMediaPlayItems[(int)_playIndex];
+        _isLike = button.IsChecked == true;
 
-        var pickCode = playItem.PickCode;
-        var trueName = playItem.TrueName;
-
-        if (string.IsNullOrEmpty(pickCode)) return;
-
-        _isLike = button.IsChecked == true ? 1 : 0;
-
-        var videoInfo = playItem.GetVideoInfo();
-
-        if (videoInfo != null)
-        {
-            _videoInfoDao.ExecuteUpdate(i => string.Equals(i.TrueName, trueName),
-                info => info.IsLike = _isLike);
-            
-            if (_isLike == 1) ShowTeachingTip("已添加进喜欢");
-        }
-        else
-        {
-            Debug.WriteLine($"数据库不存在该数据:{trueName}");
-
-            var failInfo = playItem.GetFailInfo();
-
-            if (failInfo == null)
-            {
-                var capPath = await ScreenShotAsync(pickCode);
-                
-                _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(pickCode, i.PickCode),
-                    i =>
-                    {
-                        i.IsLike = _isLike;
-                        i.ImagePath = capPath;
-                    });
-                
-                if (_isLike == 1) ShowTeachingTip("已添加进喜欢");
-            }
-            else
-            {
-                _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(pickCode, i.PickCode),
-                    i => i.IsLike = _isLike);
-
-                //需要截图
-                if (failInfo.ImagePath == FileType.NoPicturePath || !File.Exists(failInfo.ImagePath))
-                {
-                    var capPath = await ScreenShotAsync(pickCode);
-                    
-                    _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(pickCode, i.PickCode),
-                        i => i.ImagePath = capPath);
-
-                    if (_isLike == 1) ShowTeachingTip("已添加进喜欢，并截取当前画面作为封面");
-                }
-                else
-                {
-                    if (_isLike == 1) ShowTeachingTip("已添加进喜欢");
-                }
-            }
-        }
+        videoInfo.Interest.IsLike = _isLike;
+        _videoInfoDao.ExecuteUpdate(videoInfo);
+        
+        if (_isLike) ShowTeachingTip("已添加进喜欢");
     }
 
-    private async void LookLaterButtonClick(object sender, RoutedEventArgs e)
+    private bool GetVideoInfoFromClickButton(object sender, out VideoInfo videoInfo, out AppBarToggleButton button)
     {
-        if (sender is not AppBarToggleButton button) return;
+        if (sender is not AppBarToggleButton appBarToggleButton)
+        {
+            videoInfo = null;
+            button = null;
+            return false;
+        }
+        
+        button = appBarToggleButton;
 
         var playItem = _allMediaPlayItems[(int)_playIndex];
-        var pickCode = playItem.PickCode;
-        var trueName = playItem.TrueName;
+        videoInfo = playItem.GetVideoInfo();
+        return videoInfo != null;
+    }
 
-        if (string.IsNullOrEmpty(pickCode)) return;
+    private void LookLaterButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (!GetVideoInfoFromClickButton(sender, out var videoInfo, out AppBarToggleButton button)) return;
 
+        _lookLater = button.IsChecked == true;
 
-        _lookLater = button.IsChecked == true ? Convert.ToInt32(DateTimeOffset.Now.ToUnixTimeSeconds()) : 0;
-
-        var videoInfo = playItem.GetVideoInfo();
-
-        if (videoInfo != null)
-        {
-            _videoInfoDao.ExecuteUpdate(i => string.Equals(trueName, i.TrueName),
-                i => i.LookLater = _lookLater);
-
-            if (_lookLater != 0) ShowTeachingTip("已添加进稍后观看");
-        }
-        else
-        {
-            var failInfo = playItem.GetFailInfo();
-
-            if (failInfo == null)
-            {
-                var capPath = await ScreenShotAsync(pickCode);
-                _failListIsLikeLookLaterDao.ExecuteAdd(new FailListIsLikeLookLater
-                {
-                    PickCode = pickCode,
-                    LookLater = _lookLater,
-                    ImagePath = capPath
-                });
-                if (_lookLater != 0) ShowTeachingTip("已添加进稍后观看");
-            }
-            else
-            {
-                _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(pickCode, i.PickCode),
-                    i => i.LookLater = _lookLater);
-
-                //需要添加截图
-                if (failInfo.ImagePath == FileType.NoPicturePath || !File.Exists(failInfo.ImagePath))
-                {
-                    var capPath = await ScreenShotAsync(pickCode);
-                    
-                    _failListIsLikeLookLaterDao.ExecuteUpdate(i => string.Equals(pickCode, i.PickCode),
-                        i => i.ImagePath = capPath);
-
-                    if (_lookLater != 0) ShowTeachingTip("已添加进稍后观看，并截取当前画面作为封面");
-                }
-                else
-                {
-                    if (_lookLater != 0) ShowTeachingTip("已添加进稍后观看");
-                }
-            }
-        }
+        videoInfo.Interest.IsLookAfter = _lookLater;
+        _videoInfoDao.ExecuteUpdate(videoInfo);
+        
+        if (_lookLater) ShowTeachingTip("已添加进稍后观看");
     }
     private async void ScreenShotButtonClick(object sender, RoutedEventArgs e)
     {
@@ -579,14 +467,10 @@ public sealed partial class CustomMediaPlayerElement
         var pickCode = playItem.PickCode;
 
         var capPath = await ScreenShotAsync(pickCode);
+        
+        // TODO 将截图和视频信息关联起来
 
-        _failListIsLikeLookLaterDao.ExecuteAdd(new FailListIsLikeLookLater
-        {
-            PickCode = pickCode,
-            ImagePath = capPath
-        });
-
-        ShowTeachingTip("已截取当前画面作为封面");
+        // ShowTeachingTip("已截取当前画面作为封面");
     }
 
     private async Task<string> ScreenShotAsync(string pickCode)

@@ -20,10 +20,8 @@ using System.Linq;
 using Windows.Foundation;
 using Windows.System;
 using DataAccess.Models.Entity;
-using Display.Models.Dto.Media;
 using Display.Models.Dto.Settings;
 using Display.Models.Enums;
-using Display.Models.Vo;
 using Display.Views.Pages;
 using Display.Views.Pages.More.DatumList;
 using Display.Views.Pages.OfflineDown;
@@ -31,6 +29,7 @@ using Display.Views.Pages.SearchLink;
 using Display.Views.Pages.Settings;
 using Display.Views.Pages.Settings.Account;
 using Display.Views.Windows;
+using VideoCoverVo = Display.Models.Vo.Video.VideoCoverVo;
 
 
 namespace Display;
@@ -63,7 +62,7 @@ public sealed partial class MainWindow
 
         AppTitleBar.Height = NavView.CompactPaneLength - 2;
 
-        NavView.Resources["NavigationViewContentMargin"] = new Thickness()
+        NavView.Resources["NavigationViewContentMargin"] = new Thickness
         {
             Left = 0,
             Top = NavView.CompactPaneLength + 2,
@@ -82,15 +81,15 @@ public sealed partial class MainWindow
             titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
             AppTitleBar.Loaded += AppTitleBar_Loaded;
             AppTitleBar.SizeChanged += AppTitleBar_SizeChanged;
-            CustomAutoSuggestBox.OpenAutoSuggestionBoxCompleted += OpenAutoSuggestionBoxCompleted;
-            CustomAutoSuggestBox.CloseAutoSuggestionBoxCompleted += CloseAutoSuggestionBoxCompleted;
+            customAutoSuggestBox.OpenAutoSuggestionBoxCompleted += OpenAutoSuggestionBoxCompleted;
+            customAutoSuggestBox.CloseAutoSuggestionBoxCompleted += CloseAutoSuggestionBoxCompleted;
         }
         else
         {
             NavView.AlwaysShowHeader = true;
             NavView.HeaderTemplate = RootGrid.Resources["HeaderTemplate"] as DataTemplate;
             ExtendsContentIntoTitleBar = true;
-            CustomAutoSuggestBox.Visibility = Visibility.Collapsed;
+            customAutoSuggestBox.Visibility = Visibility.Collapsed;
             SetTitleBar(AppTitleBar);
         }
 
@@ -358,19 +357,10 @@ public sealed partial class MainWindow
 
         if (grid.DataContext is not VideoInfo nowItem) return;
 
-        //选中的是失败项
-        if (nowItem is FailVideoInfo failVideoInfo)
-        {
-            var mediaPlayItem = new MediaPlayItem(failVideoInfo);
-            await PlayVideoHelper.PlayVideo([mediaPlayItem], ((Page)ContentFrame.Content).XamlRoot);
-        }
-        //正常点击
-        else
-        {
-            //加载应用记录的图片默认大小
-            var newItem = new VideoInfoVo(nowItem, AppSettings.ImageWidth);
-            ContentFrame.Navigate(typeof(DetailInfoPage), newItem, new SuppressNavigationTransitionInfo());
-        }
+        //加载应用记录的图片默认大小
+        var newItem = new VideoCoverVo(nowItem, AppSettings.ImageWidth);
+        ContentFrame.Navigate(typeof(DetailInfoPage), newItem, new SuppressNavigationTransitionInfo());
+
 
     }
 

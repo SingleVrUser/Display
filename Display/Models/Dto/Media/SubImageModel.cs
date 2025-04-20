@@ -3,9 +3,7 @@ using System;
 using System.Threading.Tasks;
 using Display.Helper.Data;
 using Display.Helper.Network;
-using Display.Models.Api.OneOneFive;
 using Display.Models.Api.OneOneFive.File;
-using Display.Models.Dto.OneOneFive;
 using Display.Models.Vo.OneOneFive;
 
 namespace Display.Models.Dto.Media;
@@ -19,7 +17,7 @@ internal class SubImageModel(DetailFileInfo detailFileInfo) : BaseImage
 
     public async Task LoadThumbnailFromInternetAsync(IProgress<int>? progress = null)
     {
-        if (Thumbnail is null && DetailFileInfo.PickCode is not null)
+        if (FullImage is null && DetailFileInfo.PickCode is not null)
         {
             IsDowning = true;
 
@@ -30,7 +28,7 @@ internal class SubImageModel(DetailFileInfo detailFileInfo) : BaseImage
                 return;
             }
 
-            if (Thumbnail == null)
+            if (FullImage == null)
             {
                 var fileName = _imageInfo.Data.FileName;
 
@@ -66,20 +64,6 @@ internal class SubImageModel(DetailFileInfo detailFileInfo) : BaseImage
                 }
 
                 await SetBitmap(filePath);
-                //var bitmapImage = new BitmapImage();
-
-                //var imageFile = await StorageFile.GetFileFromPathAsync(filePath);
-
-                //using (var fileStream = await imageFile.OpenAsync(FileAccessMode.Read))
-                //{
-                //    await bitmapImage.SetSourceAsync(fileStream);
-                //}
-
-                ////var properties = await imageFile.Properties.GetImagePropertiesAsync();
-                ////Dimensions = $"{properties.Width} x {properties.Height}"; 
-                ////Dimensions = $"{bitmapImage.PixelWidth} x {bitmapImage.PixelHeight}";
-
-                //Thumbnail = bitmapImage;
             }
 
             IsDowning = false;

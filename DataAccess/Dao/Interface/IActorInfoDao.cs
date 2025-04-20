@@ -1,8 +1,9 @@
-﻿using DataAccess.Models.Entity;
+﻿using System.Linq.Expressions;
+using DataAccess.Models.Entity;
 
 namespace DataAccess.Dao.Interface;
 
-public interface IActorInfoDao : IDao<ActorInfo>
+public interface IActorInfoDao : IBaseDao<ActorInfo>
 {
     /// <summary>
     /// 通过视频的Name获取出演者的部分信息列表（不包括出演视频数）
@@ -16,14 +17,16 @@ public interface IActorInfoDao : IDao<ActorInfo>
     /// </summary>
     /// <param name="showName"></param>
     /// <returns></returns>
-    ActorInfo? GetPartInfoByActorName(string showName);
-
-    List<ActorInfo> GetList(int index, int limit);
-
-    List<ActorInfo> GetPageList(int index, int limit, Dictionary<string, bool>? orderByList = null, List<string>? filterList = null);
-
-    void UpdateAllProfilePathList(string srcPath, string dstPath);
-
+    ActorInfo? GetPartInfoExceptVideoInfoByActorName(string showName);
+    
+    //
+    // List<ActorInfo> GetPageList(int index, int limit, Dictionary<string, bool>? orderByList = null, List<string>? filterList = null);
+    //
+    // void UpdateAllProfilePathList(string srcPath, string dstPath);
+    
     ActorInfo? GetOne();
-    void ExecuteUpdateById(long id, Action<ActorInfo> updateAction);
+
+    void ExecuteUpdateLike(long id, bool isLike);
+
+    // void ExecuteUpdateById(long id, Action<ActorInfo> updateAction);
 }

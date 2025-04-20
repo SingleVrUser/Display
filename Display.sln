@@ -5,12 +5,14 @@ VisualStudioVersion = 17.1.32414.318
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Display", "Display\Display.csproj", "{D5C1303B-3F41-45CF-A3E7-1E7514BEA214}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{17E05989-B787-49BA-BE76-89D17C65B747}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisplayAppTest", "DisplayAppTest\DisplayAppTest.csproj", "{17E05989-B787-49BA-BE76-89D17C65B747}"
 	ProjectSection(ProjectDependencies) = postProject
 		{CDAF1083-DEF9-4128-B0B9-4F6D572AC9D0} = {CDAF1083-DEF9-4128-B0B9-4F6D572AC9D0}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{CDAF1083-DEF9-4128-B0B9-4F6D572AC9D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessTest", "DataAccessTest\DataAccessTest.csproj", "{4CFA3BCD-3AC7-4A3A-AEF7-30EA2468CDEF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -80,6 +82,22 @@ Global
 		{CDAF1083-DEF9-4128-B0B9-4F6D572AC9D0}.Release|x86.ActiveCfg = Release|Any CPU
 		{CDAF1083-DEF9-4128-B0B9-4F6D572AC9D0}.Release|x86.Build.0 = Release|Any CPU
 		{CDAF1083-DEF9-4128-B0B9-4F6D572AC9D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CFA3BCD-3AC7-4A3A-AEF7-30EA2468CDEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CFA3BCD-3AC7-4A3A-AEF7-30EA2468CDEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CFA3BCD-3AC7-4A3A-AEF7-30EA2468CDEF}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{4CFA3BCD-3AC7-4A3A-AEF7-30EA2468CDEF}.Debug|arm64.Build.0 = Debug|Any CPU
+		{4CFA3BCD-3AC7-4A3A-AEF7-30EA2468CDEF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4CFA3BCD-3AC7-4A3A-AEF7-30EA2468CDEF}.Debug|x64.Build.0 = Debug|Any CPU
+		{4CFA3BCD-3AC7-4A3A-AEF7-30EA2468CDEF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4CFA3BCD-3AC7-4A3A-AEF7-30EA2468CDEF}.Debug|x86.Build.0 = Debug|Any CPU
+		{4CFA3BCD-3AC7-4A3A-AEF7-30EA2468CDEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CFA3BCD-3AC7-4A3A-AEF7-30EA2468CDEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CFA3BCD-3AC7-4A3A-AEF7-30EA2468CDEF}.Release|arm64.ActiveCfg = Release|Any CPU
+		{4CFA3BCD-3AC7-4A3A-AEF7-30EA2468CDEF}.Release|arm64.Build.0 = Release|Any CPU
+		{4CFA3BCD-3AC7-4A3A-AEF7-30EA2468CDEF}.Release|x64.ActiveCfg = Release|Any CPU
+		{4CFA3BCD-3AC7-4A3A-AEF7-30EA2468CDEF}.Release|x64.Build.0 = Release|Any CPU
+		{4CFA3BCD-3AC7-4A3A-AEF7-30EA2468CDEF}.Release|x86.ActiveCfg = Release|Any CPU
+		{4CFA3BCD-3AC7-4A3A-AEF7-30EA2468CDEF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

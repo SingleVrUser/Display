@@ -6,16 +6,17 @@ using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using VideoCoverVo = Display.Models.Vo.Video.VideoCoverVo;
 
 namespace Display.Controls.UserController;
 
 public sealed partial class MultipleCoverShow
 {
     public static readonly DependencyProperty MoreButtonVisibilityProperty =
-        DependencyProperty.Register(nameof(MoreButtonVisibility), typeof(Visibility), typeof(VideoCoverPage), PropertyMetadata.Create(() => Visibility.Collapsed));
+        DependencyProperty.Register(nameof(MoreButtonVisibility), typeof(Visibility), typeof(MultipleCoverShow), PropertyMetadata.Create(() => Visibility.Collapsed));
 
     public static readonly DependencyProperty RefreshButtonVisibilityProperty =
-        DependencyProperty.Register(nameof(RefreshButtonVisibility), typeof(Visibility), typeof(VideoCoverPage), PropertyMetadata.Create(() => Visibility.Collapsed));
+        DependencyProperty.Register(nameof(RefreshButtonVisibility), typeof(Visibility), typeof(MultipleCoverShow), PropertyMetadata.Create(() => Visibility.Collapsed));
 
     //是否显示MoreButton
     public Visibility MoreButtonVisibility
@@ -33,7 +34,7 @@ public sealed partial class MultipleCoverShow
 
     public string ShowName { get; set; }
 
-    public ObservableCollection<VideoInfoVo> CoverList { get; set; } = new();
+    public ObservableCollection<VideoCoverVo> CoverList { get; set; } = new();
 
     public MultipleCoverShow()
     {

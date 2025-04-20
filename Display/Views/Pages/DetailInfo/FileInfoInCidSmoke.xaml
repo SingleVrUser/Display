@@ -19,7 +19,7 @@
         <ListView x:Name="InfosListView"
                   CharacterSpacing="5">
             <ListView.ItemTemplate>
-                <DataTemplate x:DataType="entity:FilesInfo">
+                <DataTemplate x:DataType="entity:FileInfo">
                     <Grid Padding="5"
                           RowDefinitions="auto,auto,*"
                           RowSpacing="3">
