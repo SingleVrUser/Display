@@ -77,15 +77,18 @@ public sealed unsafe class VideoStreamDecoder(
 
         ffmpeg.avcodec_close(_pCodecContext);
 
-        if (_pFormatContext->video_codec_id != AVCodecID.AV_CODEC_ID_NONE)
-        {
-            var pFormatContext = _pFormatContext;
-            ffmpeg.avformat_close_input(&pFormatContext);
-        }
-        else
-        {
-            //ffmpeg.avformat_free_context(_pFormatContext);
-        }
+        // 在ThrowExceptionIfError（）的时候，_pFormatContext->video_codec_id会报错 System.AccessViolationException: Attempted to read or write protected memory. This is often an indication that other memory is corrupt.
+        // TODO 但不执行以下这些，内存会不断增加。加了也增加，需要检查是否是其他原因
+        //if (_pFormatContext->video_codec_id != AVCodecID.AV_CODEC_ID_NONE)
+        //{
+        //    var pFormatContext = _pFormatContext;
+        //    ffmpeg.avformat_close_input(&pFormatContext);
+        //}
+        //else
+        //{
+        //    ffmpeg.avformat_free_context(_pFormatContext);
+        //}
+
     }
 
     public bool TrySeekPosition(long timestamp)

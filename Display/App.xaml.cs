@@ -84,7 +84,10 @@ public partial class App
                     // Services
                     //.AddSingleton<IThumbnailService, ThumbnailService>()
                     // Views and ViewModels
-                    .AddSingleton<IThumbnailGeneratorService, ThumbnailGeneratorService>()
+                    //.AddSingleton<IThumbnailGeneratorService, ThumbnailGeneratorService>()
+
+
+                    .AddTransient<IThumbnailGeneratorService, ThumbnailGeneratorService>()
 
                     .AddTransient<IActorInfoDao, ActorInfoDao>()
                     .AddTransient<IDownHistoryDao, DownHistoryDao>()
